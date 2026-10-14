@@ -4,7 +4,7 @@ import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from "./util/constants";
 import { installRenderScale } from "./util/renderScale";
 
 installRenderScale();
-new Phaser.Game({
+const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: "game",
   width: GAME_WIDTH * RENDER_SCALE,
@@ -14,3 +14,6 @@ new Phaser.Game({
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   scene: [DioramaDemoScene]
 });
+
+// Dev-only handle for debugging and the capture harness.
+if (import.meta.env.DEV) (window as unknown as { __game: Phaser.Game }).__game = game;

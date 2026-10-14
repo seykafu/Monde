@@ -13,6 +13,9 @@ import { attachPostPipeline } from "../render/postPipelines";
 import { SUN, castFrom } from "../render/sun";
 import { DEPTH, actorDepth } from "../render/depth";
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from "../util/constants";
+import { getMusic } from "../audio/Music";
+import { TRACK_KEYS } from "../audio/musicTracks";
+import { playSfx, type SfxKey } from "../audio/Sfx";
 import { installAudioUnlock } from "../audio/Sfx";
 import { makePanel } from "../ui/Panel";
 import { Button } from "../ui/Button";
@@ -41,6 +44,9 @@ export class DioramaDemoScene extends Phaser.Scene {
   constructor() { super("DioramaDemo"); }
 
   create(data: { rotation?: ViewRotation; zoom?: number }): void {
+    const music = getMusic(this);
+    music.play(music.currentTrack ?? 'main_theme');
+    music.duck(true);
     const rotation = data.rotation ?? 0;
     let zoom = data.zoom ?? 1;
     const map = makeDemoMap();
@@ -98,9 +104,14 @@ export class DioramaDemoScene extends Phaser.Scene {
     const uiCamera = this.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT);
     uiCamera.ignore(world);
     this.add.text(40, 25, "Monde · Diorama study", { fontFamily: FAMILY_BODY, fontSize: "30px", color: "#f3e3c3" });
-    this.add.text(40, 65, "Q / E: rotate    •    Wheel: zoom    •    Next: dialogue / sound", {
+    this.add.text(40, 65, "Q / E: rotate    •    Wheel: zoom    •    M: music • 1–9: SFX • D: dialogue", {
       fontFamily: FAMILY_BODY, fontSize: "18px", color: "#c4d0bb"
     });
+    const musicLabel = this.add.text(40, 95, '', { fontFamily: FAMILY_BODY, fontSize: '16px', color: '#c4d0bb' });
+    const updateMusicLabel = () => musicLabel.setText(`${music.currentTrack ?? 'silent'} · ${music.source ?? 'waiting for gesture / loading'}`);
+    updateMusicLabel();
+    const musicStatus = this.time.addEvent({ delay: 250, loop: true, callback: updateMusicLabel });
+    const beforeDialogue = new Set(this.children.list);
     makePanel(this, 160, 590, 960, 110);
     const body = this.add.text(185, 607, "", {
       fontFamily: FAMILY_BODY, fontSize: "21px", color: "#f3e3c3", wordWrap: { width: 710 }
@@ -121,6 +132,22 @@ export class DioramaDemoScene extends Phaser.Scene {
       if (count < pages[page]!.length) { count = pages[page]!.length; body.setText(pages[page]!); }
       else { page = (page + 1) % pages.length; count = 0; body.setText(""); }
     } });
+    const dialogueObjects = this.children.list.filter(obj => !beforeDialogue.has(obj)) as unknown as Phaser.GameObjects.Components.Visible[];
+    let dialogueOpen = true;
+    const toggleDialogue = () => {
+      dialogueOpen = !dialogueOpen;
+      dialogueObjects.forEach(obj => obj.setVisible(dialogueOpen));
+      timer.paused = !dialogueOpen;
+      music.duck(dialogueOpen);
+    };
+    const samples: SfxKey[] = ['click', 'footstep_cobble', 'door_open', 'gull_cry', 'coin', 'clock_chime', 'pan_clang', 'applause_warm', 'fair_cheer'];
+    const audioKey = (event: KeyboardEvent) => {
+      if (event.repeat) return;
+      if (event.key.toLowerCase() === 'm') music.play(TRACK_KEYS[(TRACK_KEYS.indexOf(music.currentTrack ?? 'main_theme') + 1) % TRACK_KEYS.length]!);
+      if (event.key.toLowerCase() === 'd') toggleDialogue();
+      if (/^[1-9]$/.test(event.key)) playSfx(samples[Number(event.key) - 1]!);
+    };
+    this.input.keyboard?.on('keydown', audioKey);
     camera.ignore(this.children.list.filter(obj => !world.includes(obj)));
     installAudioUnlock(this);
     const rotateLeft = () => this.scene.restart({ rotation: normalizeRotation(rotation - 1), zoom });
@@ -137,6 +164,9 @@ export class DioramaDemoScene extends Phaser.Scene {
       this.input.keyboard?.off("keydown-E", rotateRight);
       this.input.off("wheel", wheel);
       timer.remove();
+      musicStatus.remove();
+      music.duck(false);
+      this.input.keyboard?.off('keydown', audioKey);
     });
   }
 }
