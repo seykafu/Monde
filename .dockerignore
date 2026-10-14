@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+client/*
+!client/package.json
+docs/
+.ref/
+.git
+**/.env
+**/.env.*
+**/coverage
+release/

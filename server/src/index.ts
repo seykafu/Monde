@@ -1,8 +1,26 @@
-import Fastify from "fastify";
+import { buildApp } from "./app.js";
+import { parseConfig } from "./config.js";
 
-// monde-mind: the resident-agent backend (GDD §9, §19.3). Skeleton only; see MVP_PLAN F-07.
-const app = Fastify({ logger: true });
-app.get("/v1/health", async () => ({ ok: true, service: "monde-mind" }));
-
-const port = Number(process.env.PORT ?? 8080);
-await app.listen({ port, host: "0.0.0.0" });
+const config = parseConfig();
+const app = buildApp(config);
+let shuttingDown = false;
+async function shutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  app.log.info({ signal }, "Shutting down");
+  try {
+    await app.close();
+  } catch (err) {
+    app.log.error({ err }, "Shutdown failed");
+    process.exitCode = 1;
+  }
+}
+process.once("SIGTERM", () => void shutdown("SIGTERM"));
+process.once("SIGINT", () => void shutdown("SIGINT"));
+try {
+  await app.listen({ port: config.PORT, host: "0.0.0.0" });
+} catch (err) {
+  app.log.error({ err }, "Startup failed");
+  await app.close();
+  process.exitCode = 1;
+}

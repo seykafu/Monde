@@ -6,8 +6,23 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsup",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node --import tsx src/db/migrate.ts"
   },
-  "dependencies": { "@monde/shared": "*", "fastify": "^5.2.0" },
-  "devDependencies": { "tsup": "^8.3.5", "tsx": "^4.19.2" }
+  "dependencies": {
+    "@monde/shared": "*",
+    "fastify": "^5.2.0",
+    "drizzle-orm": "^0.44.7",
+    "postgres": "^3.4.7",
+    "ioredis": "^5.8.2",
+    "@fastify/cors": "^11.1.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "drizzle-kit": "^0.31.5"
+  }
 }
