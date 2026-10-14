@@ -9781,6 +9781,10 @@ browser build.
 
 ### 20.2 Milestones
 
+> **First ship:** the "Spring in Monde" MVP (Days 1–25, four districts, live residents, ending with a
+> Spring Straw Poll), planned task by task in [`docs/MVP_PLAN.md`](MVP_PLAN.md). The milestones below
+> describe the full game.
+
 | Milestone | Scope | Exit criteria |
 |---|---|---|
 | **M0 Foundation** (≈ 2 weeks) | Repo scaffold (client from the Ravage stack, server skeleton on Fly, shared schemas); Old Quarter greybox in the diorama; movement; clock; save slots; puzzle verification in CI | Walk the Old Quarter at 60 fps; `/v1/health` live on Fly; CI green |
