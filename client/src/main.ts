@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { ZoneScene } from "./scenes/ZoneScene";
 import { DioramaDemoScene } from "./scenes/DioramaDemoScene";
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from "./util/constants";
 import { installRenderScale } from "./util/renderScale";
@@ -12,7 +13,8 @@ const game = new Phaser.Game({
   backgroundColor: "#202820",
   pixelArt: false,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  scene: [DioramaDemoScene]
+  scene: new URLSearchParams(window.location.search).get("demo") === "1"
+    ? [DioramaDemoScene, ZoneScene] : [ZoneScene, DioramaDemoScene]
 });
 
 // Dev-only handle for debugging and the capture harness.

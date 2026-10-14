@@ -1,0 +1,97 @@
+# Greybox: building letters are solid; door coordinates are outside on the street.
+id: old_quarter
+name: Old Quarter
+size: [40, 30]
+legend:
+  ".": { terrain: cobblestone }
+  ",": { terrain: grass }
+  A: { terrain: wall, elev: 1, solid: true, building: town_hall }
+  B: { terrain: wall, elev: 1, solid: true, building: clocktower }
+  C: { terrain: wall, elev: 1, solid: true, building: library }
+  D: { terrain: wall, elev: 1, solid: true, building: lantern_office }
+  E: { terrain: wall, elev: 1, solid: true, building: founders_house }
+  F: { terrain: wall, elev: 1, solid: true, building: st_brigids }
+  G: { terrain: wall, elev: 1, solid: true, building: pell_house }
+  H: { terrain: wall, elev: 1, solid: true, building: bertrand_house }
+  I: { terrain: wall, elev: 1, solid: true, building: constabulary }
+  J: { terrain: wall, elev: 1, solid: true, building: lamplighter_cottage }
+  K: { terrain: wall, elev: 1, solid: true, building: okafor_house }
+  L: { terrain: wall, elev: 1, solid: true, building: augusta_house }
+  M: { terrain: wall, elev: 1, solid: true, building: vacant_house_39 }
+  N: { terrain: wall, elev: 1, solid: true, building: vacant_house_40 }
+  O: { terrain: wall, elev: 1, solid: true, building: vacant_house_41 }
+  P: { terrain: wall, elev: 1, solid: true, building: vacant_house_42 }
+  Q: { terrain: wall, elev: 1, solid: true, building: vacant_house_43 }
+  R: { terrain: wall, elev: 1, solid: true, building: vacant_house_44 }
+  S: { terrain: wall, elev: 1, solid: true, building: vacant_house_45 }
+  T: { terrain: wall, elev: 1, solid: true, building: vacant_house_46 }
+  U: { terrain: wall, elev: 1, solid: true, building: vacant_house_47 }
+tiles: |
+  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,......................................,
+  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
+  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
+  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
+  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
+  ,......................................,
+  ,......................................,
+  ,......................................,
+  ,......................................,
+  ,..FFFFF..GGGG............HHHHH..IIIII.,
+  ,..FFFFF..GGGG............HHHHH..IIIII.,
+  ,..FFFFF..GGGG............HHHHH..IIIII.,
+  ,..FFFFF.........................IIIII.,
+  ,......................................,
+  ,.......................................
+  ,.......................................
+  ,.......................................
+  ,......................................,
+  ,..JJJJJ..KKKK...LLLL..................,
+  ,..JJJJJ..KKKK...LLLL..................,
+  ,..JJJJJ..KKKK...LLLL..................,
+  ,......................................,
+  ,......................................,
+  ,......................................,
+  ,.MMM.NNN.OOO.PPP.QQQ.RRR.SSS.TTT.UUU..,
+  ,.MMM.NNN.OOO.PPP.QQQ.RRR.SSS.TTT.UUU..,
+  ,.MMM.NNN.OOO.PPP.QQQ.RRR.SSS.TTT.UUU..,
+  ,......................................,
+  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+places:
+  - { id: town_hall, rect: [3, 2, 6, 4], door: [6, 6] }
+  - { id: clocktower, rect: [12, 2, 3, 4], door: [13, 6] }
+  - { id: library, rect: [18, 2, 6, 4], door: [21, 6] }
+  - { id: lantern_office, rect: [27, 2, 5, 4], door: [29, 6] }
+  - { id: founders_house, rect: [34, 2, 4, 4], door: [36, 6] }
+  - { id: st_brigids, rect: [3, 10, 5, 4], door: [5, 14] }
+  - { id: pell_house, rect: [10, 10, 4, 3], door: [12, 13] }
+  - { id: bertrand_house, rect: [26, 10, 5, 3], door: [28, 13] }
+  - { id: constabulary, rect: [33, 10, 5, 4], door: [35, 14] }
+  - { id: lamplighter_cottage, rect: [3, 19, 5, 3], door: [5, 22] }
+  - { id: okafor_house, rect: [10, 19, 4, 3], door: [12, 22] }
+  - { id: augusta_house, rect: [17, 19, 4, 3], door: [19, 22] }
+  - { id: vacant_house_39, rect: [2, 25, 3, 3], door: [3, 28] }
+  - { id: vacant_house_40, rect: [6, 25, 3, 3], door: [7, 28] }
+  - { id: vacant_house_41, rect: [10, 25, 3, 3], door: [11, 28] }
+  - { id: vacant_house_42, rect: [14, 25, 3, 3], door: [15, 28] }
+  - { id: vacant_house_43, rect: [18, 25, 3, 3], door: [19, 28] }
+  - { id: vacant_house_44, rect: [22, 25, 3, 3], door: [23, 28] }
+  - { id: vacant_house_45, rect: [26, 25, 3, 3], door: [27, 28] }
+  - { id: vacant_house_46, rect: [30, 25, 3, 3], door: [31, 28] }
+  - { id: vacant_house_47, rect: [34, 25, 3, 3], door: [35, 28] }
+  - { id: fountain_square, rect: [16, 9, 8, 8], door: [19, 16] }
+  - { id: lamplighter_lane, rect: [1, 22, 37, 2], door: [5, 22] }
+props:
+  - { kind: fountain, at: [20, 13] }
+  - { kind: gate, at: [5, 15] }
+  - { kind: tree, at: [1, 8] }
+  - { kind: tree, at: [38, 20] }
+  - { kind: tree, at: [24, 21] }
+  - { kind: lamp_post, at: [15, 8] }
+  - { kind: lamp_post, at: [25, 16] }
+  - { kind: lamp_post, at: [8, 23] }
+  - { kind: bench, at: [18, 14] }
+  - { kind: sign, at: [37, 16] }
+edges:
+  - { side: east, from: 15, to: 17, zone: market_row, arrive: [1, 10] }
+spawn: [5, 22]
