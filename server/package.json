@@ -1,0 +1,13 @@
+{
+  "name": "@monde/server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js"
+  },
+  "dependencies": { "@monde/shared": "*", "fastify": "^5.2.0" },
+  "devDependencies": { "tsup": "^8.3.5", "tsx": "^4.19.2" }
+}

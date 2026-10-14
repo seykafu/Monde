@@ -1,0 +1,14 @@
+{
+  "name": "@monde/client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:itch": "vite build --outDir dist-itch --emptyOutDir",
+    "preview": "vite preview --port 4173"
+  },
+  "dependencies": { "@monde/shared": "*", "phaser": "^3.90.0" },
+  "devDependencies": { "vite": "^5.4.11" }
+}

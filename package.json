@@ -1,0 +1,27 @@
+{
+  "name": "monde",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": ["shared", "client", "server"],
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "npm run dev -w @monde/client",
+    "dev:server": "npm run dev -w @monde/server",
+    "typecheck": "tsc -p shared --noEmit && tsc -p client --noEmit && tsc -p server --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run --passWithNoTests",
+    "verify:puzzles": "python3 tools/verify_puzzles.py",
+    "build": "npm run build -w @monde/client && npm run build -w @monde/server",
+    "build:itch": "npm run build:itch -w @monde/client",
+    "ci": "npm run typecheck && npm run lint && npm test && npm run verify:puzzles && npm run build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.39.4",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.60.1",
+    "vitest": "^2.1.9"
+  }
+}

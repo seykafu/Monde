@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "monde-client", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5173 },
+    { "name": "monde-server", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev:server"], "port": 8080 }
+  ]
+}
