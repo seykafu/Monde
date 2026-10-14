@@ -1,0 +1,86 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: nell
+name: Nell Dunmore
+age: 46
+pronouns: she/her
+kind: canon
+occupation: Fisher; runs Dunmore's General Store with her brother Barney
+workplace: wharf.fish_market
+home: wharf.nell_cottage
+portrait: nell
+sprite: nell
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, arms_crossed, squint_sea]
+appearance: >
+  Weather-cracked hands, an oilskin coat gone white at the seams, cropped grey-brown hair under a
+  knitted cap, forearms like rope.
+backstory: >
+  Nell was the second woman on the cannery floor and the first elected union steward there. When the
+  Liss Cannery closed eleven years ago she took her father's boat and her brother's shop and kept both
+  open. She sells fish at eight, minds the store counter after two, and has not missed a Saturday in
+  eleven years. The union ledger and the east shed key hang in her kitchen. In the first year she told
+  the Tollmen to take it up with the union, and they have never come to her front counter since.
+personality:
+  traits: [blunt, loud, fair, unyielding]
+  big5: { open: 50, conscientious: 78, extravert: 72, agreeable: 35, neurotic: 38 }
+values: { prosperity: 0.50, safety: 0.20, spirit: 0.15, charm: 0.15 }
+beliefs:
+  - "Dunmore's has paid the Tollmen nothing since the first year."   # wrong: Barney pays 20 coins from the till every Saturday
+  - "Pell is a coward who hides behind the word 'wait.'"   # wrong
+  - "Constable Reyes files what she's told and does nothing with it."   # wrong: Reyes has no deputies to act with
+voice:
+  register: >
+    Loud, blunt, Wharf nouns: tide table, ice, nets, lorries, the boats. Union cadence: "Who signed
+    that?" "And who pays?" Opens with "Look." Says "Madam Mayor" with the sarcasm audible. Never
+    whispers. Surprise makes her go quiet and specific.
+  tics: ["Look.", "And who pays for that?", "Right, then."]
+  never_says: ["community", "stakeholder", "with respect", "it'll sort itself out"]
+  samples:
+    - "Look. Cod's four coins, haddock's three, and if you ask me for a discount you'll be carrying your own ice."
+    - "Union rule: nobody leaves a boat tied up with the catch aboard. Eleven years, nobody's broken it. Can the council say that?"
+    - "Madam Mayor says wait. Madam Mayor's been saying wait since the cannery doors went. I'd like her to say a date."
+likes: [a full hold, the union ledger, sprats, cold clean mornings]
+dislikes: [the grey van, speeches, ferry delays, being told to wait]
+fears: [the Wharf going quiet, Barney's books, dying with the cannery still shut]
+dream:
+  text: The cannery reopened as a co-op.
+  stages:
+    - "Inventory the cannery (Favor: help her list the machinery in the east shed)"
+    - "Gather twelve Wharf signatures for a co-op (Favor: carry the sheet door to door)"
+    - "Get the boiler fired (Favor: bring Kasimir; Project cannery_coop)"
+    - "Sell the first catch under the co-op name (sets flag.cannery_coop)"
+routine:
+  weekday:
+    - { at: "04:30", do: fish, where: wharf.boathouse }
+    - { at: "08:00", do: work, where: wharf.fish_market }
+    - { at: "12:00", do: eat, where: wharf.nell_cottage }
+    - { at: "13:00", do: nap, where: wharf.nell_cottage }
+    - { at: "14:30", do: work, where: market_row.general_store }
+    - { at: "18:00", do: sit, where: wharf.cannery }
+    - { at: "19:30", do: eat, where: wharf.nell_cottage }
+    - { at: "21:30", do: sleep, where: wharf.nell_cottage }
+  weekend:                       # Saturday night she sits on the harbor steps with a flask, facing the crane yard
+    - { at: "05:00", do: fish, where: wharf.boathouse }
+    - { at: "08:00", do: work, where: market_row.market_hall }
+    - { at: "12:00", do: eat, where: wharf.nell_cottage }
+    - { at: "14:00", do: work, where: market_row.general_store }
+    - { at: "17:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sit, where: wharf.harbor_steps }
+    - { at: "24:00", do: sleep, where: wharf.nell_cottage }
+chores: [gut and ice the catch, mend nets, balance the union ledger, sluice the fish market floor]
+relationships:
+  - { id: pell, affinity: -25, trust: -30, tag: rival, note: "Twenty-six years of 'wait.' Wants her to say a date for the cannery." }
+  - { id: rook, affinity: -55, trust: -60, tag: wary, note: "Stand-off since the first year. Wants him to say who is behind the van." }
+  - { id: augusta, affinity: 35, trust: 45, tag: wary, note: "Gave her the van sightings in January and heard nothing since. Wants a stakeout, not a notebook." }
+  - { id: bastien, affinity: 35, trust: 25, tag: tolerates, note: "Fish heads daily, with complaints." }
+  - { id: barney, affinity: 70, trust: 80, tag: brother, note: "Keeps the till and the books. Wants him to stop looking at the floor whenever the Tollmen come up." }
+secrets:
+  - text: "She keeps a log of the grey van's Saturday visits to the crane yard in the back of her tide table: thirty-one so far, each with the minute of arrival."
+    reveal: { regard_min: 45 }
+  - text: "She lets Delphine Mercer's fish account run and writes it off at the end of every month. She would deny it to Delphine's face."
+    reveal: { regard_min: 55 }
+canon_locks:
+  - { while: "!flag.barney_confessed", fact: "Nell says Dunmore's pays the Tollmen nothing and means it." }
+  - { while: "!flag.cannery_coop", fact: "The Liss Cannery has been shut eleven years. Nell keeps the union ledger and the key to the east shed in her kitchen." }
+  - { while: "!flag.option_public", fact: "Nell knows nothing about the Option Clause. She thinks Pell stalls on the cannery because she is timid." }
+  - { while: "flag.cannery_coop", fact: "She is the co-op's first chair and chalks the first catch on the board herself." }
+story_role: The Wharf's voice. Cannery co-op Project giver, Regatta organizer, keeps the grey-van log. Pushes Pell for a date.

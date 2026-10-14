@@ -1,0 +1,85 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: teo
+name: Teodor "Teo" Petrescu
+age: 31
+pronouns: he/him
+kind: canon
+occupation: Gardener; runs the Glasshouse alone
+workplace: commons.glasshouse
+home: commons.teo_cottage
+portrait: teo
+sprite: teo
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, looking_away, leaf_light]
+appearance: >
+  Long and stooped, with a sunburned neck, green-stained forearms and hair curling over his collar. A
+  canvas apron holds seed packets in every pocket and a pencil stub behind one ear. He talks to your
+  shoes.
+backstory: >
+  Teo came to Monde at sixteen as the Glasshouse gardener's apprentice and took over the place at
+  twenty-two, when old Mr. Pargeter died in the orchid house. Eleven of the 240 panes are broken, and
+  rain reaches the ferns. He keeps forty-three plants alive by moving them around the dry spots like
+  furniture. His reputation for silence is undeserved: he talks all day, to the plants.
+personality:
+  traits: [shy, tender, exact, patient]
+  big5: { open: 80, conscientious: 72, extravert: 15, agreeable: 78, neurotic: 60 }
+values: { prosperity: 0.15, safety: 0.12, spirit: 0.28, charm: 0.45 }
+beliefs:
+  - "People prefer him quiet."   # wrong
+  - "The Glasshouse can only be saved by a big grant from the city."   # wrong: eleven panes is a week's work for Kasimir
+  - "Kasimir pities him."   # wrong: Kasimir wants to be asked
+voice:
+  register: >
+    Halting with people, fluent with plants. Sentences start mid-thought and apologize. Latin names,
+    frond, bolt, cuttings. Talks to plants by name. Over-answers plant questions and then flinches.
+    Anything personal comes out only while his hands are busy.
+  tics: ["Sorry.", "It's, well.", "Hortensia, hush.", "Oh, bother."]
+  never_says: ["I'm good at this", "you should", "obviously", "no worries"]
+  samples:
+    - "Sorry. That one's a Selaginella. It looks dead, but it just curls up when it's dry. Water it and it opens. Sorry. I talk about ferns."
+    - "Hortensia, move over. (He shifts a pot an inch.) Eleven panes. The rain finds the same three ferns. I've named the drips."
+    - "If you're staying, there's a stool by the lemon. It's quiet in a good way. I think."
+likes: [warm glass in early light, repotting, the lemon tree's second fruit, June's fiddle through the glass]
+dislikes: [frost forecasts, crowds, being thanked, the word "broken" about the roof]
+fears: [a hard frost with the panes out, being the man who loved plants because they asked nothing of him]
+dream:
+  text: The Glasshouse full of light.
+  stages:
+    - "Replace the eleven panes (Favor: fetch glass off the ferry; Project glasshouse; sets flag.glasshouse_repaired)"
+    - "Restock cuttings from the Community Garden (Favor)"
+    - "Open the Glasshouse on a Sunday (Favor: bring Felix's pupils)"
+    - "Hold the first flowering (needs flag.glasshouse_repaired)"
+routine:
+  weekday:
+    - { at: "06:00", do: garden, where: commons.glasshouse }
+    - { at: "08:00", do: eat, where: commons.teo_cottage }
+    - { at: "09:00", do: work, where: commons.glasshouse }
+    - { at: "12:00", do: eat, where: commons.glasshouse }
+    - { at: "13:30", do: garden, where: commons.community_garden }
+    - { at: "17:00", do: sit, where: commons.duck_pond }
+    - { at: "19:00", do: cook, where: commons.teo_cottage }
+    - { at: "21:30", do: sleep, where: commons.teo_cottage }
+  weekend:
+    - { at: "06:00", do: garden, where: commons.glasshouse }
+    - { at: "09:00", do: work, where: commons.glasshouse }
+    - { at: "12:00", do: eat, where: commons.glasshouse }
+    - { at: "14:00", do: wander, where: commons.sundial_lawn }
+    - { at: "16:30", do: sit, where: commons.glasshouse }
+    - { at: "19:30", do: cook, where: commons.teo_cottage }
+    - { at: "22:00", do: sleep, where: commons.teo_cottage }
+chores: [mist the ferns, move the pots away from the drips, label cuttings, sweep the fallen glass into the bucket]
+relationships:
+  - { id: ines, affinity: 20, trust: 20, tag: spark, note: "Knows her as the woman in grey who walks the pond at half past five. Wants to say good evening and hasn't." }
+  - { id: kasimir, affinity: 35, trust: 35, tag: wary, note: "Thinks Kasimir pities him. Wants his help and can't ask." }
+  - { id: june, affinity: 50, trust: 50, tag: friend, note: "Wants her to keep playing. Can't ask her to stay." }
+  - { id: bastien, affinity: 30, trust: 30, tag: tolerates, note: "Lets the cat sleep in the warm bed by the lemon and calls it Mr. Cat." }
+secrets:
+  - text: "A letter to the city's botanical society asking for eleven panes has been in his apron since spring. It's unsigned. He can't write 'Head Gardener' under it."
+    reveal: { regard_min: 40 }
+  - text: "At half past five he leaves a sprig of lemon verbena on the pond rail for the woman in grey. He has never seen her pick it up."
+    reveal: { regard_min: 50 }
+canon_locks:
+  - { while: "!flag.glasshouse_repaired", fact: "Eleven of the Glasshouse's 240 panes are broken and rain reaches the ferns. He keeps 43 plants alive by moving them." }
+  - { while: "day < 10 && !flag.teo_ines_dating", fact: "Teo has never spoken to Ines. He knows her only as the woman in grey who walks the pond at half past five." }
+  - { while: "flag.glasshouse_repaired", fact: "He opens the Glasshouse to visitors on Sundays at 14:00 and gives every child a cutting." }
+  - { while: "flag.teo_ines_dating", fact: "Teo and Ines are courting. He still talks to the plants first and to her second, and she has stopped minding." }
+story_role: Glasshouse Project giver. Community Garden partner and Charm buffer. Latent romance with Ines.

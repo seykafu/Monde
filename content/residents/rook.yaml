@@ -1,0 +1,97 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: rook
+name: Roland "Rook" Mercer
+age: 33
+pronouns: he/him
+kind: canon
+occupation: Leader of the Tollmen; former mill doffer
+workplace: briar_woods.tollmen_hideout
+home: millbrook.mercer_house    # nominal; he sleeps at the hideout and has not been inside for nine years
+portrait: rook
+sprite: rook
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, guarded, ashamed_glance]
+appearance: >
+  Lean, with broad scarred hands and a grey wool mill cap pulled low. A brass shift whistle hangs on a
+  bootlace around his neck; he has never blown it.
+backstory: >
+  Roland was nineteen and a doffer on second shift when Lissworth Mill closed. The floor called him
+  Rook because he climbed the frames like one. His father Gil, a loom fixer for thirty years, drank
+  through two winters and did not see a third. A man offered steady coins to anyone who would walk
+  Market Row on Saturdays. Rook said yes because nobody else was hiring, and he has told himself
+  every week since that it keeps the shops safe. He sleeps at the quarry and hasn't been inside his
+  mother's house for nine years.
+personality:
+  traits: [angry, loyal, watchful, ashamed]
+  big5: { open: 40, conscientious: 70, extravert: 45, agreeable: 30, neurotic: 70 }
+values: { prosperity: 0.45, safety: 0.30, spirit: 0.15, charm: 0.10 }
+beliefs:
+  - "The Tollmen are the only thing standing between Market Row and worse men."   # wrong
+  - "His mother can't stand the sight of him."   # wrong: she sets a second place every Sunday
+  - "The mill is gone for good."
+voice:
+  register: >
+    Flat, short, hot underneath. Stops sentences before the true part. Mill nouns: shift, bobbin,
+    frame, warp, the whistle. Calls the crew by surname and the player "Fellow" like a dare. Anger
+    gets quieter and more specific, never louder. Won't say "Mum" or "Mother": it's "she" or "at
+    home." "Don't." ends a topic.
+  tics: ["Say what you came to say.", "Don't.", "Shift's over.", "Rot."]
+  never_says: ["sorry", "please", "Mum", "my father drank"]
+  samples:
+    - "You're standing in my light, Fellow. Everyone's got somewhere to be. Mine's here."
+    - "Twenty coins. It's a loaf and a half. Nobody's bleeding over a loaf and a half."
+    - "Don't ask about home. That's all I've got on that."
+likes: [the sound of a frame running true, cold mornings in the mill yard, Nettie's slingshot practice, Odile's heel of rye]
+dislikes: [being pitied, the grey van's engine, Vane's name, anyone who says 'your father']
+fears: [his mother dying with the door shut, the crew getting hurt on his say-so, being asked why]
+dream:
+  text: (hidden) To work the mill floor like his father did, before.
+  stages:
+    - "Get him to talk at the quarry (needs one fair Scuffle won; Regard ≥ 20)"
+    - "Get Delphine to see Priya (needs flag.delphine_ill_known; sets flag.delphine_cared_for)"
+    - "Show him the Mill Reopening plans (Favor: bring him the frame inventory from the mill office; needs flag.mill_project_active)"
+    - "Ask him to run the floor (Regard ≥ 60, three fair Scuffles won; sets flag.rook_turned)"
+routine:                         # sleeps at the hideout, not the nominal home
+  weekday:
+    - { at: "06:30", do: sit, where: millbrook.mill_yard }
+    - { at: "08:30", do: wander, where: market_row.market_street }
+    - { at: "10:30", do: socialize, where: briar_woods.tollmen_hideout }
+    - { at: "12:30", do: eat, where: briar_woods.tollmen_hideout }
+    - { at: "14:00", do: exercise, where: briar_woods.quarry }
+    - { at: "17:00", do: wander, where: wharf.crane_yard }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:30", do: sleep, where: briar_woods.tollmen_hideout }
+  weekend:                       # Saturday: the collection and the van; Sunday: the green
+    - { at: "09:00", do: work, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: briar_woods.tollmen_hideout }
+    - { at: "16:00", do: sit, where: millbrook.laundry_green }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: work, where: wharf.crane_yard }
+    - { at: "24:00", do: sleep, where: briar_woods.tollmen_hideout }
+chores: [oil the hideout's lock, check Nettie's lookout rota, count the Saturday take twice, wind the shift whistle's lanyard]
+relationships:
+  - { id: vane, affinity: -35, trust: 10, tag: paymaster, note: "Met him once, on the crane yard in the rain. Hates being grateful to him." }
+  - { id: delphine, affinity: 75, trust: 30, tag: estranged, note: "Watches the house from the laundry green on Sundays. Wants her to open the door first." }
+  - { id: nell, affinity: -15, trust: 25, tag: respects, note: "She spat at his boots in the first year and he has respected it since. Doesn't press her." }
+  - { id: odile, affinity: 35, trust: 10, tag: ashamed, note: "She fed him at the back door when he was nine and hungry. Hates taking her twenty." }
+  - { id: augusta, affinity: -30, trust: -10, tag: adversary, note: "She let him off with a warning at seventeen. He hasn't forgotten it and hasn't thanked her." }
+  - { id: felix, affinity: 30, trust: 20, tag: ashamed, note: "His first teacher. Crosses the road when he sees him." }
+  - { id: nettie, affinity: 65, trust: 60, tag: crew, note: "The youngest, nineteen. Keeps her out of the quarry fights and out of the van's sight." }
+  - { id: bru, affinity: 60, trust: 65, tag: crew, note: "Follows him without asking why. Rook is careful never to ask him to hit anyone twice." }
+  - { id: dex, affinity: 45, trust: 40, tag: crew, note: "Plans every Saturday round. Rook trusts the plan more than the man." }
+  - { id: dom, affinity: 55, trust: 45, tag: crew, note: "Charms the shopkeepers into paying on time. Rook can't stop him joking at the till." }
+  - { id: weasel, affinity: 30, trust: 25, tag: crew, note: "Carries the envelope to the van and talks too much on the way. Rook wants him quieter." }
+secrets:
+  - text: "The crew's real wage arrives in an envelope from a man in a grey van at the crane yard every Saturday night. The shop money is pocket change next to it."
+    reveal: { day: 40 }
+  - text: "Every Monday he puts an envelope of coins in the St. Brigid's poor box marked 'Mercer, Millbrook.' Reverend Cobb carries it to his mother, who takes it as church charity."
+    reveal: { regard_min: 40 }
+  - text: "He kept his father's loom-fixer's bench key. Once a month he lets himself into the closed mill at night and oils the frames."
+    reveal: { regard_min: 60 }
+  - text: "Eleven years ago, on the crane yard in the rain, he took the first envelope from Silas Vane's own hand. He can say what Vane's voice sounded like."
+    reveal: { flag: rook_turned }
+canon_locks:
+  - { while: "!flag.tollmen_broken", fact: "The Tollmen collect 20 coins from every open shop each Saturday and split it six ways. The man in the grey van pays the crew a separate wage in an envelope at the crane yard that night." }
+  - { while: "!flag.delphine_ill_known", fact: "Rook knows his mother coughs. He does not know it is the mill lint or that it is chronic, and he denies being worried." }
+  - { while: "!flag.rook_turned", fact: "Rook fights fair in Scuffles: he never hits a child, a bystander, or anyone already Winded. He never admits aloud that the Tollmen are wrong." }
+  - { while: "flag.rook_turned", fact: "He testifies against Vane at the Day 95 debate, stays in Monde and runs the mill floor. He eats at his mother's table on Sundays and tells nobody." }
+story_role: Antagonist-in-the-middle. D3 watcher across the street, D40 quarry conversation (his first real talk), D45 Delphine track, D95 testimony if Turned. Biggest single vote swing in the game.

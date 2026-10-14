@@ -1,0 +1,87 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: priya
+name: Priya Ramaswamy
+age: 29
+pronouns: she/her
+kind: canon
+occupation: Nurse; unofficial house-call nurse and carer for her father
+workplace: millbrook.clinic
+home: millbrook.priya_house
+portrait: priya
+sprite: priya
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, dry_eyebrow, tired_smile]
+appearance: >
+  Neat braid, shirtsleeves pushed to the elbow, and a black leather nurse's bag within reach at all
+  times. A quick, tired grin.
+backstory: >
+  Priya trained at a city hospital and came home eight months ago when her father Raman, a mill
+  electrician, had a stroke on the weir path. She learned the ferry timetable by heart: the nearest
+  doctor is forty minutes away and sails twice a week. She does house calls with her own bag and
+  sweeps the closed clinic on Sundays, telling no one. Millbrook calls her a godsend. She says she's
+  passing through.
+personality:
+  traits: [practical, funny, tired, stubborn]
+  big5: { open: 65, conscientious: 78, extravert: 58, agreeable: 70, neurotic: 52 }
+values: { prosperity: 0.20, safety: 0.45, spirit: 0.25, charm: 0.10 }
+beliefs:
+  - "Her father can't be left alone for a whole day."   # wrong: Raman has walked the weir path alone since June
+  - "If she stays, she'll never be anything but the town's nurse."
+  - "Nobody in Monde would run a clinic if she left."
+voice:
+  register: >
+    Practical and teasing, hands before words. Nursing nouns: obs, dressing, pulse, sutures, sprain.
+    Shrinks a scare to its real size and then checks you again. Talks about leaving in the third
+    person ("someone could just go"). Sincerity comes out quick and low, and then she gives you
+    something to hold.
+  tics: ["Right.", "Let's have a look.", "Sit. Sleeves up."]
+  never_says: ["miracle", "I'm staying", "it's nothing", "plenty of rest"]
+  samples:
+    - "Right. Sit, sleeves up. That's a sprain, not a tragedy, and you've got the good kind of swelling."
+    - "Dad's grumbling at the radio, which is how I know he's well. If you hear a crash, that's the radio."
+    - "Someone could take that city job. Hypothetically. Someone with a packed bag and a cupboard of out-of-date plasters."
+likes: [clean dressings, ferry days with a doctor aboard, Raman's radio plays, June's late shifts at the Café]
+dislikes: [boarded clinic windows, "being asked how she is holding up", "being the answer to everyone's question"]
+fears: [Raman falling when she isn't there, a 3 a.m. knock she can't answer, being the one who stayed]
+dream:
+  text: To reopen the clinic, though she won't say it.
+  stages:
+    - "Get the clinic inspected (Favor: bring Kasimir to look at the roof and the boiler)"
+    - "Restock the cupboards (Favor: collect a crate of dressings from Dr. Lowe on the Friday ferry)"
+    - "Persuade Dr. Lowe to visit (Favor: carry Priya's letter on the ferry and bring the reply back)"
+    - "Open the doors (Project clinic; sets flag.clinic_open)"
+routine:
+  weekday:
+    - { at: "06:30", do: cook, where: millbrook.priya_house }
+    - { at: "08:00", do: exercise, where: millbrook.priya_house }
+    - { at: "09:30", do: walk, where: millbrook.terrace_row }
+    - { at: "12:00", do: eat, where: millbrook.priya_house }
+    - { at: "14:30", do: clean, where: millbrook.clinic }
+    - { at: "16:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "18:30", do: cook, where: millbrook.priya_house }
+    - { at: "22:00", do: sleep, where: millbrook.priya_house }
+  weekend:
+    - { at: "08:00", do: cook, where: millbrook.priya_house }
+    - { at: "10:00", do: exercise, where: millbrook.weir }
+    - { at: "12:00", do: eat, where: millbrook.priya_house }
+    - { at: "14:00", do: clean, where: millbrook.clinic }
+    - { at: "17:00", do: walk, where: millbrook.weir }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.priya_house }
+chores: [pack the bag, count the splints, run Raman's stretches, check the ferry timetable against the calendar]
+relationships:
+  - { id: kasimir, affinity: 30, trust: 45, tag: spark, note: "Fixed Dad's porch step and keeps finding reasons to pass. She has noticed and hasn't decided." }
+  - { id: june, affinity: 55, trust: 55, tag: friend, note: "Fellow leaver. Each is the other's alibi." }
+  - { id: felix, affinity: 45, trust: 50, tag: colleague, note: "Patches scraped knees at the school for nothing. Wants the clinic open so she can stop." }
+  - { id: delphine, affinity: 40, trust: 30, tag: patient, note: "Heard the chest at the market. Can't say so; Delphine hasn't asked." }
+  - { id: raman, affinity: 85, trust: 70, tag: father, note: "Stroke on the weir path eight months ago. Wants him to stop pretending the stairs are harder than they are." }
+secrets:
+  - text: "A city ward has offered her a post, open until Day 40. The letter is in her bag, under the splints."
+    reveal: { regard_min: 45 }
+  - text: "She has measured every room of the clinic and drawn a floor plan in a notebook: four beds, a dispensary, a kettle."
+    reveal: { regard_min: 30 }
+canon_locks:
+  - { while: "!flag.clinic_open", fact: "Monde Clinic is closed. The nearest doctor is 40 minutes away by ferry and the ferry runs Tuesday and Friday. Priya does house calls with her own bag." }
+  - { while: "!flag.delphine_ill_known", fact: "She suspects Delphine Mercer has a chronic lung condition from the mill. She cannot say so; patients have to ask." }
+  - { while: "!flag.clinic_open && day < 40", fact: "She holds the city ward's offer open until Day 40 and will not say yes or no." }
+  - { while: "flag.clinic_open", fact: "She is the clinic's resident nurse and has declined the city post. Dr. Lowe visits on Friday ferries." }
+story_role: Clinic Project giver (Acts II to III). D45 Delphine track. Her ferry date is the clock on her arc; the clinic is what makes her stay.

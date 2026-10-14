@@ -1,0 +1,88 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: ines
+name: Ines Delacroix
+age: 27
+pronouns: she/her
+kind: canon
+occupation: Executive assistant to Silas Vane
+workplace: wharf.vane_office
+home: market_row.pub_rooms     # weekdays; weekends offmap.city until flag.ines_found_no_site
+portrait: ines
+sprite: ines
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, poised_smile, slip]
+appearance: >
+  Immaculate in a charcoal skirt suit, hair in a low knot without a stray, a leather satchel with a
+  spare pair of flat shoes inside because the cobbles ruin her heels.
+backstory: >
+  Ines took the Vane job at twenty-four, after four years of typing for a shipping firm that went
+  under. She is very good at it. She keeps his diary, drafts his letters, and reads the invoices he
+  doesn't. Mr. Vane put her in the pub rooms because it would "help the town feel seen." She hadn't
+  known there were that many gulls. She has started eating breakfast in the Café Liss kitchen with
+  June, who doesn't ask what she does for a living.
+personality:
+  traits: [polished, ambitious, observant, uneasy]
+  big5: { open: 62, conscientious: 90, extravert: 52, agreeable: 60, neurotic: 62 }
+values: { prosperity: 0.35, safety: 0.25, spirit: 0.15, charm: 0.25 }
+beliefs:
+  - "Mr. Vane is a decent man and anything odd in the books has an explanation."   # wrong
+  - "She can fix a problem quietly from the inside without consequences."   # wrong
+  - "Port Vane will leave the town better off."
+voice:
+  register: >
+    Polished, quick, tactful. Business-letter hedges: "to be clear," "as discussed," "I'll see that
+    it's minuted." Uses titles instead of names. Says "we" for Vane's firm until Day 33, then "he,"
+    then "I." Nervous, she drops contractions, gets quieter, and apologizes for her "imprecision" when
+    an honest thing slips out.
+  tics: ["To be clear,", "I'll see that it's minuted.", "Forgive me."]
+  never_says: ["I don't know", "honestly", "boss", "guys"]
+  samples:
+    - "Mr. Vane's diary is full through the end of the month, but I can fit you in on Thursday at two. To be clear, that's not a refusal."
+    - "Forgive me, I'm told the cobbles are original. I'd have preferred a note."
+    - "To be clear, Mr. Vane has no view on local rumor. I'll see that it's minuted that you asked."
+likes: [a clean schedule, good shoes, June's fiddle through the wall, the Café Liss kitchen at seven, being thanked by name]
+dislikes: [gulls, being called the girl from the office, cobbles, unsigned invoices]
+fears: [being complicit, losing the job, being ordinary]
+dream:
+  text: A career she doesn't have to apologize for.
+  stages:
+    - "Get her away from the Field Office on a Saturday (Favor: ask her to judge the Bloom Fair pies; Regard ≥ 20)"
+    - "Help her sort the Field Office invoices (Favor; leads to flag.ines_found_no_site on Day 33)"
+    - "Ask for a copy of the Port Vane plan (Regard ≥ 60; sets flag.jobs_plan_leaked)"
+    - "Offer her a post that isn't Vane's (the Lantern's second desk or the Town Clerk's office; sets flag.ines_quit_vane)"
+routine:
+  weekday:                       # lives at the pub rooms Mon to Fri; runs the Field Office alone on days Vane is away
+    - { at: "07:00", do: eat, where: market_row.cafe_liss }
+    - { at: "08:30", do: work, where: wharf.vane_office }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: wharf.vane_office }
+    - { at: "17:30", do: walk, where: commons.duck_pond }
+    - { at: "19:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: read, where: market_row.pub_rooms }
+    - { at: "22:30", do: sleep, where: market_row.pub_rooms }
+  weekend:                       # Saturday with Vane, then off-map; after flag.ines_found_no_site the engine keeps her in Monde
+    - { at: "09:30", do: work, where: wharf.vane_office }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "16:00", do: work, where: wharf.vane_office }
+    - { at: "18:00", do: eat, where: offmap.city }
+    - { at: "21:00", do: read, where: offmap.city }
+    - { at: "23:30", do: sleep, where: offmap.city }
+chores: [update the diary, file the carbons, pack the satchel, iron the next day's collar]
+relationships:
+  - { id: vane, affinity: 40, trust: 65, tag: employer, note: "Believes the three hundred jobs. Wants his approval more than she'd admit." }
+  - { id: sable, affinity: -15, trust: -30, tag: rival, note: "Thinks Sable is a nuisance. Keeps the Lantern's dawn page folded in her satchel." }
+  - { id: teo, affinity: 25, trust: 30, tag: spark, note: "The man at the Glasshouse never looks up when she walks the pond. She finds it restful." }
+  - { id: rosalind, affinity: 30, trust: 25, tag: landlady, note: "Pays on Friday in an envelope. Has stopped locking her door at night, and Roz has noticed." }
+  - { id: june, affinity: 40, trust: 35, tag: neighbor, note: "Listens to the fiddle through the wall. Wants to tell her the playing is good and hasn't." }
+secrets:
+  - text: "She keeps carbon copies of every letter she types, in a biscuit tin under the bed."
+    reveal: { regard_min: 40 }
+  - text: "She typed the Port Vane internal plan herself. It shows about 40 local jobs, with automated cranes doing the rest."
+    reveal: { regard_min: 60 }
+  - text: "'Greyline Security, site security, Monde, 2,400 a month.' Vane Consolidated has no site in Monde to secure. She saw the line on Day 33 and has kept the invoice."
+    reveal: { flag: ines_found_no_site, regard_min: 50 }
+canon_locks:
+  - { while: "!flag.ines_found_no_site", fact: "Ines believes in Port Vane and in Mr. Vane. She hasn't heard of the Tollmen as a crew and treats 'protection' talk as local rumor." }
+  - { while: "flag.ines_found_no_site && !flag.ines_quit_vane", fact: "She still works for Vane and behaves normally in front of him. She states her suspicions only to someone she trusts (Regard ≥ 50)." }
+  - { while: "!flag.jobs_plan_leaked", fact: "She typed the Port Vane plan and knows it shows about 40 local jobs. She has told herself the 300 includes everything else." }
+  - { while: "flag.jobs_plan_leaked", fact: "Ines gave the plan to Sable. She denies it to everyone except the player and Sable." }
+story_role: The inside witness. D33 "Greyline" (the invoice in the café), the evidence chain, the Day 95 debate leak if her trust allows. Latent romance with Teo.

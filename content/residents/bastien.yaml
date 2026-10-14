@@ -1,0 +1,77 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: bastien
+name: Bastien
+age: 6
+pronouns: he/him
+kind: animal
+occupation: Town cat
+workplace: market_row.bakery
+home: market_row.bakery          # the doorstep; he sleeps wherever is warm
+portrait: bastien
+sprite: bastien
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, loaf, ear_flick]   # the eight map to cat poses: sitting, slow blink, yawn, tucked paws, flat ears, round eyes, low tail, staring at a corner
+appearance: >
+  An orange tabby with a white bib, a notched left ear, and a belly that swings when he runs.
+backstory: >
+  Bastien arrived on the Friday ferry six years ago in a fish crate and did not go back. Everyone
+  feeds him and everyone believes they are the only one. The notch in his left ear came from a gull
+  on his first morning. He sleeps on the library windowsill until noon (Margo says it keeps the rare
+  books warm), on the bakery step in the afternoon, and on the fish market scales at dusk. He has
+  never entered the Gull & Anchor, which Roz takes personally. Where he sits, Spirit rises a little.
+personality:
+  traits: [aloof, opportunistic, unhurried, loyal-to-fish]
+  big5: { open: 60, conscientious: 50, extravert: 25, agreeable: 40, neurotic: 20 }
+values: { prosperity: 0.10, safety: 0.25, spirit: 0.40, charm: 0.25 }   # does not vote; weights where he settles
+beliefs:
+  - "Whoever is holding the fish is the owner of the building."
+  - "The gull from his first morning is still out there."   # wrong, probably
+voice:
+  mode: narrated_action          # no speech, ever, and no voice samples by design
+  register: >
+    One narrated action line, present tense, subject first, fourteen words at most. No thoughts, no
+    "seems to," no named emotions. The humor is in what he sits on.
+  tics: ["slow blink", "tail wrapped round his front paws"]
+  never_says: ["any spoken line"]
+  action_verbs: [sleeps, wanders, sits, follows, eats]   # engine verbs: sleep, wander, sit, eat; "follows" is wander with a person as target
+likes: [warm windowsills, fish heads, Odile's doorstep, Tib's lap when Tib is busy, the fish market scales]
+dislikes: [gulls, closed doors, the grey van's exhaust, being carried]
+fears: [the bath, the weir in flood]
+dream:
+  text: Unknown. Fish, probably.
+  stages:
+    - "Leave a fish head on the library windowsill (Favor: any resident)"
+    - "Mend the loose board on the bakery step where he sleeps (Favor: Kasimir)"
+    - "Get Roz to prop the Gull & Anchor's door open for him (Favor; sets flag.bastien_in_pub)"
+    - "A basket by the platform stove (needs flag.station_project_active)"
+routine:
+  weekday:
+    - { at: "05:30", do: eat, where: market_row.bakery }
+    - { at: "06:30", do: sit, where: market_row.bakery }
+    - { at: "08:30", do: sleep, where: old_quarter.library }
+    - { at: "12:00", do: wander, where: market_row.market_street }
+    - { at: "14:00", do: nap, where: commons.glasshouse }
+    - { at: "17:00", do: sit, where: wharf.fish_market }
+    - { at: "19:30", do: wander, where: wharf.harbor_steps }
+    - { at: "21:00", do: sleep, where: market_row.bakery }
+  weekend:
+    - { at: "06:30", do: sit, where: market_row.bakery }
+    - { at: "09:00", do: wander, where: market_row.market_hall }
+    - { at: "12:00", do: nap, where: old_quarter.library }
+    - { at: "15:00", do: sit, where: old_quarter.okafor_house }
+    - { at: "18:00", do: sit, where: wharf.fish_market }
+    - { at: "21:00", do: sleep, where: market_row.bakery }
+chores: [sit on whatever is being worked on, inspect every new arrival, supervise the bakery step]
+relationships:
+  - { id: margo, affinity: 50, trust: 40, tag: fond, note: "The windowsill is his until noon." }
+  - { id: tib, affinity: 55, trust: 40, tag: friend, note: "Follows the satchel for the jam." }
+  - { id: odile, affinity: 60, trust: 40, tag: fond, note: "Crusts on the step at 05:30." }
+  - { id: nell, affinity: 65, trust: 45, tag: fond, note: "Fish heads, daily, with complaints." }
+  - { id: teo, affinity: 55, trust: 40, tag: fond, note: "The warm bed by the lemon." }
+secrets:
+  - text: "On cold nights he sleeps in Hollis's signal box, where the radio valves stay warm. Hollis knows and leaves the door on the latch."
+    reveal: { day: 30 }
+canon_locks:
+  - { while: "true", fact: "Bastien never speaks. Every output is a single narrated action line of at most 14 words." }
+  - { while: "!flag.bastien_in_pub", fact: "Bastien has not entered the Gull & Anchor in six years. He sits on the step and watches the door." }
+  - { while: "flag.station_open", fact: "He is on the platform for the First Train, sitting on the stationmaster's bench." }
+story_role: Ambient mascot. A small Spirit buff while he is on screen, Dawn Report cat-sighting filler, a subject residents argue about. His position tells the player where the warm places are.

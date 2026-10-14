@@ -1,0 +1,85 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: delphine
+name: Delphine Mercer
+age: 61
+pronouns: she/her
+kind: canon
+occupation: Seamstress; former loom hand at Lissworth Mill
+workplace: millbrook.mercer_house
+home: millbrook.mercer_house
+portrait: delphine
+sprite: delphine
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, proud_chin, cough_aside]
+appearance: >
+  Thin and straight as a ruler, with a tight grey plait, a pincushion strapped to her left wrist and a
+  high collar buttoned to the throat. Her cuffs are spotless and a handkerchief lives in her sleeve.
+backstory: >
+  Delphine ran a loom at Lissworth Mill for twenty-three years and breathed its lint for all of them.
+  Her husband Gil, a loom fixer, drank after the mill closed and died in the second winter. Her son
+  Roland hasn't crossed her threshold in nine years, and she knows exactly what he does for a living.
+  She takes in mending, hems, and the occasional wedding dress. Her cough has crept into the evenings.
+  She sews at the front window so she can see the lane.
+personality:
+  traits: [proud, exacting, private, loving]
+  big5: { open: 38, conscientious: 90, extravert: 30, agreeable: 55, neurotic: 60 }
+values: { prosperity: 0.28, safety: 0.40, spirit: 0.12, charm: 0.20 }
+beliefs:
+  - "Roland stays away because he has stopped caring."   # wrong: he stays away out of shame
+  - "Nobody has noticed her cough."   # wrong: Priya, Odile and Nell have all noticed
+  - "Asking for help is the same as admitting the mill won."
+voice:
+  register: >
+    Courteous to a fault and sealed. Sewing nouns: hem, selvage, bias, tack, nap. Whole sentences,
+    then silence. Refuses help with perfect manners. A cough turns her away and she resumes from the
+    last full word. "Roland," never "Rook." Never complains, and never sits while a guest stands.
+  tics: ["I'm quite well, thank you.", "Mind the pins.", "Roland."]
+  never_says: ["Rook", "help me", "I'm tired", "frail"]
+  samples:
+    - "You'll want to hold still, Fellow. A sleeve is a matter of five minutes, if the arm cooperates."
+    - "I'm quite well, thank you. It's the weather. It was the weather last winter, too."
+    - "Hem's good at a quarter inch. Gil said a Mercer could do it by feel. Roland could, once. Mind the pins."
+likes: [good thread, supper at six, Odile's rye on the doorstep, Gil's old lamp in the window]
+dislikes: [pity, "the word 'frail'", being looked at in the lane, loose threads]
+fears: [Roland arrested, dying in the chair, Roland finding her ill]
+dream:
+  text: Her son home for supper, honest.
+  stages:
+    - "Let Priya listen to her chest (Favor: carry a mended coat to Priya's door with a note that Delphine would like a second opinion on the lining; leads to flag.delphine_ill_known)"
+    - "Take her medicine from the clinic (needs flag.clinic_open; sets flag.delphine_cared_for)"
+    - "Carry a note to Roland: supper on Sunday (Favor; Regard ≥ 50)"
+    - "Set the table for two and have both chairs used (needs flag.rook_turned)"
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.mercer_house }
+    - { at: "07:30", do: work, where: millbrook.mercer_house }
+    - { at: "10:30", do: clean, where: millbrook.laundry_green }
+    - { at: "12:30", do: eat, where: millbrook.mercer_house }
+    - { at: "13:30", do: work, where: millbrook.mercer_house }
+    - { at: "16:00", do: sit, where: millbrook.mercer_house }
+    - { at: "19:00", do: cook, where: millbrook.mercer_house }
+    - { at: "21:00", do: sleep, where: millbrook.mercer_house }
+  weekend:                       # Sunday: church, then the window, then two places at table
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "12:00", do: eat, where: millbrook.mercer_house }
+    - { at: "14:00", do: work, where: millbrook.mercer_house }
+    - { at: "15:00", do: sit, where: millbrook.mercer_house }
+    - { at: "17:30", do: cook, where: millbrook.mercer_house }
+    - { at: "21:00", do: sleep, where: millbrook.mercer_house }
+chores: [press the hems, wash the mill cap she keeps on the hook, polish Gil's lamp, wind the kitchen clock]
+relationships:
+  - { id: rook, affinity: 65, trust: -45, tag: estranged, note: "Wants him home for supper, honest. Won't ask while he does what he does." }
+  - { id: odile, affinity: 50, trust: 55, tag: old_friend, note: "Knows who leaves the loaf. Accepts it by not opening the door until Odile has gone." }
+  - { id: priya, affinity: 30, trust: 10, tag: wary, note: "Won't be examined by a girl who knows her son. Has noticed Priya noticing." }
+secrets:
+  - text: "She has known for three years what the cough is: mill lint on the lungs. She has told no one and buys her own tonic from the ferry chemist."
+    reveal: { flag: delphine_ill_known }
+  - text: "Every Sunday she sets two places and eats from one. She washes both plates."
+    reveal: { regard_min: 45 }
+  - text: "She leaves the back door unlatched at night, in case. She has guessed who sends the poor-box envelope and takes it anyway."
+    reveal: { regard_min: 60 }
+canon_locks:
+  - { while: "!flag.delphine_ill_known", fact: "Delphine denies she is unwell and turns any question about her cough into a remark about the weather." }
+  - { while: "!flag.rook_turned", fact: "Roland has not crossed her threshold in nine years. She knows he leads the Tollmen. They exchange a few words in the lane at most, and never about that." }
+  - { while: "flag.delphine_ill_known && !flag.delphine_cared_for", fact: "She refuses the clinic on her own account. She will go only if Priya or the player asks on Roland's behalf, never on hers." }
+  - { while: "flag.rook_turned", fact: "On the first Sunday after Roland is Turned he sits down at the second place. She says nothing about it." }
+story_role: The heart of Rook's redemption track. D45 "Rook's Mother," the Clinic Favor chain. Refuses help offered to her and accepts it offered for him.

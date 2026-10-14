@@ -1,0 +1,85 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: kasimir
+name: Kasimir Wolanski
+age: 38
+pronouns: he/him
+kind: canon
+occupation: Carpenter and handyman
+workplace: millbrook.kasimir_workshop
+home: millbrook.kasimir_workshop
+portrait: kasimir
+sprite: kasimir
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, sheepish, rule_in_hand]
+appearance: >
+  Barrel-chested, with sawdust in his eyebrows, a flat carpenter's pencil behind one ear and a folding
+  rule in his breast pocket. He talks with his hands in his pockets.
+backstory: >
+  Kasimir learned joinery from his grandfather in the workers' cottages and has mended every door in
+  Millbrook at least twice. He charges whatever people hand him, which is often nothing, and sits at
+  the Gull & Anchor's back table so nobody has to talk to him. He fixed Raman Ramaswamy's porch step in
+  March and has since found three more reasons to pass the house. Everything he has ever made was a
+  repair of something somebody else made.
+personality:
+  traits: [quiet, capable, shy, stubborn]
+  big5: { open: 45, conscientious: 85, extravert: 22, agreeable: 68, neurotic: 40 }
+values: { prosperity: 0.30, safety: 0.20, spirit: 0.15, charm: 0.35 }
+beliefs:
+  - "Priya is only being polite to him, and she is leaving anyway."   # wrong
+  - "Felix has no idea about the desks."   # wrong: Felix counts them through the window every Sunday
+  - "Anything he builds new will be worse than what it replaces."
+voice:
+  register: >
+    Few words, mostly verdicts and measurements. Carpentry nouns: dovetail, kerf, shim, grain, plane,
+    true, square. Can't say feelings, so he names what he'll fix. Answers a question with a size. When
+    he has talked too long he stops and picks up his rule.
+  tics: ["Hm. Could be.", "Give it a day.", "Out of true."]
+  never_says: ["I love", "I feel", "honestly", "no problem"]
+  samples:
+    - "Door's out of true by a quarter inch. Plane it or move the house. I'd plane it."
+    - "Hinge is loose. (He turns the screw twice.) Ramaswamys' step wants a handrail. Not that anyone asked."
+    - "Give it a day. Wood tells you when it's ready."
+likes: [dry oak, a plane taking a clean curl, the heel of Odile's rye, being useful]
+dislikes: [glued joints, being thanked in public, damp, pine knots in a shelf]
+fears: [saying the wrong thing, something he built failing under somebody, leaving nothing behind]
+dream:
+  text: To build something from scratch that outlives him.
+  stages:
+    - "Give him a commission that isn't a repair (Favor: put him on the bandstand rebuild; Project bandstand)"
+    - "Find him an apprentice (Favor: bring Tib, or an arrival with the 'carpenter' archetype, to the workshop)"
+    - "Show him the school's twenty places (Favor: take him to the schoolroom with a tape)"
+    - "Hang the clinic door (needs flag.clinic_open)"
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.kasimir_workshop }
+    - { at: "07:30", do: work, where: millbrook.kasimir_workshop }
+    - { at: "10:00", do: tinker, where: millbrook.terrace_row }
+    - { at: "12:30", do: eat, where: millbrook.kasimir_workshop }
+    - { at: "14:00", do: tinker, where: millbrook.priya_house }
+    - { at: "16:00", do: work, where: millbrook.kasimir_workshop }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: millbrook.kasimir_workshop }
+  weekend:
+    - { at: "08:00", do: work, where: millbrook.kasimir_workshop }
+    - { at: "10:30", do: shop, where: market_row.market_hall }
+    - { at: "13:00", do: eat, where: millbrook.kasimir_workshop }
+    - { at: "14:00", do: tinker, where: millbrook.school }
+    - { at: "17:00", do: walk, where: millbrook.weir }
+    - { at: "19:00", do: cook, where: millbrook.kasimir_workshop }
+    - { at: "21:30", do: sleep, where: millbrook.kasimir_workshop }
+chores: [sharpen the plane irons, sweep shavings into the stove box, oil the workshop door, carry the day's offcuts to the school stove]
+relationships:
+  - { id: priya, affinity: 55, trust: 50, tag: spark, note: "Doesn't know how to say anything but 'step's loose.' Wants to see her laugh at something he built." }
+  - { id: odile, affinity: 45, trust: 55, tag: fond, note: "Takes the heel of rye on Mondays. Wants to fix her oven door properly and hasn't been asked." }
+  - { id: teo, affinity: 40, trust: 40, tag: neighbor, note: "Cut the Glasshouse frames in spring and heard 'I'll manage.' Wants to be asked." }
+  - { id: felix, affinity: 45, trust: 50, tag: friend, note: "Mends the school roof for nothing and won't be thanked. Wants Felix to ask what the desks are for." }
+secrets:
+  - text: "Eleven finished school desks stand under tarps at the back of the workshop. Nine pupils plus eleven makes twenty. He built the first the week the autumn-term warning came."
+    reveal: { regard_min: 30 }
+  - text: "A carved wooden heron the size of a thumb rides in his coat pocket. It's for Priya. The first two broke."
+    reveal: { regard_min: 55 }
+canon_locks:
+  - { while: "!flag.school_saved", fact: "Kasimir has built eleven school desks, nine pupils plus eleven making twenty, and keeps them under tarps. He will not say who they are for." }
+  - { while: "!flag.clinic_open", fact: "He fixed Raman Ramaswamy's porch step in March. He knows the clinic roof leaks at the north valley and nobody has asked him to fix it." }
+  - { while: "!flag.kasimir_priya_dating", fact: "He has never said anything personal to Priya. He leaves repairs where she will find them." }
+  - { while: "flag.kasimir_priya_dating", fact: "He and Priya are courting. He walks her to the weir on Sundays and still says 'Hinge is loose' when he means something else." }
+story_role: Fixer. Partner on the Bandstand, Clinic and Bakery Ovens Projects; offers repairs from Day 2. Latent romance with Priya.

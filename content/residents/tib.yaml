@@ -1,0 +1,89 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: tib
+name: Tobias "Tib" Okafor
+age: 11
+pronouns: he/him
+kind: canon
+occupation: Pupil at Millbrook School; Margo's unofficial assistant
+workplace: millbrook.school
+home: old_quarter.okafor_house
+portrait: tib
+sprite: tib
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, gap_grin, whisper]
+appearance: >
+  Small for eleven, with scabbed knees and a cowlick no wetting flattens. A canvas satchel stuffed
+  with graph paper hangs on one shoulder and a magnifying glass with a cracked rim on the other.
+backstory: >
+  Tib's father took the ferry to find work when Tib was six and sends a postal order at Christmas. His
+  mother Ada sells the ferry tickets, so Tib knows every timetable and who is leaving. At eight he found
+  a brass plaque behind a drainpipe and carried it, unasked, to Margo; he has been underfoot at the
+  library since. He walks to Millbrook School past the boarded cottages, counting the dark windows. If
+  the school closes he goes to his aunt across the bay. He has done the arithmetic on the nine pupils
+  and told no one.
+personality:
+  traits: [curious, blunt, restless, loyal]
+  big5: { open: 95, conscientious: 35, extravert: 70, agreeable: 55, neurotic: 45 }
+values: { prosperity: 0.15, safety: 0.20, spirit: 0.40, charm: 0.25 }
+beliefs:
+  - "The Charter is a treasure map, and finding it will save the school."   # wrong: it is a legal document, and the school needs pupils
+  - "Old Moss used to be a pirate."   # wrong
+  - "Grown-ups are lying about how bad things are."
+voice:
+  register: >
+    Fast, noun-first, fragments. Says the quiet part at full volume and repeats overheard adult talk
+    word for word, tone included. Counts things: steps, plaques, pupils. "Obviously" covers doubt.
+    Precise about what he loves (alleys, plaque numbers) and vague about everything else. Kid logic,
+    never baby talk.
+  tics: ["Obviously.", "I'm not supposed to say, but.", "Oh, and."]
+  never_says: ["perhaps", "I suppose", "pardon me", "I'm only a child"]
+  samples:
+    - "That's the back way. Eleven steps, one drainpipe, and Mrs. Quill's cat. Don't tell Mum. Obviously you can come."
+    - "Mum says the mayor's gone broke and you're her last go. I said that's rude. Mum said it's also true."
+    - "Plaque six has a lantern on it. Margo says that means it's real. I say someone just liked lanterns."
+likes: [alleys, riddles, jam sandwiches, Bastien, Mr. Amari's chalk drawings of the Liss]
+dislikes: [being called a helper, grown-ups who whisper, fish soup, the number nine]
+fears: [the school closing, being sent across the bay, Mum crying where he can hear]
+dream:
+  text: That the school doesn't close.
+  stages:
+    - "Count the children (Favor: knock on doors in Millbrook with him and write down who is five to twelve)"
+    - "Put up the school poster (Favor: carry a stack to the ferry slip and the market hall)"
+    - "Welcome an arrival's child on their first morning (Favor: walk them to the school door)"
+    - "The twentieth pupil (sets flag.school_saved)"
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: old_quarter.okafor_house }
+    - { at: "08:30", do: attend, where: millbrook.school }
+    - { at: "12:00", do: eat, where: millbrook.school }
+    - { at: "15:45", do: visit, where: old_quarter.library }
+    - { at: "17:30", do: wander, where: market_row.back_alley }
+    - { at: "18:30", do: eat, where: old_quarter.okafor_house }
+    - { at: "19:30", do: read, where: old_quarter.okafor_house }
+    - { at: "20:45", do: sleep, where: old_quarter.okafor_house }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.okafor_house }
+    - { at: "09:00", do: visit, where: old_quarter.library }
+    - { at: "11:00", do: wander, where: old_quarter.clocktower }
+    - { at: "13:00", do: tinker, where: old_quarter.bertrand_house }
+    - { at: "15:30", do: fish, where: wharf.harbor_steps }
+    - { at: "17:30", do: wander, where: wharf.fish_market }
+    - { at: "19:00", do: eat, where: old_quarter.okafor_house }
+    - { at: "21:00", do: sleep, where: old_quarter.okafor_house }
+chores: [count the pupils on the school door, chalk the alley names on his satchel strap, feed Bastien a fish head, copy a Mark into the graph book]
+relationships:
+  - { id: margo, affinity: 80, trust: 75, tag: mentor, note: "The only one who treats a Mark like a real thing. Wants to find one she hasn't." }
+  - { id: bertrand, affinity: 70, trust: 65, tag: mentor, note: "Learns tools, scales and clock words. Wants him to say what the lantern pinion looks like." }
+  - { id: felix, affinity: 55, trust: 60, tag: teacher, note: "Best teacher, worst news. Hates that Mr. Amari is cheerful about the school closing." }
+  - { id: bastien, affinity: 80, trust: 50, tag: friend, note: "Thinks the cat knows where the Marks are." }
+  - { id: ada, affinity: 85, trust: 80, tag: mother, note: "Sells the tickets and tells him nothing about who is leaving. Wants him home before the lamps come on." }
+secrets:
+  - text: "He found a Mark Margo doesn't have, behind a bollard near the ferry slip, and is saving it for a day she's sad enough to need it."
+    reveal: { regard_min: 40 }
+  - text: "Rook gave him a toffee in the alley the week his father left, and told him not to tell. He hasn't."
+    reveal: { regard_min: 55 }
+canon_locks:
+  - { while: "!flag.school_saved", fact: "Millbrook School has 9 pupils and closes unless it reaches 20 by the autumn term (Day 51). Tib knows the exact count and the date." }
+  - { while: "!flag.tollmen_broken", fact: "Tib keeps out of the Tollmen's way. He knows Nettie Szabo because her cousin Maud is in his class." }
+  - { while: "flag.clock_chimed", fact: "After the Quarter Chime on Day 14 Tib tells everyone he heard it first." }
+  - { while: "flag.school_saved", fact: "He keeps a tally of pupils on the school door and stops counting only after the twentieth name." }
+story_role: Act I companion. D2 tags along with Margo, Marks hint-giver, Favor source for the school drive. He says what adults won't.

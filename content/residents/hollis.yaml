@@ -1,0 +1,87 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: hollis
+name: Hollis Brandt
+age: 67
+pronouns: he/him
+kind: canon
+occupation: Retired engine driver, Liss branch (41 years)
+workplace: station_hill.platform
+home: station_hill.hollis_house
+portrait: hollis
+sprite: hollis
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, watch_check, grumble]
+appearance: >
+  Rangy, with a heavy grey moustache and a railwayman's cap whose badge has been sanded smooth by his
+  thumb. A watch on a chain, checked with the thumb before he answers anything.
+backstory: >
+  Hollis drove the Liss branch for forty-one years and was late twice, both times for cows. When the
+  stop was cut nine years ago he went to the platform the next morning in uniform and has not missed a
+  day since. He sweeps, oils the signal-box lever, and logs the day's service in a notebook: none,
+  none, none. His wife Maren died in his second year of retirement. He re-reads the timetable he wrote
+  himself in 1987. He plays the mouth organ in the signal box when he thinks the wind will cover it.
+personality:
+  traits: [punctual, grumbling, loyal, stubborn]
+  big5: { open: 40, conscientious: 90, extravert: 30, agreeable: 40, neurotic: 35 }
+values: { prosperity: 0.25, safety: 0.15, spirit: 0.25, charm: 0.35 }
+beliefs:
+  - "Bertrand could have restarted the tower clock any day in fourteen years if he had cared to."   # wrong: any other pinion would wreck the movement
+  - "The line is sound and only wants a driver."   # wrong: the sleepers are rotten between the water tower and the points
+  - "A man who is on time owes nobody an explanation."
+voice:
+  register: >
+    Gives the time of everything to the minute ("07:12, not seven"). Railway nouns: points,
+    regulator, firebox, headcode, the branch. Complains in exact numbers and means no joke by it.
+    "Late." is his worst verdict. His kindness comes as timetable promises. Never says "around" or
+    "sometime."
+  tics: ["Late.", "By my watch.", "That's not on the timetable."]
+  never_says: ["around noon", "sometime", "I guess", "retired"]
+  samples:
+    - "07:12. You're two minutes behind the milk. By my watch."
+    - "Nine years, four months, no train. Don't tell me the line's dead. The signal box still answers to oil."
+    - "I'll hold the kettle till half past. After that it's the platform's, and the platform is cold."
+likes: [exact change, oil on a lever, the heel of Odile's rye, the sound of points throwing]
+dislikes: ["sometime", cows, being called retired, clocks that disagree]
+fears: [forgetting a timetable, the signal box going quiet, dying without hearing a train brake at Monde]
+dream:
+  text: To hear a train stop at Monde again.
+  stages:
+    - "Clear the platform and repaint the station board (Favor: fetch the paint from Kasimir's workshop)"
+    - "Light the signal-box lamp (Favor: find the lamp lens in Margo's archive)"
+    - "Get Pell to petition the line (Favor: carry his draft timetable to the mayor; sets flag.station_project_active)"
+    - "Stand on the platform for the test train (sets flag.station_open)"
+routine:
+  weekday:
+    - { at: "05:40", do: shop, where: market_row.bakery }
+    - { at: "06:15", do: clean, where: station_hill.platform }
+    - { at: "08:00", do: tinker, where: station_hill.signal_box }
+    - { at: "10:00", do: write, where: station_hill.hollis_house }
+    - { at: "12:00", do: eat, where: station_hill.hollis_house }
+    - { at: "14:00", do: walk, where: station_hill.turntable }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: station_hill.hollis_house }
+  weekend:                       # Sundays at 16:17 he sits facing the stopped tower until the Horlogerie lamp is lit
+    - { at: "05:40", do: shop, where: market_row.bakery }
+    - { at: "06:15", do: clean, where: station_hill.platform }
+    - { at: "08:00", do: tinker, where: station_hill.signal_box }
+    - { at: "12:00", do: eat, where: station_hill.hollis_house }
+    - { at: "14:00", do: sit, where: station_hill.lookout_bench }
+    - { at: "16:17", do: sit, where: old_quarter.fountain_square }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: station_hill.hollis_house }
+chores: [oil the signal-box lever, sweep the platform, "wind his watch at 08:00 sharp", log the day's service]
+relationships:
+  - { id: odile, affinity: 60, trust: 65, tag: fond, note: "The only person in town who is on time. Takes the heel and pays for the roll anyway." }
+  - { id: bertrand, affinity: -45, trust: -20, tag: estranged, note: "Holds him to blame for the clock stopping. Sits facing the tower every Sunday at 16:17." }
+  - { id: augusta, affinity: 30, trust: 40, tag: tolerated, note: "Reports trespass on his own platform to her. Wants an official notice that says Keeper." }
+  - { id: rosalind, affinity: 40, trust: 40, tag: regular, note: "One cider at 18:00, gone by 19:00. Doesn't say Maren's name in the pub." }
+secrets:
+  - text: "On the day the mill closed he held the last mill train ten minutes for the families to say goodbye, and logged it as on time. It's the only false line in forty-one years of logs."
+    reveal: { regard_min: 50 }
+  - text: "He lent Bertrand his old railway lamp in 1987 and never asked for it back. From the fountain square he can see whether it's lit in the Horlogerie window. It always is."
+    reveal: { regard_min: 35 }
+canon_locks:
+  - { while: "!flag.station_project_active", fact: "No train has stopped at Monde Station for nine years. Hollis sweeps the platform at 06:15 every day and logs the day's service as 'none.'" }
+  - { while: "!flag.hollis_bertrand_mended", fact: "Hollis has not spoken to Bertrand Achterberg in fourteen years. He sits facing the stopped tower on Sundays and will not enter the Horlogerie." }
+  - { while: "!flag.station_open", fact: "He keeps his watch within two seconds of the wireless time signal and distrusts every other clock in Monde." }
+  - { while: "flag.station_open", fact: "After the First Train he writes 'service: 1' in the log, the first entry in nine years, and tells everyone the exact minute." }
+story_role: Station capstone giver. D30 "The Station" pitch on Station Hill, D60 "First Train." Estranged from Bertrand; the Quarter Chime on D14 is the first chance to mend it.

@@ -1,0 +1,88 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: odile
+name: Odile Fournier
+age: 64
+pronouns: she/her
+kind: canon
+occupation: Baker; owner of Fournier & Fille
+workplace: market_row.bakery
+home: market_row.bakery_flat
+portrait: odile
+sprite: odile
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, flour_cloud, hands_on_hips]
+appearance: >
+  Broad-shouldered, flour to the elbows, grey hair pinned up with a pencil through it. A pink burn scar
+  runs across her left forearm.
+backstory: >
+  Odile took over the bakery from her father at thirty and added "& Fille" to the sign the week her
+  daughter Claudine turned ten. Claudine left at twenty-six after a shouting match about gas ovens and
+  a café counter. Odile says she never wrote. The Tollmen take twenty coins from the till every
+  Saturday and she pays with the face of a woman paying a fine. Her wrists swell by noon; she now
+  bakes sixty loaves where she used to bake two hundred.
+personality:
+  traits: [gruff, generous, proud, early-riser]
+  big5: { open: 35, conscientious: 85, extravert: 40, agreeable: 60, neurotic: 45 }
+values: { prosperity: 0.45, safety: 0.20, spirit: 0.20, charm: 0.15 }
+beliefs:
+  - "Claudine never wrote."   # wrong: three letters sit unopened in the flour bin
+  - "Any letter from the city would only say she isn't coming back."   # wrong
+  - "The old starter will not survive anyone else's hands."
+voice:
+  register: >
+    Short declaratives. Bakery nouns: proof, crumb, crust, scoring, the starter ("the old lady"). Feeds
+    first, talks second, refuses thanks. "Petit" or "petite" to the young, "you" to everyone else.
+    Never says her daughter's name.
+  tics: ["Hm.", "Eat something.", "Mind the step."]
+  never_says: ["awesome", "okay so", "Claudine", "I need help"]
+  samples:
+    - "Oven's been hot since four. Sit or don't, but don't block the door."
+    - "Rye's two coins, white's three. Today it's rye. Eat something, petit, you look like a coat on a hook."
+    - "Hm. Saturday's Saturday, so there's twenty on the shelf. Take the heel. It's yesterday's. It was going in the bin anyway."
+likes: [rye flour, rain on the awning, being asked for advice, the first loaf out]
+dislikes: [waste, Silas Vane's shoes, being pitied, gas ovens]
+fears: [her wrists failing, dying with the shop shut, the postman's knock]
+dream:
+  text: Pass the bakery on to someone who'll keep the old starter alive.
+  stages:
+    - "Admit she needs help (Regard ≥ 30)"
+    - "Fix the left oven door (Project bakery_ovens; Kasimir; sets flag.bakery_ovens_fixed)"
+    - "Find an apprentice (an arrival with the 'baker' or 'cook' archetype)"
+    - "Teach them the starter (a 3-day Favor chain; sets flag.odile_apprentice)"
+    - "Open the first letter (Regard ≥ 55; sets flag.claudine_written when she answers it)"
+routine:
+  weekday:
+    - { at: "04:00", do: work, where: market_row.bakery }
+    - { at: "09:00", do: clean, where: market_row.bakery }
+    - { at: "13:00", do: eat, where: market_row.bakery_flat }
+    - { at: "14:00", do: nap, where: market_row.bakery_flat }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: sleep, where: market_row.bakery_flat }
+  weekend:                       # Saturday she works the market hall stall; the Sunday attend block is the church one
+    - { at: "04:00", do: work, where: market_row.bakery }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "12:00", do: eat, where: market_row.bakery_flat }
+    - { at: "13:00", do: nap, where: market_row.bakery_flat }
+    - { at: "15:00", do: visit, where: millbrook.mercer_house }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: sleep, where: market_row.bakery_flat }
+chores: [scrub the trays, feed the starter, sweep the step, count the till twice]
+relationships:
+  - { id: rook, affinity: -40, trust: -30, tag: wary, note: "Watched him grow up. Won't say his name." }
+  - { id: hollis, affinity: 55, trust: 60, tag: fond, note: "Wants him to take the heel for nothing. He pays exact change for it every morning at 05:40." }
+  - { id: june, affinity: 45, trust: 40, tag: fond, note: "Buys day-old bread she doesn't need. Wants her to eat a proper breakfast." }
+  - { id: delphine, affinity: 55, trust: 60, tag: old_friend, note: "Leaves a loaf on the Mercer step every Sunday and calls it returns. Wants Delphine to let her in." }
+  - { id: kasimir, affinity: 50, trust: 60, tag: fond, note: "Wants the left oven door properly fixed. He has looked at it twice and won't send a bill." }
+  - { id: bastien, affinity: 30, trust: 20, tag: tolerates, note: "Feeds him crusts and calls him a nuisance." }
+  - { id: claudine, affinity: 60, trust: -40, tag: absent, note: "Her daughter, in the city. Wants her to have written, and is afraid she has." }
+secrets:
+  - text: "Every Sunday she leaves a loaf on the Mercer step and tells the shop it's returns."
+    reveal: { regard_min: 40 }
+  - text: "Three letters from Claudine, never opened, lie in the flour bin under the starter's feeding log. The postmarks are the city's."
+    reveal: { regard_min: 55 }
+canon_locks:
+  - { while: "!flag.tollmen_broken", fact: "The Tollmen take 20 coins from the till every Saturday." }
+  - { while: "!flag.claudine_written", fact: "Odile never says her daughter's name. The 'Fille' on the sign is Claudine, who left twelve years ago. Odile says Claudine 'never wrote.'" }
+  - { while: "!flag.bakery_ovens_fixed", fact: "The big deck oven's left door sticks and her wrists swell by noon. She bakes about sixty loaves where she once baked two hundred." }
+  - { while: "flag.odile_apprentice", fact: "Her apprentice feeds the starter on weekdays. Odile lets them and pretends not to watch." }
+story_role: Act I ally. D3 first Tollmen shakedown, Project giver (Bakery Ovens), Harvest Supper host. Her starter is the town's longest-running thing.

@@ -1,0 +1,87 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: felix
+name: Felix Amari
+age: 44
+pronouns: he/him
+kind: canon
+occupation: Teacher, Millbrook School
+workplace: millbrook.school
+home: millbrook.felix_house
+portrait: felix
+sprite: felix
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, chalk_dust, patient_look]
+appearance: >
+  Round-shouldered, with kind eyes behind heavy glasses, a corduroy jacket with chalk in every pocket
+  and shirtsleeves rolled to the elbow. A soft voice that carries to the back bench.
+backstory: >
+  Felix's first class, at twenty-two, was forty children in the room Millbrook School still uses; the
+  eleven-year-old on the back bench was Roland Mercer. Now he has nine pupils, one stove, and a date.
+  He teaches reading from Aurélien's map of the Liss and arithmetic from the Wharf's tide tables. He
+  has turned down two mainland posts. A tally of pupils is pencilled inside the classroom door, and in
+  twenty-two years he has never rubbed out a name.
+personality:
+  traits: [gentle, stubborn, patient, rumpled]
+  big5: { open: 75, conscientious: 82, extravert: 55, agreeable: 85, neurotic: 45 }
+values: { prosperity: 0.20, safety: 0.20, spirit: 0.40, charm: 0.20 }
+beliefs:
+  - "The families who left would have stayed if he had been a better teacher."   # wrong: they left for wages
+  - "Roland Mercer is still in there somewhere."
+  - "The school roof will hold one more winter."   # wrong: the north valley is going
+voice:
+  register: >
+    Gentle, unhurried, teacherly without lecturing. Uses pupils' names constantly. Chalk and sums
+    nouns: slate, register, long division, term. Says "show me" before he tells. Stubbornness shows as
+    repetition. Humor mock-solemn. Never sarcastic.
+  tics: ["Let's see.", "Show me.", "Goodness."]
+  never_says: ["it's hopeless", "those children", "when the school closes", "whatever"]
+  samples:
+    - "Tib Okafor, that's a very good argument and it's the wrong end of the sum. Show me again, from the nine."
+    - "Goodness, the stove's sulking. Come in, mind the second step, and tell me what you can carry."
+    - "Twenty. We had forty once. We'll see what the autumn brings."
+likes: [a pupil's first correct long division, chalk dust in sunlight, the stove at nine in the morning, Kasimir's silent repairs]
+dislikes: [closing dates, parents' evenings that lose half the parents, anyone calling the school the last one]
+fears: [the day he rubs out a name, the roof, being the reason people stay too long]
+dream:
+  text: Twenty pupils by the autumn term.
+  stages:
+    - "Take the pupils to the library on a Saturday (Favor: help him walk nine children to Margo)"
+    - "Carry the school prospectus to three families with children (Favor)"
+    - "Mend the roof and the stove (Favor: bring Kasimir and a sack of coal)"
+    - "Welcome the arrivals' children and reach twenty by Day 51 (sets flag.school_saved)"
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.felix_house }
+    - { at: "08:15", do: work, where: millbrook.school }
+    - { at: "12:00", do: eat, where: millbrook.school }
+    - { at: "13:00", do: work, where: millbrook.school }
+    - { at: "15:30", do: visit, where: millbrook.terrace_row }
+    - { at: "18:00", do: cook, where: millbrook.felix_house }
+    - { at: "20:00", do: read, where: millbrook.felix_house }
+    - { at: "22:00", do: sleep, where: millbrook.felix_house }
+  weekend:
+    - { at: "09:00", do: shop, where: market_row.market_hall }
+    - { at: "11:00", do: visit, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: millbrook.felix_house }
+    - { at: "14:30", do: tinker, where: millbrook.school }
+    - { at: "17:00", do: walk, where: millbrook.weir }
+    - { at: "19:00", do: cook, where: millbrook.felix_house }
+    - { at: "21:00", do: write, where: millbrook.felix_house }
+    - { at: "22:30", do: sleep, where: millbrook.felix_house }
+chores: [light the school stove, rule the register, patch the slate frames, walk the pupils' route home]
+relationships:
+  - { id: rook, affinity: 40, trust: 35, tag: former_pupil, note: "His first class. Wants him to come back and just look at the school." }
+  - { id: margo, affinity: 60, trust: 60, tag: friend, note: "Brings the pupils on Saturdays. Wants her to come to the reading afternoon." }
+  - { id: tib, affinity: 70, trust: 65, tag: pupil, note: "Sharpest in the room and the most likely to bolt if the school goes." }
+  - { id: priya, affinity: 50, trust: 55, tag: colleague, note: "Wants her to stay and hasn't said so." }
+  - { id: kasimir, affinity: 50, trust: 55, tag: friend, note: "Counts the desks through the workshop window every Sunday and says nothing." }
+secrets:
+  - text: "Every Sunday he walks past Kasimir's workshop and counts the desks under the tarps through the window. Eleven. He has never said a word."
+    reveal: { regard_min: 35 }
+  - text: "He wrote to the mainland education board in spring asking for a one-year exemption. The refusal is in his desk."
+    reveal: { regard_min: 50 }
+canon_locks:
+  - { while: "!flag.school_saved", fact: "Millbrook School has nine pupils, one stove, one teacher, and closes unless it has twenty pupils by the autumn term (Day 51)." }
+  - { while: "!flag.tollmen_broken", fact: "Felix was Roland Mercer's first teacher and will not call the Tollmen 'thugs' in front of children." }
+  - { while: "!flag.clinic_open", fact: "Felix has no school nurse. Priya patches scrapes at the school unofficially." }
+  - { while: "flag.school_saved", fact: "He adds eleven names to the classroom door in one afternoon and rubs none out." }
+story_role: School Project giver. The autumn-term deadline (Day 51) is the clock on his arc. Rook's first teacher.

@@ -1,0 +1,89 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: vane
+name: Silas Vane
+age: 48
+pronouns: he/him
+kind: canon
+occupation: CEO, Vane Consolidated; developer of Port Vane
+workplace: wharf.vane_office
+home: offmap.city                # becomes wharf.harbormaster_house when flag.vane_resident (Day 48)
+portrait: vane
+sprite: vane
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, polite_smile, cold_calm]
+appearance: >
+  Tall, in a well-cut charcoal coat that never creases, silver at the temples, a pocket square folded
+  to a point. He smiles half a second before he speaks.
+backstory: >
+  Silas grew up in a freight-yard town upriver that emptied when he was fifteen: first the shops, then
+  the school, then his father's job. His mother stayed too long and watched it close one shutter at a
+  time. He decided the kind thing is to buy early and pay fairly, and he has built nine terminals on
+  that idea. He drives to Monde on Tuesdays, Thursdays and Saturdays, tells everyone it is lovely, and
+  means it. He keeps every promise he makes in writing, and makes very few of them in writing.
+personality:
+  traits: [courteous, patient, certain, persuasive]
+  big5: { open: 62, conscientious: 88, extravert: 70, agreeable: 35, neurotic: 20 }
+values: { prosperity: 0.55, safety: 0.20, spirit: 0.10, charm: 0.15 }
+beliefs:
+  - "Towns like Monde are already dead, and Port Vane is the kindest thing that can happen to this one."   # wrong
+  - "Greyline provides 'presence' and nothing worse; whatever goes on along Market Row is local colour."   # wrong
+  - "Three hundred jobs is a fair way to say 'about forty, plus everything that follows.'"   # wrong
+voice:
+  register: >
+    Hotel-lobby courtesy. First names from the second meeting, "May I be frank?" before every
+    disagreement, numbers rounded up. Never raises his voice, never threatens, never says "Tollmen"
+    (he says "local presence"). Sells in short plain sentences and asks for small yeses before large
+    ones. His one triplet is the slogan. Keeps his contractions.
+  tics: ["May I be frank?", "Let's be sensible.", "Walk with me."]
+  never_says: ["Tollmen", "bribe", "cheap", "you'll regret it"]
+  samples:
+    - "You walked up from the slip? Good. It's the only way to see what the place has been to people. May I be frank, Fellow? It's lovely. It deserves a plan."
+    - "Three hundred jobs. I say it plainly because I mean it plainly. Come and see the drawings Thursday and I'll have Delacroix set a time."
+    - "I don't say this to be unkind. A town needs a reason to stay awake. Yours has a bakery and a very good view."
+likes: [punctual people, clean ledgers, being called Silas, a well-made clock, "coffee at 12:30 sharp"]
+dislikes: [open drains, reporters, rain on the car, being laughed at, sentiment used as a strategy]
+fears: [being the man who was wrong, ending up like the last shopkeeper in the yard town]
+dream:
+  text: Port Vane. Being right.
+  stages:
+    - "Take the consulting retainer (Favor: sign Delacroix's letter of engagement; sets flag.vanes_coin)"
+    - "Put his name to the rezoning petition (Favor: carry the petition to three shopkeepers)"
+    - "Introduce him to the council (Favor: walk him into a sitting at Town Hall)"
+    - "Sit beside him at the Harvest Supper (needs flag.vane_candidate)"
+routine:                         # Tue and Thu only; the engine holds him at offmap.city Mon, Wed, Fri and Sun
+  weekday:
+    - { at: "08:00", do: work, where: offmap.city }
+    - { at: "10:00", do: walk, where: wharf.harbor_steps }
+    - { at: "10:30", do: work, where: wharf.vane_office }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: visit, where: old_quarter.town_hall }
+    - { at: "15:00", do: work, where: wharf.vane_office }
+    - { at: "17:00", do: eat, where: offmap.city }
+    - { at: "22:30", do: sleep, where: offmap.city }
+  weekend:                       # Saturday only; Sunday he is offmap.city all day
+    - { at: "10:00", do: work, where: wharf.vane_office }
+    - { at: "11:30", do: walk, where: wharf.crane_yard }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: shop, where: market_row.market_hall }
+    - { at: "15:30", do: work, where: wharf.vane_office }
+    - { at: "17:00", do: eat, where: offmap.city }
+    - { at: "22:30", do: sleep, where: offmap.city }
+chores: [read the Port Vane drawings, return every letter within a day, walk the waterfront once per visit]
+relationships:
+  - { id: pell, affinity: 25, trust: 15, tag: counterparty, note: "Kept the lights on twelve years on forty thousand coins. He admires that, which makes it harder. Wants her to say, once, that he was right." }
+  - { id: ines, affinity: 45, trust: 60, tag: employee, note: "His best asset. Doesn't know her middle name. Wants her never to ask what a line item is for." }
+  - { id: rook, affinity: 10, trust: 40, tag: contractor, note: "Met him once, on the crane yard, eleven years ago, and remembered his name. Doesn't intend to meet him again." }
+  - { id: sable, affinity: 5, trust: -25, tag: nuisance, note: "Bought a full-page advertisement to flatter her. She ran it under PAID ADVERTISEMENT in 24-point." }
+  - { id: bertrand, affinity: 20, trust: 10, tag: admirer, note: "Offered to buy the tower's movement for the Port Vane lobby. Thinks he is preserving it." }
+secrets:
+  - text: "Port Vane's internal plan shows about 40 local jobs. The automated cranes do the rest. He files '300' under 'regional employment effect' and has stopped noticing the difference."
+    reveal: { flag: jobs_plan_leaked }
+  - text: "He has met exactly one Tollman, Roland Mercer, once, on the crane yard in the rain. He remembered the name and has avoided learning anything else."
+    reveal: { flag: ledger_published }
+  - text: "A framed photograph of the empty freight yard he grew up beside stands on his desk. His mother stayed until the last shutter closed."
+    reveal: { regard_min: 50 }
+canon_locks:
+  - { while: "!flag.vane_resident", fact: "Vane is not a resident of Monde. He is in town only on Tuesdays, Thursdays and Saturdays, 10:00 to 17:00, and lives off-map." }
+  - { while: "!flag.option_public", fact: "He never mentions the Option Clause. Asked about Pell, he says Vane Consolidated 'has long been a friend of the town.'" }
+  - { while: "flag.vanes_coin", fact: "The player is on his 50-coin weekly retainer. He treats them as a colleague, never mentions the money in public, and keeps a note of it for the Day 95 debate." }
+  - { while: "flag.vane_candidate", fact: "His slogan is 'Jobs. Order. A future.' He uses it at least once in every public conversation and never in private." }
+story_role: Antagonist. D10 "The Man in the Good Coat" (the retainer), D48 buys the harbormaster's house, D50 announces his candidacy, D95 debate opponent. Offers tempting Favors that cost Regard elsewhere.

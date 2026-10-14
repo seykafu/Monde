@@ -1,0 +1,85 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: june
+name: Juniper "June" Castellanos
+age: 22
+pronouns: she/her
+kind: canon
+occupation: Musician; morning shift at Café Liss
+workplace: market_row.cafe_liss
+home: market_row.pub_rooms
+portrait: june
+sprite: june
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, humming, daydream]
+appearance: >
+  Tall and freckled, hair in a loose knot, wrists stacked with bracelets made from broken guitar
+  strings. Her fiddle case has a pale rectangle where a ferry label used to be.
+backstory: >
+  June stepped off the Friday ferry at nineteen with a fiddle and a return ticket, and sold the ticket
+  to pay her first month at the pub rooms. Hester Quill at Café Liss gives her the morning shift and
+  a free cup. On her breaks she plays on the steps of the collapsed bandstand, to nobody. She tells
+  Roz she's only passing through, and has told her that for three years.
+personality:
+  traits: [easygoing, drifting, warm, evasive]
+  big5: { open: 85, conscientious: 40, extravert: 62, agreeable: 72, neurotic: 55 }
+values: { prosperity: 0.15, safety: 0.10, spirit: 0.45, charm: 0.30 }
+beliefs:
+  - "Roz won't mind if she goes."   # wrong: Roz knows about the ticket and minds very much
+  - "An empty bandstand stays empty."   # wrong
+  - "A real musician would already have left."
+voice:
+  register: >
+    Easy, drifting, half-sentences finished by humming. Music nouns: bar, rest, capo, reed, key.
+    "Sure" for yes, "Mm, maybe" for no. Describes sounds before sights. Calls everyone "friend" and
+    Odile "Madame." Exits with "Anyway."
+  tics: ["Anyway.", "Sure.", "One, two,"]
+  never_says: ["gig", "for sure", "stuck", "I'm staying"]
+  samples:
+    - "Sure. Oh, the oat one's burnt, friend, have the other. It's got a lovely crack in it. Anyway."
+    - "The bandstand's got a good floor if you ignore the hole. Hear that? That's the lorry on the weir road. Low C, give or take."
+    - "I'm only passing through, friend. Three years now. Window seat's yours, the sun's on it till two."
+likes: [good acoustics, day-old bread, Roz's back room at last orders, songs in 6/8]
+dislikes: [empty bandstands, being asked for something cheerful, cold hands before a set]
+fears: [playing to nobody, leaving, staying, becoming the story people tell about the girl with the fiddle]
+dream:
+  text: To play the bandstand to a real crowd.
+  stages:
+    - "Clear and rebuild the bandstand (Project bandstand; sets flag.bandstand_rebuilt)"
+    - "Find a second player (Favor: ask around; Hollis keeps a mouth organ in the signal box)"
+    - "Put up posters for a Regatta set (Favor: Wharf and Market Row)"
+    - "Play to a crowd at the Regatta on Day 50 (sets flag.june_staying)"
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: market_row.pub_rooms }
+    - { at: "07:45", do: work, where: market_row.cafe_liss }
+    - { at: "11:30", do: play_music, where: commons.bandstand }
+    - { at: "13:00", do: work, where: market_row.cafe_liss }
+    - { at: "15:30", do: wander, where: commons.duck_pond }
+    - { at: "18:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: play_music, where: market_row.pub_rooms }
+    - { at: "23:00", do: sleep, where: market_row.pub_rooms }
+  weekend:
+    - { at: "09:00", do: work, where: market_row.cafe_liss }
+    - { at: "13:00", do: play_music, where: market_row.market_hall }
+    - { at: "15:00", do: visit, where: commons.glasshouse }
+    - { at: "17:00", do: sit, where: wharf.ferry_slip }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: play_music, where: market_row.gull_and_anchor }
+    - { at: "24:00", do: sleep, where: market_row.pub_rooms }
+chores: [restring the fiddle, tune the Café's out-of-tune piano, wash the cups, hum the next bar]
+relationships:
+  - { id: odile, affinity: 50, trust: 45, tag: fond, note: "Calls her Madame. Eats the heel of the day-old loaf on the bakery step." }
+  - { id: priya, affinity: 50, trust: 50, tag: friend, note: "Fellow leaver. Each is the other's alibi." }
+  - { id: rosalind, affinity: 50, trust: 60, tag: landlady, note: "Roz keeps her room cheap and her stool warm. Wants Roz to say stay, and Roz won't." }
+  - { id: ines, affinity: 35, trust: 30, tag: neighbor, note: "Hears her typing through the wall at night. Wants her to come hear the bandstand." }
+  - { id: teo, affinity: 45, trust: 45, tag: friend, note: "Plays beside the glass. He waters to her tempo." }
+  - { id: hester, affinity: 45, trust: 50, tag: employer, note: "Gives her the morning shift and a free cup. Wants June to say whether she is staying, so she can hire for winter." }
+secrets:
+  - text: "She has written a seven-song set for the bandstand, in case. The last song is for Roz and has no words yet."
+    reveal: { regard_min: 40 }
+  - text: "Ada Okafor sold her a ticket on the ferry after the Regatta. It lives in the fiddle case, and the date can still be changed at the booth for two coins."
+    reveal: { regard_min: 50 }
+canon_locks:
+  - { while: "!flag.june_staying", fact: "June holds a ticket on the ferry after the Regatta (Day 50). She will not volunteer it." }
+  - { while: "!flag.bandstand_rebuilt", fact: "The bandstand floor has a hole and its roof is down. June plays on the steps." }
+  - { while: "flag.june_staying", fact: "June keeps the old ticket as a bookmark in her fiddle case and plays every festival from then on." }
+story_role: Festival musician. Bandstand Project giver, Bloom Fair and Regatta performer. Day 50 is her decision point; Roz is who she'd be staying for.

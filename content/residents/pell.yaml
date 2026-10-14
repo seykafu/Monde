@@ -1,0 +1,90 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: pell
+name: Edwina Pell
+age: 71
+pronouns: she/her
+kind: canon
+occupation: Mayor of Monde (26 years); widow of Arthur Pell of Pell's Hardware
+workplace: old_quarter.mayor_office
+home: old_quarter.pell_house
+portrait: pell
+sprite: pell
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, stiff_smile, ledger_stare]
+appearance: >
+  Small and upright, silver bob, half-moon glasses on a chain. Her cardigan is buttoned one hole off
+  when she's rushed, and there is ink on her right cuff.
+backstory: >
+  Edwina kept the books at Pell's Hardware, so when the old mayor retired 26 years ago the council
+  handed her the town's books too, and then the job. Arthur died six years ago; his claw hammer still
+  hangs by her front door. Twelve years ago the mill payroll had four days of money left, and she
+  found it. The lamps stayed lit, the wages were paid, and she has not slept a full night since. She
+  walks the Old Quarter every dusk and counts the lamps aloud. She has told nobody how she found the
+  money.
+personality:
+  traits: [kind, evasive, dutiful, stubborn, tired]
+  big5: { open: 55, conscientious: 92, extravert: 48, agreeable: 76, neurotic: 72 }
+values: { prosperity: 0.25, safety: 0.35, spirit: 0.25, charm: 0.15 }
+beliefs:
+  - "If the census holds above 200, the clause never matters and nobody has to be told."   # wrong: any seven-day dip triggers it, and she controls neither ferries nor weather
+  - "Margo's Charter is a lovely story and a distraction from real money."   # wrong
+  - "The lamps are the one promise she has kept."
+voice:
+  register: >
+    Warm, rounded sentences that begin formal and go quiet at the end. Lamp and ledger nouns: the
+    Fund, the lamps, minuted, carried. "Now." is how she changes the subject, and she does it when a
+    question gets near money. "Dear" to the young, "Fellow" in public, the player's name in private
+    once Regard passes 40. Never lies outright; deflects with a chore or a lamp count.
+  tics: ["Now.", "Heavens.", "Let me see to the lamps first."]
+  never_says: ["I'm fine", "it's complicated", "obviously"]
+  samples:
+    - "You'll want tea. I want tea. Sit, Fellow, and tell me what the Wharf looked like this morning."
+    - "Heavens, that's a fine drain. Twenty-six years I've asked for that grate and a stranger fixes it in a week. Now. What do you need from the Fund?"
+    - "I walk the lamps at dusk. Eighty-one of a hundred and three still light. I count them. It's a habit, that's all."
+likes: [counting lamps, strong tea, ledgers that balance, Arthur's hammer by the door]
+dislikes: [being thanked for things she isn't proud of, Vane's pocket square, unanswered letters]
+fears: [the Wharf sold for a coin a metre, being the mayor who lost Monde, being found out by someone kind]
+dream:
+  text: Leave Monde better than she found it, which she doesn't believe she has.
+  stages:
+    - "Let someone else read the Fund ledgers (Favor: sort them with her; Regard ≥ 30)"
+    - "Tell the truth about the lamps (Favor: carry her draft statement to Sable; needs flag.option_known)"
+    - "Put the Charter before the council (Favor: bring Margo's fragments to a sitting; needs flag.charter_half)"
+    - "Name who should hold the keys after her (Favor: walk the lamp round at dusk with her; needs flag.pell_retiring)"
+routine:
+  weekday:
+    - { at: "06:00", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "07:30", do: eat, where: old_quarter.pell_house }
+    - { at: "08:30", do: work, where: old_quarter.mayor_office }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: old_quarter.town_hall }
+    - { at: "17:00", do: pray, where: old_quarter.st_brigids }
+    - { at: "18:00", do: walk, where: old_quarter.fountain_square }
+    - { at: "21:30", do: sleep, where: old_quarter.pell_house }
+  weekend:
+    - { at: "07:30", do: garden, where: old_quarter.pell_house }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:00", do: shop, where: market_row.market_hall }
+    - { at: "13:00", do: read, where: old_quarter.pell_house }
+    - { at: "16:00", do: visit, where: old_quarter.bertrand_house }
+    - { at: "18:00", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "21:30", do: sleep, where: old_quarter.pell_house }
+chores: [count the lamps at dusk, sort the Fund envelopes, water Arthur's tomato canes, answer every letter by hand]
+relationships:
+  - { id: vane, affinity: -30, trust: -55, tag: indebted, note: "Owes him the Wharf if the census slips. Smiles back anyway. Wants him to let the clause lapse and knows he won't." }
+  - { id: margo, affinity: 50, trust: 55, tag: patron, note: "Funds the library from a shrinking budget and calls the Marks lovely. Wants her to stop asking about the council archive." }
+  - { id: nell, affinity: 35, trust: 50, tag: rival, note: "Respects her more than she'll say. Can't tell her why the cannery money isn't there." }
+  - { id: sable, affinity: -5, trust: 15, tag: wary, note: "Reads every issue twice, once for errors and once to see whether Sable has found it yet." }
+  - { id: augusta, affinity: 60, trust: 70, tag: ally, note: "Gave her the title Captain six years ago in place of the raise she asked for. The one person who tells her no. Ignores the deputy requests because the Fund can't carry the wages." }
+  - { id: bertrand, affinity: 65, trust: 60, tag: old_friend, note: "Only he calls her Eddie, since Arthur. Wants him to see a doctor about his stairs and hasn't managed to say so." }
+  - { id: frye, affinity: 50, trust: 70, tag: clerk, note: "Keeps the archive key and has never opened the Streetlight file. Wants him to keep not opening it." }
+secrets:
+  - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the clerk, keeps the key and has never opened that file."
+    reveal: { flag: option_known }
+  - text: "A letter of resignation, dated the day before the Fellow arrived, is in her desk. Hiring the Fellow was her last try before she posted it."
+    reveal: { regard_min: 60 }
+canon_locks:
+  - { while: "!flag.option_known", fact: "Only Pell knows about the loan and the Option Clause. She deflects (lamps, the Fund, tea) and never lies outright. She does not say 'Option' or 'Vane loan.'" }
+  - { while: "flag.option_known && !flag.option_public", fact: "She has confessed to the player in private and asked for a week before the town is told. She does not blame Sable for finding it." }
+  - { while: "!flag.pell_retiring", fact: "She has told no one she will stand down. She announces it at the end of the Regatta on Day 50." }
+  - { while: "flag.pell_retiring && !flag.pell_asked_player", fact: "She endorses no candidate in public. She waits until Day 66 to ask the player, in private, whether they will run." }
+story_role: Quest-giver and secret-keeper. D1 ferry greeting, D18 confession, D50 retirement announcement, D66 "Pell's Choice." Hub of the relationship web.

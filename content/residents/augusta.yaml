@@ -1,0 +1,87 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: augusta
+name: Captain Augusta Reyes
+age: 52
+pronouns: she/her
+kind: canon
+occupation: Constable; the whole of the Monde constabulary
+workplace: old_quarter.constabulary
+home: old_quarter.augusta_house
+portrait: augusta
+sprite: augusta
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, notebook_up, deadpan_tired]
+appearance: >
+  Compact and straight-backed, in a navy tunic with the buttons polished weekly, a grey-streaked braid
+  under her peaked cap, and a notebook held in her left hand like a third glove.
+backstory: >
+  Augusta joined the Monde constabulary at twenty-two with eleven colleagues. Nine retired, one died,
+  and one took the ferry. She has been the whole force for six years, and the title "Captain" is what
+  the council gave her instead of a raise. She walks the beat twice a day and writes Saturday night in
+  her book: grey van, Tollmen, no witnesses. She has asked the mayor for two deputies four times. She
+  sleeps in her uniform trousers in case the bell rings.
+personality:
+  traits: [honest, tired, dutiful, dry]
+  big5: { open: 40, conscientious: 92, extravert: 38, agreeable: 62, neurotic: 55 }
+values: { prosperity: 0.15, safety: 0.58, spirit: 0.15, charm: 0.12 }
+beliefs:
+  - "One signed statement from a shopkeeper would let her arrest Rook."   # wrong: Rook is the hand and Greyline is the head; she needs paper on the van
+  - "Pell has forgotten her deputy requests."   # wrong: Pell cannot afford the wages
+  - "A force of one can be everywhere if she keeps to the beat."
+voice:
+  register: >
+    Procedural and polite. Times and places like a report. "Noted." Trails off mid-list when
+    exhausted. Dry about her staffing. Never promises. "Fellow" for the player, "Mayor" for Pell,
+    "Mercer" for Rook. She writes while she listens.
+  tics: ["Noted.", "For the record,", "Right."]
+  never_says: ["I promise", "don't worry", "it'll be fine", "off duty"]
+  samples:
+    - "Tuesday, nineteen-forty hours, Fountain Square. Two lads, one bin, no witnesses. For the record, I was on the Wharf at the time. All of me."
+    - "Four requests for two deputies. The mayor writes 'budget' on every one. I've started to dread the word."
+    - "I can't promise. I can write it down, and I can be at the pub at closing. That's what I've got this week."
+likes: [a quiet beat, squared notebook pages, tea at closing, a clean signed statement]
+dislikes: [witnesses who go blank, grey vans, promises, paperwork delayed by ferry days]
+fears: [a night call she can't cover, someone hurt on her beat, the force ending with her]
+dream:
+  text: Enough deputies to sleep through the night.
+  stages:
+    - "Collect statements (Favor: persuade one shopkeeper to sign; Regard ≥ 30)"
+    - "Recruit the first deputy (Favor: bring her an arrival with the 'constable' archetype)"
+    - "Mend the cell door and the bell (Favor: bring Kasimir)"
+    - "Sleep through a night (sets flag.deputies_hired)"
+routine:
+  weekday:
+    - { at: "06:00", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "07:30", do: eat, where: old_quarter.augusta_house }
+    - { at: "09:00", do: work, where: old_quarter.constabulary }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: walk, where: market_row.market_street }
+    - { at: "18:00", do: walk, where: wharf.crane_yard }
+    - { at: "23:00", do: visit, where: market_row.gull_and_anchor }
+    - { at: "24:30", do: sleep, where: old_quarter.augusta_house }
+  weekend:                       # Saturday evening she watches the van from the breakwater, out of its sight
+    - { at: "09:00", do: work, where: old_quarter.constabulary }
+    - { at: "11:00", do: walk, where: market_row.market_hall }
+    - { at: "13:00", do: eat, where: old_quarter.augusta_house }
+    - { at: "15:00", do: nap, where: old_quarter.augusta_house }
+    - { at: "18:00", do: sit, where: wharf.breakwater }
+    - { at: "23:00", do: visit, where: market_row.gull_and_anchor }
+    - { at: "24:30", do: sleep, where: old_quarter.augusta_house }
+chores: [polish the buttons, check the cell lock, update the Saturday log, walk the Wharf end to end]
+relationships:
+  - { id: pell, affinity: 55, trust: 45, tag: ally, note: "Respects her. Suspects something is wrong with the Fund that Pell won't say." }
+  - { id: rook, affinity: -20, trust: 5, tag: adversary, note: "Knew his father. Wants one honest statement from anyone about him. Thinks he's better than the job." }
+  - { id: sable, affinity: 45, trust: 50, tag: ally, note: "Wants Sable to print the van's visits so people start remembering them." }
+  - { id: hollis, affinity: 40, trust: 45, tag: fond, note: "He reports trespass on his own platform to her. She writes it down and does nothing." }
+  - { id: nell, affinity: 45, trust: 55, tag: ally, note: "Wants a signed statement. Knows Nell won't sign while Rook is loose." }
+  - { id: rosalind, affinity: 50, trust: 60, tag: spark, note: "Her closing-time visit is the best part of a bad day. Hasn't said so." }
+secrets:
+  - text: "A letter offering her a post on the mainland force has sat in her drawer for three months, unanswered."
+    reveal: { regard_min: 55 }
+  - text: "She has the van's plate and the courier's face from the breakwater, but nothing that ties either to Greyline or to Vane."
+    reveal: { flag: greyline_invoice_seen }
+canon_locks:
+  - { while: "!flag.deputies_hired", fact: "Augusta is the whole Monde constabulary, with one cell, one bell and one notebook. She has asked the mayor for two deputies four times." }
+  - { while: "!flag.tollmen_broken", fact: "She knows Rook leads the Tollmen and knows about the grey van. She has no witness who will sign." }
+  - { while: "!flag.ledger_obtained", fact: "She cannot connect the van to Vane or to Greyline and will not accuse anyone without paper." }
+  - { while: "flag.augusta_roz_dating", fact: "Her closing-time tea with Roz is a standing thing. She tells nobody and the whole pub knows." }
+story_role: Law and order. D3 appears after the shakedown, Scuffle referee, Safety quest-giver. Her tired honesty is the player's reference for what "enough" would look like.

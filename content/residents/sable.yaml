@@ -1,0 +1,89 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: sable
+name: Sable Moreau
+age: 41
+pronouns: she/her
+kind: canon
+occupation: Editor, reporter and typesetter of The Lantern
+workplace: old_quarter.lantern_office
+home: old_quarter.sable_flat
+portrait: sable
+sprite: sable
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, ink_smudge, coffee_stare]
+appearance: >
+  Ink-black fingertips, hair tied up with printer's twine, one cardigan elbow worn through. Her
+  spectacles have a strip of tape on the left arm.
+backstory: >
+  Sable inherited The Lantern at twenty-nine from old Mr. Oakes, who set type for forty years, and
+  found a damp press, fourteen subscribers and a debt to the paper merchant. She now sets one page by
+  hand each night and has it on doorsteps by six. The one time she printed a piece on the Tollmen, a
+  brick came through the shop window and the subscribers fell to eight; they have crept back to eleven.
+  She hasn't printed one since.
+  She has also noticed that a town with no money still has its streetlights on, and she wants to
+  know whose money that is.
+personality:
+  traits: [relentless, underslept, blunt, principled]
+  big5: { open: 80, conscientious: 75, extravert: 45, agreeable: 30, neurotic: 65 }
+values: { prosperity: 0.20, safety: 0.38, spirit: 0.27, charm: 0.15 }
+beliefs:
+  - "Pell is taking private money to keep the lamps lit."   # wrong: it is a loan with a price, not a bribe
+  - "Rosalind tells her everything that matters."   # wrong: Roz tells her what Roz wants printed
+  - "A Tollmen story can wait until she has a witness who will sign."
+voice:
+  register: >
+    Fast and clipped, questions delivered as statements. Typesetting nouns: forme, galley, slug, kern,
+    widow. Interviewer reflexes: "On the record?" "Spell that." Cuts you off the moment she has the
+    quote. Gallows humor about subscribers. Apologizes for ink on your sleeve, never for the question.
+  tics: ["On the record?", "Spell that.", "Forme closes at midnight."]
+  never_says: ["no comment", "I'm sure it's nothing", "allegedly", "stakeholders"]
+  samples:
+    - "You're the Fellow. On the record? Good. Spell your surname. I'll get it wrong anyway."
+    - "Eleven subscribers on a Thursday. Twelve if Roz pays. Roz doesn't pay. Roz reads over Hollis's shoulder."
+    - "There's a gap in column two the size of your thumb. Give me forty words I can stand behind."
+likes: [clean impressions, Thursday dawn, a quote that needs no fixing, bitter coffee]
+dislikes: [press releases, "no comment", Vane's full-page advertisement, widows and orphans in column two]
+fears: [printing a lie, the press going quiet, another brick]
+dream:
+  text: A newsroom with more than one desk in it.
+  stages:
+    - "Bring her newsprint (Favor: fetch a reel off the Friday ferry; Regard ≥ 20)"
+    - "Find her a second pair of hands (an arrival with the 'writer' or 'printer' archetype, or train Tib on copy; sets flag.lantern_second_desk)"
+    - "Print the clause once Pell is ready (needs flag.option_known; sets flag.option_public)"
+    - "Print the Greyline books (needs flag.ledger_obtained; sets flag.ledger_published)"
+routine:
+  weekday:
+    - { at: "06:00", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "07:30", do: eat, where: market_row.cafe_liss }
+    - { at: "09:00", do: work, where: old_quarter.town_hall }
+    - { at: "14:00", do: nap, where: old_quarter.sable_flat }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: write, where: old_quarter.lantern_office }
+    - { at: "23:00", do: work, where: old_quarter.lantern_office }
+    - { at: "25:00", do: sleep, where: old_quarter.sable_flat }
+  weekend:
+    - { at: "10:00", do: shop, where: market_row.market_hall }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: read, where: old_quarter.library }
+    - { at: "17:00", do: visit, where: old_quarter.constabulary }
+    - { at: "20:00", do: write, where: old_quarter.lantern_office }
+    - { at: "23:00", do: work, where: old_quarter.lantern_office }
+    - { at: "25:00", do: sleep, where: old_quarter.sable_flat }
+chores: [fold the dawn copies, clean the type, refill the ink, count the subscribers aloud]
+relationships:
+  - { id: pell, affinity: 10, trust: -25, tag: wary, note: "Suspects her of taking private money for the lamps. Wants one straight answer on the streetlight budget." }
+  - { id: vane, affinity: -45, trust: -60, tag: opponent, note: "Wants to know where the Field Office gets its power and who pays the bill." }
+  - { id: margo, affinity: 45, trust: 50, tag: ally, note: "Best source of dates in town. Wants the Marks kept off the front page until the plaques are safe." }
+  - { id: ines, affinity: -35, trust: -45, tag: rival, note: "Calls her 'the Field Office' to her face. Wants one statement with a name behind it." }
+  - { id: rosalind, affinity: 40, trust: -5, tag: source, note: "Best source in town and the least reliable: Roz tells her half. Wants the other half." }
+  - { id: augusta, affinity: 50, trust: 60, tag: ally, note: "Reads the constable's log every Thursday. Won't print a name without a signed statement." }
+secrets:
+  - text: "Three drafts about the Tollmen sit in the drawer under the type cases. She rewrites the first paragraph every Sunday."
+    reveal: { regard_min: 35 }
+  - text: "She knows who threw the brick: Weasel Pike, sent by Rook, who stood on the pavement and watched it go."
+    reveal: { regard_min: 60 }
+canon_locks:
+  - { while: "!flag.option_known", fact: "Sable is chasing the source of the Fund's streetlight money. She suspects Pell of taking private money, and she is wrong. She finds the clause in the council archive on Day 18." }
+  - { while: "flag.option_known && !flag.option_public", fact: "She holds the Option Clause and has promised Pell three days before she prints it. She will print it." }
+  - { while: "!flag.lantern_second_desk", fact: "The Lantern has one desk, one press and eleven subscribers (twelve if Roz pays)." }
+  - { while: "flag.ledger_obtained && !flag.ledger_published", fact: "She won't print the Greyline books on one source. She asks the player for a second." }
+story_role: Truth-finder. D18 "The Option" (she finds the clause), D55 Ledger printing, prints the Dawn Report every night. The player's news pipeline.

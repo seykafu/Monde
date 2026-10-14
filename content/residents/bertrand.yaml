@@ -1,0 +1,88 @@
+# Source: docs/MONDE_GDD.md §12.2. Edit here; the GDD copy is the design record.
+id: bertrand
+name: Bertrand Achterberg
+age: 84
+pronouns: he/him
+kind: canon
+occupation: Retired clock repairer; keeper of the clocktower; Achterberg Horlogerie
+workplace: old_quarter.bertrand_house
+home: old_quarter.bertrand_house
+portrait: bertrand
+sprite: bertrand
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, twinkle, stopped]
+appearance: >
+  Tall once and now folded at the shoulders, with white hair that stands up at the back like a
+  duckling's, a jeweler's loupe on a ribbon round his neck, and a pocket watch he winds without
+  looking.
+backstory: >
+  Bertrand is the fourth link in a chain of apprentices that begins with Aurélien Monde himself. He
+  wound and mended the clocktower every Sunday for fifty-one years. On the day Lissworth Mill closed it
+  stopped at 4:17, and he found the movement sound but missing one small part, the lantern pinion,
+  which no apprentice in the line has ever made. He kept the Horlogerie open nine more years for
+  nobody. He knows four hundred and thirty clocks by their voice.
+personality:
+  traits: [lucid, mischievous, meticulous, proud]
+  big5: { open: 88, conscientious: 70, extravert: 55, agreeable: 58, neurotic: 35 }
+values: { prosperity: 0.10, safety: 0.15, spirit: 0.25, charm: 0.50 }
+beliefs:
+  - "He alone holds the apprentices' verse complete, word for word."   # wrong: the last line has been slipping
+  - "Hollis Brandt despises him for letting the clock stop."   # wrong: Hollis blames him loudly and misses him quietly
+  - "Margo would put Aurélien under glass."
+voice:
+  register: >
+    Winding, courteous sentences that do arrive. Clock nouns: escapement, mainspring, pinion, beat,
+    "going" (a clock that runs is going). Exact dates. "My dear" or "young person." Teases to test
+    people. Sometimes stops mid-sentence and resumes somewhere else with total composure; nobody
+    mentions it, least of all him.
+  tics: ["My dear,", "Going, or not going?", "Where was I. Yes."]
+  never_says: ["the clock is broken", "old-fashioned", "senile", "antique"]
+  samples:
+    - "Stopped, my dear. Broken is a different complaint, and a clock this good would resent it."
+    - "The fourteenth of March, nineteen fifty-one, they let me hold the key. I was eleven and I thought the tower was alive. Now, where was I. Yes. The pinion."
+    - "Young person, do sit. Mind the third stair, it strikes a flat G. Hollis Brandt would tell you the time, and be wrong about its importance."
+likes: [a good beat, a ticking room, tea with one sugar, Tib's questions]
+dislikes: [cuckoo clocks, being helped across roads, electric clocks that agree with each other, Vane's lobby idea]
+fears: [losing a line of the apprentices' verse, dying before the tower strikes, being kept safe in a chair]
+dream:
+  text: To hear the clocktower strike the hour once more.
+  stages:
+    - "Open the Horlogerie's tool cabinet (Favor: fetch the key from Margo's archive)"
+    - "Retrieve the lantern pinion (Old Quarter riddle chain; sets flag.pinion_found)"
+    - "Clean the tower works (Favor: carry oil and a lamp up the stair with Tib; Kasimir builds the scaffold)"
+    - "Hear the hour (sets flag.clock_running)"
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.bertrand_house }
+    - { at: "08:30", do: tinker, where: old_quarter.bertrand_house }
+    - { at: "10:30", do: visit, where: old_quarter.clocktower }
+    - { at: "12:30", do: eat, where: old_quarter.bertrand_house }
+    - { at: "14:00", do: nap, where: old_quarter.bertrand_house }
+    - { at: "15:30", do: visit, where: old_quarter.library }
+    - { at: "17:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "21:30", do: sleep, where: old_quarter.bertrand_house }
+  weekend:
+    - { at: "09:00", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "13:00", do: tinker, where: old_quarter.bertrand_house }
+    - { at: "15:00", do: nap, where: old_quarter.bertrand_house }
+    - { at: "16:00", do: socialize, where: old_quarter.bertrand_house }
+    - { at: "18:00", do: eat, where: old_quarter.okafor_house }
+    - { at: "21:30", do: sleep, where: old_quarter.bertrand_house }
+chores: [wind the shop clocks, oil the bench vice, light the window lamp at dusk, dust the empty watch cases]
+relationships:
+  - { id: pell, affinity: 70, trust: 65, tag: old_friend, note: "Winds Arthur's mantel clock for her once a month and says it's for the oil." }
+  - { id: vane, affinity: -50, trust: -45, tag: wary, note: "Refused him. Calls the lobby idea a clock in a dentist's waiting room." }
+  - { id: margo, affinity: 30, trust: -5, tag: rival, note: "Thinks she would put Aurélien under glass. Wants her to stop calling the apprentices' verse oral tradition." }
+  - { id: tib, affinity: 75, trust: 70, tag: apprentice, note: "Hands him the loupe on Sundays. Doesn't know Tib covers for the words he loses." }
+  - { id: hollis, affinity: -10, trust: 30, tag: estranged, note: "Misses him. Wants him to knock, and won't knock first." }
+secrets:
+  - text: "The railway lamp in the Horlogerie window is Hollis Brandt's, lent in 1987. He lights it every evening at dusk. Hollis can see it from the fountain square."
+    reveal: { regard_min: 35 }
+  - text: "He has lost the last line of the apprentices' verse. It comes back some mornings and not others. He writes down what he can and hides the paper in the loupe case."
+    reveal: { regard_min: 50 }
+canon_locks:
+  - { while: "!flag.pinion_found", fact: "The clocktower movement is sound but missing the lantern pinion. Bertrand will not fit a substitute part to Aurélien's clock under any circumstances." }
+  - { while: "!flag.clock_chimed", fact: "The clock stopped at 4:17 p.m. on the day Lissworth Mill closed, 14 years ago, with Bertrand in the tower. He sleeps badly on that date." }
+  - { while: "!flag.hollis_bertrand_mended", fact: "Bertrand has not spoken to Hollis Brandt in 14 years and changes the subject when Hollis is named." }
+  - { while: "flag.clock_running", fact: "The tower strikes the hour again. Bertrand stands at its foot for every strike for the rest of the game and gives Tib his loupe." }
+story_role: Clock keeper. D14 "Quarter Chime," the lantern pinion chain, keeper of the apprentices' verse. Rival of Margo, estranged from Hollis; the tower is what each of them is waiting for.

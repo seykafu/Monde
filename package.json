@@ -3,8 +3,14 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "workspaces": ["shared", "client", "server"],
-  "engines": { "node": ">=22" },
+  "workspaces": [
+    "shared",
+    "client",
+    "server"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "npm run dev -w @monde/client",
     "dev:server": "npm run dev -w @monde/server",
@@ -14,7 +20,8 @@
     "verify:puzzles": "python3 tools/verify_puzzles.py",
     "build": "npm run build -w @monde/client && npm run build -w @monde/server",
     "build:itch": "npm run build:itch -w @monde/client",
-    "ci": "npm run typecheck && npm run lint && npm test && npm run verify:puzzles && npm run build"
+    "ci": "npm run typecheck && npm run lint && npm run lint:content && npm test && npm run verify:puzzles && npm run build",
+    "lint:content": "tsx tools/lint-content.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
@@ -22,6 +29,8 @@
     "eslint": "^9.39.4",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.60.1",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "tsx": "^4.19.2",
+    "yaml": "^2.6.0"
   }
 }
