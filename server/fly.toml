@@ -2,7 +2,7 @@ app = "monde-mind-staging"
 primary_region = "iad"
 
 [build]
-  dockerfile = "server/Dockerfile"
+  dockerfile = "Dockerfile"  # relative to this file; deploy with the repo root as context: flyctl deploy . -c server/fly.toml
 
 [deploy]
   release_command = "node server/dist/db/migrate.js"
