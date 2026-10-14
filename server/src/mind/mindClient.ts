@@ -74,9 +74,10 @@ export class DisabledMindClient implements MindClient {
   async createMessage(): Promise<Anthropic.Message> { throw new MindUnavailableError(); }
 }
 
-export function createMindClient(config: Pick<Config, "ANTHROPIC_API_KEY">): MindClient {
+export function createMindClient(config: Pick<Config, "ANTHROPIC_API_KEY" | "ANTHROPIC_WORKSPACE_ID">): MindClient {
   if (!config.ANTHROPIC_API_KEY) return new DisabledMindClient();
   // One SDK retry: dialogue calls are bounded by their own deadlines (dialogue.ts), so a retry can only help
   // inside that window, and a prewarm that fails twice isn't worth a third try.
-  return new AnthropicMindClient(new Anthropic({ apiKey: config.ANTHROPIC_API_KEY, maxRetries: 1 }));
+  const defaultHeaders = config.ANTHROPIC_WORKSPACE_ID ? { "anthropic-workspace-id": config.ANTHROPIC_WORKSPACE_ID } : undefined;
+  return new AnthropicMindClient(new Anthropic({ apiKey: config.ANTHROPIC_API_KEY, maxRetries: 1, defaultHeaders }));
 }

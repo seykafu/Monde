@@ -6,6 +6,8 @@ const schema = z.object({
   DATABASE_URL: z.url().optional(),
   REDIS_URL: z.url().optional(),
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
+  // Needed only when the API key is org-level rather than scoped to a workspace (sent as anthropic-workspace-id).
+  ANTHROPIC_WORKSPACE_ID: z.string().min(1).optional(),
   MONDE_ENV: z.enum(["dev", "staging", "production"]).default("dev"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   MONDE_TOKEN_SECRET: z.string().min(1).optional(),
