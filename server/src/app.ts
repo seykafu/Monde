@@ -5,6 +5,9 @@ import type { Config } from "./config.js";
 import { createDatabase } from "./db/client.js";
 import { createRedis } from "./redis.js";
 
+import { registerWorldRoutes } from "./worlds/routes.js";
+import type { WorldDatabase } from "./worlds/createWorld.js";
+
 type Check = "ok" | "down" | "off";
 async function check(probe?: () => Promise<unknown>): Promise<Check> {
   if (!probe) return "off";
@@ -24,7 +27,7 @@ async function check(probe?: () => Promise<unknown>): Promise<Check> {
   }
 }
 
-export function buildApp(config: Config) {
+export function buildApp(config: Config, testDb?: WorldDatabase) {
   const app = Fastify({ logger: { level: config.LOG_LEVEL }, genReqId: () => randomUUID() });
   const database = createDatabase(config.DATABASE_URL);
   const redis = createRedis(config.REDIS_URL);
@@ -61,5 +64,6 @@ export function buildApp(config: Config) {
     };
   });
   app.get("/v1/version", async () => ({ version: config.GIT_SHA }));
+  registerWorldRoutes(app, config, testDb ?? database?.db);
   return app;
 }

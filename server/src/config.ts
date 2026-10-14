@@ -8,10 +8,17 @@ const schema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
   MONDE_ENV: z.enum(["dev", "staging", "production"]).default("dev"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
+  MONDE_TOKEN_SECRET: z.string().min(1).optional(),
+  MONDE_INVITE_CODES: z.string().optional(),
+  MONDE_CONTENT_DIR: z.string().min(1).optional(),
   GIT_SHA: z.string().min(1).default("dev"),
 });
 
 export type Config = z.infer<typeof schema>;
 export function parseConfig(env: NodeJS.ProcessEnv = process.env): Config {
-  return schema.parse(env);
+  const config = schema.parse(env);
+  if (config.MONDE_ENV !== "dev" && !config.MONDE_TOKEN_SECRET) {
+    throw new Error("MONDE_TOKEN_SECRET is required outside dev");
+  }
+  return config;
 }

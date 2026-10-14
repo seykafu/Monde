@@ -17,7 +17,7 @@ describe("monde-mind", () => {
     expect(parseConfig({})).toEqual({
       PORT: 8080, NODE_ENV: "development", MONDE_ENV: "dev", LOG_LEVEL: "info", GIT_SHA: "dev",
     });
-    expect(parseConfig({ PORT: "9090", MONDE_ENV: "staging" }).PORT).toBe(9090);
+    expect(parseConfig({ PORT: "9090", MONDE_ENV: "staging", MONDE_TOKEN_SECRET: "test-secret" }).PORT).toBe(9090);
     expect(() => parseConfig({ PORT: "invalid" })).toThrow();
     expect(() => parseConfig({ MONDE_ENV: "invalid" })).toThrow();
   });

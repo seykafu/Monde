@@ -7,5 +7,5 @@ export default defineConfig({
   target: "node22",
   outDir: "dist",
   clean: true,
-  noExternal: ["@monde/shared"]
+  noExternal: ["@monde/shared", "yaml"]
 });

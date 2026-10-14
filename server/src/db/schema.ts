@@ -1,7 +1,128 @@
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import type { PersonaCard, ResidentState, PlanOutput, DialogueTurnOutput } from "@monde/shared";
+import { pgTable, text, timestamp, uuid, integer, numeric, jsonb, boolean, bigserial, primaryKey, index } from "drizzle-orm/pg-core";
 
 export const meta = pgTable("meta", {
   key: text("key").primaryKey(),
   value: text("value"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+});
+
+const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
+export const devices = pgTable("devices", {
+  id: text("id").primaryKey(), inviteCode: text("invite_code").notNull(),
+  createdAt: createdAt(), lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull().defaultNow(),
+});
+export const worlds = pgTable("worlds", {
+  id: uuid("id").primaryKey(), deviceId: text("device_id").notNull().references(() => devices.id),
+  seed: integer("seed").notNull(), day: integer("day").notNull().default(1),
+  minute: integer("minute").notNull().default(360), status: text("status").notNull(),
+  branchId: uuid("branch_id").notNull(), createdAt: createdAt(),
+  aiSpendDay: integer("ai_spend_day").notNull(), aiSpendUsd: numeric("ai_spend_usd").notNull().default("0"),
+});
+const worldId = () => uuid("world_id").notNull().references(() => worlds.id, { onDelete: "cascade" });
+export const residents = pgTable("residents", {
+  worldId: worldId(),
+  id: text("id").notNull(),
+  card: jsonb("card").$type<PersonaCard>().notNull(),
+  state: jsonb("state").$type<ResidentState>().notNull(),
+  tier: text("tier").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
+export const relationships = pgTable("relationships", {
+  worldId: worldId(),
+  fromId: text("from_id").notNull(),
+  toId: text("to_id").notNull(),
+  affinity: integer("affinity").notNull(),
+  trust: integer("trust").notNull(),
+  tag: text("tag").notNull(),
+  note: text("note").notNull(),
+  feelingKind: text("feeling_kind"),
+  feelingIntensity: integer("feeling_intensity").notNull().default(0),
+  lastSeenDay: integer("last_seen_day"),
+}, (t) => [primaryKey({ columns: [t.worldId, t.fromId, t.toId] })]);
+export const memories = pgTable("memories", {
+  worldId: worldId(),
+  id: text("id").notNull(),
+  residentId: text("resident_id").notNull(),
+  day: integer("day").notNull(),
+  minute: integer("minute").notNull(),
+  kind: text("kind").notNull(),
+  text: text("text").notNull(),
+  who: text("who").array().notNull(),
+  wherePlace: text("where_place").notNull(),
+  importance: integer("importance").notNull(),
+  valence: integer("valence").notNull(),
+  sourceEvent: text("source_event"),
+  archived: boolean("archived").notNull().default(false),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] }), index("memories_world_resident_day_idx").on(t.worldId, t.residentId, t.day)]);
+export const events = pgTable("events", {
+  worldId: worldId(),
+  id: text("id").notNull(),
+  day: integer("day").notNull(),
+  minute: integer("minute").notNull(),
+  type: text("type").notNull(),
+  wherePlace: text("where_place").notNull(),
+  who: text("who").array().notNull(),
+  importance: integer("importance").notNull(),
+  tags: text("tags").array().notNull(),
+  summary: text("summary").notNull(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] }), index("events_world_day_idx").on(t.worldId, t.day)]);
+export const plans = pgTable("plans", {
+  worldId: worldId(),
+  residentId: text("resident_id").notNull(),
+  day: integer("day").notNull(),
+  plan: jsonb("plan").$type<PlanOutput>().notNull(),
+  source: text("source").$type<"model" | "template">().notNull(),
+  promptVersion: text("prompt_version"),
+}, (t) => [primaryKey({ columns: [t.worldId, t.residentId, t.day] })]);
+export const favors = pgTable("favors", {
+  worldId: worldId(),
+  id: text("id").notNull(),
+  residentId: text("resident_id").notNull(),
+  template: text("template").notNull(),
+  target: text("target").notNull(),
+  text: text("text").notNull(),
+  status: text("status").notNull(),
+  createdDay: integer("created_day").notNull(),
+  expiresDay: integer("expires_day").notNull(),
+  reward: jsonb("reward").notNull(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
+export const letters = pgTable("letters", {
+  worldId: worldId(),
+  id: text("id").notNull(),
+  fromId: text("from_id").notNull(),
+  toId: text("to_id").notNull(),
+  day: integer("day").notNull(),
+  text: text("text").notNull(),
+  delivered: boolean("delivered").notNull().default(false),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
+export const dialogueTurns = pgTable("dialogue_turns", {
+  worldId: worldId(),
+  id: text("id").notNull(),
+  residentId: text("resident_id").notNull(),
+  conversationId: text("conversation_id").notNull(),
+  day: integer("day").notNull(),
+  minute: integer("minute").notNull(),
+  playerInput: text("player_input"),
+  output: jsonb("output").$type<DialogueTurnOutput>().notNull(),
+  fallback: boolean("fallback").notNull(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
+export const snapshots = pgTable("snapshots", {
+  worldId: worldId(),
+  id: uuid("id").notNull(),
+  branchId: uuid("branch_id").notNull(),
+  day: integer("day").notNull(),
+  objectKey: text("object_key").notNull(),
+  createdAt: createdAt(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
+export const aiLog = pgTable("ai_log", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  worldId: uuid("world_id").references(() => worlds.id, { onDelete: "set null" }),
+  kind: text("kind").notNull(), residentId: text("resident_id"),
+  promptVersion: text("prompt_version").notNull(), model: text("model").notNull(),
+  inputTokens: integer("input_tokens").notNull(), cachedTokens: integer("cached_tokens").notNull(),
+  cacheWriteTokens: integer("cache_write_tokens").notNull(), outputTokens: integer("output_tokens").notNull(),
+  costUsd: numeric("cost_usd").notNull(), latencyMs: integer("latency_ms").notNull(),
+  firstTokenMs: integer("first_token_ms"), stopReason: text("stop_reason").notNull(),
+  validation: text("validation").notNull(), fallback: boolean("fallback").notNull(), createdAt: createdAt(),
 });

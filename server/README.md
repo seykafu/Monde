@@ -43,3 +43,34 @@ manually in Drizzle format because drizzle-kit could not be installed.
 After installation, run db:generate to verify the snapshot matches the schema
 (no schema changes expected), then run typecheck, tests, lint, build, and a live
 health request before deployment. Docker was unavailable in that environment.
+
+## World creation (M-01)
+
+`POST /v1/worlds` accepts `{ "device_id": "...", "invite_code": "..." }` and
+returns `{ "world_id": "...", "token": "..." }`. Each call creates a distinct
+save, including when the device already exists. Device upsert, world, residents,
+and directed relationships are committed together. The Day-1 template is parsed
+and validated once per content directory, then cloned for each request.
+
+`GET /v1/worlds/:w` returns `{ world_id, day, minute, residents }`. Send
+`Authorization: Bearer <token>` on this and every nested world route. Tokens are
+HMAC-SHA256 signatures bound to the world's stored device id.
+
+- `MONDE_TOKEN_SECRET`: required in staging/production; set a strong random Fly
+  secret. Changing it invalidates existing world tokens. Dev has a local fallback.
+- `MONDE_INVITE_CODES`: comma-separated allowed codes; set as a Fly secret.
+  Outside dev, an empty list denies world creation. Dev accepts any nonempty code.
+- `MONDE_CONTENT_DIR`: optional content root containing `residents/*.yaml`.
+  Defaults to the repository content directory relative to the server package.
+  Docker sets `/app/content`, copied into the image without write permission.
+
+Provision Postgres and set `DATABASE_URL` before enabling world creation. Fly's
+existing release command applies the generated migrations. Redis and object
+storage are not needed by these endpoints; snapshot storage must be provisioned
+when snapshot operations are implemented. YAML is bundled from the already
+installed package, so runtime installation needs no new dependency.
+
+PGlite tests apply the real migration files. Verification for M-01 passed root
+typecheck, tests and lint, plus the server build. Day-1 mood numbers are a
+`GDD-GAP`: valence 0, energy 50, stress 0, content intensity 0. Needs start at 70
+and stay at the requested placeholder 50 pending simulation computation.

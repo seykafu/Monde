@@ -12,17 +12,18 @@
     "db:migrate": "node --import tsx src/db/migrate.ts"
   },
   "dependencies": {
-    "@monde/shared": "*",
-    "fastify": "^5.2.0",
-    "drizzle-orm": "^0.44.7",
-    "postgres": "^3.4.7",
-    "ioredis": "^5.8.2",
     "@fastify/cors": "^11.1.0",
+    "@monde/shared": "*",
+    "drizzle-orm": "^0.44.7",
+    "fastify": "^5.2.0",
+    "ioredis": "^5.8.2",
+    "postgres": "^3.4.7",
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.3.16",
+    "drizzle-kit": "^0.31.5",
     "tsup": "^8.3.5",
-    "tsx": "^4.19.2",
-    "drizzle-kit": "^0.31.5"
+    "tsx": "^4.19.2"
   }
 }

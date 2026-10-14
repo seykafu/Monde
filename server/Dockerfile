@@ -19,6 +19,9 @@ COPY client/package.json ./client/package.json
 RUN npm ci --omit=dev --workspace @monde/server --include-workspace-root=false && npm cache clean --force
 COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/server/drizzle ./server/drizzle
+COPY content/ ./content/
+RUN chmod -R a-w /app/content
+ENV MONDE_CONTENT_DIR=/app/content
 USER node
 EXPOSE 8080
 CMD ["node", "server/dist/index.js"]
