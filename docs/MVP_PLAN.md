@@ -238,8 +238,8 @@ soak passes on every commit.
 
 | ID | Task | Owner | Dep | Done when |
 |---|---|---|---|---|
-| A-01 | **Style bible**: 6 key paintings + 4 master portraits (Pell, Odile, Tib, Rook) per §16.7 | IMG + OP | none | **Kasey approves (week 3)**; everything else uses these as references |
-| A-02 | Port Ravage's art scripts (`gen_portrait_art`, `gen_anim_sheets`, `process_*`) to Monde, using `codex exec -m gpt-6-astra` | CX | F-01 | One portrait and one sheet regenerate from source |
+| A-01 | **Style bible** in the cartoon direction (Fire Emblem × Stardew, GDD §16.1): 6 key backdrops + 4 master portraits (Pell, Odile, Tib, Rook) + a gameplay mockup. v1 (painterly) was superseded on 2026-10-14. | IMG + OP | none | **Kasey approves**; everything else uses these as references |
+| A-02 | Port Ravage's art scripts (`gen_portrait_art`, `gen_anim_sheets`, `process_*`) to Monde, using `codex exec -m gpt-6-astra`; move `art_sources/` to **Git LFS** before bulk generation | CX | F-01 | One portrait and one sheet regenerate from source |
 | A-03 | Tilesets and props for the 4 districts, plus Faded/Restored decals | IMG | A-01, W-01 | Greybox maps swapped to real tiles |
 | A-04 | Portraits for the 15 MVP core residents + 4 featured (Bru, Nettie, Moss, Ada) × the standard 8 (+ signature expressions) | IMG | A-01 | Contact sheets pass the consistency check |
 | A-05 | Library portraits for MVP: **40 masters × 3 color variants × 5 expressions** (600 images) with tags | IMG | A-01 | 120 identities tagged; M-03 can assign them |

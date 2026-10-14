@@ -76,7 +76,7 @@ town doesn't wait for you. It has its own life, and you're one part of it.
 | P2 | **You can see the town come back** | Every good deed has a visible result. Shop shutters go up, lights come on, the fountain runs, new faces walk off the morning train. The Dawn Report shows arrivals each morning. |
 | P3 | **Cozy, with stakes** | No permadeath, no fail screens before Day 100. But a real antagonist and a real deadline give the days weight. Scuffles are cartoon-level and nobody dies. |
 | P4 | **The founder's riddles** | Hand-made riddles and puzzles run under the whole game as an authored backbone. Unlike the AI layer, they are fixed, fair and designed. |
-| P5 | **Ravage's look, a warmer palette** | Same tech and the same art language as Ravage: a ¾ diorama world, pixel sprites standing on it, painted portraits and backdrops, visual-novel dialogue. Warmer light, softer hours. |
+| P5 | **Cartoon cozy: Fire Emblem × Stardew Valley** | Ravage's tech (a ¾ diorama world, visual-novel dialogue) with a cartoon look: a Stardew-style pixel-art town and sprites, Fire Emblem-style cel-shaded character portraits, clean cartoon backdrops. Warm, bright and readable. |
 
 ### 1.3 Player fantasy
 
@@ -92,7 +92,7 @@ off the people bleeding it dry, and when I asked the town to trust me with it, t
 | Session shape | One in-game day ≈ 15 real minutes. Full run ≈ 25–35 hours. |
 | Rating target | ESRB E10+ / PEGI 7. Cartoon scuffles, no romance content beyond hand-holding and dating between NPCs, no profanity, no substance use beyond the café and the pub's cider. |
 | Online | The live NPC layer needs a connection. A full **Quiet Mode** (offline fallback) keeps the game playable without one (see §9.13). |
-| Reference | Ravage (`seykafu/Ravage`) for tech, rendering, art pipeline, VN presentation and voice-writing rules. Stardew Valley / Animal Crossing for day rhythm. Persona for calendar pressure. |
+| Reference | Ravage (`seykafu/Ravage`) for tech, rendering, the art pipeline, VN presentation and voice-writing rules. **Art: Fire Emblem (character portraits) × Stardew Valley (world, sprites, palette, coziness).** Stardew Valley / Animal Crossing for day rhythm. Persona for calendar pressure. |
 
 ---
 
@@ -9522,24 +9522,35 @@ player's Wits level. Each run takes 2–5 real minutes and costs Stamina (§8).
 
 ## 16. Art direction and asset pipeline
 
-### 16.1 Style: Ravage, warmer
+### 16.1 Style: cartoon cozy, Fire Emblem × Stardew Valley
 
-Monde uses Ravage's visual language and rendering tech, pointed at a gentler subject.
+*Revised 2026-10-14 at Kasey's direction: less like Ravage's painterly art, more cartoon, a mix of Fire
+Emblem and Stardew Valley. The approved references are in `art_sources/style_bible_v2/`.*
 
-- **The ¾ diorama** (Ravage's "Approach C," `render/ObliqueProjection.ts`, `keystone.ts`, `depth.ts`,
-  `sun.ts`, `BloomPipeline.ts`): foreshortened 48×36 tile tops, elevation in 14 px steps, keystone
-  perspective (k = 0.12), luminance- and saturation-keyed bloom, sun shadows that follow the clock, and
-  x-ray outlines when the player is behind a building.
-- **Sprites:** 32×40 pixel-art frames drawn as 48×60 billboards (a clean 3× device scale), feet
-  anchored, hard edges, a 1 px dark outline, 16–32 colors per sprite.
-- **Portraits:** painted busts, 1024×1536 (2:3), transparent background, warm low light, head and
-  shoulders, a three-quarter view turned slightly right. The same spec and generation workflow as
-  Ravage's live portraits.
-- **Backdrops:** painted 1280×720 scenes for VN dialogue and puzzles. Painterly and atmospheric, with
-  no characters in them.
+Monde keeps Ravage's **rendering tech** and changes its **look**.
 
-**Palette and mood.** Monde runs warmer than Ravage: golden-hour light, sea-glass greens, brick reds,
-cream plaster, slate blues for shadow. It *starts faded*. Each zone has two color grades, **Faded**
+- **The ¾ diorama** (tech unchanged: Ravage's "Approach C," `render/ObliqueProjection.ts`, `keystone.ts`,
+  `depth.ts`, `sun.ts`, `BloomPipeline.ts`): foreshortened 48×36 tile tops, elevation in 14 px steps,
+  keystone perspective (k = 0.12), bloom, sun shadows that follow the clock, x-ray outlines behind
+  buildings. Bloom stays subtle so pixel art stays crisp.
+- **World art (tiles, props, buildings): Stardew Valley-style pixel art.** Chunky, clearly visible
+  pixels, a warm and bright limited palette, simple readable shapes, clean dithering, dark outlines on
+  props. Drawn at pixel scale and shown at an integer zoom, never smoothed.
+- **Sprites: Stardew-style pixel characters.** 32×40 frames shown as 48×60 billboards (a clean 3×
+  device scale), feet anchored, rounder Stardew proportions (bigger heads, stubby limbs), a 1 px dark
+  outline, 16–24 colors per sprite, readable at a glance.
+- **Portraits: Fire Emblem-style cartoon busts with Stardew warmth.** Clean, confident line art, cel
+  shading with soft gradients, crisp eye and hair highlights, expressive anime-influenced faces;
+  slightly rounder, friendlier proportions and a warm saturated palette. 1024×1536 (2:3), on flat
+  magenta for keying, head and shoulders, a three-quarter view turned slightly right.
+- **Backdrops: clean cozy cartoon illustration.** Crisp outlines, flat color with soft cel shading, a
+  bright warm palette, simple readable forms, a touch of whimsy. 1280×720 for VN dialogue and puzzles,
+  with no characters in them.
+- **Avoid:** painterly brushwork, photorealism, heavy texture, muddy low-key lighting. Those were
+  Ravage's look, not Monde's.
+
+**Palette and mood.** Bright and warm: sunny yellows, sea-glass greens, brick reds, cream plaster, slate
+blues for shadow. It *starts faded*. Each zone has two color grades, **Faded**
 (desaturated, cool, grey sky) and **Restored** (warm, saturated, clean light). The zone's grade blends
 between them by that district's share of restored landmarks and occupied homes. **That makes Pillar P2
 visible:** the player watches their district warm up. Other world details follow the same state: shop
@@ -9550,7 +9561,7 @@ and litter and graffiti decals clear as Charm rises.
 
 | Group | Count | Expressions | Images |
 |---|---|---|---|
-| Core cast (§4) | 20 (Bastien: 6 cat poses) | standard 8 + up to 2 signature | ≈ 190 |
+| Core cast (§4), cel-shaded cartoon busts (§16.1) | 20 (Bastien: 6 cat poses) | standard 8 + up to 2 signature | ≈ 190 |
 | Featured supporting (Tollmen ×5, Old Moss, Ada, Raman, Claudine, plus about 6 others from §12.4) | ~15 | standard 8 | ≈ 120 |
 | **Resident library** (Day-1 residents + arrivals) | 200 master busts × 3 color variants = **600 identities** | 5: neutral, happy, sad, angry, surprised | **3,000** |
 
@@ -9559,7 +9570,7 @@ and litter and graffiti decals clear as Charm rises.
   tone, hair color and style, build, attire (by archetype), distinguishing feature. A portrait is never
   reused while its owner lives in Monde; departures free it.
 - **Generation:** the Ravage workflow (`scripts/art/gen_portrait_art.py`). A **master** per identity in
-  the house style uses a style reference. **Expression** images are edits of the master that change only
+  the house style uses an approved v2 portrait (`art_sources/style_bible_v2/`) as its style reference. **Expression** images are edits of the master that change only
   the expression. **Color variants** are edits that change only hair and clothing colors. Every render
   is on flat magenta (#FF00FF) and keyed out by `process_portrait_art.py`.
 
@@ -9573,8 +9584,8 @@ and litter and graffiti decals clear as Charm rises.
 | Puzzle close-ups (one per PZ) | 20 |
 | Festival dressing (Bloom Fair, Regatta, Harvest Supper, Lantern Night) | 4 |
 
-The composition rules are Ravage's: horizon about y = 420, no characters, no UI, vignette allowed. Paint
-at native 1280×720.
+Clean cartoon illustration (§16.1). Composition rules carried over from Ravage: horizon about y = 420,
+no characters, no UI. Draw at native 1280×720.
 
 ### 16.4 The world
 
@@ -9618,7 +9629,8 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
 
 - **Generator:** GPT-6 image generation through the Codex CLI, as in Ravage's `scripts/art/gen_*.py`:
   `codex exec -m gpt-6-astra -s read-only --image <reference> -`, with the prompt on stdin, asking for
-  ONE image on flat #FF00FF. Monde copies Ravage's prompt kinds: **new** (a new subject in the house
+  ONE image on flat #FF00FF, with an approved v2 style key from `art_sources/style_bible_v2/` attached as the
+  style reference (never Ravage art). Monde copies Ravage's prompt kinds: **new** (a new subject in the house
   style of a reference), **edit** (the same subject with one change), and **pose** (a sprite sheet from
   a character reference plus a pose reference).
 - **Processing:** chroma key with de-spill, one blob per frame, a single scale per sheet, feet on the
@@ -9856,6 +9868,7 @@ Marks → library size 120 masters.
 | D12 | The "storybook modern" era | Timeless mood; keeps the AI away from real-world topics |
 | D13 | Romance is NPC↔NPC only | The rating; keeps the player as the town's catalyst |
 | D14 | A deterministic, seeded voter model | Fair, reproducible, explainable elections |
+| D15 | Art direction: cartoon cozy, Fire Emblem × Stardew Valley (§16.1), replacing "Ravage, warmer" | Kasey's call (2026-10-14): friendlier, more distinctive, better fit for a cozy game |
 
 ### 21.2 Open questions for Kasey
 
