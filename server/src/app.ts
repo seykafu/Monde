@@ -8,6 +8,9 @@ import { createRedis } from "./redis.js";
 import { registerWorldRoutes } from "./worlds/routes.js";
 import type { WorldDatabase } from "./worlds/createWorld.js";
 import { promptVersion } from "./mind/promptBuilder.js";
+import { createMindClient, type MindClient } from "./mind/mindClient.js";
+import { registerMindRoutes } from "./mind/routes.js";
+import type { DialogueTimings } from "./mind/dialogue.js";
 
 type Check = "ok" | "down" | "off";
 async function check(probe?: () => Promise<unknown>): Promise<Check> {
@@ -28,7 +31,14 @@ async function check(probe?: () => Promise<unknown>): Promise<Check> {
   }
 }
 
-export function buildApp(config: Config, testDb?: WorldDatabase) {
+/** Test and wiring seams. Production passes nothing: the Mind client comes from config (no key → fallbacks). */
+export interface AppOptions {
+  mind?: MindClient;
+  dialogueTimings?: Partial<DialogueTimings>;
+  prewarmIntervalMs?: number;
+}
+
+export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOptions = {}) {
   const app = Fastify({ logger: { level: config.LOG_LEVEL }, genReqId: () => randomUUID() });
   const database = createDatabase(config.DATABASE_URL);
   const redis = createRedis(config.REDIS_URL);
@@ -39,6 +49,8 @@ export function buildApp(config: Config, testDb?: WorldDatabase) {
       /^https:\/\/(?:[a-z0-9-]+\.)*itch\.io$/i,
       "http://localhost:5173",
     ],
+    // The default (GET, HEAD, POST) would make browsers refuse PATCH /v1/worlds/:w/player at preflight.
+    methods: ["GET", "HEAD", "POST", "PATCH"],
   });
   app.addHook("onRequest", async (request, reply) => {
     reply.header("x-request-id", request.id);
@@ -67,5 +79,10 @@ export function buildApp(config: Config, testDb?: WorldDatabase) {
   // Loading the prompt version at request time proves the prompt templates shipped with the build.
   app.get("/v1/version", async () => ({ version: config.GIT_SHA, prompt_version: promptVersion() }));
   registerWorldRoutes(app, config, testDb ?? database?.db);
+  registerMindRoutes(app, testDb ?? database?.db, {
+    mind: options.mind ?? createMindClient(config),
+    timings: options.dialogueTimings,
+    prewarmIntervalMs: options.prewarmIntervalMs,
+  });
   return app;
 }

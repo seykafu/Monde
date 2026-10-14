@@ -1,0 +1,252 @@
+/**
+ * monde-mind HTTP routes for M-05 (GDD §19.4): the player profile, live dialogue over Server-Sent Events and the
+ * proximity prewarm. All three sit under /v1/worlds/:w and are authorized by the world token hook in
+ * worlds/routes.ts.
+ *
+ * POST /v1/worlds/:w/talk answers `text/event-stream`:
+ *   event: line_delta  {index, text_so_far, attempt}   lines as they stream (attempt 2 replaces attempt 1)
+ *   event: thinking    {text: "Hm."}                   nothing visible after 2.5 s
+ *   event: error       {code, message}                 the turn failed; a fallback turn follows
+ *   event: turn        {conversation_id, resident_id, turn_index, lines[{text, expr}], choices, wrap_up, fallback}
+ * `turn` is always last and is authoritative: the client replaces any streamed text with its lines.
+ */
+import type { OutgoingHttpHeaders } from "node:http";
+import type { FastifyInstance, FastifyReply } from "fastify";
+import { eq } from "drizzle-orm";
+import { z } from "zod";
+import { Intent, PlaceId, ResidentId, type DialogueTurnOutput } from "@monde/shared";
+import { aiLog, worlds } from "../db/schema.js";
+import type { WorldDatabase } from "../worlds/createWorld.js";
+import { buildDialogueRequest, promptVersion } from "./promptBuilder.js";
+import { loadDialogueContext, loadResidentPrefix, type DialogueContext } from "./context.js";
+import {
+  MAX_EXCHANGES, WRAP_UP_NOTE, generateTurn, prewarmParams, type CallRecord, type DialogueTimings, type TurnFailure,
+} from "./dialogue.js";
+import { aiLogRow, persistTurn } from "./effects.js";
+import { LEAVE_CHOICE, THINKING_BEAT, fallbackTurn } from "./fallback.js";
+import { tokensOf, type MindClient } from "./mindClient.js";
+import { PlayerProfile, PlayerProfilePatch } from "./player.js";
+import { costUsd } from "./pricing.js";
+
+export interface MindRouteOptions {
+  mind: MindClient;
+  timings?: Partial<DialogueTimings>;
+  /** §9.10 step 1 / brief: at most one prewarm per resident per world every 4 minutes. */
+  prewarmIntervalMs?: number;
+  /** GDD-GAP: a prewarm is prefill only (no output); 5 s is ample and keeps a stuck call from piling up. */
+  prewarmTimeoutMs?: number;
+  now?: () => number;
+}
+
+export const PREWARM_INTERVAL_MS = 4 * 60 * 1000;
+
+/** §9.10: free text is at most 140 characters; generated choices are at most 90. */
+const PLAYER_TEXT = z.string().trim().min(1).max(140);
+
+export const TalkBody = z.object({
+  resident_id: ResidentId,
+  conversation_id: z.uuid(),
+  input: z.discriminatedUnion("kind", [
+    z.object({ kind: z.literal("open") }),
+    z.object({ kind: z.literal("choice"), choice_id: z.string().min(1).max(8), text: PLAYER_TEXT, intent: Intent }),
+    z.object({ kind: z.literal("say"), text: PLAYER_TEXT }),
+  ]),
+  context: z.object({
+    day: z.number().int().min(1),
+    minute: z.number().int().min(0).max(1560),
+    place: PlaceId,
+    weather: z.string().trim().min(1).max(40),
+    current_activity: z.string().trim().min(1).max(120).nullish(),
+    riddle: z.object({ id: z.string().min(1).max(16), hints_allowed: z.number().int().min(0).max(3) }).nullish(),
+  }),
+});
+export type TalkBody = z.infer<typeof TalkBody>;
+
+export const PrewarmBody = z.object({
+  resident_id: ResidentId,
+  /** The in-game day of the coming conversation (day-gated canon locks are part of block 2). Defaults to the world's. */
+  day: z.number().int().min(1).optional(),
+});
+
+const issues = (error: z.ZodError) => error.issues.map((issue) => ({ path: issue.path.join("."), message: issue.message }));
+
+/** Keep the CORS and request-id headers Fastify's hooks already set; hijacked replies skip Fastify's send path. */
+function sseHeaders(reply: FastifyReply): OutgoingHttpHeaders {
+  const headers: OutgoingHttpHeaders = {};
+  for (const [name, value] of Object.entries(reply.getHeaders())) if (value !== undefined) headers[name] = value;
+  return {
+    ...headers,
+    "content-type": "text/event-stream; charset=utf-8",
+    "cache-control": "no-cache, no-transform",
+    connection: "keep-alive",
+    "x-accel-buffering": "no",
+  };
+}
+
+/** §9.10 step 6: past six exchanges the resident wraps up, and Leave is the only reply. */
+function forceWrapUp(output: DialogueTurnOutput): DialogueTurnOutput {
+  return { ...output, wrap_up: true, choices: [{ ...LEAVE_CHOICE }] };
+}
+
+export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | undefined, options: MindRouteOptions): void {
+  const { mind } = options;
+  const now = options.now ?? (() => Date.now());
+  const interval = options.prewarmIntervalMs ?? PREWARM_INTERVAL_MS;
+  const lastPrewarm = new Map<string, number>();
+
+  // ------------------------------------------------------------------------------------------------------------
+  // Player profile (GDD §11.1)
+  // ------------------------------------------------------------------------------------------------------------
+  app.patch<{ Params: { w: string } }>("/v1/worlds/:w/player", async (request, reply) => {
+    const patch = PlayerProfilePatch.safeParse(request.body);
+    if (!patch.success) return reply.code(400).send({ error: "invalid player profile", issues: issues(patch.error) });
+    const [world] = await db!.select({ player: worlds.player }).from(worlds).where(eq(worlds.id, request.params.w));
+    const merged = PlayerProfile.safeParse({ ...(world?.player ?? {}), ...patch.data });
+    if (!merged.success) return reply.code(400).send({ error: "incomplete player profile", issues: issues(merged.error) });
+    await db!.update(worlds).set({ player: merged.data }).where(eq(worlds.id, request.params.w));
+    return { player: merged.data };
+  });
+
+  // ------------------------------------------------------------------------------------------------------------
+  // Dialogue (GDD §9.10)
+  // ------------------------------------------------------------------------------------------------------------
+  app.post<{ Params: { w: string } }>("/v1/worlds/:w/talk", async (request, reply) => {
+    const parsed = TalkBody.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: "invalid talk request", issues: issues(parsed.error) });
+    const body = parsed.data;
+    const worldId = request.params.w;
+    const playerText = body.input.kind === "open" ? null : body.input.text;
+    const loaded = await loadDialogueContext(db!, {
+      worldId, residentId: body.resident_id, conversationId: body.conversation_id, scene: body.context,
+      playerText, playerSaid: playerText ?? "(walks up to you)",
+    });
+    if (!loaded.ok) {
+      return loaded.error === "unknown_resident"
+        ? reply.code(404).send({ error: "unknown resident" })
+        : reply.code(409).send({ error: "conversation belongs to another resident" });
+    }
+    const ctx = loaded.context;
+    if (body.context.riddle && !ctx.riddle) {
+      request.log.warn({ riddle: body.context.riddle.id }, "unknown riddle id; no hint guard on this turn");
+    }
+
+    reply.hijack();
+    const raw = reply.raw;
+    raw.writeHead(200, sseHeaders(reply));
+    raw.flushHeaders();
+    const send = (event: string, data: unknown) => {
+      if (!raw.writableEnded && !raw.destroyed) raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    };
+    const clientGone = new AbortController();
+    raw.on("close", () => { if (!raw.writableFinished) clientGone.abort(); });
+
+    const forced = ctx.turnIndex >= MAX_EXCHANGES;
+    const fallbackFor = (context: DialogueContext): DialogueTurnOutput => {
+      const turn = fallbackTurn({
+        card: context.prefix.card, state: context.prefix.state, playerName: context.playerName,
+        turnIndex: context.turnIndex, riddle: context.riddle,
+      });
+      return forced ? forceWrapUp(turn) : turn;
+    };
+    const sendTurn = (output: DialogueTurnOutput, fallback: boolean) => send("turn", {
+      conversation_id: body.conversation_id, resident_id: body.resident_id, turn_index: ctx.turnIndex,
+      lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback,
+    });
+
+    try {
+      let calls: CallRecord[] = [];
+      let output: DialogueTurnOutput;
+      let failure: TurnFailure | null = null;
+      try {
+        const result = await generateTurn({
+          mind,
+          request: buildDialogueRequest(ctx.input),
+          notes: forced ? [WRAP_UP_NOTE] : [],
+          validation: ctx.validation,
+          timings: options.timings,
+          signal: clientGone.signal,
+          onLineDelta: (delta) => send("line_delta", delta),
+          onThinking: () => send("thinking", { text: THINKING_BEAT }),
+        });
+        calls = result.calls;
+        failure = result.failure;
+        output = result.output ? (forced ? forceWrapUp(result.output) : result.output) : fallbackFor(ctx);
+        if (result.adjustments.length) request.log.info({ adjustments: result.adjustments }, "dialogue output adjusted");
+      } catch (error) {
+        request.log.error({ err: error }, "dialogue generation crashed");
+        failure = { code: "api_error", message: "The turn failed; using an authored line." };
+        output = fallbackFor(ctx);
+      }
+      const fallback = failure !== null;
+      if (failure) request.log.warn({ failure, calls: calls.map((c) => c.validation) }, "dialogue fell back");
+
+      try {
+        await persistTurn(db!, {
+          worldId, residentId: body.resident_id, conversationId: body.conversation_id, turnIndex: ctx.turnIndex,
+          day: body.context.day, minute: body.context.minute, place: body.context.place, playerInput: playerText,
+          output, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
+        });
+      } catch (error) {
+        request.log.error({ err: error, calls }, "persisting the dialogue turn failed");
+        send("error", { code: "persist_failed", message: "The turn couldn't be saved; using an authored line." });
+        sendTurn(fallbackFor(ctx), true);
+        return;
+      }
+      if (failure) send("error", failure);
+      sendTurn(output, fallback);
+    } catch (error) {
+      request.log.error({ err: error }, "talk stream failed");
+      send("error", { code: "internal", message: "Something went wrong; using an authored line." });
+      sendTurn(fallbackFor(ctx), true);
+    } finally {
+      if (!raw.writableEnded) raw.end();
+    }
+  });
+
+  // ------------------------------------------------------------------------------------------------------------
+  // Prewarm (GDD §9.10 step 1): never fails the client.
+  // ------------------------------------------------------------------------------------------------------------
+  app.post<{ Params: { w: string } }>("/v1/worlds/:w/prewarm", async (request, reply) => {
+    const parsed = PrewarmBody.safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: "invalid prewarm request", issues: issues(parsed.error) });
+    const worldId = request.params.w;
+    const residentId = parsed.data.resident_id;
+    if (!mind.enabled) return { warmed: false, reason: "disabled" };
+
+    const key = `${worldId}:${residentId}`;
+    const at = now();
+    const last = lastPrewarm.get(key);
+    if (last !== undefined && at - last < interval) return { warmed: false, reason: "recent" };
+
+    const prefix = await loadResidentPrefix(db!, worldId, residentId);
+    if (!prefix) return reply.code(404).send({ error: "unknown resident" });
+    const [world] = await db!.select({ day: worlds.day }).from(worlds).where(eq(worlds.id, worldId));
+    const day = parsed.data.day ?? world?.day ?? 1;
+
+    if (lastPrewarm.size > 10_000) for (const [k, t] of lastPrewarm) if (at - t >= interval) lastPrewarm.delete(k);
+    lastPrewarm.set(key, at);
+
+    const params = prewarmParams(prefix, day);
+    const started = performance.now();
+    try {
+      const message = await mind.createMessage(params, { signal: AbortSignal.timeout(options.prewarmTimeoutMs ?? 5000) });
+      const tokens = tokensOf(message.usage);
+      try {
+        await db!.insert(aiLog).values(aiLogRow({
+          worldId, residentId, kind: "prewarm", promptVersion: promptVersion(), fallback: false,
+          call: {
+            attempt: 1, model: params.model, tokens, costUsd: costUsd(tokens), latencyMs: Math.round(performance.now() - started),
+            firstTokenMs: null, stopReason: message.stop_reason ?? "none", validation: "ok",
+          },
+        }));
+      } catch (error) {
+        request.log.warn({ err: error }, "prewarm ai_log write failed");
+      }
+      return { warmed: true };
+    } catch (error) {
+      // The API may reject max_tokens: 0 (or anything else): log it and move on. The real turn will just be cold.
+      request.log.warn({ err: error, residentId }, "prewarm failed");
+      return { warmed: false, reason: "error" };
+    }
+  });
+}

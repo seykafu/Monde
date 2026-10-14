@@ -1,4 +1,5 @@
 import type { PersonaCard, ResidentState, PlanOutput, DialogueTurnOutput } from "@monde/shared";
+import type { PlayerProfile } from "../mind/player.js";
 import { pgTable, text, timestamp, uuid, integer, numeric, jsonb, boolean, bigserial, primaryKey, index } from "drizzle-orm/pg-core";
 
 export const meta = pgTable("meta", {
@@ -18,6 +19,8 @@ export const worlds = pgTable("worlds", {
   minute: integer("minute").notNull().default(360), status: text("status").notNull(),
   branchId: uuid("branch_id").notNull(), createdAt: createdAt(),
   aiSpendDay: integer("ai_spend_day").notNull(), aiSpendUsd: numeric("ai_spend_usd").notNull().default("0"),
+  /** The Fellowship application (GDD §11.1), set by PATCH /v1/worlds/:w/player. Null until the player fills it in. */
+  player: jsonb("player").$type<PlayerProfile>(),
 });
 const worldId = () => uuid("world_id").notNull().references(() => worlds.id, { onDelete: "cascade" });
 export const residents = pgTable("residents", {
@@ -106,7 +109,14 @@ export const dialogueTurns = pgTable("dialogue_turns", {
   playerInput: text("player_input"),
   output: jsonb("output").$type<DialogueTurnOutput>().notNull(),
   fallback: boolean("fallback").notNull(),
-}, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
+  /** 0-based exchange number inside the conversation (the id is `<conversation_id>/<turn_index>`). */
+  turnIndex: integer("turn_index").notNull().default(0),
+  createdAt: createdAt(),
+}, (t) => [
+  primaryKey({ columns: [t.worldId, t.id] }),
+  index("dialogue_turns_world_conversation_idx").on(t.worldId, t.conversationId),
+  index("dialogue_turns_world_resident_created_idx").on(t.worldId, t.residentId, t.createdAt),
+]);
 export const snapshots = pgTable("snapshots", {
   worldId: worldId(),
   id: uuid("id").notNull(),

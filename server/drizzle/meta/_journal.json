@@ -15,6 +15,13 @@
       "when": 1792015073451,
       "tag": "0001_graceful_thing",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792020808226,
+      "tag": "0002_m05_dialogue",
+      "breakpoints": true
     }
   ]
 }
