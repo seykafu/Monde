@@ -1,0 +1,162 @@
+# Dawn Report fallback headlines (GDD Appendix B.5).
+headlines:
+  - id: HL-AR-01
+    category: Arrivals
+    headline: NEW NEIGHBOR STEPS OFF THE {transport|upper}, IMMEDIATELY ASKED ABOUT BREAD.
+    dek: "{name}, {a_occupation} from {from_place}, becomes Monde's {census}th resident, and {resident:odile} has already offered a view on {their} coat."
+  - id: HL-AR-02
+    category: Arrivals
+    headline: "{n} ARRIVE; THE TOWN COUNTS ITS CHAIRS."
+    dek: The {surname} household takes {home_place}, adding {n} sets of footsteps to a street that had grown used to its own.
+  - id: HL-AR-03
+    category: Arrivals
+    headline: LIGHTS ON AT {home_place|upper}.
+    dek: After a long dark spell the windows are lit again, thanks to {name} and one very large kettle.
+  - id: HL-AR-04
+    category: Arrivals
+    headline: MONDE GAINS {a_occupation|upper}, LOSES A VACANCY.
+    dek: '{name} moves into {home_place} and the empty-house count drops to {vacant}, which {resident:pell} calls "encouraging" and means "keep going."'
+  - id: HL-AR-05
+    category: Arrivals
+    headline: SCHOOL ROLL RISES TO {pupils}.
+    dek: "{name}'s children join {resident:felix}'s class, and the desk count has officially become a trend."
+  - id: HL-RT-01
+    category: Returnees
+    headline: "{name|upper} COMES HOME AFTER {years_gone} YEARS."
+    dek: "{they|cap} stepped off the {transport} with one bag, and {miss} was already there, pretending to be passing."
+  - id: HL-RT-02
+    category: Returnees
+    headline: THE WANDERER RETURNS; THE KETTLE IS PUT ON.
+    dek: "{name}, last seen {years_gone} years ago heading for {from_place}, is back at {home_place}, and neighbors who were asked not to make a fuss are making one."
+  - id: HL-DP-01
+    category: Departures
+    headline: "{name|upper} LEAVES MONDE; THE FERRY SEEMS LONGER THAN USUAL."
+    dek: "{name} left on {weekday}'s {transport} for {to_place}, and the Lantern wishes {them} well and means it, with a small sting."
+  - id: HL-DP-02
+    category: Departures
+    headline: "{n} PACK UP; HOUSES GO QUIET."
+    dek: "{names} left for {to_place} over the weekend, which puts the census at {census}, and nobody laughed."
+  - id: HL-DP-03
+    category: Departures
+    headline: "FOR SALE: ONE SHOP, ONE SIGN, ONE FAREWELL."
+    dek: '{name} has closed {place}, and a handwritten note thanks "all {n} customers" and asks someone to water the fern.'
+  - id: HL-DP-04
+    category: Departures
+    headline: '"NOT FOR GOOD," SAYS DEPARTING {name|upper}.'
+    dek: "{name} is off to {to_place} for a while, and the Lantern would like that in writing."
+  - id: HL-PJ-01
+    category: Project milestones
+    headline: "{project|upper} IS DONE, AND IT WORKS."
+    dek: Residents gathered at {place} to confirm the miracle, and the builders declined to comment, which is how builders comment.
+  - id: HL-PJ-02
+    category: Project milestones
+    headline: "{project|upper}: HALFWAY, AND NOBODY HAS FALLEN OFF YET."
+    dek: Work on {project} reached {pct}% this week, and volunteers are asked to bring tea, not opinions.
+  - id: HL-PJ-03
+    category: Project milestones
+    headline: "SHUTTERS UP AT {place|upper}: A SIGN OF LIFE."
+    dek: The first customer through the door was, as usual, {resident:bastien}, who left without buying anything.
+  - id: HL-PJ-04
+    category: Project milestones
+    headline: TOWN FUND STANDS AT {coins} COINS.
+    dek: '{resident:pell} says this is "fine," in the voice she keeps for things that are not fine yet.'
+  - id: HL-PJ-05
+    category: Project milestones
+    headline: "{project|upper} DELAYED BY {cause|upper}."
+    dek: Work resumes "as soon as the {cause} permits," though the Lantern notes that the {cause} has not been consulted.
+  - id: HL-TM-01
+    category: Tollmen incidents
+    headline: TOLLMEN SEEN ON {place|upper}; BINS REPORT BEING KICKED.
+    dek: Three matching coats and no receipts were reported, and {resident:augusta} has been informed and says she is "aware."
+  - id: HL-TM-02
+    category: Tollmen incidents
+    headline: SATURDAY "TOLL" TAKES {coins} COINS FROM {n} SHOPS.
+    dek: The Lantern reminds readers that protection is not a service if nobody asked for it.
+  - id: HL-TM-03
+    category: Tollmen incidents
+    headline: TOLLMEN QUIET THIS WEEK; MONDE UNSURE HOW TO FEEL.
+    dek: No collections were reported on Market Row, and shopkeepers are checking their tills for ghosts.
+  - id: HL-TM-04
+    category: Tollmen incidents
+    headline: "SCUFFLE ON {place|upper}: THE FRYING PAN HAS THE LAST WORD."
+    dek: Several Tollmen were winded and one was seen apologizing to a bin, while {player} declined to comment, and to sit down.
+  - id: HL-TM-05
+    category: Tollmen incidents
+    headline: TOLLMEN LEAVE {place|upper} IN A HURRY.
+    dek: The crew left behind one boot, one slingshot and a surprising quantity of string.
+  - id: HL-FS-01
+    category: Festivals
+    headline: "{festival|upper}: BUNTING UP, OPINIONS OUT."
+    dek: "The Lantern's program for {weekday}: music, food, and a minute of silence for whoever sits in the wrong chair."
+  - id: HL-FS-02
+    category: Festivals
+    headline: "{festival|upper} DRAWS {n}."
+    dek: That is {pct}% of the town, which {resident:pell} calls "a crowd" and this paper calls "a start."
+  - id: HL-FS-03
+    category: Festivals
+    headline: RAIN FAILS TO STOP {festival|upper}.
+    dek: Attendance was {n} wet people, {m} dry ones and one very smug cat.
+  - id: HL-FS-04
+    category: Festivals
+    headline: TOWN SPIRIT RUNS HIGH AT {festival|upper}.
+    dek: The Lantern's unofficial scale reads {spirit}, up {delta} on last week, and dancing was reported on a table.
+  - id: HL-WX-01
+    category: Weather
+    headline: "FOG: THE TOWN'S BEST-KEPT SECRET."
+    dek: Visibility was "somewhere near the bakery," the ferry is delayed, and the gulls are not impressed.
+  - id: HL-WX-02
+    category: Weather
+    headline: WIND TAKES {n} HATS, RETURNS {m}.
+    dek: Lost property at {place} is accepting hats, scarves and one very confused kite.
+  - id: HL-WX-03
+    category: Weather
+    headline: "FIRST SNOW: MONDE HOLDS ITS BREATH, THEN ITS HAT."
+    dek: The cobbles are slick, sledding is being discussed with caution, and {resident:augusta} advises against it for the third winter running.
+  - id: HL-WX-04
+    category: Weather
+    headline: "{weather|upper} FOR {days} DAYS RUNNING."
+    dek: The Lantern has run out of things to say about the weather and will say them anyway.
+  - id: HL-PL-01
+    category: Campaign polls
+    headline: "POLL: {player|upper} {player_pct}, VANE {vane_pct}, MOSS {moss_pct}."
+    dek: "{undecided_pct}% are undecided, and {n} residents said they'd vote for whoever fixes the ferry first."
+  - id: HL-PL-02
+    category: Campaign polls
+    headline: "CAMPAIGN WATCH: {name|upper} GAINS IN {district|upper}."
+    dek: The Lantern's unscientific survey of {n} people on {place} suggests a movement, or at least a draft.
+  - id: HL-PL-03
+    category: Campaign polls
+    headline: DEBATE IN {days} DAYS; {questions} QUESTIONS SUBMITTED.
+    dek: The Market Hall has been dusted, and candidates are advised to bring a flask.
+  - id: HL-CH-01
+    category: Charter discoveries
+    headline: A BRASS PLAQUE ASKS A QUESTION; SOMEONE ANSWERS.
+    dek: A Mark in {district} has been read and answered, and the Lantern does not say by whom, only "well done."
+  - id: HL-CH-02
+    category: Charter discoveries
+    headline: "{n} OF 6 FRAGMENTS ACCOUNTED FOR."
+    dek: '{resident:margo} will say only that it "goes well," and then close the door.'
+  - id: HL-CH-03
+    category: Charter discoveries
+    headline: FOUNDER'S FOLLY OPENS ITS DOOR.
+    dek: Beyond the stone steps and the brass lock lies a great deal of dust, and the Lantern's correspondent was asked to wipe their feet.
+  - id: HL-HI-01
+    category: Human interest
+    headline: "{resident:bastien|upper} SPOTTED ON {place|upper}, REFUSES TO COMMENT."
+    dek: The cat sat there from {time} to {time2}, and his intentions remain unconfirmed.
+  - id: HL-HI-02
+    category: Human interest
+    headline: LOCAL {occupation|upper} WINS {n}-YEAR ARGUMENT.
+    dek: The dispute over the bench on {place} was settled with a plaque that is crooked, and both parties are satisfied.
+  - id: HL-HI-03
+    category: Human interest
+    headline: "LOST: ONE UMBRELLA. FOUND: {n}."
+    dek: "{n} umbrellas have been handed in at Town Hall since Monday, and owners are asked to be honest about the color."
+  - id: HL-HI-04
+    category: Human interest
+    headline: "{name|upper} TURNS {age}; TOWN SINGS, MOSTLY IN KEY."
+    dek: The party at {place} ran past ten o'clock, which in Monde counts as rowdy.
+  - id: HL-HI-05
+    category: Human interest
+    headline: WHO WAS THE MAN WITH THE LANTERN?
+    dek: A light seen on {place} at {time} was, this paper has learned, {resident:hollis} looking for his glasses, which were on his head.

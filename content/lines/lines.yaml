@@ -1,0 +1,1998 @@
+# Quiet Mode line library (GDD Appendix B.1–B.4). Selection rules: GDD B.1.
+lines:
+  - id: GR-001
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - glum
+    text: Morning, I suppose. Don't mind me.
+  - id: GR-002
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - glum
+    text: It's early and I'm already tired of it.
+  - id: GR-003
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - low
+    text: Morning. The day's barely started and it already feels long.
+  - id: GR-004
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - low
+    text: Oh, hello, {player}. I didn't see you there.
+  - id: GR-005
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - even
+    text: Morning, {player}. Fresh one, isn't it?
+  - id: GR-006
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - even
+    text: Morning. Early start, or a late finish?
+  - id: GR-007
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - bright
+    text: Morning, {player}! Today feels like a good one.
+  - id: GR-008
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - bright
+    text: There you are! Lovely start to the day.
+  - id: GR-009
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - glowing
+    text: Good morning! I woke up smiling and I don't know why.
+  - id: GR-010
+    kind: greet
+    when:
+      t:
+        - dawn
+      m:
+        - glowing
+    text: "{player}! What a morning to be out and about!"
+  - id: GR-011
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - glum
+    text: Mm. Morning. It hasn't been much of one.
+  - id: GR-012
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - glum
+    text: Oh, hello. I'm not much company today.
+  - id: GR-013
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - low
+    text: Morning, {player}. Getting there, one hour at a time.
+  - id: GR-014
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - low
+    text: Hello. I'm a bit slow today, so bear with me.
+  - id: GR-015
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - even
+    text: Morning, {player}. How's your day shaping up?
+  - id: GR-016
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - even
+    text: Morning. Nice to see a face I know.
+  - id: GR-017
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - bright
+    text: Morning, {player}! Good to see you.
+  - id: GR-018
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - bright
+    text: Hello there! Going well so far, I'd say.
+  - id: GR-019
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - glowing
+    text: Morning, {player}! I could hug the whole street.
+  - id: GR-020
+    kind: greet
+    when:
+      t:
+        - morning
+      m:
+        - glowing
+    text: What a day already! Come on, tell me everything.
+  - id: GR-021
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - glum
+    text: It's midday and I'm already counting the hours.
+  - id: GR-022
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - glum
+    text: Lunchtime, I think. Not hungry. Hello.
+  - id: GR-023
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - low
+    text: Hello, {player}. Halfway through and I'm flagging.
+  - id: GR-024
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - low
+    text: Oh, hello. I keep forgetting to eat.
+  - id: GR-025
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - even
+    text: Nearly afternoon. Have you eaten yet, {player}?
+  - id: GR-026
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - even
+    text: Midday already. Where does the morning go?
+  - id: GR-027
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - bright
+    text: Hello, {player}! Perfect time for a bite, I'd say.
+  - id: GR-028
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - bright
+    text: Lunchtime! My favorite time of day, after all the others.
+  - id: GR-029
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - glowing
+    text: "{player}! Have you eaten? Eat with me. I insist."
+  - id: GR-030
+    kind: greet
+    when:
+      t:
+        - midday
+      m:
+        - glowing
+    text: Midday and everything's right. Don't ask me why.
+  - id: GR-031
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - glum
+    text: Afternoon. It's dragging, isn't it?
+  - id: GR-032
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - glum
+    text: Oh. It's you. Hello. Sorry, long day.
+  - id: GR-033
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - low
+    text: Afternoon, {player}. Nearly through it, I think.
+  - id: GR-034
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - low
+    text: Hello. I could do with a sit-down.
+  - id: GR-035
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - even
+    text: Afternoon, {player}. Getting much done?
+  - id: GR-036
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - even
+    text: Afternoon. The day's turned the corner, I'd say.
+  - id: GR-037
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - bright
+    text: Afternoon, {player}! The day's treating me well.
+  - id: GR-038
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - bright
+    text: Hello! I've been hoping to bump into you.
+  - id: GR-039
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - glowing
+    text: Afternoon, {player}! I'm having a wonderful day. Join in.
+  - id: GR-040
+    kind: greet
+    when:
+      t:
+        - afternoon
+      m:
+        - glowing
+    text: There you are! Best part of the day, this.
+  - id: GR-041
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - glum
+    text: Evening. Glad it's nearly over, to be honest.
+  - id: GR-042
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - glum
+    text: Mm. Evening. Don't ask how it went.
+  - id: GR-043
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - low
+    text: Evening, {player}. I'll be glad to put my feet up.
+  - id: GR-044
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - low
+    text: Evening. It's been a long one.
+  - id: GR-045
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - even
+    text: Evening, {player}. Heading home, or heading out?
+  - id: GR-046
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - even
+    text: Evening. Quiet one, so far.
+  - id: GR-047
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - bright
+    text: Evening, {player}! Just right for a slow walk, I'd say.
+  - id: GR-048
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - bright
+    text: Evening! Lovely time of day, this.
+  - id: GR-049
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - glowing
+    text: Evening, {player}! What a day. What a lovely day.
+  - id: GR-050
+    kind: greet
+    when:
+      t:
+        - evening
+      m:
+        - glowing
+    text: Good evening! I'd stay out till midnight if I could.
+  - id: GR-051
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - glum
+    text: Late, isn't it? Can't sleep. Never can.
+  - id: GR-052
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - glum
+    text: Night, then. Not a good one, so far.
+  - id: GR-053
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - low
+    text: Still up? Me too. Neither of us should be.
+  - id: GR-054
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - low
+    text: Hello, {player}. Late, isn't it?
+  - id: GR-055
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - even
+    text: The evening's gone. Late one, {player}?
+  - id: GR-056
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - even
+    text: Hello. Nearly time for bed, I'd say.
+  - id: GR-057
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - bright
+    text: Still up, {player}? Good company beats a good pillow.
+  - id: GR-058
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - bright
+    text: Night, {player}! The quiet hours are the best ones.
+  - id: GR-059
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - glowing
+    text: Look at us, out past bedtime! I love it.
+  - id: GR-060
+    kind: greet
+    when:
+      t:
+        - night
+      m:
+        - glowing
+    text: Night, {player}! I'm far too happy to sleep.
+  - id: GR-061
+    kind: greet
+    when:
+      r_exact:
+        - Wary
+      m:
+        - glum
+    text: Oh. It's you. I haven't the energy for this.
+  - id: GR-062
+    kind: greet
+    when:
+      r_exact:
+        - Wary
+      m:
+        - low
+    text: Hello. I'd rather not talk, if it's all the same.
+  - id: GR-063
+    kind: greet
+    when:
+      r_exact:
+        - Wary
+      m:
+        - even
+    text: "{player}. Can I help you, or are you just passing?"
+  - id: GR-064
+    kind: greet
+    when:
+      r_exact:
+        - Wary
+      m:
+        - bright
+    text: Hm. Hello. I'm in a good mood, so don't spoil it.
+  - id: GR-065
+    kind: greet
+    when:
+      r_exact:
+        - Wary
+      m:
+        - glowing
+    text: Well. Even I can't stay cross on a day like this. Hello.
+  - id: GR-066
+    kind: greet
+    when:
+      r_exact:
+        - Stranger
+      m:
+        - glum
+    text: Hello. I'm {name}, if you need it. Not much company today.
+  - id: GR-067
+    kind: greet
+    when:
+      r_exact:
+        - Stranger
+      m:
+        - low
+    text: Hello. I'm {name}. We haven't really talked, have we?
+  - id: GR-068
+    kind: greet
+    when:
+      r_exact:
+        - Stranger
+      m:
+        - even
+    text: Hello. I'm {name}. You're the Fellow, aren't you?
+  - id: GR-069
+    kind: greet
+    when:
+      r_exact:
+        - Stranger
+      m:
+        - bright
+    text: Hello, {player}! I'm {name}. Welcome to the neighborhood, properly.
+  - id: GR-070
+    kind: greet
+    when:
+      r_exact:
+        - Stranger
+      m:
+        - glowing
+    text: "{player}! I'm {name}. I've been meaning to say hello all week."
+  - id: GR-071
+    kind: greet
+    when:
+      r_exact:
+        - Neighbor
+      m:
+        - glum
+    text: Oh, {player}. Hello. Not my best day, I'm afraid.
+  - id: GR-072
+    kind: greet
+    when:
+      r_exact:
+        - Neighbor
+      m:
+        - low
+    text: Hello, {player}. Good to see a face I know.
+  - id: GR-073
+    kind: greet
+    when:
+      r_exact:
+        - Neighbor
+      m:
+        - even
+    text: Hello again, {player}. How are you getting on?
+  - id: GR-074
+    kind: greet
+    when:
+      r_exact:
+        - Neighbor
+      m:
+        - bright
+    text: "{player}! Good to see you. Walk with me a minute?"
+  - id: GR-075
+    kind: greet
+    when:
+      r_exact:
+        - Neighbor
+      m:
+        - glowing
+    text: "{player}! Just the person. Everything's going right today."
+  - id: GR-076
+    kind: greet
+    when:
+      r_exact:
+        - Friend
+      m:
+        - glum
+    text: You came. Thank you. I'm poor company, but stay a bit.
+  - id: GR-077
+    kind: greet
+    when:
+      r_exact:
+        - Friend
+      m:
+        - low
+    text: "{player}. I'm glad it's you. Sit, if you've time."
+  - id: GR-078
+    kind: greet
+    when:
+      r_exact:
+        - Friend
+      m:
+        - even
+    text: "{player}! There you are. I was hoping you'd come by."
+  - id: GR-079
+    kind: greet
+    when:
+      r_exact:
+        - Friend
+      m:
+        - bright
+    text: "{player}! I was just thinking about you. Come here."
+  - id: GR-080
+    kind: greet
+    when:
+      r_exact:
+        - Friend
+      m:
+        - glowing
+    text: "{player}! My favorite person in Monde today, and I mean it."
+  - id: GR-081
+    kind: greet
+    when:
+      r_exact:
+        - Confidant
+      m:
+        - glum
+    text: "{player}. Stay a while. I can't pretend with you."
+  - id: GR-082
+    kind: greet
+    when:
+      r_exact:
+        - Confidant
+      m:
+        - low
+    text: Oh, {player}. Good. I needed someone who wouldn't fuss.
+  - id: GR-083
+    kind: greet
+    when:
+      r_exact:
+        - Confidant
+      m:
+        - even
+    text: "{player}. How are you, really? Take your time."
+  - id: GR-084
+    kind: greet
+    when:
+      r_exact:
+        - Confidant
+      m:
+        - bright
+    text: "{player}! Come here, you. It's been a good day, and it's better now."
+  - id: GR-085
+    kind: greet
+    when:
+      r_exact:
+        - Confidant
+      m:
+        - glowing
+    text: "{player}! Don't say a word yet. I've got such a day to tell you about."
+  - id: ST-001
+    kind: talk
+    when:
+      m:
+        - glum
+    text: Everything takes more effort lately. Even this conversation, no offense.
+  - id: ST-002
+    kind: talk
+    when:
+      m:
+        - glum
+    text: Some days you just wait for them to end.
+  - id: ST-003
+    kind: talk
+    when:
+      m:
+        - glum
+    text: I keep meaning to cheer up. It keeps not happening.
+  - id: ST-004
+    kind: talk
+    when:
+      m:
+        - glum
+    text: Don't worry about me. I'll sort myself out by Thursday.
+  - id: ST-005
+    kind: talk
+    when:
+      m:
+        - glum
+    text: It's strange how loud a quiet street can be.
+  - id: ST-006
+    kind: talk
+    when:
+      m:
+        - glum
+    text: I'd tell you what's wrong, but it's mostly the weather in my head.
+  - id: ST-007
+    kind: talk
+    when:
+      m:
+        - low
+    text: Not terrible. Not great. Somewhere in the middle, wearing a coat.
+  - id: ST-008
+    kind: talk
+    when:
+      m:
+        - low
+    text: Slow week, this. I keep expecting something to happen.
+  - id: ST-009
+    kind: talk
+    when:
+      m:
+        - low
+    text: I'm all right. Tired, but all right.
+  - id: ST-010
+    kind: talk
+    when:
+      m:
+        - low
+    text: Funny how a small thing can sit on you all day.
+  - id: ST-011
+    kind: talk
+    when:
+      m:
+        - low
+    text: I'll feel better after one useful thing. Haven't picked it yet.
+  - id: ST-012
+    kind: talk
+    when:
+      m:
+        - low
+    text: Thanks for stopping. It helps, even when I'm poor company.
+  - id: ST-013
+    kind: talk
+    when:
+      m:
+        - even
+    text: Not much to report. Which, in Monde, is a kind of news.
+  - id: ST-014
+    kind: talk
+    when:
+      m:
+        - even
+    text: I keep meaning to walk the whole town in one go.
+  - id: ST-015
+    kind: talk
+    when:
+      m:
+        - even
+    text: It's a good town for noticing things. Slow enough to see them.
+  - id: ST-016
+    kind: talk
+    when:
+      m:
+        - even
+    text: Cat on the wall, gull on the post, nobody in a hurry.
+  - id: ST-017
+    kind: talk
+    when:
+      m:
+        - even
+    text: Ask me something. I know about half the answers.
+  - id: ST-018
+    kind: talk
+    when:
+      m:
+        - even
+    text: Same as ever, really. Which is nice, some days.
+  - id: ST-019
+    kind: talk
+    when:
+      m:
+        - bright
+    text: I've had one of those mornings where everything fits.
+  - id: ST-020
+    kind: talk
+    when:
+      m:
+        - bright
+    text: Funny, isn't it? You get used to a place and it starts liking you back.
+  - id: ST-021
+    kind: talk
+    when:
+      m:
+        - bright
+    text: I've decided to be optimistic. It's cheaper than worrying.
+  - id: ST-022
+    kind: talk
+    when:
+      m:
+        - bright
+    text: Heard a good joke today. Can't remember it. Still pleased.
+  - id: ST-023
+    kind: talk
+    when:
+      m:
+        - bright
+    text: Monde's got something. I can't name it. I keep looking.
+  - id: ST-024
+    kind: talk
+    when:
+      m:
+        - bright
+    text: Tell me something good. I'll tell you something better.
+  - id: ST-025
+    kind: talk
+    when:
+      m:
+        - glowing
+    text: I feel like I could carry the whole town on my back. Slowly.
+  - id: ST-026
+    kind: talk
+    when:
+      m:
+        - glowing
+    text: I don't know what's got into me, and I hope it stays.
+  - id: ST-027
+    kind: talk
+    when:
+      m:
+        - glowing
+    text: Everything looks different today. Better different. Do you see it too?
+  - id: ST-028
+    kind: talk
+    when:
+      m:
+        - glowing
+    text: I've been smiling at strangers. Several smiled back. Wild.
+  - id: ST-029
+    kind: talk
+    when:
+      m:
+        - glowing
+    text: If I could bottle today, I'd sell it. Cheap. To everyone.
+  - id: ST-030
+    kind: talk
+    when:
+      m:
+        - glowing
+    text: I told the gulls good morning. One of them seemed to understand.
+  - id: ST-031
+    kind: talk
+    when:
+      r_exact:
+        - Wary
+    text: I'll be polite. That's the most I'm offering.
+  - id: ST-032
+    kind: talk
+    when:
+      r_exact:
+        - Wary
+    text: People talk. I'll wait and see what's true.
+  - id: ST-033
+    kind: talk
+    when:
+      r_exact:
+        - Wary
+    text: You'll have to earn a longer chat than this one.
+  - id: ST-034
+    kind: talk
+    when:
+      r_exact:
+        - Stranger
+    text: Still finding my way around who's who. You?
+  - id: ST-035
+    kind: talk
+    when:
+      r_exact:
+        - Stranger
+    text: We haven't properly met, have we? Not really.
+  - id: ST-036
+    kind: talk
+    when:
+      r_exact:
+        - Stranger
+    text: What brings you out this way, {player}?
+  - id: ST-037
+    kind: talk
+    when:
+      r_exact:
+        - Neighbor
+    text: It's nice, being on first-name terms with the street.
+  - id: ST-038
+    kind: talk
+    when:
+      r_exact:
+        - Neighbor
+    text: You've been about a lot. Folk have noticed. In a good way.
+  - id: ST-039
+    kind: talk
+    when:
+      r_exact:
+        - Neighbor
+    text: If you're ever short of sugar, you know where I am.
+  - id: ST-040
+    kind: talk
+    when:
+      r_exact:
+        - Friend
+    text: Honestly, {player}, the town's better with you in it.
+  - id: ST-041
+    kind: talk
+    when:
+      r_exact:
+        - Friend
+    text: You can tell me things, you know. I'm good at keeping them.
+  - id: ST-042
+    kind: talk
+    when:
+      r_exact:
+        - Friend
+    text: I saved you a seat. Metaphorically. The real one was taken.
+  - id: ST-043
+    kind: talk
+    when:
+      r_exact:
+        - Confidant
+    text: I trust you with the real answers, {player}. Don't make me regret it.
+  - id: ST-044
+    kind: talk
+    when:
+      r_exact:
+        - Confidant
+    text: I'd tell you everything, if I could find the words and the hour.
+  - id: ST-045
+    kind: talk
+    when:
+      r_exact:
+        - Confidant
+    text: Whatever happens, I'm glad you came to Monde.
+  - id: ST-046
+    kind: talk
+    when: {}
+    text: Hm.
+  - id: ST-047
+    kind: talk
+    when: {}
+    text: Right.
+  - id: ST-048
+    kind: talk
+    when: {}
+    text: Well. There it is.
+  - id: ST-049
+    kind: talk
+    when: {}
+    text: Mm-hm.
+  - id: ST-050
+    kind: talk
+    when: {}
+    text: Can't argue with that.
+  - id: ST-051
+    kind: talk
+    when: {}
+    text: Funny old day.
+  - id: CX-001
+    kind: ctx
+    when:
+      w:
+        - sun
+    text: Proper sun today. The whole town looks freshly washed.
+  - id: CX-002
+    kind: ctx
+    when:
+      w:
+        - sun
+    text: Sun's out. Even the gulls are being civil.
+  - id: CX-003
+    kind: ctx
+    when:
+      w:
+        - sun
+      m:
+        - glum
+        - low
+    text: Bright out. Somehow that makes it worse. Don't mind me.
+  - id: CX-004
+    kind: ctx
+    when:
+      w:
+        - sun
+      m:
+        - bright
+        - glowing
+    text: Look at that sky! Nobody could have a bad day under it.
+  - id: CX-005
+    kind: ctx
+    when:
+      w:
+        - cloud
+    text: Grey and soft today. Good weather for getting on with things.
+  - id: CX-006
+    kind: ctx
+    when:
+      w:
+        - cloud
+    text: The clouds can't make up their minds. Neither can I.
+  - id: CX-007
+    kind: ctx
+    when:
+      w:
+        - cloud
+      m:
+        - glum
+        - low
+    text: Lid's on the sky again. Suits my mood, to be honest.
+  - id: CX-008
+    kind: ctx
+    when:
+      w:
+        - cloud
+      m:
+        - bright
+        - glowing
+    text: Cloudy, but the kind with silver edges. I like those.
+  - id: CX-009
+    kind: ctx
+    when:
+      w:
+        - rain
+    text: Rain again. The gutters are getting their money's worth.
+  - id: CX-010
+    kind: ctx
+    when:
+      w:
+        - rain
+    text: Mind the puddles on {place}. Some are deeper than they look.
+  - id: CX-011
+    kind: ctx
+    when:
+      w:
+        - rain
+      m:
+        - glum
+        - low
+    text: Rain on top of everything. Naturally.
+  - id: CX-012
+    kind: ctx
+    when:
+      w:
+        - rain
+      m:
+        - bright
+        - glowing
+    text: I love a good rain. Everything smells like it's starting over.
+  - id: CX-013
+    kind: ctx
+    when:
+      w:
+        - fog
+    text: Can't see the end of the street. Walk like you mean it.
+  - id: CX-014
+    kind: ctx
+    when:
+      w:
+        - fog
+    text: Fog's in. Listen for the gulls and you'll find the Wharf.
+  - id: CX-015
+    kind: ctx
+    when:
+      w:
+        - fog
+      m:
+        - glum
+        - low
+    text: Fog suits me today. Nobody can see my face.
+  - id: CX-016
+    kind: ctx
+    when:
+      w:
+        - fog
+      m:
+        - bright
+        - glowing
+    text: Fog! The whole town's turned into a secret. I adore it.
+  - id: CX-017
+    kind: ctx
+    when:
+      w:
+        - wind
+    text: Wind's up. Hold your hat, and anything else you're fond of.
+  - id: CX-018
+    kind: ctx
+    when:
+      w:
+        - wind
+    text: That wind has opinions today. Mostly about hats.
+  - id: CX-019
+    kind: ctx
+    when:
+      w:
+        - wind
+      m:
+        - glum
+        - low
+    text: Wind in my ears all day. I can't think straight.
+  - id: CX-020
+    kind: ctx
+    when:
+      w:
+        - wind
+      m:
+        - bright
+        - glowing
+    text: Windy! Good for kites, washing and clearing the head.
+  - id: CX-021
+    kind: ctx
+    when:
+      w:
+        - snow
+    text: Snow. Everything's gone quiet, even the gulls.
+  - id: CX-022
+    kind: ctx
+    when:
+      w:
+        - snow
+    text: Mind your feet. Snow hides the cobbles but not the ice.
+  - id: CX-023
+    kind: ctx
+    when:
+      w:
+        - snow
+      m:
+        - glum
+        - low
+    text: Snow's pretty. I'm just too cold to enjoy it.
+  - id: CX-024
+    kind: ctx
+    when:
+      w:
+        - snow
+      m:
+        - bright
+        - glowing
+    text: Snow! Look at it. Nobody should be indoors for this.
+  - id: CX-025
+    kind: ctx
+    when: {}
+    text: Another day of {weather}. Monde takes what it's given.
+  - id: CX-026
+    kind: ctx
+    when: {}
+    text: Not complaining about the {weather}. Well, not out loud.
+  - id: CX-027
+    kind: ctx
+    when:
+      z:
+        - old_quarter
+    text: The Old Quarter's the only place where being lost looks like sightseeing.
+  - id: CX-028
+    kind: ctx
+    when:
+      z:
+        - old_quarter
+    text: Gas lamps, gulls and cobbles. You can almost hear the founder grumbling.
+  - id: CX-029
+    kind: ctx
+    when:
+      z:
+        - old_quarter
+      req:
+        - "!flag.quarter_chime"
+    text: The clocktower's stuck at 4:17. I still check it every time.
+  - id: CX-030
+    kind: ctx
+    when:
+      z:
+        - old_quarter
+      req:
+        - flag.quarter_chime
+    text: It struck once. I'm still hearing it, a little.
+  - id: CX-031
+    kind: ctx
+    when:
+      z:
+        - market_row
+    text: Market Row smells of bread by seven. That never changes.
+  - id: CX-032
+    kind: ctx
+    when:
+      z:
+        - market_row
+    text: Striped awnings, wet cobbles, somebody arguing about cheese. Market Row in a sentence.
+  - id: CX-033
+    kind: ctx
+    when:
+      z:
+        - market_row
+      req:
+        - storefront.empty>=1
+    text: Plenty of empty storefronts here. I keep imagining what goes in them.
+  - id: CX-034
+    kind: ctx
+    when:
+      z:
+        - wharf
+    text: The Wharf always smells of salt and rope. Worse things to smell of.
+  - id: CX-035
+    kind: ctx
+    when:
+      z:
+        - wharf
+    text: Those cranes have been rusting longer than I've been paying attention.
+  - id: CX-036
+    kind: ctx
+    when:
+      z:
+        - wharf
+      req:
+        - "!project.lighthouse.done"
+    text: The lighthouse sits dark on the breakwater. Somebody ought to fix that.
+  - id: CX-037
+    kind: ctx
+    when:
+      z:
+        - wharf
+      req:
+        - project.lighthouse.done
+    text: The lighthouse is lit again. I keep looking up to check.
+  - id: CX-038
+    kind: ctx
+    when:
+      z:
+        - commons
+    text: The Commons are overgrown but lovely. A garden that gave up and kept its manners.
+  - id: CX-039
+    kind: ctx
+    when:
+      z:
+        - commons
+    text: Duck pond's busy today. The ducks keep a schedule, at least.
+  - id: CX-040
+    kind: ctx
+    when:
+      z:
+        - commons
+    text: The Old Elm's been here longer than the town's complaints.
+  - id: CX-041
+    kind: ctx
+    when:
+      z:
+        - millbrook
+    text: Brick, boards and washing lines. Millbrook's still got plenty of home in it.
+  - id: CX-042
+    kind: ctx
+    when:
+      z:
+        - millbrook
+    text: You can hear the weir from half of Millbrook. It's company.
+  - id: CX-043
+    kind: ctx
+    when:
+      z:
+        - millbrook
+    text: Plenty of empty houses here. Every one's got a story and a damp patch.
+  - id: CX-044
+    kind: ctx
+    when:
+      z:
+        - station_hill
+    text: Station Hill's all wind and long views. You can see tomorrow's weather coming.
+  - id: CX-045
+    kind: ctx
+    when:
+      z:
+        - station_hill
+      req:
+        - "!flag.station_open"
+    text: Rails in the grass, signal box with its eyes shut. Still handsome.
+  - id: CX-046
+    kind: ctx
+    when:
+      z:
+        - station_hill
+    text: Come up here when you need to think. The wind does the rest.
+  - id: CX-047
+    kind: ctx
+    when:
+      z:
+        - briar_woods
+    text: Briar Woods is greener than it has any right to be. Mind the ferns.
+  - id: CX-048
+    kind: ctx
+    when:
+      z:
+        - briar_woods
+    text: Birdsong, fog, wet boots. The best sort of afternoon.
+  - id: CX-049
+    kind: ctx
+    when:
+      z:
+        - briar_woods
+    text: Stay on the path. Nothing sinister. Just brambles.
+  - id: CX-050
+    kind: ctx
+    when:
+      ev:
+        - bloom_fair_eve
+    text: Bloom Fair tomorrow. Everyone's pretending not to be excited.
+  - id: CX-051
+    kind: ctx
+    when:
+      ev:
+        - bloom_fair
+    text: Bloom Fair! Garlands on the Commons and nobody working. Perfect.
+  - id: CX-052
+    kind: ctx
+    when:
+      ev:
+        - bloom_fair
+    text: Have you seen the Commons? Flowers everywhere. Mind the bunting.
+  - id: CX-053
+    kind: ctx
+    when:
+      ev:
+        - regatta_eve
+    text: Regatta tomorrow. Half the Wharf is polishing boats it won't admit it polished.
+  - id: CX-054
+    kind: ctx
+    when:
+      ev:
+        - regatta
+    text: Regatta day! Smell that fry oil? That's the smell of happiness.
+  - id: CX-055
+    kind: ctx
+    when:
+      ev:
+        - regatta
+    text: Boats on the bay and fish on the grill. What more could you want?
+  - id: CX-056
+    kind: ctx
+    when:
+      ev:
+        - supper_eve
+    text: Supper's tomorrow. I've been told to bring a dish. I'm panicking.
+  - id: CX-057
+    kind: ctx
+    when:
+      ev:
+        - supper
+    text: Harvest Supper! Long tables, long speeches, second helpings. Marvelous.
+  - id: CX-058
+    kind: ctx
+    when:
+      ev:
+        - supper
+    text: Everyone's here. Save yourself a chair before the pudding goes.
+  - id: CX-059
+    kind: ctx
+    when:
+      ev:
+        - lantern_eve
+    text: Tomorrow's Lantern Night. I've been polishing my lantern all week.
+  - id: CX-060
+    kind: ctx
+    when:
+      ev:
+        - lantern_night
+    text: It's Lantern Night. The whole town's in the square. Go and be counted.
+  - id: CX-061
+    kind: ctx
+    when:
+      ev:
+        - lantern_night
+    text: Lanterns by dusk, votes by dark. Don't go anywhere without a coat.
+  - id: CX-062
+    kind: ctx
+    when:
+      ev:
+        - tollmen_near
+    text: Tollmen on the corner again. I'd cross the street, if I were you.
+  - id: CX-063
+    kind: ctx
+    when:
+      ev:
+        - tollmen_near
+    text: Funny how quiet a street gets when they walk down it.
+  - id: CX-064
+    kind: ctx
+    when:
+      ev:
+        - tollmen_near
+      m:
+        - glum
+        - low
+    text: Them again. I'm too tired to be angry, and that's the worst bit.
+  - id: CX-065
+    kind: ctx
+    when:
+      ev:
+        - tollmen_near
+      m:
+        - even
+    text: Don't stare, don't hurry. It annoys them more than you'd think.
+  - id: CX-066
+    kind: ctx
+    when:
+      ev:
+        - tollmen_near
+      m:
+        - bright
+        - glowing
+    text: Not today, you lot. I'm in too good a mood to be bothered.
+  - id: CX-067
+    kind: ctx
+    when:
+      ev:
+        - tollmen_near
+    text: Eyes on the cobbles and coins in your boot. That's my advice.
+  - id: CX-068
+    kind: ctx
+    when:
+      ev:
+        - project_done
+    text: Did you see? Another one finished. The place is getting back on its feet.
+  - id: CX-069
+    kind: ctx
+    when:
+      ev:
+        - project_done
+    text: They finished it, {player}. Just like that. I keep walking past to check.
+  - id: CX-070
+    kind: ctx
+    when:
+      ev:
+        - project_done
+      m:
+        - glum
+        - low
+    text: I won't say it isn't good news. I'm just too tired to cheer.
+  - id: CX-071
+    kind: ctx
+    when:
+      ev:
+        - project_done
+      m:
+        - bright
+        - glowing
+    text: It's done! I've been telling everyone. They're sick of me.
+  - id: CX-072
+    kind: ctx
+    when:
+      ev:
+        - project_done
+    text: Whatever you're doing, {player}, it's working. Don't stop yet.
+  - id: CX-073
+    kind: ctx
+    when:
+      ev:
+        - project_done
+    text: Look at that. I'd forgotten what finished looks like.
+  - id: CX-074
+    kind: ctx
+    when:
+      ev:
+        - arrival_new
+    text: New face in town. Did you see? Looked lost, in a good way.
+  - id: CX-075
+    kind: ctx
+    when:
+      ev:
+        - arrival_new
+    text: Someone new has moved in. We'll have to learn another name.
+  - id: CX-076
+    kind: ctx
+    when:
+      ev:
+        - arrival_new
+      m:
+        - glum
+        - low
+    text: More people. That's something, I suppose. A little something.
+  - id: CX-077
+    kind: ctx
+    when:
+      ev:
+        - arrival_new
+      m:
+        - bright
+        - glowing
+    text: A new neighbor! I'm going to bake something. Or buy something.
+  - id: CX-078
+    kind: ctx
+    when:
+      ev:
+        - arrival_new
+    text: Census is up, they say. I've started counting strangers on the street.
+  - id: CX-079
+    kind: ctx
+    when:
+      ev:
+        - returnee_new
+    text: Somebody's come home. You can tell from how people are walking.
+  - id: CX-080
+    kind: ctx
+    when:
+      ev:
+        - returnee_new
+    text: A face from the old days is back. The whole street's gone soft.
+  - id: CX-081
+    kind: ctx
+    when:
+      ev:
+        - station_open
+    text: The station's open! I keep going up the hill to look at it.
+  - id: CX-082
+    kind: ctx
+    when:
+      ev:
+        - station_open
+    text: A whistle on the hill again. Listen to that.
+  - id: CX-083
+    kind: ctx
+    when:
+      ev:
+        - station_open
+      m:
+        - glum
+        - low
+    text: Trains again. Good. Let's hope they keep stopping here.
+  - id: CX-084
+    kind: ctx
+    when:
+      ev:
+        - station_open
+      m:
+        - bright
+        - glowing
+    text: A train! A real train! In Monde! Somebody pinch me, gently.
+  - id: CX-085
+    kind: ctx
+    when:
+      ev:
+        - station_open
+    text: The station's open. Now there's a way in and a way home.
+  - id: CX-086
+    kind: ctx
+    when:
+      ev:
+        - station_open
+      z:
+        - station_hill
+    text: Platform's full of folk watching the rails like they might leave.
+  - id: CX-087
+    kind: ctx
+    when:
+      z:
+        - market_row
+      t:
+        - dawn
+        - morning
+    text: "{resident:odile} had the ovens going before dawn again. You can smell it from here."
+  - id: CX-088
+    kind: ctx
+    when: {}
+    text: "{resident:bastien} is on the wall again. That cat has the best seat in {place}."
+  - id: CX-089
+    kind: ctx
+    when:
+      z:
+        - station_hill
+      t:
+        - dawn
+        - morning
+    text: "{resident:hollis} is up at the station again. Never misses a morning."
+  - id: CX-090
+    kind: ctx
+    when:
+      z:
+        - market_row
+      t:
+        - evening
+        - night
+    text: "{resident:augusta} is doing her rounds again. Feels safer, somehow, even when it isn't."
+  - id: CX-091
+    kind: ctx
+    when:
+      t:
+        - dawn
+        - morning
+    text: "{resident:sable} printed the whole paper alone again. Read it twice, to be fair."
+  - id: RX-001
+    kind: react
+    when:
+      ev:
+        - gift_love
+      r:
+        - Stranger
+    text: Oh. Oh, {player}. This is exactly right. How did you know?
+  - id: RX-002
+    kind: react
+    when:
+      ev:
+        - gift_love
+      r:
+        - Stranger
+    text: I don't know what to say. That never happens. Thank you.
+  - id: RX-003
+    kind: react
+    when:
+      ev:
+        - gift_love
+      r:
+        - Stranger
+    text: You shouldn't have. I'm very glad you did.
+  - id: RX-004
+    kind: react
+    when:
+      ev:
+        - gift_love
+      r:
+        - Stranger
+    text: I'm keeping this. Don't let me lose it.
+  - id: RX-005
+    kind: react
+    when:
+      ev:
+        - gift_love
+      r:
+        - Stranger
+    text: Well! That's made my whole week. Possibly my year.
+  - id: RX-006
+    kind: react
+    when:
+      ev:
+        - gift_love
+      r:
+        - Neighbor
+    text: "{player}, you've no idea. Come here. Thank you."
+  - id: RX-007
+    kind: react
+    when:
+      ev:
+        - gift_like
+      r:
+        - Stranger
+    text: That's kind. I'll make good use of it.
+  - id: RX-008
+    kind: react
+    when:
+      ev:
+        - gift_like
+      r:
+        - Stranger
+    text: Oh, lovely! Thank you, {player}. That's thoughtful.
+  - id: RX-009
+    kind: react
+    when:
+      ev:
+        - gift_like
+      r:
+        - Stranger
+    text: For me? Well. That's a nice surprise.
+  - id: RX-010
+    kind: react
+    when:
+      ev:
+        - gift_like
+      r:
+        - Stranger
+    text: You noticed what I like. I'm touched.
+  - id: RX-011
+    kind: react
+    when:
+      ev:
+        - gift_like
+      r:
+        - Stranger
+    text: Thank you. It's just my sort of thing.
+  - id: RX-012
+    kind: react
+    when:
+      ev:
+        - gift_like
+      r:
+        - Stranger
+    text: That's a good one. I'll put it where I can see it.
+  - id: RX-013
+    kind: react
+    when:
+      ev:
+        - gift_neutral
+      r:
+        - Stranger
+    text: Oh. Thank you. I'll find a place for it.
+  - id: RX-014
+    kind: react
+    when:
+      ev:
+        - gift_neutral
+      r:
+        - Stranger
+    text: Kind of you. I'm not sure what I'll do with it.
+  - id: RX-015
+    kind: react
+    when:
+      ev:
+        - gift_neutral
+      r:
+        - Stranger
+    text: Thank you, {player}. It's the thought, isn't it?
+  - id: RX-016
+    kind: react
+    when:
+      ev:
+        - gift_neutral
+      r:
+        - Stranger
+    text: Well. That's something. I'll see what I can do with it.
+  - id: RX-017
+    kind: react
+    when:
+      ev:
+        - gift_neutral
+      r:
+        - Stranger
+    text: Very kind. I'll put it by the door and decide later.
+  - id: RX-018
+    kind: react
+    when:
+      ev:
+        - gift_dislike
+    text: Oh. Thank you. It's not quite for me, I'm afraid.
+  - id: RX-019
+    kind: react
+    when:
+      ev:
+        - gift_dislike
+    text: That's thoughtful, truly. I can't use it, but the thought's lovely.
+  - id: RX-020
+    kind: react
+    when:
+      ev:
+        - gift_dislike
+    text: Hm. Not my favorite. I'll pass it on, if you don't mind.
+  - id: RX-021
+    kind: react
+    when:
+      ev:
+        - gift_dislike
+    text: I'm sure it's lovely to someone. Not me, sadly.
+  - id: RX-022
+    kind: react
+    when:
+      ev:
+        - gift_dislike
+    text: Please don't be offended. I'd rather you took it back.
+  - id: RX-023
+    kind: react
+    when:
+      ev:
+        - gift_dislike
+    text: That's... bold. I'll say that. It's bold.
+  - id: RX-024
+    kind: react
+    when:
+      ev:
+        - gift_love
+        - gift_like
+        - gift_neutral
+      r_exact:
+        - Wary
+    text: I won't say no. But don't think this changes anything.
+  - id: RX-025
+    kind: react
+    when:
+      ev:
+        - helped
+    text: You did that for me? Thank you. I won't forget it.
+  - id: RX-026
+    kind: react
+    when:
+      ev:
+        - helped
+    text: I'd have been at it all day. Thank you, {player}.
+  - id: RX-027
+    kind: react
+    when:
+      ev:
+        - helped
+    text: That's a weight off. I mean it. Thank you.
+  - id: RX-028
+    kind: react
+    when:
+      ev:
+        - helped
+    text: Well, that's sorted. You're good at this, you know.
+  - id: RX-029
+    kind: react
+    when:
+      ev:
+        - helped
+    text: I owe you one. Possibly two. I'm keeping count.
+  - id: RX-030
+    kind: react
+    when:
+      ev:
+        - refused_by_player
+    text: Oh. That's all right. I understand. It's a lot to ask.
+  - id: RX-031
+    kind: react
+    when:
+      ev:
+        - refused_by_player
+    text: No, no, of course. I shouldn't have asked.
+  - id: RX-032
+    kind: react
+    when:
+      ev:
+        - refused_by_player
+    text: Fair enough. I'll manage. Somehow.
+  - id: RX-033
+    kind: react
+    when:
+      ev:
+        - refused_by_player
+    text: Hm. Well. I'll ask someone else, then.
+  - id: RX-034
+    kind: react
+    when:
+      ev:
+        - declined_by_resident
+    text: I'd like to help. I can't, though. Not today.
+  - id: RX-035
+    kind: react
+    when:
+      ev:
+        - declined_by_resident
+    text: Not that, I'm afraid. Ask me something else.
+  - id: RX-036
+    kind: react
+    when:
+      ev:
+        - declined_by_resident
+    text: No. Sorry. It's not you. Well, it's partly you.
+  - id: RX-037
+    kind: react
+    when:
+      ev:
+        - scuffle_seen
+    text: Did you see that? Pan, broom, umbrella, the lot. Nobody hurt, thank goodness.
+  - id: RX-038
+    kind: react
+    when:
+      ev:
+        - scuffle_seen
+    text: Stand back, everyone! It's only a scuffle. Probably.
+  - id: RX-039
+    kind: react
+    when:
+      ev:
+        - scuffle_seen
+    text: Brooms and frying pans on {place}. Whatever next?
+  - id: RX-040
+    kind: react
+    when:
+      ev:
+        - scuffle_seen
+    text: Let them get it out of their systems. Then we'll tidy up.
+  - id: RX-041
+    kind: react
+    when:
+      ev:
+        - scuffle_won
+    text: Where did you learn to swing a broom like that?
+  - id: RX-042
+    kind: react
+    when:
+      ev:
+        - scuffle_won
+    text: Well done, {player}! They went off like startled pigeons.
+  - id: RX-043
+    kind: react
+    when:
+      ev:
+        - scuffle_won
+    text: Winded, the lot of them! I won't forget that.
+  - id: RX-044
+    kind: react
+    when:
+      ev:
+        - scuffle_won
+    text: Good show. Sit down before you fall down.
+  - id: RX-045
+    kind: react
+    when:
+      ev:
+        - scuffle_won
+    text: I should've brought a stool. Best seat in town, that was.
+  - id: RX-046
+    kind: react
+    when:
+      ev:
+        - scuffle_lost
+    text: Oh, {player}. Are you all right? Sit down. Somebody fetch water.
+  - id: RX-047
+    kind: react
+    when:
+      ev:
+        - scuffle_lost
+    text: You'll mend. It's only your pride that's winded.
+  - id: RX-048
+    kind: react
+    when:
+      ev:
+        - scuffle_lost
+    text: Not your day. There'll be others. Better ones.
+  - id: RX-049
+    kind: react
+    when:
+      ev:
+        - scuffle_lost
+    text: That looked sore. Rest up, and come back with a better umbrella.
+  - id: RX-050
+    kind: bye
+    when:
+      t:
+        - dawn
+        - morning
+    text: Right, off I go. Mind how you go, {player}.
+  - id: RX-051
+    kind: bye
+    when:
+      t:
+        - midday
+        - afternoon
+    text: Well, I've kept you long enough. Good {time_of_day}.
+  - id: RX-052
+    kind: bye
+    when:
+      t:
+        - evening
+    text: I'll leave you to your evening. Take care, {player}.
+  - id: RX-053
+    kind: bye
+    when:
+      t:
+        - night
+    text: Goodnight, {player}. Sleep well, and mind the cobbles.
+  - id: RX-054
+    kind: bye
+    when:
+      m:
+        - glum
+        - low
+    text: Thanks for stopping. It helped, a little.
+  - id: RX-055
+    kind: bye
+    when:
+      m:
+        - bright
+        - glowing
+    text: That was grand! Come again soon, {player}.
+  - id: RX-056
+    kind: bye
+    when:
+      r_exact:
+        - Friend
+    text: Go on, then. Come back soon. I mean it.
+  - id: RX-057
+    kind: bye
+    when:
+      r_exact:
+        - Confidant
+    text: Look after yourself, {player}. I'll be here.
+  - id: RX-058
+    kind: bye
+    when:
+      r_exact:
+        - Wary
+    text: Goodbye.
+  - id: RX-059
+    kind: bye
+    when:
+      r_exact:
+        - Stranger
+    text: Nice to meet you properly. See you around.
