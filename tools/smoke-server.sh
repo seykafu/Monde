@@ -7,7 +7,9 @@ PID=$!
 trap 'kill $PID 2>/dev/null || true' EXIT
 for _ in $(seq 1 40); do
   if curl -fsS "http://127.0.0.1:$PORT/v1/health" >/dev/null 2>&1; then
-    echo "smoke: server healthy"; exit 0
+    V=$(curl -fsS "http://127.0.0.1:$PORT/v1/version") || { echo "smoke: /v1/version failed"; cat /tmp/monde-smoke.log; exit 1; }
+    echo "$V" | grep -q '"prompt_version":"[0-9a-f]\{6,\}"' || { echo "smoke: prompt templates missing ($V)"; exit 1; }
+    echo "smoke: server healthy, $V"; exit 0
   fi
   if ! kill -0 $PID 2>/dev/null; then echo "smoke: server exited"; cat /tmp/monde-smoke.log; exit 1; fi
   sleep 0.25

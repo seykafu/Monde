@@ -32,8 +32,8 @@ describe("monde-mind", () => {
   });
   it("returns the configured version and dev fallback", async () => {
     expect((await app({ GIT_SHA: "abc123" }).inject({ url: "/v1/version" })).json())
-      .toEqual({ version: "abc123" });
-    expect((await app().inject({ url: "/v1/version" })).json()).toEqual({ version: "dev" });
+      .toMatchObject({ version: "abc123", prompt_version: expect.stringMatching(/^[0-9a-f]{6,}$/) });
+    expect((await app().inject({ url: "/v1/version" })).json()).toMatchObject({ version: "dev" });
   });
   it("reports unreachable services as degraded with HTTP 200", async () => {
     const response = await app({

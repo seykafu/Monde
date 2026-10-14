@@ -1228,7 +1228,7 @@ departures, romance outcomes and election spread. It runs nightly in CI at Beta 
 
 ### 9.17 Prompt templates
 
-Prompts live in `server/prompts/*.md` with typed slot fills. They're versioned, and the version is
+Prompts live in `server/src/mind/prompts/*.md` (copied to `dist/prompts` at build) with typed slot fills. They're versioned, and the version is
 logged on every call. Skeletons:
 
 **World Bible** (block 1, shared, cached):
@@ -8493,9 +8493,11 @@ Every riddle has a three-step hint ladder: a **nudge**, then a **narrowing**, th
 
 **AI hint guard.** When a resident is asked about a riddle, the dialogue prompt includes the
 inscription and only the hint levels the player has unlocked, inside a `<hints allowed="2">` block.
-The answer is never in the prompt. Residents are told to give the hint in their own words, never to
-guess beyond it, and to say they're stumped if pushed. A post-filter rejects any generated line
-containing an accepted answer string for an unsolved riddle and falls back to the authored hint text.
+The answer is never rendered with its riddle, and a hint that contains an accepted answer is dropped.
+Residents are told to give the hint in their own words, never to guess beyond it, and to say they're
+stumped if pushed. On **riddle-topic turns only**, a post-filter rejects any generated line containing an
+accepted answer for that unsolved riddle and falls back to the authored hint text. (Many answers are
+ordinary words, like the library or the school, that residents must stay free to say on other turns.)
 
 ### 14.3 Rewards
 

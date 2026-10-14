@@ -7,5 +7,7 @@ export default defineConfig({
   target: "node22",
   outDir: "dist",
   clean: true,
-  noExternal: ["@monde/shared"]
+  noExternal: ["@monde/shared"],
+  // Prompt templates are read at runtime from ./prompts next to the bundle (promptBuilder.promptsDirectory).
+  onSuccess: "rm -rf dist/prompts && cp -R src/mind/prompts dist/prompts"
 });

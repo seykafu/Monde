@@ -7,6 +7,7 @@ import { createRedis } from "./redis.js";
 
 import { registerWorldRoutes } from "./worlds/routes.js";
 import type { WorldDatabase } from "./worlds/createWorld.js";
+import { promptVersion } from "./mind/promptBuilder.js";
 
 type Check = "ok" | "down" | "off";
 async function check(probe?: () => Promise<unknown>): Promise<Check> {
@@ -63,7 +64,8 @@ export function buildApp(config: Config, testDb?: WorldDatabase) {
       checks: { db, redis: redisStatus },
     };
   });
-  app.get("/v1/version", async () => ({ version: config.GIT_SHA }));
+  // Loading the prompt version at request time proves the prompt templates shipped with the build.
+  app.get("/v1/version", async () => ({ version: config.GIT_SHA, prompt_version: promptVersion() }));
   registerWorldRoutes(app, config, testDb ?? database?.db);
   return app;
 }
