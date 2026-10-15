@@ -79,14 +79,20 @@ describe("validation pipeline", () => {
 
   it("3. maps an expression the card lacks from the resident's emotion", () => {
     const result = run(turn({ lines: [{ text: "Hm.", expr: "smirk" }, { text: "Now.", expr: "ledger_stare" }] }), ctx({ emotion: "wistful" }));
-    expect(result.ok && result.output.lines.map((l) => l.expr)).toEqual(["sad", "ledger_stare"]);
+    expect(result.ok && result.output.lines.map((l) => l.expr)).toEqual(["sad", "sad"]);
     const pell = card("pell");
     expect(expressionFor(pell, "irritated")).toBe("angry");
     expect(expressionFor(pell, "anxious")).toBe("worried");
     expect(expressionFor(pell, "excited")).toBe("warm");
     expect(expressionFor(pell, "embarrassed")).toBe("surprised");
     expect(expressionFor(pell, "content")).toBe("neutral");
-    expect(checkedExpression({ portrait_expressions: ["grin"] }, "smirk", "sad")).toBe("grin");
+    // People get the six portraits (GDD §16.2): aliases map, unknowns come from the emotion.
+    expect(checkedExpression(pell, "laugh", "sad")).toBe("warm");
+    expect(checkedExpression(pell, "thinking", "sad")).toBe("neutral");
+    expect(checkedExpression(pell, "worried", "content")).toBe("worried");
+    expect(checkedExpression(pell, "ledger_stare", "angry")).toBe("angry");
+    // Animals keep their own small sets.
+    expect(checkedExpression({ portrait_expressions: ["grin"], kind: "animal" }, "smirk", "sad")).toBe("grin");
   });
 
   it.each([

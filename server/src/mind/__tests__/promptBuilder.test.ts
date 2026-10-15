@@ -5,6 +5,7 @@ import { join } from "node:path";
 import type Anthropic from "@anthropic-ai/sdk";
 import { ResidentState, UNSUPPORTED_SCHEMA_KEYS, type Memory, type PersonaCard } from "@monde/shared";
 import { loadContent } from "../../content/loadContent.js";
+import { promptExpressions } from "../expressions.js";
 import {
   activeCanonLocks, apiParams, beliefsBlock, buildDialogueRequest, buildGossipRequest, buildPlanRequest,
   buildReflectRequest, containsAnswer, personaBlock, promptVersion, promptsDirectory, requestSettings,
@@ -403,7 +404,7 @@ describe("every card builds", () => {
         buildDialogueRequest(dialogueInput(c)), buildPlanRequest(planInput(c)), buildReflectRequest(reflectInput(c)),
       ]) {
         expect(JSON.stringify(req), `${c.id} has an unfilled slot`).not.toContain("{{");
-        expect(req.system[1]!.text).toContain(`Portrait expressions (each line's expr must be one of these): ${c.portrait_expressions.join(", ")}`);
+        expect(req.system[1]!.text).toContain(`Portrait expressions (each line's expr must be one of these): ${promptExpressions(c).join(", ")}`);
       }
     }
   });

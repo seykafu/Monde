@@ -24,6 +24,7 @@ import {
   evaluate, gameContext, modelOutputFormat, regardTier,
   type FavorTemplate, type Memory, type PersonaCard, type ResidentState, type Verb,
 } from "@monde/shared";
+import { promptExpressions } from "./expressions.js";
 
 // ---------------------------------------------------------------------------------------------------------------
 // API settings (GDD §9.17 "API call settings"; AGENTS.md "Claude API rules")
@@ -311,7 +312,7 @@ export function personaBlock(card: PersonaCard, ctx: CanonContext): string {
     tics: quoted(voice.tics),
     never_says: quoted(voice.never_says),
     voice_extra: voiceExtra,
-    expressions: card.portrait_expressions.join(", "),
+    expressions: promptExpressions(card).join(", "),
     canon: bullets(activeCanonLocks(card, ctx), "(none right now)"),
   });
 }

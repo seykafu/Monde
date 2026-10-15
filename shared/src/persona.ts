@@ -8,6 +8,23 @@ export const STANDARD_EXPRESSIONS = [
   "neutral", "warm", "laugh", "sad", "angry", "surprised", "worried", "thinking",
 ] as const;
 
+/**
+ * The six portraits drawn for every character (Kasey, 2026-10-14): the dialogue picks one per line from the
+ * conversation's emotion and content. Card expressions outside the six map onto them (laugh → warm,
+ * thinking → neutral); signature expressions return later with more art.
+ */
+export const PORTRAIT_SET = ["neutral", "warm", "sad", "angry", "surprised", "worried"] as const;
+export type PortraitExpression = (typeof PORTRAIT_SET)[number];
+const PORTRAIT_ALIASES: Readonly<Record<string, PortraitExpression>> = {
+  laugh: "warm", happy: "warm", thinking: "neutral", guarded: "neutral", deadpan: "neutral",
+  ashamed_glance: "sad", alarmed: "surprised", grim: "angry",
+};
+/** The portrait for an expression id, or null if it has no sensible mapping. */
+export function toPortraitExpression(expr: string): PortraitExpression | null {
+  if ((PORTRAIT_SET as readonly string[]).includes(expr)) return expr as PortraitExpression;
+  return PORTRAIT_ALIASES[expr] ?? null;
+}
+
 const HomePlace = z.union([PlaceId, z.literal("offmap.city")]);
 
 export const RoutineBlock = z.object({
