@@ -54,6 +54,8 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
       /^https:\/\/(?:[a-z0-9-]+\.)+itch\.zone$/i,
       /^https:\/\/(?:[a-z0-9-]+\.)*itch\.io$/i,
       "http://localhost:5173",
+      // The desktop build (Electron) serves the game from app://monde/ (desktop/src/protocol.ts).
+      "app://monde",
     ],
     // The default (GET, HEAD, POST) would make browsers refuse PATCH /v1/worlds/:w/player at preflight.
     methods: ["GET", "HEAD", "POST", "PATCH"],

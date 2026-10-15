@@ -4,6 +4,7 @@ COPY package*.json tsconfig.base.json ./
 COPY shared/ ./shared/
 COPY server/ ./server/
 COPY client/package.json ./client/package.json
+COPY desktop/package.json ./desktop/package.json
 RUN npm ci --workspace @monde/server --include-workspace-root=true
 RUN npm run build -w @monde/server
 
@@ -16,6 +17,7 @@ COPY package*.json ./
 COPY shared/package.json ./shared/package.json
 COPY server/package.json ./server/package.json
 COPY client/package.json ./client/package.json
+COPY desktop/package.json ./desktop/package.json
 RUN npm ci --omit=dev --workspace @monde/server --include-workspace-root=false && npm cache clean --force
 COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/server/drizzle ./server/drizzle

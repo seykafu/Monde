@@ -47,6 +47,7 @@ describe("monde-mind", () => {
     ["https://game.itch.zone", true], ["https://itch.io", true],
     ["https://creator.itch.io", true], ["http://localhost:5173", true],
     ["https://itch.io.evil.test", false], ["http://game.itch.zone", false],
+    ["app://monde", true], ["app://monde.evil", false], ["app://evil", false],
   ])("checks CORS for %s", async (origin, allowed) => {
     const response = await app().inject({ url: "/v1/health", headers: { origin } });
     expect(response.headers["access-control-allow-origin"]).toBe(allowed ? origin : undefined);
