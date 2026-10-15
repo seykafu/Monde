@@ -117,7 +117,7 @@ describe('zone graph', () => {
 
   it('builds portals from every edge, with door-to-edge distances', () => {
     expect(graph.portals.old_quarter!.map(p => [p.to, p.exit])).toEqual([['market_row', [39, 16]]]);
-    expect(graph.portals.market_row!.map(p => [p.to, p.exit])).toEqual([['old_quarter', [0, 10]]]);
+    expect(graph.portals.market_row!.map(p => [p.to, p.exit])).toEqual([['old_quarter', [0, 10]], ['commons', [8, 0]], ['wharf', [18, 19]]]);
     for (const zone of Object.values(zones)) for (const place of zone.places) {
       for (const d of Object.values(graph.doorToEdge[zone.id]![place.id]!)) expect(d, `${zone.id}.${place.id}`).toBeLessThan(Infinity);
     }
@@ -141,6 +141,6 @@ describe('zone graph', () => {
     expect(graph.estimateMinutes({ zone: 'old_quarter', tile: cottage }, { zone: 'market_row', tile: cafe }, 2)).toBeCloseTo(route.length / 2, 9);
     // Same-zone routes are a single leg; unknown zones have no route.
     expect(graph.route({ zone: 'market_row', tile: cafe }, { zone: 'market_row', tile: [4, 7] })!.legs).toHaveLength(1);
-    expect(graph.route({ zone: 'wharf', tile: [0, 0] }, { zone: 'market_row', tile: cafe })).toBeNull();
+    expect(graph.route({ zone: 'millbrook', tile: [0, 0] }, { zone: 'market_row', tile: cafe })).toBeNull();
   });
 });

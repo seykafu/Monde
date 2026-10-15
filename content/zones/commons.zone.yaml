@@ -1,0 +1,96 @@
+# Greybox: building letters are solid; door coordinates are outside on the street.
+# Gravel walks run from the Commons gate up the avenue to the bandstand, with a cross walk east–west.
+id: commons
+name: The Commons
+size: [40, 30]
+legend:
+  ",": { terrain: grass }
+  ".": { terrain: dirt }
+  "~": { terrain: water, solid: true }
+  "=": { terrain: wood }
+  m: { terrain: mud }
+  f: { terrain: forest }
+  "|": { terrain: stone, obstacle: fence, solid: true }
+  p: { terrain: stone, solid: true }
+  o: { terrain: stone, elev: 1 }
+  l: { terrain: stone, elev: 1, obstacle: pillar }
+  x: { terrain: rubble, elev: 1, obstacle: rock }
+  "*": { terrain: marble, obstacle: pillar }
+  G: { terrain: wall, elev: 1, solid: true, building: glasshouse }
+  T: { terrain: wall, elev: 1, solid: true, building: teo_cottage }
+# "." gravel walks · m garden soil (the community garden's beds) · f deep shade under the Old Elm
+# "|" the railing along Market Row, broken by the Commons gate: p are its posts (CM-1), each with a gate prop
+# o the bandstand's octagonal base (+1) · l its legs still standing · x fallen legs and the collapsed roof
+# "*" the sundial on its plinth; the Old Elm (the tree prop in the shade) stands to its north-east (CM-2)
+# "~" the duck pond, two lobes joined by a channel · "=" the footbridge across the channel (CM-4)
+tiles: |
+  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,GGGGGGGG,TTT,,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,GGGGGGGG,TTT,,,,lox,,,,,,,,,,,,,,,,,,,
+  ,,GGGGGGGG,TTT,,,ooooo,,,,,,,,,,,,,,,,,,
+  ,,GGGGGGGG,,,,,,loooool,,,,,,,,,,,,,,,,,
+  ,,.............,oooxooo,,,,,,,,,,,,,,,,,
+  ,,,mmm,mmm,mmm,,xoooxox,,,,,,,,,,,,,,,,,
+  ,,,mmm,mmm,mmm,,,ooooo,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,lol,,,,,,,,,,,,,,,,,,,
+  ,,,mmm,mmm,mmm,,,,...,,,,,,,,,,,,,,,,,,,
+  ,,,mmm,mmm,mmm,,,,...,,,,,,,,,,,,,,,,,,,
+  ,......................................,
+  ,......................................,
+  ,,,,,,,.,,,fffff,,...,,,,,,,,,,..,,,,,,,
+  ,,,,,,,.,,,fffff,,...,,,,,,,,,,..,,,,,,,
+  ,,,,,,,.,,,fffff,,...,,,,,,,,,,..,,,,,,,
+  ,,,,,,,.,,,fffff,,...,,,,,~~~,,..,,,,,,,
+  ,,,,,,,,,,,,,,,,,,...,,,,~~~~~,,,~~~~~,,
+  ,,,,,,,,,,,,,,,,,,...,,,~~~~~~~==~~~~~~,
+  ,,,,,,,,*,,,,,,,,,...,,,~~~~~~~==~~~~~~,
+  ,,,,,,,,,,,,,,,,,,...,,,~~~~~~~==~~~~~~,
+  ,,,,,,,,,,,,,,,,,,...,,,,~~~~~,..~~~~~,,
+  ,,,,,,,,,,,,,,,,,,...,,,,,~~~,,..,,,,,,,
+  ,,,,,,,,,,,,,,,,,,....................,,
+  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
+  |||||||||||||||||p...p||||||||||||||||||
+  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
+places:
+  - { id: glasshouse, rect: [2, 2, 8, 4], door: [5, 6] }
+  - { id: teo_cottage, rect: [11, 2, 3, 3], door: [12, 5] }
+  - { id: community_garden, rect: [2, 7, 13, 5], door: [8, 12] }
+  - { id: bandstand, rect: [16, 3, 7, 7], door: [19, 10] }
+  - { id: picnic_lawn, rect: [25, 2, 13, 10], door: [31, 12] }
+  - { id: old_elm, rect: [11, 14, 5, 4], door: [13, 13] }
+  - { id: sundial_lawn, rect: [2, 18, 11, 7], door: [7, 17] }
+  - { id: duck_pond, rect: [22, 16, 17, 9], door: [21, 20] }
+  - { id: footbridge, rect: [31, 19, 2, 3], door: [31, 18] }
+props:
+  - { kind: gate, at: [17, 26] }    # the Commons gate posts (CM-1)
+  - { kind: gate, at: [21, 26] }
+  - { kind: sign, at: [16, 27] }
+  - { kind: tree, at: [13, 15] }    # the Old Elm
+  - { kind: lamp_post, at: [17, 14] }
+  - { kind: lamp_post, at: [21, 14] }
+  - { kind: lamp_post, at: [17, 25] }
+  - { kind: lamp_post, at: [21, 25] }
+  - { kind: bench, at: [28, 5] }
+  - { kind: bench, at: [33, 5] }
+  - { kind: bench, at: [28, 8] }
+  - { kind: bench, at: [33, 8] }
+  - { kind: bench, at: [17, 19] }
+  - { kind: bench, at: [4, 23] }
+  - { kind: bench, at: [30, 25] }
+  - { kind: crate, at: [14, 9] }
+  - { kind: tree, at: [15, 2] }
+  - { kind: tree, at: [24, 2] }
+  - { kind: tree, at: [37, 3] }
+  - { kind: tree, at: [25, 10] }
+  - { kind: tree, at: [37, 10] }
+  - { kind: tree, at: [1, 15] }
+  - { kind: tree, at: [16, 22] }
+  - { kind: tree, at: [2, 25] }
+  - { kind: tree, at: [23, 15] }
+  - { kind: tree, at: [38, 15] }
+edges:
+  - { side: south, from: 18, to: 20, zone: market_row, arrive: [8, 1] }
+spawn: [19, 27]

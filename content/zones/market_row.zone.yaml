@@ -66,4 +66,6 @@ props:
   - { kind: sign, at: [1, 8] }
 edges:
   - { side: west, from: 9, to: 11, zone: old_quarter, arrive: [38, 16] }
+  - { side: north, from: 7, to: 9, zone: commons, arrive: [19, 28] }
+  - { side: south, from: 17, to: 19, zone: wharf, arrive: [18, 1] }
 spawn: [1, 10]

@@ -122,11 +122,12 @@ describe('routine executor', () => {
     expect(firstSeen.position!.x).toBeLessThan(1);
     expect(firstSeen.position!.y).toBeCloseTo(16.5, 0);
     expect(ex.stateAt(tib, 945)).toMatchObject({ zone: 'old_quarter', traveling: null, visible: false, place: 'old_quarter.library' });
-    // Between two unbuilt zones the road crosses the town: in from the west, out to the wharf road.
+    // From an unbuilt zone to a built one across town: in from the west road, through Market Row, and down
+    // the real edge into the Wharf (its provisional road is gone now the board exists).
     const cross = plan('cross', 'millbrook.mill', [['08:00', 'work', 'millbrook.mill'], ['12:00', 'eat', 'wharf.fish_market']]);
     const seen: (string | null)[] = [];
     for (let m = 600; m < 720; m += 0.5) { const z = ex.stateAt(cross, m).zone; if (seen.at(-1) !== z) seen.push(z); }
-    expect(seen).toEqual([null, 'old_quarter', 'market_row', null]);
+    expect(seen).toEqual([null, 'old_quarter', 'market_row', 'wharf']);
   });
 
   it('warns about unknown places instead of crashing', () => {
