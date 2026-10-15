@@ -105,6 +105,34 @@ JOBS = {
     "station_hill_dusk": ("market_row_restored", backdrop("Station Hill above Monde at dusk: a small derelict railway station with a wooden canopy, grass growing between the rails, a rusty water tower, a little signal box with tall windows, a weathered bench at a lookout; far below, the town and the bay with a few windows lighting up. Golden-hour light, wind in the grass. No trains.")),
 }
 
+# The six dialogue portraits every character gets (GDD §16.2), drawn against their neutral key so only the face moves.
+EXPRESSIONS = {
+    "warm": "warm and pleased: a genuine smile, softened eyes, a little colour in the cheeks.",
+    "sad": "sad: brows drawn up in the middle, eyes lowered, mouth turned down, shoulders a touch lower.",
+    "angry": "angry: brows down and angled, eyes narrowed, jaw set, nostrils flared, lips pressed thin.",
+    "surprised": "surprised: eyebrows high, eyes wide, mouth open in a small round O.",
+    "worried": "worried: brows tilted up and pinched together, a wavering mouth, eyes glancing aside.",
+}
+
+
+def expression_variant(name: str, expr: str) -> str:
+    return HEAD + ("The attached image is " + name + "'s neutral portrait from our game. Create ONE new image of EXACTLY "
+                   "the same character: same face, hair, clothes, colours, pose, framing, line art and cel shading, and "
+                   "the same flat pure magenta (#FF00FF) background. Change ONLY the facial expression (and the smallest "
+                   "natural shift of head and shoulders that goes with it).\n\nNew expression: " + expr +
+                   "\n\nNo text, no border, no frame.")
+
+
+for _expr, _desc in EXPRESSIONS.items():
+    JOBS[f"odile_{_expr}"] = ("portrait_odile", expression_variant("Odile", _desc))
+
+# The player's walk cycle as a sprite sheet (sheet contract: client/public/assets/sprites/README or GDD §16).
+JOBS["walk_sheet_player"] = (None, HEAD + """A pixel-art sprite sheet for a cozy top-down town-life game in the style of Stardew Valley: chunky, clearly visible square pixels, a limited warm palette, a dark soft outline. One character, a friendly young adult townsperson with short brown hair, a teal knitted jumper, brown trousers and boots, about two tiles tall (proportions like Stardew Valley's villagers: big head, small body).
+
+Layout: a precise grid of 4 rows by 4 columns, every cell the same size with the character centred and feet on the same baseline. Row 1: walking towards the viewer (facing down). Row 2: walking left. Row 3: walking right. Row 4: walking away (facing up). The 4 columns in each row are one walk cycle: left foot forward, passing, right foot forward, passing, with arms swinging opposite the legs and a one-pixel bob on the passing frames.
+
+Background: the ENTIRE background is one flat, solid, pure magenta (#FF00FF). No grid lines, no labels, no text, no shadows.""")
+
 PATH_RE = re.compile(r"(/[^`'\"\s]*?generated_images/[^`'\"\s]*?\.png)")
 
 
