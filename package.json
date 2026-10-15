@@ -6,7 +6,8 @@
   "workspaces": [
     "shared",
     "client",
-    "server"
+    "server",
+    "desktop"
   ],
   "engines": {
     "node": ">=22"
@@ -14,13 +15,17 @@
   "scripts": {
     "dev": "npm run dev -w @monde/client",
     "dev:server": "npm run dev -w @monde/server",
-    "typecheck": "tsc -p shared --noEmit && tsc -p client --noEmit && tsc -p server --noEmit",
+    "typecheck": "tsc -p shared --noEmit && tsc -p client --noEmit && tsc -p server --noEmit && tsc -p desktop --noEmit",
     "lint": "eslint .",
     "test": "vitest run --passWithNoTests",
     "verify:puzzles": "python3 tools/verify_puzzles.py",
     "build": "npm run build -w @monde/client && npm run build -w @monde/server",
     "build:itch": "npm run build:itch -w @monde/client",
-    "ci": "npm run typecheck && npm run lint && npm run lint:content && npm run scenes && npm test && npm run verify:puzzles && npm run build && npm run smoke:server",
+    "desktop:dev": "npm run dev -w @monde/desktop",
+    "desktop:compile": "npm run build -w @monde/desktop",
+    "desktop:build": "npm run build -w @monde/client && npm run desktop:compile",
+    "desktop:dist": "npm run desktop:build && npm run dist -w @monde/desktop --",
+    "ci": "npm run typecheck && npm run lint && npm run lint:content && npm run scenes && npm test && npm run verify:puzzles && npm run build && npm run desktop:compile && npm run smoke:server",
     "lint:content": "tsx tools/lint-content.ts",
     "scenes": "tsx tools/compile-scenes.ts",
     "smoke:server": "bash tools/smoke-server.sh"
@@ -29,10 +34,10 @@
     "@eslint/js": "^9.39.4",
     "@types/node": "^22.10.0",
     "eslint": "^9.39.4",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.60.1",
     "vitest": "^2.1.9",
-    "tsx": "^4.19.2",
     "yaml": "^2.6.0"
   }
 }

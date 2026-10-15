@@ -1,0 +1,21 @@
+{
+  "name": "@monde/desktop",
+  "productName": "Monde",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Monde, a cozy town life-sim: the desktop build (Electron)",
+  "author": "seykafu",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && tsx scripts/build-config.mts",
+    "dev": "tsx scripts/dev.mts",
+    "dist": "electron-builder --config electron-builder.yml --publish never",
+    "icon": "python3 scripts/make-icon.py"
+  },
+  "devDependencies": {
+    "electron": "44.7.2",
+    "electron-builder": "26.15.3"
+  }
+}

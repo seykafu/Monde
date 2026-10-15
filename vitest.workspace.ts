@@ -1,1 +1,1 @@
-export default ["shared", "client", "server"];
+export default ["shared", "client", "server", "desktop"];

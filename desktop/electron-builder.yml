@@ -1,0 +1,68 @@
+# electron-builder: `npm run desktop:dist` (Mac here; Windows from a Windows machine or CI later).
+# Unsigned for now: Mac builds are ad-hoc signed so they launch on Apple silicon; see README.md for Developer ID
+# signing, notarization and Windows code signing.
+appId: com.seykafu.monde
+productName: Monde
+copyright: Copyright © 2026 seykafu
+
+directories:
+  output: release
+  buildResources: build
+
+# The app itself is only the compiled main process and preload: no runtime dependencies. With none of its own,
+# electron-builder would fall back to the workspace root's dependencies (flyctl's tree), hence the exclusion.
+files:
+  - package.json
+  - dist/**/*.js
+  - dist/build-config.json
+  - "!node_modules{,/**/*}"
+
+# The built game (client/dist) ships beside app.asar as loose files: Resources/game, served as app://monde/.
+extraResources:
+  - from: ../client/dist
+    to: game
+    filter:
+      - "**/*"
+      - "!**/*.map"
+
+asar: true
+npmRebuild: false
+nodeGypRebuild: false
+
+# Harden the Electron binary (flipped at package time).
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  onlyLoadAppFromAsar: true
+  grantFileProtocolExtraPrivileges: false
+
+mac:
+  category: public.app-category.role-playing-games
+  icon: build/icon.png
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  # "-" = ad-hoc. With a Developer ID: set CSC_NAME/CSC_LINK, drop this line, and turn hardenedRuntime on.
+  identity: "-"
+  hardenedRuntime: false
+  darkModeSupport: true
+
+dmg:
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+  writeUpdateInfo: false
+
+win:
+  icon: build/icon.png
+  target:
+    - target: nsis
+      arch: [x64]
+
+nsis:
+  artifactName: ${productName}-${version}-win-${arch}-setup.${ext}
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: Monde
+  # Saves live in %APPDATA%\Monde\saves: an uninstall keeps them.
+  deleteAppDataOnUninstall: false

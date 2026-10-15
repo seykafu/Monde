@@ -11,3 +11,7 @@ coverage/
 .fly/
 .ref/
 client/src/story/scenes.gen.json
+# Desktop (Electron): compiled main process and electron-builder output (dist/ and release/ above match them too).
+# Electron's binary and electron-builder's downloads are cached outside the repo (~/Library/Caches/electron*).
+desktop/dist/
+desktop/release/

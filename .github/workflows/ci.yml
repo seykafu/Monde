@@ -23,4 +23,6 @@ jobs:
       - run: npm test
       - run: npm run verify:puzzles
       - run: npm run build
+      # Compiles the Electron main process and preload; packaging (electron-builder) is not run in CI.
+      - run: npm run desktop:compile
       - run: npm run smoke:server
