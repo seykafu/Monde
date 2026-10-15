@@ -9787,6 +9787,75 @@ no characters, no UI. Draw at native 1280×720.
 - **Zone transitions:** walk off a marked edge, with a 0.4 s fade. Residents path across zones through a
   zone graph; off-screen movement is abstract (§19.5).
 
+#### 16.4.1 Zone files and the town board (format v2, D20)
+
+*Added 2026-10-15 with the town lift (part 1). The four MVP districts are in this format; part 2 redesigns
+their layouts.* A zone is `content/zones/<id>.zone.yaml`, compiled by `client/src/world/zoneFormat.ts` (the
+format's reference, with a commented example) and drawn by `client/src/render/town/`. The v1 greybox
+format still loads.
+
+```yaml
+format: 2
+id: old_quarter
+name: Old Quarter
+size: [40, 30]
+terrain: |                 # one character a tile (default legend below; `legend:` adds characters)
+  ,,,,'''...pppp
+elevation: |               # optional digits 0–3 (Ravage's rules: elevation.ts clamps any rise in front)
+buildings:                 # place-linked sprites; the footprint (manifest `foot`) is solid
+  - { id: bakery, sprite: bakery, at: [10, 3], door: [12, 7], state: auto }
+props:                     # single placements and lines
+  - { sprite: lamp_post, at: [6, 7] }
+  - { sprite: cat_sleeping, at: [23, 14], offset: [-6, 2], lift: 13 }
+  - { sprite: hedge, line: [[1, 24], [18, 24]] }
+scatter:                   # seeded set dressing
+  - { sprites: [tall_grass, bush_round], on: [grass], density: 0.07, seed: 11,
+      near: { kinds: [river], radius: 1 }, keepout: { kinds: [cobble], radius: 1, doors: 2 } }
+places:                    # open ground, as v1; buildings with an id are places already
+  - { id: fountain_square, rect: [14, 8, 12, 8], door: [19, 15] }
+edges:
+  - { side: east, from: 15, to: 17, zone: market_row, arrive: [1, 10] }
+spawn: [5, 22]
+```
+
+- **Ground.** `,` grass · `'` meadow (wildflowers) · `.` cobble · `b` brick paving · `p` plaza flagstones ·
+  `:` gravel path · `r` cart road (packed earth, wheel ruts along it) · `s` sand · `h` shingle · `w` wet sand ·
+  `m` garden soil (planked borders) · `=` boards (wharf, pier, bridge deck) · `_` stone steps · `g` weedy
+  stone · `~` sea · `o` pond · `-` shallows · `> < ^ v` river, the arrow pointing downstream. Water is not
+  walkable. Each kind has a stacking layer and a soft or hard edge: soft kinds (grass, meadow, sand, gravel,
+  road, shallows) spill a ragged few pixels over a lower neighbour with a dark lip, a lit rim and a shadow
+  on the ground below; two spilling sides round their corner; laid kinds (cobbles, boards, soil) keep a
+  straight edge with kerbs, plank borders or a timber edge. Above the far side of water the bank shows
+  earth, quay stone or pier timber; beaches slope in with surf. No two tiles of a kind repeat: materials
+  are drawn per world pixel (`render/town/materials.ts`) with a slow brightness drift over them.
+- **Buildings.** `at` is the footprint's top-left tile; the sprite stands bottom-centre on the middle of
+  the footprint's front edge. `door` is the tile in front of that edge, inside the footprint's columns. With
+  an `id` the building is that place (rect = footprint) and its tiles carry the id, so residents go inside;
+  without one it is scenery. `state: restored | faded | auto`: `auto` is faded on Day 1 for vacant homes,
+  empty storefronts and sprites with an unfinished Project (fountain, market hall and stalls, glasshouse,
+  bandstand, cannery and cranes, lighthouse, garden beds, the cottage roof), and turns restored when
+  `project_<project>_done`, the project's own flag (`bandstand_rebuilt`, `glasshouse_repaired`,
+  `cannery_coop`) or `project_<place id>_done` is set; the board swaps the art in place.
+- **Props.** A prop blocks its trunk, base or legs (`block` per sprite in `world/townSprites.ts`, or
+  `solid:`); floating props (boats, buoys, lilies, ducks) go on water. `offset` moves a prop (and its
+  depth); `lift` only draws it higher. Lamp posts are lights.
+- **Scatter** is deterministic per seed and rule, only on free ground away from doors, edges and the
+  spawn, and walk-through unless `solid: true`.
+- **Validation.** Unknown sprites, overlapping footprints, doors not on walkable ground or not at the
+  front edge, props in buildings or on the wrong side of the waterline, and any door or edge the spawn
+  cannot reach are load errors.
+- **On the board.** Buildings and props are billboards sorted with the people by their ground line, and
+  fade to 35% while the player is behind them; contact shadows, sun shadows from the clock (props lean,
+  buildings shear along the ground) and lamp shadows at night; lamp pools and heads, lit windows found in
+  the art, and door pools for lived-in homes only. Water moves in its layer under the ground (rivers carry
+  their crests downstream, the sea swells, foam laps the shore), tinted with the board by the day's grade
+  and the night. Small life is pooled and capped: chimney smoke from lived-in homes, birds and gulls,
+  butterflies over flowers in sun, ducks on the pond, leaves in a wind, the restored fountain running,
+  glints on the water, grass and reeds leaning in the wind. `prefers-reduced-motion` (or `?motion=0`) keeps
+  only smoke, ducks, the fountain and glints. The ground bakes into chunk textures (8×6 tiles) round the
+  camera first and the rest in idle time, once per zone per session; sprites and water tiles are culled to
+  the camera.
+
 ### 16.5 Sprites
 
 - **Directions:** down, up, side (flipped for left). Ravage's sheets are side-only, so this is new work.
@@ -10095,6 +10164,7 @@ Marks → library size 120 masters.
 | D17 | Desktop first: the same Phaser/TypeScript game packaged with Electron for Mac and Windows (Steam later); the web build stays for demos and playtests | Kasey's call (2026-10-14): a big game sells and saves better as a desktop install; no engine rewrite |
 | D18 | Conversation sessions: verbatim while live, resumable for 5 game minutes, then compacted into a summary and a rolling digest (§9.10.3) | Kasey's call (2026-10-14): residents keep the thread of a moment, and long-term history stays bounded in tokens |
 | D19 | The database is Supabase (managed Postgres, us-east, beside the Fly server): the pooled connection for the server, a session connection for migrations; the game only ever talks to monde-mind, never to Supabase directly | Kasey's call (2026-10-15): managed backups and point-in-time restore, pooling and storage as the player count grows, with no change to the schema or the ORM |
+| D20 | The town is drawn from sprites on a zone format v2 board (§16.4.1): autotiled procedural ground, animated water, building and prop billboards that fade, shadows, night windows and small life; v1 greybox zones still load | Kasey's call (2026-10-15): the town lift, "make the city lively and real" |
 
 ### 21.2 Open questions for Kasey
 

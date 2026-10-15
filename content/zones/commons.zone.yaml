@@ -1,96 +1,115 @@
-# Greybox: building letters are solid; door coordinates are outside on the street.
-# Gravel walks run from the Commons gate up the avenue to the bandstand, with a cross walk east–west.
+# The Commons (GDD §2.3): overgrown, quiet, beautiful bones. The Glasshouse (broken panes) and Teo's cottage,
+# the community garden's six beds (overgrown until the garden Project), the collapsed bandstand on its round
+# (CM puzzles), the picnic lawn, the Old Elm north-east of the sundial (CM-2), the duck pond's two lobes and
+# the footbridge over the channel between them (CM-4), and the railing along Market Row broken by the Commons
+# gate (CM-1). Gravel walks run up the avenue from the gate and across. Zone format v2 (world/zoneFormat.ts).
+format: 2
 id: commons
 name: The Commons
 size: [40, 30]
-legend:
-  ",": { terrain: grass }
-  ".": { terrain: dirt }
-  "~": { terrain: water, solid: true }
-  "=": { terrain: wood }
-  m: { terrain: mud }
-  f: { terrain: forest }
-  "|": { terrain: stone, obstacle: fence, solid: true }
-  p: { terrain: stone, solid: true }
-  o: { terrain: stone, elev: 1 }
-  l: { terrain: stone, elev: 1, obstacle: pillar }
-  x: { terrain: rubble, elev: 1, obstacle: rock }
-  "*": { terrain: marble, obstacle: pillar }
-  G: { terrain: wall, elev: 1, solid: true, building: glasshouse }
-  T: { terrain: wall, elev: 1, solid: true, building: teo_cottage }
-# "." gravel walks · m garden soil (the community garden's beds) · f deep shade under the Old Elm
-# "|" the railing along Market Row, broken by the Commons gate: p are its posts (CM-1), each with a gate prop
-# o the bandstand's octagonal base (+1) · l its legs still standing · x fallen legs and the collapsed roof
-# "*" the sundial on its plinth; the Old Elm (the tree prop in the shade) stands to its north-east (CM-2)
-# "~" the duck pond, two lobes joined by a channel · "=" the footbridge across the channel (CM-4)
-tiles: |
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,GGGGGGGG,TTT,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,GGGGGGGG,TTT,,,,lox,,,,,,,,,,,,,,,,,,,
-  ,,GGGGGGGG,TTT,,,ooooo,,,,,,,,,,,,,,,,,,
-  ,,GGGGGGGG,,,,,,loooool,,,,,,,,,,,,,,,,,
-  ,,.............,oooxooo,,,,,,,,,,,,,,,,,
-  ,,,mmm,mmm,mmm,,xoooxox,,,,,,,,,,,,,,,,,
-  ,,,mmm,mmm,mmm,,,ooooo,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,lol,,,,,,,,,,,,,,,,,,,
-  ,,,mmm,mmm,mmm,,,,...,,,,,,,,,,,,,,,,,,,
-  ,,,mmm,mmm,mmm,,,,...,,,,,,,,,,,,,,,,,,,
-  ,......................................,
-  ,......................................,
-  ,,,,,,,.,,,fffff,,...,,,,,,,,,,..,,,,,,,
-  ,,,,,,,.,,,fffff,,...,,,,,,,,,,..,,,,,,,
-  ,,,,,,,.,,,fffff,,...,,,,,,,,,,..,,,,,,,
-  ,,,,,,,.,,,fffff,,...,,,,,~~~,,..,,,,,,,
-  ,,,,,,,,,,,,,,,,,,...,,,,~~~~~,,,~~~~~,,
-  ,,,,,,,,,,,,,,,,,,...,,,~~~~~~~==~~~~~~,
-  ,,,,,,,,*,,,,,,,,,...,,,~~~~~~~==~~~~~~,
-  ,,,,,,,,,,,,,,,,,,...,,,~~~~~~~==~~~~~~,
-  ,,,,,,,,,,,,,,,,,,...,,,,~~~~~,..~~~~~,,
-  ,,,,,,,,,,,,,,,,,,...,,,,,~~~,,..,,,,,,,
-  ,,,,,,,,,,,,,,,,,,....................,,
-  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
-  |||||||||||||||||p...p||||||||||||||||||
-  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,
+terrain: |
+  ''''''''''''''''''''''''''''''''''''''''
+  ''''''''''''''''''''''''''''''''''''''''
+  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,''''''
+  ,,,,,,,,,,,,,,,,ppppppp,,,,,,,,,,,''''''
+  ,,,,,,,,,,,,,,,,ppppppp,,,,,,,,,,,''''''
+  ,,,,,,,,,,,,,,,,ppppppp,,,,,,,,,,,''''''
+  ,::::::::::::::,ppppppp,,,,,,,,,,,''''''
+  ,,:mmm:mmm:mmm:,ppppppp,,,,,,,,,,,''''''
+  ,,:mmm:mmm:mmm:,ppppppp,,,,,,,,,,,''''''
+  ,,:::::::::::::,ppppppp,,,,,,,,,,,''''''
+  ,,:mmm:mmm:mmm:,,,:::,,,,,,,,,,,,,''''''
+  ,,:mmm:mmm:mmm:,,,:::,,,,,,,,,,,,,''''''
+  ,::::::::::::::::::::::::::::::::::::::,
+  ,::::::::::::::::::::::::::::::::::::::,
+  '''''''''',,,,,,,,:::,,'''''''''''''''',
+  '''''''''',,,,,,,,:::,,,,ooooooooooo,,,,
+  '''''''''',,,,,,,,:::,,,ooooooooooooo,,,
+  ,,,,,,,:,,,,,,,,,,:::,,,ooooooooooooo,,,
+  ,,,,,,,:,,,,,,,,,,:::,,,ooooooooooooo,,,
+  ,,,,,,,:,,,,,,,,,,:::,,,,,,,,,oo,,,,,,,,
+  ,,,,,,ppp,,,,,,,,,:::,:::::::====::::::,
+  ,,,,,,ppp,,,,,,,,,:::,,,,,,,,,oo,,,,,,,,
+  ,,,,,,ppp,,,,,,,,,:::,,,ooooooooooooo,,,
+  ,,,,,,,,,,,,,,,,,,:::,,,ooooooooooooo,,,
+  ,,,,,,,,,,,,,,,,,,:::,,,ooooooooooooo,,,
+  ''''''''''''''''',:::,''''ooooooooo'''''
+  ,,,,,,,,,,,,,,,,,:::::,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,:::,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,:::,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,:::,,,,,,,,,,,,,,,,,,,
+buildings:
+  - { id: glasshouse, sprite: glasshouse, at: [2, 2], door: [4, 6] }
+  - { id: teo_cottage, sprite: teo_cottage, at: [9, 2], door: [11, 5] }
+  - { sprite: garden_shed, at: [13, 3] }
+  - { sprite: bandstand, at: [18, 4] }
+props:
+  # The community garden's beds.
+  - { sprite: veg_bed, at: [3, 8], offset: [24, 0] }
+  - { sprite: veg_bed, at: [7, 8], offset: [24, 0] }
+  - { sprite: veg_bed, at: [11, 8], offset: [24, 0] }
+  - { sprite: veg_bed, at: [3, 11], offset: [24, 0] }
+  - { sprite: veg_bed, at: [7, 11], offset: [24, 0] }
+  - { sprite: veg_bed, at: [11, 11], offset: [24, 0] }
+  - { sprite: apple_tree, at: [1, 10] }
+  - { sprite: well, at: [15, 9] }
+  # The bandstand round.
+  - { sprite: lamp_post, at: [16, 9] }
+  - { sprite: lamp_post, at: [22, 9] }
+  - { sprite: bench, at: [17, 3] }
+  - { sprite: bench, at: [21, 3] }
+  # The picnic lawn.
+  - { sprite: picnic_table, at: [27, 5] }
+  - { sprite: picnic_table, at: [31, 5] }
+  - { sprite: bench, at: [27, 9] }
+  - { sprite: bench, at: [31, 9] }
+  - { sprite: birch, at: [33, 7] }
+  - { sprite: oak, at: [36, 5] }
+  - { sprite: pine, at: [37, 9] }
+  - { sprite: birch, at: [24, 6] }
+  - { sprite: flowerbed, at: [29, 7] }
+  # The Old Elm and the sundial lawn (the Elm stands north-east of the sundial, CM-2).
+  - { sprite: old_elm, at: [13, 16], offset: [24, 0] }
+  - { sprite: sundial, at: [7, 21] }
+  - { sprite: bench, at: [4, 23] }
+  - { sprite: bench, at: [10, 23] }
+  - { sprite: flowerbed, at: [5, 19] }
+  - { sprite: flowerbed, at: [9, 19] }
+  - { sprite: birch, at: [1, 18] }
+  # The duck pond and the footbridge (CM-4).
+  - { sprite: footbridge, at: [30, 21], offset: [24, 0] }
+  - { sprite: willow, at: [23, 18] }
+  - { sprite: willow, at: [37, 23] }
+  - { sprite: birch, at: [38, 17] }
+  - { sprite: bench, at: [22, 17] }
+  - { sprite: bench, at: [34, 21] }
+  - { sprite: lamp_post, at: [21, 19] }
+  - { sprite: lamp_post, at: [21, 14] }
+  - { sprite: lamp_post, at: [17, 14] }
+  # The railing along Market Row and the Commons gate (CM-1).
+  - { sprite: fence, line: [[0, 26], [16, 26]] }
+  - { sprite: fence, line: [[22, 26], [39, 26]] }
+  - { sprite: stone_wall, at: [17, 26] }
+  - { sprite: stone_wall, at: [21, 26] }
+  - { sprite: lamp_post, at: [17, 25] }
+  - { sprite: lamp_post, at: [21, 25] }
+  - { sprite: signpost, at: [16, 27] }
+  - { sprite: oak, at: [3, 28] }
+  - { sprite: pine, at: [36, 28] }
+  - { sprite: apple_tree, at: [27, 28] }
+scatter:
+  - { sprites: [tall_grass, tall_grass, tall_grass, bush_round, bush_flowering, rock], on: [grass], density: 0.09, seed: 41, keepout: { kinds: [gravel, plaza, soil], radius: 0, doors: 2 } }
+  - { sprites: [tall_grass, tall_grass, bush_flowering], on: [meadow], density: 0.22, seed: 42, keepout: { doors: 1 } }
+  - { sprites: [lilypads], on: [pond], density: 0.14, seed: 43 }
+  - { sprites: [reeds], on: [grass, meadow], density: 0.55, seed: 44, near: { kinds: [pond], radius: 1 } }
 places:
-  - { id: glasshouse, rect: [2, 2, 8, 4], door: [5, 6] }
-  - { id: teo_cottage, rect: [11, 2, 3, 3], door: [12, 5] }
   - { id: community_garden, rect: [2, 7, 13, 5], door: [8, 12] }
   - { id: bandstand, rect: [16, 3, 7, 7], door: [19, 10] }
-  - { id: picnic_lawn, rect: [25, 2, 13, 10], door: [31, 12] }
-  - { id: old_elm, rect: [11, 14, 5, 4], door: [13, 13] }
+  - { id: picnic_lawn, rect: [25, 2, 9, 10], door: [29, 12] }
+  - { id: old_elm, rect: [11, 14, 6, 5], door: [13, 13] }
   - { id: sundial_lawn, rect: [2, 18, 11, 7], door: [7, 17] }
-  - { id: duck_pond, rect: [22, 16, 17, 9], door: [21, 20] }
-  - { id: footbridge, rect: [31, 19, 2, 3], door: [31, 18] }
-props:
-  - { kind: gate, at: [17, 26] }    # the Commons gate posts (CM-1)
-  - { kind: gate, at: [21, 26] }
-  - { kind: sign, at: [16, 27] }
-  - { kind: tree, at: [13, 15] }    # the Old Elm
-  - { kind: lamp_post, at: [17, 14] }
-  - { kind: lamp_post, at: [21, 14] }
-  - { kind: lamp_post, at: [17, 25] }
-  - { kind: lamp_post, at: [21, 25] }
-  - { kind: bench, at: [28, 5] }
-  - { kind: bench, at: [33, 5] }
-  - { kind: bench, at: [28, 8] }
-  - { kind: bench, at: [33, 8] }
-  - { kind: bench, at: [17, 19] }
-  - { kind: bench, at: [4, 23] }
-  - { kind: bench, at: [30, 25] }
-  - { kind: crate, at: [14, 9] }
-  - { kind: tree, at: [15, 2] }
-  - { kind: tree, at: [24, 2] }
-  - { kind: tree, at: [37, 3] }
-  - { kind: tree, at: [25, 10] }
-  - { kind: tree, at: [37, 10] }
-  - { kind: tree, at: [1, 15] }
-  - { kind: tree, at: [16, 22] }
-  - { kind: tree, at: [2, 25] }
-  - { kind: tree, at: [23, 15] }
-  - { kind: tree, at: [38, 15] }
+  - { id: duck_pond, rect: [23, 14, 15, 12], door: [22, 20] }
+  - { id: footbridge, rect: [29, 19, 4, 3], door: [28, 20] }
 edges:
   - { side: south, from: 18, to: 20, zone: market_row, arrive: [8, 1] }
 spawn: [19, 27]

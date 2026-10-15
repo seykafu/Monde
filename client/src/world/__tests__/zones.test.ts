@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
 import { compileZone, validateZoneLinks } from '../zoneFormat';
-import { movePlayer, nearbyPlace, resolveEdge } from '../player';
+import { movePlayer, nearbyPlace, resolveEdge, standable } from '../player';
 import { ObliqueProjection } from '../../render/ObliqueProjection';
 import { elevationFor } from '../../render/elevation';
 import { DIORAMA_TILE_W, DIORAMA_TILE_H, DIORAMA_ELEV_STEP, DIORAMA_SLAB_DEPTH } from '../../render/dioramaConfig';
@@ -54,6 +54,10 @@ describe('player', () => {
     expect(movePlayer(zone, { x: 0.3, y: 0.5 }, { x: -1, y: 0 }, 0.25).edge?.zone).toBe('other');
     expect(resolveEdge(zone, { x: -0.01, y: 1 })).toBeUndefined();
     expect(resolveEdge(zone, { x: 0.01, y: 0.5 })).toBeUndefined();
+  });
+  it('moves a saved position that is now inside a wall to the nearest open tile', () => {
+    expect(standable(zone, { x: 0.5, y: 0.5 })).toEqual({ x: 0.5, y: 0.5 });
+    expect(standable(zone, { x: 2.6, y: 1.4 })).toEqual({ x: 2.5, y: 0.5 });
   });
   it('prompts within one tile of a door', () => {
     expect(nearbyPlace(zone, { x: 2.5, y: 3.5 })?.id).toBe('shop');

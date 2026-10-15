@@ -11,7 +11,13 @@ import { hhmmToMinutes } from "./templatePlan.js";
  * Unmapped places only witness at the exact same place. No cross-zone or offmap sight. */
 export const WITNESS_RADIUS = 6;
 export type PlacePositions = ReadonlyMap<string, readonly [number, number]>;
-const Zone = z.object({ id: z.string(), places: z.array(z.object({ id: z.string(), door: z.tuple([z.number(), z.number()]) })) });
+const Door = z.tuple([z.number(), z.number()]);
+/** Zone files (client/src/world/zoneFormat.ts): open places under `places:`; in format v2, buildings with an id are places too. */
+const Zone = z.object({
+  id: z.string(),
+  places: z.array(z.object({ id: z.string(), door: Door })).default([]),
+  buildings: z.array(z.object({ id: z.string().optional(), door: Door.optional() })).default([])
+});
 const root = fileURLToPath(new URL(import.meta.url.includes("/src/") ? "../../../content/" : "../../content/", import.meta.url));
 export async function loadPlacePositions(directory = process.env.MONDE_CONTENT_DIR ?? root): Promise<PlacePositions> {
   const positions = new Map<string, readonly [number, number]>();
@@ -21,6 +27,7 @@ export async function loadPlacePositions(directory = process.env.MONDE_CONTENT_D
   for (const file of files.filter(f => f.endsWith(".zone.yaml")).sort()) {
     const zone = Zone.parse(parse(await readFile(join(directory, "zones", file), "utf8")));
     for (const place of zone.places) positions.set(`${zone.id}.${place.id}`, place.door);
+    for (const building of zone.buildings) if (building.id && building.door) positions.set(`${zone.id}.${building.id}`, building.door);
   }
   return positions;
 }

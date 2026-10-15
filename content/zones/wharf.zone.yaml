@@ -1,113 +1,145 @@
-# Greybox: building letters are solid; door coordinates are outside on the street.
-# The Grey Bay fills the south and east; water is solid and foams where it meets a bank.
+# The Wharf (GDD §2.3): salt, rope, rusting cranes. The road comes down from Market Row to the quay; the
+# shuttered Liss Cannery and the Calloways' bunkhouse up top, two rows of empty cottages to the west, the fish
+# market's boards and net racks, the crane yard, Vane's trailer, the boathouse over its slipway, the harbour
+# steps (the bottom one weedy, uncovered at low water: WF-1), the ferry slip, and the breakwater (+1) out to
+# Point Lumiere's dark lighthouse. The Grey Bay fills the south and east. Zone format v2 (world/zoneFormat.ts).
+format: 2
 id: wharf
 name: The Wharf
 size: [44, 30]
-legend:
-  ".": { terrain: cobblestone }
-  ",": { terrain: grass }
-  "~": { terrain: water, solid: true }
-  ":": { terrain: sand }
-  "=": { terrain: wood }
-  "-": { terrain: dirt }
-  s: { terrain: stone }
-  w: { terrain: moss_stone }
-  b: { terrain: stone, elev: 1 }
-  r: { terrain: wood, obstacle: fence, solid: true }
-  k: { terrain: dirt, obstacle: pillar }
-  A: { terrain: wall, elev: 1, solid: true, building: cannery }
-  B: { terrain: wall, elev: 1, solid: true, building: boathouse }
-  C: { terrain: wall, elev: 1, solid: true, building: ticket_booth }
-  D: { terrain: wall, elev: 1, solid: true, building: nell_cottage }
-  E: { terrain: wall, elev: 1, solid: true, building: vane_office }
-  F: { terrain: wall, elev: 1, solid: true, building: harbormaster_house }
-  G: { terrain: wall, elev: 1, solid: true, building: home_bunkhouse }
-  H: { terrain: wall, elev: 2, solid: true, building: lighthouse }
-  I: { terrain: wall, elev: 1, solid: true, building: vacant_house_48 }
-  J: { terrain: wall, elev: 1, solid: true, building: vacant_house_49 }
-  K: { terrain: wall, elev: 1, solid: true, building: vacant_house_50 }
-  L: { terrain: wall, elev: 1, solid: true, building: vacant_house_51 }
-  M: { terrain: wall, elev: 1, solid: true, building: vacant_house_52 }
-  N: { terrain: wall, elev: 1, solid: true, building: vacant_house_53 }
-  O: { terrain: wall, elev: 1, solid: true, building: vacant_house_54 }
-  P: { terrain: wall, elev: 1, solid: true, building: vacant_house_55 }
-# "=" wharf boards (quay, fish market floor, ferry slip) · ":" shingle bank and the beach under the boathouse
-# "-" the crane yard · k crane bases (2×2 each) · r net racks, running inland from the quay, so each rack's
-# seaward end is its south end (WF-2 counts hooks from there) · s harbor steps · w the bottom step, weedy,
-# uncovered at low water (WF-1) · b the breakwater (+1), the long arm out to the lighthouse (H, +2 on it)
-tiles: |
-  ,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,:~~~~~~~~~
-  ,.................................:~~~~~~~~~
-  ,III.JJJ.KKK.LLL......AAAAAAAAAGGG:~~~~~~~~~
-  ,III.JJJ.KKK.LLL......AAAAAAAAAGGG:~~~~~~~~~
-  ,III.JJJ.KKK.LLL......AAAAAAAAAGGG:~~~~~~~~~
-  ,.....................AAAAAAAAA...:~~~~~~~~~
-  ,.....................AAAAAAAAA...:~~~~~~~~~
-  ,MMM.NNN.OOO.PPP......AAAAAAAAA...:~~~~~~~~~
-  ,MMM.NNN.OOO.PPP..................:~~~~~~~~~
-  ,MMM.NNN.OOO.PPP..................:~~~~~~~~~
-  ,..........................EEEE...:~~~~~~~~~
-  ,.....=======FFFF..........EEEE...:~~~~~~~~~
-  ,DDD..=r===r=FFFF.......----------:~~~~~~~~~
-  ,DDD..=r===r=FFFF.......----------:~~~~~~~~~
-  ,DDD..=r===r=FFFF.......--kk--kk--:~~~~~~~~~
-  ,.....=r===r=...........--kk--kk--:~~~~~~~~~
-  ,BBBBB=r===r=........CC.----------:~~~~~~~~~
-  ,BBBBB=======........CC.----------:~~~~~~~~~
-  =BBBBB=============================~~~~~~~~~
-  =BBBBB=============================~~~~~~~~~
-  =BBBBB=============================~~~~~~~~~
-  ~::::::~~~~~sss~~~===~~~~~~~~~~~~bb~~~~~~~~~
-  ~::::::~~~~~sss~~~===~~~~~~~~~~~~bb~~~~~~~~~
-  ~~~~~~~~~~~~www~~~===~~~~~~~~~~~~bb~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~===~~~~~~~~~~~~bb~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~===~~~~~~~~~~~~bb~~~~HHH~~
-  ~~~~~~~~~~~~~~~~~~===~~~~~~~~~~~~bbbbbbHHH~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~bbbbbbHHH~~
+terrain: |
+  ,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,hh-~~~~~~~~
+  ,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,hh-~~~~~~~~
+  ,,,,,,,,,,,,,,,,,...,,......,,,,,hh-~~~~~~~~
+  ,,,,,,,,,,,,,,,,,...,,......,,,,,hh-~~~~~~~~
+  ,,,,,,,,,,,,,,,,,...,,......,,,,,hh-~~~~~~~~
+  ....................,,...........hh-~~~~~~~~
+  ,,,,,,,,,,,,,,,,,...,,......,,,,,hh-~~~~~~~~
+  ,,,,,,,,,,,,,,,,,...,,......,,,,,hh-~~~~~~~~
+  ,,,,,,,,,,,,,,,,,................,h-~~~~~~~~
+  .................................hh-~~~~~~~~
+  .............,,,,...,,,,,,......hhh-~~~~~~~~
+  ,,,,,========.......,,,,,,......hhh-~~~~~~~~
+  ,,,,,========.......,,,,rrrrrrrrrrh-~~~~~~~~
+  ,,,,,========.......,,,,rrrrrrrrrrh-~~~~~~~~
+  ,,,,,========.......,,,,rrrrrrrrrrh-~~~~~~~~
+  ,,,,,========.......,,,,rrrrrrrrrrh-~~~~~~~~
+  .....========.......,,,,rrrrrrrrrrh-~~~~~~~~
+  .....========.......,,,,rrrrrrrrrrh-~~~~~~~~
+  .....==============================-~~~~~~~~
+  .....==============================-~~~~~~~~
+  .....==============================-~~~~~~~~
+  ssssssssww~~___~~~===~~~~~~~~~~~~pp~~~~~~~~~
+  ssssssssww~~___~~~===~~~~~~~~~~~~pp~~~~~~~~~
+  wwwwwwwww~~~ggg~~~===~~~~~~~~~~~~pp~~ppppp~~
+  ----------~~~~~~~~===~~~~~~~~~~~~pp~~ppppp~~
+  ~~~~~~~~~~~~~~~~~~===~~~~~~~~~~~~pp~~ppppp~~
+  ~~~~~~~~~~~~~~~~~~===~~~~~~~~~~~~pp~~ppppp~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ppppppppp~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ppppppppp~~
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+elevation: |
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000000000000000
+  00000000000000000000000000000000011000000000
+  00000000000000000000000000000000011000000000
+  00000000000000000000000000000000011001111100
+  00000000000000000000000000000000011001111100
+  00000000000000000000000000000000011001111100
+  00000000000000000000000000000000011001111100
+  00000000000000000000000000000000011111111100
+  00000000000000000000000000000000011111111100
+  00000000000000000000000000000000000000000000
+buildings:
+  - { id: cannery, sprite: cannery, at: [22, 2], door: [24, 8] }
+  - { id: home_bunkhouse, sprite: bunkhouse, at: [28, 2], door: [30, 5] }
+  - { id: vacant_house_48, sprite: wharf_cottage, at: [1, 2], door: [1, 5] }
+  - { id: vacant_house_49, sprite: wharf_cottage, at: [4, 2], door: [4, 5] }
+  - { id: vacant_house_50, sprite: wharf_cottage, at: [7, 2], door: [7, 5] }
+  - { id: vacant_house_51, sprite: wharf_cottage, at: [10, 2], door: [10, 5] }
+  - { id: vacant_house_52, sprite: wharf_cottage, at: [1, 6], door: [1, 9] }
+  - { id: vacant_house_53, sprite: wharf_cottage, at: [4, 6], door: [4, 9] }
+  - { id: vacant_house_54, sprite: wharf_cottage, at: [7, 6], door: [7, 9] }
+  - { id: vacant_house_55, sprite: wharf_cottage, at: [10, 6], door: [10, 9] }
+  - { id: vane_office, sprite: vane_office, at: [26, 10], door: [27, 12] }
+  - { id: harbormaster_house, sprite: harbormaster_house, at: [13, 11], door: [14, 14] }
+  - { id: nell_cottage, sprite: nell_cottage, at: [1, 12], door: [2, 15] }
+  - { id: boathouse, sprite: boathouse, at: [1, 16], door: [2, 21] }
+  - { id: ticket_booth, sprite: ticket_booth, at: [21, 16], door: [21, 18] }
+  - { id: lighthouse, sprite: lighthouse, at: [38, 23], door: [39, 26] }
+  - { sprite: fish_market, at: [6, 11] }
+props:
+  # The fish market: its net racks run back from the quay (WF-2 counts hooks from the seaward end).
+  - { sprite: net_rack, at: [6, 16] }
+  - { sprite: net_rack, at: [10, 16] }
+  - { sprite: fish_crates, at: [8, 15] }
+  - { sprite: fish_crates, at: [12, 13] }
+  - { sprite: lobster_pots, at: [12, 16] }
+  - { sprite: lobster_pots, at: [16, 16] }
+  # The quay: bollards along the edge, gulls on two of them, lamps.
+  - { sprite: bollard, at: [6, 20] }
+  - { sprite: bollard, at: [11, 20] }
+  - { sprite: bollard, at: [16, 20] }
+  - { sprite: bollard, at: [23, 20] }
+  - { sprite: bollard, at: [27, 20] }
+  - { sprite: bollard, at: [31, 20] }
+  - { sprite: gull, at: [16, 20], offset: [0, 1], lift: 22 }
+  - { sprite: gull, at: [27, 20], offset: [0, 1], lift: 22, flip: true }
+  - { sprite: lamp_post, at: [16, 17] }
+  - { sprite: lamp_post, at: [20, 17] }
+  - { sprite: lamp_post, at: [32, 19] }
+  - { sprite: lamp_post, at: [16, 4] }
+  - { sprite: lamp_post, at: [21, 10] }
+  - { sprite: lamp_post, at: [13, 10] }
+  # On the water.
+  - { sprite: fishing_boat, at: [24, 23] }
+  - { sprite: fishing_boat, at: [7, 27], flip: true }
+  - { sprite: rowboat, at: [16, 22] }
+  - { sprite: rowboat, at: [4, 22], flip: true }
+  - { sprite: buoy, at: [27, 25] }
+  - { sprite: buoy, at: [12, 27] }
+  - { sprite: buoy, at: [30, 22] }
+  # The crane yard and the cannery forecourt.
+  - { sprite: crane, at: [25, 16], offset: [24, 0] }
+  - { sprite: crane, at: [30, 16], offset: [24, 0], flip: true }
+  - { sprite: crates, at: [21, 8] }
+  - { sprite: barrel, at: [21, 7] }
+  - { sprite: barrel, at: [28, 8] }
+  - { sprite: crates, at: [29, 8] }
+  - { sprite: notice_board, at: [30, 10] }
+  - { sprite: anchor, at: [14, 8] }
+  - { sprite: net_rack, at: [14, 3] }
+  - { sprite: signpost, at: [16, 1] }
+  - { sprite: handcart, at: [32, 13] }
+scatter:
+  - { sprites: [tall_grass, tall_grass, rock, bush_round], on: [grass], density: 0.08, seed: 31, keepout: { kinds: [cobble, boards], radius: 0, doors: 2 } }
+  - { sprites: [reeds, tall_grass], on: [shingle], density: 0.25, seed: 32 }
+  - { sprites: [rock], on: [sand, wet_sand], density: 0.06, seed: 33, keepout: { doors: 2 } }
 places:
-  - { id: cannery, rect: [22, 2, 9, 6], door: [26, 8] }
-  - { id: home_bunkhouse, rect: [31, 2, 3, 3], door: [32, 5] }
-  - { id: boathouse, rect: [1, 16, 5, 5], door: [6, 18] }
-  - { id: nell_cottage, rect: [1, 12, 3, 3], door: [2, 15] }
-  - { id: harbormaster_house, rect: [13, 11, 4, 4], door: [15, 15] }
-  - { id: ticket_booth, rect: [21, 16, 2, 2], door: [21, 18] }
-  - { id: vane_office, rect: [27, 10, 4, 2], door: [28, 12] }
-  - { id: lighthouse, rect: [39, 25, 3, 3], door: [38, 26] }
-  - { id: vacant_house_48, rect: [1, 2, 3, 3], door: [2, 5] }
-  - { id: vacant_house_49, rect: [5, 2, 3, 3], door: [6, 5] }
-  - { id: vacant_house_50, rect: [9, 2, 3, 3], door: [10, 5] }
-  - { id: vacant_house_51, rect: [13, 2, 3, 3], door: [14, 5] }
-  - { id: vacant_house_52, rect: [1, 7, 3, 3], door: [2, 6] }
-  - { id: vacant_house_53, rect: [5, 7, 3, 3], door: [6, 6] }
-  - { id: vacant_house_54, rect: [9, 7, 3, 3], door: [10, 6] }
-  - { id: vacant_house_55, rect: [13, 7, 3, 3], door: [14, 6] }
-  - { id: fish_market, rect: [6, 11, 7, 7], door: [9, 18] }
+  - { id: fish_market, rect: [5, 11, 8, 7], door: [9, 18] }
   - { id: ferry_slip, rect: [18, 21, 3, 6], door: [19, 20] }
   - { id: harbor_steps, rect: [12, 21, 3, 3], door: [13, 20] }
   - { id: crane_yard, rect: [24, 12, 10, 6], door: [29, 18] }
-  - { id: breakwater, rect: [33, 21, 6, 7], door: [33, 20] }
-props:
-  - { kind: bollard, at: [20, 26] }      # the ferry slip's mooring bollard (WF-1)
-  - { kind: bollard, at: [17, 20] }
-  - { kind: bollard, at: [21, 20] }
-  - { kind: bollard, at: [8, 20] }
-  - { kind: bollard, at: [27, 20] }
-  - { kind: lamp_post, at: [16, 17] }
-  - { kind: lamp_post, at: [20, 17] }    # the paper flags hang between these two
-  - { kind: lamp_post, at: [8, 6] }
-  - { kind: lamp_post, at: [24, 9] }
-  - { kind: lamp_post, at: [32, 19] }
-  - { kind: crate, at: [9, 12] }
-  - { kind: crate, at: [9, 13] }
-  - { kind: barrel, at: [9, 16] }
-  - { kind: crate, at: [24, 19] }
-  - { kind: crate, at: [25, 12] }
-  - { kind: barrel, at: [33, 12] }
-  - { kind: bench, at: [11, 19] }
-  - { kind: bench, at: [23, 19] }
-  - { kind: sign, at: [16, 1] }
+  - { id: breakwater, rect: [33, 21, 9, 8], door: [33, 20] }
 edges:
   - { side: north, from: 17, to: 19, zone: market_row, arrive: [18, 18] }
 spawn: [19, 19]

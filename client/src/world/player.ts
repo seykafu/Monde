@@ -40,3 +40,22 @@ export function placeName(id: string): string {
   const names: Record<string, string> = { bakery: 'Fournier & Fille', general_store: "Dunmore’s General Store", gull_and_anchor: 'The Gull & Anchor', cafe_liss: 'Café Liss', library: 'Monde Free Library', lantern_office: 'The Lantern', st_brigids: 'St. Brigid’s', bertrand_house: 'Achterberg Horlogerie', market_hall: 'Covered Market Hall' };
   return names[id] ?? id.split('_').map(s => s[0]!.toUpperCase() + s.slice(1)).join(' ');
 }
+
+/**
+ * Where a saved position may stand: itself if the player fits there, else the centre of the nearest
+ * walkable tile (a save from an older layout of the board can put the player inside what is now a wall).
+ */
+export function standable(zone: ZoneDef, p: Position): Position {
+  if (fits(zone, p)) return p;
+  const sx = Math.min(zone.width - 1, Math.max(0, Math.floor(p.x))), sy = Math.min(zone.height - 1, Math.max(0, Math.floor(p.y)));
+  for (let r = 0; r < Math.max(zone.width, zone.height); r++) {
+    let best: Position | undefined, bestD = Infinity;
+    for (let y = sy - r; y <= sy + r; y++) for (let x = sx - r; x <= sx + r; x++) {
+      if (Math.max(Math.abs(x - sx), Math.abs(y - sy)) !== r || !zone.walkability[y]?.[x]) continue;
+      const d = Math.hypot(x + 0.5 - p.x, y + 0.5 - p.y);
+      if (d < bestD) { bestD = d; best = { x: x + 0.5, y: y + 0.5 }; }
+    }
+    if (best) return best;
+  }
+  return { x: zone.spawn[0] + 0.5, y: zone.spawn[1] + 0.5 };
+}

@@ -11,6 +11,7 @@ import { LooksGalleryScene } from "./scenes/LooksGalleryScene";
 import { getMind } from "./mind/api";
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from "./util/constants";
 import { installRenderScale } from "./util/renderScale";
+import { TownBoard } from "./render/town/TownBoard";
 
 installRenderScale();
 const game = new Phaser.Game({
@@ -38,4 +39,4 @@ const mind = getMind();
 void mind.ensureWorld().then(() => mind.syncPlayer());
 
 // Dev-only handle for debugging and the capture harness.
-if (import.meta.env.DEV) Object.assign(window as unknown as Record<string, unknown>, { __game: game, __mind: mind });
+if (import.meta.env.DEV) Object.assign(window as unknown as Record<string, unknown>, { __game: game, __mind: mind, __townBake: TownBoard.bakeLog });

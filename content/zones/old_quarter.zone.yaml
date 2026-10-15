@@ -1,97 +1,122 @@
-# Greybox: building letters are solid; door coordinates are outside on the street.
+# The Old Quarter (GDD §2.3): cobbles, gas lamps, the civic row along the high street, Fountain Square and
+# its dry fountain, St Brigid's, the Lamplighter's Cottage on Lamplighter Lane, and the vacant row behind it
+# with the Liss's millrace running down past it to the south. Zone format v2 (world/zoneFormat.ts).
+format: 2
 id: old_quarter
 name: Old Quarter
 size: [40, 30]
-legend:
-  ".": { terrain: cobblestone }
-  ",": { terrain: grass }
-  A: { terrain: wall, elev: 1, solid: true, building: town_hall }
-  B: { terrain: wall, elev: 1, solid: true, building: clocktower }
-  C: { terrain: wall, elev: 1, solid: true, building: library }
-  D: { terrain: wall, elev: 1, solid: true, building: lantern_office }
-  E: { terrain: wall, elev: 1, solid: true, building: founders_house }
-  F: { terrain: wall, elev: 1, solid: true, building: st_brigids }
-  G: { terrain: wall, elev: 1, solid: true, building: pell_house }
-  H: { terrain: wall, elev: 1, solid: true, building: bertrand_house }
-  I: { terrain: wall, elev: 1, solid: true, building: constabulary }
-  J: { terrain: wall, elev: 1, solid: true, building: lamplighter_cottage }
-  K: { terrain: wall, elev: 1, solid: true, building: okafor_house }
-  L: { terrain: wall, elev: 1, solid: true, building: augusta_house }
-  M: { terrain: wall, elev: 1, solid: true, building: vacant_house_39 }
-  N: { terrain: wall, elev: 1, solid: true, building: vacant_house_40 }
-  O: { terrain: wall, elev: 1, solid: true, building: vacant_house_41 }
-  P: { terrain: wall, elev: 1, solid: true, building: vacant_house_42 }
-  Q: { terrain: wall, elev: 1, solid: true, building: vacant_house_43 }
-  R: { terrain: wall, elev: 1, solid: true, building: vacant_house_44 }
-  S: { terrain: wall, elev: 1, solid: true, building: vacant_house_45 }
-  T: { terrain: wall, elev: 1, solid: true, building: vacant_house_46 }
-  U: { terrain: wall, elev: 1, solid: true, building: vacant_house_47 }
-tiles: |
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,......................................,
-  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
-  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
-  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
-  ,..AAAAAA...BBB...CCCCCC...DDDDD..EEEE.,
+terrain: |
+  ,,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,
+  ,.............................,,,,,....,
+  ,.............................,''',....,
+  ,.............................,''',....,
+  ,.............................,,,,,....,
   ,......................................,
   ,......................................,
-  ,......................................,
-  ,......................................,
-  ,..FFFFF..GGGG............HHHHH..IIIII.,
-  ,..FFFFF..GGGG............HHHHH..IIIII.,
-  ,..FFFFF..GGGG............HHHHH..IIIII.,
-  ,..FFFFF.........................IIIII.,
-  ,......................................,
-  ,.......................................
-  ,.......................................
-  ,.......................................
-  ,......................................,
-  ,..JJJJJ..KKKK...LLLL..................,
-  ,..JJJJJ..KKKK...LLLL..................,
-  ,..JJJJJ..KKKK...LLLL..................,
-  ,......................................,
-  ,......................................,
-  ,......................................,
-  ,.MMM.NNN.OOO.PPP.QQQ.RRR.SSS.TTT.UUU..,
-  ,.MMM.NNN.OOO.PPP.QQQ.RRR.SSS.TTT.UUU..,
-  ,.MMM.NNN.OOO.PPP.QQQ.RRR.SSS.TTT.UUU..,
-  ,......................................,
-  ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-places:
-  - { id: town_hall, rect: [3, 2, 6, 4], door: [6, 6] }
-  - { id: clocktower, rect: [12, 2, 3, 4], door: [13, 6] }
-  - { id: library, rect: [18, 2, 6, 4], door: [21, 6] }
-  - { id: lantern_office, rect: [27, 2, 5, 4], door: [29, 6] }
-  - { id: founders_house, rect: [34, 2, 4, 4], door: [36, 6] }
-  - { id: st_brigids, rect: [3, 10, 5, 4], door: [5, 14] }
-  - { id: pell_house, rect: [10, 10, 4, 3], door: [12, 13] }
-  - { id: bertrand_house, rect: [26, 10, 5, 3], door: [28, 13] }
-  - { id: constabulary, rect: [33, 10, 5, 4], door: [35, 14] }
-  - { id: lamplighter_cottage, rect: [3, 19, 5, 3], door: [5, 22] }
-  - { id: okafor_house, rect: [10, 19, 4, 3], door: [12, 22] }
-  - { id: augusta_house, rect: [17, 19, 4, 3], door: [19, 22] }
-  - { id: vacant_house_39, rect: [2, 25, 3, 3], door: [3, 28] }
-  - { id: vacant_house_40, rect: [6, 25, 3, 3], door: [7, 28] }
-  - { id: vacant_house_41, rect: [10, 25, 3, 3], door: [11, 28] }
-  - { id: vacant_house_42, rect: [14, 25, 3, 3], door: [15, 28] }
-  - { id: vacant_house_43, rect: [18, 25, 3, 3], door: [19, 28] }
-  - { id: vacant_house_44, rect: [22, 25, 3, 3], door: [23, 28] }
-  - { id: vacant_house_45, rect: [26, 25, 3, 3], door: [27, 28] }
-  - { id: vacant_house_46, rect: [30, 25, 3, 3], door: [31, 28] }
-  - { id: vacant_house_47, rect: [34, 25, 3, 3], door: [35, 28] }
-  - { id: fountain_square, rect: [16, 9, 8, 8], door: [19, 16] }
-  - { id: lamplighter_lane, rect: [1, 22, 37, 2], door: [5, 22] }
+  ,,,,,,,,..,,,,bbbbbbbbbbbb,,,..,,,,,,,,,
+  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
+  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
+  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
+  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
+  ,.............bppppppppppb.............,
+  ,,,,,,,,,,,,,,bppppppppppb,,,,,,,,,,,,,,
+  r.............bppppppppppb..............
+  r.............bbbbbbbbbbbb..............
+  r.............bbbbbbbbbbbb..............
+  ,,,,,,,,,,,,,,,,,,,,,,:,,,,,,.vv.,,,,,,,
+  ,,,,,,,,,,,,,,,,,,'''':,,,,,,.vv.,,,,,,,
+  ,,,,,,,,,,,,,,,,,,'''':,,,,,,.vv.,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,,,:,,,,,,.vv.,,,,,,,
+  ,.............................==.......,
+  ,.............................==.......,
+  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
+  ,.............................==.......,
+  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
+buildings:
+  - { id: town_hall, sprite: town_hall, at: [2, 2], door: [5, 6] }
+  - { id: clocktower, sprite: clocktower, at: [10, 3], door: [10, 6] }
+  - { id: library, sprite: library, at: [14, 2], door: [16, 6] }
+  - { id: lantern_office, sprite: lantern_office, at: [27, 2], door: [29, 6] }
+  - { id: founders_house, sprite: founders_house, at: [35, 2], door: [36, 6] }
+  - { id: st_brigids, sprite: st_brigids, at: [3, 9], door: [4, 13] }
+  - { id: pell_house, sprite: pell_house, at: [10, 10], door: [10, 13] }
+  - { id: bertrand_house, sprite: bertrand_house, at: [26, 10], door: [26, 13] }
+  - { id: constabulary, sprite: constabulary, at: [33, 9], door: [34, 13] }
+  - { id: lamplighter_cottage, sprite: lamplighter_cottage, at: [3, 19], door: [5, 22] }
+  - { id: okafor_house, sprite: okafor_house, at: [9, 19], door: [9, 22] }
+  - { id: augusta_house, sprite: augusta_house, at: [13, 19], door: [13, 22] }
+  - { id: vacant_house_39, sprite: townhouse_a, at: [2, 25], door: [3, 28] }
+  - { id: vacant_house_40, sprite: townhouse_b, at: [5, 25], door: [6, 28] }
+  - { id: vacant_house_41, sprite: townhouse_c, at: [8, 25], door: [8, 28] }
+  - { id: vacant_house_42, sprite: townhouse_d, at: [11, 25], door: [12, 28] }
+  - { id: vacant_house_43, sprite: townhouse_a, at: [14, 25], door: [15, 28] }
+  - { id: vacant_house_44, sprite: townhouse_b, at: [17, 25], door: [18, 28] }
+  - { id: vacant_house_45, sprite: townhouse_c, at: [23, 25], door: [23, 28] }
+  - { id: vacant_house_46, sprite: townhouse_d, at: [26, 25], door: [27, 28] }
+  - { id: vacant_house_47, sprite: townhouse_a, at: [34, 25], door: [35, 28] }
 props:
-  - { kind: fountain, at: [20, 13] }
-  - { kind: gate, at: [5, 15] }
-  - { kind: tree, at: [1, 8] }
-  - { kind: tree, at: [38, 20] }
-  - { kind: tree, at: [24, 21] }
-  - { kind: lamp_post, at: [15, 8] }
-  - { kind: lamp_post, at: [25, 16] }
-  - { kind: lamp_post, at: [8, 23] }
-  - { kind: bench, at: [18, 14] }
-  - { kind: sign, at: [37, 16] }
+  # Fountain Square: the dry fountain and its bronze heron, benches, beds, a lamp at each corner.
+  - { sprite: fountain, at: [20, 12], offset: [-24, 0] }
+  - { sprite: bench, at: [16, 9] }
+  - { sprite: bench, at: [23, 9] }
+  - { sprite: bench, at: [16, 14] }
+  - { sprite: bench, at: [23, 14] }
+  - { sprite: cat_sleeping, at: [23, 14], offset: [-6, 2], lift: 13 }
+  - { sprite: flowerbed, at: [17, 12] }
+  - { sprite: flowerbed, at: [23, 12] }
+  - { sprite: lamp_post, at: [13, 8] }
+  - { sprite: lamp_post, at: [26, 8] }
+  - { sprite: lamp_post, at: [13, 14] }
+  - { sprite: lamp_post, at: [26, 14] }
+  # The high street.
+  - { sprite: lamp_post, at: [8, 5] }
+  - { sprite: lamp_post, at: [21, 5] }
+  - { sprite: postbox, at: [22, 5] }
+  - { sprite: lamp_post, at: [30, 5] }
+  - { sprite: bicycle, at: [31, 5] }
+  - { sprite: notice_board, at: [12, 8] }
+  - { sprite: planter, at: [4, 8] }
+  - { sprite: planter, at: [6, 8] }
+  - { sprite: planter, at: [34, 8] }
+  - { sprite: flower_pots, at: [37, 7] }
+  - { sprite: signpost, at: [38, 14] }
+  # Trees behind the civic row, in the pocket garden, the churchyard and the green.
+  - { sprite: oak, at: [9, 1] }
+  - { sprite: birch, at: [21, 1] }
+  - { sprite: pine, at: [28, 1] }
+  - { sprite: oak, at: [37, 1] }
+  - { sprite: oak, at: [32, 4] }
+  - { sprite: birch, at: [1, 10] }
+  - { sprite: pine, at: [38, 11] }
+  - { sprite: willow, at: [1, 20] }
+  - { sprite: apple_tree, at: [19, 19] }
+  - { sprite: oak, at: [26, 20] }
+  - { sprite: well, at: [24, 19] }
+  - { sprite: bench, at: [20, 21] }
+  - { sprite: birch, at: [36, 19] }
+  - { sprite: bush_flowering, at: [34, 20] }
+  # Lamplighter Lane and the back lane.
+  - { sprite: lamp_post, at: [8, 21] }
+  - { sprite: lamp_post, at: [16, 21] }
+  - { sprite: lamp_post, at: [28, 21] }
+  - { sprite: lamp_post, at: [35, 21] }
+  - { sprite: lamp_post, at: [10, 29] }
+  - { sprite: lamp_post, at: [26, 29] }
+  - { sprite: flower_pots, at: [7, 21] }
+  - { sprite: hedge, line: [[1, 24], [18, 24]] }
+  - { sprite: hedge, line: [[24, 24], [28, 24]] }
+  - { sprite: hedge, line: [[33, 24], [38, 24]] }
+scatter:
+  - { sprites: [tall_grass, tall_grass, tall_grass, bush_round, bush_flowering, rock], on: [grass], density: 0.07, seed: 11, keepout: { kinds: [cobble, brick, plaza, gravel, boards, river], radius: 1, doors: 2 } }
+  - { sprites: [tall_grass], on: [meadow], density: 0.25, seed: 12 }
+  - { sprites: [reeds], on: [grass], density: 0.7, seed: 13, near: { kinds: [river], radius: 1 } }
+places:
+  - { id: fountain_square, rect: [14, 8, 12, 8], door: [19, 15] }
+  - { id: lamplighter_lane, rect: [1, 22, 37, 2], door: [5, 22] }
 edges:
   - { side: east, from: 15, to: 17, zone: market_row, arrive: [1, 10] }
 spawn: [5, 22]

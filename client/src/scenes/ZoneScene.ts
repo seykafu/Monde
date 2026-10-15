@@ -3,6 +3,10 @@ import { attachSaves } from '../save/runtime';
 import Phaser from 'phaser';
 import { Grid } from '../combat/Grid';
 import { buildDiorama, type DioramaResult } from '../render/diorama/Diorama';
+import { TownBoard, preloadTownSprites } from '../render/town/TownBoard';
+import { TownLife, reducedMotion } from '../render/town/TownLife';
+import type { TownLook } from '../world/townSprites';
+import type { TownFlag } from '../town/pillars';
 import { addTorchGlow } from '../render/diorama/Lighting';
 import { ensureDotTexture } from '../render/diorama/Atmosphere';
 import { ObliqueProjection } from '../render/ObliqueProjection';
@@ -19,7 +23,7 @@ import { ensureFellow } from '../fellow/state';
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from '../util/constants';
 import { zones } from '../world/zones';
 import type { Point, ZoneDef } from '../world/zoneFormat';
-import { movePlayer, resolveEdge, nearbyPlace, placeName, type Position } from '../world/player';
+import { movePlayer, resolveEdge, nearbyPlace, placeName, standable, type Position } from '../world/player';
 import { Clock, DAY_START, SOLAR_NOON, formatClock, formatDate, formatGameTime, parseClock } from '../sim/clock';
 import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, type DailyWeather, type WeatherKind, type WeatherNow } from '../sim/weather';
 import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
@@ -229,6 +233,8 @@ export class ZoneScene extends Phaser.Scene {
   private nightLayer!: Phaser.GameObjects.RenderTexture;
   private gradeLayer!: Phaser.GameObjects.RenderTexture;
   private lampLevel = 0;
+  /** The light and sky the town's life reads (smoke, birds, butterflies). */
+  private lightKind = { dark: 0, sunny: true, wet: false };
   private lightKey = NaN;
   private shadowDirty = true;
   // Weather.
@@ -254,10 +260,18 @@ export class ZoneScene extends Phaser.Scene {
   private hintCard!: HintCard;
   private toast!: Phaser.GameObjects.Text;
   private hintAt = 0;
+  /** v2 zones: the town drawn from its sprites (render/town), and its small life. */
+  private town?: TownBoard;
+  private life?: TownLife;
+  /** Where the wind blows (screen unit vector) and how hard, for smoke, leaves and swaying grass. */
+  private windVec = { x: 0, y: 0, strength: 0 };
+  /** Place names on a v2 board fade in near their door (the greybox showed them all, always). */
+  private placeLabels: { text: Phaser.GameObjects.Text; x: number; y: number }[] = [];
+  private lookAt = 0;
   constructor() { super('Zone'); }
 
-  /** Drawn character sheets listed in assets/sprites/manifest.json (none yet: everyone uses the procedural rig). */
-  preload(): void { preloadCharacterSheets(this); }
+  /** Drawn character sheets listed in assets/sprites/manifest.json, and the town's sprites. */
+  preload(): void { preloadCharacterSheets(this); preloadTownSprites(this); }
 
   create(data: { zone?: string; arrive?: Point; savedPlayer?: SaveGame['player'] } = {}): void {
     this.zone = zones[data.zone ?? 'old_quarter']!;
@@ -267,7 +281,7 @@ export class ZoneScene extends Phaser.Scene {
     const savedWeather = this.registry.get('monde.save.weather') as SaveGame['weather'] | undefined;
     this.daily = savedWeather?.daily.day === this.clock.day ? savedWeather.daily : dailyWeather(this.saveWeatherSeed(), this.clock.day);
     const [x, y] = data.arrive ?? this.zone.spawn;
-    this.position = data.savedPlayer ? { x: data.savedPlayer.x, y: data.savedPlayer.y } : { x: x + 0.5, y: y + 0.5 };
+    this.position = data.savedPlayer ? standable(this.zone, { x: data.savedPlayer.x, y: data.savedPlayer.y }) : { x: x + 0.5, y: y + 0.5 };
     let facing = data.savedPlayer?.facing ?? 0;
     let lastPosition = { ...this.position };
     attachSaves(this, this.clock, () => {
@@ -285,21 +299,38 @@ export class ZoneScene extends Phaser.Scene {
       gridWidth: this.zone.width, gridHeight: this.zone.height,
       tileW: DIORAMA_TILE_W, tileH: DIORAMA_TILE_H, elevStep: DIORAMA_ELEV_STEP,
       slabDepth: DIORAMA_SLAB_DEPTH, elevationAt: (x, y) => elevation(Math.floor(x), Math.floor(y)) });
-    const firstBoardObject = this.children.list.length;
-    // No `sun` here: the board's static shadows are replaced by clock-driven ones (buildShadows).
-    const board = buildDiorama(this, { width: this.zone.width, height: this.zone.height,
-      tileAt: p => ({ ...grid.tileAt(p), blocksMovement: !this.zone.walkability[p.y]?.[p.x] }) }, this.projection,
-    { footDY: DIORAMA_FOOT_DY, seed: 42, elevationAt: elevation, elevStep: DIORAMA_ELEV_STEP, rotation: 0, gridOf: (x, y) => ({ x, y }) });
-    this.lampGlows = this.children.list.slice(firstBoardObject).filter((o): o is Phaser.GameObjects.Image =>
-      o instanceof Phaser.GameObjects.Image && o.texture.key === TORCH_GLOW_KEY);
-    this.lamps = board.lights.map(({ x, y, radius }) => ({ x, y, radius }));
-    this.buildShadows(board);
-    // Greybox doorstep markers and short labels keep the town navigable (labels stay readable over the night).
-    for (const place of this.zone.places) {
-      const p = this.projection.tileToWorld({ x: place.door[0], y: place.door[1] });
-      this.add.rectangle(p.x, p.y, 18, 7, 0xe4c77f).setDepth(DEPTH.GROUND_MARK);
-      this.add.text(p.x, p.y - 22, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#343d34' })
-        .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK);
+    if (this.zone.town) {
+      // The town (zone format v2): baked ground, animated water, the buildings and props from their sprites.
+      const start = this.projection.tileToWorld({ x: this.position.x - 0.5, y: this.position.y - 0.5 });
+      const reduced = reducedMotion();
+      this.town = new TownBoard(this, { zone: this.zone, projection: this.projection, seed: 42, look: this.townLook(), focus: start, reduced });
+      this.lampGlows = [...this.town.lampGlows];
+      this.lamps = this.town.lights.map(({ x, y, radius }) => ({ x, y, radius }));
+      this.life = new TownLife(this, this.town, { reduced, seaside: this.zone.tiles.some(t => t.kind === 'sea') });
+      // Place names fade in as you near the door, readable over the night.
+      this.placeLabels = this.zone.places.map(place => {
+        const p = this.projection.tileToWorld({ x: place.door[0], y: place.door[1] });
+        const text = this.add.text(p.x, p.y - 30, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#343d34cc', padding: { x: 4, y: 1 }, resolution: RENDER_SCALE })
+          .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setAlpha(0);
+        return { text, x: place.door[0] + 0.5, y: place.door[1] + 0.5 };
+      });
+    } else {
+      const firstBoardObject = this.children.list.length;
+      // No `sun` here: the board's static shadows are replaced by clock-driven ones (buildShadows).
+      const board = buildDiorama(this, { width: this.zone.width, height: this.zone.height,
+        tileAt: p => ({ ...grid.tileAt(p), blocksMovement: !this.zone.walkability[p.y]?.[p.x] }) }, this.projection,
+      { footDY: DIORAMA_FOOT_DY, seed: 42, elevationAt: elevation, elevStep: DIORAMA_ELEV_STEP, rotation: 0, gridOf: (x, y) => ({ x, y }) });
+      this.lampGlows = this.children.list.slice(firstBoardObject).filter((o): o is Phaser.GameObjects.Image =>
+        o instanceof Phaser.GameObjects.Image && o.texture.key === TORCH_GLOW_KEY);
+      this.lamps = board.lights.map(({ x, y, radius }) => ({ x, y, radius }));
+      this.buildShadows(board);
+      // Greybox doorstep markers and short labels keep the town navigable (labels stay readable over the night).
+      for (const place of this.zone.places) {
+        const p = this.projection.tileToWorld({ x: place.door[0], y: place.door[1] });
+        this.add.rectangle(p.x, p.y, 18, 7, 0xe4c77f).setDepth(DEPTH.GROUND_MARK);
+        this.add.text(p.x, p.y - 22, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#343d34' })
+          .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK);
+      }
     }
     // The player: a drawn sheet if the manifest lists one, else the procedural rig. The shadow shows the same frame.
     // Arriving without a signed Fellowship form: ?skiptitle=1 and the demo sign a default one ("Fellow", the default
@@ -393,7 +424,15 @@ export class ZoneScene extends Phaser.Scene {
     return (this.registry.get('monde.save.weather') as SaveGame['weather'] | undefined)?.seed ?? WORLD_SEED;
   }
 
+  /** What decides each restorable sprite's art: the story's flags (the save's record) and the town engine's. */
+  private townLook(): TownLook {
+    const story = (this.registry.get('monde.story.flags') ?? {}) as Record<string, unknown>;
+    const town = getTown(this.registry);
+    return { flag: f => story[f] === true || town?.flags[f as TownFlag] === true };
+  }
+
   private resetLight(): void {
+    this.town = undefined; this.life = undefined; this.placeLabels = []; this.lookAt = 0;
     this.lamps = []; this.sunCasts = []; this.lampCasts = []; this.lampGlows = []; this.windowGlows = []; this.fog = [];
     this.lampLevel = 0; this.lightKey = NaN; this.shadowDirty = true; this.aimedFor = undefined; this.hudIcon = '';
   }
@@ -475,7 +514,12 @@ export class ZoneScene extends Phaser.Scene {
     const panes = this.add.graphics().setDepth(DEPTH.TERRAIN_FX).setBlendMode(Phaser.BlendModes.ADD);
     const pools: { x: number; y: number; w: number; h: number }[] = [];
     const buildings = new Set(this.zone.tiles.map(t => t.building));
-    for (const place of this.zone.places) {
+    if (this.town) {
+      // v2: lit windows ride on the buildings themselves (render/town); here, the pool at each lived-in door.
+      pools.push(...this.town.doorPools());
+      this.windowGlows.push(...this.town.doorGlows);
+    }
+    for (const place of this.town ? [] : this.zone.places) {
       // GDD-GAP: §16.4 lights occupied homes only, and nothing tracks occupancy or restoration
       // yet. Until it does, every building is lit from dusk except the Day-1 empties: the
       // vacant houses (§2.4) and the nine empty storefronts (A.1.4). Open ground
@@ -537,6 +581,8 @@ export class ZoneScene extends Phaser.Scene {
     for (const glow of this.windowGlows) glow.setVisible(on).setTint(grey);
     this.windowPanes.setVisible(on).setAlpha(this.lampLevel);
     for (const { cast, alpha } of this.lampCasts) cast.setVisible(on).setAlpha(alpha * this.lampLevel);
+    this.town?.applyLight({ sun: this.sun, lampLevel: this.lampLevel, dark });
+    this.lightKind = { dark, sunny: (kind === 'sun' || kind === 'wind') && intensity > 0.3, wet: kind === 'rain' || kind === 'snow' || kind === 'fog' };
     this.nightLayer.setVisible(dark > 0.004).setAlpha(dark);
     const weather = mixColor(0xffffff, WEATHER_GRADE[kind], intensity * (1 - 0.5 * dark));
     const warm = mixColor(0xffffff, minute < SOLAR_NOON ? DAWN_GRADE : DUSK_GRADE, 0.6 * twilightGlow(day, minute));
@@ -568,6 +614,7 @@ export class ZoneScene extends Phaser.Scene {
   private aimWeather(daily: DailyWeather): void {
     const toward = windToward(daily.wind) * DEG;
     const wind = { x: Math.sin(toward), y: -Math.cos(toward), strength: daily.windStrength };
+    this.windVec = wind;
     this.rain.setConfig(rainConfig(wind));
     this.snow.setConfig(snowConfig(wind));
     this.gusts.setConfig(gustConfig(wind));
@@ -758,7 +805,9 @@ export class ZoneScene extends Phaser.Scene {
   private followPlayer(): void {
     // Explicit follow uses the patch's top-left zoom pivot and bounds clamp.
     const camera = this.cameras.main;
-    camera.setScroll(camera.clampX(this.figure.x - camera.displayWidth / 2), camera.clampY(this.figure.y - camera.displayHeight / 2));
+    // On the town's pixel art, scroll in whole device pixels so no art pixel ever shimmers between widths.
+    const snap = this.town ? (v: number) => Math.round(v * RENDER_SCALE) / RENDER_SCALE : (v: number) => v;
+    camera.setScroll(snap(camera.clampX(this.figure.x - camera.displayWidth / 2)), snap(camera.clampY(this.figure.y - camera.displayHeight / 2)));
   }
   update(time: number, delta: number): void {
     // Time runs while walking (GDD §5.3); a long frame (a backgrounded tab) doesn't skip the evening.
@@ -767,6 +816,15 @@ export class ZoneScene extends Phaser.Scene {
     this.applyLight();
     this.driftFog(dt);
     this.residents.update(dt, this.position);
+    if (this.town) {
+      this.town.update(dt, { x: this.figure.x, y: this.figure.y }, this.windVec.strength);
+      this.life?.update(dt, { wind: this.windVec, ...this.lightKind });
+      if (time - this.lookAt > 1000) { this.lookAt = time; this.town.refresh(this.townLook()); }
+      for (const l of this.placeLabels) {
+        const d = Math.hypot(this.position.x - l.x, this.position.y - l.y);
+        l.text.setAlpha(Math.max(0, Math.min(1, (3.2 - d) / 1.2)));
+      }
+    }
     if (time - this.hintAt > 250) { this.hintAt = time; this.refreshHint(); }
     if (this.transitioning || !this.keys) return;
     const down = (...names: string[]) => names.some(name => this.keys[name]!.isDown) ? 1 : 0;
