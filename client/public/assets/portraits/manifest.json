@@ -1,1 +1,194 @@
-{}
+{
+ "ada": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "augusta": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "bastien": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "bertrand": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "bru": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "delphine": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "felix": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "hollis": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "ines": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "june": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "kasimir": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "margo": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "moss": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "nell": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "nettie": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "odile": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "pell": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "priya": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "rook": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "rosalind": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "sable": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "teo": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "tib": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "vane": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ]
+}

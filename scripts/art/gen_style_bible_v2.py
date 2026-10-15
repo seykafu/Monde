@@ -136,6 +136,18 @@ Background: the ENTIRE background is one flat, solid, pure magenta (#FF00FF). No
 PATH_RE = re.compile(r"(/[^`'\"\s]*?generated_images/[^`'\"\s]*?\.png)")
 
 
+def magenta_background(png: str) -> bool:
+    """True when the image's edges are the flat magenta the keyer needs (the model sometimes paints a dark glow)."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return True
+    im = Image.open(png).convert("RGB")
+    w, h = im.size
+    points = [(5, 5), (w - 6, 5), (5, h // 3), (w - 6, h // 3)]
+    return sum(1 for p in points if (lambda c: c[0] > 200 and c[1] < 70 and c[2] > 200)(im.getpixel(p))) >= 3
+
+
 def run_job(label: str, prompt: str, ref_png: str | None, out: str) -> str:
     """One image through Codex; copies the generated file to `out`, or saves a log next to it on failure."""
     cmd = ["codex", "exec", "-m", MODEL, "--skip-git-repo-check", "-s", "read-only", "-C", os.path.dirname(out)]
@@ -148,7 +160,7 @@ def run_job(label: str, prompt: str, ref_png: str | None, out: str) -> str:
                               errors="replace", timeout=900)
         text_out = (proc.stdout or "") + (proc.stderr or "")
         paths = [p for p in PATH_RE.findall(text_out) if os.path.exists(p)]
-        if paths:
+        if paths and ("#FF00FF" not in prompt or magenta_background(paths[-1])):
             shutil.copyfile(paths[-1], out)
             return f"{label}: ok"
         if "usage limit" in text_out.lower():
