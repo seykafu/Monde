@@ -14,6 +14,16 @@ appearance: >
   Round and rosy, with a tea towel over one shoulder like an epaulette, reading glasses pushed into
   curly auburn-grey hair, and forearms from pulling kegs. Her eyes drift to whoever has just left the
   room.
+look:
+  kind: human
+  skin: 0    # SKIN_TONES: light peach
+  hair: { style: curly, colour: "#a65a38" }
+  eyes: 2
+  build: broad
+  height: short
+  outfit: { cut: plain, top: 9, bottom: 11, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: scarf, colour: 5 }
+  glasses: on_head
 backstory: >
   Roz inherited the Gull & Anchor from her mother and her mother's mother, along with the back snug
   where half the town's secrets were first said aloud. She hears everything and repeats it

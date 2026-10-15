@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SaveGame, emptyFriendship, migrateSave } from '@monde/shared';
+import { SaveGame, emptyEventLog, emptyFriendship, migrateSave } from '@monde/shared';
 import { applyDawn, meet, recordTurn } from '../../friendship/state';
 import { learnTies, tieIndex } from '../../friendship/knownTies';
 import { parseDawnPackage } from '../../mind/dawn';
@@ -12,7 +12,7 @@ import { collect, type GameState } from '../collect';
 
 const base = (friendship?: GameState['friendship']): GameState => ({
   clock: new Clock({ day: 5, minute: 600 }), town: createTownState({ day: 5 }), player: { zone: 'old_quarter', x: 10.5, y: 10.5, facing: 0 },
-  weather: { seed: 1, daily: dailyWeather(1, 5), override: null }, story_flags: {}, quiet: emptyQuietState(), offline_events: [],
+  weather: { seed: 1, daily: dailyWeather(1, 5), override: null }, story_flags: {}, quiet: emptyQuietState(), client_events: emptyEventLog(),
   player_name: 'Wren', playtime: 60, fellow: { profile: null, look: null }, skills: baseSkills(), friendship
 });
 

@@ -13,6 +13,15 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Tall for the booth, so she ducks to speak through the hatch, with a pencil behind each ear, ink on
   the heel of her right hand and a rubber stamp on a cord at her wrist.
+look:
+  kind: human
+  skin: 8    # SKIN_TONES: dark brown
+  hair: { style: curly, colour: 3 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: pinafore, top: 0, trim: 9, bottom: 6, bottom_style: skirt, shoes: 13 }
+  accessory: { kind: none }
 backstory: >
   Ada has sold the Gannet's tickets for nine years and the post across the same hatch since the post
   office shut. Six years ago her husband bought a one-way at that hatch to look for work on the

@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Compact and straight-backed, in a navy tunic with the buttons polished weekly, a grey-streaked braid
   under her peaked cap, and a notebook held in her left hand like a third glove.
+look:
+  kind: human
+  skin: 1    # SKIN_TONES: light tan
+  hair: { style: braids, colour: "#6f6862" }
+  eyes: 0
+  build: medium
+  height: short
+  outfit: { cut: coat, top: "#2f3d5c", bottom: "#2f3d5c", bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  headwear: { kind: peaked_cap, colour: "#2f3d5c" }
 backstory: >
   Augusta joined the Monde constabulary at twenty-two with eleven colleagues. Nine retired, one died,
   and one took the ferry. She has been the whole force for six years, and the title "Captain" is what

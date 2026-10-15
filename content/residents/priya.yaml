@@ -13,6 +13,15 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Neat braid, shirtsleeves pushed to the elbow, and a black leather nurse's bag within reach at all
   times. A quick, tired grin.
+look:
+  kind: human
+  skin: 5    # SKIN_TONES: medium brown
+  hair: { style: braids, colour: 7 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: apron, top: "#3f8a9a", bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: apron, colour: 9 }
 backstory: >
   Priya trained at a city hospital and came home eight months ago when her father Raman, a mill
   electrician, had a stroke on the weir path. She learned the ferry timetable by heart: the nearest

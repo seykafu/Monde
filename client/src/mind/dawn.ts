@@ -8,13 +8,17 @@
 // tolerance). Without a server (Quiet Mode, no world, a network failure) nothing changes: templates, and the ties the
 // client last knew.
 import {
-  DawnFavorData, DawnLetterData, DawnPlanData, PlanOutput, TieData, TieMilestoneData, TownEvent, type SaveGame
+  DawnFavorData, DawnLetterData, DawnPlanData, PlanOutput, RegardSnapshot, TieData, TieMilestoneData,
+  type ClientEvent, type TownEvent
 } from '@monde/shared';
 
 /** POST /v1/worlds/:w/night (server/src/mind/night.ts NightBody). */
 export interface NightRequest {
   day: number;
+  /** Scheduled / town prompt facts only (EVENTS.md); the client's own events go as `client_events`. */
   events?: TownEvent[];
+  /** The event log's unsent ClientEvents up to this night (mind/events.ts), ingested before the night runs (M-06). */
+  client_events?: ClientEvent[];
   town?: { pillars?: { prosperity: number; safety: number; spirit: number; charm: number }; census?: number; weather_tomorrow?: string };
 }
 
@@ -26,6 +30,8 @@ export interface DawnPackage {
   letters: DawnLetterData[];
   favors: DawnFavorData[];
   ties: { pairs: TieData[]; milestones: TieMilestoneData[] };
+  /** Every resident's Regard toward the player as the server has it (M-06): it replaces the client's mirror. */
+  regard?: RegardSnapshot | null;
   /** Residents the night is still working on. */
   pending: number;
   /** Every night job has finished (its plans are final). */
@@ -41,10 +47,12 @@ const each = <T>(v: unknown, schema: { safeParse(x: unknown): { success: true; d
 export function parseDawnPackage(v: unknown): DawnPackage | null {
   if (!isObject(v) || typeof v.day !== 'number' || !Number.isInteger(v.day) || v.day < 1 || !Array.isArray(v.plans)) return null;
   const ties = isObject(v.ties) ? v.ties : {};
+  const regard = RegardSnapshot.safeParse(v.regard);
   return {
     day: v.day, weekday: typeof v.weekday === 'string' ? v.weekday : '',
     plans: each(v.plans, DawnPlanData), letters: each(v.letters, DawnLetterData), favors: each(v.favors, DawnFavorData),
     ties: { pairs: each(ties.pairs, TieData), milestones: each(ties.milestones, TieMilestoneData) },
+    regard: regard.success ? regard.data : null,
     pending: typeof v.pending === 'number' && v.pending > 0 ? v.pending : 0,
     // A package that doesn't say is taken as final.
     complete: v.complete !== false
@@ -104,28 +112,4 @@ export async function syncDawn(deps: DawnSyncDeps, day: number, night: NightRequ
     if (deps.now() - started + rules.pollMs > rules.budgetMs) return { status: 'partial', pkg, polls };
     await deps.sleep(rules.pollMs);
   }
-}
-
-// ── The night's body ────────────────────────────────────────────────────────
-
-/**
- * The client's town events for `day` as the night takes them (TownEvent, §9.12). GDD-GAP: the client doesn't log
- * town events yet (§9.12's events come with M-06); what it has is the save's `offline_events` (§9.14), which nothing
- * writes so far. Each becomes an event with its `data.where`, `data.summary` and `data.importance` when they're there.
- */
-export function nightEvents(offline: SaveGame['offline_events'], day: number): TownEvent[] {
-  const out: TownEvent[] = [];
-  offline.forEach((e, i) => {
-    if (e.day !== day) return;
-    const d = e.data;
-    const importance = typeof d.importance === 'number' ? d.importance : 3;
-    const parsed = TownEvent.safeParse({
-      id: `client-${day}-${i}`, day, minute: Math.max(0, Math.min(1560, Math.round(e.minute))), type: e.type,
-      where: typeof d.where === 'string' ? d.where : 'town', who: e.resident_id ? [e.resident_id] : [],
-      importance: Math.max(1, Math.min(10, Math.round(importance))), tags: typeof d.tag === 'string' ? [d.tag] : [],
-      summary: (typeof d.summary === 'string' ? d.summary : e.type).slice(0, 240)
-    });
-    if (parsed.success) out.push(parsed.data);
-  });
-  return out.slice(-500);
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_PLAYER_LOOK } from '../../render/character/look';
 import { lookFromChoices, randomChoices } from '../options';
 import {
-  FELLOW_KEY, PLAYER_LOOK_KEY, SAVE_NAME_KEY, clearFellow, ensureFellow, getFellow, perksOf, setFellow, signedFellow, storyPlayer,
+  FELLOW_KEY, PLAYER_LOOK_KEY, SAVE_NAME_KEY, clearFellow, ensureFellow, getFellow, isSigned, perksOf, setFellow, signedFellow, storyPlayer,
   type RegistryLike
 } from '../state';
 
@@ -27,6 +27,22 @@ describe('the fellow in the registry', () => {
     clearFellow(r);
     expect(getFellow(r)).toBeNull();
     expect(r.data.has(PLAYER_LOOK_KEY) || r.data.has(FELLOW_KEY)).toBe(false);
+  });
+
+  it('starts a New Game unsigned: the form comes at S01a\'s cue (§11.1), and signing it re-dresses the player', () => {
+    const r = registry();
+    const fellow = ensureFellow(r, { signDefault: false });
+    expect(fellow.profile).toBeNull();
+    expect(fellow.look).toBeNull();
+    expect(isSigned(fellow)).toBe(false);
+    expect(Object.values(fellow.skills).every(s => s.level === 1)).toBe(true);
+    expect(r.data.has(PLAYER_LOOK_KEY) || r.data.has(SAVE_NAME_KEY)).toBe(false);
+    expect(ensureFellow(r)).toBe(fellow); // a later zone keeps it unsigned
+    const signed = signedFellow(wren, lookFromChoices(randomChoices(() => 0.2)));
+    setFellow(r, signed);
+    expect(isSigned(getFellow(r))).toBe(true);
+    expect(r.get(PLAYER_LOOK_KEY)).toEqual(signed.look);
+    expect(r.get(SAVE_NAME_KEY)).toBe('Wren');
   });
 
   it('starts skills from the Background (§11.1 over §11.2)', () => {

@@ -10,10 +10,12 @@
 //   offline  nothing: templates, and the ties the client last knew (Day 1's from the cards before any).
 // A game loaded mid-day whose save has no plans for that day asks for the day's package again (no night).
 import type Phaser from 'phaser';
-import type { PlanOutput, SaveGame, TieData, TieMilestoneData, TurnRegard } from '@monde/shared';
+import type { PlanOutput, RegardSnapshot, TieData, TieMilestoneData, TurnRegard } from '@monde/shared';
 import { getMind } from '../mind/api';
-import { DAWN_SYNC, modelPlans, nightEvents, syncDawn, type NightRequest } from '../mind/dawn';
-import { applyDawn, cardTies, emptyFriendship, meet, recordTurn, regardOf, seedRegard, type FriendshipState } from '../friendship/state';
+import { DAWN_SYNC, modelPlans, syncDawn, type NightRequest } from '../mind/dawn';
+import { acknowledge, pendingRegard, sendable } from '../mind/events';
+import { applyDawn, applyRegardSnapshot, cardTies, emptyFriendship, meet, recordTurn, regardOf, seedRegard, type FriendshipState } from '../friendship/state';
+import { EVENTS_KEY, eventSyncFor, getEventLog } from './events';
 import { heardPairs, learnTies, nameIndex, tieIndex, townName } from '../friendship/knownTies';
 import type { RomanceNews } from '../friendship/milestones';
 import { personaCards } from '../world/residents';
@@ -25,9 +27,8 @@ import type { Pillars } from '../town/pillars';
 export const FRIENDSHIP_KEY = 'monde.friendship';
 /** This morning's friendship news: `DawnTiesNews`, for the Ledger and the Dawn Report (M-10). */
 export const DAWN_TIES_KEY = 'monde.dawnTies';
-/** Same keys save/runtime.ts uses. */
+/** Same key save/runtime.ts uses. */
 const CLOCK_KEY = 'monde.clock';
-const OFFLINE_EVENTS_KEY = 'monde.offline.events';
 
 export interface DawnTiesNews {
   day: number;
@@ -69,8 +70,16 @@ export function tieMap(registry: Registry): Map<string, TieData> {
 /** The Regard a resident starts at before the server says (the signed Background's start, §11.1). */
 export const seedFor = (id: string): number => seedRegard(getMind().player?.background, id);
 
-/** The mirrored Regard toward the player. */
-export const regardFor = (registry: Registry, id: string): number => regardOf(getFriendship(registry), id, seedFor(id));
+/**
+ * The mirrored Regard toward the player: the server's last word (or the seed), plus scripted Regard still waiting in
+ * the event log (M-06), so a story's {regard} shows at once and in Quiet Mode, and never twice once acknowledged.
+ */
+export const regardFor = (registry: Registry, id: string): number =>
+  Math.max(-100, Math.min(100, regardOf(getFriendship(registry), id, seedFor(id)) + pendingRegard(getEventLog(registry), id)));
+
+/** The server's Regard for the whole town (an events reply, the night's ingestion, the dawn): replace the mirror. */
+export const applyServerRegard = (registry: Registry, regard: RegardSnapshot): FriendshipState =>
+  updateFriendship(registry, s => applyRegardSnapshot(s, regard));
 
 /** The dialogue opened: the player has met them. */
 export const meetResident = (registry: Registry, id: string, day: number): FriendshipState =>
@@ -119,14 +128,17 @@ export interface DawnSyncOptions {
 
 const clampPillar = (v: number): number => Math.max(0, Math.min(100, Math.round(v * 10) / 10));
 
-/** The night of `day`: the client's town events of that day and the town's facts, with the next day's weather. */
+/**
+ * The night of `day`: the event log's unsent ClientEvents up to that night (§9.14: logged offline, uploaded with the
+ * night pass; ingested before reflections run), and the town's facts with the next day's weather.
+ */
 function nightRequest(registry: Registry, day: number, opts: DawnSyncOptions): NightRequest {
   const town = opts.town();
   const tomorrow = dailyWeather(opts.weatherSeed(), day + 1);
-  const events = nightEvents((registry.get(OFFLINE_EVENTS_KEY) as SaveGame['offline_events'] | undefined) ?? [], day);
+  const events = sendable(getEventLog(registry), day);
   return {
     day,
-    ...(events.length ? { events } : {}),
+    ...(events.length ? { client_events: events } : {}),
     town: {
       ...(town ? {
         pillars: { prosperity: clampPillar(town.pillars.prosperity), safety: clampPillar(town.pillars.safety), spirit: clampPillar(town.pillars.spirit), charm: clampPillar(town.pillars.charm) },
@@ -135,6 +147,14 @@ function nightRequest(registry: Registry, day: number, opts: DawnSyncOptions): N
       weather_tomorrow: describeWeather({ kind: tomorrow.kind, intensity: 0.6 }).toLowerCase()
     }
   };
+}
+
+/** The night's ingestion: through this game's EventSync when it runs, else straight into the registry. */
+function acknowledgeNight(registry: Registry, ingestion: Parameters<typeof acknowledge>[1]): void {
+  const sync = eventSyncFor(registry);
+  if (sync) { sync.apply(ingestion); return; }
+  registry.set(EVENTS_KEY, acknowledge(getEventLog(registry), ingestion).log);
+  applyServerRegard(registry, ingestion.regard);
 }
 
 const attached = new WeakSet<Clock>();
@@ -155,7 +175,13 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     const safety = setTimeout(() => clock.resume('dawn'), DAWN_SYNC.budgetMs + 10_000);
     try {
       const result = await syncDawn({
-        postNight: body => mind.postNight(body), getDawn: d => mind.getDawn(d),
+        postNight: async body => {
+          const posted = await mind.postNight(body);
+          // The night took the log's events first: acknowledge them as /events would (and take its Regard).
+          if (posted?.ingestion && registry.get(CLOCK_KEY) === clock) acknowledgeNight(registry, posted.ingestion);
+          return posted?.status ?? null;
+        },
+        getDawn: d => mind.getDawn(d),
         sleep: ms => new Promise(resolve => setTimeout(resolve, ms)), now: () => performance.now()
       }, day, withNight ? nightRequest(registry, day - 1, opts) : null);
       // A newer dawn, or a load that replaced the game meanwhile, owns the state now.

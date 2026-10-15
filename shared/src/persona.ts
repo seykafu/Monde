@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PlaceId, ResidentId } from "./ids";
+import { CardLook } from "./look";
 import { Verb } from "./verbs";
 
 /** Persona Card (GDD §9.3, with the §12.5 additions `portrait_expressions` and `beliefs`). Authored content. */
@@ -96,6 +97,11 @@ export const PersonaCard = z.object({
   portrait_expressions: z.array(z.string()).min(1),
   sprite: z.string(),
   appearance: z.string(),
+  /**
+   * What the sprite and the dialogue bust draw (look.ts CardLook), read from `appearance` once by hand. Absent:
+   * a look varied by the id hash (the linter warns).
+   */
+  look: CardLook.optional(),
   backstory: z
     .string()
     .refine((s) => s.trim().split(/\s+/).length <= 120, "backstory must be 120 words or fewer"),

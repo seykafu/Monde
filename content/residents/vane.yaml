@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Tall, in a well-cut charcoal coat that never creases, silver at the temples, a pocket square folded
   to a point. He smiles half a second before he speaks.
+look:
+  kind: human
+  skin: 1    # SKIN_TONES: light tan
+  hair: { style: short, colour: "#2e2a28" }
+  eyes: 4
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: "#3c3a40", bottom: "#3c3a40", bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  face: { grey_temples: true }
 backstory: >
   Silas grew up in a freight-yard town upriver that emptied when he was fifteen: first the shops, then
   the school, then his father's job. His mother stayed too long and watched it close one shutter at a

@@ -7,7 +7,11 @@
 //   refresh; when a scene is ready and nothing else holds the world (dialogue, ledger, menu, an edge fade),
 //   StoryScene opens over the zone. Summoned scenes (S10a/b, S11) ask first and then move the player.
 // - A New Game opens 09:50 on the ferry slip (§13.2, Day 1: "New game opens 09:50 aboard the Gannet"), so S01a
-//   plays at once; `?skiptitle=1`, `?day=`, `?time=` and `?scene=` keep their old starting point.
+//   plays at once, with the Fellowship form at its {charcreate} cue (§11.1); `?skiptitle=1`, `?day=`, `?time=` and
+//   `?scene=` keep their old starting point.
+// - Cues that change the world beyond the client go to the event log (scenes/events.ts, M-06): memories, Regard and
+//   Scuffles as ClientEvents. The story reads Regard from the friendship mirror (scenes/friendship.ts regardFor).
+// - The Next hint (story/hint.ts): the scene the player can still catch today, for the HUD and the Ledger.
 // - Dev: `?scene=<id>` plays a scene immediately; `window.__story` lists, plays and inspects (dev builds or ?dev).
 import type Phaser from 'phaser';
 import { DAY_START, type Clock } from '../../sim/clock';
@@ -15,23 +19,25 @@ import type { WeatherNow } from '../../sim/weather';
 import { getMind, uuid } from '../../mind/api';
 import { talkContext } from '../../mind/context';
 import { requestCheckpoint } from '../../save/runtime';
-import { decodeStory, placeAt, syncTownFlags, type FellowProfile, type OfflineEvent, type StoryWorld } from '../../story/host';
+import { decodeStory, placeAt, syncTownFlags, type FellowProfile, type StoryWorld } from '../../story/host';
+import { HINT_KEY, storyHint, zoneRoute, type StoryHint } from '../../story/hint';
 import { liveLine } from '../../story/live';
 import { ALL_SCENES, SPRING_SCENES, StorySession } from '../../story/session';
 import { eligibleScenes, minutes } from '../../story/triggers';
-import type { Position } from '../../world/player';
+import { placeName, type Position } from '../../world/player';
+import { personaCards } from '../../world/residents';
 import type { Point, ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
 import { DIALOGUE_SCENE } from '../DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE, type StoryOpen } from '../StoryScene';
 import { TOWN_KEY, TOWN_LEDGER_SCENE, getTown } from '../TownLedgerScene';
+import { appendEvent, getEventLog } from '../events';
+import { regardFor } from '../friendship';
 import type { ResidentLayer } from '../zone/residents';
 
 const SESSION_KEY = 'monde.story.session';
 /** save/runtime.ts saves this as SaveGame.story_flags and restores it on load. */
 const FLAGS_KEY = 'monde.story.flags';
-/** save/runtime.ts saves this as SaveGame.offline_events (the offline event log, §9.14). */
-const EVENTS_KEY = 'monde.offline.events';
 /** fellow/state.ts FELLOW_KEY (W-07): the signed Fellowship application for this game. */
 const FELLOW_KEY = 'monde.fellow';
 /** Scenes that hold the world while open: a story scene waits for them. */
@@ -59,7 +65,17 @@ export interface StoryAttachOptions {
 export interface StoryAttachment {
   /** Every frame, with the player's position: place entry triggers. */
   update(position: Position): void;
+  /** The Next hint now (recomputed when the minute, the place, the flags or the scene change; null: nothing today). */
+  hint(): StoryHint | null;
+  /** The `zone.place` the player is at now ('' between places). */
+  place(): string;
 }
+
+const HINT_PLACES = {
+  placeName,
+  zoneName: (id: string) => zones[id]?.name ?? id,
+  route: (from: string, to: string) => zoneRoute(zones, from, to)
+};
 
 /** The game's session: kept while the clock is the same clock, rebuilt from the save's story record otherwise. */
 function heldFor(scene: Phaser.Scene, clock: Clock): Held {
@@ -92,16 +108,19 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     if (target) {
       clock.setTime(1, minutes(opening.time.start));
       scene.scene.restart({ zone: zoneId, arrive: target.spawn });
-      return { update: () => undefined };
+      return { update: () => undefined, hint: () => null, place: () => '' };
     }
   }
 
-  const events = (): readonly OfflineEvent[] => (registry.get(EVENTS_KEY) as OfflineEvent[] | undefined) ?? [];
   const world: StoryWorld = {
-    now: () => ({ day: clock.day, minute: clock.minute, zone: zone.id, place: placeAt(zone, opts.position()), town: getTown(registry), profile: fellowProfile(registry) }),
+    now: () => ({
+      day: clock.day, minute: clock.minute, zone: zone.id, place: placeAt(zone, opts.position()), town: getTown(registry), profile: fellowProfile(registry),
+      regard: Object.fromEntries(personaCards.map(c => [c.id, regardFor(registry, c.id)]))
+    }),
     setTown: state => registry.set(TOWN_KEY, state),
-    events,
-    appendEvent: event => registry.set(EVENTS_KEY, [...events(), event]),
+    events: () => getEventLog(registry).outbox,
+    appendEvent: event => { appendEvent(registry, event); },
+    newId: uuid,
     persist: () => {
       registry.set(FLAGS_KEY, session.snapshot());
       const town = getTown(registry);
@@ -157,13 +176,26 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
   check(); // zone entry
 
   let lastPlace = placeAt(zone, opts.position());
+  let hintKey = '';
+  let hint: StoryHint | null = null;
   return {
     update(position) {
       const place = placeAt(zone, position);
       if (place === lastPlace) return;
       lastPlace = place;
       check(); // place entry
-    }
+    },
+    hint() {
+      const done = session.director.serialize().completed;
+      const key = `${clock.day}:${clock.minute}:${zone.id}:${session.active ?? ''}:${session.flags.serialize().join(',')}:${done.length}`;
+      if (key === hintKey) return hint;
+      hintKey = key;
+      const context = { ...session.context(), zone: zone.id, place: lastPlace };
+      hint = storyHint(session.scenes, context, session.flags, HINT_PLACES, new Set(done), session.active);
+      registry.set(HINT_KEY, hint);
+      return hint;
+    },
+    place: () => lastPlace
   };
 }
 

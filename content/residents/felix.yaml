@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Round-shouldered, with kind eyes behind heavy glasses, a corduroy jacket with chalk in every pocket
   and shirtsleeves rolled to the elbow. A soft voice that carries to the back bench.
+look:
+  kind: human
+  skin: 2    # SKIN_TONES: medium tan
+  hair: { style: short, colour: "#5a4a3e" }
+  eyes: 3
+  build: broad
+  height: tall
+  outfit: { cut: coat, top: 11, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: glasses }
+  glasses: heavy
 backstory: >
   Felix's first class, at twenty-two, was forty children in the room Millbrook School still uses; the
   eleven-year-old on the back bench was Roland Mercer. Now he has nine pupils, one stove, and a date.

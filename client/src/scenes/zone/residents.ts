@@ -33,7 +33,7 @@ import { placeRegistry } from '../../world/places';
 import { personaCards } from '../../world/residents';
 import { PREWARM_RANGE } from '../../mind/prewarm';
 import { CharacterSprite } from '../../render/characterSprite';
-import { BASTIEN_LOOK, residentLook, type Look } from '../../render/character/look';
+import { BASTIEN_LOOK, lookFromCard, residentLook, type Look } from '../../render/character/look';
 import { PAIR_EMOTE_RULES, PairEmoteThrottle, inSight, nearPairs, type Spot } from '../../friendship/emotes';
 import { pairEmote } from '../../friendship/knownTies';
 import type { EmoteIcon } from '../../friendship/icons';
@@ -111,14 +111,21 @@ interface Actor {
 // ── Figures ─────────────────────────────────────────────────────────────────
 // Each resident is a CharacterSprite (render/characterSprite): their drawn sheet once one is listed in
 // assets/sprites/manifest.json (by resident id, which is also the card's `sprite`), else the procedural
-// rig wearing their roster colour. Bastien gets the cat rig, collar in his roster colour.
+// rig wearing their card's `look` (the same look the dialogue bust draws; Bastien's cat collar, unless the
+// card names one, in his roster colour). A card without a look (and the dev `?npcs=` copies) wears the hash
+// look with the roster colour on top.
 
 /** A distinct hue per roster index (golden-angle spacing), muted to sit in the cozy palette. */
 const residentColour = (index: number): number =>
   Phaser.Display.Color.HSLToColor(((index * 137.508) % 360) / 360, 0.52, 0.56).color;
 
-const lookFor = (profile: ResidentProfile, colour: number): Look =>
-  profile.kind === 'animal' ? { ...BASTIEN_LOOK, collar: colour } : residentLook(profile.id, colour);
+const cardLooks = new Map(personaCards.flatMap(c => (c.look ? [[c.id, c.look] as const] : [])));
+
+const lookFor = (profile: ResidentProfile, colour: number): Look => {
+  const look = cardLooks.get(profile.id);
+  if (look) return lookFromCard(look, colour);
+  return profile.kind === 'animal' ? { ...BASTIEN_LOOK, collar: colour } : residentLook(profile.id, colour);
+};
 
 /** The emote bubble for a verb (GDD §16.5 emotes); null for verbs that show nothing. */
 function ensureEmote(scene: Phaser.Scene, verb: string): string | null {

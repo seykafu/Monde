@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Ink-black fingertips, hair tied up with printer's twine, one cardigan elbow worn through. Her
   spectacles have a strip of tape on the left arm.
+look:
+  kind: human
+  skin: 6    # SKIN_TONES: fairest
+  hair: { style: bun, colour: "#7a4a30" }
+  eyes: 3
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: "#7a3040", bottom: 13, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: glasses }
+  glasses: round
 backstory: >
   Sable inherited The Lantern at twenty-nine from old Mr. Oakes, who set type for forty years, and
   found a damp press, fourteen subscribers and a debt to the paper merchant. She now sets one page by

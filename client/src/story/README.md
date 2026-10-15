@@ -55,9 +55,13 @@ Calendar-only system events (e.g. Day 21's newspaper disclosure) are outside thi
 ## The host in the game (G-10 part 2)
 
 `host.ts` (pure) builds the `StoryContext` from the live game (clock, zone, `placeAt` the player's position,
-the town engine's Pillars/Appeal/census, the `monde.fellow` application) and maps every cue: Regard is mirrored
-in a ledger and queued in the offline event log, Pillars go through the town engine, coins/items/Projects/riddles
-are ledger placeholders, memories are `kind: "scripted"` offline events, checkpoints go to the save system.
+the town engine's Pillars/Appeal/census, the `monde.fellow` application, Regard from the friendship mirror) and maps
+every cue: Regard and memories become `scripted_regard` / `scripted_memory` ClientEvents (M-06, `mind/events.ts`;
+sent to monde-mind online, saved meanwhile) with their scene id and cue key, a {scuffle} becomes a `town_event`,
+Pillars go through the town engine, coins/items/Projects/riddles are ledger placeholders, checkpoints go to the save
+system. The story flags reach the server as `flags` snapshots (`scenes/events.ts`). `{charcreate}` opens the
+Fellowship form whenever the application isn't signed yet: a New Game reaches it on the ferry slip (§11.1).
+`hint.ts` (pure) picks the HUD's Next hint: the scene the player can still catch today, its place and window.
 Durable effects are idempotent per `scene|cue key`. `encodeStory` keeps the director and ledger inside the save's
 `story_flags` record (flags as `true`, the rest under `$story`), so the save schema is unchanged.
 `session.ts` owns one game's director (Spring scenes S01–S10; `?story=all` for every scene), summons with a

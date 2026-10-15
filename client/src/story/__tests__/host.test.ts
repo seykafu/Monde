@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { ClientEvent } from '@monde/shared';
 import { applyPillarDelta, createTownState, DAY1_PILLARS, type TownState } from '../../town/pillars';
 import type { ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
@@ -6,7 +7,7 @@ import type { StorySave } from '../director';
 import {
   ARRIVAL_STANDIN, DEFAULT_FELLOW, buildStoryContext, clipActivity, createStoryHandlers, decodeStory, emptyLedger, encodeStory, fellowSigned, placeAt,
   plainText, pronounWords, sceneName, STORY_META_KEY, summonText, syncTownFlags,
-  type HandlerDeps, type OfflineEvent, type StoryLedger, type StoryPresenter, type StoryWorld, type WorldNow
+  scuffleEvent, type HandlerDeps, type StoryLedger, type StoryPresenter, type StoryWorld, type WorldNow
 } from '../host';
 import type { CueContext, HostCue, StoryHandlers, StoryLine } from '../runtime';
 import { FlagStore } from '../flags';
@@ -26,6 +27,12 @@ describe('buildStoryContext', () => {
     expect(typeof ctx.values!.appeal).toBe('number');
     expect(buildStoryContext(now({ day: 2 }), emptyLedger()).values!.ferry_day).toBe(false); // Wednesday
     expect(buildStoryContext(now({ day: 2 }), emptyLedger()).weekday).toBe('wed');
+  });
+
+  it("reads Regard from the game's mirror over the ledger's (the arrival keeps the ledger's)", () => {
+    const ledger = { ...emptyLedger(), regard: { arrival: 5, pell: 3 } };
+    expect(buildStoryContext(now({ regard: { pell: 23, odile: 20 } }), ledger).regard).toEqual({ arrival: 5, pell: 23, odile: 20 });
+    expect(buildStoryContext(now(), ledger).regard).toEqual({ arrival: 5, pell: 3 });
   });
 
   it('uses the signed Fellowship application, the live town and any outcomes', () => {
@@ -87,14 +94,17 @@ describe('small helpers', () => {
 function harness(opts: { presenter?: boolean; town?: TownState } = {}) {
   const ledger = emptyLedger();
   let town = opts.town ?? createTownState({ day: 1 });
-  const events: OfflineEvent[] = [];
+  const events: ClientEvent[] = [];
   const outcomes: Record<string, unknown> = {};
   const warn = vi.fn();
+  let ids = 0;
   const world: StoryWorld = {
     now: () => now({ town }),
     setTown: vi.fn((t: TownState) => { town = t; }),
     events: () => events,
-    appendEvent: vi.fn((e: OfflineEvent) => { events.push(e); }),
+    // As scenes/events.ts appendEvent: checked against the shared contract.
+    appendEvent: vi.fn((e: ClientEvent) => { events.push(ClientEvent.parse(e)); }),
+    newId: () => `e${++ids}`,
     persist: vi.fn(),
     checkpoint: vi.fn(async () => {}),
     travel: vi.fn(),
@@ -119,15 +129,24 @@ function harness(opts: { presenter?: boolean; town?: TownState } = {}) {
 }
 
 describe('cue → effect', () => {
-  it('mirrors Regard, logs it for the night pass, and applies it once per cue position', async () => {
+  it('mirrors Regard, queues it as scripted_regard with its scene and cue, once per cue position', async () => {
     const h = harness();
     await h.run({ cmd: 'regard', resident: 'pell', delta: 3 }, 's01a_ferry:12:choice:0:0');
     await h.run({ cmd: 'regard', resident: 'pell', delta: 3 }, 's01a_ferry:12:choice:0:0'); // a restarted scene
     await h.run({ cmd: 'regard', resident: 'pell', delta: 2 }, 's01a_ferry:40');
     expect(h.ledger.regard.pell).toBe(5);
-    expect(h.events.map(e => [e.type, e.resident_id, e.data.delta, e.data.key])).toEqual([
-      ['regard', 'pell', 3, 's01a_ferry|s01a_ferry:12:choice:0:0'], ['regard', 'pell', 2, 's01a_ferry|s01a_ferry:40']
+    expect(h.events).toEqual([
+      { kind: 'scripted_regard', id: 'e1', day: 1, minute: 590, resident: 'pell', delta: 3, scene_id: 's01a_ferry', cue_key: 's01a_ferry:12:choice:0:0' },
+      { kind: 'scripted_regard', id: 'e2', day: 1, minute: 590, resident: 'pell', delta: 2, scene_id: 's01a_ferry', cue_key: 's01a_ferry:40' }
     ]);
+  });
+
+  it("doesn't queue a cue the log already has (a restart whose ledger was lost)", async () => {
+    const h = harness();
+    await h.run({ cmd: 'regard', resident: 'pell', delta: 3 }, 's01a_ferry:12');
+    h.ledger.applied = [];
+    await h.run({ cmd: 'regard', resident: 'pell', delta: 3 }, 's01a_ferry:12');
+    expect(h.events).toHaveLength(1);
   });
 
   it('moves Pillars through the town engine (story source, clamped there) once', async () => {
@@ -151,17 +170,18 @@ describe('cue → effect', () => {
     expect(h.outcomes.riddle).toEqual({ solved: false });
   });
 
-  it('writes scripted memories to the offline event log with the scene, cue and place', async () => {
+  it('queues scripted memories as scripted_memory with the scene, cue and place', async () => {
     const h = harness();
     await h.run({ cmd: 'memory', resident: 'moss', text: 'Brought the Fellow in.', importance: 4 }, 's01a_ferry:90');
     await h.run({ cmd: 'memory', resident: 'moss', text: 'Brought the Fellow in.', importance: 4 }, 's01a_ferry:90');
     await h.run({ cmd: 'memory', resident: 'arrival', text: 'Stepped off.', importance: 6 }, 's05:3', 's05_first_arrival');
     expect(h.events).toHaveLength(2);
-    expect(h.events[0]).toEqual({ day: 1, minute: 590, type: 'memory', resident_id: 'moss', data: {
-      kind: 'scripted', text: 'Brought the Fellow in.', importance: 4, place: 'wharf.ferry_slip', participants: 'player', valence: null,
-      key: 's01a_ferry|s01a_ferry:90', scene: 's01a_ferry', cue: 's01a_ferry:90'
-    } });
-    expect(h.events[1]!.data).toMatchObject({ alias: 'arrival', place: 'wharf.ferry_slip' });
+    expect(h.events[0]).toEqual({
+      kind: 'scripted_memory', id: 'e1', day: 1, minute: 590, resident: 'moss', place: 'wharf.ferry_slip', text: 'Brought the Fellow in.', importance: 4,
+      scene_id: 's01a_ferry', cue_key: 's01a_ferry:90'
+    });
+    // The arrival alias is queued as it is (mind/events.ts holds it back from the server until it has a real id).
+    expect(h.events[1]).toMatchObject({ kind: 'scripted_memory', resident: 'arrival', place: 'wharf.ferry_slip', scene_id: 's05_first_arrival' });
   });
 
   it('persists before a checkpoint and survives a failing one', async () => {
@@ -210,6 +230,18 @@ describe('cue → effect', () => {
     expect(h.outcomes).toMatchObject({ puzzle: { solved: true }, scuffle: { won: false } });
   });
 
+  it('logs a story Scuffle as a §9.6 town event (importance 7) once, with the player and its enemies', async () => {
+    const h = harness();
+    await h.run({ cmd: 'scuffle', id: 'sc_bakery_tutorial' }, 's03:71', 's01a_ferry');
+    await h.run({ cmd: 'scuffle', id: 'sc_bakery_tutorial' }, 's03:71', 's01a_ferry'); // a restarted scene
+    expect(h.events).toEqual([{
+      kind: 'town_event', id: 'e1', day: 1, minute: 590, type: 'scuffle', place: 'wharf.ferry_slip', participants: ['player', 'bru', 'nettie'],
+      summary: 'Fellow won a Scuffle against Bru and Nettie at Ferry Slip.', importance: 7
+    }]);
+    const lost = scuffleEvent({ id: 'x', day: 3, minute: 700 }, 'sc_unknown', 'market_row.bakery', false, { values: { name: 'Wren' } });
+    expect(lost).toMatchObject({ participants: ['player'], summary: 'Wren lost a Scuffle at Fournier & Fille.' });
+  });
+
   it('hands {ai_line} to the world and {ai_open} to the presenter at the scene place', async () => {
     const h = harness();
     const lines = await h.run({ cmd: 'ai_line', slot: 'fair_roz_low', speaker: { id: 'rosalind', auto: false }, brief: 'One sentence.', fallback: 'Sixty cups.' });
@@ -225,6 +257,14 @@ describe('cue → effect', () => {
     await h.run({ cmd: 'charcreate' });
     expect(h.presenter.charcreate).toHaveBeenCalled();
     expect(h.warn).toHaveBeenCalledWith(expect.stringContaining('no Fellowship form'));
+  });
+
+  it('opens the form for an unsigned New Game (no profile yet)', async () => {
+    const h = harness();
+    const base = h.world.now();
+    h.world.now = () => ({ ...base, profile: null });
+    await h.run({ cmd: 'charcreate' });
+    expect(h.presenter.charcreate).toHaveBeenCalledTimes(1);
   });
 
   it("skips the form when this game's application is already signed", async () => {

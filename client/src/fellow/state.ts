@@ -3,7 +3,7 @@
 // is anything with get/set/remove, so this runs under vitest.
 
 import {
-  DEFAULT_PLAYER_PROFILE, pronounSet, startingSkills, BACKGROUND_STARTS,
+  DEFAULT_PLAYER_PROFILE, baseSkills, pronounSet, startingSkills, BACKGROUND_STARTS,
   type PlayerProfile, type Skills
 } from '@monde/shared';
 import { DEFAULT_PLAYER_LOOK, type CharacterLook } from '../render/character/look';
@@ -22,7 +22,7 @@ export const PLAYER_LOOK_KEY = 'monde.playerLook';
 export const SAVE_NAME_KEY = 'monde.save.name';
 
 export interface Fellow {
-  /** Null before the form is signed (a v1 save). */
+  /** Null before the form is signed: a New Game until S01a's {charcreate} (§11.1), a save made before it, a v1 save. */
   profile: PlayerProfile | null;
   /** Null: the default look. */
   look: CharacterLook | null;
@@ -39,6 +39,17 @@ export function defaultFellow(): Fellow {
   return signedFellow(DEFAULT_PLAYER_PROFILE, DEFAULT_PLAYER_LOOK);
 }
 
+/**
+ * A New Game before Pell hands the form over (§11.1: on the ferry slip in S01a): no profile yet (residents and the
+ * story say "Fellow", they/them), the default look, every skill at level 1 until a Background is chosen.
+ */
+export function unsignedFellow(): Fellow {
+  return { profile: null, look: null, skills: baseSkills() };
+}
+
+/** The application has been signed (a profile exists). */
+export const isSigned = (fellow: Fellow | null | undefined): boolean => !!fellow?.profile;
+
 export function getFellow(registry: RegistryLike): Fellow | null {
   return (registry.get(FELLOW_KEY) as Fellow | undefined) ?? null;
 }
@@ -54,11 +65,14 @@ export function clearFellow(registry: RegistryLike): void {
   for (const key of [FELLOW_KEY, PLAYER_LOOK_KEY]) registry.remove(key);
 }
 
-/** The fellow, setting the default first if nobody signed a form (skiptitle, demo). */
-export function ensureFellow(registry: RegistryLike): Fellow {
+/**
+ * The fellow, setting one first if there's none in the registry: the signed default for `?skiptitle=1` and the demo
+ * (`signDefault`, the default), else an unsigned one (a New Game, which signs at S01a's {charcreate}).
+ */
+export function ensureFellow(registry: RegistryLike, opts: { signDefault?: boolean } = {}): Fellow {
   const have = getFellow(registry);
   if (have) return have;
-  const fellow = defaultFellow();
+  const fellow = opts.signDefault === false ? unsignedFellow() : defaultFellow();
   setFellow(registry, fellow);
   return fellow;
 }

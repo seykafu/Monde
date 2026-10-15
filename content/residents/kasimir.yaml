@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Barrel-chested, with sawdust in his eyebrows, a flat carpenter's pencil behind one ear and a folding
   rule in his breast pocket. He talks with his hands in his pockets.
+look:
+  kind: human
+  skin: 1    # SKIN_TONES: light tan
+  hair: { style: short, colour: "#7f4f2e" }
+  eyes: 0
+  build: broad
+  height: tall
+  outfit: { cut: dungarees, top: 1, trim: 9, bottom: 6, bottom_style: trousers, shoes: 1 }
+  accessory: { kind: none }
+  face: { stubble: true }
 backstory: >
   Kasimir learned joinery from his grandfather in the workers' cottages and has mended every door in
   Millbrook at least twice. He charges whatever people hand him, which is often nothing, and sits at

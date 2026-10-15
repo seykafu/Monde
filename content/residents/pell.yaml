@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Small and upright, silver bob, half-moon glasses on a chain. Her cardigan is buttoned one hole off
   when she's rushed, and there is ink on her right cuff.
+look:
+  kind: human
+  skin: 4    # SKIN_TONES: fair
+  hair: { style: bob, colour: "#c9cdd4" }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: "#3f8487", bottom: 14, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
 backstory: >
   Edwina kept the books at Pell's Hardware, so when the old mayor retired 26 years ago the council
   handed her the town's books too, and then the job. Arthur died six years ago; his claw hammer still

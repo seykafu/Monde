@@ -13,6 +13,17 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Lean, with broad scarred hands and a grey wool mill cap pulled low. A brass shift whistle hangs on a
   bootlace around his neck; he has never blown it.
+look:
+  kind: human
+  skin: 4    # SKIN_TONES: fair
+  hair: { style: cropped, colour: 0 }
+  eyes: 4
+  build: narrow
+  height: tall
+  outfit: { cut: plain, top: 10, bottom: 2, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: "#7d7a74" }
+  face: { stubble: true }
 backstory: >
   Roland was nineteen and a doffer on second shift when Lissworth Mill closed. The floor called him
   Rook because he climbed the frames like one. His father Gil, a loom fixer for thirty years, drank

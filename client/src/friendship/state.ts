@@ -1,9 +1,11 @@
 // What the client knows of friendship (GDD §9.11; MVP G-13 client). Pure: no Phaser, no DOM.
 //
-// Regard lives on the server (§9.4); the client mirrors it per resident from each turn's applied Regard so the
-// hearts can show, also in Quiet Mode. Before the server has said anything the mirror starts from the Background's
-// starting Regard (§11.1: a Homecomer's six old neighbours) or 0. Quiet Mode turns earn nothing: the server judges
-// replies and owns the caps, so the client never invents a gain offline.
+// Regard lives on the server (§9.4); the client mirrors it per resident so the hearts can show, also in Quiet Mode:
+// each turn's applied Regard, and the whole town's Regard from every events reply and dawn package (M-06), which
+// replaces the mirror. Before the server has said anything the mirror starts from the Background's starting Regard
+// (§11.1: a Homecomer's six old neighbours) or 0. Quiet Mode turns earn nothing: the server judges replies and owns
+// the caps, so the client never invents a gain offline. Scripted Regard ({regard} cues) still waiting in the event
+// log is added on top where the mirror is read (scenes/friendship.ts regardFor), until the server acknowledges it.
 //
 // The dawn package brings the town's ties and last night's milestones, the letters and Favors, and the model plans;
 // applyDawn folds them in. Every function returns a new state (the registry keeps one and replaces it).
@@ -34,15 +36,33 @@ export function seedRegard(background: Background | null | undefined, residentId
   return background ? BACKGROUND_STARTS[background]?.regard[residentId] ?? 0 : 0;
 }
 
-/** The mirrored Regard toward the player (the seed for someone the client has never heard from). */
-export const regardOf = (state: FriendshipState, id: string, seed = 0): number => state.residents[id]?.regard ?? seed;
+/** The mirrored Regard toward the player: the server's last word, else the bond's, else the seed. */
+export const regardOf = (state: FriendshipState, id: string, seed = 0): number => state.regard?.[id] ?? state.residents[id]?.regard ?? seed;
+
+const clampRegard = (v: number): number => Math.max(-100, Math.min(100, v));
+
+/**
+ * The server's Regard for the whole town (the events reply, the dawn package, the night's ingestion): it replaces the
+ * mirror for every resident it names, met or not. Returns the same state when nothing changed.
+ */
+export function applyRegardSnapshot(state: FriendshipState, snapshot: Readonly<Record<string, number>> | null | undefined): FriendshipState {
+  if (!snapshot) return state;
+  const entries = Object.entries(snapshot).filter(([, v]) => Number.isFinite(v)).map(([id, v]) => [id, clampRegard(v)] as const);
+  const before = state.regard ?? {};
+  if (entries.every(([id, v]) => before[id] === v && (!state.residents[id] || (state.residents[id]!.regard === v && state.residents[id]!.source === 'server')))) return state;
+  const residents = { ...state.residents };
+  for (const [id, v] of entries) if (residents[id]) residents[id] = { ...residents[id]!, regard: v, source: 'server' };
+  return { ...state, residents, regard: { ...before, ...Object.fromEntries(entries) } };
+}
 
 /** The player spoke with a resident on `day`: they're met from now on. */
 export function meet(state: FriendshipState, id: string, day: number, seed = 0): FriendshipState {
   const bond = state.residents[id];
   const next: SavedBond = bond
     ? { ...bond, last_talk_day: Math.max(bond.last_talk_day, day) }
-    : { regard: seed, source: 'seed', met_day: day, last_talk_day: day, likes: [] };
+    : state.regard?.[id] !== undefined
+      ? { regard: state.regard[id]!, source: 'server', met_day: day, last_talk_day: day, likes: [] }
+      : { regard: seed, source: 'seed', met_day: day, last_talk_day: day, likes: [] };
   return { ...state, residents: { ...state.residents, [id]: next } };
 }
 
@@ -54,8 +74,8 @@ export function recordTurn(state: FriendshipState, id: string, day: number, rega
   const met = meet(state, id, day, seed);
   if (!regard || !Number.isFinite(regard.after)) return met;
   const bond = met.residents[id]!;
-  const value = Math.max(-100, Math.min(100, regard.after));
-  return { ...met, residents: { ...met.residents, [id]: { ...bond, regard: value, source: 'server' } } };
+  const value = clampRegard(regard.after);
+  return { ...met, residents: { ...met.residents, [id]: { ...bond, regard: value, source: 'server' } }, regard: { ...met.regard, [id]: value } };
 }
 
 /** Residents the player has met, in the order they were met (then by id). */
@@ -118,10 +138,10 @@ export function applyDawn(state: FriendshipState, pkg: DawnPackage, opts: { name
     .filter(m => m.day > day - MILESTONE_DAYS);
   const letters: DawnLetterData[] = byId([...state.letters, ...pkg.letters]).slice(-LETTERS_KEPT);
   const favors: DawnFavorData[] = byId([...state.favors, ...pkg.favors]).filter(f => f.expires_day >= day);
-  let next: FriendshipState = {
+  let next: FriendshipState = applyRegardSnapshot({
     ...state, ties: { day, pairs: pkg.ties.pairs }, milestones, tiers, plans: { day, plans: { ...opts.plans } }, letters, favors,
     report: { day, lines }
-  };
+  }, pkg.regard);
   const index = tieIndex(pkg.ties.pairs);
   next = learnTies(next, [...printed.map(m => [m.a, m.b] as const), ...romance.map(r => [r.a, r.b] as const)], day, 'read', index);
   return { state: next, lines, printed, romance };

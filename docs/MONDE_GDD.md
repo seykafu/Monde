@@ -988,10 +988,10 @@ Acquainted or Core, time window valid) and rejects or repairs it otherwise.
 
 **Flow.**
 1. The player walks within 6 tiles of a resident. The client sends `prewarm`, and the server issues a
-   `max_tokens: 0` request with that resident's stable prefix, so the first real turn hits a warm prompt
+   `max_tokens: 1` request with that resident's stable prefix and exact dialogue output schema, so the first real turn hits a warm prompt
    cache.
 2. The player presses Talk, and the VN panel opens on the zone's backdrop with the resident's portrait.
-   The client opens a WebSocket stream: `POST /v1/worlds/:w/talk {resident, context}`.
+   The client opens an SSE stream: `POST /v1/worlds/:w/talk {resident, context}`.
 3. The server builds the prompt (§9.10.1) and calls Haiku with **streaming**, **structured output**
    (§9.10.2) and **thinking disabled** (`thinking: {type: "disabled"}`, valid at the default effort, for
    latency).
@@ -1032,7 +1032,7 @@ characters) is available and on by default. It passes a cheap moderation check f
 | 1 | **World Bible** (setting, era rules, tone, rating rules, voice bible digest §12.1, anti-patterns, output contract). Identical for every world and resident. | ~2,500 | Per release | Breakpoint 1 (hit almost always, shared by all players) |
 | 2 | **Persona Card** (§9.3) with canon locks evaluated | ~900–1,200 | Rarely | Breakpoint 2 |
 | 3 | **Beliefs + relationship summary** (top 8 relationships as one-liners) | ~300–500 | Nightly | Breakpoint 3 |
-| 4 | Dynamic user message: time, place, weather, mood, needs, the player's name/pronouns/Regard tier, retrieved memories, topic cards, open Favors, `<hints allowed=n>` if the topic is a riddle, the conversation so far, `<player_said>` | ~800–1,500 | Every turn | Not cached |
+| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: time, place, weather, mood, needs, player, memories, topics, Favors, hints and `<player_said>`. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
 
 Haiku 5.5's minimum cacheable prefix is 512 tokens, so every breakpoint above qualifies. Byte-stable
 serialization is mandatory (sorted keys, no timestamps in blocks 1–3), or caching silently stops working.
@@ -1063,6 +1063,32 @@ A resident remembers a conversation in three tiers (D18):
 fourth cache breakpoint sits on the last earlier turn, so each new turn reads the conversation so far
 from the prompt cache; the per-turn dynamic context (time, mood, retrieved memories, `<player_said>`)
 goes only in the final user message.
+
+**Implementation decisions (D18).** `POST /talk/close` records the client’s game day and minute;
+if the close is lost, the last persisted turn supplies the activity time. The server chooses the session
+on `open`, and the final SSE `turn` reports its authoritative id, `resumed`, and the earlier backlog.
+The sixth exchange wraps up. A resume grants two slots, up to eight total; when fewer than two slots
+remain, another open starts fresh. This resolves the otherwise unbounded repeated-resume case
+(GDD-GAP). Backdated closes are ignored. Game minutes remain 360–1560; midnight does not change the
+game day, but sleeping does.
+
+Compaction runs after the new session’s reply has ended, and at night before memory selection and
+reflections. Pending conversations contribute a bounded template to a new session’s frozen history,
+so the latest encounter is remembered without waiting for a model. Blocks 1–3 are frozen alongside
+that history. Prewarm uses the same dialogue schema and history prefix with **one output token**
+(`max_tokens: 0` rejects structured output). Earlier user turns preserve the player’s words and resume cue, without replaying old dynamic context.
+Accepted model JSON is stored verbatim separately from clamped effects.
+
+Summary memories use `said`, preserve the strongest turn importance (minimum 3), and archive the
+replaced per-turn memories. The full ≤ 60-word summary and facts remain in the summary table; its
+episodic-memory text follows §9.6’s 200-character limit. Summary valence defaults to neutral; the
+structured `felt_after` retains the resident’s description. These importance/valence choices fill a
+GDD-GAP. Auxiliary fact lists are capped at six entries of 30 words, topics at six of 10 words, and
+`felt_after` at 20 words (GDD-GAP: metadata bounds). Digests merge the oldest four undigested summaries
+when more than six wait; the template keeps the newest facts within 150 words. Summary/digest jobs
+use the existing low-effort call and semaphore path; offline, invalid output, refusals, errors or
+spend at the Standard $0.06/day target use templates (GDD-GAP: optional-summary budget policy).
+Verbatim database records remain for analytics but only the current session reaches dialogue prompts.
 
 #### 9.10.2 Dialogue output contract
 
@@ -9936,7 +9962,8 @@ Monde/
 | GET | `/v1/worlds/:w/dawn/:day` | The dawn package: plans, letters, Favors, Dawn Report, arrivals and departures |
 | POST | `/v1/worlds/:w/events` | Batched town events and memories from the client (every 30 s and at scene ends) |
 | POST | `/v1/worlds/:w/prewarm` | Warm a resident's prompt cache (proximity) |
-| WS | `/v1/worlds/:w/talk` | Dialogue session (streaming turns) |
+| POST | `/v1/worlds/:w/talk` | Dialogue session (SSE streaming turns; server chooses/resumes the id) |
+| POST | `/v1/worlds/:w/talk/close` | Report the session close in game time |
 | POST | `/v1/worlds/:w/night` | Start the night pass for day N. Returns when done or at 4 s, whichever is first |
 | POST/GET | `/v1/worlds/:w/snapshots` | Save, list and restore (restore creates a branch, §19.5) |
 | POST | `/v1/report` | Report a generated line |
@@ -10067,6 +10094,7 @@ Marks → library size 120 masters.
 | D16 | Stardew-style friendship: hearts for Regard, model-judged replies with engine caps, labelled NPC↔NPC ties (§9.11) | Kasey's call (2026-10-14): better replies should visibly earn friendship, and residents befriend, fall out with and court each other |
 | D17 | Desktop first: the same Phaser/TypeScript game packaged with Electron for Mac and Windows (Steam later); the web build stays for demos and playtests | Kasey's call (2026-10-14): a big game sells and saves better as a desktop install; no engine rewrite |
 | D18 | Conversation sessions: verbatim while live, resumable for 5 game minutes, then compacted into a summary and a rolling digest (§9.10.3) | Kasey's call (2026-10-14): residents keep the thread of a moment, and long-term history stays bounded in tokens |
+| D19 | The database is Supabase (managed Postgres, us-east, beside the Fly server): the pooled connection for the server, a session connection for migrations; the game only ever talks to monde-mind, never to Supabase directly | Kasey's call (2026-10-15): managed backups and point-in-time restore, pooling and storage as the player count grows, with no change to the schema or the ORM |
 
 ### 21.2 Open questions for Kasey
 

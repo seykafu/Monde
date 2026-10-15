@@ -12,6 +12,12 @@ sprite: bastien
 portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, loaf, ear_flick]   # the eight map to cat poses: sitting, slow blink, yawn, tucked paws, flat ears, round eyes, low tail, staring at a corner
 appearance: >
   An orange tabby with a white bib, a notched left ear, and a belly that swings when he runs.
+look:
+  kind: cat
+  fur: "#d98a3d"
+  markings: "#a8592a"
+  bib: "#f4ecdc"
+  eyes: "#9bbf4a"
 backstory: >
   Bastien arrived on the Friday ferry six years ago in a fish crate and did not go back. Everyone
   feeds him and everyone believes they are the only one. The notch in his left ear came from a gull

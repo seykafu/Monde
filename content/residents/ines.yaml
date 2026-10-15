@@ -13,6 +13,15 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Immaculate in a charcoal skirt suit, hair in a low knot without a stray, a leather satchel with a
   spare pair of flat shoes inside because the cobbles ruin her heels.
+look:
+  kind: human
+  skin: 1    # SKIN_TONES: light tan
+  hair: { style: bun, colour: 0 }
+  eyes: 3
+  build: narrow
+  height: tall
+  outfit: { cut: plain, top: "#45434b", bottom: "#45434b", bottom_style: skirt, shoes: 13 }
+  accessory: { kind: none }
 backstory: >
   Ines took the Vane job at twenty-four, after four years of typing for a shipping firm that went
   under. She is very good at it. She keeps his diary, drafts his letters, and reads the invoices he

@@ -13,6 +13,17 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Rangy, with a heavy grey moustache and a railwayman's cap whose badge has been sanded smooth by his
   thumb. A watch on a chain, checked with the thumb before he answers anything.
+look:
+  kind: human
+  skin: 0    # SKIN_TONES: light peach
+  hair: { style: short, colour: 2 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: "#2a3350", bottom: "#2a3350", bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 3 }
+  headwear: { kind: peaked_cap, colour: "#2a3350" }
+  face: { moustache: true }
 backstory: >
   Hollis drove the Liss branch for forty-one years and was late twice, both times for cows. When the
   stop was cut nine years ago he went to the platform the next morning in uniform and has not missed a

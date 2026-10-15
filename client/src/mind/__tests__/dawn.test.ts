@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { PlanOutput } from '@monde/shared';
-import { DAWN_SYNC, modelPlans, nightEvents, parseDawnPackage, syncDawn, type DawnPackage, type DawnSyncDeps } from '../dawn';
+import { DAWN_SYNC, modelPlans, parseDawnPackage, syncDawn, type DawnPackage, type DawnSyncDeps } from '../dawn';
 import { MindClient, type StorageLike } from '../api';
 import { asTurn } from '../talkStream';
 
@@ -104,20 +104,6 @@ describe('syncing a dawn (§9.8: polling briefly, then templates)', () => {
   });
 });
 
-describe('the night\'s town events', () => {
-  it('turns the day\'s offline events into TownEvents', () => {
-    const events = nightEvents([
-      { day: 4, minute: 600.4, type: 'fountain', resident_id: 'pell', data: { where: 'old_quarter.fountain_square', summary: 'The fountain ran.', importance: 12 } },
-      { day: 3, minute: 600, type: 'old', resident_id: null, data: {} },
-      { day: 4, minute: 900, type: 'talk', resident_id: null, data: { text: 'Hello' } }
-    ], 4);
-    expect(events).toEqual([
-      { id: 'client-4-0', day: 4, minute: 600, type: 'fountain', where: 'old_quarter.fountain_square', who: ['pell'], importance: 10, tags: [], summary: 'The fountain ran.' },
-      { id: 'client-4-2', day: 4, minute: 900, type: 'talk', where: 'town', who: [], importance: 3, tags: [], summary: 'talk' }
-    ]);
-  });
-});
-
 describe('the mind client\'s night and dawn calls', () => {
   const storage = (): StorageLike => { const m = new Map<string, string>(); return { getItem: k => m.get(k) ?? null, setItem: (k, v) => { m.set(k, v); }, removeItem: k => { m.delete(k); } }; };
   const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
@@ -131,7 +117,7 @@ describe('the mind client\'s night and dawn calls', () => {
   it('posts the night and reads the package under the world', async () => {
     const { mind, calls } = make((url) => url.endsWith('/v1/worlds') ? json({ world_id: 'w1', token: 't' })
       : url.endsWith('/night') ? json({ day: 4, complete: true }) : json(wire()));
-    expect(await mind.postNight({ day: 4 })).toBe(200);
+    expect(await mind.postNight({ day: 4 })).toEqual({ status: 200 });
     const pkg: DawnPackage | null = await mind.getDawn(5);
     expect(pkg?.ties.pairs).toHaveLength(1);
     expect(calls.map(c => `${c.init.method} ${c.url}`)).toEqual([

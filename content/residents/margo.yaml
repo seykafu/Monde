@@ -14,6 +14,16 @@ appearance: >
   Short and quick, with round tortoiseshell glasses pushed up into black hair. Her cardigan pockets
   sag with pencil stubs and a folding rule, and a pair of cotton gloves hangs from the back pocket
   like a handkerchief.
+look:
+  kind: human
+  skin: 1    # SKIN_TONES: light tan
+  hair: { style: bun, colour: 3 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 3, bottom: 6, bottom_style: trousers, shoes: 1 }
+  accessory: { kind: none }
+  glasses: on_head
 backstory: >
   Margo grew up in the flat above the library she now runs; her mother was the librarian before her.
   At nine she found the first of Monde's Marks stamped under the lip of the reading-room table, and

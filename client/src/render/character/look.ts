@@ -1,15 +1,19 @@
 // What a character looks like, as data (GDD §11.1 creation fields, §16.1/§16.5 sprite style).
 //
-// The procedural rig (rig.ts) draws any CharacterLook. The shape of the data (and its zod schema, for saves)
-// lives in @monde/shared look.ts; this module adds the palettes, the defaults and the residents' placeholder
-// looks. W-07 character creation (fellow/options.ts) builds the player's from the Fellowship application.
+// The procedural rig (rig.ts) draws any CharacterLook. The shape of the data (and its zod schema, for saves),
+// the palettes and the persona cards' `look` block live in @monde/shared look.ts; this module adds the
+// defaults, the resolver from a card's look (lookFromCard) and the hash looks for residents without one.
+// W-07 character creation (fellow/options.ts) builds the player's from the Fellowship application.
 // Pure: no Phaser, no DOM.
 
-import type { Accessory, BottomStyle, Build, CharacterLookData, HairStyle, Height, OutfitCut } from '@monde/shared';
-import { HAIR_STYLES } from '@monde/shared';
+import type { Accessory, BottomStyle, Build, CardLook, CharacterLookData, HairStyle, HeadwearKind, Height, OutfitCut } from '@monde/shared';
+import { CLOTH_COLOURS, EYE_COLOURS, HAIR_COLOURS, HAIR_STYLES, SKIN_TONES, WORN_GLASSES, swatchColour } from '@monde/shared';
 
-export { ACCESSORIES, BOTTOM_STYLES, BUILDS, HAIR_STYLES, HEIGHTS, OUTFIT_CUTS } from '@monde/shared';
-export type { Accessory, BottomStyle, Build, HairStyle, Height, OutfitCut } from '@monde/shared';
+export {
+  ACCESSORIES, BOTTOM_STYLES, BUILDS, CLOTH_COLOURS, EYE_COLOURS, HAIR_COLOURS, HAIR_STYLES, HEADWEAR_KINDS, HEIGHTS,
+  OUTFIT_CUTS, SKIN_TONES
+} from '@monde/shared';
+export type { Accessory, BottomStyle, Build, HairStyle, HeadwearKind, Height, OutfitCut } from '@monde/shared';
 
 export interface CharacterLook {
   kind: 'human';
@@ -34,6 +38,10 @@ export interface CharacterLook {
   outfit?: OutfitCut;
   /** The layer under a bib (a pinafore's blouse, dungarees' shirt): sleeves and shoulders. Absent: the top. */
   trim?: number;
+  /** A cap over the hair (residents' card looks only). Absent: none. */
+  headwear?: HeadwearKind;
+  /** The cap's colour. Absent: DEFAULT_CAP. */
+  headwearColour?: number;
 }
 
 // The client's look and the save's schema must describe the same thing.
@@ -56,18 +64,8 @@ export interface CatLook {
 export type Look = CharacterLook | CatLook;
 
 // ── Palettes ────────────────────────────────────────────────────────────────
-// GDD §11.1: 10 skin swatches, 12 hair colours, 8 eye colours; §16.5: 16 cloth colours. These are the ramps'
-// base tones (the first six skins and seven hairs are the colours the old resident billboards used, so
-// residents keep indexing them in this order; the form shows skins sorted light to dark).
-
-export const SKIN_TONES = [0xf2d5b3, 0xe3b48c, 0xc68e64, 0x8d5a3b, 0xf6e1cb, 0xa86f48, 0xfbe3c8, 0xd9a274, 0x6e4430, 0xb8825a] as const;
-export const HAIR_COLOURS = [0x3b2a20, 0x6b4a2b, 0xb7b2a8, 0x1f1a17, 0x9c4a26, 0xd9c28a, 0x50392b, 0x2c2a3a, 0xe2e0d8, 0x7a3b2a, 0xc98b4a, 0x5c5048] as const;
-export const EYE_COLOURS = [0x3a2a22, 0x4a6b8a, 0x4f6b3a, 0x6b4a2b, 0x2e3a4a, 0x7a6a3a, 0x3b3b3b, 0x5a3a5a] as const;
-/** Cloth for the starter outfits' recolourable slots: warm, bright and sea-glass, per §16.1's palette. */
-export const CLOTH_COLOURS = [
-  0x3f9e94, 0x6b4f3a, 0x4a3428, 0xc0504d, 0xd9a93a, 0x6a8fb5, 0x46536a, 0x5fa36a,
-  0x8a6aa8, 0xe8dcc0, 0x4d5a3c, 0x7a4b3a, 0xd98a7a, 0x2f2a28, 0x9aa3a8, 0xb8865a
-] as const;
+// SKIN_TONES, HAIR_COLOURS, EYE_COLOURS and CLOTH_COLOURS (GDD §11.1, §16.5) live in @monde/shared look.ts
+// (persona cards index them too) and are re-exported above. The hash looks also pick from these:
 const BOTTOMS = [0x5b4636, 0x46536a, 0x4d5a3c, 0x6b5a48, 0x4a4552, 0x7a4b3a, 0x48586a, 0x5e4b5e] as const;
 const SHOES = [0x4a3428, 0x2f2a28, 0x5e3f2c, 0x3d3a44, 0x6a4a34] as const;
 const ACCENTS = [0xe8dcc0, 0xc0504d, 0xd9a93a, 0x6a8fb5, 0x8a6aa8, 0x5fa36a] as const;
@@ -85,6 +83,42 @@ export const DEFAULT_PLAYER_LOOK: CharacterLook = {
 
 /** Bastien (content/residents/bastien.yaml): an orange tabby with a white bib. */
 export const BASTIEN_LOOK: CatLook = { kind: 'cat', fur: 0xd98a3d, markings: 0xa8592a, bib: 0xf4ecdc, eyes: 0x9bbf4a, collar: 0xc0504d };
+
+/** A cap whose card gives no colour: slate. */
+export const DEFAULT_CAP = 0x46536a;
+/** An apron or scarf whose card gives no colour: cream. */
+const DEFAULT_ACCENT = 0xe8dcc0;
+
+/**
+ * A card's look (content/residents/*.yaml `look:`) as the rig draws it. Palette indices and "#rrggbb" strings
+ * become colours; a worn glasses style is the glasses accessory; a cat's absent collar takes `colour` (the
+ * resident's roster colour). The face details are the dialogue bust's (portraitModel.ts reads them).
+ */
+export function lookFromCard(look: CardLook, colour: number): Look {
+  if (look.kind === 'cat') {
+    return {
+      kind: 'cat', fur: swatchColour(look.fur, HAIR_COLOURS), markings: swatchColour(look.markings, HAIR_COLOURS),
+      bib: swatchColour(look.bib, HAIR_COLOURS), eyes: swatchColour(look.eyes, EYE_COLOURS),
+      collar: look.collar === undefined ? colour : swatchColour(look.collar, CLOTH_COLOURS)
+    };
+  }
+  const cloth = (v: number | string) => swatchColour(v, CLOTH_COLOURS);
+  const worn = WORN_GLASSES.includes(look.glasses ?? 'none');
+  const out: CharacterLook = {
+    kind: 'human', skin: swatchColour(look.skin, SKIN_TONES), hair: swatchColour(look.hair.colour, HAIR_COLOURS),
+    hairStyle: look.hair.style, eyes: swatchColour(look.eyes, EYE_COLOURS),
+    top: cloth(look.outfit.top), bottom: cloth(look.outfit.bottom), bottomStyle: look.outfit.bottom_style, shoes: cloth(look.outfit.shoes),
+    accessory: worn ? 'glasses' : look.accessory.kind,
+    accessoryColour: look.accessory.colour === undefined ? DEFAULT_ACCENT : cloth(look.accessory.colour),
+    build: look.build, height: look.height, outfit: look.outfit.cut
+  };
+  if (look.outfit.trim !== undefined) out.trim = cloth(look.outfit.trim);
+  if (look.headwear && look.headwear.kind !== 'none') {
+    out.headwear = look.headwear.kind;
+    out.headwearColour = look.headwear.colour === undefined ? DEFAULT_CAP : cloth(look.headwear.colour);
+  }
+  return out;
+}
 
 /** FNV-1a, the same hash sim/plans uses for per-resident variety (kept local so this module stays leaf). */
 export function lookHash(text: string): number {

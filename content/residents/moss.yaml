@@ -13,6 +13,17 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Short and bandy-legged, weathered to the color of rope, in a salt-stiff wool cap and a navy jersey
   darned at both elbows. A tin kettle with SLOWEST BOAT scratched on its lid rides on the wheelhouse shelf.
+look:
+  kind: human
+  skin: 9    # SKIN_TONES: weathered tan
+  hair: { style: short, colour: 8 }
+  eyes: 1
+  build: medium
+  height: short
+  outfit: { cut: jumper, top: "#2f3d5c", bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  headwear: { kind: knit_cap, colour: "#34405e" }
+  face: { stubble: true }
 backstory: >
   Moss fished herring in the Grey Bay for thirty-one years, mostly for the Liss Cannery. When it shut
   he took the Gannet, because the council couldn't pay anyone else and she'd have been scrapped. She is

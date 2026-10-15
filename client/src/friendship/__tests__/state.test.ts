@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { pairKey, type PlanOutput, type TieData, type TieMilestoneData, type TurnRegard } from '@monde/shared';
-import { applyDawn, cardTies, emptyFriendship, meet, metResidents, recordTurn, regardOf, seedRegard } from '../state';
+import { applyDawn, applyRegardSnapshot, cardTies, emptyFriendship, meet, metResidents, recordTurn, regardOf, seedRegard } from '../state';
 import { dawnLines, printedMilestones, romanceNews } from '../milestones';
 import type { DawnPackage } from '../../mind/dawn';
 import { loadCards } from '../../sim/__tests__/content';
@@ -36,6 +36,23 @@ describe('mirrored Regard (§9.11.1)', () => {
     expect(s.residents.odile).toMatchObject({ regard: 23, source: 'server', met_day: 2, last_talk_day: 3 });
     expect(regardOf(s, 'odile')).toBe(23);
     expect(regardOf(s, 'june', 7)).toBe(7);
+  });
+
+  it("takes the server's whole-town snapshot (M-06): met or not, over the bond and the seed", () => {
+    let s = recordTurn(meet(emptyFriendship(), 'odile', 2, 20), 'odile', 3, regard(20, 23), 20);
+    expect(s.regard).toEqual({ odile: 23 });
+    s = applyRegardSnapshot(s, { odile: 26, pell: 3, tib: 140 });
+    expect(regardOf(s, 'odile', 20)).toBe(26);
+    expect(s.residents.odile).toMatchObject({ regard: 26, source: 'server' });
+    expect(regardOf(s, 'pell', 20)).toBe(3); // not met, still mirrored
+    expect(regardOf(s, 'tib')).toBe(100); // clamped
+    expect(s.residents.pell).toBeUndefined();
+    expect(applyRegardSnapshot(s, { odile: 26 })).toBe(s); // nothing new
+    expect(applyRegardSnapshot(s, null)).toBe(s);
+    // Meeting someone the snapshot already knows starts the bond there.
+    expect(meet(s, 'pell', 4, 20).residents.pell).toMatchObject({ regard: 3, source: 'server' });
+    // And the dawn package's Regard replaces it too.
+    expect(applyDawn(s, pkg({ regard: { odile: 30 } }), { names: NAMES, plans: {} }).state.regard.odile).toBe(30);
   });
 
   it('never invents a gain for a Quiet Mode turn', () => {

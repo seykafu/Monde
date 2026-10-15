@@ -1,18 +1,22 @@
 // The story session against the real compiled Spring scenes, with a fake world and presenter.
 import { describe, expect, it, vi } from 'vitest';
+import { ClientEvent as ClientEventSchema } from '@monde/shared';
 import { createTownState, type TownState } from '../../town/pillars';
-import { decodeStory, type OfflineEvent, type StoryPresenter, type StoryWorld, type WorldNow } from '../host';
+import type { ClientEvent } from '@monde/shared';
+import { decodeStory, type StoryPresenter, type StoryWorld, type WorldNow } from '../host';
 import type { StoryLine } from '../runtime';
 import { SPRING_SCENES, StorySession, SUMMON_COOLDOWN_MINUTES } from '../session';
 
 function fakeWorld(start: Partial<WorldNow> = {}) {
   const state: WorldNow & { town: TownState } = { day: 1, minute: 590, zone: 'wharf', place: 'wharf.ferry_slip', town: createTownState({ day: 1 }), ...start };
-  const events: OfflineEvent[] = [];
+  const events: ClientEvent[] = [];
+  let ids = 0;
   const world: StoryWorld = {
     now: () => ({ ...state }),
     setTown: t => { state.town = t; },
     events: () => events,
     appendEvent: e => { events.push(e); },
+    newId: () => `e${++ids}`,
     persist: vi.fn(),
     checkpoint: vi.fn(async () => {}),
     travel: vi.fn((place: string) => { state.zone = place.split('.')[0]!; state.place = place; }),
@@ -62,7 +66,8 @@ describe('StorySession', () => {
     expect(presenter.music).toHaveBeenCalledWith('arrival_theme');
     expect(presenter.charcreate).toHaveBeenCalledTimes(1);
     expect(session.ledger.regard).toMatchObject({ pell: 3, ada: 1 });
-    expect(events.filter(e => e.type === 'memory').map(e => e.resident_id)).toEqual(['pell', 'moss', 'ada']);
+    expect(events.filter(e => e.kind === 'scripted_memory').map(e => 'resident' in e && e.resident)).toEqual(['pell', 'moss', 'ada']);
+    expect(events.every(e => ClientEventSchema.safeParse(e).success)).toBe(true);
     expect(lines.find(l => l.text.includes('{'))).toBeUndefined();
     expect(lines.some(l => l.text.startsWith('Fellow. Good.'))).toBe(true);
     expect(warn).not.toHaveBeenCalled();
@@ -88,7 +93,7 @@ describe('StorySession', () => {
     await playOut(again);
     expect(again.ledger.regard.pell).toBe(3); // the restart replays the choice; its Regard was already applied
     expect(again.flags.has('s01a_done')).toBe(true);
-    expect(events.filter(e => e.type === 'regard' && e.resident_id === 'pell')).toHaveLength(1);
+    expect(events.filter(e => e.kind === 'scripted_regard' && e.resident === 'pell')).toHaveLength(1);
   });
 
   it('summons the player to Bloom Fair, waits after a "Not yet", then travels', async () => {

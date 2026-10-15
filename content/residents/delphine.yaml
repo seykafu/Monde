@@ -13,6 +13,15 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Thin and straight as a ruler, with a tight grey plait, a pincushion strapped to her left wrist and a
   high collar buttoned to the throat. Her cuffs are spotless and a handkerchief lives in her sleeve.
+look:
+  kind: human
+  skin: 4    # SKIN_TONES: fair
+  hair: { style: braids, colour: 2 }
+  eyes: 4
+  build: narrow
+  height: tall
+  outfit: { cut: plain, top: "#2f5f6e", bottom: "#2f5f6e", bottom_style: skirt, shoes: 13 }
+  accessory: { kind: none }
 backstory: >
   Delphine ran a loom at Lissworth Mill for twenty-three years and breathed its lint for all of them.
   Her husband Gil, a loom fixer, drank after the mill closed and died in the second winter. Her son

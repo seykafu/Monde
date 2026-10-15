@@ -14,6 +14,16 @@ appearance: >
   Long and stooped, with a sunburned neck, green-stained forearms and hair curling over his collar. A
   canvas apron holds seed packets in every pocket and a pencil stub behind one ear. He talks to your
   shoes.
+look:
+  kind: human
+  skin: 2    # SKIN_TONES: medium tan
+  hair: { style: swept, colour: 6 }
+  eyes: 2
+  build: narrow
+  height: tall
+  outfit: { cut: apron, top: 9, bottom: 10, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: apron, colour: 10 }
+  face: { stubble: true }
 backstory: >
   Teo came to Monde at sixteen as the Glasshouse gardener's apprentice and took over the place at
   twenty-two, when old Mr. Pargeter died in the orchid house. Eleven of the 240 panes are broken, and

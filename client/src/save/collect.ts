@@ -9,7 +9,8 @@ export interface GameState {
   weather: SaveGame['weather'];
   story_flags: SaveGame['story_flags'];
   quiet: SaveGame['quiet'];
-  offline_events: SaveGame['offline_events'];
+  /** The ClientEvent log (M-06; mind/events.ts): what's still to send, what the server refused, the flags revision. */
+  client_events: SaveGame['client_events'];
   player_name: string;
   playtime: number;
   /** The Fellowship application and look (W-07); profile null before the form is signed. */
@@ -24,7 +25,7 @@ export function collect(state: GameState, kind: SaveGame['kind'], label: string,
       zone: state.player.zone, player_name: state.player_name, playtime: state.playtime },
     mind: { world_id: null, branch_id: null, snapshot_id: null }, clock: state.clock.time,
     town: serialize(state.town), player: state.player, weather: state.weather,
-    story_flags: state.story_flags, quiet: state.quiet, offline_events: state.offline_events,
+    story_flags: state.story_flags, quiet: state.quiet, client_events: state.client_events,
     fellow: state.fellow, inventory: {}, coins: {}, skills: state.skills, friendship: state.friendship
   });
 }

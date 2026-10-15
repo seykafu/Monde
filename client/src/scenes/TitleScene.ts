@@ -3,7 +3,6 @@ import { FAMILY_BODY, GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from '../util/cons
 import { finishSaving, loadGame, resetGame, saveGame, saveStorage } from '../save/runtime';
 import { IndexedDBSaveStorage } from '../save/storage';
 import { formatSummary, MANUAL_SLOTS, sortForMenu, type SaveEntry } from '../save/slots';
-import { FELLOWSHIP_SCENE, type FellowshipData } from './FellowshipScene';
 
 type Choice = { text: string; run?: () => void | Promise<void> };
 /** Thin shared presentation for title and pause; persistence lives outside Phaser. */
@@ -86,8 +85,11 @@ class SaveMenuBase extends Phaser.Scene {
       ], () => undefined);
     }
   }
-  /** New Game: Pell's Fellowship application first (W-07), then the town. */
-  private newGame(): void { resetGame(this); this.scene.start(FELLOWSHIP_SCENE, { next: 'Zone' } satisfies FellowshipData); }
+  /**
+   * New Game: straight to the ferry slip at 09:50 (scenes/story/attach.ts), where S01a plays and Pell hands over the
+   * Fellowship application at its {charcreate} cue (GDD §11.1).
+   */
+  private newGame(): void { resetGame(this); this.scene.start('Zone'); }
   private confirm(text: string, yes: () => void | Promise<void>, no: () => void = () => { void this.home().catch(error => this.error(error)); }): void {
     this.message.setText(text);
     this.show([{ text: 'Cancel', run: no }, { text: 'Confirm', run: yes }], no);

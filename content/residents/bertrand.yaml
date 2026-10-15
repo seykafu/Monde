@@ -14,6 +14,15 @@ appearance: >
   Tall once and now folded at the shoulders, with white hair that stands up at the back like a
   duckling's, a jeweler's loupe on a ribbon round his neck, and a pocket watch he winds without
   looking.
+look:
+  kind: human
+  skin: 4    # SKIN_TONES: fair
+  hair: { style: tufty, colour: "#ece8df" }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: dungarees, top: 2, trim: 9, bottom: 14, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
 backstory: >
   Bertrand is the fourth link in a chain of apprentices that begins with Aurélien Monde himself. He
   wound and mended the clocktower every Sunday for fifty-one years. On the day Lissworth Mill closed it

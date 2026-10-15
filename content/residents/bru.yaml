@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   So tall he checks every lintel, in a flat cap he takes off indoors and puts back on at the door. One
   jacket pocket sags with a half-carved wooden bird, and his hands are big and careful.
+look:
+  kind: human
+  skin: 1    # SKIN_TONES: light tan
+  hair: { style: short, colour: 0 }
+  eyes: 4
+  build: broad
+  height: tall
+  outfit: { cut: plain, top: 6, bottom: 1, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: "#5f625c" }
 backstory: >
   Bru was fourteen when the Liss Cannery closed. His mother, who packed sardines there, went across the
   bay for work and meant to send for him by spring. He slept in the mill's boiler house for three

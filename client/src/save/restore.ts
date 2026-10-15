@@ -10,6 +10,6 @@ export function restore(raw: unknown): GameState {
   if (save.clock.minute === 1560) { clock.autoRollover = false; clock.advanceMinutes(1200); clock.autoRollover = true; }
   else clock.setTime(save.clock.day, save.clock.minute);
   return { clock, town: restoreTown(save.town), player: save.player, weather: save.weather,
-    story_flags: save.story_flags, quiet: save.quiet, offline_events: save.offline_events,
+    story_flags: save.story_flags, quiet: save.quiet, client_events: save.client_events,
     player_name: save.summary.player_name, playtime: save.summary.playtime, fellow: save.fellow, skills: save.skills };
 }

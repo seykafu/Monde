@@ -144,6 +144,42 @@ function drawBackHair(g: G, look: PortraitLook, f: Frame): void {
       shape(g, arcPts(cx, hy - 8, rx + 6, ry + 2), hair, ln);
       return;
     }
+    case 'ponytail': {
+      // Pulled back into a tail that hangs behind the head (the back of the head is the viewer's left).
+      const root = { x: cx - rx + 4, y: hy - 34 };
+      const tail = [...quad(root, { x: cx - rx - 26, y: hy - 30 }, { x: cx - rx - 18, y: hy + 66 }, 12),
+        ...quad({ x: cx - rx - 18, y: hy + 66 }, { x: cx - rx - 2, y: hy + 20 }, { x: root.x + 14, y: root.y + 6 }, 10).slice(1)];
+      shape(g, tail, hair, ln);
+      stroke(g, quad({ x: cx - rx - 8, y: hy - 12 }, { x: cx - rx - 16, y: hy + 20 }, { x: cx - rx - 14, y: hy + 50 }, 8), 1.6, dark(hair, 0.78), 0.55);
+      g.fillStyle(look.cloth).fillRoundedRect(root.x - 12, root.y - 2, 14, 10, 3);
+      shape(g, arcPts(cx, hy - 8, rx + 5, ry + 2), hair, ln);
+      return;
+    }
+    case 'pigtails': {
+      for (const side of [-1, 1]) {
+        const x = cx + side * (rx + 14), y = hy + 14;
+        const bunch = [...quad({ x: x - side * 14, y: y - 18 }, { x: x + side * 26, y: y - 8 }, { x: x + side * 6, y: y + 40 }, 12),
+          ...quad({ x: x + side * 6, y: y + 40 }, { x: x - side * 10, y: y + 18 }, { x: x - side * 14, y: y - 18 }, 8).slice(1)];
+        shape(g, bunch, hair, ln);
+        g.fillStyle(look.cloth).fillCircle(x - side * 10, y - 12, 6);
+      }
+      shape(g, arcPts(cx, hy - 8, rx + 6, ry + 2), hair, ln);
+      return;
+    }
+    case 'swept': {
+      // Grown out: one shaggy mass down the back of the head (the viewer's left) to the collar, its ends flicking out.
+      const x0 = cx - rx;
+      const nape = [{ x: x0 + 10, y: hy - 34 }, ...quad({ x: x0 - 8, y: hy - 14 }, { x: x0 - 14, y: hy + 28 }, { x: x0 - 6, y: hy + 56 }, 10),
+        { x: x0 - 18, y: hy + 68 }, { x: x0 + 2, y: hy + 62 }, { x: x0 + 2, y: hy + 76 }, { x: x0 + 16, y: hy + 62 },
+        { x: x0 + 28, y: hy + 58 }, { x: cx - 16, y: hy + 36 }];
+      shape(g, nape, hair, ln);
+      stroke(g, quad({ x: x0 - 4, y: hy + 6 }, { x: x0 - 8, y: hy + 34 }, { x: x0 - 2, y: hy + 54 }, 8), 1.6, dark(hair, 0.78), 0.55);
+      shape(g, arcPts(cx, hy - 8, rx + 7, ry + 3), hair, ln);
+      return;
+    }
+    case 'buzz':
+      shape(g, arcPts(cx, hy - 6, rx + 2, ry - 1), hair, ln);
+      return;
     case 'bun':
     case 'braid': {
       if (look.hairStyle === 'bun' && look.headwear === 'none') {
@@ -160,7 +196,7 @@ function drawBackHair(g: G, look: PortraitLook, f: Frame): void {
 }
 
 function drawBody(g: G, look: PortraitLook, f: Frame): void {
-  const { cx, hy, ry, shoulderY } = f, skin = look.skin, cloth = look.colour;
+  const { cx, hy, ry, shoulderY } = f, skin = look.skin, cloth = look.cloth;
   const half = look.build === 'broad' ? 104 : look.build === 'narrow' ? 86 : 95;
   // Neck, with the chin's shadow.
   const neck = [{ x: cx - 18, y: hy + ry - 24 }, { x: cx + 22, y: hy + ry - 24 }, { x: cx + 24, y: shoulderY + 14 }, { x: cx - 20, y: shoulderY + 14 }];
@@ -189,6 +225,27 @@ function drawBody(g: G, look: PortraitLook, f: Frame): void {
     }
     default:
       shape(g, [...arcPts(cx + 2, shoulderY + 1, 24, 13, 0, Math.PI, 16)], skin, line(cloth));
+  }
+  // An apron's bib and neck strap, or a scarf (a tea towel over a shoulder reads the same), as the sprite wears them.
+  if (look.apron !== undefined) {
+    const a = look.apron, top = shoulderY + 30;
+    stroke(g, quad({ x: cx - 30, y: top + 2 }, { x: cx - 26, y: shoulderY - 2 }, { x: cx - 8, y: shoulderY - 8 }, 8), 5, line(a));
+    stroke(g, quad({ x: cx - 30, y: top + 2 }, { x: cx - 26, y: shoulderY - 2 }, { x: cx - 8, y: shoulderY - 8 }, 8), 3, a);
+    stroke(g, quad({ x: cx + 36, y: top + 2 }, { x: cx + 32, y: shoulderY - 2 }, { x: cx + 14, y: shoulderY - 8 }, 8), 5, line(a));
+    stroke(g, quad({ x: cx + 36, y: top + 2 }, { x: cx + 32, y: shoulderY - 2 }, { x: cx + 14, y: shoulderY - 8 }, 8), 3, a);
+    const bib = [{ x: cx - 36, y: top }, { x: cx + 42, y: top }, { x: cx + 46, y: bottom + 2 }, { x: cx - 40, y: bottom + 2 }];
+    shape(g, bib, a, line(a), 2.5);
+    fill(g, [{ x: cx + 26, y: top + 2 }, { x: cx + 41, y: top + 2 }, { x: cx + 44, y: bottom }, { x: cx + 28, y: bottom }], dark(a), 0.6);
+  }
+  if (look.scarf !== undefined) {
+    const sc = look.scarf, ln = line(sc);
+    const wrap = [...quad({ x: cx - 40, y: shoulderY - 8 }, { x: cx + 2, y: shoulderY + 30 }, { x: cx + 44, y: shoulderY - 8 }, 14),
+      ...quad({ x: cx + 44, y: shoulderY - 8 }, { x: cx + 40, y: shoulderY + 10 }, { x: cx + 30, y: shoulderY + 18 }, 6).slice(1),
+      ...quad({ x: cx + 30, y: shoulderY + 18 }, { x: cx + 2, y: shoulderY + 44 }, { x: cx - 30, y: shoulderY + 18 }, 14).slice(1),
+      ...quad({ x: cx - 30, y: shoulderY + 18 }, { x: cx - 40, y: shoulderY + 10 }, { x: cx - 40, y: shoulderY - 8 }, 6).slice(1)];
+    shape(g, [{ x: cx - 30, y: shoulderY + 16 }, { x: cx - 14, y: shoulderY + 22 }, { x: cx - 18, y: bottom }, { x: cx - 38, y: bottom }], sc, ln, 2.5);
+    shape(g, wrap, sc, ln, 2.5);
+    stroke(g, quad({ x: cx - 30, y: shoulderY + 6 }, { x: cx + 2, y: shoulderY + 32 }, { x: cx + 34, y: shoulderY + 6 }, 12), 1.8, dark(sc), 0.6);
   }
 }
 
@@ -221,6 +278,17 @@ function drawHead(g: G, look: PortraitLook, f: Frame): void {
     }
     stroke(g, quad({ x: fx - 12, y: ey + 24 }, { x: fx - 19, y: ey + 34 }, { x: fx - 16, y: ey + 42 }, 8), 1.8, ln, 0.45);
     stroke(g, quad({ x: fx + 16, y: ey + 24 }, { x: fx + 22, y: ey + 34 }, { x: fx + 19, y: ey + 42 }, 8), 1.8, ln, 0.45);
+  }
+  if (look.stubble) {
+    // A shadow of stubble round the jaw and the upper lip (a scatter, the same every draw).
+    const dot = mixColour(shadeColour(skin, 0.68), look.hair, 0.35);
+    for (let i = 0; i < 140; i++) {
+      // Denser toward the jaw line and fading inward, so the shadow has no edge of its own.
+      const a = Math.PI * (0.1 + 0.8 * ((i * 0.618034) % 1)), u = (i * 0.381966 + 0.13) % 1, k = 0.5 + 0.46 * Math.sqrt(u);
+      const x = fx - 4 + Math.cos(a) * (rx - 4) * k, y = hy + 6 + Math.sin(a) * (f.ry - 2) * k;
+      if (y < ey + 26) continue;
+      g.fillStyle(dot, 0.12 + 0.5 * u).fillCircle(x, y, 1.1);
+    }
   }
   if (look.freckles) {
     for (const side of [-1, 1]) for (let i = 0; i < 6; i++) {
@@ -268,7 +336,8 @@ function drawFrontHair(g: G, look: PortraitLook, f: Frame): void {
       }
       break;
     case 'bun':
-    case 'braid': {
+    case 'braid':
+    case 'ponytail': {
       // Swept back: a high hairline with a parting.
       const top = arcPts(cx, hy - 4, rx + 4, ry + 4, Math.PI * 1.1, Math.PI * 1.9, 26);
       const edge = quad(top.at(-1)!, { x: cx + 8, y: hy - 76 }, top[0]!, 12);
@@ -283,6 +352,19 @@ function drawFrontHair(g: G, look: PortraitLook, f: Frame): void {
       break;
     case 'cropped':
       shape(g, cap(34, 2, 0), hair, ln);
+      break;
+    case 'buzz':
+      // Close-cropped: a hairline high on the brow, no fringe.
+      shape(g, cap(46, 0, 0, 0.05), hair, ln);
+      break;
+    case 'pigtails':
+      shape(g, cap(26, 5, 1), hair, ln);
+      stroke(g, quad({ x: cx - 2, y: hy - ry - 2 }, { x: cx + 2, y: hy - 50 }, { x: cx + 4, y: hy - 30 }, 8), 2, dark(hair, 0.7), 0.7);
+      break;
+    case 'swept':
+      // A smooth fringe swept down from a parting on the far side toward the near brow.
+      shape(g, cap(24, 0, 3), hair, ln);
+      stroke(g, quad({ x: cx + 26, y: hy - ry + 4 }, { x: cx - 6, y: hy - 44 }, { x: cx - rx + 2, y: hy - 18 }, 10), 1.8, dark(hair, 0.78), 0.55);
       break;
     case 'cowlick':
       shape(g, cap(24, 6, 2), hair, ln);
@@ -304,7 +386,7 @@ function drawFrontHair(g: G, look: PortraitLook, f: Frame): void {
       g.lineStyle(2.2, ln).strokeEllipse(x, y, 22, 20);
       stroke(g, [{ x: x - 8, y: y - 2 }, { x: x + 6, y: y + 5 }], 1.8, ln, 0.6);
     }
-    g.fillStyle(look.colour).fillRect(cx - rx - 8, hy + 132, 16, 6);
+    g.fillStyle(look.cloth).fillRect(cx - rx - 8, hy + 132, 16, 6);
   }
 }
 
@@ -563,9 +645,11 @@ export function drawOverlay(g: G, look: PortraitLook): void {
 const CAT = { fur: 0xd98a3d, markings: 0xa8592a, bib: 0xf4ecdc, eyes: 0x9bbf4a, nose: 0xe88f96 } as const;
 
 function catFrame(): { cx: number; hy: number } { return { cx: W / 2 + 4, hy: 128 }; }
+/** The cat's colours: its card look's coat, or Bastien's. */
+const catOf = (look: PortraitLook): { fur: number; markings: number; bib: number; eyes: number; nose: number } => ({ ...CAT, ...look.coat });
 
-function drawCatBody(g: G, _look: PortraitLook): void {
-  const { cx, hy } = catFrame(), ln = line(CAT.fur);
+function drawCatBody(g: G, look: PortraitLook): void {
+  const { cx, hy } = catFrame(), CAT = catOf(look), ln = line(CAT.fur);
   const body = [{ x: cx - 96, y: H - 3 }, ...quad({ x: cx - 96, y: H - 3 }, { x: cx - 92, y: hy + 40 }, { x: cx, y: hy + 34 }, 14),
     ...quad({ x: cx, y: hy + 34 }, { x: cx + 94, y: hy + 40 }, { x: cx + 98, y: H - 3 }, 14).slice(1)];
   shape(g, body, CAT.fur, ln, 3);
@@ -589,7 +673,7 @@ function drawCatBody(g: G, _look: PortraitLook): void {
 }
 
 function drawCatFace(g: G, look: PortraitLook, expr: PortraitExpression): void {
-  const { cx, hy } = catFrame(), ln = line(CAT.fur), spec = FACES[expr];
+  const { cx, hy } = catFrame(), CAT = catOf(look), ln = line(CAT.fur), spec = FACES[expr];
   // Ears follow the mood: up, tall, drooped or flat back. The notch is on his left (the viewer's right).
   const earUp = expr === 'surprised' ? 1.25 : expr === 'sad' ? 0.55 : expr === 'angry' ? 0.45 : expr === 'worried' ? 0.8 : 1;
   const flare = expr === 'angry' || expr === 'sad' ? 1.5 : 1;

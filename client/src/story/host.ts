@@ -8,7 +8,8 @@
 //   StoryWorld (scenes/story/attach.ts). Anything without somewhere to go warns in development and continues.
 // - encodeStory/decodeStory: the director and ledger inside the save's existing `story_flags` record.
 // - placeAt: which `zone.place` the player is at, for place triggers.
-import type { SaveGame, SceneHeader } from '@monde/shared';
+import type { ClientEvent, SaveGame, SceneHeader } from '@monde/shared';
+import { scriptedMemory, scriptedRegard, townEvent } from '../mind/events';
 import { weekdayOf } from '../sim/clock';
 import { computeAppeal } from '../town/appeal';
 import { isFerryDay } from '../town/migration';
@@ -34,8 +35,9 @@ export interface FellowProfile {
 export const DEFAULT_FELLOW: Readonly<FellowProfile> = { name: 'Fellow', pronouns: 'they/them', background: 'tinkerer', why: 'curious', loves: 'tea' };
 
 /**
- * This game's application was already signed (W-07's New Game asks before the town), so S01a's {charcreate}
- * has nothing to add. The unsigned default (fellow/state.ts ensureFellow, `?skiptitle=1`) still opens the form.
+ * The Fellowship application is signed (GDD §11.1: Pell hands the form over on the ferry slip in S01a, at its
+ * {charcreate} cue). A New Game reaches the cue unsigned (no profile); so does `?skiptitle=1`'s default "Fellow"
+ * (fellow/state.ts ensureFellow), and a save made before the cue, which plays S01a again from its start.
  */
 export const fellowSigned = (profile: FellowProfile | null | undefined): boolean =>
   !!profile && (['name', 'pronouns', 'background', 'why'] as const).some(k => profile[k] !== DEFAULT_FELLOW[k]);
@@ -59,8 +61,10 @@ export function pronounWords(pronouns: string): PronounWords {
 
 /**
  * Story-side state for effects whose real owners don't exist on the client yet, saved with the story.
- * - regard: a mirror of scripted Regard deltas. The server owns Regard (§9.4) and has no endpoint for them;
- *   each delta is also queued in the offline event log for the night-pass sync (§9.14).
+ * - regard: scripted Regard deltas as the story applied them. The server owns Regard (§9.4): each delta is queued as a
+ *   `scripted_regard` ClientEvent (M-06), and in the game the context reads the friendship mirror instead
+ *   (WorldNow.regard: the server's snapshot plus what's still queued). The ledger's values stand in for residents the
+ *   game doesn't mirror (the S05 `arrival`) and when no world supplies Regard (tests).
  * - coins / items / projects / riddles: typed placeholders until the inventory, Project and Marks systems land.
  * - applied: `scene|cue key` of every durable effect already applied (idempotent restarts).
  */
@@ -99,6 +103,8 @@ export interface WorldNow {
   profile?: FellowProfile | null;
   asleep?: boolean;
   inScuffle?: boolean;
+  /** Regard toward the player by resident, as the game mirrors it (scenes/friendship.ts regardFor); over the ledger's. */
+  regard?: Readonly<Record<string, number>>;
 }
 
 /** The StoryContext for the director: the live world, the ledger, and any puzzle/riddle/scuffle outcomes. */
@@ -112,7 +118,7 @@ export function buildStoryContext(world: WorldNow, ledger: StoryLedger, outcomes
     zone: world.zone,
     place: world.place,
     pillar: { ...town.pillars },
-    regard: { ...ledger.regard },
+    regard: { ...ledger.regard, ...(world.regard ?? {}) },
     values: {
       name: profile.name,
       ...pronounWords(profile.pronouns),
@@ -172,7 +178,6 @@ export function clipActivity(text: string, max = 120): string {
 
 // ── Cues ────────────────────────────────────────────────────────────────────
 
-export type OfflineEvent = SaveGame['offline_events'][number];
 type Cue<K extends HostCue['cmd']> = Extract<HostCue, { cmd: K }>;
 
 /** The StoryScene: presentation and the interactive handoffs. */
@@ -200,8 +205,12 @@ export interface StoryPresenter {
 export interface StoryWorld {
   now(): WorldNow;
   setTown(state: TownState): void;
-  events(): readonly OfflineEvent[];
-  appendEvent(event: OfflineEvent): void;
+  /** The event log's queued ClientEvents (mind/events.ts; sent to monde-mind online, saved meanwhile). */
+  events(): readonly ClientEvent[];
+  /** Queue a ClientEvent (scenes/events.ts appendEvent checks it against the contract). */
+  appendEvent(event: ClientEvent): void;
+  /** A fresh event id (a UUID), given once when the event is queued. */
+  newId(): string;
   /** Save the director and ledger into the registry the save system reads. */
   persist(): void;
   checkpoint(key: string): Promise<void>;
@@ -238,13 +247,16 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
     apply();
     ledger.applied.push(key);
   };
-  const event = (ctx: CueContext, type: string, residentId: string | null, data: OfflineEvent['data']): void => {
+  /** Queue a cue's ClientEvent once (a restarted scene's cue is already in the log, or already applied). */
+  const cueEvent = (ctx: CueContext, kind: 'scripted_memory' | 'scripted_regard', build: (world: StoryWorld) => ClientEvent): void => {
     const world = deps.world();
-    if (!world) { note(`no world to log ${type}`); return; }
-    const key = effectKey(ctx);
-    if (world.events().some(e => e.data.key === key)) return;
-    world.appendEvent({ day: ctx.game.day, minute: ctx.game.minute, type, resident_id: residentId, data: { ...data, key, scene: ctx.scene, cue: ctx.key } });
+    if (!world) { note(`no world to log ${kind}`); return; }
+    if (world.events().some(e => e.kind === kind && e.scene_id === ctx.scene && e.cue_key === ctx.key)) return;
+    world.appendEvent(build(world));
   };
+  const stamp = (world: StoryWorld, ctx: CueContext) => ({ id: world.newId(), day: ctx.game.day, minute: ctx.game.minute });
+  const cue = (ctx: CueContext) => ({ scene_id: ctx.scene, cue_key: ctx.key });
+  const where = (ctx: CueContext): string => deps.scenePlace(ctx.scene) || ctx.game.place;
   const stage = (what: string): StoryPresenter | null => {
     const p = deps.presenter();
     if (!p) note(`no presenter for {${what}}`);
@@ -261,10 +273,10 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
     sfx: cue => { const p = stage('sfx'); if (p && !p.sfx(cue.id)) note(`unknown sound ${cue.id}`); },
 
     // Durable world effects.
-    regard: (cue, ctx) => once(ctx, () => {
+    regard: (r, ctx) => once(ctx, () => {
       const ledger = deps.ledger();
-      ledger.regard[cue.resident] = (ledger.regard[cue.resident] ?? 0) + cue.delta;
-      event(ctx, 'regard', cue.resident, { delta: cue.delta });
+      ledger.regard[r.resident] = (ledger.regard[r.resident] ?? 0) + r.delta;
+      cueEvent(ctx, 'scripted_regard', w => scriptedRegard(stamp(w, ctx), cue(ctx), { resident: r.resident, delta: r.delta }));
     }),
     pillar: (cue, ctx) => once(ctx, () => {
       const world = deps.world(), town = world?.now().town;
@@ -279,14 +291,14 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
     project: (cue, ctx) => once(ctx, () => {
       const projects = deps.ledger().projects;
       if (!projects.includes(cue.id)) projects.push(cue.id);
+      // GDD-GAP: unlocking isn't §9.6's `project_open` (a Project opening): no town event until Projects exist (§6.3).
       note(`{project: ${cue.id}} unlocked in the ledger only (no Project system yet)`);
     }),
-    // GDD-GAP: §9.6 memories carry a valence, but scripted memories don't author one; null until the night
-    // pass derives it. monde-mind has no events endpoint yet (§19's POST /events), so they wait in the offline log.
-    memory: (cue, ctx) => once(ctx, () => event(ctx, 'memory', cue.resident, {
-      kind: 'scripted', text: cue.text, importance: cue.importance, place: deps.scenePlace(ctx.scene) || ctx.game.place,
-      participants: 'player', valence: null, ...(cue.resident === 'arrival' ? { alias: 'arrival' } : {})
-    })),
+    // A `scripted_memory` ClientEvent (M-06): the server writes it with the player and the resident as `who` (valence
+    // is unauthored: the server's GDD-GAP keeps it neutral). The S05 `arrival` alias waits in the log until the arrival
+    // generator gives it a real resident id (mind/events.ts HELD_RESIDENTS).
+    memory: (m, ctx) => once(ctx, () => cueEvent(ctx, 'scripted_memory', w => scriptedMemory(stamp(w, ctx), cue(ctx),
+      { resident: m.resident, place: where(ctx), text: m.text, importance: m.importance }))),
     checkpoint: async cue => {
       const world = deps.world();
       if (!world) { note(`no world for {checkpoint: ${cue.key}}`); return; }
@@ -299,9 +311,15 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
       const solved = (await deps.presenter()?.placeholder('puzzle', cue.id)) ?? false;
       deps.setOutcome('puzzle', { solved });
     },
-    scuffle: async cue => {
-      const won = (await deps.presenter()?.placeholder('scuffle', cue.id)) ?? false;
+    scuffle: async (sc, ctx) => {
+      const won = (await deps.presenter()?.placeholder('scuffle', sc.id)) ?? false;
       deps.setOutcome('scuffle', { won });
+      // A Scuffle is a §9.6 town event (importance 7): everyone in sight remembers it (server witnessing).
+      once(ctx, () => {
+        const world = deps.world();
+        if (!world) { note(`no world to log {scuffle: ${sc.id}}`); return; }
+        world.appendEvent(scuffleEvent(stamp(world, ctx), sc.id, where(ctx), won, ctx.game));
+      });
     },
     riddle: (cue, ctx) => {
       once(ctx, () => { const r = deps.ledger().riddles; if (!r.includes(cue.id)) r.push(cue.id); });
@@ -328,6 +346,34 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
       return p ? p.aiOpen(cue, deps.scenePlace(ctx.scene) || ctx.game.place) : [];
     }
   };
+}
+
+/**
+ * The residents a Scuffle is fought against (§7.9's Enemies column), by resident id; enemies without a persona card
+ * (Dex, Dom, hired hands, animals) aren't residents the server knows, so they're left out.
+ */
+export const SCUFFLE_ENEMIES: Readonly<Record<string, readonly string[]>> = {
+  sc_bakery_tutorial: ['bru', 'nettie'],
+  sc_quarry_first: ['bru', 'nettie'],
+  sc_quarry_rook_1: ['rook'], sc_quarry_rook_2: ['rook'], sc_quarry_rook_3: ['rook'],
+  sc_quarry_final: ['rook'],
+  sc_vane_office_guard: ['bru']
+};
+
+const titleCase = (id: string): string => id.split('_').map(w => (w[0] ?? '').toUpperCase() + w.slice(1)).join(' ');
+const listNames = (names: readonly string[]): string =>
+  names.length <= 1 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+
+/** A story Scuffle as a `town_event` (§9.6 type `scuffle`): the player and the enemies take part, at the scene's place. */
+export function scuffleEvent(s: { id: string; day: number; minute: number }, scuffleId: string, place: string, won: boolean, game: Pick<CueContext['game'], 'values'>): ClientEvent {
+  const enemies = SCUFFLE_ENEMIES[scuffleId] ?? [];
+  const name = typeof game.values?.name === 'string' ? game.values.name : DEFAULT_FELLOW.name;
+  const against = enemies.length ? ` against ${listNames(enemies.map(titleCase))}` : '';
+  const [, placeId = ''] = place.split('.');
+  return townEvent(s, {
+    type: 'scuffle', place, participants: ['player', ...enemies],
+    summary: `${name} ${won ? 'won' : 'lost'} a Scuffle${against} at ${placeName(placeId)}.`
+  }) as ClientEvent;
 }
 
 /** Story flags the town engine reads (§6.2, §6.5) follow the story: set in one, set in the other. */

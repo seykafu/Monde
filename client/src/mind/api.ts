@@ -13,7 +13,8 @@ import { readSse } from './sse';
 import { parseTalkEvent } from './talkStream';
 import { PrewarmGate } from './prewarm';
 import { parseDawnPackage, type DawnPackage, type NightRequest } from './dawn';
-import { PlayerProfile as PlayerProfileSchema } from '@monde/shared';
+import { EventIngestionResult, PlayerProfile as PlayerProfileSchema, type ClientEvent } from '@monde/shared';
+import type { PostOutcome } from './events';
 import type { LineDelta, PlayerProfile, TalkRequest, TalkTurn } from './types';
 
 export const DEFAULT_MIND_URL = 'https://monde-mind-staging.fly.dev';
@@ -79,6 +80,13 @@ export interface TalkHandlers {
   onError?: (error: { code: string; message: string }) => void;
   /** A Quiet Mode turn, used whenever the server can't supply one. */
   fallback: () => TalkTurn;
+}
+
+/** The night's answer as the client uses it. */
+export interface NightPosted {
+  status: number;
+  /** The server's ingestion of the night's `client_events` (absent when none were sent or the answer had none). */
+  ingestion?: EventIngestionResult;
 }
 
 export interface TalkResult {
@@ -205,6 +213,12 @@ export class MindClient {
     this.write(STORAGE_KEYS.playerSynced, synced ? '1' : '0');
   }
 
+  async closeTalk(resident_id: string, conversation_id: string, day: number, minute: number): Promise<void> {
+    if (!this.online) return;
+    try { await this.authed('/talk/close', { method: 'POST', body: JSON.stringify({ resident_id, conversation_id, day, minute }) }, REQUEST_TIMEOUT_MS); }
+    catch { /* Last successful turn is the server's fallback activity time. */ }
+  }
+
   // TODO W-06: server snapshot/restore endpoints and Tigris persistence are a separate task.
   async createSnapshot(day: number, minute: number, label: string): Promise<{
     world_id: string | null; branch_id: string | null; snapshot_id: string | null;
@@ -255,18 +269,48 @@ export class MindClient {
     void this.prewarm(residentId, day);
   }
 
-  /** POST the night (§19.4; mind/dawn.ts). The HTTP status (409: already passed), or null without a server. Never rejects. */
-  async postNight(body: NightRequest): Promise<number | null> {
+  /**
+   * POST the night (§19.4; mind/dawn.ts). The HTTP status (409: already passed) and, when the body carried
+   * `client_events`, the server's ingestion of them; null without a server. Never rejects.
+   */
+  async postNight(body: NightRequest): Promise<NightPosted | null> {
     if (!this.enabled || this.now() < this.offlineUntil) return null;
     try {
       const res = await this.authed('/night', { method: 'POST', body: JSON.stringify(body) }, REQUEST_TIMEOUT_MS);
       if (!res) return null;
-      if (!res.ok && res.status !== 409) this.log('warn', `night ${body.day}: HTTP ${res.status}`, await res.text().catch(() => ''));
-      else await res.body?.cancel().catch(() => undefined);
-      return res.status;
+      if (!res.ok && res.status !== 409) {
+        this.log('warn', `night ${body.day}: HTTP ${res.status}`, await res.text().catch(() => ''));
+        return { status: res.status };
+      }
+      const answer = await res.json().catch(() => null) as { ingestion?: unknown } | null;
+      const ingestion = EventIngestionResult.safeParse(answer?.ingestion);
+      return { status: res.status, ...(ingestion.success ? { ingestion: ingestion.data } : {}) };
     } catch (error) {
       this.wentOffline('night', error);
       return null;
+    }
+  }
+
+  /**
+   * POST /v1/worlds/:w/events (M-06; server/src/mind/EVENTS.md): one batch of ClientEvents. `ok` with the ingestion
+   * result (accepted / duplicates / rejected ids and the town's Regard), else the HTTP status, or null when there's no
+   * server to ask (Quiet Mode, no world, cooling off after a failure, the network). Never rejects.
+   */
+  async postEvents(events: readonly ClientEvent[]): Promise<PostOutcome> {
+    if (!this.enabled || this.now() < this.offlineUntil) return { ok: false, status: null };
+    try {
+      const res = await this.authed('/events', { method: 'POST', body: JSON.stringify({ events }) }, REQUEST_TIMEOUT_MS);
+      if (!res) return { ok: false, status: null };
+      if (!res.ok) {
+        this.log('warn', `events: HTTP ${res.status}`, await res.text().catch(() => ''));
+        return { ok: false, status: res.status };
+      }
+      const result = EventIngestionResult.safeParse(await res.json().catch(() => null));
+      if (!result.success) { this.log('warn', 'events: not an ingestion result'); return { ok: false, status: res.status }; }
+      return { ok: true, result: result.data };
+    } catch (error) {
+      this.wentOffline('events', error);
+      return { ok: false, status: null };
     }
   }
 

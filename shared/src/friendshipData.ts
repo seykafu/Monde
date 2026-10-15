@@ -77,9 +77,14 @@ export const SavedFriendship = z.object({
   favors: z.array(DawnFavorData),
   /** The friendship lines of the latest dawn summary (milestones and romance news), for the Dawn Report (M-10). */
   report: z.object({ day, lines: z.array(z.string()) }).nullable(),
+  /**
+   * M-06: every resident's Regard toward the player as the server last reported it (a turn's applied Regard, the
+   * events reply, the dawn package), met or not. Absent in older saves: nothing reported yet.
+   */
+  regard: z.record(z.string(), n.min(-100).max(100)).default({}),
 });
 export type SavedFriendship = z.infer<typeof SavedFriendship>;
 
 export const emptyFriendship = (): SavedFriendship => ({
-  residents: {}, ties: null, milestones: [], known_ties: {}, tiers: {}, plans: null, letters: [], favors: [], report: null,
+  residents: {}, ties: null, milestones: [], known_ties: {}, tiers: {}, plans: null, letters: [], favors: [], report: null, regard: {},
 });

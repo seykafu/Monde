@@ -1,5 +1,5 @@
 /**
- * Content linter (GDD §20.4): persona cards, place registry, declared flags, the Quiet Mode line library
+ * Content linter (GDD §20.4): persona cards (with their `look`), place registry, declared flags, the Quiet Mode line library
  * (Appendix B) with its authored replies, and the scripted {ai_open} exchanges (content/lines/scripted.yaml).
  * Run: npm run lint:content   (CI runs it too). Exit 1 on any error.
  */
@@ -7,7 +7,8 @@ import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
 import {
-  PersonaCard, STANDARD_EXPRESSIONS, compileScenes, evaluate, fillReply, registryFromContent, type PersonaCard as Card
+  PersonaCard, STANDARD_EXPRESSIONS, cardLookProblems, compileScenes, evaluate, fillReply, registryFromContent,
+  type PersonaCard as Card
 } from "@monde/shared";
 import { firstName, parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
 import {
@@ -68,6 +69,11 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".yaml")).sort()
     if (!placeOk(p)) err(`${where}: ${label} '${p}' is not in the place registry`);
   for (const [day, blocks] of Object.entries(c.routine))
     for (const b of blocks) if (!placeOk(b.where)) err(`${where}: routine.${day} ${b.at} place '${b.where}' unknown`);
+
+  // The look the sprite and the dialogue bust draw: its shape (palette ranges included) is the schema's; here, the
+  // cross-checks (an animal wears a cat look, a person a human one; worn glasses ⇔ the glasses accessory).
+  if (!c.look) warn(`${where}: no look; the sprite and the bust fall back to a look varied by the id hash`);
+  for (const problem of cardLookProblems(c)) err(`${where}: ${problem}`);
 
   if (c.kind !== "animal")
     for (const e of STANDARD_EXPRESSIONS)
@@ -171,7 +177,8 @@ if (scripted) {
 
 for (const w of warnings) console.warn(`warn  ${w}`);
 for (const e of errors) console.error(`error ${e}`);
-console.log(`content: ${cards.size} cards, ${places.size} places, ${declared.size} declared flags, `
+const looks = [...cards.values()].filter((c) => c.look).length;
+console.log(`content: ${cards.size} cards (${looks} with a look), ${places.size} places, ${declared.size} declared flags, `
   + `${library?.lines.length ?? 0} lines with ${replyCount} replies, `
   + `${scripted?.exchanges.length ?? 0} scripted exchanges (${scriptedTurns} nodes, ${scriptedPaths} paths; ${laterCues} later {ai_open} cues still to write) `
   + `· ${errors.length} errors, ${warnings.length} warnings`);

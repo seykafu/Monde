@@ -23,6 +23,7 @@ import { PILLARS, communityWorkRoom, createTownState, todayChange, COMMUNITY_WOR
 import { runDawnsThrough, type DawnReport } from '../town/townEngine';
 import { DIALOGUE_SCENE } from './DialogueScene';
 import { friendshipLines } from './friendship';
+import { HINT_KEY, type StoryHint } from '../story/hint';
 
 export const TOWN_LEDGER_SCENE = 'TownLedger';
 /** The TownState in the game registry. */
@@ -316,8 +317,10 @@ export class TownLedgerScene extends Phaser.Scene {
     this.content.add(g);
     const clock = this.open.clock;
 
-    // Dateline.
+    // Dateline, and where the story is waiting today (story/hint.ts, as the HUD shows it).
     this.text(PX + PW / 2, PY + 90, `Day ${town.day} · ${formatDate(gameTime(town.day, clock.minute))} · ${formatClock(clock.minute)}`, 16, { italic: true, color: MUTED, align: 'center' });
+    const hint = this.registry.get(HINT_KEY) as StoryHint | null | undefined;
+    if (hint) this.text(PX + PW / 2, PY + 106, `Next: ${hint.text}.`, 13, { color: BRASS_CSS, align: 'center' });
 
     this.drawPillars(g, town);
     this.drawRightColumn(g, town);

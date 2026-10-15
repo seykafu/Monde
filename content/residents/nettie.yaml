@@ -14,6 +14,15 @@ appearance: >
   Short and quick, in a hooded jacket two sizes too big, with a slingshot hanging from her belt like a
   set of keys. Her eyes go over a stranger like a customs officer's, and she is usually standing a step
   higher than you are.
+look:
+  kind: human
+  skin: 0    # SKIN_TONES: light peach
+  hair: { style: short, colour: "#7a5a3a" }
+  eyes: 3
+  build: narrow
+  height: short
+  outfit: { cut: coat, top: "#2f7b8c", bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
 backstory: >
   Nettie lives on Terrace Row with her grandmother Ilona, a few doors from her cousin Maud, who is nine
   and in Felix Amari's class. She left that class at fifteen when Gran's pension stopped covering the

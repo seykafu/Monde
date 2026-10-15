@@ -11,6 +11,9 @@
 // §11.1's six starter outfits: a knitted jumper (ribbed neck, hem and cuffs), a fisher's smock (long, with a
 // placket), a pinafore and dungarees (a bib and straps over the `trim` layer), a workshop shirt (collar
 // points, sleeves rolled to the elbow) and a harbour coat (long, buttoned, with a back vent).
+// Caps (residents' card looks): a flat cap (a low crown with a short peak), a peaked cap (a tall crown, a dark
+// band, a visor and a badge) and a knitted cap (a dome over a ribbed turn-up). A cap replaces the hair above
+// its lower edge, so tall styles (a bun, curls, tufts) sit under it rather than poking through.
 //
 // Poses (per facing; "right" is "left" mirrored):
 //   idle  rest · breathe (head and shoulders drop 1 px) · blink (rest, eyes shut)
@@ -19,7 +22,7 @@
 //         up on passing frames, hems flaring at contact and hair tips lagging the bob.
 // Pure: no Phaser, no DOM. renderSheet returns RGBA pixels; characterSprite.ts uploads them.
 
-import { INK, farRamp, mix, ramp, type Build, type CatLook, type CharacterLook, type Look, type OutfitCut, type Ramp } from './look';
+import { DEFAULT_CAP, INK, farRamp, mix, ramp, type Build, type CatLook, type CharacterLook, type HeadwearKind, type Look, type OutfitCut, type Ramp } from './look';
 import { Frame, Mask, lit } from './pixels';
 import { FRAME_H, FRAME_W, PROCEDURAL_LAYOUT, breathFrames, columns, type Facing, type SheetLayout } from './sheet';
 
@@ -258,6 +261,7 @@ function drawFrontBack(f: Frame, look: CharacterLook, t: Tones, fit: Fit, p: Pos
   f.paint(head, lit(head, t.skin, { right: 1, bottom: 1 }), t.skin);
   if (front) drawFace(f, look, t, ht, p.blink);
   drawHair(f, look, t, front ? 'down' : 'up', ht, p);
+  drawHeadwear(f, look, front ? 'down' : 'up', ht);
   if (front && look.accessory === 'glasses') {
     const rim = mix(INK, look.hair, 0.25);
     f.decal(f.mask().span(ht + 7, 9, 12).span(ht + 7, 19, 22).span(ht + 8, 13, 18), rim);
@@ -385,6 +389,7 @@ function drawSide(f: Frame, look: CharacterLook, t: Tones, fit: Fit, p: Pose): v
   f.decal(f.mask().set(17, ht + 9), t.skin.line);
   drawFace(f, look, t, ht, p.blink, true);
   drawHair(f, look, t, 'left', ht, p);
+  drawHeadwear(f, look, 'left', ht);
   if (look.accessory === 'glasses') {
     const rim = mix(INK, look.hair, 0.25);
     f.decal(f.mask().span(ht + 7, 8, 12).rect(8, ht + 8, 1, 3).span(ht + 11, 8, 11).span(ht + 8, 13, 16), rim);
@@ -631,8 +636,13 @@ function drawHair(f: Frame, look: CharacterLook, t: Tones, view: View, ht: numbe
         break;
     }
   }
+  // Under a cap the hair starts below its lower edge (drawHeadwear covers the rest).
+  const covered = coveredTo(look);
+  for (let r = -6; r <= covered; r++) rows[r + 6] = null;
   const cap = f.mask(), tips = f.mask();
   rows.forEach((spans, i) => spans?.forEach(([a, b]) => (i - 6 >= 16 ? tips : cap).span(ht + i - 6, a, b)));
+  // A cap is pulled down over the brow: no fringe on the face, only hair at the sides (and behind).
+  if (covered > -99 && view !== 'up') cap.cut(view === 'down' ? f.mask().rect(9, ht, 14, 13) : f.mask().rect(0, ht, 13, 13));
   // Lagging tips stretch down rather than detach, so the hair never shows a seam.
   const hair = cap.add(tips).add(tips.shifted(0, p.lag));
   if (extra) f.paint(extra, lit(extra, t.hair, { right: 1, bottom: 1 }), t.hair);
@@ -640,11 +650,77 @@ function drawHair(f: Frame, look: CharacterLook, t: Tones, view: View, ht: numbe
   // A highlight streak across the crown, texture, and ties for tails, plaits and bunches.
   const sheen = view === 'left' ? f.mask().span(ht, 12, 15).span(ht + 1, 11, 13) : f.mask().span(ht, 10, 14).span(ht + 1, 9, 11);
   f.decal(sheen.clip(hair), t.hair.light);
-  f.decal(texture, t.hair.shade);
+  f.decal(texture.clip(hair), t.hair.shade);
   if (style === 'ponytail' && view !== 'down') {
     f.decal(view === 'up' ? f.mask().span(ht + 7, 14, 17) : f.mask().rect(24, ht + 5, 1, 2), t.top.shade);
   }
   f.decal(ties, t.top.shade);
+}
+
+// ── Caps ────────────────────────────────────────────────────────────────────
+
+/** The last hair row (from the top of the head) a cap hides; below the cap's lower edge the hair shows. */
+const CAP_COVERS: Record<Exclude<HeadwearKind, 'none'>, number> = { flat_cap: 3, peaked_cap: 2, knit_cap: 3 };
+const coveredTo = (look: CharacterLook): number =>
+  look.headwear && look.headwear !== 'none' ? CAP_COVERS[look.headwear] : -99;
+/** A peaked cap's badge: the eyes' glint, a tone the frame already has. */
+const BADGE = GLINT;
+
+type Spans = ReadonlyArray<readonly [number, number]>;
+/** A cap's rows from r0 (rows from the top of the head, as drawHair counts them). */
+interface CapShape { r0: number; rows: Spans[] }
+/** Each cap in each view, its silhouette (rows from the top of the head; the side view faces left). */
+const CAP_SHAPES: Record<Exclude<HeadwearKind, 'none'>, Record<View, CapShape>> = {
+  flat_cap: {
+    // A low crown that overhangs the brow, with a short peak.
+    down: { r0: -2, rows: [[[10, 21]], [[8, 23]], [[7, 24]], [[6, 25]], [[6, 25]], [[8, 23]]] },
+    up: { r0: -2, rows: [[[10, 21]], [[8, 23]], [[7, 24]], [[6, 25]], [[6, 25]], [[7, 24]]] },
+    left: { r0: -2, rows: [[[11, 20]], [[9, 22]], [[8, 23]], [[7, 24]], [[6, 24]], [[4, 24]]] }
+  },
+  peaked_cap: {
+    // A tall, flat-topped crown over a band, and a visor.
+    down: { r0: -4, rows: [[[9, 22]], [[7, 24]], [[7, 24]], [[8, 23]], [[8, 23]], [[7, 24]], [[7, 24]]] },
+    up: { r0: -4, rows: [[[9, 22]], [[7, 24]], [[7, 24]], [[8, 23]], [[8, 23]], [[7, 24]], [[8, 23]]] },
+    left: { r0: -4, rows: [[[10, 21]], [[8, 23]], [[8, 23]], [[9, 23]], [[9, 23]], [[8, 24]], [[4, 24]]] }
+  },
+  knit_cap: {
+    // A dome over a ribbed turn-up.
+    down: { r0: -3, rows: [[[11, 20]], [[9, 22]], [[8, 23]], [[7, 24]], [[7, 24]], [[6, 25]], [[6, 25]]] },
+    up: { r0: -3, rows: [[[11, 20]], [[9, 22]], [[8, 23]], [[7, 24]], [[7, 24]], [[6, 25]], [[6, 25]]] },
+    left: { r0: -3, rows: [[[12, 19]], [[10, 21]], [[9, 22]], [[8, 23]], [[8, 24]], [[7, 24]], [[7, 24]]] }
+  }
+};
+
+/** The cap over the hair, if the look wears one: only the cap's own ramp (and the eyes' glint for a peaked cap's badge). */
+function drawHeadwear(f: Frame, look: CharacterLook, view: View, ht: number): void {
+  const kind = look.headwear;
+  if (!kind || kind === 'none') return;
+  const cap = ramp(look.headwearColour ?? DEFAULT_CAP), shape = CAP_SHAPES[kind][view];
+  const m = f.mask().rows(ht + shape.r0, shape.rows);
+  // No highlight tone: a cap adds at most three colours, so a frame stays within §16.1's 24.
+  f.paint(m, lit(m, cap, { right: 1 }), cap);
+  const row = (r: number) => f.mask().rows(ht + r, [shape.rows[r - shape.r0]!]);
+  switch (kind) {
+    case 'flat_cap':
+      // The peak in shade (from the side, only its forward part; the band behind it stays in the crown's tone).
+      if (view === 'left') f.decal(f.mask().span(ht + 3, 4, 8), cap.shade).decal(f.mask().span(ht + 3, 4, 5), cap.line);
+      else f.decal(row(3), cap.shade);
+      break;
+    case 'peaked_cap':
+      // The band, the visor (darkest) and, in front, the badge.
+      f.decal(row(0).add(row(1)), cap.shade);
+      if (view === 'down') f.decal(row(2), cap.line).decal(f.mask().span(ht - 2, 15, 16).span(ht - 1, 15, 16), BADGE);
+      else if (view === 'left') f.decal(row(2), cap.shade).decal(f.mask().span(ht + 2, 4, 9), cap.line).dot(9, ht - 1, BADGE);
+      else f.decal(row(2), cap.shade);
+      break;
+    case 'knit_cap': {
+      // Ribbing on the turn-up: every other column in shade.
+      const rib = f.mask();
+      for (const r of [2, 3]) for (const [a, b] of shape.rows[r - shape.r0]!) for (let x = a + 1; x < b; x += 2) rib.set(x, ht + r);
+      f.decal(row(2).add(row(3)), cap.base).decal(rib, cap.shade);
+      break;
+    }
+  }
 }
 
 // ── Bastien ─────────────────────────────────────────────────────────────────

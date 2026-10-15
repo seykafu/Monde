@@ -3,10 +3,15 @@
 // Three things live here, so they run under vitest:
 //   1. which of the six portraits an incoming `expr` shows (people), or which art file (anyone);
 //   2. the art manifest (client/public/assets/portraits/manifest.json: resident id → expressions with art);
-//   3. the procedural bust's look (from the card and the resident's existing colours) and face per expression.
+//   3. the procedural bust's look (from the card's `look`, the same one the walking sprite wears; or, for a card
+//      without one, from its appearance text and the id hash) and the face per expression.
 // The Phaser side (portrait.ts) draws from these.
-import { PORTRAIT_SET, toPortraitExpression, type PersonaCard, type PortraitExpression } from '@monde/shared';
+import {
+  PORTRAIT_SET, toPortraitExpression, type Build, type CardLook, type HairStyle as SpriteHairStyle, type HeadwearKind,
+  type OutfitCut, type PersonaCard, type PortraitExpression
+} from '@monde/shared';
 import { hashString } from '../sim/plans';
+import { lookFromCard, type CatLook, type CharacterLook } from '../render/character/look';
 
 // ── Size and files (the §16.2 portrait file contract) ───────────────────────
 
@@ -63,14 +68,17 @@ export function artExpression(manifest: PortraitManifest, residentId: string, ex
 
 // ── The procedural bust's look ──────────────────────────────────────────────
 
-export type HairStyle = 'short' | 'cropped' | 'bob' | 'long' | 'bun' | 'braid' | 'curly' | 'tufty' | 'cowlick';
+export type HairStyle = 'short' | 'cropped' | 'bob' | 'long' | 'bun' | 'braid' | 'curly' | 'tufty' | 'cowlick'
+  | 'ponytail' | 'buzz' | 'pigtails' | 'swept';
 export type Headwear = 'none' | 'peaked' | 'flat' | 'beanie';
 export type Glasses = 'none' | 'round' | 'halfmoon' | 'heavy' | 'on_head';
 
 export interface PortraitLook {
   animal: boolean;
-  /** The resident's roster colour (their sprite's top): clothes and the frame tint. */
+  /** The resident's roster colour: the frame's (and the dialogue panel's) tint. */
   colour: number;
+  /** The clothes: the card look's top, or (without one) the roster colour, as the hash sprite wears it. */
+  cloth: number;
   skin: number;
   hair: number;
   eyes: number;
@@ -82,6 +90,12 @@ export interface PortraitLook {
   freckles: boolean;
   /** Dark hair going grey at the sides (Vane). */
   greyTemples: boolean;
+  stubble: boolean;
+  /** A scarf's or an apron's colour, when the card look wears one (the sprite's accessory). */
+  scarf?: number;
+  apron?: number;
+  /** An animal's coat (from its card look); absent: Bastien's orange tabby. */
+  coat?: { fur: number; markings: number; bib: number; eyes: number };
   age: 'child' | 'adult' | 'elder';
   build: 'narrow' | 'average' | 'broad';
   collar: 'round' | 'vneck' | 'shirt';
@@ -107,20 +121,37 @@ function hairClause(appearance: string): string | null {
   return appearance.toLowerCase().split(/[,.;]| and /).find(clause => HAIR_NOUN.test(clause)) ?? null;
 }
 
-type LookCard = Pick<PersonaCard, 'id' | 'age' | 'pronouns' | 'kind' | 'appearance'>;
+type LookCard = Pick<PersonaCard, 'id' | 'age' | 'pronouns' | 'kind' | 'appearance'> & { look?: CardLook | undefined };
+
+const ageOf = (age: number): PortraitLook['age'] => (age < 16 ? 'child' : age >= 65 ? 'elder' : 'adult');
+
+/** Each sprite hair style as the bust draws the same haircut. */
+export const PORTRAIT_HAIR: Readonly<Record<SpriteHairStyle, HairStyle>> = {
+  short: 'short', cropped: 'cropped', bob: 'bob', long: 'long', ponytail: 'ponytail', bun: 'bun',
+  curly: 'curly', braids: 'braid', buzz: 'buzz', pigtails: 'pigtails', swept: 'swept', tufty: 'tufty'
+};
+export const PORTRAIT_HEADWEAR: Readonly<Record<HeadwearKind, Headwear>> = { none: 'none', flat_cap: 'flat', peaked_cap: 'peaked', knit_cap: 'beanie' };
+const PORTRAIT_BUILD: Readonly<Record<Build, PortraitLook['build']>> = { narrow: 'narrow', medium: 'average', broad: 'broad' };
+/** The neckline each cut shows at the top of the bust (a plain top is a shirt or a high-collared blouse). */
+const PORTRAIT_COLLAR: Readonly<Record<OutfitCut, PortraitLook['collar']>> = {
+  plain: 'shirt', jumper: 'round', smock: 'vneck', pinafore: 'round', apron: 'shirt', coat: 'shirt', dungarees: 'shirt'
+};
 
 /**
- * The bust for a card: skin and clothes in the resident's existing colours (the billboard hash and the roster
- * colour), with what the card's appearance names layered on top: hair colour and style, a cap, glasses, a
- * moustache, freckles, build. Anything the card doesn't say is varied by the id hash. Elders go grey unless
- * the card says otherwise.
+ * The bust for a card. With a `look` (content/residents/*.yaml) it draws exactly that: the colours, hair, glasses,
+ * cap and build the walking sprite wears (both resolve through lookFromCard), plus the face details only a bust
+ * shows; age still comes from the card's `age`. Without one: skin and clothes in the resident's existing colours
+ * (the billboard hash and the roster colour), with what the card's appearance names layered on top: hair colour
+ * and style, a cap, glasses, a moustache, freckles, build. Anything the card doesn't say is varied by the id
+ * hash. Elders go grey unless the card says otherwise.
  */
 export function portraitLook(card: LookCard, colour: number): PortraitLook {
+  if (card.look) return portraitFromCardLook(card, card.look, colour);
   const h = hashString(card.id);
   const r = hashString(`${card.id}:portrait`);
   const text = card.appearance.toLowerCase();
   const clause = hairClause(card.appearance);
-  const age: PortraitLook['age'] = card.age < 16 ? 'child' : card.age >= 65 ? 'elder' : 'adult';
+  const age = ageOf(card.age);
   let hair: number = HAIR[(h >> 4) % HAIR.length]!;
   // The billboards' palette includes a grey; a card under fifty that names no colour isn't grey.
   if (hair === HAIR[2] && card.age < 50) hair = HAIR[((h >> 4) + 1) % HAIR.length]!;
@@ -154,6 +185,7 @@ export function portraitLook(card: LookCard, colour: number): PortraitLook {
   return {
     animal: card.kind === 'animal',
     colour,
+    cloth: colour,
     skin: SKIN[h % SKIN.length]!,
     hair,
     eyes: EYES[(r >> 6) % EYES.length]!,
@@ -164,10 +196,45 @@ export function portraitLook(card: LookCard, colour: number): PortraitLook {
     moustache: /\b(?:moustache|mustache)\b/.test(text),
     freckles: /\bfreckle/.test(text),
     greyTemples,
+    stubble: false,
     age,
     build: /\b(?:broad-shouldered|barrel-chested)\b|^round and\b/.test(text) ? 'broad'
       : /\b(?:thin|lean|small|short|compact|rangy)\b/.test(text) ? 'narrow' : 'average',
     collar: /\bhigh collar\b|\bshirtsleeves\b|\bsuit\b|\bcoat\b|\btunic\b/.test(text) ? 'shirt' : (['round', 'vneck', 'shirt'] as const)[(r >> 9) % 3]!
+  };
+}
+
+function portraitFromCardLook(card: LookCard, look: CardLook, colour: number): PortraitLook {
+  const age = ageOf(card.age);
+  if (look.kind === 'cat') {
+    const cat = lookFromCard(look, colour) as CatLook;
+    return {
+      animal: true, colour, cloth: colour, skin: cat.fur, hair: cat.fur, eyes: cat.eyes, hairStyle: 'short', headwear: 'none',
+      capColour: cat.collar, glasses: 'none', moustache: false, freckles: false, greyTemples: false, stubble: false, age,
+      build: 'average', collar: 'round', coat: { fur: cat.fur, markings: cat.markings, bib: cat.bib, eyes: cat.eyes }
+    };
+  }
+  const sprite = lookFromCard(look, colour) as CharacterLook, face = look.face ?? {};
+  return {
+    animal: card.kind === 'animal',
+    colour,
+    cloth: sprite.top,
+    skin: sprite.skin,
+    hair: sprite.hair,
+    eyes: sprite.eyes,
+    hairStyle: face.cowlick ? 'cowlick' : PORTRAIT_HAIR[sprite.hairStyle],
+    headwear: PORTRAIT_HEADWEAR[sprite.headwear ?? 'none'],
+    capColour: sprite.headwearColour ?? mixColour(sprite.top, 0x2a2420, 0.55),
+    glasses: look.glasses ?? (sprite.accessory === 'glasses' ? 'round' : 'none'),
+    moustache: face.moustache ?? false,
+    freckles: face.freckles ?? false,
+    greyTemples: face.grey_temples ?? false,
+    stubble: face.stubble ?? false,
+    age,
+    build: PORTRAIT_BUILD[sprite.build ?? 'medium'],
+    collar: PORTRAIT_COLLAR[sprite.outfit ?? 'plain'],
+    ...(sprite.accessory === 'scarf' ? { scarf: sprite.accessoryColour } : {}),
+    ...(sprite.accessory === 'apron' ? { apron: sprite.accessoryColour } : {})
   };
 }
 

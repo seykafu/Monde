@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Tall and freckled, hair in a loose knot, wrists stacked with bracelets made from broken guitar
   strings. Her fiddle case has a pale rectangle where a ferry label used to be.
+look:
+  kind: human
+  skin: 0    # SKIN_TONES: light peach
+  hair: { style: bun, colour: 1 }
+  eyes: 3
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: "#b5583a", bottom: 1, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: apron, colour: 9 }
+  face: { freckles: true }
 backstory: >
   June stepped off the Friday ferry at nineteen with a fiddle and a return ticket, and sold the ticket
   to pay her first month at the pub rooms. Hester Quill at Café Liss gives her the morning shift and

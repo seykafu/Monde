@@ -26,9 +26,13 @@ import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
 import { ResidentLayer } from './zone/residents';
 import { attachDialogue } from './DialogueScene';
 import { PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
-import { attachDawnSync } from './friendship';
+import { applyServerRegard, attachDawnSync } from './friendship';
+import { attachEventSync } from './events';
 import { openPeople } from './PeopleScene';
 import { attachStory, type StoryAttachment } from './story/attach';
+import { closingToast, type StoryHint } from '../story/hint';
+import { DIALOGUE_SCENE } from './DialogueScene';
+import { STORY_SCENE, FELLOWSHIP_SCENE } from './StoryScene';
 
 // ── Time, light and weather (W-04) ───────────────────────────────────────────
 // One Clock for the whole game lives in the registry, so it keeps running across
@@ -47,6 +51,15 @@ const query = new URLSearchParams(window.location.search);
 const WORLD_SEED = Number(query.get('seed')) || 1;
 /** `[` / `]` move the clock an hour, `\` cycles the weather. Dev builds, or `?dev`. */
 const DEV_KEYS = import.meta.env.DEV || query.has('dev');
+/**
+ * Into the town without the title (`?skiptitle=1`, the demo): sign a default Fellowship application. A New Game
+ * arrives unsigned and signs at S01a's {charcreate} on the ferry slip (§11.1).
+ */
+const SIGN_DEFAULT_FELLOW = query.get('skiptitle') === '1' || query.get('demo') === '1';
+/** Scene windows already warned about (story/hint.ts closingToast), per game: `sceneId@day`. */
+const WARNED_KEY = 'monde.story.warned';
+/** Overlays that hide the Next hint (it's for walking about). */
+const HINT_HIDDEN_UNDER = [STORY_SCENE, DIALOGUE_SCENE, FELLOWSHIP_SCENE, 'TownLedger', 'People', 'SaveMenu'];
 /** render/diorama/Lighting's glow texture: how the board's lamp glows are found to switch them by night. */
 const TORCH_GLOW_KEY = 'torch_glow';
 
@@ -172,6 +185,17 @@ const gustConfig = (w: Wind): EmitterConfig => {
   };
 };
 interface Cast { cast: Phaser.GameObjects.Image; src: Phaser.GameObjects.Image }
+/** The Next hint under the HUD (story/hint.ts): a small card with when, where and why. */
+interface HintCard {
+  bg: Phaser.GameObjects.Graphics;
+  when: Phaser.GameObjects.Text;
+  where: Phaser.GameObjects.Text;
+  why: Phaser.GameObjects.Text;
+  x: number;
+  w: number;
+  shown: string;
+}
+
 interface Hud {
   date: Phaser.GameObjects.Text;
   time: Phaser.GameObjects.Text;
@@ -227,6 +251,9 @@ export class ZoneScene extends Phaser.Scene {
   private pillarStrip!: PillarStrip;
   /** Scripted scenes (G-10): zone, place and minute triggers; StoryScene plays them over this scene. */
   private story!: StoryAttachment;
+  private hintCard!: HintCard;
+  private toast!: Phaser.GameObjects.Text;
+  private hintAt = 0;
   constructor() { super('Zone'); }
 
   /** Drawn character sheets listed in assets/sprites/manifest.json (none yet: everyone uses the procedural rig). */
@@ -275,8 +302,9 @@ export class ZoneScene extends Phaser.Scene {
         .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK);
     }
     // The player: a drawn sheet if the manifest lists one, else the procedural rig. The shadow shows the same frame.
-    // Arriving without a signed Fellowship form (?skiptitle=1, the demo) signs a default one ("Fellow", the default look).
-    ensureFellow(this.registry);
+    // Arriving without a signed Fellowship form: ?skiptitle=1 and the demo sign a default one ("Fellow", the default
+    // look); a New Game stays unsigned until Pell hands the form over in S01a.
+    ensureFellow(this.registry, { signDefault: SIGN_DEFAULT_FELLOW });
     this.avatar = new CharacterSprite(this, 'player', playerLook(this.registry));
     this.figure = this.add.image(0, 0, this.avatar.sheet.key);
     this.shadow = this.add.image(0, 0, this.avatar.sheet.key).setTintFill(0).setAlpha(0).setDepth(DEPTH.SHADOW);
@@ -316,7 +344,10 @@ export class ZoneScene extends Phaser.Scene {
     const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
     this.prompt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 50, '', { fontFamily: FAMILY_BODY, fontSize: '22px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 12, y: 6 } }).setOrigin(0.5);
-    camera.ignore([title, controls, devHelp, this.prompt, ...this.buildHud(), ...this.residents.buildUi()]);
+    // Above the E prompt: the gentle toasts (a scene's window about to close).
+    this.toast = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 84, '', { fontFamily: FAMILY_BODY, fontSize: '17px', fontStyle: 'italic', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 14, y: 7 }, resolution: RENDER_SCALE })
+      .setOrigin(0.5, 1).setAlpha(0);
+    camera.ignore([title, controls, devHelp, this.prompt, this.toast, ...this.buildHud(), ...this.residents.buildUi()]);
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E') as Record<string, Phaser.Input.Keyboard.Key>;
     // On the key's own down event, so even a tap shorter than a frame counts (keys are destroyed on restart).
     this.interact = undefined;
@@ -339,6 +370,8 @@ export class ZoneScene extends Phaser.Scene {
     attachTown(this.registry, clock);
     // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
     attachDawnSync(this.registry, clock, { weatherSeed: () => this.saveWeatherSeed(), town: () => getTown(this.registry) });
+    // The event log (M-06): story cues, flags and town events to monde-mind; each answer's Regard replaces the mirror.
+    attachEventSync(this.registry, clock, { onRegard: regard => applyServerRegard(this.registry, regard) });
     return clock;
   }
 
@@ -591,7 +624,66 @@ export class ZoneScene extends Phaser.Scene {
       arrow
     };
     this.pillarStrip = new PillarStrip(this, x0, y0 + H + 6, W).onClick(() => openTownLedger(this, this.clock));
-    return [bg, ...Object.values(this.hud), ...this.pillarStrip.objects];
+    return [bg, ...Object.values(this.hud), ...this.pillarStrip.objects, ...this.buildHintCard(x0, W)];
+  }
+
+  // ── The Next hint (story/hint.ts) ──────────────────────────────────────────
+
+  private buildHintCard(x: number, w: number): Phaser.GameObjects.GameObject[] {
+    const style = (size: number, color: string, italic = false): Phaser.Types.GameObjects.Text.TextStyle =>
+      ({ fontFamily: FAMILY_BODY, fontSize: `${size}px`, color, fontStyle: italic ? 'italic' : 'normal', resolution: RENDER_SCALE, wordWrap: { width: w - 28 } });
+    this.hintCard = {
+      bg: this.add.graphics(),
+      when: this.add.text(x + 14, 0, '', style(13, '#e4c77f')),
+      where: this.add.text(x + 14, 0, '', style(16, '#fff0ce')),
+      why: this.add.text(x + 14, 0, '', style(14, '#d9cfb4', true)),
+      x, w, shown: ''
+    };
+    const card = this.hintCard;
+    for (const o of [card.bg, card.when, card.where, card.why]) o.setVisible(false);
+    return [card.bg, card.when, card.where, card.why];
+  }
+
+  /** Lay the card out for a hint (only when its text changed) and show or hide it. */
+  private showHint(hint: StoryHint | null, visible: boolean): void {
+    const card = this.hintCard;
+    if (!card) return;
+    const on = visible && !!hint;
+    // Under the Pillar strip, or where it would be when P has hidden it.
+    const top = this.pillarStrip.visible ? 16 + 102 + 6 + 32 + 6 : 16 + 102 + 6;
+    const key = on ? `${hint!.text}|${top}` : '';
+    if (key !== card.shown) {
+      card.shown = key;
+      if (on) {
+        card.when.setText(`NEXT · ${hint!.when}`).setY(top + 9);
+        card.where.setText(hint!.where).setY(card.when.y + card.when.height + 2);
+        card.why.setText(hint!.reason).setY(card.where.y + card.where.height + 2);
+        const h = card.why.y + card.why.height + 9 - top;
+        card.bg.clear().fillStyle(0x28372d, 0.86).fillRoundedRect(card.x, top, card.w, h, 8)
+          .lineStyle(1.5, 0xe4c77f, 0.4).strokeRoundedRect(card.x, top, card.w, h, 8);
+      }
+    }
+    for (const o of [card.bg, card.when, card.where, card.why]) o.setVisible(on);
+  }
+
+  /** A few times a second: the hint for now, hidden under scenes, dialogue and menus; a toast as a window closes. */
+  private refreshHint(): void {
+    const covered = HINT_HIDDEN_UNDER.some(key => this.scene.isActive(key));
+    const hint = this.story.hint();
+    // Standing there with the window open: the scene is about to start, nothing to point at.
+    const arrived = !!hint && hint.open && this.story.place() === hint.place;
+    this.showHint(hint, !covered && !this.transitioning && !arrived);
+    if (covered || this.transitioning) return;
+    let warned = this.registry.get(WARNED_KEY) as Set<string> | undefined;
+    if (!warned) { warned = new Set(); this.registry.set(WARNED_KEY, warned); }
+    const toast = closingToast(hint, { day: this.clock.day, minute: this.clock.minute, place: this.story.place() }, warned);
+    if (toast) this.showToast(toast);
+  }
+
+  private showToast(text: string): void {
+    this.tweens.killTweensOf(this.toast);
+    this.toast.setText(text).setAlpha(0);
+    this.tweens.add({ targets: this.toast, alpha: 1, duration: 300, yoyo: true, hold: 4200, ease: 'Sine.easeInOut' });
   }
 
   private updateHud(dark: number, overridden: boolean): void {
@@ -668,13 +760,14 @@ export class ZoneScene extends Phaser.Scene {
     const camera = this.cameras.main;
     camera.setScroll(camera.clampX(this.figure.x - camera.displayWidth / 2), camera.clampY(this.figure.y - camera.displayHeight / 2));
   }
-  update(_time: number, delta: number): void {
+  update(time: number, delta: number): void {
     // Time runs while walking (GDD §5.3); a long frame (a backgrounded tab) doesn't skip the evening.
     const dt = Math.min(delta, 250);
     this.clock.advance(dt);
     this.applyLight();
     this.driftFog(dt);
     this.residents.update(dt, this.position);
+    if (time - this.hintAt > 250) { this.hintAt = time; this.refreshHint(); }
     if (this.transitioning || !this.keys) return;
     const down = (...names: string[]) => names.some(name => this.keys[name]!.isDown) ? 1 : 0;
     const input = { x: down('D', 'RIGHT') - down('A', 'LEFT'), y: down('S', 'DOWN') - down('W', 'UP') };

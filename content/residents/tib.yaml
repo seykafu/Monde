@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Small for eleven, with scabbed knees and a cowlick no wetting flattens. A canvas satchel stuffed
   with graph paper hangs on one shoulder and a magnifying glass with a cracked rim on the other.
+look:
+  kind: human
+  skin: 3    # SKIN_TONES: brown
+  hair: { style: cropped, colour: 3 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: dungarees, top: "#2f6f7a", trim: 9, bottom: "#2f6f7a", bottom_style: shorts, shoes: 2 }
+  accessory: { kind: none }
+  face: { cowlick: true }
 backstory: >
   Tib's father took the ferry to find work when Tib was six and sends a postal order at Christmas. His
   mother Ada sells the ferry tickets, so Tib knows every timetable and who is leaving. At eight he found

@@ -13,6 +13,16 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Weather-cracked hands, an oilskin coat gone white at the seams, cropped grey-brown hair under a
   knitted cap, forearms like rope.
+look:
+  kind: human
+  skin: 2    # SKIN_TONES: medium tan
+  hair: { style: cropped, colour: "#857463" }
+  eyes: 3
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 4, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  headwear: { kind: knit_cap, colour: "#8a3a2e" }
 backstory: >
   Nell was the second woman on the cannery floor and the first elected union steward there. When the
   Liss Cannery closed eleven years ago she took her father's boat and her brother's shop and kept both

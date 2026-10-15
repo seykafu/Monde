@@ -13,6 +13,15 @@ portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thi
 appearance: >
   Broad-shouldered, flour to the elbows, grey hair pinned up with a pencil through it. A pink burn scar
   runs across her left forearm.
+look:
+  kind: human
+  skin: 0    # SKIN_TONES: light peach
+  hair: { style: bun, colour: 2 }
+  eyes: 3
+  build: broad
+  height: tall
+  outfit: { cut: apron, top: 13, bottom: 1, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: apron, colour: 9 }
 backstory: >
   Odile took over the bakery from her father at thirty and added "& Fille" to the sign the week her
   daughter Claudine turned ten. Claudine left at twenty-six after a shouting match about gas ovens and
