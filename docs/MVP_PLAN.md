@@ -90,6 +90,7 @@ clear fix.
 | **Puzzles (§15)** | PZ-01, 02, 03, 04, 06, 13, 15, 18, plus PZ-05 with the lighthouse. Procedural: Mail Round, Library Returns. |
 | **Scuffles (§7)** | `sc_bakery_tutorial`, `sc_market_saturday`, `sc_bins_raccoons`; the Tollmen level system; allies Augusta, Kasimir, Nell. |
 | **Player (§11)** | The Fellowship form (character creation, all four backgrounds), skills, Stamina, meals, coins, inventory, gifts, 6 community-work tasks, the cottage (no upgrades). |
+| **Friendship (§9.11)** | Hearts for Regard with the earning table and daily cap, model-judged replies, heart feedback in dialogue; NPC↔NPC labels (Acquaintances → Close friends, Rivals, Enemies), encounters in summary mode, emotes, the People page, Dawn Report milestones (D16). |
 | **Romance** | The ladder up to Courting (§9.11). Weddings come later. |
 | **Platform** | Web build (desktop Chrome, Edge, Firefox, Safari) on itch.io. Mouse and keyboard. 3 save slots. |
 
@@ -230,6 +231,7 @@ validation ≥ 99%, p95 ≤ 2 s. First real cost per in-game day measured.
 | G-10 | **Story runtime**: triggers, flags, `{ai_open}` and `{ai_line}` handoffs, memory writes; compile S01–S10 | CX + OP | F-08, M-05 | All ten scenes compile and play in order on a scripted run |
 | G-11 | **Spring finale**: Bloom Fair (S10) → **Spring Straw Poll** (the §10.3 model with Day 25 data and a "Spring" framing) → End-of-Spring report screen → "To be continued" | OP (model) + CX (UI) + SN (copy) | G-10, G-01 | Soak runs give a spread of poll results (H5) |
 | G-12 | Romance ladder to Courting + birthdays (light) | CX | M-07 | A seeded couple reaches Courting in a 25-day soak |
+| G-13 | **Friendship** (§9.11.1–9.11.3, D16): `shared` friendship rules (hearts, labels, earning caps, neglect, drift); the reply rubric in the World Bible; daily cap and first-chat bonus on the server; applied Regard in the `turn` event; NPC↔NPC encounters from plans in the night pass (model-judged for Core/Acquainted pairs, rule for Ambient); heart feedback on the name plate; emotes; the People page | OP (server) + CX (client) | M-07, M-05 | A 25-day soak forms friendships and at least one rivalry among Core residents; talking well to one resident every day reaches Friend (4♥) by Day 10, and no resident gains more than +6 Regard a day from talk |
 
 **Gate G4 (end of week 9):** Days 1–25 are playable start to finish, online and in Quiet Mode. The mock
 soak passes on every commit.

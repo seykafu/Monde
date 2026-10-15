@@ -1053,7 +1053,80 @@ The server monitors `usage.cache_read_input_tokens`.
 }
 ```
 
-### 9.11 Residents and each other
+### 9.11 Friendship: the player, the residents and each other
+
+Friendship works like Stardew Valley's, with hearts you can watch fill. It runs both ways: the
+player befriends residents, and residents become friends, rivals, enemies and sweethearts with each
+other. The model judges how a moment lands; the engine owns the numbers (D16).
+
+#### 9.11.1 Hearts
+
+A resident's **Regard** toward the player (−100..100, §9.4) is shown as **10 hearts**, one per 10
+Regard, with half hearts at 5. Below 0 the row shows a single cracked heart (Wary). The tiers are
+unchanged (§10.2): **Stranger** 0–19 (0–1♥) · **Neighbor** 20–39 (2–3♥) · **Friend** 40–69 (4–6♥) ·
+**Confidant** 70+ (7–10♥). Hearts appear on the dialogue name plate and on the People page.
+
+#### 9.11.2 Earning Regard
+
+| Source | Regard | Limit |
+|---|---|---|
+| First chat of the day | +1 | once per resident per day |
+| A reply that lands (model-judged each turn, engine-clamped) | −5..+5 (Heart skill: ±7) | conversation gains cap at **+6 per resident per day**; losses are not capped |
+| Gift (§11.4) | love +8 · like +4 · neutral +1 · dislike −4; birthdays ×2 | one gift per resident per day |
+| Favor done (§9.9) | +5..+15 | |
+| Work on a Project or community task they care about (their dream or stance) | +2 | per task |
+| Word of the player's deeds (gossip, nightly reflection) | −8..+8 | per night |
+| Neglect: 3 days without a word | −1 | only at Friend and above; never below 40 |
+
+**How a reply is judged.** The dialogue model proposes `regard_delta` for the player's last reply,
+from *this* resident's point of view: their likes and dislikes, values, humour, mood and the topic.
+The World Bible gives it the rubric:
+- **0**: ordinary pleasant talk. Most turns are 0 or +1.
+- **+2/+3**: the reply is what they value (Odile likes it blunt, Pell likes it courteous), answers
+  what they asked, or shows the player was listening.
+- **+4/+5** (rare): remembering something personal they said, real kindness at a hard moment, a
+  promise kept.
+- **−1/−2**: dismissive, pushy, nosy about a sore spot, talking down, asking the same thing again.
+- **−3..−5**: mocking their dream, cruelty, siding against something they love, a broken promise.
+
+The 2–3 reply choices differ in tone (warm, curious, blunt or playful), so which one lands depends
+on who the player is talking to. Choices carry no hint, as in Stardew; the player learns people.
+
+**Feedback.** After the resident's reply, the name plate's hearts fill or drain, a small ♥ floats up
+from the portrait (a cracked ♥ for a loss), and a new whole heart plays a soft chime. A turn that
+changes nothing shows nothing.
+
+#### 9.11.3 Residents and each other
+
+Each directed pair has `affinity` (−100..100, §9.4). The pair's **label** comes from the mean of the
+two directions, *m*:
+
+| Label | Condition | Emote when they meet |
+|---|---|---|
+| Strangers | never met (no relationship row) | none |
+| Acquaintances | −19 ≤ m < 40 | none |
+| Friends | 40 ≤ m < 70 | ♪ |
+| Close friends | m ≥ 70 | ♥ |
+| Rivals | −59 ≤ m ≤ −20 | … |
+| Enemies | m ≤ −60 | 💢 |
+
+Romance is a separate ladder on top of the label (*Feelings and the ladder*, below). "Friends" uses
+the same 40 as the Stay formula's `friends_in_town` (§6.4).
+
+**What moves affinity** (engine-applied; a pair's net change is capped at ±6 a day, except for the
+Favor and the ladder's events):
+
+| Source | Affinity (each direction) |
+|---|---|
+| An encounter (below), summary or live | −3..+3, model-judged for Core/Acquainted pairs, by rule for Ambient pairs |
+| Planned time together (`companions` in a plan, a `visit` that happens) | +1 |
+| A town meeting where both hold a stance of 30+ on the issue: same side / opposite sides | +1 / −1 |
+| Gossip heard about the other (nightly reflection) | −10..+10 |
+| The player's `introduce` Favor | +10 |
+| Drift: a week without meeting | 1 toward 40, only above 40 |
+
+**Ambient rule.** An encounter between two Ambient residents (no model call) gives +1 when both moods
+are "even" or better, −1 when either is "glum" and the pair's affinity is below 0, and 0 otherwise.
 
 **Encounters.** When two residents' plans put them in the same place, or one plan says `visit` /
 `socialize` with someone, the engine rolls an encounter (chance rises with affinity and with shared
@@ -1081,7 +1154,16 @@ model's reflection deltas. The engine runs the ladder and its thresholds:
 | Falling out | affinity < −40 after a negative event | A public argument at the pub (Spirit −1); can be mended with an `introduce` Favor |
 
 The three latent romances in §12.3 are seeded so they *can* bloom. Generated residents can also pair
-up on their own. Romance never involves the player.
+up on their own. **Romance rules (engine):** both residents are adults (18+), not family, and neither
+is already Courting or Together with someone else. A card can opt out with `romance: false`. Romance
+never involves the player (D13), and it stays at hand-holding and a kiss on the cheek (§9.13).
+
+**What the player sees.** The **People** page in the Journal lists each resident's hearts, their
+birthday, the gift likes the player has learned, and their **known ties**: a tie appears once the
+player has seen the pair together (an encounter within earshot), heard about it (gossip or a line),
+or read it in the Dawn Report. The Dawn Report prints milestones: new Friends or Close friends among
+Core residents, a falling out, a crush noticed, Courting, Together. Emotes (§16) float over residents
+when they meet.
 
 **Life events** the engine can schedule from agent state: birthdays (every resident has one; a party
 if they have 3+ friends), a new job (a reopened shop hires the best-matching resident), moving house,
@@ -1330,7 +1412,7 @@ clamped, logged numbers (Regard, stances, relationships). The count is reproduci
   signature, but it's remembered ("asked me to sign before they'd learned my name").
 - **Filing fee:** 300 coins, paid at Town Hall.
 - **Regard tiers** (used everywhere): **Wary** < 0 · **Stranger** 0–19 · **Neighbor** 20–39 ·
-  **Friend** 40–69 · **Confidant** 70+.
+  **Friend** 40–69 · **Confidant** 70+. On screen they are hearts, one per 10 Regard (§9.11.1).
 
 If the player misses the Day 80 deadline, Vane runs against Old Moss alone. The game goes on to Lantern
 Night as a spectator ending (E4 variant, "Didn't run"), with the checkpoint offered.
@@ -1473,7 +1555,7 @@ Stamina the next day. Staying up past 02:00 means passing out (§5.2).
 
 24 slots, with stacks. **Gifts:** one per resident per day. Reactions follow their likes and dislikes:
 love +8, like +4, neutral +1, dislike −4. Birthdays double it. The AI writes the reaction line; the
-engine sets the number.
+engine sets the number. Gifts don't count toward the daily conversation cap (§9.11.2).
 
 ### 11.5 Home: the Lamplighter's Cottage
 
@@ -9875,6 +9957,7 @@ Marks → library size 120 masters.
 | D13 | Romance is NPC↔NPC only | The rating; keeps the player as the town's catalyst |
 | D14 | A deterministic, seeded voter model | Fair, reproducible, explainable elections |
 | D15 | Art direction: cartoon cozy, Fire Emblem × Stardew Valley (§16.1), replacing "Ravage, warmer" | Kasey's call (2026-10-14): friendlier, more distinctive, better fit for a cozy game |
+| D16 | Stardew-style friendship: hearts for Regard, model-judged replies with engine caps, labelled NPC↔NPC ties (§9.11) | Kasey's call (2026-10-14): better replies should visibly earn friendship, and residents befriend, fall out with and court each other |
 
 ### 21.2 Open questions for Kasey
 
