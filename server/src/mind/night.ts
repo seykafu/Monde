@@ -1,0 +1,363 @@
+/**
+ * The night pass (GDD §9.7, §9.8; §19.4 POST /v1/worlds/:w/night; MVP M-07).
+ *
+ * When the player sleeps, the client posts the night for Day N. The runner:
+ *   1. claims the night: worlds.day becomes N + 1 and minute 360, atomically, so a night runs once
+ *      (a repeat of the same night reports its status; an older one is a 409);
+ *   2. recomputes the tiers (tiers.ts);
+ *   3. queues the jobs, Core first, then Acquainted, then Ambient:
+ *        core        reflect, then a model plan for N + 1
+ *        acquainted  reflect if they had an importance-5+ memory today or it's their every-second-day turn,
+ *                    then a model plan
+ *        ambient     reflect only if an importance-6+ memory touched them today; their plan is the template,
+ *                    computed at dawn
+ *      Each resident's plan waits for their reflection (the plan reads the new beliefs). Model calls take a slot
+ *      in the world's semaphore (8 in flight, §9.8), Core before Acquainted before Ambient;
+ *   4. answers when everything is done or after 4 s, whichever comes first (§9.8 night pass budget, §19.7).
+ *      Whatever isn't finished keeps running in the background and is still persisted; the response says how
+ *      many residents are done and how many are pending. Until a plan lands, the dawn package serves the
+ *      routine template for that resident (§9.8 lag tolerance).
+ */
+import { and, count, eq, inArray, lte, max } from "drizzle-orm";
+import { z } from "zod";
+import { TownEvent } from "@monde/shared";
+import { events, memories, plans, residents, worlds } from "../db/schema.js";
+import type { WorldDatabase } from "../worlds/createWorld.js";
+import type { MindClient } from "./mindClient.js";
+import { SILENT_LOG, type NightJobDeps, type NightLog, type NightWorld } from "./nightJob.js";
+import { loadPlaceRegistry } from "./places.js";
+import { planResident } from "./plan.js";
+import { clockTime } from "./promptBuilder.js";
+import { reflectResident } from "./reflect.js";
+import { WorldSemaphores } from "./semaphore.js";
+import { DAY_START } from "./templatePlan.js";
+import { countTiers, recomputeTiers, type Tier, type TierCounts } from "./tiers.js";
+
+/** §9.8, §19.7: the night transition shows for at most 4 seconds. */
+export const NIGHT_BUDGET_MS = 4000;
+/** §9.8: 8 in-flight model calls per world. */
+export const NIGHT_CONCURRENCY = 8;
+/**
+ * GDD-GAP: §9.8 bounds the response, not each call. A plan or reflection is ≤ 900 output tokens at effort "low",
+ * a few seconds at Haiku speed; 30 s lets a slow call finish in the background without letting it hang forever.
+ */
+export const NIGHT_CALL_TIMEOUT_MS = 30_000;
+/**
+ * GDD-GAP: on shutdown, background night work gets this long to finish before its calls are aborted (and fall
+ * back). Kept under Fly's default 5 s kill timeout.
+ */
+export const NIGHT_CLOSE_GRACE_MS = 4000;
+/** §9.8: Acquainted residents reflect daily after an importance-5+ memory; Ambient ones only after a 6+. */
+export const ACQUAINTED_REFLECT_IMPORTANCE = 5;
+export const AMBIENT_REFLECT_IMPORTANCE = 6;
+
+/** GDD-GAP: defaults when the client sends no town facts: the Day-1 Pillars (§6.1) and census (§3). */
+export const DAY_ONE_PILLARS = { prosperity: 18, safety: 30, spirit: 22, charm: 25 } as const;
+export const DAY_ONE_CENSUS = 210;
+/** GDD-GAP: no weather sent → the plan prompt says so rather than inventing one. */
+export const UNKNOWN_FORECAST = "unknown";
+/** GDD-GAP: §9.17 lists "events" among the town facts without a count; the 8 most important keep it short. */
+const TOWN_EVENTS = 8;
+
+const Pillar = z.number().min(0).max(100);
+export const NightBody = z.object({
+  day: z.number().int().min(1).max(100_000),
+  /** Today's town events (for the reflections' town facts) and tomorrow's scheduled ones (for the plans). */
+  events: z.array(TownEvent).max(500).optional(),
+  town: z.object({
+    pillars: z.object({ prosperity: Pillar, safety: Pillar, spirit: Pillar, charm: Pillar }).optional(),
+    census: z.number().int().min(0).max(100_000).optional(),
+    weather_tomorrow: z.string().trim().min(1).max(40).optional(),
+  }).optional(),
+});
+export type NightBody = z.infer<typeof NightBody>;
+
+// ---------------------------------------------------------------------------------------------------------------
+// Who does what tonight (pure)
+// ---------------------------------------------------------------------------------------------------------------
+
+export interface NightJob {
+  residentId: string;
+  tier: Tier;
+  reflect: boolean;
+  /** A model plan for tomorrow. Ambient residents get the template at dawn instead. */
+  plan: boolean;
+}
+
+const TIER_ORDER: Record<Tier, number> = { core: 0, acquainted: 1, ambient: 2 };
+
+/**
+ * GDD-GAP: §9.8 has quiet Acquainted residents reflect "every 2nd day" without saying which; it's the even days,
+ * so every quiet Acquainted resident reflects on the same nights and the odd nights stay cheap.
+ */
+export const acquaintedTurn = (day: number): boolean => day % 2 === 0;
+
+/** The night's jobs in queue order (Core, Acquainted, Ambient; by id within a tier). Ambient residents with nothing to do are left out. */
+export function nightJobs(tiers: ReadonlyMap<string, Tier>, topImportance: ReadonlyMap<string, number>, day: number): NightJob[] {
+  const jobs: NightJob[] = [];
+  for (const [residentId, tier] of tiers) {
+    const top = topImportance.get(residentId) ?? 0;
+    if (tier === "core") jobs.push({ residentId, tier, reflect: true, plan: true });
+    else if (tier === "acquainted") {
+      jobs.push({ residentId, tier, reflect: top >= ACQUAINTED_REFLECT_IMPORTANCE || acquaintedTurn(day), plan: true });
+    } else if (top >= AMBIENT_REFLECT_IMPORTANCE) jobs.push({ residentId, tier, reflect: true, plan: false });
+  }
+  return jobs.sort((a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier] || (a.residentId < b.residentId ? -1 : 1));
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// The runner
+// ---------------------------------------------------------------------------------------------------------------
+
+export interface NightRunnerOptions {
+  db: WorldDatabase;
+  mind: MindClient;
+  budgetMs?: number;
+  callTimeoutMs?: number;
+  concurrency?: number;
+  closeGraceMs?: number;
+  /** Content root with places/places.yaml (MONDE_CONTENT_DIR). */
+  contentDir?: string;
+  log?: NightLog;
+  now?: () => number;
+}
+
+export interface NightReport {
+  day: number;
+  next_day: number;
+  /** Residents whose night work has finished (model output or fallback). */
+  done: number;
+  /** Residents whose night work is still running in the background. */
+  pending: number;
+  /** True once every job (and the setup before them) has finished. */
+  complete: boolean;
+  tiers: TierCounts | null;
+  elapsed_ms: number;
+  /** Set when this night had already been started: nothing new was run. */
+  already?: true;
+}
+
+export type NightResult =
+  | { status: 200; body: NightReport }
+  | { status: 409 | 503; body: { error: string; day: number; world_day?: number | null } };
+
+interface NightRun {
+  worldId: string;
+  day: number;
+  finished: boolean;
+  tiers: TierCounts | null;
+  jobs: Map<string, "pending" | "done">;
+  work: Promise<void>;
+}
+
+/** Resolve after `promise` settles or `ms` pass, whichever is first. */
+function within(promise: Promise<unknown>, ms: number): Promise<void> {
+  if (ms <= 0) return Promise.resolve();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  return Promise.race([
+    promise.then(() => undefined, () => undefined),
+    new Promise<void>((resolve) => { timer = setTimeout(resolve, ms); }),
+  ]).finally(() => clearTimeout(timer));
+}
+
+interface EventLine { id: string; day: number; minute: number; where: string; summary: string; importance: number }
+const eventLine = (e: EventLine): string => `${clockTime(e.minute)} at ${e.where}: ${e.summary}`;
+
+export class NightRunner {
+  private readonly runs = new Map<string, Map<number, NightRun>>();
+  private readonly active = new Set<NightRun>();
+  private readonly gates: WorldSemaphores;
+  private readonly controller = new AbortController();
+  private readonly log: NightLog;
+  private readonly now: () => number;
+  private closing = false;
+
+  constructor(private readonly options: NightRunnerOptions) {
+    this.gates = new WorldSemaphores(options.concurrency ?? NIGHT_CONCURRENCY);
+    this.log = options.log ?? SILENT_LOG;
+    this.now = options.now ?? (() => performance.now());
+  }
+
+  /** Run the night for `body.day`. Resolves within the budget; unfinished work continues in the background. */
+  async start(worldId: string, body: NightBody): Promise<NightResult> {
+    const started = this.now();
+    const { day } = body;
+    const elapsed = () => Math.round(this.now() - started);
+    // A repeat of the world's latest night reports its live status. An older night this process ran is long past:
+    // the database says so (409), and its run stays tracked for the dawn's pending count.
+    const byDay = this.runs.get(worldId);
+    const existing = byDay?.get(day);
+    if (existing) {
+      if (Math.max(...byDay!.keys()) === day) return { status: 200, body: { ...this.report(existing, elapsed()), already: true } };
+      return this.alreadyPassed(worldId, day, elapsed());
+    }
+    if (this.closing) return { status: 503, body: { error: "the server is shutting down", day } };
+
+    // Registered before the first await, so a concurrent repeat finds it instead of racing the claim.
+    const run: NightRun = { worldId, day, finished: false, tiers: null, jobs: new Map(), work: Promise.resolve() };
+    this.track(run);
+    let claimed: boolean;
+    try {
+      claimed = await this.claim(worldId, day);
+    } catch (error) {
+      this.untrack(run);
+      throw error;
+    }
+    if (!claimed) {
+      this.untrack(run);
+      return this.alreadyPassed(worldId, day, elapsed());
+    }
+
+    this.active.add(run);
+    run.work = this.execute(run, body)
+      .catch((error: unknown) => { this.log.error({ err: error, worldId, day }, "night pass failed"); })
+      .finally(() => { run.finished = true; this.active.delete(run); });
+    await within(run.work, (this.options.budgetMs ?? NIGHT_BUDGET_MS) - elapsed());
+    const report = this.report(run, elapsed());
+    if (report.pending > 0 || !report.complete) {
+      this.log.info({ worldId, day, done: report.done, pending: report.pending }, "night pass continues in the background");
+    }
+    return { status: 200, body: report };
+  }
+
+  /** Residents still being worked on for the plans of `planDay` (the night of planDay - 1), from this process. */
+  status(worldId: string, planDay: number): { pending: number; complete: boolean } {
+    const run = this.runs.get(worldId)?.get(planDay - 1);
+    if (!run) return { pending: 0, complete: true };
+    const { pending, complete } = this.report(run, 0);
+    return { pending, complete };
+  }
+
+  /** Test and shutdown hook: resolves when every night run of `worldId` (or of every world) has finished. */
+  async idle(worldId?: string): Promise<void> {
+    const runs = [...this.active].filter((run) => worldId === undefined || run.worldId === worldId);
+    await Promise.all(runs.map((run) => run.work));
+  }
+
+  /** Stop taking nights, give background work `graceMs` to finish, then abort its calls (they fall back). */
+  async close(graceMs = this.options.closeGraceMs ?? NIGHT_CLOSE_GRACE_MS): Promise<void> {
+    this.closing = true;
+    if (this.active.size === 0) return;
+    const all = this.idle();
+    await within(all, graceMs);
+    if (this.active.size > 0) {
+      this.log.warn({ runs: this.active.size }, "aborting unfinished night work for shutdown");
+      this.controller.abort();
+      await within(all, 2000);
+    }
+  }
+
+  // -------------------------------------------------------------------------------------------------------------
+
+  private track(run: NightRun): void {
+    let byDay = this.runs.get(run.worldId);
+    if (!byDay) { byDay = new Map(); this.runs.set(run.worldId, byDay); }
+    byDay.set(run.day, run);
+    // Keep the last few nights for status; older finished ones go.
+    for (const [day, old] of byDay) if (day < run.day - 2 && old.finished) byDay.delete(day);
+  }
+
+  private untrack(run: NightRun): void {
+    const byDay = this.runs.get(run.worldId);
+    if (byDay?.get(run.day) === run) byDay.delete(run.day);
+    if (byDay?.size === 0) this.runs.delete(run.worldId);
+  }
+
+  /** Advance the world past Day N if it isn't already. True if this call did it. */
+  private async claim(worldId: string, day: number): Promise<boolean> {
+    const rows = await this.options.db.update(worlds).set({ day: day + 1, minute: DAY_START })
+      .where(and(eq(worlds.id, worldId), lte(worlds.day, day))).returning();
+    return rows.length > 0;
+  }
+
+  /** The night was claimed before (by another request, process or an earlier run): report what's stored. */
+  private async alreadyPassed(worldId: string, day: number, elapsedMs: number): Promise<NightResult> {
+    const { db } = this.options;
+    const [world] = await db.select({ day: worlds.day }).from(worlds).where(eq(worlds.id, worldId));
+    if (world?.day !== day + 1) {
+      return { status: 409, body: { error: "that night has already passed", day, world_day: world?.day ?? null } };
+    }
+    const [stored] = await db.select({ n: count() }).from(plans).where(and(eq(plans.worldId, worldId), eq(plans.day, day + 1)));
+    return {
+      status: 200,
+      body: { day, next_day: day + 1, done: stored?.n ?? 0, pending: 0, complete: true, tiers: null, elapsed_ms: elapsedMs, already: true },
+    };
+  }
+
+  private report(run: NightRun, elapsedMs: number): NightReport {
+    let done = 0;
+    let pending = 0;
+    for (const state of run.jobs.values()) {
+      if (state === "done") done++;
+      else pending++;
+    }
+    return { day: run.day, next_day: run.day + 1, done, pending, complete: run.finished, tiers: run.tiers, elapsed_ms: elapsedMs };
+  }
+
+  private async execute(run: NightRun, body: NightBody): Promise<void> {
+    const { db } = this.options;
+    const { worldId, day } = run;
+    const tiers = await recomputeTiers(db, worldId, day);
+    run.tiers = countTiers(tiers);
+
+    const [registry, ids, tops, stored] = await Promise.all([
+      loadPlaceRegistry(this.options.contentDir),
+      db.select({ id: residents.id }).from(residents).where(eq(residents.worldId, worldId)),
+      db.select({ residentId: memories.residentId, top: max(memories.importance) }).from(memories)
+        .where(and(eq(memories.worldId, worldId), eq(memories.day, day), eq(memories.archived, false)))
+        .groupBy(memories.residentId),
+      db.select().from(events).where(and(eq(events.worldId, worldId), inArray(events.day, [day, day + 1]))),
+    ]);
+
+    // Town events: the client's batch plus anything already logged (M-06), one line each.
+    const byId = new Map<string, EventLine>();
+    for (const e of stored) byId.set(e.id, { id: e.id, day: e.day, minute: e.minute, where: e.wherePlace, summary: e.summary, importance: e.importance });
+    for (const e of body.events ?? []) byId.set(e.id, { id: e.id, day: e.day, minute: e.minute, where: e.where, summary: e.summary, importance: e.importance });
+    const all = [...byId.values()];
+    const today = all.filter((e) => e.day === day)
+      .sort((a, b) => b.importance - a.importance || a.minute - b.minute).slice(0, TOWN_EVENTS)
+      .sort((a, b) => a.minute - b.minute);
+    const tomorrow = all.filter((e) => e.day === day + 1).sort((a, b) => a.minute - b.minute);
+
+    const town = body.town ?? {};
+    const world: NightWorld = {
+      worldId,
+      day,
+      residentIds: new Set(ids.map((r) => r.id)),
+      places: registry,
+      town: { pillars: town.pillars ?? DAY_ONE_PILLARS, census: town.census ?? DAY_ONE_CENSUS, events: today.map(eventLine) },
+      forecast: town.weather_tomorrow ?? UNKNOWN_FORECAST,
+      eventsTomorrow: tomorrow.map(eventLine),
+      flags: [],
+    };
+    const jobs = nightJobs(tiers, new Map(tops.map((t) => [t.residentId, t.top ?? 0])), day);
+    for (const job of jobs) run.jobs.set(job.residentId, "pending");
+    await Promise.all(jobs.map((job) => this.runJob(run, world, job)));
+  }
+
+  private async runJob(run: NightRun, world: NightWorld, job: NightJob): Promise<void> {
+    const signal = this.controller.signal;
+    const deps: NightJobDeps = {
+      db: this.options.db,
+      mind: this.options.mind,
+      gate: (task) => this.gates.run(run.worldId, task, TIER_ORDER[job.tier], signal),
+      signal,
+      callTimeoutMs: this.options.callTimeoutMs ?? NIGHT_CALL_TIMEOUT_MS,
+      log: this.log,
+      now: this.options.now,
+    };
+    const context = { worldId: run.worldId, day: run.day, residentId: job.residentId, tier: job.tier };
+    try {
+      if (job.reflect) {
+        await reflectResident(deps, world, job.residentId)
+          .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); });
+      }
+      if (job.plan) {
+        await planResident(deps, world, job.residentId, { model: true })
+          .catch((error: unknown) => { this.log.error({ err: error, ...context }, "plan failed"); });
+      }
+    } finally {
+      run.jobs.set(job.residentId, "done");
+    }
+  }
+}

@@ -11,6 +11,8 @@ import { promptVersion } from "./mind/promptBuilder.js";
 import { createMindClient, type MindClient } from "./mind/mindClient.js";
 import { registerMindRoutes } from "./mind/routes.js";
 import type { DialogueTimings } from "./mind/dialogue.js";
+import { NightRunner } from "./mind/night.js";
+import { registerNightRoutes } from "./mind/nightRoutes.js";
 
 type Check = "ok" | "down" | "off";
 async function check(probe?: () => Promise<unknown>): Promise<Check> {
@@ -36,6 +38,8 @@ export interface AppOptions {
   mind?: MindClient;
   dialogueTimings?: Partial<DialogueTimings>;
   prewarmIntervalMs?: number;
+  /** The night pass runner (M-07). Tests pass their own to tune the budget and await background work. */
+  nightRunner?: NightRunner;
 }
 
 export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOptions = {}) {
@@ -78,11 +82,16 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   });
   // Loading the prompt version at request time proves the prompt templates shipped with the build.
   app.get("/v1/version", async () => ({ version: config.GIT_SHA, prompt_version: promptVersion() }));
-  registerWorldRoutes(app, config, testDb ?? database?.db);
-  registerMindRoutes(app, testDb ?? database?.db, {
-    mind: options.mind ?? createMindClient(config),
+  const db = testDb ?? database?.db;
+  const mind = options.mind ?? createMindClient(config);
+  registerWorldRoutes(app, config, db);
+  registerMindRoutes(app, db, {
+    mind,
     timings: options.dialogueTimings,
     prewarmIntervalMs: options.prewarmIntervalMs,
   });
+  const nightRunner = options.nightRunner
+    ?? (db ? new NightRunner({ db, mind, contentDir: config.MONDE_CONTENT_DIR, log: app.log }) : undefined);
+  registerNightRoutes(app, db, nightRunner);
   return app;
 }
