@@ -11,8 +11,8 @@
 //     been asked to talk, the actor holds that executor moment; afterwards it hurries to catch up;
 //   • a lateral offset: walkers keep slightly to the right, step around the player where there's room,
 //     and anyone standing too close to another resident eases apart, so two never overlap exactly.
-// Placeholder billboards for now: a coloured figure per resident (distinct hues), three facings, a name
-// tag near the player or under the pointer, and a small emote bubble for what they're doing.
+// Each is drawn as a walking character sprite (four facings, idle and walk cycle; see "Figures" below),
+// with a name tag near the player or under the pointer and a small emote bubble for what they're doing.
 
 import Phaser from 'phaser';
 import type { ObliqueProjection } from '../../render/ObliqueProjection';
@@ -31,6 +31,8 @@ import { zones } from '../../world/zones';
 import { placeRegistry } from '../../world/places';
 import { personaCards } from '../../world/residents';
 import { PREWARM_RANGE } from '../../mind/prewarm';
+import { CharacterSprite } from '../../render/characterSprite';
+import { BASTIEN_LOOK, residentLook, type Look } from '../../render/character/look';
 
 const SIM_KEY = 'monde.residents';
 /** Off-screen tick: one executor sample per resident per real second (§19.2). */
@@ -71,8 +73,6 @@ export function sharedResidentSim(scene: Phaser.Scene): ResidentSim {
   return sim;
 }
 
-type Facing = 'down' | 'up' | 'side';
-
 interface Actor {
   profile: ResidentProfile;
   animal: boolean;
@@ -81,8 +81,8 @@ interface Actor {
   shadow: Phaser.GameObjects.Ellipse;
   label: Phaser.GameObjects.Text;
   bubble: Phaser.GameObjects.Image;
-  facing: Facing;
-  flip: boolean;
+  /** Sheet and walk/idle animation (facing, frames by distance walked). */
+  avatar: CharacterSprite;
   /** Game minutes behind the executor. */
   delay: number;
   blockedMs: number;
@@ -95,62 +95,21 @@ interface Actor {
   pos: Vec | null;
   state: ResidentState | null;
   alpha: number;
-  phase: number;
-  /** Textures currently on the sprite and bubble (set only when they change). */
-  figureKey: string;
+  /** Texture currently on the bubble (set only when it changes). */
   emoteKey: string;
 }
 
-// ── Placeholder art ─────────────────────────────────────────────────────────
-
-const SKIN = [0xf2d5b3, 0xe3b48c, 0xc68e64, 0x8d5a3b, 0xf6e1cb, 0xa86f48];
-const HAIR = [0x3b2a20, 0x6b4a2b, 0xb7b2a8, 0x1f1a17, 0x9c4a26, 0xd9c28a, 0x50392b];
+// ── Figures ─────────────────────────────────────────────────────────────────
+// Each resident is a CharacterSprite (render/characterSprite): their drawn sheet once one is listed in
+// assets/sprites/manifest.json (by resident id, which is also the card's `sprite`), else the procedural
+// rig wearing their roster colour. Bastien gets the cat rig, collar in his roster colour.
 
 /** A distinct hue per roster index (golden-angle spacing), muted to sit in the cozy palette. */
 const residentColour = (index: number): number =>
   Phaser.Display.Color.HSLToColor(((index * 137.508) % 360) / 360, 0.52, 0.56).color;
-const darker = (c: number, f: number): number =>
-  (Math.round(((c >> 16) & 0xff) * f) << 16) | (Math.round(((c >> 8) & 0xff) * f) << 8) | Math.round((c & 0xff) * f);
 
-function ensureFigure(scene: Phaser.Scene, actor: Pick<Actor, 'profile' | 'animal' | 'colour'>, facing: Facing): string {
-  const key = `res-${actor.profile.id}-${facing}`;
-  if (scene.textures.exists(key)) return key;
-  const h = hashString(actor.profile.id), g = scene.make.graphics({ x: 0, y: 0 }, false);
-  const body = actor.colour, trim = darker(body, 0.62);
-  if (actor.animal) {
-    // A cat, sitting low: body, head, ears, tail.
-    const fur = 0x4a4038, ear = 0x2f2924;
-    g.fillStyle(fur).fillEllipse(16, 41, 20, 11);
-    if (facing === 'side') {
-      g.fillStyle(fur).fillCircle(23, 33, 6.5).fillTriangle(18, 30, 20, 24, 23, 28).fillTriangle(24, 28, 27, 24, 28, 30);
-      g.lineStyle(3, fur).lineBetween(7, 41, 4, 33);
-      g.fillStyle(0xd8e070).fillCircle(26, 33, 1.3);
-    } else {
-      g.fillStyle(fur).fillCircle(16, 33, 7).fillTriangle(10, 31, 11, 24, 15, 28).fillTriangle(17, 28, 21, 24, 22, 31);
-      g.fillStyle(ear).fillTriangle(11, 29, 12, 26, 14, 28).fillTriangle(18, 28, 20, 26, 21, 29);
-      if (facing === 'down') g.fillStyle(0xd8e070).fillCircle(13.5, 33, 1.3).fillCircle(18.5, 33, 1.3);
-      else g.lineStyle(3, fur).lineBetween(16, 44, 25, 38);
-    }
-    g.fillStyle(body).fillRect(11, 38, 10, 2); // a collar in his roster colour
-  } else {
-    const skin = SKIN[h % SKIN.length]!, hair = HAIR[(h >> 4) % HAIR.length]!;
-    const side = facing === 'side';
-    g.fillStyle(trim).fillRect(side ? 11 : 8, 40, side ? 5 : 6, 8).fillRect(side ? 16 : 18, 40, side ? 5 : 6, 8);
-    g.fillStyle(body).fillRoundedRect(side ? 9 : 6, 15, side ? 14 : 20, 27, 4);
-    g.fillStyle(trim).fillRect(side ? 9 : 6, 34, side ? 14 : 20, 3);
-    g.fillStyle(skin).fillCircle(16, 9, 8);
-    g.fillStyle(hair);
-    if (facing === 'up') g.fillCircle(16, 9, 8.2);
-    else if (side) g.fillRoundedRect(8, 1, 12, 9, 4).fillRect(8, 4, 5, 9);
-    else g.fillRoundedRect(8, 1, 16, 6, 3);
-    g.fillStyle(0x2a2420);
-    if (facing === 'down') g.fillCircle(13, 10, 1.1).fillCircle(19, 10, 1.1);
-    else if (side) g.fillCircle(20.5, 10, 1.1);
-  }
-  g.generateTexture(key, 32, 48);
-  g.destroy();
-  return key;
-}
+const lookFor = (profile: ResidentProfile, colour: number): Look =>
+  profile.kind === 'animal' ? { ...BASTIEN_LOOK, collar: colour } : residentLook(profile.id, colour);
 
 /** The emote bubble for a verb (GDD §16.5 emotes); null for verbs that show nothing. */
 function ensureEmote(scene: Phaser.Scene, verb: string): string | null {
@@ -219,16 +178,17 @@ export class ResidentLayer {
     this.actors = this.sim.profiles.map(profile => {
       const animal = profile.kind === 'animal', colour = residentColour(profile.index);
       const actor = { profile, animal, colour } as Actor;
-      for (const f of ['down', 'up', 'side'] as const) ensureFigure(scene, actor, f);
+      const avatar = new CharacterSprite(scene, profile.id, lookFor(profile, colour));
+      const sprite = scene.add.image(0, 0, avatar.sheet.key).setVisible(false);
+      avatar.apply(sprite);
       return Object.assign(actor, {
-        sprite: scene.add.image(0, 0, `res-${profile.id}-down`).setOrigin(0.5, 1).setVisible(false),
+        avatar, sprite,
         shadow: scene.add.ellipse(0, 0, animal ? 18 : 22, 7, 0x000000, 0.22).setDepth(DEPTH.SHADOW).setVisible(false),
         label: scene.add.text(0, 0, profile.name, { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#28372dcc', padding: { x: 3, y: 1 }, resolution: RENDER_SCALE })
           .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setVisible(false),
         bubble: scene.add.image(0, 0, '__DEFAULT').setOrigin(0.2, 1).setDepth(DEPTH.OVER_DARK - 0.01).setVisible(false),
-        facing: 'down' as Facing, flip: false, delay: 0, blockedMs: 0, passing: false, talking: false,
-        offset: { x: 0, y: 0 }, base: null, pos: null, state: null, alpha: 0, phase: hashString(profile.id) % 7,
-        figureKey: `res-${profile.id}-down`, emoteKey: ''
+        delay: 0, blockedMs: 0, passing: false, talking: false,
+        offset: { x: 0, y: 0 }, base: null, pos: null, state: null, alpha: 0, emoteKey: ''
       });
     });
     this.byId = new Map(this.actors.map(a => [a.profile.id, a]));
@@ -295,7 +255,7 @@ export class ResidentLayer {
     }
     // Pass 2: offsets (keep right, sidestep the player, personal space), then draw.
     const sec = dtMs / 1000;
-    for (const a of live) this.place(a, live, player, sec);
+    for (const a of live) this.place(a, live, player, sec, dtMs);
     const pointer = this.pointerWorld();
     for (const a of live) this.draw(a, player, pointer, dtMs);
     if (this.overlayOn) this.drawOverlay(live);
@@ -395,7 +355,7 @@ export class ResidentLayer {
     return off;
   }
 
-  private place(a: Actor, live: readonly Actor[], player: Position, sec: number): void {
+  private place(a: Actor, live: readonly Actor[], player: Position, sec: number, dtMs: number): void {
     const s = a.state!, base = a.base!;
     const want = s.visible ? this.desiredOffset(base, s, a, player, live) : { x: 0, y: 0 };
     const k = Math.min(1, sec * 8);
@@ -407,14 +367,11 @@ export class ResidentLayer {
       pos = { x: base.x + a.offset.x / 2, y: base.y + a.offset.y / 2 };
       if (!fits(walk, pos.x, pos.y, BODY_CLEARANCE)) { pos = { ...base }; a.offset.x = a.offset.y = 0; }
     }
-    // Facing: toward the player while talking, else the way they walk.
-    const dir = a.talking ? { x: player.x - pos.x, y: player.y - pos.y } : s.moving ? s.facing : null;
-    if (dir && (dir.x !== 0 || dir.y !== 0)) {
-      if (Math.abs(dir.y) > Math.abs(dir.x)) a.facing = dir.y > 0 ? 'down' : 'up';
-      else { a.facing = 'side'; a.flip = dir.x < 0; }
-    }
-    const moved = a.pos ? Math.hypot(pos.x - a.pos.x, pos.y - a.pos.y) : 0;
-    a.phase += moved * 7;
+    // Facing: toward the player while talking (standing: talkers idle), else the way they walk.
+    // Walk frames follow the distance actually drawn, so a held or hurrying walker's feet keep pace.
+    const intent = a.talking ? { x: player.x - pos.x, y: player.y - pos.y } : s.moving ? s.facing : null;
+    const moved = a.pos && !a.talking ? { x: pos.x - a.pos.x, y: pos.y - a.pos.y } : { x: 0, y: 0 };
+    a.avatar.step({ intent, moved, dtMs });
     a.pos = pos;
   }
 
@@ -426,12 +383,10 @@ export class ResidentLayer {
     if (a.alpha <= 0) { this.hide(a, false); return; }
     const x = this.projection.originX + pos.x * DIORAMA_TILE_W;
     const foot = this.projection.originY + pos.y * DIORAMA_TILE_H - this.projection.elevationAt(Math.floor(pos.x), Math.floor(pos.y)) * DIORAMA_ELEV_STEP + DIORAMA_FOOT_DY;
-    const bob = s.moving && !a.talking ? -Math.abs(Math.sin(a.phase)) * 2.5 : 0;
     // Squeezing past the player reads as a courtesy, not a collision: a little see-through while it lasts.
     const ghost = a.passing && Math.hypot(pos.x - player.x, pos.y - player.y) < BLOCK_RADIUS + 0.2 ? 0.6 : 1;
-    const figure = `res-${a.profile.id}-${a.facing}`;
-    if (figure !== a.figureKey) { a.figureKey = figure; a.sprite.setTexture(figure); }
-    a.sprite.setFlipX(a.facing === 'side' && a.flip).setPosition(x, foot + bob).setDepth(actorDepth(foot)).setAlpha(a.alpha * ghost).setVisible(true);
+    a.avatar.apply(a.sprite);
+    a.sprite.setPosition(x, foot).setDepth(actorDepth(foot)).setAlpha(a.alpha * ghost).setVisible(true);
     a.shadow.setPosition(x, foot - 1).setAlpha(a.alpha).setVisible(true);
     const top = foot - (a.animal ? 26 : 50);
     const hovered = pointer !== null && Math.abs(pointer.x - x) < 15 && pointer.y > foot - (a.animal ? 26 : 48) && pointer.y < foot;
