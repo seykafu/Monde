@@ -1,13 +1,18 @@
 /**
- * Content linter (GDD §20.4): persona cards, place registry, declared flags, and the Quiet Mode line library
- * (Appendix B) with its authored replies.
+ * Content linter (GDD §20.4): persona cards, place registry, declared flags, the Quiet Mode line library
+ * (Appendix B) with its authored replies, and the scripted {ai_open} exchanges (content/lines/scripted.yaml).
  * Run: npm run lint:content   (CI runs it too). Exit 1 on any error.
  */
 import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
-import { PersonaCard, STANDARD_EXPRESSIONS, evaluate, fillReply, type PersonaCard as Card } from "@monde/shared";
-import { parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
+import {
+  PersonaCard, STANDARD_EXPRESSIONS, compileScenes, evaluate, fillReply, registryFromContent, type PersonaCard as Card
+} from "@monde/shared";
+import { firstName, parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
+import {
+  SPRING_SCENE_ID, aiOpenCues, exchangePaths, fillScripted, parseScriptedLibrary, scriptedKey, type ScriptedLibrary
+} from "../client/src/mind/scripted.ts";
 import { lexicalHits } from "../server/src/mind/filters.ts";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -100,8 +105,74 @@ for (const line of library?.lines ?? []) {
   if (line.kind === "bye" && line.replies) warn(`lines.yaml ${line.id}: a goodbye ends the conversation; its replies are never shown`);
 }
 
+// ---- Scripted {ai_open} exchanges (content/lines/scripted.yaml): the client's own parser (it checks the schema and
+// the graph, and throws naming the exchange and node), the server's lexical filters over every line, reply and
+// farewell, each resident's `never_says`, and the scene files: every Spring (S01–S10) {ai_open} cue needs an
+// exchange with its turn count, and an exchange must name a cue that exists.
+let scripted: ScriptedLibrary | null = null;
+try {
+  scripted = parseScriptedLibrary(YAML.parse(fs.readFileSync(path.join(root, "content/lines/scripted.yaml"), "utf8")));
+} catch (e) {
+  err((e as Error).message);
+}
+const scenesDir = path.join(root, "content/scenes");
+const read = (p: string) => fs.readFileSync(path.join(root, p), "utf8");
+const sceneFiles = fs.readdirSync(scenesDir).filter((f) => f.endsWith(".scene.md")).sort();
+const compiled = compileScenes(
+  sceneFiles.map((f) => ({ file: `content/scenes/${f}`, source: read(`content/scenes/${f}`) })),
+  registryFromContent({
+    flagsYaml: read("content/flags.yaml"),
+    residentYamls: fs.readdirSync(dir).filter((f) => f.endsWith(".yaml")).sort().map((f) => read(`content/residents/${f}`)),
+    placesYaml: read("content/places/places.yaml")
+  })
+);
+const cues = aiOpenCues(compiled.scenes);
+let scriptedTurns = 0, scriptedPaths = 0, laterCues = 0;
+if (scripted) {
+  const seenCue = new Set<string>();
+  for (const cue of cues) {
+    const key = scriptedKey(cue.scene, cue.resident);
+    const spring = SPRING_SCENE_ID.test(cue.scene);
+    if (seenCue.has(key)) { err(`scripted.yaml: ${cue.scene} has two {ai_open} cues to ${cue.resident}; exchanges are keyed by scene and resident`); continue; }
+    seenCue.add(key);
+    const ex = scripted.find(cue.scene, cue.resident);
+    if (!ex) {
+      if (spring) err(`scripted.yaml: no exchange for the {ai_open: ${cue.resident}} cue in ${cue.scene} (Quiet Mode would fall back to small talk)`);
+      else laterCues++;
+    } else if (ex.turns !== cue.turns) err(`scripted.yaml ${key}: turns is ${ex.turns} but the cue says turns: ${cue.turns}`);
+  }
+  for (const ex of scripted.exchanges) {
+    if (!seenCue.has(ex.key)) err(`scripted.yaml ${ex.key}: no {ai_open: ${ex.resident}} cue in ${ex.scene} (stale, or a typo in the scene or resident id)`);
+    const card = cards.get(ex.resident);
+    if (!card && ex.resident !== "arrival") err(`scripted.yaml ${ex.key}: ${ex.resident} has no persona card`);
+    scriptedPaths += exchangePaths(ex).length;
+    const vars = { name: card ? firstName(card.name) : "Robin", player: "Wren" };
+    // `speaks`: the resident's own words (lines, reacts, farewell), which also must keep to their `never_says`.
+    const check = (where: string, text: string, speaks: boolean) => {
+      const filled = fillScripted(text, vars);
+      for (const hit of lexicalHits(filled)) err(`scripted.yaml ${ex.key} ${where} "${text}": ${hit.group} "${hit.term}"`);
+      if (speaks)
+        for (const banned of card?.voice.never_says ?? [])
+          if (filled.toLowerCase().includes(banned.toLowerCase())) err(`scripted.yaml ${ex.key} ${where}: ${ex.resident} never says "${banned}"`);
+    };
+    ex.farewell.forEach((l, i) => check(`farewell line ${i + 1}`, l.text, true));
+    for (const node of Object.values(ex.nodes)) {
+      scriptedTurns++;
+      node.lines.forEach((l, i) => check(`node ${node.id} line ${i + 1}`, l.text, true));
+      node.replies.forEach((r, i) => {
+        check(`node ${node.id} reply ${i + 1}`, r.text, false);
+        if (r.react) check(`node ${node.id} reply ${i + 1} react`, r.react.text, true);
+      });
+      const tones = new Set(node.replies.map((r) => r.intent));
+      if (node.replies.length >= 2 && tones.size < 2) warn(`scripted.yaml ${ex.key} node ${node.id}: every reply has the same tone (${[...tones][0]})`);
+    }
+  }
+}
+
 for (const w of warnings) console.warn(`warn  ${w}`);
 for (const e of errors) console.error(`error ${e}`);
 console.log(`content: ${cards.size} cards, ${places.size} places, ${declared.size} declared flags, `
-  + `${library?.lines.length ?? 0} lines with ${replyCount} replies · ${errors.length} errors, ${warnings.length} warnings`);
+  + `${library?.lines.length ?? 0} lines with ${replyCount} replies, `
+  + `${scripted?.exchanges.length ?? 0} scripted exchanges (${scriptedTurns} nodes, ${scriptedPaths} paths; ${laterCues} later {ai_open} cues still to write) `
+  + `· ${errors.length} errors, ${warnings.length} warnings`);
 process.exit(errors.length ? 1 : 0);

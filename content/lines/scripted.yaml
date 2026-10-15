@@ -1,0 +1,291 @@
+# Scripted Quiet Mode exchanges for the story's {ai_open} hand-offs (GDD §9.14, §13.1).
+#
+# A scene's {ai_open: <resident>, topic: "...", turns: N} cue opens a live conversation online. With no model to
+# talk to (Quiet Mode) it plays the exchange written here instead of generic small talk. There is one exchange per
+# cue, found by scene id + resident id (client/src/mind/scripted.ts). The cue's own `topic` is the brief for what
+# the resident may know; keep every line inside it. Voice: GDD §12.1 and the resident's persona card.
+#
+# Only the Spring scenes (S01–S10) need one so far; tools/lint-content.ts fails if a Spring cue has none, if the
+# turn counts disagree, or if an exchange names a cue that no longer exists.
+#
+# exchanges:
+#   - scene:    the scene id (content/scenes/<scene>.scene.md)
+#     resident: the cue's resident id (`arrival` for the S05 newcomer, who has no persona card)
+#     turns:    must equal the cue's `turns`. The player gets exactly this many replies: the resident speaks
+#               turn 0 (the opener) up to turn N, and turn N is the close, which offers only Leave.
+#     start:    the node shown first (depth 0)
+#     farewell: 1-2 lines the resident says if the player leaves before the close (Leave, Esc, or a goodbye reply)
+#     nodes:    a graph of resident turns, keyed by node id (lowercase, digits, underscore)
+#
+# node:
+#   lines:   1-3 resident lines shown in order, each { expr, text }
+#              expr = a portrait: neutral, warm, sad, angry, surprised or worried (GDD §16.2)
+#              text = the line. A leading (stage business) is a small physical action, never an emotion.
+#                     At most 55 words a line, contractions in speech, no banned vocabulary or modern words.
+#   replies: 2-3 things the Fellow can say, each { text, intent, next, react? }; left out on a close
+#              text   = first person, plain, friendly, a little dry, at most 90 characters, tones that differ
+#              intent = kind | curious | joke | firm | about_riddle | ask_favor | campaign | leave
+#              next   = the node that follows (never on a `leave` reply, which ends the exchange via `farewell`)
+#              react  = optional { expr, text }: one short line the resident says first, so a node shared by
+#                       several replies can still answer each one. react + the next node's lines must be 3 or fewer.
+#
+# Rules the linter and the loader enforce:
+#   - Every node reaches the same depth every way it is reached (replies may share a follow-up, but never loop).
+#   - A node with replies is shallower than `turns`; a node with none (a close) sits at exactly depth `turns`, so every
+#     path hands back to the script after exactly N replies, and each path starts at `start`.
+#   - Every node is reachable; at most one `leave` reply per node.
+#   - Free text typed in "Say something..." continues down the first non-goodbye reply (without its react).
+#   - Tokens: {player} = the Fellow's name, {name} = the speaker's first name. Nothing else in braces.
+#   - Every line and reply passes the server's lexical filters (profanity, modern tech, brands, fourth wall, style).
+#
+# The last scripted line after each cue picks up right after the close, so a close hands over in a sentence that
+# the next line can follow (see S02 Tib, S05 Moss, S08 Sable's note).
+
+exchanges:
+
+  # ── S02 · Monde's Marks: Margo, 4 turns ────────────────────────────────────────────────────────────────────
+  - scene: s02_marks
+    resident: margo
+    turns: 4
+    start: ask
+    farewell:
+      - { expr: neutral, text: "(takes the pencil from behind her ear) Of course. Gloves on the hook, please." }
+    nodes:
+      ask:
+        lines:
+          - { expr: neutral, text: "(uncaps a pencil, looks at the point, caps it again) Go on. I've a call number for most of it." }
+          - { expr: neutral, text: "Everyone assumes the minute book first. I'd welcome a surprise." }
+        replies:
+          - { text: "What was Aurélien like? Not the tower. The man.", intent: curious, next: man }
+          - text: "Sorry to disappoint you. The minute book first."
+            intent: joke
+            next: book
+            react: { expr: neutral, text: "Correct. It's a very good minute book." }
+          - text: "Whatever you've waited longest to tell someone. Start there."
+            intent: kind
+            next: marks
+            react: { expr: warm, text: "(a pause) Nobody has put it that way. All right. The brass." }
+
+      man:
+        lines:
+          - { expr: neutral, text: "Tidy. His household ledger lists every hinge and candle he bought, and there isn't one crossing-out in it." }
+          - { expr: neutral, text: "Clocks by trade, maps by habit. He signed every plaque A.M. beside the lantern, like a man expecting to be checked." }
+          - { expr: warm, text: "(pushes her glasses up into her hair) I like him. It's unscholarly. Don't write that down." }
+        replies:
+          - { text: "A tidy man hid a Charter? What have you actually got?", intent: curious, next: claim }
+          - { text: "Liking him seems fair. Is his lantern anywhere on the tower?", intent: kind, next: tower }
+
+      book:
+        lines:
+          - { expr: neutral, text: "The first council argued about drains for the better part of two hundred pages. I read every one." }
+          - { expr: neutral, text: "Then, on page two hundred and eleven, a single word. Deposited. No place, no witness, no receipt." }
+        replies:
+          - { text: "Is there anything else on paper about it?", intent: curious, next: claim }
+          - text: "Two hundred pages of drains. You deserve a medal."
+            intent: joke
+            next: claim
+            react: { expr: neutral, text: "I was sent a ribbon once. It lives in the drawer with the spare gloves." }
+
+      marks:
+        lines:
+          - { expr: neutral, text: "Nineteen lantern stamps catalogued. Rubbed, measured, filed. I file one a week, and I buy the paper myself." }
+          - { expr: neutral, text: "The council's idea of heritage is a ribbon, once a year. Brass is worth more by the pound than by the verse." }
+        replies:
+          - { text: "Is every stamp on a plaque? Or are some in odder places?", intent: curious, next: tower }
+          - { text: "Would anyone really scrap them? They're all you've got.", intent: firm, next: claim }
+
+      claim:
+        lines:
+          - { expr: neutral, text: "A letter, a preamble quoted by a clerk, and a minute book that says deposited. I call that the claim, or the record on a generous day." }
+          - { expr: neutral, text: "I've never held a fragment. I'd want one on the felt, gloves on, in his own hand. Until then I'd rather be proved wrong in writing than right in my head." }
+        replies:
+          - { text: "Someone must know where it went. Bertrand, maybe?", intent: curious, next: bertrand }
+          - { text: "Then let me help you prove it. Where do I start?", intent: kind, next: door }
+
+      tower:
+        lines:
+          - { expr: neutral, text: "One that I know of. The lantern stamp is cut on the escapement cover in the clocktower. Same lantern as the plaques, as far as I can tell." }
+          - { expr: neutral, text: "And before you ask: lantern pinion. I know the phrase. I couldn't draw you the part, and I won't guess." }
+          - { expr: neutral, text: "(glances at the window) Bertrand might know. Bertrand isn't saying." }
+        replies:
+          - { text: "Why isn't he saying?", intent: curious, next: bertrand }
+          - text: "I'll ask nicely. Does he take sugar?"
+            intent: joke
+            next: bertrand
+            react: { expr: neutral, text: "Two. He counts them out loud." }
+          - { text: "Does the tower figure in the plate on my door?", intent: about_riddle, next: door }
+
+      bertrand:
+        lines:
+          - { expr: neutral, text: "Bertrand Achterberg wound that tower every Sunday for fifty-one years, and he keeps what he knows about Aurélien where I can't reach. We argue about it on Saturdays. Six years." }
+          - { expr: worried, text: "(sets the pencil down) He's eighty-four. I'd like him to say it while he still has it. I wouldn't tell him that." }
+        replies:
+          - text: "Maybe he's waiting for someone to ask the right way."
+            intent: kind
+            next: close_talk
+            react: { expr: neutral, text: "Possibly. I've asked the wrong way for six years." }
+          - text: "What would you ask him, if he'd answer?"
+            intent: curious
+            next: close_talk
+            react: { expr: neutral, text: "Everything. In order, with dates." }
+          - { text: "I should let you get on. Thanks, {name}.", intent: leave }
+
+      door:
+        lines:
+          - { expr: neutral, text: "Start with the plate on your own door. I won't tell you what it says, only how to read one." }
+          - { expr: neutral, text: "The answer to a Mark is a place, so read it as directions. Aloud, slowly, standing at the door." }
+        replies:
+          - text: "Directions. Right. Anything else you'd tell me?"
+            intent: about_riddle
+            next: close_plate
+            react: { expr: neutral, text: "No. The rest would be me solving it for you, and I don't." }
+          - text: "I'll read it aloud. The whole lane can enjoy it."
+            intent: joke
+            next: close_plate
+            react: { expr: neutral, text: "Lamplighter Lane has heard worse. Mostly from Tobias." }
+
+      close_talk:
+        lines:
+          - { expr: neutral, text: "(without turning her head) Yes, Tobias, I can hear you breathing. One moment." }
+          - { expr: warm, text: "If he ever says anything, write it down and bring it here." }
+
+      close_plate:
+        lines:
+          - { expr: neutral, text: "(not looking up) Tobias. What's in that satchel can stay there one minute more." }
+          - { expr: warm, text: "Go and stand at your door. Tell me what you find, and I'll say \"technically\" if you're close." }
+
+  # ── S05 · First Arrival: the newcomer, 2 turns (no persona card: played in the story panel) ────────────────────
+  # Written for any newcomer: no trade, no past, no pronouns, nothing the generated card could contradict.
+  - scene: s05_first_arrival
+    resident: arrival
+    turns: 2
+    start: walk
+    farewell:
+      - { expr: neutral, text: "(looks up the slope) Right. Lead on, then." }
+    nodes:
+      walk:
+        lines:
+          - { expr: neutral, text: "(settles the hat, looks back at the Gannet, then up the slope) Is that usual? Mayor, camera, cat, all before I've found the pavement." }
+          - { expr: neutral, text: "I'd like to know the rules, that's all." }
+        replies:
+          - text: "Not usual. You've made Pell's morning."
+            intent: kind
+            next: ask
+            react: { expr: warm, text: "(a short laugh) Then I'll try to deserve it." }
+          - text: "The cat does that to everyone. Don't take it personally."
+            intent: joke
+            next: ask
+            react: { expr: warm, text: "Good. I'd hate to think the cat had singled me out." }
+          - text: "What were you expecting, coming off that boat?"
+            intent: curious
+            next: ask
+            react: { expr: neutral, text: "Rain, mostly. And nobody looking up from their tea." }
+
+      ask:
+        lines:
+          - { expr: neutral, text: "I'd hoped for a roof and a quiet week. I hadn't hoped to be met." }
+          - { expr: worried, text: "(glances back toward the mayor, voice lowered) I nearly didn't ask. She said 'one more.' Under her breath, with my hand still in hers. One more what?" }
+        replies:
+          - text: "One more neighbor. It's been quiet here a good while."
+            intent: kind
+            next: close
+            react: { expr: neutral, text: "(nods slowly, as though a sum has come out) I counted chimneys from the boat. I stopped when I ran out of smoke." }
+          - text: "Probably one more person to be asked about bread. Brace yourself."
+            intent: joke
+            next: close
+            react: { expr: warm, text: "Then I'll practise a face." }
+          - text: "What did you think she meant?"
+            intent: curious
+            next: close
+            react: { expr: worried, text: "That I'd been counted before I'd been asked. It's a daft thing to mind." }
+
+      close:
+        lines:
+          - { expr: warm, text: "(settles the hat) Which way is the house, {player}? I'll follow." }
+          - { expr: neutral, text: "Whatever I owe you for the bag, I'll owe." }
+
+  # ── S08 · The Option: Sable, 3 turns ───────────────────────────────────────────────────────────────────────
+  - scene: s08_option
+    resident: sable
+    turns: 3
+    start: open
+    farewell:
+      - { expr: neutral, text: "(doesn't look up) Go, then. One more thing before you do." }
+    nodes:
+      open:
+        lines:
+          - { expr: neutral, text: "(turns a slug of type face down on the stone, then face up) Ask the one you're not sure you should." }
+          - { expr: neutral, text: "On the record, unless you say otherwise. Spell anything I'm likely to get wrong." }
+        replies:
+          - { text: "How did you even find it? Page nine, in a cabinet nobody locked.", intent: curious, next: found }
+          - text: "Why wait three days? Print it tonight."
+            intent: firm
+            next: three_days
+            react: { expr: neutral, text: "(flat) Tonight I'd be printing half a story." }
+          - { text: "Take me through the clause. Slowly. I'm not a lawyer.", intent: kind, next: clause }
+
+      found:
+        lines:
+          - { expr: neutral, text: "How do you find anything in an archive? You start at the bottom. Nobody else does. That's the whole method." }
+          - { expr: neutral, text: "Eight pages of streetlight contract, then a ninth that isn't about lamps. Most people stop at eight." }
+        replies:
+          - { text: "Do you know why she signed it?", intent: curious, next: pell }
+          - text: "Who'll read it, though? Be honest."
+            intent: joke
+            next: print
+            react: { expr: neutral, text: "Eleven subscribers. All eleven, for once." }
+
+      three_days:
+        lines:
+          - { expr: neutral, text: "Because I can stand behind page nine. I can't stand behind why she signed it." }
+          - { expr: neutral, text: "Would you print a woman's signature without letting her read it first? Don't answer. I've met people who would." }
+        replies:
+          - { text: "Do you know why she signed it?", intent: curious, next: pell }
+          - { text: "And if she says nothing in three days?", intent: firm, next: print }
+          - { text: "Fair. She should hear it from you first.", intent: kind, next: print }
+
+      clause:
+        lines:
+          - { expr: neutral, text: "Census under two hundred on seven days running. Seven in a row, no gaps." }
+          - { expr: angry, text: "Then the Lender may, at its sole election, buy the Wharf. Sole election means its choice and nobody else's. Not the council's, not the town's." }
+        replies:
+          - { text: "Do you know why she signed it?", intent: curious, next: pell }
+          - text: "Then what are you going to do about it?"
+            intent: firm
+            next: print
+            react: { expr: neutral, text: "(flat) Print it." }
+
+      pell:
+        lines:
+          - { expr: neutral, text: "Why she signed? I don't know. Her name's under his, in blue ink, careful. That's what I can print." }
+          - { expr: neutral, text: "The forty thousand paid for the lamps and the payroll. After that I couldn't tell you where a coin went." }
+          - { expr: neutral, text: "Everybody's got a theory. I had one for three weeks. It was wrong, and I'm not collecting another." }
+        replies:
+          - text: "She kept the lamps lit. That has to count for something."
+            intent: kind
+            next: close
+            react: { expr: neutral, text: "It counts for eighty-one lamps. Beyond that, I'll wait to be told." }
+          - text: "Who else has seen page nine?"
+            intent: curious
+            next: close
+            react: { expr: neutral, text: "You, me, Pell and S. Vane. That's the list I can swear to." }
+          - { text: "I'll let you get to your forme. Thanks, {name}.", intent: leave }
+
+      print:
+        lines:
+          - { expr: neutral, text: "When Pell's had her say, it runs. Front page, above the fold. Whatever she gives me goes beside mine in the same size type, same measure. I check with a rule." }
+          - { expr: neutral, text: "If she gives me nothing, mine runs alone. I'll spell her name right. It's printed on page nine, so I've no excuse." }
+        replies:
+          - text: "What if what she says changes the story?"
+            intent: curious
+            next: close
+            react: { expr: neutral, text: "Then the story changes. I've reset worse than a headline." }
+          - text: "Sounds fair. I'd put my name down for a copy."
+            intent: kind
+            next: close
+            react: { expr: neutral, text: "(writes it down) A subscriber. Page nine's already paying." }
+
+      close:
+        lines:
+          - { expr: neutral, text: "(picks up the stick without looking) That's everything I'd stand behind. Forme closes at midnight." }
+          - { expr: neutral, text: "One more thing, and then I'm setting type." }

@@ -24,8 +24,8 @@ Stage business and retained expressions accompany each `StoryLine`.
 AI handlers return lines from the live resident or the resident's Quiet Mode line library.
 The host owns conversational interaction, turn caps, timeouts and selection of `auto` speakers.
 A missing, empty, or rejected `ai_line` response uses the authored fallback. An unsupported
-`ai_open` warns in development and continues, as do other unsupported host cues. It does not
-invent a canned resident exchange. The production adapter must provide that exchange.
+`ai_open` warns in development and continues, as do other unsupported host cues. The core does not
+invent a canned resident exchange; the production adapter provides it (below).
 
 Memory cues pass substituted first-person text and importance unchanged, alongside game day,
 minute, place and scene/cue identity. The host must write a `kind: "scripted"` episodic memory,
@@ -51,3 +51,26 @@ The minute-by-minute Spring tests visit the relevant places, answer every AI cue
 first or last option. Both traverse 13 scene parts representing all ten beats, on Days
 1/2/3/5/8/10/14/18/25. Additional tests cover the empty-boat re-arm and early repaired clock.
 Calendar-only system events (e.g. Day 21's newspaper disclosure) are outside this interpreter.
+
+## The host in the game (G-10 part 2)
+
+`host.ts` (pure) builds the `StoryContext` from the live game (clock, zone, `placeAt` the player's position,
+the town engine's Pillars/Appeal/census, the `monde.fellow` application) and maps every cue: Regard is mirrored
+in a ledger and queued in the offline event log, Pillars go through the town engine, coins/items/Projects/riddles
+are ledger placeholders, memories are `kind: "scripted"` offline events, checkpoints go to the save system.
+Durable effects are idempotent per `scene|cue key`. `encodeStory` keeps the director and ledger inside the save's
+`story_flags` record (flags as `true`, the rest under `$story`), so the save schema is unchanged.
+`session.ts` owns one game's director (Spring scenes S01–S10; `?story=all` for every scene), summons with a
+30-minute cooldown after "Not yet", and dev `play(id)`. `live.ts` asks /talk for one `{ai_line}` within 6 s.
+The Phaser side is `scenes/StoryScene.ts` (the VN presenter) and `scenes/story/attach.ts` (zone, place and
+minute triggers, the New Game opening at 09:50 on the ferry slip, `?scene=<id>` and `window.__story`).
+
+### `{ai_open}` in Quiet Mode (offline exchanges)
+
+Each Spring `{ai_open}` cue has a written, branching exchange in `content/lines/scripted.yaml` (schema in its header,
+engine in `mind/scripted.ts`, found by scene id + resident). `StoryScene.aiOpen` looks it up when the cue fires:
+a resident with a persona card opens the dialogue panel as before, with the exchange passed in `DialogueOpen.scripted`;
+the panel's Quiet Mode path (offline, no world, or a server that fails) then plays it instead of small talk, and a live
+turn still comes from the model whenever the server answers. A speaker with no card (the S05 `arrival`) has no agent
+to open the panel on, so the exchange plays in the story panel itself, replies as choices. A cue without an exchange
+behaves as before. `tools/lint-content.ts` fails when a Spring cue has none or its `turns` disagree.

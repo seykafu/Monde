@@ -1,8 +1,11 @@
 // The conversation log's entries and scrolling, as data (backlog.ts draws them). Pure: no Phaser, no DOM.
 
 export interface LogEntry {
-  who: 'resident' | 'player';
+  /** `narrator`: a scripted scene's narration (no name, set in italics). */
+  who: 'resident' | 'player' | 'narrator';
   text: string;
+  /** The speaker's name, for logs with more than one resident (scripted scenes); else the log's resident. */
+  name?: string;
 }
 
 /** Space between entries, design pixels. */

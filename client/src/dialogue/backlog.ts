@@ -25,7 +25,8 @@ export class Backlog {
   private readonly room: number;
   private readonly wheel: (pointer: Phaser.Input.Pointer, over: unknown, dx: number, dy: number) => void;
 
-  constructor(private readonly scene: Phaser.Scene, private readonly box: BacklogLayout, entries: readonly LogEntry[], residentName: string, onClose: () => void) {
+  constructor(private readonly scene: Phaser.Scene, private readonly box: BacklogLayout, entries: readonly LogEntry[], residentName: string, onClose: () => void,
+    opts: { title?: string } = {}) {
     const { x, y, w, h } = box;
     // A click anywhere outside the box closes it; inside, it's swallowed.
     const shield = scene.add.zone(0, 0, scene.scale.gameSize.width * 4, scene.scale.gameSize.height * 4).setOrigin(0).setInteractive().setDepth(69);
@@ -38,7 +39,7 @@ export class Backlog {
     bg.fillStyle(INK, 1).fillRoundedRect(x, y, w, h, 14);
     bg.lineStyle(2, GOLD, 0.6).strokeRoundedRect(x, y, w, h, 14);
     bg.lineStyle(1, GOLD, 0.25).lineBetween(x + PAD, y + HEADER, x + w - PAD, y + HEADER);
-    const title = scene.add.text(x + PAD, y + HEADER / 2 + 2, `Talking with ${residentName}`, {
+    const title = scene.add.text(x + PAD, y + HEADER / 2 + 2, opts.title ?? `Talking with ${residentName}`, {
       fontFamily: FAMILY_HEADING, fontSize: '20px', color: '#fff0ce', resolution: RENDER_SCALE
     }).setOrigin(0, 0.5).setDepth(71);
     const hint = scene.add.text(x + w - PAD, y + HEADER / 2 + 2, '↑↓ scroll · L or Esc to close', {
@@ -48,13 +49,13 @@ export class Backlog {
 
     const textW = w - PAD * 2 - NAME_W - 16;
     for (const entry of entries) {
-      const player = entry.who === 'player';
-      const name = scene.add.text(0, 0, player ? 'You' : residentName, {
+      const player = entry.who === 'player', narrator = entry.who === 'narrator';
+      const name = scene.add.text(0, 0, player ? 'You' : narrator ? '' : entry.name ?? residentName, {
         fontFamily: FAMILY_HEADING, fontSize: '17px', color: player ? '#9fd3b6' : '#e4c77f', resolution: RENDER_SCALE,
         align: 'right', fixedWidth: NAME_W
       }).setDepth(71);
       const text = scene.add.text(0, 0, entry.text, {
-        fontFamily: FAMILY_BODY, fontSize: '18px', color: player ? '#f6dc9c' : '#f3ecd9', fontStyle: player ? 'italic' : 'normal',
+        fontFamily: FAMILY_BODY, fontSize: '18px', color: player ? '#f6dc9c' : narrator ? '#e6dcc0' : '#f3ecd9', fontStyle: player || narrator ? 'italic' : 'normal',
         lineSpacing: 4, wordWrap: { width: textW }, resolution: RENDER_SCALE
       }).setDepth(71);
       this.rows.push({ name, text, h: Math.max(name.height, text.height) });

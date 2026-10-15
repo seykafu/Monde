@@ -1,0 +1,383 @@
+// The story host's pure parts (MVP G-10 part 2). No Phaser, no DOM: everything here runs under vitest.
+//
+// - buildStoryContext: the StoryContext the director reads, from the live game (clock, zone, the place the
+//   player is at, the town engine's Pillars/Appeal/census, the Fellowship profile) plus the story ledger.
+// - createStoryHandlers: one handler per host cue. Durable effects (Regard, Pillars, coins, items, memories)
+//   are idempotent per `scene|cue key`, so a scene restarted from a save doesn't apply them twice (README).
+//   Presentation and interactive cues go to the StoryPresenter (StoryScene); world effects go to the
+//   StoryWorld (scenes/story/attach.ts). Anything without somewhere to go warns in development and continues.
+// - encodeStory/decodeStory: the director and ledger inside the save's existing `story_flags` record.
+// - placeAt: which `zone.place` the player is at, for place triggers.
+import type { SaveGame, SceneHeader } from '@monde/shared';
+import { weekdayOf } from '../sim/clock';
+import { computeAppeal } from '../town/appeal';
+import { isFerryDay } from '../town/migration';
+import { TOWN_FLAGS, applyPillarDelta, createTownState, setTownFlag, type TownState } from '../town/pillars';
+import { nearbyPlace, placeName, type Position } from '../world/player';
+import type { ZoneDef } from '../world/zoneFormat';
+import type { StorySave } from './director';
+import type { CueContext, HostCue, StoryHandlers, StoryLine } from './runtime';
+import type { StoryContext } from './triggers';
+
+// ── The player ──────────────────────────────────────────────────────────────
+
+/** The Fellowship application as the story reads it (§11.1; `player.why`, `player.background`, `{name}`). */
+export interface FellowProfile {
+  name: string;
+  pronouns: string;
+  background: string;
+  why: string;
+  loves?: string;
+}
+
+/** Before the form is signed: residents say "Fellow" (mind/api DEFAULT_PLAYER_NAME), they/them. */
+export const DEFAULT_FELLOW: Readonly<FellowProfile> = { name: 'Fellow', pronouns: 'they/them', background: 'tinkerer', why: 'curious', loves: 'tea' };
+
+/**
+ * This game's application was already signed (W-07's New Game asks before the town), so S01a's {charcreate}
+ * has nothing to add. The unsigned default (fellow/state.ts ensureFellow, `?skiptitle=1`) still opens the form.
+ */
+export const fellowSigned = (profile: FellowProfile | null | undefined): boolean =>
+  !!profile && (['name', 'pronouns', 'background', 'why'] as const).some(k => profile[k] !== DEFAULT_FELLOW[k]);
+
+/** Profiles written before the ids matched §13.3 said "running_from_something"; scripts test `running`. */
+export const normalizeWhy = (why: string): string => (why === 'running_from_something' ? 'running' : why);
+
+export interface PronounWords { they: string; them: string; their: string; theyre: string }
+
+/** `{they}` / `{them}` / `{their}` / `{theyre}` (§13.1) for a preset or custom "subject/object/possessive" set. */
+export function pronounWords(pronouns: string): PronounWords {
+  const p = pronouns.trim().toLowerCase();
+  if (p === 'she/her') return { they: 'she', them: 'her', their: 'her', theyre: "she's" };
+  if (p === 'he/him') return { they: 'he', them: 'him', their: 'his', theyre: "he's" };
+  const [they, them, their] = p.split('/');
+  if (p !== 'they/them' && they && them && their) return { they, them, their, theyre: `${they}'s` };
+  return { they: 'they', them: 'them', their: 'their', theyre: "they're" };
+}
+
+// ── The ledger ──────────────────────────────────────────────────────────────
+
+/**
+ * Story-side state for effects whose real owners don't exist on the client yet, saved with the story.
+ * - regard: a mirror of scripted Regard deltas. The server owns Regard (§9.4) and has no endpoint for them;
+ *   each delta is also queued in the offline event log for the night-pass sync (§9.14).
+ * - coins / items / projects / riddles: typed placeholders until the inventory, Project and Marks systems land.
+ * - applied: `scene|cue key` of every durable effect already applied (idempotent restarts).
+ */
+export interface StoryLedger {
+  regard: Record<string, number>;
+  coins: number;
+  items: Record<string, number>;
+  projects: string[];
+  riddles: string[];
+  applied: string[];
+}
+
+/**
+ * GDD-GAP: the client doesn't know the server's Regard, so the mirror starts every resident at 0 (Stranger)
+ * except `arrival` at +5 (§13.3 "Regard"); Homecomer starts (§11.1) and tier clamps (§9.4) are server-side.
+ * GDD-GAP: §11 gives the Fellow no starting purse, so the placeholder wallet starts empty.
+ */
+export const emptyLedger = (): StoryLedger => ({ regard: { arrival: 5 }, coins: 0, items: {}, projects: [], riddles: [], applied: [] });
+
+/**
+ * GDD-GAP: the arrival generator (§6.4, Appendix A) isn't built, so S05's `{arrival.*}` tokens read this
+ * stand-in until the first generated arrival's card exists.
+ */
+export const ARRIVAL_STANDIN = { id: 'arrival', name: 'Robin', trade: 'Baker', reason: 'Wanted a fresh start.' } as const;
+
+// ── Context ─────────────────────────────────────────────────────────────────
+
+export interface WorldNow {
+  day: number;
+  /** Minutes since the start of the game day, 360–1560 (the clock's own range). */
+  minute: number;
+  zone: string;
+  /** `zone.place` the player is at, or '' between places. */
+  place: string;
+  town?: TownState;
+  profile?: FellowProfile | null;
+  asleep?: boolean;
+  inScuffle?: boolean;
+}
+
+/** The StoryContext for the director: the live world, the ledger, and any puzzle/riddle/scuffle outcomes. */
+export function buildStoryContext(world: WorldNow, ledger: StoryLedger, outcomes: Readonly<Record<string, unknown>> = {}): StoryContext {
+  const profile = { ...DEFAULT_FELLOW, ...(world.profile ?? {}) };
+  const town = world.town ?? createTownState({ day: world.day });
+  return {
+    day: world.day,
+    minute: world.minute,
+    weekday: weekdayOf(world.day).toLowerCase(),
+    zone: world.zone,
+    place: world.place,
+    pillar: { ...town.pillars },
+    regard: { ...ledger.regard },
+    values: {
+      name: profile.name,
+      ...pronounWords(profile.pronouns),
+      player: { name: profile.name, pronouns: profile.pronouns, background: profile.background, why: normalizeWhy(profile.why), loves: profile.loves ?? '' },
+      census: town.census,
+      appeal: computeAppeal(town).appeal,
+      ferry_day: isFerryDay(world.day, town.flags),
+      coins: ledger.coins,
+      arrival: { ...ARRIVAL_STANDIN },
+      ...outcomes
+    },
+    ...(world.asleep ? { asleep: true } : {}),
+    ...(world.inScuffle ? { inScuffle: true } : {})
+  };
+}
+
+/**
+ * The place the player is at: a doorstep within a tile (world/player nearbyPlace, as the E prompt uses), else
+ * the smallest place whose rect holds the player's tile (open ground: the ferry slip, Fountain Square).
+ */
+export function placeAt(zone: Pick<ZoneDef, 'id' | 'places'>, p: Position): string {
+  const door = nearbyPlace(zone as ZoneDef, p);
+  if (door) return `${zone.id}.${door.id}`;
+  const tx = Math.floor(p.x), ty = Math.floor(p.y);
+  const inside = zone.places.filter(({ rect: [x, y, w, h] }) => tx >= x && tx < x + w && ty >= y && ty < y + h)
+    .sort((a, b) => a.rect[2] * a.rect[3] - b.rect[2] * b.rect[3]);
+  return inside[0] ? `${zone.id}.${inside[0].id}` : '';
+}
+
+/**
+ * A line as the panel shows it. Scripts italicise names with markdown (`The *Gannet*`); Phaser text can't style
+ * a span, so the markers go and the words stay.
+ */
+export const plainText = (text: string): string => text.replace(/\*{1,2}([^*\n]+?)\*{1,2}/g, '$1');
+
+/** "Bloom Fair (opening)" from "S10a · Bloom Fair (opening)". */
+export const sceneName = (title: string | undefined, id: string): string => (title ?? id).replace(/^[A-Z]+\d+[a-z]?\s*·\s*/, '');
+
+/** One-line summons for an appointment scene (§13.3 "Summoned scenes"). */
+export function summonText(header: Pick<SceneHeader, 'place'>, title: string | undefined, zoneName: string): string {
+  const [, placeId = ''] = header.place.split('.');
+  return `${sceneName(title, header.place)} is starting: ${placeName(placeId)}, ${zoneName}.`;
+}
+
+/**
+ * The scene's brief or topic as the talk API's `current_activity` (≤ 120 characters, server routes.ts), cut at
+ * a word. GDD-GAP: /talk has no topic or brief field yet, so this is how an {ai_open}/{ai_line} seed reaches
+ * the resident's prompt (block 4's "doing", memory retrieval and topic cards).
+ */
+export function clipActivity(text: string, max = 120): string {
+  const t = text.replace(/\s+/g, ' ').trim();
+  if (t.length <= max) return t;
+  const cut = t.slice(0, max - 1);
+  const space = cut.lastIndexOf(' ');
+  return `${(space > max / 2 ? cut.slice(0, space) : cut).replace(/[\s,;:.(-]+$/, '')}…`;
+}
+
+// ── Cues ────────────────────────────────────────────────────────────────────
+
+export type OfflineEvent = SaveGame['offline_events'][number];
+type Cue<K extends HostCue['cmd']> = Extract<HostCue, { cmd: K }>;
+
+/** The StoryScene: presentation and the interactive handoffs. */
+export interface StoryPresenter {
+  backdrop(id: string): void;
+  music(id: string): void;
+  fade(): Promise<void>;
+  wait(seconds: number): Promise<void>;
+  /** False for an effect it doesn't know. */
+  cam(effect: string): boolean;
+  /** False for a sound it doesn't have. */
+  sfx(id: string): boolean;
+  /** An {ai_line} is being fetched for this speaker. */
+  thinking(speaker: string): void;
+  confirm(text: string, yes: string, no: string): Promise<boolean>;
+  /** A stand-in for a system that isn't built yet: true for the success branch. */
+  placeholder(kind: 'puzzle' | 'scuffle', id: string): Promise<boolean>;
+  /** The Fellowship form (§11.1); false when there's none to open. */
+  charcreate(): Promise<boolean>;
+  /** {ai_open}: a live exchange in the dialogue panel; resolves when it closes. */
+  aiOpen(cue: Cue<'ai_open'>, place: string): Promise<readonly StoryLine[]>;
+}
+
+/** The game around the story (scenes/story/attach.ts). */
+export interface StoryWorld {
+  now(): WorldNow;
+  setTown(state: TownState): void;
+  events(): readonly OfflineEvent[];
+  appendEvent(event: OfflineEvent): void;
+  /** Save the director and ledger into the registry the save system reads. */
+  persist(): void;
+  checkpoint(key: string): Promise<void>;
+  /** Move the player to a summoned scene's place. */
+  travel(place: string): void;
+  zoneName(zone: string): string;
+  /** One live line for {ai_line}; [] means use the authored fallback. */
+  aiLine(residentId: string, brief: string): Promise<readonly StoryLine[]>;
+}
+
+export interface HandlerDeps {
+  dev: boolean;
+  warn(message: string): void;
+  ledger(): StoryLedger;
+  world(): StoryWorld | null;
+  presenter(): StoryPresenter | null;
+  setOutcome(name: 'puzzle' | 'riddle' | 'scuffle', value: Record<string, boolean>): void;
+  /** The `zone.place` a scene is set in (memories are written there). */
+  scenePlace(sceneId: string): string;
+}
+
+/** GDD-GAP: §13.1 doesn't time a bare {wait}; one second reads as a beat. */
+export const DEFAULT_WAIT_SECONDS = 1;
+
+/** Ids the durable effects are keyed by: one per cue position, stable across a restarted scene. */
+export const effectKey = (ctx: Pick<CueContext, 'scene' | 'key'>): string => `${ctx.scene}|${ctx.key}`;
+
+export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
+  const note = (message: string) => { if (deps.dev) deps.warn(`[story] ${message}`); };
+  /** Apply a durable effect once per cue position. */
+  const once = (ctx: CueContext, apply: () => void): void => {
+    const ledger = deps.ledger(), key = effectKey(ctx);
+    if (ledger.applied.includes(key)) return;
+    apply();
+    ledger.applied.push(key);
+  };
+  const event = (ctx: CueContext, type: string, residentId: string | null, data: OfflineEvent['data']): void => {
+    const world = deps.world();
+    if (!world) { note(`no world to log ${type}`); return; }
+    const key = effectKey(ctx);
+    if (world.events().some(e => e.data.key === key)) return;
+    world.appendEvent({ day: ctx.game.day, minute: ctx.game.minute, type, resident_id: residentId, data: { ...data, key, scene: ctx.scene, cue: ctx.key } });
+  };
+  const stage = (what: string): StoryPresenter | null => {
+    const p = deps.presenter();
+    if (!p) note(`no presenter for {${what}}`);
+    return p;
+  };
+
+  return {
+    // Presentation.
+    backdrop: cue => { stage('backdrop')?.backdrop(cue.id); },
+    music: cue => { stage('music')?.music(cue.id); },
+    fade: async () => { await stage('fade')?.fade(); },
+    wait: async cue => { await stage('wait')?.wait(cue.seconds ?? DEFAULT_WAIT_SECONDS); },
+    cam: cue => { const p = stage('cam'); if (p && !p.cam(cue.effect)) note(`unknown camera effect ${cue.effect}`); },
+    sfx: cue => { const p = stage('sfx'); if (p && !p.sfx(cue.id)) note(`unknown sound ${cue.id}`); },
+
+    // Durable world effects.
+    regard: (cue, ctx) => once(ctx, () => {
+      const ledger = deps.ledger();
+      ledger.regard[cue.resident] = (ledger.regard[cue.resident] ?? 0) + cue.delta;
+      event(ctx, 'regard', cue.resident, { delta: cue.delta });
+    }),
+    pillar: (cue, ctx) => once(ctx, () => {
+      const world = deps.world(), town = world?.now().town;
+      if (!world || !town) { note(`no town engine for {pillar: ${cue.pillar}}`); return; }
+      world.setTown(applyPillarDelta(town, cue.pillar, cue.delta, 'story', ctx.scene));
+    }),
+    coins: (cue, ctx) => once(ctx, () => { deps.ledger().coins += cue.delta; }),
+    item: (cue, ctx) => once(ctx, () => {
+      const items = deps.ledger().items;
+      items[cue.item] = Math.max(0, (items[cue.item] ?? 0) + cue.delta);
+    }),
+    project: (cue, ctx) => once(ctx, () => {
+      const projects = deps.ledger().projects;
+      if (!projects.includes(cue.id)) projects.push(cue.id);
+      note(`{project: ${cue.id}} unlocked in the ledger only (no Project system yet)`);
+    }),
+    // GDD-GAP: §9.6 memories carry a valence, but scripted memories don't author one; null until the night
+    // pass derives it. monde-mind has no events endpoint yet (§19's POST /events), so they wait in the offline log.
+    memory: (cue, ctx) => once(ctx, () => event(ctx, 'memory', cue.resident, {
+      kind: 'scripted', text: cue.text, importance: cue.importance, place: deps.scenePlace(ctx.scene) || ctx.game.place,
+      participants: 'player', valence: null, ...(cue.resident === 'arrival' ? { alias: 'arrival' } : {})
+    })),
+    checkpoint: async cue => {
+      const world = deps.world();
+      if (!world) { note(`no world for {checkpoint: ${cue.key}}`); return; }
+      world.persist();
+      try { await world.checkpoint(cue.key); } catch (error) { deps.warn(`[story] checkpoint ${cue.key} failed: ${String(error)}`); }
+    },
+
+    // Systems still to come: typed placeholders.
+    puzzle: async cue => {
+      const solved = (await deps.presenter()?.placeholder('puzzle', cue.id)) ?? false;
+      deps.setOutcome('puzzle', { solved });
+    },
+    scuffle: async cue => {
+      const won = (await deps.presenter()?.placeholder('scuffle', cue.id)) ?? false;
+      deps.setOutcome('scuffle', { won });
+    },
+    riddle: (cue, ctx) => {
+      once(ctx, () => { const r = deps.ledger().riddles; if (!r.includes(cue.id)) r.push(cue.id); });
+      deps.setOutcome('riddle', { solved: false });
+      note(`{riddle: ${cue.id}} noted in the ledger only (no Marks log yet)`);
+    },
+
+    // Handoffs.
+    charcreate: async () => {
+      if (fellowSigned(deps.world()?.now().profile)) { note('{charcreate}: the application is already signed; skipping the form'); return; }
+      const p = stage('charcreate');
+      if (p && !(await p.charcreate())) note('{charcreate}: no Fellowship form registered; keeping the current profile');
+    },
+    ai_line: async cue => {
+      const world = deps.world();
+      if (!world) return [];
+      deps.presenter()?.thinking(cue.speaker.id);
+      // GDD-GAP: `auto:` speakers should be the resident with the strongest open concern (§13.1); the client
+      // can't see concerns, so the default speaker is used online as well as in Quiet Mode.
+      return world.aiLine(cue.speaker.id, cue.brief);
+    },
+    ai_open: async (cue, ctx) => {
+      const p = stage('ai_open');
+      return p ? p.aiOpen(cue, deps.scenePlace(ctx.scene) || ctx.game.place) : [];
+    }
+  };
+}
+
+/** Story flags the town engine reads (§6.2, §6.5) follow the story: set in one, set in the other. */
+export function syncTownFlags(town: TownState, flags: ReadonlySet<string>): TownState {
+  let next = town;
+  for (const flag of TOWN_FLAGS) if (flags.has(flag) && !next.flags[flag]) next = setTownFlag(next, flag);
+  return next;
+}
+
+// ── The save ────────────────────────────────────────────────────────────────
+
+/** The reserved `story_flags` key holding the director's queue/completions and the ledger (flags can't contain `$`). */
+export const STORY_META_KEY = '$story';
+type StoryFlagsRecord = SaveGame['story_flags'];
+
+/** Flags as `{flag: true}` (readable by anything that only wants flags) plus one JSON entry for the rest. */
+export function encodeStory(save: StorySave, ledger: StoryLedger): StoryFlagsRecord {
+  const record: StoryFlagsRecord = {};
+  for (const flag of save.flags) record[flag] = true;
+  const { flags: _flags, ...rest } = save;
+  record[STORY_META_KEY] = JSON.stringify({ ...rest, ledger });
+  return record;
+}
+
+const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((s): s is string => typeof s === 'string') : []);
+const numbers = (v: unknown): Record<string, number> => Object.fromEntries(Object.entries(v && typeof v === 'object' ? v : {})
+  .filter((e): e is [string, number] => typeof e[1] === 'number' && Number.isFinite(e[1])));
+
+/** Read a `story_flags` record back; anything malformed falls back to an empty part, never an error. */
+export function decodeStory(record: StoryFlagsRecord | undefined | null): { save: StorySave; ledger: StoryLedger } {
+  const entries = Object.entries(record ?? {});
+  const flags = entries.filter(([k, v]) => v === true && !k.startsWith('$')).map(([k]) => k).sort();
+  let meta: Record<string, unknown> = {};
+  const raw = record?.[STORY_META_KEY];
+  if (typeof raw === 'string') {
+    try { const parsed = JSON.parse(raw) as unknown; if (parsed && typeof parsed === 'object') meta = parsed as Record<string, unknown>; } catch { /* keep the flags */ }
+  }
+  const queue = (Array.isArray(meta.queue) ? meta.queue : []).flatMap(q => {
+    const e = q as Record<string, unknown>;
+    if (!e || typeof e.id !== 'string') return [];
+    return [{ id: e.id, ...(typeof e.from === 'string' ? { from: e.from } : {}), ...(e.restart === true ? { restart: true } : {}) }];
+  });
+  const a = meta.active as Record<string, unknown> | undefined;
+  const active = a && typeof a.id === 'string' ? { id: a.id, initialFlags: strings(a.initialFlags) } : undefined;
+  const l = (meta.ledger ?? {}) as Record<string, unknown>;
+  const base = emptyLedger();
+  const ledger: StoryLedger = {
+    regard: { ...base.regard, ...numbers(l.regard) },
+    coins: typeof l.coins === 'number' && Number.isFinite(l.coins) ? l.coins : base.coins,
+    items: numbers(l.items), projects: strings(l.projects), riddles: strings(l.riddles), applied: strings(l.applied)
+  };
+  return { save: { version: 1, flags, completed: strings(meta.completed), queue, ...(active ? { active } : {}) }, ledger };
+}
