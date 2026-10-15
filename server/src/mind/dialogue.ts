@@ -11,7 +11,7 @@
  * This module has no I/O of its own beyond the MindClient: the route streams, effects.ts persists.
  */
 import type Anthropic from "@anthropic-ai/sdk";
-import { LIMITS, type DialogueTurnOutput } from "@monde/shared";
+import { DialogueTurnOutput, LIMITS, modelOutputFormat } from "@monde/shared";
 import { apiParams, containsAnswer, requestSettings, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
 import { completeWords, lexicalHits } from "./filters.js";
@@ -118,20 +118,22 @@ export function dialogueParams(request: MindRequest, notes: readonly string[] = 
 }
 
 /**
- * A `max_tokens: 0` request with the dialogue's blocks 1-3 and settings, to write the prompt cache before the
- * first real turn (§9.10 step 1). `max_tokens: 0` rejects `stream: true` and `output_config.format`, so this
- * goes through `createMessage` without the schema. Check `cache_read_input_tokens` on the first real turn in
- * staging (M-14's acceptance) to confirm the format block doesn't sit ahead of the cached prefix.
+ * A one-token request with exactly the dialogue's blocks 1-3, settings and output format, to write the prompt
+ * cache before the first real turn (§9.10 step 1). The structured-output schema is part of the cached prefix, so
+ * the prewarm must carry the same `output_config.format` as a real turn or the first turn misses the cache
+ * (measured on staging 2026-10-14: a schema-less prewarm cached 5.8k tokens, the real turn then wrote 7.2k).
+ * `max_tokens: 0` rejects a format, so the prewarm asks for one token and ignores it (stop_reason max_tokens).
  */
 export function prewarmParams(prefix: ResidentPrefix, day: number): Anthropic.MessageCreateParamsNonStreaming {
   const settings = requestSettings("dialogue");
   return {
     model: settings.model,
-    max_tokens: 0,
+    max_tokens: 1,
     ...(settings.thinking ? { thinking: settings.thinking } : {}),
     system: prefixSystemBlocks(prefix, day),
     messages: [{ role: "user", content: "warmup" }],
-  };
+    output_config: { format: modelOutputFormat(DialogueTurnOutput) },
+  } as Anthropic.MessageCreateParamsNonStreaming;
 }
 
 const textOf = (message: Anthropic.Message): string =>

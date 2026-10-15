@@ -351,7 +351,7 @@ describe("POST /v1/worlds/:w/prewarm", () => {
   const prewarm = (env: Env, body: Record<string, unknown>) =>
     env.app.inject({ method: "POST", url: `/v1/worlds/${env.worldId}/prewarm`, headers: env.headers, payload: body });
 
-  it("sends max_tokens: 0 with the dialogue's exact system blocks, once per resident per window", async () => {
+  it("sends a one-token request with the dialogue's exact system blocks and output format, once per resident per window", async () => {
     const mind = new FakeMind([{ output: good() }]);
     const env = await setup(mind);
     expect((await prewarm(env, { resident_id: "pell", day: 4 })).json()).toEqual({ warmed: true });
@@ -359,15 +359,18 @@ describe("POST /v1/worlds/:w/prewarm", () => {
     expect((await prewarm(env, { resident_id: "odile" })).json()).toEqual({ warmed: true });
     expect(mind.creates).toHaveLength(2);
     const warm = mind.creates[0]!;
-    expect(warm).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 0, thinking: { type: "disabled" } });
+    expect(warm).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 1, thinking: { type: "disabled" } });
     expect(warm).not.toHaveProperty("stream");
-    expect(warm).not.toHaveProperty("output_config");
     expect(warm.messages).toEqual([{ role: "user", content: "warmup" }]);
 
     await talk(env, payload());
     expect(JSON.stringify(mind.streams[0]!.system)).toBe(JSON.stringify(warm.system));
+    // The schema is part of the cached prefix: the prewarm must carry the same format as a real turn.
+    const formatOf = (p: object) => JSON.stringify((p as { output_config?: { format?: unknown } }).output_config?.format);
+    expect(formatOf(warm)).toBe(formatOf(mind.streams[0]!));
+    expect(formatOf(warm)).toContain("json_schema");
     const [log] = await logs(env.worldId);
-    expect(log).toMatchObject({ kind: "prewarm", residentId: "pell", cacheWriteTokens: 3800, outputTokens: 0, stopReason: "max_tokens" });
+    expect(log).toMatchObject({ kind: "prewarm", residentId: "pell", cacheWriteTokens: 3800, stopReason: "max_tokens" });
     expect(Number(log!.costUsd)).toBeCloseTo((4 * 0.10 + 3800 * 0.125) / 1e6, 10);
   });
 
