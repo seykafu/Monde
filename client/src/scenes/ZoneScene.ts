@@ -19,6 +19,7 @@ import { movePlayer, nearbyPlace, placeName, type Position } from '../world/play
 import { Clock, DAY_START, SOLAR_NOON, formatClock, formatDate, formatGameTime, parseClock } from '../sim/clock';
 import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, type DailyWeather, type WeatherKind, type WeatherNow } from '../sim/weather';
 import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
+import { ResidentLayer } from './zone/residents';
 
 // ── Time, light and weather (W-04) ───────────────────────────────────────────
 // One Clock for the whole game lives in the registry, so it keeps running across
@@ -207,6 +208,10 @@ export class ZoneScene extends Phaser.Scene {
   private aimedFor?: DailyWeather;
   private hud!: Hud;
   private hudIcon = '';
+  /** The town's residents on this board (W-05); off-screen ones tick at 1 Hz inside it. */
+  private residents!: ResidentLayer;
+  /** What E does right now (set every frame along with the prompt). */
+  private interact?: () => void;
   constructor() { super('Zone'); }
 
   create(data: { zone?: string; arrive?: Point } = {}): void {
@@ -251,6 +256,8 @@ export class ZoneScene extends Phaser.Scene {
     this.buildNight();
     this.buildWeather();
     this.syncFigure();
+    // Before the world snapshot below, so every resident sprite belongs to the world camera.
+    this.residents = new ResidentLayer(this, this.zone, this.projection, this.clock, DEV_KEYS);
     const world = this.children.list.slice();
     const camera = this.cameras.main;
     camera.setOrigin(0, 0).setZoom(RENDER_SCALE);
@@ -264,11 +271,14 @@ export class ZoneScene extends Phaser.Scene {
     ui.ignore(world);
     const title = this.add.text(24, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce', backgroundColor: '#28372d' });
     const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  East / west road: change district', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
-    const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
+    const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
     this.prompt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 50, '', { fontFamily: FAMILY_BODY, fontSize: '22px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 12, y: 6 } }).setOrigin(0.5);
-    camera.ignore([title, controls, devHelp, this.prompt, ...this.buildHud()]);
+    camera.ignore([title, controls, devHelp, this.prompt, ...this.buildHud(), ...this.residents.buildUi()]);
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E') as Record<string, Phaser.Input.Keyboard.Key>;
+    // On the key's own down event, so even a tap shorter than a frame counts (keys are destroyed on restart).
+    this.interact = undefined;
+    this.keys.E!.on('down', () => { if (!this.transitioning) this.interact?.(); });
     // Forced, so weather already under way is prefilled: arriving mid-shower, the sky is full.
     this.applyLight(true);
     this.installClockHooks();
@@ -305,6 +315,7 @@ export class ZoneScene extends Phaser.Scene {
     const onKey = (event: KeyboardEvent) => {
       if (seen.has(event)) return;
       seen.add(event);
+      if (pressed(event, 'n', 'KeyN') || event.key === 'N') { this.residents.toggleOverlay(); return; }
       if (pressed(event, ']', 'BracketRight')) this.clock.advanceMinutes(60);
       else if (pressed(event, '[', 'BracketLeft')) this.clock.setTime(this.clock.day, this.clock.minute - 60);
       else if (pressed(event, '\\', 'Backslash')) {
@@ -597,14 +608,17 @@ export class ZoneScene extends Phaser.Scene {
     this.clock.advance(dt);
     this.applyLight();
     this.driftFog(dt);
+    this.residents.update(dt, this.position);
     if (this.transitioning || !this.keys) return;
     const down = (...names: string[]) => names.some(name => this.keys[name]!.isDown) ? 1 : 0;
     const result = movePlayer(this.zone, this.position, { x: down('D', 'RIGHT') - down('A', 'LEFT'), y: down('S', 'DOWN') - down('W', 'UP') }, delta / 1000);
     this.position = result.position;
     this.syncFigure(); this.followPlayer();
-    const place = nearbyPlace(this.zone, this.position);
-    this.prompt.setText(place ? `E: ${placeName(place.id)}` : '').setVisible(!!place);
-    if (Phaser.Input.Keyboard.JustDown(this.keys.E!) && place) console.log(`${this.zone.id}.${place.id}`);
+    // Residents take precedence over doors.
+    const talk = this.residents.talkTarget(this.position);
+    const place = talk ? undefined : nearbyPlace(this.zone, this.position);
+    this.prompt.setText(talk ? `E: Talk to ${talk.name}` : place ? `E: ${placeName(place.id)}` : '').setVisible(!!talk || !!place);
+    this.interact = talk ? () => this.residents.requestTalk(talk.id) : place ? () => console.log(`${this.zone.id}.${place.id}`) : undefined;
     if (result.edge) {
       this.transitioning = true;
       const edge = result.edge;
