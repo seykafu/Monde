@@ -5,13 +5,14 @@ import { SPRING_SCENES } from '../session';
 describe('backdrops', () => {
   it('reads the manifest in any of its forms, skipping junk', () => {
     expect([...parseBackdropManifest({})]).toEqual([]);
-    expect([...parseBackdropManifest({ bg_ferry_slip_morning: true, bg_x: false, 'Bad Id': true, bg_y: 'bg_y.png' })]).toEqual(['bg_ferry_slip_morning', 'bg_y']);
-    expect([...parseBackdropManifest(['bg_a', 7, 'bg_b'])]).toEqual(['bg_a', 'bg_b']);
+    expect([...parseBackdropManifest({ bg_ferry_slip_morning: true, bg_x: false, 'Bad Id': true, bg_y: 'bg_y.jpg', bg_z: '../evil.png' })]).toEqual([['bg_ferry_slip_morning', 'bg_ferry_slip_morning.png'], ['bg_y', 'bg_y.jpg']]);
+    expect([...parseBackdropManifest(['bg_a', 7, 'bg_b']).keys()]).toEqual(['bg_a', 'bg_b']);
     expect([...parseBackdropManifest(null)]).toEqual([]);
   });
 
   it('resolves art against the base URL, never a leading slash', () => {
     expect(backdropUrl('./', 'bg_cottage_door')).toBe('./assets/backdrops/bg_cottage_door.png');
+    expect(backdropUrl('./', 'bg_cottage_door', 'bg_cottage_door.jpg')).toBe('./assets/backdrops/bg_cottage_door.jpg');
   });
 
   it('reads a mood and a name from every Spring backdrop id', () => {

@@ -67,11 +67,11 @@ const SFX_ALIASES: Readonly<Record<string, SfxKey>> = { thin_applause: 'applause
 const BLIP_GAP_MS = 55;
 const DEV = import.meta.env.DEV || (typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('dev'));
 
-let backdropManifest: Promise<ReadonlySet<string>> | null = null;
+let backdropManifest: Promise<ReadonlyMap<string, string>> | null = null;
 /** The backdrop manifest, fetched once; missing or broken means no art (never an error). */
-const loadBackdropManifest = (): Promise<ReadonlySet<string>> => {
+const loadBackdropManifest = (): Promise<ReadonlyMap<string, string>> => {
   backdropManifest ??= fetch(`${import.meta.env.BASE_URL}${BACKDROP_MANIFEST_PATH}`, { cache: 'no-cache' })
-    .then(res => (res.ok ? res.json() : {})).then(parseBackdropManifest).catch(() => new Set<string>());
+    .then(res => (res.ok ? res.json() : {})).then(parseBackdropManifest).catch(() => new Map<string, string>());
   return backdropManifest;
 };
 
@@ -482,7 +482,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
         this.backdropLayer.add([img, shade]);
       };
       if (this.textures.exists(key)) { show(); return; }
-      this.load.image(key, backdropUrl(import.meta.env.BASE_URL, id));
+      this.load.image(key, backdropUrl(import.meta.env.BASE_URL, id, ids.get(id)));
       this.load.once(Phaser.Loader.Events.COMPLETE, show);
       this.load.start();
     });

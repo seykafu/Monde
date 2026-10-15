@@ -1,26 +1,34 @@
 // VN backdrops for scripted scenes (GDD §16.3). Pure: the ids, the manifest and the stand-in's mood.
 //
-// No backdrop art ships yet. StoryScene loads `<base>assets/backdrops/<id>.png` only when
+// StoryScene loads `<base>assets/backdrops/<file>` only when
 // assets/backdrops/manifest.json lists the id; otherwise it paints a tinted panel with the place name, coloured
 // by the time of day the id names (bg_ferry_slip_morning, bg_pell_kitchen_night…).
 
 export const BACKDROP_MANIFEST_PATH = 'assets/backdrops/manifest.json';
 
-/** `<base>assets/backdrops/<id>.png`; `base` is import.meta.env.BASE_URL (never a leading /). */
-export const backdropUrl = (base: string, id: string): string => `${base}assets/backdrops/${id}.png`;
+/** `<base>assets/backdrops/<file>` (default `<id>.png`); `base` is import.meta.env.BASE_URL (never a leading /). */
+export const backdropUrl = (base: string, id: string, file?: string): string => `${base}assets/backdrops/${file ?? `${id}.png`}`;
 export const backdropTextureKey = (id: string): string => `backdrop:${id}`;
 
 const ID = /^[a-z][a-z0-9_]*$/;
 
+const FILE = /^[a-z][a-z0-9_]*\.(png|jpg|webp)$/;
+
 /**
- * The ids that have art. Accepts `{ "bg_x": true }` (the shipped form), `{ "bg_x": "bg_x.png" }` or
- * `["bg_x"]`; anything malformed is skipped, so a bad entry costs art, never the scene.
+ * The ids that have art, each with its file. Accepts `{ "bg_x": "bg_x.jpg" }` (the shipped form: painted
+ * backdrops are JPEGs), `{ "bg_x": true }` (meaning `bg_x.png`) or `["bg_x"]`; anything malformed is skipped,
+ * so a bad entry costs art, never the scene.
  */
-export function parseBackdropManifest(raw: unknown): ReadonlySet<string> {
-  const ids = Array.isArray(raw) ? raw : raw && typeof raw === 'object'
-    ? Object.entries(raw as Record<string, unknown>).filter(([, v]) => v === true || (typeof v === 'string' && v.length > 0)).map(([k]) => k)
-    : [];
-  return new Set(ids.filter((id): id is string => typeof id === 'string' && ID.test(id)));
+export function parseBackdropManifest(raw: unknown): ReadonlyMap<string, string> {
+  const entries: [unknown, unknown][] = Array.isArray(raw) ? raw.map(id => [id, true]) : raw && typeof raw === 'object'
+    ? Object.entries(raw as Record<string, unknown>) : [];
+  const out = new Map<string, string>();
+  for (const [id, v] of entries) {
+    if (typeof id !== 'string' || !ID.test(id)) continue;
+    if (v === true) out.set(id, `${id}.png`);
+    else if (typeof v === 'string' && FILE.test(v)) out.set(id, v);
+  }
+  return out;
 }
 
 export type BackdropMood = 'dawn' | 'morning' | 'noon' | 'day' | 'dusk' | 'night' | 'fog' | 'interior';
