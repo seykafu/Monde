@@ -21,6 +21,7 @@ import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, ty
 import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
 import { ResidentLayer } from './zone/residents';
 import { attachDialogue } from './DialogueScene';
+import { PillarStrip, attachTown, openTownLedger } from './TownLedgerScene';
 
 // ── Time, light and weather (W-04) ───────────────────────────────────────────
 // One Clock for the whole game lives in the registry, so it keeps running across
@@ -213,6 +214,8 @@ export class ZoneScene extends Phaser.Scene {
   private residents!: ResidentLayer;
   /** What E does right now (set every frame along with the prompt). */
   private interact?: () => void;
+  /** The small Pillar strip under the clock (G-01); P hides it. */
+  private pillarStrip!: PillarStrip;
   constructor() { super('Zone'); }
 
   create(data: { zone?: string; arrive?: Point } = {}): void {
@@ -273,7 +276,7 @@ export class ZoneScene extends Phaser.Scene {
     const ui = this.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT);
     ui.ignore(world);
     const title = this.add.text(24, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce', backgroundColor: '#28372d' });
-    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  East / west road: change district', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
+    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  L: town ledger  ·  East / west road: change district', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
     const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
     this.prompt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 50, '', { fontFamily: FAMILY_BODY, fontSize: '22px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 12, y: 6 } }).setOrigin(0.5);
@@ -282,6 +285,7 @@ export class ZoneScene extends Phaser.Scene {
     // On the key's own down event, so even a tap shorter than a frame counts (keys are destroyed on restart).
     this.interact = undefined;
     this.keys.E!.on('down', () => { if (!this.transitioning) this.interact?.(); });
+    this.installTownKeys();
     // Forced, so weather already under way is prefilled: arriving mid-shower, the sky is full.
     this.applyLight(true);
     this.installClockHooks();
@@ -295,7 +299,22 @@ export class ZoneScene extends Phaser.Scene {
       clock = new Clock({ day: Number(query.get('day')) || 1, minute: parseClock(query.get('time') ?? '') ?? DAY_START });
       this.registry.set(CLOCK_KEY, clock);
     }
+    // The town's numbers live beside the clock, with Day-1 values, and its dawn pass runs on the clock's dawn (G-01).
+    attachTown(this.registry, clock);
     return clock;
+  }
+
+  /** L opens the Town Ledger (it holds the clock while open); P shows or hides the HUD Pillar strip. */
+  private installTownKeys(): void {
+    const seen = new WeakSet<KeyboardEvent>();
+    const onKey = (event: KeyboardEvent) => {
+      if (seen.has(event) || event.repeat || this.transitioning) return;
+      seen.add(event);
+      if (event.code === 'KeyL' || event.key === 'l' || event.key === 'L') openTownLedger(this, this.clock);
+      else if (event.code === 'KeyP' || event.key === 'p' || event.key === 'P') this.pillarStrip.toggle();
+    };
+    this.input.keyboard?.on('keydown', onKey);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.input.keyboard?.off('keydown', onKey));
   }
 
   private resetLight(): void {
@@ -528,7 +547,8 @@ export class ZoneScene extends Phaser.Scene {
       icon: this.add.graphics({ x: x0 + W - 42, y: y0 + 42 }),
       arrow
     };
-    return [bg, ...Object.values(this.hud)];
+    this.pillarStrip = new PillarStrip(this, x0, y0 + H + 6, W).onClick(() => openTownLedger(this, this.clock));
+    return [bg, ...Object.values(this.hud), ...this.pillarStrip.objects];
   }
 
   private updateHud(dark: number, overridden: boolean): void {
