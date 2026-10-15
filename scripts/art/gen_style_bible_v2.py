@@ -142,10 +142,12 @@ def magenta_background(png: str) -> bool:
         from PIL import Image
     except ImportError:
         return True
-    im = Image.open(png).convert("RGB")
+    im = Image.open(png).convert("RGBA")
     w, h = im.size
     points = [(5, 5), (w - 6, 5), (5, h // 3), (w - 6, h // 3)]
-    return sum(1 for p in points if (lambda c: c[0] > 200 and c[1] < 70 and c[2] > 200)(im.getpixel(p))) >= 3
+    # Real transparency is even better than magenta: the keyer passes it through.
+    keyable = lambda c: c[3] == 0 or (c[0] > 200 and c[1] < 70 and c[2] > 200)  # noqa: E731
+    return sum(1 for p in points if keyable(im.getpixel(p))) >= 3
 
 
 def run_job(label: str, prompt: str, ref_png: str | None, out: str) -> str:
