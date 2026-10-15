@@ -17,7 +17,11 @@
 // the time: the other 30% the `ev` lines sit out (unless nothing else matches).
 //
 // Everything random comes from the `rng` passed in, so a seed reproduces a pick exactly.
-import { evaluate, gameContext, moodBand, regardTier, type ExprContext, type MoodBand, type RegardTier } from '@monde/shared';
+import {
+  INTENTS, MAX_REPLIES, MIN_REPLIES, REPLY_CHARS, derivedReplies, evaluate, fillReply, gameContext, moodBand, regardTier,
+  replyHash, replyId, type ExprContext, type MoodBand, type PortraitExpression, type RegardTier, type Reply, type ReplyCue,
+  type ReplyNext
+} from '@monde/shared';
 import type { TalkChoice, TalkInput, TalkTurn } from './types';
 
 export const LINE_KINDS = ['greet', 'talk', 'ctx', 'react', 'bye'] as const;
@@ -69,6 +73,11 @@ export interface QuietLine {
   text: string;
   /** Identical kind + tags (B.1 step 3). */
   group: string;
+  /**
+   * Authored replies for the Fellow (2–3, at most one goodbye). Lines without them get replies derived from
+   * their kind, tags and text (shared/src/replies.ts).
+   */
+  replies?: readonly Reply[];
 }
 
 export interface LineLibrary {
@@ -85,6 +94,34 @@ const ALLOWED: Partial<Record<TagKey, readonly string[]>> = {
 
 const groupKey = (kind: string, when: LineWhen): string =>
   `${kind}|${TAG_KEYS.filter(k => when[k]?.length).map(k => `${k}:${[...when[k]!].sort().join(',')}`).join(' ')}`;
+
+const REPLY_NEXT: readonly ReplyNext[] = ['talk', 'ctx'];
+/** Placeholders a reply may use: the resident's first name and the player's name. */
+const REPLY_PLACEHOLDER = /\{(?!name\}|player\})[^}]*\}/;
+
+/** A line's `replies`: 2–3 of {text ≤ 90 characters, intent, next?}, at most one goodbye. */
+export function parseReplies(raw: unknown, fail: (why: string) => never): Reply[] {
+  if (!Array.isArray(raw)) fail('replies must be a list');
+  const list = raw as unknown[];
+  if (list.length < MIN_REPLIES || list.length > MAX_REPLIES) fail(`needs ${MIN_REPLIES}–${MAX_REPLIES} replies, has ${list.length}`);
+  const replies = list.map((entry, i): Reply => {
+    const r = entry as Record<string, unknown> | null;
+    if (!r || typeof r !== 'object') fail(`reply ${i + 1} must be a mapping`);
+    for (const key of Object.keys(r!)) if (!['text', 'intent', 'next'].includes(key)) fail(`reply ${i + 1}: unknown field ${key}`);
+    const text = typeof r!.text === 'string' ? r!.text.trim() : '';
+    if (!text) fail(`reply ${i + 1} needs text`);
+    if (text.length > REPLY_CHARS) fail(`reply ${i + 1} is over ${REPLY_CHARS} characters`);
+    if (REPLY_PLACEHOLDER.test(text)) fail(`reply ${i + 1}: only {name} and {player} can be filled`);
+    const intent = r!.intent;
+    if (typeof intent !== 'string' || !(INTENTS as readonly string[]).includes(intent)) fail(`reply ${i + 1}: unknown intent ${String(intent)}`);
+    const next = r!.next;
+    if (next !== undefined && !(REPLY_NEXT as readonly unknown[]).includes(next)) fail(`reply ${i + 1}: next must be talk or ctx`);
+    return { text, intent: intent as Reply['intent'], ...(next ? { next: next as ReplyNext } : {}) };
+  });
+  if (replies.filter(r => r.intent === 'leave').length > 1) fail('at most one reply may say goodbye');
+  if (new Set(replies.map(r => r.text.toLowerCase())).size !== replies.length) fail('replies repeat');
+  return replies;
+}
 
 /** Parse lines.yaml's `{ lines: [...] }`. Throws with the offending id on a malformed entry. */
 export function parseLineLibrary(raw: unknown): LineLibrary {
@@ -111,7 +148,10 @@ export function parseLineLibrary(raw: unknown): LineLibrary {
       for (const v of values) if (allowed && !allowed.includes(v)) fail(`${key}:${v} is not a known value`);
       if (values.length) (when as Record<string, string[]>)[key] = values;
     }
-    const line: QuietLine = { id, kind: kind as LineKind, when, text: e!.text as string, group: groupKey(kind as string, when) };
+    const replies = e!.replies === undefined ? undefined : parseReplies(e!.replies, fail);
+    const line: QuietLine = {
+      id, kind: kind as LineKind, when, text: e!.text as string, group: groupKey(kind as string, when), ...(replies ? { replies } : {})
+    };
     lines.push(line);
     byId.set(id, line);
   }
@@ -413,10 +453,8 @@ export function pickLine(lib: LineLibrary, ctx: QuietContext, state: QuietState,
 
 // ── A Quiet Mode turn ───────────────────────────────────────────────────────
 
+/** The bare Leave: the panel's own button (every Quiet Mode turn ends with it). */
 export const QUIET_CHOICES = {
-  chat: { id: 'chat', text: 'Chat a while.', intent: 'kind' },
-  news: { id: 'news', text: "What's the news?", intent: 'curious' },
-  pet: { id: 'pet', text: 'Crouch down and hold out a hand.', intent: 'kind' },
   leave: { id: 'leave', text: 'Leave', intent: 'leave' }
 } as const satisfies Record<string, TalkChoice>;
 
@@ -433,15 +471,67 @@ const ANIMAL_FILLER = '({name} yawns.)';
 const ANIMAL_BYE = '({name} watches you go.)';
 const MOOD_GROUP: Readonly<Record<MoodBand, 'low' | 'even' | 'high'>> = { glum: 'low', low: 'low', even: 'even', bright: 'high', glowing: 'high' };
 
-/** Which B.1 kind a player input asks for: walking up greets, the news asks for context, Leave says goodbye. */
+/** Words that ask for the news, typed or chosen: the resident answers with a `ctx` line. */
+const ASKS_NEWS = /\b(?:news|what'?s new|anything new|happening|going on|heard anything)\b/i;
+
+/**
+ * Which B.1 kind a player input asks for: walking up greets, Leave (or six exchanges) says goodbye, a reply
+ * that asks for the news (a `news…` id or the words) gets a `ctx` line, and anything else more talk.
+ */
 export function kindFor(input: TalkInput, turnIndex: number): LineKind {
   if (turnIndex >= MAX_EXCHANGES) return 'bye';
   if (input.kind === 'open') return 'greet';
   if (input.kind === 'choice') {
     if (input.intent === 'leave') return 'bye';
-    if (input.choice_id === QUIET_CHOICES.news.id) return 'ctx';
+    if (input.choice_id.startsWith('news')) return 'ctx';
   }
-  return 'talk';
+  return ASKS_NEWS.test(input.text) ? 'ctx' : 'talk';
+}
+
+/** What the Fellow's replies respond to: the line as shown, with its kind and tags. */
+export function replyCue(line: QuietLine, text: string, ctx: Pick<QuietContext, 'mood'>): ReplyCue {
+  const w = line.when;
+  return { text, kind: line.kind, mood: w.m?.[0] ?? ctx.mood, weather: w.w?.[0] ?? null, zone: w.z?.[0] ?? null, event: w.ev?.[0] ?? null };
+}
+
+/** Replies as choices: names filled, ids saying what each asks for (`news…` → a ctx line). */
+function asChoices(replies: readonly Reply[], ctx: Pick<QuietContext, 'speaker' | 'player'>): TalkChoice[] {
+  return replies.map((r, i) => ({ id: replyId(r, i + 1), text: fillReply(r.text, { name: ctx.speaker.firstName, player: ctx.player }), intent: r.intent }));
+}
+
+/** The line's authored replies, or ones derived from its kind, tags and text. */
+export function quietReplies(line: QuietLine, text: string, ctx: Pick<QuietContext, 'mood' | 'speaker' | 'player'>, seed = 0): TalkChoice[] {
+  return asChoices(line.replies ?? derivedReplies(replyCue(line, text, ctx), seed), ctx);
+}
+
+const EVENT_EXPR: Readonly<Record<string, PortraitExpression>> = {
+  tollmen_near: 'worried', scuffle_seen: 'surprised', scuffle_lost: 'worried', scuffle_won: 'warm',
+  gift_dislike: 'worried', refused_by_player: 'sad', declined_by_resident: 'worried'
+};
+const SURPRISE = /^oh\b|didn't see you|did you see|pinch me|can you believe/i;
+const WORRY = /\b(?:mind (?:the|your|how)|careful|deeper than|hold your hat|ice|cross the street|don't stare|panicking)\b/i;
+const SORROW = /\b(?:tired|sorry|worse|can't sleep|long day|long one|flagging|poor company|not my best|nobody can see)\b/i;
+const DELIGHT = /\b(?:lovely|adore|love|perfect|marvelous|wonderful|happiness|good one|smiling)\b/i;
+
+/**
+ * The portrait for a library line (§16.2's six), from its tags and words: an event's own face, a low or high
+ * mood tag, then worry, sorrow, surprise or delight in the text. Greetings are warm unless the resident is
+ * Wary; everything else is neutral.
+ */
+export function quietExpression(line: QuietLine, text: string): PortraitExpression {
+  const w = line.when;
+  if (line.kind === 'bye') return 'warm';
+  const event = w.ev?.find(e => EVENT_EXPR[e]);
+  if (event) return EVENT_EXPR[event]!;
+  if (w.m?.length && w.m.every(m => m === 'glum' || m === 'low')) return 'sad';
+  if (w.m?.length && w.m.every(m => m === 'bright' || m === 'glowing')) return 'warm';
+  if (w.ev?.length) return 'warm';
+  if (SURPRISE.test(text)) return 'surprised';
+  if (WORRY.test(text)) return 'worried';
+  if (SORROW.test(text)) return 'sad';
+  if (w.r_exact?.includes('Wary')) return 'neutral';
+  if (text.includes('!') || DELIGHT.test(text) || line.kind === 'greet') return 'warm';
+  return 'neutral';
 }
 
 export interface QuietTurnInput {
@@ -465,29 +555,34 @@ export interface QuietTurn {
 }
 
 /**
- * One Quiet Mode turn in the server's `turn` shape: one line (expr "neutral"), one or two neutral replies and
- * Leave, or just Leave once the resident wraps up. Records the line in `state`.
+ * One Quiet Mode turn in the server's `turn` shape: one line with a portrait that fits it, two or three
+ * replies to that line (authored or derived) and Leave, or just Leave once the resident wraps up. Records the
+ * line in `state`. Replies are seeded by the conversation and turn, so a replay offers the same ones.
  */
 export function quietTurn(q: QuietTurnInput): QuietTurn {
   const kind = kindFor(q.input, q.turnIndex);
   const ctx: QuietContext = { ...q.context, kind };
   const wrapUp = kind === 'bye';
-  let text: string, pick: LinePick | null = null;
+  const seed = replyHash(`${q.conversationId}:${q.turnIndex}`);
+  let text: string, expr: PortraitExpression, replies: TalkChoice[], pick: LinePick | null = null;
   if (q.narrated) {
-    const template = kind === 'bye' ? ANIMAL_BYE : kind === 'greet' ? ANIMAL_LINES[MOOD_GROUP[ctx.mood]] : ANIMAL_FILLER;
+    const group = MOOD_GROUP[ctx.mood];
+    const template = kind === 'bye' ? ANIMAL_BYE : kind === 'greet' ? ANIMAL_LINES[group] : ANIMAL_FILLER;
     text = template.replaceAll('{name}', ctx.speaker.firstName);
+    expr = kind === 'greet' ? (group === 'low' ? 'sad' : 'warm') : 'neutral';
+    replies = asChoices(derivedReplies({ text, kind: 'animal' }, seed), ctx);
   } else {
     pick = pickLine(q.lib, ctx, q.state, q.rng);
     rememberLine(q.state, q.residentId, pick.line, ctx.day);
     text = pick.text;
+    expr = quietExpression(pick.line, text);
+    replies = quietReplies(pick.line, text, ctx, seed);
   }
-  const choices: TalkChoice[] = wrapUp ? [{ ...QUIET_CHOICES.leave }]
-    : q.narrated ? [{ ...QUIET_CHOICES.pet }, { ...QUIET_CHOICES.leave }]
-    : [{ ...QUIET_CHOICES.chat }, { ...QUIET_CHOICES.news }, { ...QUIET_CHOICES.leave }];
   return {
     turn: {
       conversation_id: q.conversationId, resident_id: q.residentId, turn_index: q.turnIndex,
-      lines: [{ text, expr: 'neutral' }], choices, wrap_up: wrapUp, fallback: true
+      lines: [{ text, expr }], choices: wrapUp ? [{ ...QUIET_CHOICES.leave }] : [...replies, { ...QUIET_CHOICES.leave }],
+      wrap_up: wrapUp, fallback: true
     },
     pick
   };

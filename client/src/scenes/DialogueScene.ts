@@ -1,17 +1,23 @@
+import { quietStorage } from '../save/session';
 // The VN dialogue panel (GDD §9.10 flow, §18 Dialogue; MVP M-05 client, M-11 Quiet Mode).
 //
 // Launched over ZoneScene when the player presses E beside a resident (`talk-requested`). The zone keeps
 // running underneath with its input paused; the clock is held for "dialogue" and the music ducked until the
 // panel closes. Layout follows Ravage's StoryScene, adapted: a dimmed, tinted backdrop (zone backdrops are
-// art still to come), a placeholder portrait on the left that changes with each line's `expr`, a name plate
-// that shimmers softly while a turn is generating (no spinner), and a typewriter body with pages.
+// art still to come), the resident's portrait on the left (dialogue/portrait.ts: their art if the manifest
+// lists it, else a procedural cartoon bust) showing one of six expressions per line, a name plate that
+// shimmers softly while a turn is generating (no spinner), and a typewriter body with pages.
+//
+// The player's own words (a reply or "Say something…") show first, under a "You" plate with the resident
+// dimmed, before the reply types in, so it reads as an exchange; then they stay as a one-line echo. The Log
+// button (or L) opens this conversation so far.
 //
 // Streaming: line_delta text feeds a DialogueReader (mind/reader.ts), which types only what has arrived, so
 // nothing on screen is taken back unless the stream itself starts over (a new attempt, or a final turn that
 // doesn't continue it); then the body clears and starts again, quietly. If nothing is visible by 2.5 s the
 // resident plays the "Hm." thinking beat. The final `turn` brings the choices: 1–3 (keys or click),
-// "Say something…" (a DOM text input, ≤ 140 characters), Gift, Leave, and a small "⋯" menu with Report line
-// and the text speed. Quiet Mode and server fallback turns look exactly the same (`?dev` adds a tiny marker).
+// "Say something…" (a DOM text input, ≤ 140 characters), Gift, Leave, Log, and a small "⋯" menu with Report
+// line and the text speed. Quiet Mode and server fallback turns look exactly the same (`?dev` adds a tiny marker).
 import Phaser from 'phaser';
 import { FAMILY_BODY, FAMILY_HEADING, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { getMusic } from '../audio/Music';
@@ -33,7 +39,10 @@ import { loadQuietState, loadTextSpeed, saveQuietState, saveTextSpeed } from '..
 import { firstName, quietContext, quietTurn, QUIET_CHOICES, type QuietState } from '../mind/quietMode';
 import { DialogueReader, MS_PER_CHAR, TEXT_SPEEDS, type TextSpeed } from '../mind/reader';
 import type { TalkChoice, TalkContext, TalkInput, TalkTurn } from '../mind/types';
-import type { PersonaCard } from '@monde/shared';
+import { Portrait } from '../dialogue/portrait';
+import { PORTRAIT_H, PORTRAIT_W, portraitLook, shadeColour, type PortraitLook } from '../dialogue/portraitModel';
+import { Backlog, type LogEntry } from '../dialogue/backlog';
+import { callName, isBareLeave, normalizeChoices, type PersonaCard } from '@monde/shared';
 
 export const DIALOGUE_SCENE = 'Dialogue';
 
@@ -82,8 +91,6 @@ const BODY_W = PANEL_W - PAD * 2 - 60;
 const BODY_FONT = 22;
 const BODY_SPACING = 8;
 const BODY_MAX_LINES = maxLinesFor(BODY_FONT, BODY_SPACING, PANEL_H - 40 - 30);
-const PORTRAIT_W = 230;
-const PORTRAIT_H = 270;
 const PORTRAIT_X = PANEL_X + 22;
 const PORTRAIT_Y = PANEL_Y - PORTRAIT_H + 4;
 const PLATE_X = PANEL_X + 18;
@@ -103,13 +110,20 @@ const MUTED = '#cfc4a6';
 /** A goodbye the player didn't type: the Leave choice, and what Esc means while choosing. */
 const LEAVE: TalkChoice = { ...QUIET_CHOICES.leave };
 const THINKING_BEAT = 'Hm.';
-const isBareLeave = (c: TalkChoice): boolean => c.intent === 'leave' && c.text.trim().toLowerCase() === 'leave';
 /** §9.10 step 4: nothing visible by 2.5 s → the authored thinking beat (the server sends one too). */
 const THINKING_MS = 2500;
 /** Free text is at most 140 characters (§9.10). */
 const SAY_MAX = 140;
 /** Voice blips are 45 ms long: no closer together than this, whatever the text speed. */
 const BLIP_GAP_MS = 55;
+/**
+ * GDD-GAP: §18 doesn't time the player's echoed line. It types at 6 ms a character and holds for 500 ms plus
+ * 15 ms a character (at most 1.4 s; any key or click skips it), long enough to read as an exchange but under
+ * a live turn's usual wait, so it rarely delays the reply.
+ */
+export const PLAYER_LINE = { msPerChar: 6, holdMs: 500, perCharMs: 15, maxMs: 1400 } as const;
+const BODY_COLOUR = '#f3ecd9';
+const PLAYER_COLOUR = '#f6dc9c';
 
 /**
  * GDD-GAP: §17/§18 give residents voice blips but no pitches. Children sit high and elders low: 316 Hz less
@@ -119,86 +133,10 @@ const BLIP_GAP_MS = 55;
 export const voiceFrequency = (age: number, id: string): number =>
   Math.max(150, Math.min(320, 316 - 1.6 * age)) + ((hashString(id) % 25) - 12);
 
-// ── Placeholder portrait ────────────────────────────────────────────────────
+// ── Portrait colours ────────────────────────────────────────────────────────
 
-const SKIN = [0xf2d5b3, 0xe3b48c, 0xc68e64, 0x8d5a3b, 0xf6e1cb, 0xa86f48];
-const HAIR = [0x3b2a20, 0x6b4a2b, 0xb7b2a8, 0x1f1a17, 0x9c4a26, 0xd9c28a, 0x50392b];
 /** The resident's roster colour, as their sprite wears it (scenes/zone/residents.ts). */
 const rosterColour = (index: number): number => Phaser.Display.Color.HSLToColor(((index * 137.508) % 360) / 360, 0.52, 0.56).color;
-const shade = (c: number, f: number): number =>
-  (Math.min(255, Math.round(((c >> 16) & 0xff) * f)) << 16) | (Math.min(255, Math.round(((c >> 8) & 0xff) * f)) << 8) | Math.min(255, Math.round((c & 0xff) * f));
-
-interface Look { colour: number; skin: number; hair: number; animal: boolean }
-
-/** A bust in the resident's colours with a face for the standard expressions; other expressions read as neutral. */
-function drawPortrait(g: Phaser.GameObjects.Graphics, look: Look, expr: string): void {
-  const W = PORTRAIT_W, H = PORTRAIT_H, cx = W / 2, cy = H * 0.42;
-  g.clear();
-  g.fillStyle(shade(look.colour, 0.32), 0.95).fillRoundedRect(0, 0, W, H, 16);
-  g.fillStyle(look.colour, 0.22).fillCircle(cx, cy, W * 0.42);
-  g.lineStyle(2, GOLD, 0.45).strokeRoundedRect(1, 1, W - 2, H - 2, 16);
-  const ink = 0x2a2420;
-  const e = expr;
-  if (look.animal) {
-    const fur = 0x4a4038;
-    g.fillStyle(fur).fillEllipse(cx, H * 0.86, W * 0.7, H * 0.4);
-    const flat = e === 'angry' || e === 'sad' || e === 'worried';
-    g.fillStyle(fur).fillCircle(cx, cy, 62);
-    if (flat) g.fillTriangle(cx - 70, cy - 22, cx - 30, cy - 52, cx - 40, cy - 8).fillTriangle(cx + 70, cy - 22, cx + 30, cy - 52, cx + 40, cy - 8);
-    else g.fillTriangle(cx - 58, cy - 20, cx - 46, cy - 84, cx - 14, cy - 54).fillTriangle(cx + 58, cy - 20, cx + 46, cy - 84, cx + 14, cy - 54);
-    const closed = e === 'warm' || e === 'laugh' || e === 'thinking';
-    if (closed) {
-      g.lineStyle(4, 0xd8e070).beginPath().arc(cx - 24, cy - 4, 10, Math.PI * 1.1, Math.PI * 1.9).strokePath();
-      g.beginPath().arc(cx + 24, cy - 4, 10, Math.PI * 1.1, Math.PI * 1.9).strokePath();
-    } else {
-      const r = e === 'surprised' ? 12 : 9;
-      g.fillStyle(0xd8e070).fillCircle(cx - 24, cy - 6, r).fillCircle(cx + 24, cy - 6, r);
-      g.fillStyle(ink).fillEllipse(cx - 24, cy - 6, 4, r * 1.6).fillEllipse(cx + 24, cy - 6, 4, r * 1.6);
-    }
-    g.fillStyle(0xd88a8a).fillTriangle(cx - 7, cy + 14, cx + 7, cy + 14, cx, cy + 22);
-    g.fillStyle(look.colour).fillRect(cx - 40, cy + 52, 80, 8);
-    return;
-  }
-  // Shoulders, neck, head, hair.
-  g.fillStyle(look.colour).fillRoundedRect(W * 0.12, H * 0.72, W * 0.76, H * 0.4, 46);
-  g.fillStyle(shade(look.colour, 0.7)).fillRect(W * 0.12, H * 0.72 + 30, W * 0.76, 6);
-  g.fillStyle(shade(look.skin, 0.85)).fillRect(cx - 17, cy + 40, 34, 40);
-  g.fillStyle(look.skin).fillEllipse(cx, cy, 112, 128);
-  g.fillStyle(look.hair).fillEllipse(cx, cy - 46, 120, 52).fillRect(cx - 60, cy - 46, 14, 50).fillRect(cx + 46, cy - 46, 14, 50);
-  // Brows, eyes, mouth by expression.
-  const ex = 24, ey = cy - 4, my = cy + 34;
-  g.lineStyle(4, shade(look.hair, 0.8));
-  const brow = (dx: number, inner: number, outer: number) => {
-    const side = Math.sign(dx);
-    g.lineBetween(cx + dx - 12 * side, ey - 18 + outer, cx + dx + 10 * side - side * 22, ey - 18 + inner);
-  };
-  const browPair = (inner: number, outer: number) => { brow(ex, inner, outer); brow(-ex, inner, outer); };
-  switch (e) {
-    case 'angry': browPair(6, -4); break;
-    case 'sad': case 'worried': browPair(-6, 3); break;
-    case 'surprised': browPair(-8, -8); break;
-    case 'thinking': brow(-ex, 0, 0); brow(ex, -7, -7); break;
-    default: browPair(0, 0);
-  }
-  if (e === 'laugh') {
-    g.lineStyle(4, ink).beginPath().arc(cx - ex, ey + 4, 8, Math.PI * 1.15, Math.PI * 1.85).strokePath();
-    g.beginPath().arc(cx + ex, ey + 4, 8, Math.PI * 1.15, Math.PI * 1.85).strokePath();
-  } else {
-    const r = e === 'surprised' ? 7 : 5, look_ = e === 'thinking' ? { x: 5, y: -4 } : { x: 0, y: 0 };
-    g.fillStyle(ink).fillCircle(cx - ex + look_.x, ey + look_.y, r).fillCircle(cx + ex + look_.x, ey + look_.y, r);
-  }
-  g.lineStyle(4, 0x8a3f3a);
-  switch (e) {
-    case 'warm': g.beginPath().arc(cx, my - 10, 16, Math.PI * 0.2, Math.PI * 0.8).strokePath(); break;
-    case 'laugh': g.fillStyle(0x8a3f3a).slice(cx, my - 6, 18, 0, Math.PI, false).fillPath(); break;
-    case 'sad': g.beginPath().arc(cx, my + 12, 15, Math.PI * 1.2, Math.PI * 1.8).strokePath(); break;
-    case 'angry': g.lineBetween(cx - 14, my + 2, cx + 14, my - 1); break;
-    case 'surprised': g.strokeCircle(cx, my, 7); break;
-    case 'worried': g.beginPath().moveTo(cx - 14, my + 2).lineTo(cx - 5, my - 2).lineTo(cx + 4, my + 2).lineTo(cx + 14, my - 2).strokePath(); break;
-    case 'thinking': g.lineBetween(cx - 2, my, cx + 14, my - 3); break;
-    default: g.lineBetween(cx - 13, my, cx + 13, my);
-  }
-}
 
 // ── A focusable button ──────────────────────────────────────────────────────
 
@@ -251,7 +189,7 @@ class PanelButton {
 export class DialogueScene extends Phaser.Scene {
   private open!: DialogueOpen;
   private card!: PersonaCard;
-  private look!: Look;
+  private look!: PortraitLook;
   private context!: TalkContext;
   private conversationId = '';
   /** Exchanges completed (the next turn's index). */
@@ -276,9 +214,18 @@ export class DialogueScene extends Phaser.Scene {
   private more!: Phaser.GameObjects.Text;
   private devMark!: Phaser.GameObjects.Text;
   private toastText!: Phaser.GameObjects.Text;
-  private portrait!: Phaser.GameObjects.Graphics;
-  private exprLabel!: Phaser.GameObjects.Text;
+  private portrait!: Portrait;
   private plateW = 0;
+  /** The resident's name plate, dimmed while the player speaks; the player's own "You" plate. */
+  private residentPlate: Phaser.GameObjects.GameObject[] = [];
+  private youPlate!: Phaser.GameObjects.Container;
+  /** The player's line on show (null when the resident has the floor), when it started and until when. */
+  private playerLine: string | null = null;
+  private playerStart = 0;
+  private playerUntil = 0;
+  /** This conversation so far, for the Log. */
+  private log: LogEntry[] = [];
+  private backlog: Backlog | null = null;
   private shimmer!: Phaser.GameObjects.Graphics;
   private shownBody = '';
   private shownExpr = '';
@@ -300,8 +247,7 @@ export class DialogueScene extends Phaser.Scene {
     this.open = data;
     const entry = CARDS.get(data.residentId)!;
     this.card = entry.card;
-    const h = hashString(entry.card.id);
-    this.look = { colour: rosterColour(entry.index), skin: SKIN[h % SKIN.length]!, hair: HAIR[(h >> 4) % HAIR.length]!, animal: entry.card.kind === 'animal' };
+    this.look = portraitLook(entry.card, rosterColour(entry.index));
     this.context = talkContext({ day: data.clock.day, minute: data.clock.minute, state: data.state, zone: data.zone, weather: data.weather });
     this.conversationId = uuid();
     this.exchange = 0;
@@ -315,7 +261,7 @@ export class DialogueScene extends Phaser.Scene {
     this.farewell = false;
     this.closed = false;
     this.speed = loadTextSpeed(browserStorage());
-    this.quiet = loadQuietState(browserStorage());
+    this.quiet = loadQuietState(quietStorage);
     this.quietLine = null;
     this.shownBody = '';
     this.shownExpr = '';
@@ -327,6 +273,12 @@ export class DialogueScene extends Phaser.Scene {
     this.focus = 0;
     this.menu = [];
     this.say = null;
+    this.residentPlate = [];
+    this.playerLine = null;
+    this.playerStart = 0;
+    this.playerUntil = 0;
+    this.log = [];
+    this.backlog = null;
   }
 
   create(): void {
@@ -338,15 +290,12 @@ export class DialogueScene extends Phaser.Scene {
     const tint = this.look.colour;
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x10140f, 0.42).setOrigin(0);
     const wash = this.add.graphics();
-    wash.fillGradientStyle(shade(tint, 0.35), shade(tint, 0.35), 0x0c100d, 0x0c100d, 0.18, 0.18, 0.72, 0.72).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    wash.fillGradientStyle(shadeColour(tint, 0.35), shadeColour(tint, 0.35), 0x0c100d, 0x0c100d, 0.18, 0.18, 0.72, 0.72).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
     // Anywhere that isn't a button advances the text.
     this.add.zone(0, 0, GAME_WIDTH, GAME_HEIGHT).setOrigin(0).setInteractive().on('pointerdown', () => this.advance());
 
     // Portrait (left), then the panel over its lower edge.
-    this.portrait = this.add.graphics({ x: PORTRAIT_X, y: PORTRAIT_Y });
-    this.exprLabel = this.add.text(PORTRAIT_X + PORTRAIT_W - 12, PORTRAIT_Y + 12, '', {
-      fontFamily: FAMILY_BODY, fontSize: '13px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE
-    }).setOrigin(1, 0);
+    this.portrait = new Portrait(this, { residentId: this.card.id, look: this.look, x: PORTRAIT_X, y: PORTRAIT_Y, label: true });
     this.setExpr('neutral');
     const panel = this.add.graphics();
     panel.fillStyle(INK, 0.95).fillRoundedRect(PANEL_X, PANEL_Y, PANEL_W, PANEL_H, 14);
@@ -362,6 +311,14 @@ export class DialogueScene extends Phaser.Scene {
     plate.fillStyle(PLATE, 1).fillRoundedRect(PLATE_X, PLATE_Y, this.plateW, PLATE_H, 9);
     plate.lineStyle(2, GOLD, 0.85).strokeRoundedRect(PLATE_X, PLATE_Y, this.plateW, PLATE_H, 9);
     this.shimmer = this.add.graphics().setDepth(12).setBlendMode(Phaser.BlendModes.ADD);
+    this.residentPlate = [name];
+    // The player's plate, on the right, shown while their own line is up.
+    const you = this.add.text(0, PLATE_H / 2, 'You', { fontFamily: FAMILY_HEADING, fontSize: '21px', color: '#e9f4ea', resolution: RENDER_SCALE }).setOrigin(0.5);
+    const youW = Math.ceil(you.width) + 44;
+    const youBg = this.add.graphics();
+    youBg.fillStyle(0x2d4a43, 1).fillRoundedRect(-youW / 2, 0, youW, PLATE_H, 9);
+    youBg.lineStyle(2, 0x9fd3b6, 0.85).strokeRoundedRect(-youW / 2, 0, youW, PLATE_H, 9);
+    this.youPlate = this.add.container(PANEL_X + PANEL_W - 130 - youW / 2, PLATE_Y, [youBg, you]).setDepth(10).setAlpha(0);
 
     const bodyStyle: Phaser.Types.GameObjects.Text.TextStyle = {
       fontFamily: FAMILY_BODY, fontSize: `${BODY_FONT}px`, color: '#f3ecd9', lineSpacing: BODY_SPACING,
@@ -372,7 +329,7 @@ export class DialogueScene extends Phaser.Scene {
     this.reader = new DialogueReader(text => paginateBody(measure, text, BODY_MAX_LINES));
     this.echo = this.add.text(PLATE_X + this.plateW + 18, PANEL_Y + 10, '', {
       fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE,
-      wordWrap: { width: PANEL_X + PANEL_W - 70 - (PLATE_X + this.plateW + 18) }, maxLines: 1
+      wordWrap: { width: PANEL_X + PANEL_W - 120 - (PLATE_X + this.plateW + 18) }, maxLines: 1
     });
     this.more = this.add.text(PANEL_X + PANEL_W - 22, PANEL_Y + PANEL_H - 12, '', {
       fontFamily: FAMILY_BODY, fontSize: '16px', color: '#e4c77f', resolution: RENDER_SCALE
@@ -391,6 +348,13 @@ export class DialogueScene extends Phaser.Scene {
       fontFamily: FAMILY_BODY, fontSize: '24px', color: '#e4c77f', padding: { x: 8, y: 0 }, resolution: RENDER_SCALE
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
     dots.on('pointerup', () => (this.menu.length ? this.closeMenu() : this.openMenu()));
+    // Log: this conversation so far (also the L key).
+    const logButton = this.add.text(PANEL_X + PANEL_W - 64, PANEL_Y + 13, 'Log', {
+      fontFamily: FAMILY_BODY, fontSize: '16px', color: '#e4c77f', padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
+    }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
+    logButton.on('pointerover', () => logButton.setColor('#fff0ce'));
+    logButton.on('pointerout', () => logButton.setColor('#e4c77f'));
+    logButton.on('pointerup', () => { playSfx('click'); this.time.delayedCall(0, () => (this.backlog ? this.closeLog() : this.openLog())); });
 
     const keyboard = this.input.keyboard!;
     keyboard.addCapture('SPACE,TAB,UP,DOWN');
@@ -403,12 +367,29 @@ export class DialogueScene extends Phaser.Scene {
 
   update(time: number, delta: number): void {
     if (this.closed) return;
+    if (this.playerLine !== null) {
+      // The player's own line has the floor: the reply waits (it keeps streaming into the reader meanwhile).
+      const now = this.time.now;
+      if (now < this.playerUntil) {
+        const line = this.playerLine;
+        const n = this.speed === 'instant' ? line.length : Math.min(line.length, Math.floor((now - this.playerStart) / PLAYER_LINE.msPerChar));
+        const text = line.slice(0, n);
+        if (text !== this.shownBody) {
+          this.shownBody = text;
+          this.body.setText(text).setFontStyle('normal').setColor(PLAYER_COLOUR).setAlpha(1);
+        }
+        this.more.setText('');
+        this.drawShimmer(time);
+        return;
+      }
+      this.endPlayerLine();
+    }
     const typed = this.reader.tick(delta, MS_PER_CHAR[this.speed]);
     if (typed) this.blip(typed, time);
     const text = this.reader.hasText ? this.reader.visible : this.thinking ?? '';
     if (text !== this.shownBody) {
       this.shownBody = text;
-      this.body.setText(text).setFontStyle(this.reader.hasText ? 'normal' : 'italic').setAlpha(this.reader.hasText ? 1 : 0.8);
+      this.body.setText(text).setColor(BODY_COLOUR).setFontStyle(this.reader.hasText ? 'normal' : 'italic').setAlpha(this.reader.hasText ? 1 : 0.8);
     }
     // A streamed line has no expression until its turn arrives: keep the last one (or "thinking" during the beat).
     const lineExpr = this.reader.expr();
@@ -431,7 +412,8 @@ export class DialogueScene extends Phaser.Scene {
     this.reader.reset();
     this.restartQuietly();
     this.hideChoices();
-    this.echo.setText(echo ? `You: ${echo}` : '');
+    if (echo) this.speakAsPlayer(echo);
+    else this.echo.setText('');
     this.thinkTimer?.remove();
     this.thinkTimer = this.time.delayedCall(THINKING_MS, () => this.onThinking(THINKING_BEAT, seq));
     this.abort?.abort();
@@ -465,7 +447,7 @@ export class DialogueScene extends Phaser.Scene {
     if (this.closed || seq !== this.requestSeq || !this.generating || this.reader.hasText || this.thinking) return;
     this.thinking = text || THINKING_BEAT;
     // "Hm." plus a fidget.
-    this.tweens.add({ targets: this.portrait, x: { from: PORTRAIT_X - 3, to: PORTRAIT_X + 3 }, duration: 130, yoyo: true, repeat: 1, ease: 'Sine.easeInOut', onComplete: () => this.portrait.setX(PORTRAIT_X) });
+    this.portrait.fidget();
   }
 
   private onTurn(turn: TalkTurn, source: 'server' | 'quiet', reason?: string): void {
@@ -473,6 +455,7 @@ export class DialogueScene extends Phaser.Scene {
     this.thinkTimer?.remove();
     this.source = source;
     this.turn = this.tidy(turn);
+    for (const line of this.turn.lines) this.log.push({ who: 'resident', text: line.text });
     this.exchange = turn.turn_index + 1;
     if (this.reader.finish(this.turn) === 'reset') this.restartQuietly();
     if (DEV_MARK) {
@@ -482,13 +465,17 @@ export class DialogueScene extends Phaser.Scene {
   }
 
   /**
-   * At most three numbered replies, then Leave; after a wrap-up, only Leave (§9.10 step 6). A goodbye the model
-   * wrote in its own words ("I'd better get going.") stays among the numbered replies; a bare "Leave" becomes
-   * the Leave button, which is always there.
+   * Two or three numbered replies, then Leave; after a wrap-up, only Leave (§9.10 step 6). The replies go
+   * through the same guarantee as the server's (shared normalizeChoices): distinct, at most one goodbye, and
+   * padded with replies to the last line if a turn came up short. A goodbye the model wrote in its own words
+   * ("I'd better get going.") stays among the numbered replies; a bare "Leave" becomes the Leave button,
+   * which is always there.
    */
   private tidy(turn: TalkTurn): TalkTurn {
-    const replies = turn.wrap_up ? [] : turn.choices.filter(c => !isBareLeave(c)).slice(0, 3);
-    return { ...turn, choices: [...replies, turn.choices.find(isBareLeave) ?? LEAVE] };
+    const leave = turn.choices.find(c => isBareLeave(c)) ?? LEAVE;
+    if (turn.wrap_up) return { ...turn, choices: [leave] };
+    const replies = normalizeChoices(turn.choices, { cue: { text: turn.lines.at(-1)?.text ?? '' }, name: callName(this.card.name) });
+    return { ...turn, choices: [...replies, leave] };
   }
 
   private makeQuietTurn(input: TalkInput, turnIndex: number): TalkTurn {
@@ -506,7 +493,7 @@ export class DialogueScene extends Phaser.Scene {
       residentId: this.card.id, turnIndex, input, context, narrated: this.card.voice.mode === 'narrated_action'
     });
     this.quietLine = pick?.line.id ?? null;
-    saveQuietState(browserStorage(), this.quiet);
+    saveQuietState(quietStorage, this.quiet);
     return turn;
   }
 
@@ -514,7 +501,9 @@ export class DialogueScene extends Phaser.Scene {
 
   private advance(): void {
     if (this.closed || this.say) return;
+    if (this.backlog) { this.closeLog(); return; }
     if (this.menu.length) { this.closeMenu(); return; }
+    if (this.playerLine !== null) { this.playerUntil = 0; return; }
     if (this.choicesShown) return;
     const step = this.reader.advance();
     if (step === 'page' || step === 'line') { playSfx('page_turn'); this.paren = false; }
@@ -543,8 +532,46 @@ export class DialogueScene extends Phaser.Scene {
   private setExpr(expr: string): void {
     if (expr === this.shownExpr) return;
     this.shownExpr = expr;
-    drawPortrait(this.portrait, this.look, expr);
-    this.exprLabel.setText(expr.replace(/_/g, ' '));
+    this.portrait.setExpression(expr);
+  }
+
+  // ── The player's line and the Log ─────────────────────────────────────────
+
+  /** The player said something (a reply, free text or a worded goodbye): it takes the floor briefly. */
+  private speakAsPlayer(text: string): void {
+    this.playerLine = text;
+    this.playerStart = this.time.now;
+    this.playerUntil = this.time.now + Math.min(PLAYER_LINE.maxMs, PLAYER_LINE.holdMs + PLAYER_LINE.perCharMs * text.length);
+    this.log.push({ who: 'player', text });
+    this.echo.setText('');
+    this.shownBody = '\u0000';
+    this.tweens.killTweensOf([this.youPlate, ...this.residentPlate]);
+    this.tweens.add({ targets: this.youPlate, alpha: 1, duration: 100 });
+    this.tweens.add({ targets: this.residentPlate, alpha: 0.45, duration: 100 });
+    this.portrait.setDimmed(true);
+  }
+
+  /** The resident has the floor again; the player's words stay as the one-line echo. */
+  private endPlayerLine(): void {
+    const said = this.playerLine;
+    this.playerLine = null;
+    this.echo.setText(said ? `You: ${said}` : '');
+    this.restartQuietly();
+    this.tweens.killTweensOf([this.youPlate, ...this.residentPlate]);
+    this.tweens.add({ targets: this.youPlate, alpha: 0, duration: 120 });
+    this.tweens.add({ targets: this.residentPlate, alpha: 1, duration: 120 });
+    this.portrait.setDimmed(false);
+  }
+
+  private openLog(): void {
+    if (this.backlog || this.closed || this.say) return;
+    this.closeMenu();
+    this.backlog = new Backlog(this, { x: PANEL_X, y: 36, w: PANEL_W, h: PANEL_Y - 36 - 24 }, this.log, displayName(this.card.name), () => this.closeLog());
+  }
+
+  private closeLog(): void {
+    this.backlog?.destroy();
+    this.backlog = null;
   }
 
   private drawShimmer(time: number): void {
@@ -619,9 +646,11 @@ export class DialogueScene extends Phaser.Scene {
     if (this.turn?.wrap_up || this.farewell) { this.close(); return; }
     const bye = this.makeQuietTurn({ kind: 'choice', choice_id: LEAVE.id, text: LEAVE.text, intent: 'leave' }, this.exchange);
     this.hideChoices();
-    this.echo.setText(said ? `You: ${said}` : '');
+    if (said) this.speakAsPlayer(said);
+    else this.echo.setText('');
     this.farewell = true;
     this.turn = bye;
+    for (const line of bye.lines) this.log.push({ who: 'resident', text: line.text });
     this.reader.reset();
     this.reader.finish(bye);
     this.restartQuietly();
@@ -751,6 +780,16 @@ export class DialogueScene extends Phaser.Scene {
   private onKey(e: KeyboardEvent): void {
     if (this.closed || this.say) return;
     const key = e.key;
+    if (this.backlog) {
+      if (key === 'Escape' || key === 'l' || key === 'L') this.closeLog();
+      else if (key === 'ArrowUp') this.backlog.scroll(-1);
+      else if (key === 'ArrowDown') this.backlog.scroll(1);
+      else if (key === 'PageUp') this.backlog.scroll(-4);
+      else if (key === 'PageDown') this.backlog.scroll(4);
+      e.preventDefault();
+      return;
+    }
+    if (key === 'l' || key === 'L') { e.preventDefault(); this.openLog(); return; }
     if (key === 'Escape') {
       if (this.menu.length) this.closeMenu();
       else if (!this.generating) this.close(); // Esc closes only when no turn is streaming.
@@ -792,6 +831,7 @@ export class DialogueScene extends Phaser.Scene {
     this.abort?.abort();
     this.closeSay(false);
     this.closeMenu();
+    this.closeLog();
     this.tweens.add({ targets: this.cameras.main, alpha: 0, duration: 140, onComplete: () => this.scene.stop() });
   }
 
@@ -800,6 +840,7 @@ export class DialogueScene extends Phaser.Scene {
     this.closed = true;
     this.abort?.abort();
     this.closeSay(false);
+    this.closeLog();
     this.input.keyboard?.removeCapture('SPACE,TAB');
     this.pauseWorld(false);
   }

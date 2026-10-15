@@ -6,9 +6,14 @@
  * events, no-repeat windows) are M-11. Mood bands (B.1) are grouped low (glum, low) · even · high (bright,
  * glowing) so fifteen lines cover all twenty-five band × tier cells. Lines follow the voice rules (§12.1):
  * contractions, full stops, no backstory, nothing a particular resident couldn't say.
+ *
+ * Every authored turn offers 2–3 replies to the line it shows (§9.10 "Player input"): the fifteen tier × mood
+ * lines have their own; fillers, riddle hints and narrated lines take replies derived from the line
+ * (shared/src/replies.ts). The client adds Leave.
  */
 import {
-  moodBand, regardTier, type DialogueTurnOutput, type MoodBand, type PersonaCard, type RegardTier, type ResidentState,
+  callName, derivedReplies, fillReply, moodBand, normalizeChoices, regardTier, type DialogueTurnOutput, type MoodBand,
+  type PersonaCard, type RegardTier, type Reply, type ReplyCue, type ResidentState,
 } from "@monde/shared";
 import { containsAnswer } from "./promptBuilder.js";
 import type { RiddleRecord } from "./riddles.js";
@@ -63,10 +68,40 @@ const ANIMAL_FILLER = "({name} yawns.)";
 /** On a riddle turn with nothing safe to hint, the resident is stumped (§14.2). */
 export const STUMPED_LINE = "Couldn't tell you. I'm stumped.";
 
-export const FALLBACK_CHOICES: DialogueTurnOutput["choices"] = [
-  { id: "a", text: "Fair enough.", intent: "kind" },
-  { id: "b", text: "Leave", intent: "leave" },
-];
+const k = (text: string): Reply => ({ text, intent: "kind" });
+const c = (text: string): Reply => ({ text, intent: "curious" });
+const j = (text: string): Reply => ({ text, intent: "joke" });
+const bye = (text: string): Reply => ({ text, intent: "leave" });
+
+/** The Fellow's replies to each FALLBACK_LINES line, in the same order: warm, curious, wry. */
+export const FALLBACK_REPLIES: Readonly<Record<RegardTier, Readonly<Record<MoodGroup, readonly Reply[]>>>> = {
+  Wary: {
+    low: [bye("Another time, then. I'll leave you be."), c("Bad day? Anything I can do?"), j("I'll be quick. Promise.")],
+    even: [k("Polite will do for now."), c("What did I do to earn that?"), { text: "Fair. I'll earn the rest.", intent: "firm" }],
+    high: [k("I wouldn't dream of it."), c("What's put you in a good mood?"), j("I'll tiptoe, then.")],
+  },
+  Stranger: {
+    low: [bye("Another time, then. Look after yourself."), c("Is everything all right?"), j("I'm not much company either. We'd suit.")],
+    even: [k("We haven't. I'm the new Fellow."), c("What should I call you?"), j("Let's fix that, then. Hello.")],
+    high: [k("That's me. Pleased to meet you."), c("Is it that obvious?"), j("Was it the lost look that gave me away?")],
+  },
+  Neighbor: {
+    low: [k("Anything I can do before Thursday?"), c("What's happened?"), j("I'll check on you Thursday, then.")],
+    even: [k("Not bad. The town's growing on me."), c("Getting there. And you?"), j("I've stopped getting lost. Mostly.")],
+    high: [k("Gladly. Lead the way."), c("Where are we off to?"), j("Only if you set a slow pace.")],
+  },
+  Friend: {
+    low: [k("I've time. What's wrong?"), c("Has something happened?"), j("I always have time for a sit.")],
+    even: [k("Thanks. I'll take what I can get."), c("Who's got the real one?"), j("I'll stand. I'm told it's good for me.")],
+    high: [k("I was hoping you'd be here."), c("Oh? What's on your mind?"), j("I'm hard to keep away.")],
+  },
+  Confidant: {
+    low: [k("Then don't. I'm listening."), c("What's going on?"), j("Good. I'm a terrible audience for pretending.")],
+    even: [k("Honestly? Better for seeing you."), c("Tired, but all right. And you?"), j("I've lost a hat and found a friend. Even, I'd say.")],
+    high: [k("Mine too, now."), c("Tell me about it."), j("Careful. I'll start expecting this.")],
+  },
+};
+
 export const LEAVE_CHOICE: DialogueTurnOutput["choices"][number] = { id: "a", text: "Leave", intent: "leave" };
 
 export interface FallbackInput {
@@ -104,11 +139,36 @@ export function fallbackLine(input: FallbackInput): string {
   return line.replaceAll("{player}", input.playerName);
 }
 
+const CHOICE_IDS = ["a", "b", "c"] as const;
+
+/** 2–3 replies to the line `fallbackLine` shows for this input (ids a, b, c; the client adds Leave). */
+export function fallbackChoices(input: FallbackInput, text = fallbackLine(input)): DialogueTurnOutput["choices"] {
+  const name = callName(input.card.name);
+  let cue: ReplyCue;
+  let replies: readonly Reply[];
+  if (input.card.voice.mode === "narrated_action") {
+    cue = { text, kind: "animal" };
+    replies = derivedReplies(cue, input.turnIndex);
+  } else if (input.riddle) {
+    cue = { text, kind: text === STUMPED_LINE ? "stumped" : "riddle" };
+    replies = derivedReplies(cue, input.turnIndex);
+  } else if (input.turnIndex % 2 === 1) {
+    cue = { text, kind: "talk" };
+    replies = derivedReplies(cue, input.turnIndex);
+  } else {
+    cue = { text, kind: "greet", mood: moodBand(input.state.mood.valence) };
+    replies = FALLBACK_REPLIES[regardTier(input.state.regard)][MOOD_GROUP[moodBand(input.state.mood.valence)]];
+  }
+  const filled = replies.map((r) => ({ text: fillReply(r.text, { name, player: input.playerName }), intent: r.intent }));
+  return normalizeChoices(filled, { cue, name, seed: input.turnIndex }).map((choice, i) => ({ ...choice, id: CHOICE_IDS[i]! }));
+}
+
 /** A complete, effect-free turn in the dialogue contract's shape. */
 export function fallbackTurn(input: FallbackInput): DialogueTurnOutput {
+  const text = fallbackLine(input);
   return {
-    lines: [{ text: fallbackLine(input), expr: expressionFor(input.card, input.state.mood.emotion) }],
-    choices: FALLBACK_CHOICES.map((choice) => ({ ...choice })),
+    lines: [{ text, expr: expressionFor(input.card, input.state.mood.emotion) }],
+    choices: fallbackChoices(input, text),
     effects: {
       regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: "",
     },

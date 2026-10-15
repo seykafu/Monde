@@ -4,7 +4,8 @@ import { loadContent } from "../../content/loadContent.js";
 import { ECHO_THRESHOLD, correctiveNote, echoOverlap, validateTurn, wordTrigrams, type ValidationContext } from "../validate.js";
 import { completeWords, lexicalHits } from "../filters.js";
 import { checkedExpression, expressionFor } from "../expressions.js";
-import { FALLBACK_LINES, FILLER_LINES, STUMPED_LINE, authoredHint, fallbackTurn } from "../fallback.js";
+import { FALLBACK_LINES, FALLBACK_REPLIES, FILLER_LINES, STUMPED_LINE, authoredHint, fallbackTurn } from "../fallback.js";
+import { REPLY_POOLS, WEATHER_REPLIES, ZONE_REPLIES, derivedReplies, fillReply, type Reply } from "@monde/shared";
 import { RIDDLES } from "../riddles.js";
 
 let cards: PersonaCard[];
@@ -70,11 +71,43 @@ describe("validation pipeline", () => {
     expect(run(turn({ effects: { regard_delta: -40 } }))).toMatchObject({ ok: true, output: { effects: { regard_delta: -5 } } });
   });
 
-  it("2. pads a turn with fewer than two choices with Leave", () => {
+  it("2. pads a turn with fewer than two replies from the resident's last line", () => {
     const result = run(turn({ choices: [{ id: "q", text: "Go on.", intent: "curious" }] }));
-    expect(result.ok && result.output.choices).toEqual([
-      { id: "a", text: "Go on.", intent: "curious" }, { id: "b", text: "Leave", intent: "leave" },
+    if (!result.ok) throw new Error(result.detail);
+    const pads = derivedReplies({ text: "(Counts a lamp.) Eighty-one lit tonight." });
+    expect(result.output.choices).toEqual([
+      { id: "a", text: "Go on.", intent: "curious" }, { id: "b", text: pads[0]!.text, intent: pads[0]!.intent },
     ]);
+    // No replies at all, or only a bare "Leave" (the panel has its own button): two replies to the question.
+    for (const choices of [[], [{ id: "x", text: "Leave", intent: "leave" as const }]]) {
+      const padded = run(turn({ lines: [{ text: "How are you getting on, Fellow?", expr: "warm" }], choices }));
+      if (!padded.ok) throw new Error(padded.detail);
+      expect(padded.output.choices.map((c) => c.id)).toEqual(["a", "b"]);
+      expect(padded.output.choices.map((c) => c.text)).toEqual(derivedReplies({ text: "How are you getting on, Fellow?" }).slice(0, 2).map((r) => r.text));
+      expect(padded.output.choices.every((c) => c.text !== "Leave")).toBe(true);
+    }
+  });
+
+  it("2. keeps replies distinct, with at most one goodbye and at most three", () => {
+    const result = run(turn({
+      choices: [
+        { id: "1", text: "  I'd better   get on. ", intent: "leave" },
+        { id: "2", text: "i'd better get on", intent: "kind" },
+        { id: "3", text: "See you, Pell.", intent: "leave" },
+        { id: "4", text: "Eighty-one of how many?", intent: "curious" },
+        { id: "5", text: "", intent: "kind" },
+        { id: "6", text: "Who lights the rest?", intent: "curious" },
+        { id: "7", text: "Lamps are a job, then.", intent: "joke" },
+      ],
+    }));
+    if (!result.ok) throw new Error(result.detail);
+    expect(result.output.choices).toEqual([
+      { id: "a", text: "I'd better get on.", intent: "leave" },
+      { id: "b", text: "Eighty-one of how many?", intent: "curious" },
+      { id: "c", text: "Who lights the rest?", intent: "curious" },
+    ]);
+    expect(result.adjustments.some((a) => a.startsWith("choices "))).toBe(true);
+    expect(run(turn()).ok && (run(turn()) as { adjustments: string[] }).adjustments.some((a) => a.startsWith("choices "))).toBe(false);
   });
 
   it("3. maps an expression the card lacks from the resident's emotion", () => {
@@ -184,11 +217,34 @@ describe("fallback turns", () => {
     expect(fallbackTurn({ ...base, turnIndex: 1, state: state(0, 0) }).lines[0]!.text).toBe(FILLER_LINES[0]);
   });
 
-  it("is effect-free, maps the portrait, and offers a neutral reply and Leave", () => {
+  it("is effect-free, maps the portrait, and offers replies to the line it shows", () => {
     const out = fallbackTurn({ card: card("pell"), playerName: "Ada", turnIndex: 0, state: state(0, 0) });
     expect(out.lines[0]!.expr).toBe("sad");
-    expect(out.choices.map((c) => c.intent)).toEqual(["kind", "leave"]);
+    expect(out.lines[0]!.text).toBe(FALLBACK_LINES.Stranger.even);
+    expect(out.choices).toEqual(FALLBACK_REPLIES.Stranger.even.map((r, i) => ({ id: "abc"[i], text: r.text, intent: r.intent })));
     expect(out.effects).toEqual({ regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: "" });
+  });
+
+  it("gives every authored turn two or three replies, never a bare Leave, and at most one goodbye", () => {
+    const cases = [
+      ...[-10, 0, 25, 50, 80].flatMap((regard) => [-90, 0, 90].map((valence) => ({ card: card("pell"), turnIndex: 0, state: state(regard, valence) }))),
+      ...[1, 3, 5].map((turnIndex) => ({ card: card("odile"), turnIndex, state: state(0, 0) })),
+      { card: card("bastien"), turnIndex: 0, state: state(0, 0) },
+      { card: card("margo"), turnIndex: 0, state: state(0, 0), riddle: { record: RIDDLES["OQ-2"]!, allowed: 1 } },
+      { card: card("margo"), turnIndex: 0, state: state(0, 0), riddle: { record: RIDDLES["OQ-2"]!, allowed: 0 } },
+    ];
+    for (const input of cases) {
+      const { choices } = fallbackTurn({ ...input, playerName: "Ada" });
+      expect(choices.length).toBeGreaterThanOrEqual(2);
+      expect(choices.length).toBeLessThanOrEqual(3);
+      expect(choices.map((c) => c.id)).toEqual(["a", "b", "c"].slice(0, choices.length));
+      expect(choices.filter((c) => c.intent === "leave").length).toBeLessThanOrEqual(1);
+      expect(choices.some((c) => c.text.trim().toLowerCase() === "leave" || /[{}]/.test(c.text))).toBe(false);
+    }
+    // Narrated residents get things to do; riddle hints get a nudge for more.
+    expect(fallbackTurn({ ...cases.at(-3)!, playerName: "Ada" }).choices.map((c) => c.text)).toContain(
+      derivedReplies({ text: "(Bastien sits down and gives you a slow blink.)", kind: "animal" }, 0)[0]!.text);
+    expect(fallbackTurn({ ...cases.at(-2)!, playerName: "Ada" }).choices.map((c) => c.intent)).toContain("about_riddle");
   });
 
   it("narrates for residents who never speak", () => {
@@ -207,9 +263,19 @@ describe("fallback turns", () => {
     expect(fallbackTurn({ ...base, riddle: { record: oq2, allowed: 0 } }).lines[0]!.text).toBe(STUMPED_LINE);
   });
 
-  it("every authored line passes the lexical filters", () => {
+  it("every authored line and reply passes the lexical filters", () => {
     const all = [...Object.values(FALLBACK_LINES).flatMap((row) => Object.values(row)), ...FILLER_LINES, STUMPED_LINE];
     for (const line of all) expect(lexicalHits(line.replaceAll("{player}", "Ada"))).toEqual([]);
+    const pools = [...Object.values(REPLY_POOLS), ...Object.values(WEATHER_REPLIES), ...Object.values(ZONE_REPLIES)];
+    const replies: Reply[] = [
+      ...Object.values(FALLBACK_REPLIES).flatMap((row) => Object.values(row).flat()),
+      ...pools.flatMap((pool) => [...pool.warm, ...pool.curious, ...pool.wry]),
+    ];
+    for (const reply of replies) {
+      const text = fillReply(reply.text, { name: "Odile", player: "Ada" });
+      expect(lexicalHits(text), text).toEqual([]);
+      expect(text.length, text).toBeLessThanOrEqual(90);
+    }
   });
 });
 

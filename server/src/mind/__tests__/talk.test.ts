@@ -11,7 +11,7 @@ import { createWorld } from "../../worlds/createWorld.js";
 import { worldToken } from "../../worlds/routes.js";
 import type { MindClient } from "../mindClient.js";
 import { WRAP_UP_NOTE } from "../dialogue.js";
-import { FALLBACK_LINES } from "../fallback.js";
+import { FALLBACK_LINES, FALLBACK_REPLIES } from "../fallback.js";
 import { RIDDLES } from "../riddles.js";
 import { correctiveNote } from "../validate.js";
 import { FakeMind, allBodies } from "./fakeMind.js";
@@ -124,10 +124,12 @@ describe("POST /v1/worlds/:w/talk", () => {
       conversation_id: body.conversation_id, resident_id: "pell", turn_index: 0, fallback: false, wrap_up: false,
       lines: good().lines,
       choices: [{ id: "a", text: "Eighty-one of how many?", intent: "curious" }, { id: "b", text: "I'll sit.", intent: "kind" }],
+      // §9.11.2: the day's first chat (+1) and the reply judgment (+2), as applied.
+      regard: { before: 0, after: 3, delta: 3, hearts_before: 0, hearts_after: 0, first_chat: true, capped: false },
     });
 
     const state = await residentState(env.worldId);
-    expect(state).toMatchObject({ regard: 2, recent_topics: ["the lamps"], mood: { valence: 3, stress: 0 } });
+    expect(state).toMatchObject({ regard: 3, recent_topics: ["the lamps"], mood: { valence: 3, stress: 0 } });
     const [row] = await turnsOf(env.worldId);
     expect(row).toMatchObject({ id: `${body.conversation_id}/0`, conversationId: body.conversation_id, turnIndex: 0, fallback: false, playerInput: null, day: 4 });
     expect(row!.output.effects.topic).toBe("the lamps");
@@ -179,10 +181,11 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect(turn).toMatchObject({
       fallback: true, turn_index: 0, wrap_up: false,
       lines: [{ text: FALLBACK_LINES.Stranger.even, expr: "neutral" }],
-      choices: [{ id: "a", text: "Fair enough.", intent: "kind" }, { id: "b", text: "Leave", intent: "leave" }],
+      choices: FALLBACK_REPLIES.Stranger.even.map((r, i) => ({ id: "abc"[i], text: r.text, intent: r.intent })),
     });
     expect(mind.streams).toHaveLength(2);
-    expect(await residentState(env.worldId)).toMatchObject({ regard: 0, recent_topics: [] });
+    // No effects from the authored turn, but it is still the day's first chat (§9.11.2).
+    expect(await residentState(env.worldId)).toMatchObject({ regard: 1, recent_topics: [] });
     expect((await turnsOf(env.worldId)).map((t) => t.fallback)).toEqual([true]);
     expect((await logs(env.worldId)).map((l) => [l.validation, l.fallback])).toEqual([["schema", true], ["schema", true]]);
   });
@@ -234,7 +237,8 @@ describe("POST /v1/worlds/:w/talk", () => {
     await setResidentState(env.worldId, (s) => ({ ...s, mood: { ...s.mood, emotion: "irritated" } }));
     const turn = finalTurn(sse((await talk(env, payload())).payload));
     expect(turn.lines[0].expr).toBe("angry");
-    expect(await residentState(env.worldId)).toMatchObject({ regard: 5, mood: { valence: 10 } });
+    // Clamped to +5, then the first chat's +1: the day's +6 conversation cap (§9.11.2).
+    expect(await residentState(env.worldId)).toMatchObject({ regard: 6, mood: { valence: 10 } });
     const [row] = await turnsOf(env.worldId);
     expect(row!.output.effects.regard_delta).toBe(5);
   });

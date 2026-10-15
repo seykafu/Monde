@@ -4,7 +4,8 @@
  *
  *   1. schema      JSON.parse + zod DialogueTurnOutput, at least one non-empty line             (fail: "schema")
  *   2. clamps      clampDialogue (Heart perk off until skills land), topic length, choice ids,
- *                  favor template must be an MVP template the model may propose               (adjusts)
+ *                  favor template must be an MVP template the model may propose; choices made
+ *                  2–3 distinct replies with at most one goodbye, padded from the last line   (adjusts)
  *   3. portraits   each expr must be in the card's portrait_expressions, else mapped from
  *                  the resident's current emotion (§9.4)                                       (adjusts)
  *   4. lexical     profanity, modern tech, brands, self-reference, house style (filters.ts)   (fail: "lexical:<group>")
@@ -17,7 +18,7 @@
  * pretends to do them. Favor feasibility is M-09: favors are stored as "proposed".
  */
 import {
-  DialogueTurnOutput, MVP_FAVOR_TEMPLATES, clampDialogue, type Emotion, type PersonaCard,
+  DialogueTurnOutput, MVP_FAVOR_TEMPLATES, callName, clampDialogue, normalizeChoices, type Emotion, type PersonaCard,
 } from "@monde/shared";
 import { containsAnswer } from "./promptBuilder.js";
 import { checkedExpression } from "./expressions.js";
@@ -27,7 +28,8 @@ import type { RiddleRecord } from "./riddles.js";
 export type ValidationCategory = "schema" | `lexical:${FilterGroup}` | "riddle" | "echo";
 
 export interface ValidationContext {
-  card: Pick<PersonaCard, "portrait_expressions">;
+  /** The name fills `{name}` in padded replies; kind keeps an animal's own expressions. */
+  card: Pick<PersonaCard, "portrait_expressions"> & Partial<Pick<PersonaCard, "name" | "kind">>;
   /** The resident's current emotion, for mapping missing expressions. */
   emotion: Emotion;
   /** Secret ids the engine allows this turn (revealableSecrets). */
@@ -106,14 +108,18 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
   const lines = parsed.data.lines.map((l) => ({ ...l, text: l.text.trim() })).filter((l) => l.text !== "");
   if (lines.length === 0) return fail("schema", "no lines");
 
-  // 2. Clamps.
-  let out = clampDialogue({ ...parsed.data, lines }, { heartPerk: ctx.heartPerk ?? false });
+  // 2. Clamps. Choices first, so a reply dropped as a repeat or a second goodbye can be replaced by a fourth.
+  const choices = normalizeChoices(parsed.data.choices, {
+    cue: { text: lines.at(-1)!.text }, name: ctx.card.name ? callName(ctx.card.name) : null,
+  });
+  const given = parsed.data.choices.map((c) => c.text.trim());
+  if (choices.length !== given.length || choices.some((c, i) => c.text !== given[i])) {
+    adjustments.push(`choices ${JSON.stringify(given)}→${JSON.stringify(choices.map((c) => c.text))}`);
+  }
+  let out = clampDialogue({ ...parsed.data, lines, choices }, { heartPerk: ctx.heartPerk ?? false });
   if (out.effects.regard_delta !== parsed.data.effects.regard_delta) {
     adjustments.push(`regard_delta ${parsed.data.effects.regard_delta}→${out.effects.regard_delta}`);
   }
-  const choices = out.choices.map((c) => ({ ...c, text: c.text.trim() })).filter((c) => c.text !== "");
-  if (choices.length < 2 && !choices.some((c) => c.intent === "leave")) choices.push({ id: "", text: "Leave", intent: "leave" });
-  if (choices.length < 2) choices.unshift({ id: "", text: "Fair enough.", intent: "kind" });
   let favor = out.effects.favor;
   if (favor && !PROPOSABLE_FAVORS.has(favor.template)) {
     adjustments.push(`favor template ${favor.template} dropped`);
@@ -121,7 +127,7 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
   }
   out = {
     ...out,
-    choices: choices.map((c, i) => ({ ...c, id: CHOICE_IDS[i]! })),
+    choices: out.choices.map((c, i) => ({ ...c, id: CHOICE_IDS[i]! })),
     effects: { ...out.effects, favor, topic: out.effects.topic.trim().slice(0, TOPIC_CHARS) },
   };
 

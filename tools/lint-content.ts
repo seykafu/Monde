@@ -1,11 +1,14 @@
 /**
- * Content linter (GDD §20.4): persona cards, place registry, declared flags.
+ * Content linter (GDD §20.4): persona cards, place registry, declared flags, and the Quiet Mode line library
+ * (Appendix B) with its authored replies.
  * Run: npm run lint:content   (CI runs it too). Exit 1 on any error.
  */
 import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
-import { PersonaCard, STANDARD_EXPRESSIONS, evaluate, type PersonaCard as Card } from "@monde/shared";
+import { PersonaCard, STANDARD_EXPRESSIONS, evaluate, fillReply, type PersonaCard as Card } from "@monde/shared";
+import { parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
+import { lexicalHits } from "../server/src/mind/filters.ts";
 
 const root = path.resolve(import.meta.dirname, "..");
 const errors: string[] = [];
@@ -78,7 +81,27 @@ for (const c of cards.values())
     if (other && !other.relationships.some((x) => x.id === c.id)) err(`relationship ${c.id} → ${r.id} is not reciprocated`);
   }
 
+// ---- Quiet Mode lines (Appendix B) and their replies: the client's own parser (it throws on a bad entry), then
+// the server's lexical filters over every line and reply (nothing modern, no brands, no banned style).
+let library: LineLibrary | null = null;
+try {
+  library = parseLineLibrary(YAML.parse(fs.readFileSync(path.join(root, "content/lines/lines.yaml"), "utf8")));
+} catch (e) {
+  err((e as Error).message);
+}
+let replyCount = 0;
+for (const line of library?.lines ?? []) {
+  const fill = (text: string) => fillReply(text, { name: "Odile", player: "Wren" }).replace(/\{[a-z_]+(?::[a-z0-9_]+)?\}/g, "Odile");
+  for (const hit of lexicalHits(fill(line.text))) warn(`lines.yaml ${line.id}: ${hit.group} "${hit.term}"`);
+  for (const reply of line.replies ?? []) {
+    replyCount++;
+    for (const hit of lexicalHits(fill(reply.text))) err(`lines.yaml ${line.id} reply "${reply.text}": ${hit.group} "${hit.term}"`);
+  }
+  if (line.kind === "bye" && line.replies) warn(`lines.yaml ${line.id}: a goodbye ends the conversation; its replies are never shown`);
+}
+
 for (const w of warnings) console.warn(`warn  ${w}`);
 for (const e of errors) console.error(`error ${e}`);
-console.log(`content: ${cards.size} cards, ${places.size} places, ${declared.size} declared flags · ${errors.length} errors, ${warnings.length} warnings`);
+console.log(`content: ${cards.size} cards, ${places.size} places, ${declared.size} declared flags, `
+  + `${library?.lines.length ?? 0} lines with ${replyCount} replies · ${errors.length} errors, ${warnings.length} warnings`);
 process.exit(errors.length ? 1 : 0);

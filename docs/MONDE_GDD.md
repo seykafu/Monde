@@ -1007,7 +1007,11 @@ Acquainted or Core, time window valid) and rejects or repairs it otherwise.
 
 **Player input.** By default the player chooses from **2–3 generated replies** plus *Leave*, each
 tagged with an intent (`kind`, `curious`, `joke`, `firm`, `ask_favor`, `about_riddle`, `campaign`) so
-the engine can apply skill checks (Heart, Wits) to some. **"Say something…"** (free text, ≤ 140
+the engine can apply skill checks (Heart, Wits) to some. The replies answer the lines just spoken
+(answer the question, react to the news, ask a follow-up), first person in the Fellow's voice,
+different in tone, at most one a goodbye; the validator keeps 2–3 distinct ones and pads a short turn
+with replies derived from the last line. The reply picked is the player's words in the next turn's
+`<player_said>`. **"Say something…"** (free text, ≤ 140
 characters) is available and on by default. It passes a cheap moderation check first (§9.13). A
 **Choices only** setting turns it off.
 
@@ -1113,15 +1117,15 @@ two directions, *m*:
 Romance is a separate ladder on top of the label (*Feelings and the ladder*, below). "Friends" uses
 the same 40 as the Stay formula's `friends_in_town` (§6.4).
 
-**What moves affinity** (engine-applied; a pair's net change is capped at ±6 a day, except for the
-Favor and the ladder's events):
+**What moves affinity** (engine-applied; a pair's net change is capped at ±6 a day in each direction,
+which also bounds a night's gossip; only the Favor and the ladder's events go past it):
 
 | Source | Affinity (each direction) |
 |---|---|
 | An encounter (below), summary or live | −3..+3, model-judged for Core/Acquainted pairs, by rule for Ambient pairs |
 | Planned time together (`companions` in a plan, a `visit` that happens) | +1 |
 | A town meeting where both hold a stance of 30+ on the issue: same side / opposite sides | +1 / −1 |
-| Gossip heard about the other (nightly reflection) | −10..+10 |
+| Gossip heard about the other (nightly reflection) | −10..+10, within the daily cap |
 | The player's `introduce` Favor | +10 |
 | Drift: a week without meeting | 1 toward 40, only above 40 |
 
@@ -1522,7 +1526,7 @@ application, and each field is a choice:
 | Outfit | 6 starter outfits × 3 recolorable slots |
 | **Background** | **Homecomer · Tinkerer · Scrapper · Organizer** (below) |
 | "Why Monde?" | A fresh start · To help · Running from something · Curious. This seeds residents' first questions and some AI topic cards. |
-| "Something you love" | Pick from 12 (rain, old books, the sea, bread, music, puzzles…). Residents who share it warm up faster (+20% Regard gain). |
+| "Something you love" | Pick from 12: rain, old books, the sea, bread, music, puzzles, flowers, the stars, cats, boats, tea, old clocks. Residents who share it warm up faster (+20% Regard gain). |
 
 The player has **no portrait** in VN scenes, a deliberate choice: the camera is the player's eyes. The
 UI shows a small pixel **badge** (a bust cut from their layered sprite) in the Journal and on letters.
@@ -9647,20 +9651,60 @@ and litter and graffiti decals clear as Charm rises.
 
 ### 16.2 Portraits
 
+*Revised 2026-10-14 at Kasey's direction: six expressions per character, chosen line by line from the
+conversation's emotion and topic. Signature expressions come back later, with more art.*
+
 | Group | Count | Expressions | Images |
 |---|---|---|---|
-| Core cast (§4), cel-shaded cartoon busts (§16.1) | 20 (Bastien: 6 cat poses) | standard 8 + up to 2 signature | ≈ 190 |
-| Featured supporting (Tollmen ×5, Old Moss, Ada, Raman, Claudine, plus about 6 others from §12.4) | ~15 | standard 8 | ≈ 120 |
-| **Resident library** (Day-1 residents + arrivals) | 200 master busts × 3 color variants = **600 identities** | 5: neutral, happy, sad, angry, surprised | **3,000** |
+| Core cast (§4), cel-shaded cartoon busts (§16.1) | 20 (Bastien: 6 cat poses) | the six | 120 |
+| Featured supporting (Tollmen ×5, Old Moss, Ada, Raman, Claudine, plus about 6 others from §12.4) | ~15 | the six | ≈ 90 |
+| **Resident library** (Day-1 residents + arrivals) | 200 master busts × 3 color variants = **600 identities** | the six | **3,600** |
 
-- **Standard 8:** neutral, warm, laugh, sad, angry, surprised, worried, thinking.
+- **The six:** neutral, warm, sad, angry, surprised, worried. Every person has all six. The dialogue
+  prompt offers only these, and the engine maps anything else onto them (laugh → warm, thinking →
+  neutral; an unknown id comes from the resident's emotion on the server and is neutral on the
+  client). Cards keep their longer `portrait_expressions` lists (the old standard 8 plus signatures)
+  for when signature art exists. Bastien's six are cat poses: sitting, slow blink, drooped ears, flat
+  ears, round eyes, ears back.
+- **How each one reads** (direction for the art, and what the procedural bust draws): **neutral**
+  calm eyes, relaxed brows, closed mouth · **warm** smiling eyes, open smile, blush · **sad** brows up
+  at the inner ends, heavy lids, mouth turned down, a tear · **angry** brows angled down to the nose,
+  narrowed eyes, set jaw with teeth showing, a cross-vein mark · **surprised** brows high, wide eyes
+  with small pupils, open mouth, pop lines · **worried** tilted brows, a sideways glance, wavy mouth,
+  a sweat drop. Each differs from every other in at least two features, so they read at a glance.
 - **Library tags** (for portrait-first persona generation, Appendix A.3): age band, presentation, skin
   tone, hair color and style, build, attire (by archetype), distinguishing feature. A portrait is never
   reused while its owner lives in Monde; departures free it.
 - **Generation:** the Ravage workflow (`scripts/art/gen_portrait_art.py`). A **master** per identity in
   the house style uses an approved v2 portrait (`art_sources/style_bible_v2/`) as its style reference. **Expression** images are edits of the master that change only
   the expression. **Color variants** are edits that change only hair and clothing colors. Every render
-  is on flat magenta (#FF00FF) and keyed out by `process_portrait_art.py`.
+  is on flat magenta (#FF00FF) and keyed out by `process_portrait_art.py`, which also crops and scales
+  the 1024×1536 render to the runtime file below.
+- **Until the art exists** the panel draws a procedural cartoon bust for each of the six
+  (`client/src/dialogue/portrait.ts`), in the resident's sprite colours, with what the card's
+  appearance names: hair colour and style, a cap, glasses, a moustache, freckles.
+
+#### 16.2.1 Portrait files: the contract
+
+- **Path:** `client/public/assets/portraits/<resident_id>/<expression>.png`, one file per expression:
+  the six by name, plus any signature or animal pose id later.
+- **Manifest:** `client/public/assets/portraits/manifest.json` maps each resident id to the
+  expressions that have a file, `{ "odile": ["neutral", "warm", …] }`. Only listed files are ever
+  requested, so nothing 404s; it ships as `{}`. A resident's files load when their conversation opens
+  and stay cached for the session.
+- **Format:** PNG, transparent background (keyed, straight alpha), sRGB. No frame, backdrop, name or
+  text: the panel draws its own frame in the resident's colour.
+- **Size:** 460×540 px (23:27), the dialogue frame's 230×270 at the 2× render scale. Other sizes are
+  scaled to fit, anchored at the bottom centre, so keep 23:27.
+- **Framing:** head and shoulders, identical across one resident's files so an expression change
+  doesn't jump. Head centred, top of the hair about 6–15% down, eyes about 40–45% down (the face in
+  the upper half), shoulders running off the bottom edge. Three-quarter view turned slightly right,
+  toward the text panel.
+- **Fallback:** a listed resident without a file for the expression shows that expression's portrait
+  of the six, then neutral, then any file they have, never mixing art with the procedural bust. A
+  resident with no files gets the procedural bust.
+- **Motion:** an expression change crossfades in 110 ms with a slight squash; surprise adds a hop and
+  anger a shake, all within 150 ms. While the player's own line is up, the portrait dims.
 
 ### 16.3 Backdrops (≈ 100)
 
@@ -9704,6 +9748,39 @@ no characters, no UI. Draw at native 1280×720.
   baked at runtime into a cached atlas per resident. Layers are generated as sheets with fixed pose
   references so they line up.
 - **Emotes:** separate floating icons (♥ ! ? ♪ … 💢 zzz and a raindrop), 16×16.
+
+#### 16.5.1 Walk sheets: the file contract
+
+Drawn sheets replace the procedural rig (`client/src/render/character/`) one character at a time.
+Anyone without a sheet is drawn by the rig, so the game never waits on art. The code source of this
+contract is `client/src/render/character/sheet.ts`.
+
+- **Files**, under `client/public/assets/sprites/`:
+  - `manifest.json`: `{ "<id>": true | { …meta } }`. Only listed characters are fetched, so missing art
+    costs no requests and no 404s. It starts as `{}`.
+  - `<id>/walk.png`: the sheet. `<id>` is a resident id (the persona card's `sprite`) or `player`.
+  - `<id>/<id>.json`: optional meta, fetched only when the manifest entry has `"json": true`. Its
+    fields override the entry's.
+- **Grid** (after §16.7 processing): equal cells, transparent background with binary alpha, feet on the
+  cell's bottom row, no gutters or labels.
+  - **Rows** are facings, top to bottom: `down, left, right, up` by default. A sheet may leave out `left`
+    or `right` and the other is mirrored, so the three-row sheet above is `"rows": ["down", "right", "up"]`.
+  - **Columns** are the `idle` frames, then the `walk` frames. The walk is one cycle that starts on a
+    contact: left foot forward, passing, right foot forward, passing. Passing frames carry the 1 px body
+    bob. Six or eight walk frames also work; the contacts are then frames 0 and walk/2. With
+    `"blink": true` the last idle column is an eyes-shut frame shown for a moment every few seconds. With
+    `"idle": 0` the character stands on walk frame 1.
+- **Meta fields**, all optional (defaults in brackets): `frameWidth` [32], `frameHeight` [48], `rows`,
+  `idle` [2], `walk` [4], `blink` [false], `fps.idle` [0.8, the breathing rate], `fps.walk` [9, quoted at
+  the player's 4 tiles/s], `footY` [frameHeight], `scale` [1]. §16.1's 32×40 cells shown as 48×60 are
+  `"frameHeight": 40, "scale": 1.5`.
+- **Timing:** walk frames advance by distance walked, not by time, so a slowed or blocked character's
+  feet never skate. Idle breathes at `fps.idle`.
+- **The rig's own sheet** follows the same contract: 32×48 cells, idle 3 (rest, breathe, blink), walk 4,
+  at most 24 colours a frame. It draws any `CharacterLook` (skin, hair colour and style, eyes, top,
+  bottom and its style, shoes, accessory), which is what W-07 character creation will fill in.
+- **Example:** the 4×4 walk-only player sheet from `scripts/art/gen_style_bible_v2.py`
+  (`walk_sheet_player`) installs as `"player": { "idle": 0 }`.
 
 ### 16.6 UI art
 
@@ -9759,9 +9836,12 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
   Option Clause gauge when relevant (§6.5). It hides automatically when standing still.
 - **Dawn Report:** a full-screen front page each morning, dismissed with one tap, re-readable in the
   Journal.
-- **Dialogue (VN panel):** a backdrop, the resident's portrait (left or right), a name plate, a
-  typewriter body with pages ("More ▾", from Ravage's `StoryScene`), choices, **Say something…**, a
-  **Gift** button, and **Report line** (in a small menu). A soft shimmer on the name plate means a
+- **Dialogue (VN panel):** a backdrop, the resident's portrait (left or right, one of six expressions
+  per line, §16.2), a name plate, a typewriter body with pages ("More ▾", from Ravage's `StoryScene`),
+  2–3 numbered replies to what the resident just said (keys 1–3), **Say something…**, a **Gift**
+  button, **Leave**, a **Log** (L) of the conversation so far, and **Report line** (in a small menu).
+  What the player says, picked or typed, shows first under a "You" plate with the resident dimmed,
+  then stays as a one-line echo while the reply types in. A soft shimmer on the name plate means a
   line is generating. There's no spinner.
 - **Journal tabs:** Today (events, ferry, tides) · People (portrait book with Regard tier, likes they've
   told you, relationships you've learned, last seen) · Favors · Projects · Marks (riddles with
@@ -11033,6 +11113,17 @@ Quiet Mode is the offline fallback (§9.13). When the AI service can't be reache
 5. **Fill and show.** Resolve placeholders and display the line in the normal dialogue box.
 
 For `ctx` requests with an `event` set, an `ev` line is preferred 70% of the time. The other 30% falls through to weather and zone.
+
+**The player's replies** (§9.10 "Player input"). Every Quiet Mode line comes with 2–3 replies to it, so
+the player answers what was just said. A line may carry its own `replies` in `content/lines/lines.yaml`
+(each `{text, intent, next?}`, at most one goodbye; `next: ctx` asks for the news). The greetings and
+talk lines Quiet Mode reaches today all have them. A line without them gets three derived from its
+kind, tags and words (`shared/src/replies.ts`): a question gets answers, news a reaction and a
+follow-up, the weather and each zone their own, a greeting a greeting back, a low mood comfort; one
+kind, one curious, one wry. The reply the player picks is the next request: a `news…` reply (or the
+word "news") asks for a `ctx` line, Leave for `bye`, anything else for `talk`. The server's authored
+fallback turns use the same derived replies. Each line's portrait comes from its tags and words
+(an event's own face, a low or high mood tag, then worry, sorrow, surprise or delight), §16.2's six.
 
 **Placeholders.** `{player}` the player's name. `{name}` the speaker's own first name. `{place}` the display name of where the speaker is standing ("the Wharf"). `{weather}` the weather noun ("rain"). `{time_of_day}` is `morning` (dawn, morning), `afternoon` (midday, afternoon), `evening` or `night`. `{resident:<id>}` that resident's first name (the Dawn Report templates in B.5 use print names instead).
 

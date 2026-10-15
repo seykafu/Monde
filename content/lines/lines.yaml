@@ -1,4 +1,8 @@
 # Quiet Mode line library (GDD Appendix B.1–B.4). Selection rules: GDD B.1.
+# `replies` (optional): 2–3 things the Fellow can say back to the line, each {text ≤ 90 characters, intent,
+# next?: talk | ctx}, at most one goodbye (intent leave). {name} is the resident's first name, {player} the
+# player's. `next: ctx` asks for the news. Lines without replies get them derived from their kind, tags and
+# text (shared/src/replies.ts).
 lines:
   - id: GR-001
     kind: greet
@@ -40,6 +44,13 @@ lines:
       r:
         - Stranger
     text: Oh, hello, {player}. I didn't see you there.
+    replies:
+      - text: Sorry. I didn't mean to creep up on you.
+        intent: kind
+      - text: Miles away? What were you thinking about?
+        intent: curious
+      - text: I get that a lot. I'm very quiet.
+        intent: joke
   - id: GR-005
     kind: greet
     when:
@@ -50,6 +61,13 @@ lines:
       r:
         - Stranger
     text: Morning, {player}. Fresh one, isn't it?
+    replies:
+      - text: Fresh enough to wake me up properly.
+        intent: kind
+      - text: Is it always this sharp first thing?
+        intent: curious
+      - text: Fresh is one word for it. My ears have another.
+        intent: joke
   - id: GR-006
     kind: greet
     when:
@@ -60,6 +78,13 @@ lines:
       r:
         - Stranger
     text: Morning. Early start, or a late finish?
+    replies:
+      - text: Early start. The gulls saw to that.
+        intent: kind
+      - text: Early start. What gets you up at this hour?
+        intent: curious
+      - text: Bit of both. I'm not sure which yet.
+        intent: joke
   - id: GR-007
     kind: greet
     when:
@@ -120,6 +145,13 @@ lines:
       r:
         - Stranger
     text: Oh, hello. I'm not much company today.
+    replies:
+      - text: I'll leave you be, then. Feel better, {name}.
+        intent: leave
+      - text: Anything I can do?
+        intent: curious
+      - text: I'm not fussy about company.
+        intent: joke
   - id: GR-013
     kind: greet
     when:
@@ -140,6 +172,13 @@ lines:
       r:
         - Stranger
     text: Hello. I'm a bit slow today, so bear with me.
+    replies:
+      - text: Take your time. I'm in no hurry.
+        intent: kind
+      - text: Long night?
+        intent: curious
+      - text: Slow suits me. I'm still learning the streets.
+        intent: joke
   - id: GR-015
     kind: greet
     when:
@@ -150,6 +189,14 @@ lines:
       r:
         - Stranger
     text: Morning, {player}. How's your day shaping up?
+    replies:
+      - text: Well enough, thanks for asking.
+        intent: kind
+      - text: Slowly. Anything I should know about today?
+        intent: curious
+        next: ctx
+      - text: Ask me after I've found the bakery.
+        intent: joke
   - id: GR-016
     kind: greet
     when:
@@ -160,6 +207,13 @@ lines:
       r:
         - Stranger
     text: Morning. Nice to see a face I know.
+    replies:
+      - text: Likewise. I'm still collecting them.
+        intent: kind
+      - text: What are you up to this morning?
+        intent: curious
+      - text: I'm working on knowing more than four.
+        intent: joke
   - id: GR-017
     kind: greet
     when:
@@ -200,6 +254,13 @@ lines:
       r:
         - Stranger
     text: What a day already! Come on, tell me everything.
+    replies:
+      - text: Not much to tell. You first.
+        intent: kind
+      - text: What's got you so cheerful?
+        intent: curious
+      - text: Everything? I've only been up an hour.
+        intent: joke
   - id: GR-021
     kind: greet
     when:
@@ -220,6 +281,13 @@ lines:
       r:
         - Stranger
     text: Lunchtime, I think. Not hungry. Hello.
+    replies:
+      - text: Hello. Maybe a cup of tea, then?
+        intent: kind
+      - text: Off your food? What's wrong?
+        intent: curious
+      - text: More for me, then.
+        intent: joke
   - id: GR-023
     kind: greet
     when:
@@ -240,6 +308,13 @@ lines:
       r:
         - Stranger
     text: Oh, hello. I keep forgetting to eat.
+    replies:
+      - text: Let me fetch you something from the bakery.
+        intent: kind
+      - text: Busy day, or a heavy one?
+        intent: curious
+      - text: Eat something. That's an order.
+        intent: firm
   - id: GR-025
     kind: greet
     when:
@@ -250,6 +325,13 @@ lines:
       r:
         - Stranger
     text: Nearly afternoon. Have you eaten yet, {player}?
+    replies:
+      - text: I had a bun on the way. Kind of you to ask.
+        intent: kind
+      - text: Not yet. Where's good around here?
+        intent: curious
+      - text: Does a cup of tea count?
+        intent: joke
   - id: GR-026
     kind: greet
     when:
@@ -260,6 +342,13 @@ lines:
       r:
         - Stranger
     text: Midday already. Where does the morning go?
+    replies:
+      - text: I know. I'd only just found my boots.
+        intent: kind
+      - text: What did you get done with yours?
+        intent: curious
+      - text: Same place as my hat, I expect.
+        intent: joke
   - id: GR-027
     kind: greet
     when:
@@ -290,6 +379,13 @@ lines:
       r:
         - Stranger
     text: "{player}! Have you eaten? Eat with me. I insist."
+    replies:
+      - text: I'd like that. Thank you.
+        intent: kind
+      - text: What's on the menu?
+        intent: curious
+      - text: Well, if you insist.
+        intent: joke
   - id: GR-030
     kind: greet
     when:
@@ -300,6 +396,13 @@ lines:
       r:
         - Stranger
     text: Midday and everything's right. Don't ask me why.
+    replies:
+      - text: I won't ask. I'll just enjoy it.
+        intent: kind
+      - text: Go on, why?
+        intent: curious
+      - text: Can I borrow some of it?
+        intent: joke
   - id: GR-031
     kind: greet
     when:
@@ -310,6 +413,13 @@ lines:
       r:
         - Stranger
     text: Afternoon. It's dragging, isn't it?
+    replies:
+      - text: It is. Want a bit of company?
+        intent: kind
+      - text: What's making it drag?
+        intent: curious
+      - text: I've counted the cobbles twice.
+        intent: joke
   - id: GR-032
     kind: greet
     when:
@@ -320,6 +430,13 @@ lines:
       r:
         - Stranger
     text: Oh. It's you. Hello. Sorry, long day.
+    replies:
+      - text: No need to be sorry. Sit a minute?
+        intent: kind
+      - text: What happened?
+        intent: curious
+      - text: I'll let you get home, then.
+        intent: leave
   - id: GR-033
     kind: greet
     when:
@@ -340,6 +457,13 @@ lines:
       r:
         - Stranger
     text: Hello. I could do with a sit-down.
+    replies:
+      - text: There's a bench just there. Shall we?
+        intent: kind
+      - text: On your feet all day?
+        intent: curious
+      - text: I'll guard the bench for you.
+        intent: joke
   - id: GR-035
     kind: greet
     when:
@@ -350,6 +474,13 @@ lines:
       r:
         - Stranger
     text: Afternoon, {player}. Getting much done?
+    replies:
+      - text: A little. Learning the streets, mostly.
+        intent: kind
+      - text: Some. What about you?
+        intent: curious
+      - text: I've done a great deal of walking about.
+        intent: joke
   - id: GR-036
     kind: greet
     when:
@@ -360,6 +491,13 @@ lines:
       r:
         - Stranger
     text: Afternoon. The day's turned the corner, I'd say.
+    replies:
+      - text: Downhill from here. In the good way.
+        intent: kind
+      - text: Was the morning rough?
+        intent: curious
+      - text: I hope it signalled first.
+        intent: joke
   - id: GR-037
     kind: greet
     when:
@@ -380,6 +518,13 @@ lines:
       r:
         - Stranger
     text: Hello! I've been hoping to bump into you.
+    replies:
+      - text: Well, here I am.
+        intent: kind
+      - text: Oh? What about?
+        intent: curious
+      - text: Should I be worried?
+        intent: joke
   - id: GR-039
     kind: greet
     when:
@@ -390,6 +535,13 @@ lines:
       r:
         - Stranger
     text: Afternoon, {player}! I'm having a wonderful day. Join in.
+    replies:
+      - text: Don't mind if I do.
+        intent: kind
+      - text: What's made it wonderful?
+        intent: curious
+      - text: Is there a fee?
+        intent: joke
   - id: GR-040
     kind: greet
     when:
@@ -420,6 +572,13 @@ lines:
       r:
         - Stranger
     text: Mm. Evening. Don't ask how it went.
+    replies:
+      - text: I won't. Fancy a walk instead?
+        intent: kind
+      - text: That bad?
+        intent: curious
+      - text: How did it go?
+        intent: joke
   - id: GR-043
     kind: greet
     when:
@@ -430,6 +589,13 @@ lines:
       r:
         - Stranger
     text: Evening, {player}. I'll be glad to put my feet up.
+    replies:
+      - text: You've earned it.
+        intent: kind
+      - text: Long day on your feet?
+        intent: curious
+      - text: I won't keep you, then. Rest well.
+        intent: leave
   - id: GR-044
     kind: greet
     when:
@@ -450,6 +616,13 @@ lines:
       r:
         - Stranger
     text: Evening, {player}. Heading home, or heading out?
+    replies:
+      - text: Heading home. It's been a full day.
+        intent: kind
+      - text: Heading out. Where's good of an evening?
+        intent: curious
+      - text: I haven't decided. The street will tell me.
+        intent: joke
   - id: GR-046
     kind: greet
     when:
@@ -460,6 +633,13 @@ lines:
       r:
         - Stranger
     text: Evening. Quiet one, so far.
+    replies:
+      - text: Quiet suits me fine.
+        intent: kind
+      - text: Is it usually busier?
+        intent: curious
+      - text: I'll try not to spoil it.
+        intent: joke
   - id: GR-047
     kind: greet
     when:
@@ -510,6 +690,13 @@ lines:
       r:
         - Stranger
     text: Late, isn't it? Can't sleep. Never can.
+    replies:
+      - text: I'll keep you company a while.
+        intent: kind
+      - text: Is something keeping you up?
+        intent: curious
+      - text: Count gulls. It works for sheep.
+        intent: joke
   - id: GR-052
     kind: greet
     when:
@@ -530,6 +717,13 @@ lines:
       r:
         - Stranger
     text: Still up? Me too. Neither of us should be.
+    replies:
+      - text: Then we'll be awake together a minute.
+        intent: kind
+      - text: What's keeping you up?
+        intent: curious
+      - text: I won't tell if you won't.
+        intent: joke
   - id: GR-054
     kind: greet
     when:
@@ -540,6 +734,13 @@ lines:
       r:
         - Stranger
     text: Hello, {player}. Late, isn't it?
+    replies:
+      - text: It is. I'm nearly home.
+        intent: kind
+      - text: What has you out at this hour?
+        intent: curious
+      - text: The night's young. I'm not.
+        intent: joke
   - id: GR-055
     kind: greet
     when:
@@ -550,6 +751,13 @@ lines:
       r:
         - Stranger
     text: The evening's gone. Late one, {player}?
+    replies:
+      - text: A long one. I'm heading home.
+        intent: kind
+      - text: Afraid so. You too?
+        intent: curious
+      - text: I lost track of the hours. The clock didn't help.
+        intent: joke
   - id: GR-056
     kind: greet
     when:
@@ -560,6 +768,13 @@ lines:
       r:
         - Stranger
     text: Hello. Nearly time for bed, I'd say.
+    replies:
+      - text: I won't keep you long.
+        intent: kind
+      - text: Early riser?
+        intent: curious
+      - text: Is there a curfew I wasn't told about?
+        intent: joke
   - id: GR-057
     kind: greet
     when:
@@ -570,6 +785,13 @@ lines:
       r:
         - Stranger
     text: Still up, {player}? Good company beats a good pillow.
+    replies:
+      - text: I'll take the compliment.
+        intent: kind
+      - text: What keeps you out so late?
+        intent: curious
+      - text: The pillow might disagree.
+        intent: joke
   - id: GR-058
     kind: greet
     when:
@@ -590,6 +812,13 @@ lines:
       r:
         - Stranger
     text: Look at us, out past bedtime! I love it.
+    replies:
+      - text: It's a good night for it.
+        intent: kind
+      - text: Do you often stay out this late?
+        intent: curious
+      - text: Don't tell the mayor.
+        intent: joke
   - id: GR-060
     kind: greet
     when:
@@ -608,6 +837,13 @@ lines:
       m:
         - glum
     text: Oh. It's you. I haven't the energy for this.
+    replies:
+      - text: Another time, then. I'll leave you be.
+        intent: leave
+      - text: Have I done something wrong?
+        intent: curious
+      - text: I only came to say hello.
+        intent: firm
   - id: GR-062
     kind: greet
     when:
@@ -616,6 +852,13 @@ lines:
       m:
         - low
     text: Hello. I'd rather not talk, if it's all the same.
+    replies:
+      - text: All the same to me. Good day.
+        intent: leave
+      - text: Did I do something to put you off?
+        intent: curious
+      - text: Fair enough. I'll try again another day.
+        intent: firm
   - id: GR-063
     kind: greet
     when:
@@ -624,6 +867,13 @@ lines:
       m:
         - even
     text: "{player}. Can I help you, or are you just passing?"
+    replies:
+      - text: Just passing. Thought I'd say hello.
+        intent: kind
+      - text: I'm still learning who does what. What do you do?
+        intent: curious
+      - text: I'm the new Fellow. I'll be around.
+        intent: firm
   - id: GR-064
     kind: greet
     when:
@@ -632,6 +882,13 @@ lines:
       m:
         - bright
     text: Hm. Hello. I'm in a good mood, so don't spoil it.
+    replies:
+      - text: I wouldn't dream of it.
+        intent: kind
+      - text: What's put you in a good mood?
+        intent: curious
+      - text: I'll tiptoe, then.
+        intent: joke
   - id: GR-065
     kind: greet
     when:
@@ -640,6 +897,13 @@ lines:
       m:
         - glowing
     text: Well. Even I can't stay cross on a day like this. Hello.
+    replies:
+      - text: Hello. It is a good day.
+        intent: kind
+      - text: Cross with me, usually?
+        intent: curious
+      - text: I'll take it while it lasts.
+        intent: joke
   - id: GR-066
     kind: greet
     when:
@@ -648,6 +912,13 @@ lines:
       m:
         - glum
     text: Hello. I'm {name}, if you need it. Not much company today.
+    replies:
+      - text: Pleased to meet you, {name}. I won't keep you.
+        intent: leave
+      - text: Is everything all right?
+        intent: curious
+      - text: I'm not much company either. We'd suit.
+        intent: joke
   - id: GR-067
     kind: greet
     when:
@@ -656,6 +927,13 @@ lines:
       m:
         - low
     text: Hello. I'm {name}. We haven't really talked, have we?
+    replies:
+      - text: Not really. I'd like to, though.
+        intent: kind
+      - text: Not yet. What do you do here, {name}?
+        intent: curious
+      - text: We're talking now. That's a start.
+        intent: joke
   - id: GR-068
     kind: greet
     when:
@@ -664,6 +942,13 @@ lines:
       m:
         - even
     text: Hello. I'm {name}. You're the Fellow, aren't you?
+    replies:
+      - text: That's me. Pleased to meet you, {name}.
+        intent: kind
+      - text: That's me. How did you know?
+        intent: curious
+      - text: Is it the lost look that gives it away?
+        intent: joke
   - id: GR-069
     kind: greet
     when:
@@ -672,6 +957,13 @@ lines:
       m:
         - bright
     text: Hello, {player}! I'm {name}. Welcome to the neighborhood, properly.
+    replies:
+      - text: Thank you. It's good to be welcomed.
+        intent: kind
+      - text: How long have you lived here?
+        intent: curious
+      - text: Properly? Was there an improper welcome?
+        intent: joke
   - id: GR-070
     kind: greet
     when:
@@ -680,6 +972,13 @@ lines:
       m:
         - glowing
     text: "{player}! I'm {name}. I've been meaning to say hello all week."
+    replies:
+      - text: Well, hello. I'm glad you did.
+        intent: kind
+      - text: All week? Have I been hard to find?
+        intent: curious
+      - text: I'll pretend it's been all week for me too.
+        intent: joke
   - id: GR-071
     kind: greet
     when:
@@ -688,6 +987,13 @@ lines:
       m:
         - glum
     text: Oh, {player}. Hello. Not my best day, I'm afraid.
+    replies:
+      - text: Sorry to hear it. Anything I can do?
+        intent: kind
+      - text: What's gone wrong?
+        intent: curious
+      - text: Tomorrow's bound to be better. Probably.
+        intent: joke
   - id: GR-072
     kind: greet
     when:
@@ -696,6 +1002,13 @@ lines:
       m:
         - low
     text: Hello, {player}. Good to see a face I know.
+    replies:
+      - text: Likewise, {name}.
+        intent: kind
+      - text: Rough day?
+        intent: curious
+      - text: Mine's getting known, then. Good.
+        intent: joke
   - id: GR-073
     kind: greet
     when:
@@ -704,6 +1017,13 @@ lines:
       m:
         - even
     text: Hello again, {player}. How are you getting on?
+    replies:
+      - text: Not bad. The town's growing on me.
+        intent: kind
+      - text: Getting there. And you, {name}?
+        intent: curious
+      - text: I've stopped getting lost. Mostly.
+        intent: joke
   - id: GR-074
     kind: greet
     when:
@@ -712,6 +1032,13 @@ lines:
       m:
         - bright
     text: "{player}! Good to see you. Walk with me a minute?"
+    replies:
+      - text: Gladly. Lead the way.
+        intent: kind
+      - text: Where are we going?
+        intent: curious
+      - text: Only if you set a slow pace.
+        intent: joke
   - id: GR-075
     kind: greet
     when:
@@ -720,6 +1047,13 @@ lines:
       m:
         - glowing
     text: "{player}! Just the person. Everything's going right today."
+    replies:
+      - text: Good. You deserve a day like that.
+        intent: kind
+      - text: Just the person for what?
+        intent: curious
+      - text: Quick, before it changes its mind.
+        intent: joke
   - id: GR-076
     kind: greet
     when:
@@ -728,6 +1062,13 @@ lines:
       m:
         - glum
     text: You came. Thank you. I'm poor company, but stay a bit.
+    replies:
+      - text: Of course. I'm not going anywhere.
+        intent: kind
+      - text: What's happened, {name}?
+        intent: curious
+      - text: Poor company is still company.
+        intent: joke
   - id: GR-077
     kind: greet
     when:
@@ -736,6 +1077,13 @@ lines:
       m:
         - low
     text: "{player}. I'm glad it's you. Sit, if you've time."
+    replies:
+      - text: I've time. What's wrong?
+        intent: kind
+      - text: Has something happened?
+        intent: curious
+      - text: I always have time for a sit.
+        intent: joke
   - id: GR-078
     kind: greet
     when:
@@ -744,6 +1092,13 @@ lines:
       m:
         - even
     text: "{player}! There you are. I was hoping you'd come by."
+    replies:
+      - text: I was hoping you'd be here.
+        intent: kind
+      - text: Oh? What's on your mind?
+        intent: curious
+      - text: I'm hard to keep away.
+        intent: joke
   - id: GR-079
     kind: greet
     when:
@@ -752,6 +1107,13 @@ lines:
       m:
         - bright
     text: "{player}! I was just thinking about you. Come here."
+    replies:
+      - text: Good things, I hope.
+        intent: kind
+      - text: What were you thinking?
+        intent: curious
+      - text: Should my ears have been burning?
+        intent: joke
   - id: GR-080
     kind: greet
     when:
@@ -760,6 +1122,13 @@ lines:
       m:
         - glowing
     text: "{player}! My favorite person in Monde today, and I mean it."
+    replies:
+      - text: That's kind. You're not bad yourself.
+        intent: kind
+      - text: What did I do to earn that?
+        intent: curious
+      - text: Only today? I'll take it.
+        intent: joke
   - id: GR-081
     kind: greet
     when:
@@ -768,6 +1137,13 @@ lines:
       m:
         - glum
     text: "{player}. Stay a while. I can't pretend with you."
+    replies:
+      - text: Then don't. I'm listening.
+        intent: kind
+      - text: What's going on?
+        intent: curious
+      - text: Good. I'm a terrible audience for pretending.
+        intent: joke
   - id: GR-082
     kind: greet
     when:
@@ -776,6 +1152,13 @@ lines:
       m:
         - low
     text: Oh, {player}. Good. I needed someone who wouldn't fuss.
+    replies:
+      - text: No fuss. Just a sit and a cup of tea.
+        intent: kind
+      - text: What do you need?
+        intent: curious
+      - text: I'll fuss quietly, then.
+        intent: joke
   - id: GR-083
     kind: greet
     when:
@@ -784,6 +1167,13 @@ lines:
       m:
         - even
     text: "{player}. How are you, really? Take your time."
+    replies:
+      - text: Honestly? Better for seeing you.
+        intent: kind
+      - text: Tired, but all right. And you?
+        intent: curious
+      - text: Really? I've lost a hat and found a friend.
+        intent: joke
   - id: GR-084
     kind: greet
     when:
@@ -792,6 +1182,13 @@ lines:
       m:
         - bright
     text: "{player}! Come here, you. It's been a good day, and it's better now."
+    replies:
+      - text: Mine too, now.
+        intent: kind
+      - text: Tell me about it.
+        intent: curious
+      - text: Careful. I'll start expecting this.
+        intent: joke
   - id: GR-085
     kind: greet
     when:
@@ -800,6 +1197,13 @@ lines:
       m:
         - glowing
     text: "{player}! Don't say a word yet. I've got such a day to tell you about."
+    replies:
+      - text: Not a word. Go on.
+        intent: kind
+      - text: Good day or strange day?
+        intent: curious
+      - text: (Mimes buttoning lips.)
+        intent: joke
   - id: ST-001
     kind: talk
     when:
@@ -878,36 +1282,80 @@ lines:
       m:
         - even
     text: Not much to report. Which, in Monde, is a kind of news.
+    replies:
+      - text: Quiet's not so bad.
+        intent: kind
+      - text: What would count as big news here?
+        intent: curious
+        next: ctx
+      - text: "I'll put it in The Lantern: nothing happened."
+        intent: joke
   - id: ST-014
     kind: talk
     when:
       m:
         - even
     text: I keep meaning to walk the whole town in one go.
+    replies:
+      - text: I'd come along, if you want company.
+        intent: kind
+      - text: Where would you start?
+        intent: curious
+      - text: I've done it twice. By accident.
+        intent: joke
   - id: ST-015
     kind: talk
     when:
       m:
         - even
     text: It's a good town for noticing things. Slow enough to see them.
+    replies:
+      - text: I'm starting to notice that.
+        intent: kind
+      - text: What have you noticed lately?
+        intent: curious
+        next: ctx
+      - text: I noticed the clock's stuck. Does that count?
+        intent: joke
   - id: ST-016
     kind: talk
     when:
       m:
         - even
     text: Cat on the wall, gull on the post, nobody in a hurry.
+    replies:
+      - text: Sounds about perfect.
+        intent: kind
+      - text: Whose cat is that, anyway?
+        intent: curious
+      - text: I'm in no hurry either. I've no idea where I'm going.
+        intent: joke
   - id: ST-017
     kind: talk
     when:
       m:
         - even
     text: Ask me something. I know about half the answers.
+    replies:
+      - text: What do you like best about living here?
+        intent: kind
+      - text: Who should I meet first?
+        intent: curious
+      - text: Which half?
+        intent: joke
   - id: ST-018
     kind: talk
     when:
       m:
         - even
     text: Same as ever, really. Which is nice, some days.
+    replies:
+      - text: Same as ever sounds restful.
+        intent: kind
+      - text: And the other days?
+        intent: curious
+      - text: I'm still waiting for my first same-as-ever.
+        intent: joke
   - id: ST-019
     kind: talk
     when:
@@ -944,6 +1392,13 @@ lines:
       m:
         - bright
     text: Tell me something good. I'll tell you something better.
+    replies:
+      - text: I found the bakery without asking. Twice.
+        intent: kind
+      - text: You first. What's better?
+        intent: curious
+      - text: "Something good: I'm here. Beat that."
+        intent: joke
   - id: ST-025
     kind: talk
     when:
@@ -962,6 +1417,13 @@ lines:
       m:
         - glowing
     text: Everything looks different today. Better different. Do you see it too?
+    replies:
+      - text: I think I do. It's the light, maybe.
+        intent: kind
+      - text: What changed?
+        intent: curious
+      - text: I'm new. Everything looks different to me.
+        intent: joke
   - id: ST-028
     kind: talk
     when:
@@ -986,90 +1448,196 @@ lines:
       r_exact:
         - Wary
     text: I'll be polite. That's the most I'm offering.
+    replies:
+      - text: Polite will do for now.
+        intent: kind
+      - text: What did I do to earn that?
+        intent: curious
+      - text: Fair. I'll earn the rest.
+        intent: firm
   - id: ST-032
     kind: talk
     when:
       r_exact:
         - Wary
     text: People talk. I'll wait and see what's true.
+    replies:
+      - text: That's fair. I'd do the same.
+        intent: kind
+      - text: What are they saying about me?
+        intent: curious
+      - text: Watch, then. I'm not going anywhere.
+        intent: firm
   - id: ST-033
     kind: talk
     when:
       r_exact:
         - Wary
     text: You'll have to earn a longer chat than this one.
+    replies:
+      - text: Then I'll start earning.
+        intent: kind
+      - text: How would I do that?
+        intent: curious
+      - text: Short and sweet, then. Good day.
+        intent: leave
   - id: ST-034
     kind: talk
     when:
       r_exact:
         - Stranger
     text: Still finding my way around who's who. You?
+    replies:
+      - text: Same. I keep mixing up the faces.
+        intent: kind
+      - text: Who should I know first?
+        intent: curious
+      - text: I know the cat. That's a start.
+        intent: joke
   - id: ST-035
     kind: talk
     when:
       r_exact:
         - Stranger
     text: We haven't properly met, have we? Not really.
+    replies:
+      - text: We haven't. I'm the new Fellow.
+        intent: kind
+      - text: What should I call you?
+        intent: curious
+      - text: Let's fix that, then. Hello.
+        intent: joke
   - id: ST-036
     kind: talk
     when:
       r_exact:
         - Stranger
     text: What brings you out this way, {player}?
+    replies:
+      - text: Just getting to know the streets.
+        intent: kind
+      - text: Curiosity. What's worth seeing round here?
+        intent: curious
+        next: ctx
+      - text: My feet, mostly. They've a mind of their own.
+        intent: joke
   - id: ST-037
     kind: talk
     when:
       r_exact:
         - Neighbor
     text: It's nice, being on first-name terms with the street.
+    replies:
+      - text: It is. I'm getting there.
+        intent: kind
+      - text: Took a while, did it?
+        intent: curious
+      - text: I'm on first-name terms with three gulls.
+        intent: joke
   - id: ST-038
     kind: talk
     when:
       r_exact:
         - Neighbor
     text: You've been about a lot. Folk have noticed. In a good way.
+    replies:
+      - text: That's good to hear.
+        intent: kind
+      - text: What are they saying?
+        intent: curious
+      - text: I'll try to be about less suspiciously.
+        intent: joke
   - id: ST-039
     kind: talk
     when:
       r_exact:
         - Neighbor
     text: If you're ever short of sugar, you know where I am.
+    replies:
+      - text: Thank you. That's kind.
+        intent: kind
+      - text: Is that how it works here? Borrowing sugar?
+        intent: curious
+      - text: I'll be round tomorrow. With a very large bowl.
+        intent: joke
   - id: ST-040
     kind: talk
     when:
       r_exact:
         - Friend
     text: Honestly, {player}, the town's better with you in it.
+    replies:
+      - text: That means a lot, {name}.
+        intent: kind
+      - text: What makes you say that?
+        intent: curious
+      - text: Don't tell the gulls. They'll get ideas.
+        intent: joke
   - id: ST-041
     kind: talk
     when:
       r_exact:
         - Friend
     text: You can tell me things, you know. I'm good at keeping them.
+    replies:
+      - text: I know. Thank you.
+        intent: kind
+      - text: Do people tell you a lot?
+        intent: curious
+      - text: Then I'll find something worth keeping.
+        intent: joke
   - id: ST-042
     kind: talk
     when:
       r_exact:
         - Friend
     text: I saved you a seat. Metaphorically. The real one was taken.
+    replies:
+      - text: Thanks. I'll take what I can get.
+        intent: kind
+      - text: Who's got the real one?
+        intent: curious
+      - text: I'll stand. I'm told it's good for me.
+        intent: joke
   - id: ST-043
     kind: talk
     when:
       r_exact:
         - Confidant
     text: I trust you with the real answers, {player}. Don't make me regret it.
+    replies:
+      - text: You won't. I promise.
+        intent: kind
+      - text: Then tell me one.
+        intent: curious
+      - text: I won't let you down.
+        intent: firm
   - id: ST-044
     kind: talk
     when:
       r_exact:
         - Confidant
     text: I'd tell you everything, if I could find the words and the hour.
+    replies:
+      - text: Take your time. I'll be here.
+        intent: kind
+      - text: Start with one thing?
+        intent: curious
+      - text: I've got an hour. The words are your job.
+        intent: joke
   - id: ST-045
     kind: talk
     when:
       r_exact:
         - Confidant
     text: Whatever happens, I'm glad you came to Monde.
+    replies:
+      - text: So am I, {name}.
+        intent: kind
+      - text: What do you think will happen?
+        intent: curious
+      - text: Even with the fog and the gulls, so am I.
+        intent: joke
   - id: ST-046
     kind: talk
     when: {}
@@ -1302,6 +1870,13 @@ lines:
       req:
         - "!flag.quarter_chime"
     text: The clocktower's stuck at 4:17. I still check it every time.
+    replies:
+      - text: So do I. It's a hard habit to break.
+        intent: kind
+      - text: Why did it stop, do you know?
+        intent: curious
+      - text: Right twice a day, at least.
+        intent: joke
   - id: CX-030
     kind: ctx
     when:
@@ -1310,6 +1885,13 @@ lines:
       req:
         - flag.quarter_chime
     text: It struck once. I'm still hearing it, a little.
+    replies:
+      - text: I heard it too. Gave me shivers.
+        intent: kind
+      - text: Will it strike again, do you think?
+        intent: curious
+      - text: I nearly dropped my bread.
+        intent: joke
   - id: CX-031
     kind: ctx
     when:
@@ -1330,6 +1912,13 @@ lines:
       req:
         - storefront.empty>=1
     text: Plenty of empty storefronts here. I keep imagining what goes in them.
+    replies:
+      - text: Something with the lights on would do.
+        intent: kind
+      - text: What would you put in one?
+        intent: curious
+      - text: A shop that sells hats. I keep losing mine.
+        intent: joke
   - id: CX-034
     kind: ctx
     when:
@@ -1350,6 +1939,13 @@ lines:
       req:
         - "!project.lighthouse.done"
     text: The lighthouse sits dark on the breakwater. Somebody ought to fix that.
+    replies:
+      - text: Maybe somebody will.
+        intent: kind
+      - text: What would it take?
+        intent: curious
+      - text: Somebody might. Who do I ask?
+        intent: firm
   - id: CX-037
     kind: ctx
     when:
@@ -1450,6 +2046,13 @@ lines:
       ev:
         - bloom_fair
     text: Have you seen the Commons? Flowers everywhere. Mind the bunting.
+    replies:
+      - text: I have. It's lovely.
+        intent: kind
+      - text: Who put all the flowers up?
+        intent: curious
+      - text: I've already walked into the bunting twice.
+        intent: joke
   - id: CX-053
     kind: ctx
     when:
@@ -1468,6 +2071,13 @@ lines:
       ev:
         - regatta
     text: Boats on the bay and fish on the grill. What more could you want?
+    replies:
+      - text: Nothing. This is perfect.
+        intent: kind
+      - text: Which boat should I cheer for?
+        intent: curious
+      - text: A second helping, maybe.
+        intent: joke
   - id: CX-056
     kind: ctx
     when:
@@ -1554,6 +2164,13 @@ lines:
       ev:
         - project_done
     text: Did you see? Another one finished. The place is getting back on its feet.
+    replies:
+      - text: I did. It's good to see.
+        intent: kind
+      - text: What should we fix next?
+        intent: curious
+      - text: Next we'll get the clock going. Somehow.
+        intent: joke
   - id: CX-069
     kind: ctx
     when:
@@ -1596,6 +2213,13 @@ lines:
       ev:
         - arrival_new
     text: New face in town. Did you see? Looked lost, in a good way.
+    replies:
+      - text: I'll say hello. I know the feeling.
+        intent: kind
+      - text: Where are they staying?
+        intent: curious
+      - text: Lost in a good way is how I'd put myself.
+        intent: joke
   - id: CX-075
     kind: ctx
     when:
@@ -1650,6 +2274,13 @@ lines:
       ev:
         - station_open
     text: A whistle on the hill again. Listen to that.
+    replies:
+      - text: It's a lovely sound.
+        intent: kind
+      - text: Where does the line run now?
+        intent: curious
+      - text: I'll never sleep through the morning again.
+        intent: joke
   - id: CX-083
     kind: ctx
     when:
@@ -1691,10 +2322,24 @@ lines:
         - dawn
         - morning
     text: "{resident:odile} had the ovens going before dawn again. You can smell it from here."
+    replies:
+      - text: It smells wonderful.
+        intent: kind
+      - text: What's she baking today?
+        intent: curious
+      - text: I followed my nose here, honestly.
+        intent: joke
   - id: CX-088
     kind: ctx
     when: {}
     text: "{resident:bastien} is on the wall again. That cat has the best seat in {place}."
+    replies:
+      - text: He's earned it, I'd say.
+        intent: kind
+      - text: Does he belong to anyone?
+        intent: curious
+      - text: I'll ask him to budge up.
+        intent: joke
   - id: CX-089
     kind: ctx
     when:
@@ -1704,6 +2349,13 @@ lines:
         - dawn
         - morning
     text: "{resident:hollis} is up at the station again. Never misses a morning."
+    replies:
+      - text: That's a kind of loyalty.
+        intent: kind
+      - text: What's he waiting for?
+        intent: curious
+      - text: Maybe he knows something about the trains.
+        intent: joke
   - id: CX-090
     kind: ctx
     when:
@@ -1713,6 +2365,13 @@ lines:
         - evening
         - night
     text: "{resident:augusta} is doing her rounds again. Feels safer, somehow, even when it isn't."
+    replies:
+      - text: It's good someone's looking out.
+        intent: kind
+      - text: Isn't it safe, then?
+        intent: curious
+      - text: I'll walk behind her and see.
+        intent: joke
   - id: CX-091
     kind: ctx
     when:
@@ -1720,6 +2379,14 @@ lines:
         - dawn
         - morning
     text: "{resident:sable} printed the whole paper alone again. Read it twice, to be fair."
+    replies:
+      - text: I should pick up a copy.
+        intent: kind
+      - text: Anything good in it?
+        intent: curious
+        next: ctx
+      - text: I read it for the weather. Then I looked outside.
+        intent: joke
   - id: RX-001
     kind: react
     when:

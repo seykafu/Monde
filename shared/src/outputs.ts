@@ -26,11 +26,11 @@ export const DialogueTurnOutput = z.object({
     .array(
       z.object({
         id: z.string(),
-        text: z.string().describe("What the player could say next, under 90 characters"),
+        text: z.string().describe("What the Fellow says back to your lines, first person, under 90 characters"),
         intent: Intent,
       }),
     )
-    .describe("Two or three replies for the player"),
+    .describe("Two or three replies to your lines, each in a different tone; at most one goodbye"),
   effects: z.object({
     regard_delta: z.number().describe("How this turn changed your opinion of the player, -5 to 5"),
     mood: z.object({
@@ -104,8 +104,8 @@ export const GossipOutput = z.object({
     .array(z.object({ speaker: z.enum(["a", "b"]), text: z.string() }))
     .nullable()
     .describe("Two to six short lines, or null in summary mode"),
-  a_delta: z.object({ affinity: z.number(), trust: z.number() }),
-  b_delta: z.object({ affinity: z.number(), trust: z.number() }),
+  a_delta: z.object({ affinity: z.number(), trust: z.number() }).describe("How a's view of b changed, each -3 to 3"),
+  b_delta: z.object({ affinity: z.number(), trust: z.number() }).describe("How b's view of a changed, each -3 to 3"),
   news_passed: z.array(z.string()).describe("Event ids that passed between them"),
   feeling_change: z
     .object({ who: z.enum(["a", "b"]), kind: z.enum(["crush", "love", "resentment", "admiration"]), delta: z.number() })

@@ -2,12 +2,12 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
-import { gameContext } from '@monde/shared';
+import { PORTRAIT_SET, WEATHER_REPLIES, ZONE_REPLIES, derivedReplies, gameContext, replyHash } from '@monde/shared';
 import { Rng } from '../../util/rng';
 import {
   applyWindows, emptyQuietState, FILLER_IDS, fillLine, firstName, kindFor, lineMatches, lineScore, parseLineLibrary,
-  pickLine, quietContext, quietTurn, rememberLine, restoreQuietState, timeBand, WINDOW_LEVELS, type ContextInput,
-  type LineLibrary, type QuietContext, type QuietState
+  pickLine, quietContext, quietExpression, quietReplies, quietTurn, rememberLine, replyCue, restoreQuietState, timeBand,
+  WINDOW_LEVELS, type ContextInput, type LineLibrary, type QuietContext, type QuietState
 } from '../quietMode';
 
 const content = resolve(import.meta.dirname, '../../../..', 'content');
@@ -43,6 +43,41 @@ describe('the line library', () => {
   it('rejects a malformed line', () => {
     expect(() => parseLineLibrary({ lines: [{ id: 'GR-001', kind: 'greet', when: { t: ['teatime'] }, text: 'x' }] })).toThrow(/GR-001/);
     expect(() => parseLineLibrary({ lines: [{ id: 'GR-001', kind: 'shout', text: 'x' }] })).toThrow(/kind/);
+  });
+
+  it('loads authored replies and rejects malformed ones', () => {
+    expect(library.byId.get('GR-006')!.replies).toEqual([
+      { text: 'Early start. The gulls saw to that.', intent: 'kind' },
+      { text: 'Early start. What gets you up at this hour?', intent: 'curious' },
+      { text: "Bit of both. I'm not sure which yet.", intent: 'joke' }
+    ]);
+    expect(library.byId.get('GR-015')!.replies![1]).toMatchObject({ next: 'ctx' });
+    for (const line of library.lines.filter(l => l.replies)) {
+      expect(line.replies!.length).toBeGreaterThanOrEqual(2);
+      expect(line.replies!.length).toBeLessThanOrEqual(3);
+      expect(line.replies!.filter(r => r.intent === 'leave').length).toBeLessThanOrEqual(1);
+    }
+    const line = (replies: unknown) => ({ lines: [{ id: 'GR-001', kind: 'greet', text: 'Hello.', replies }] });
+    const ok = { text: 'Hello.', intent: 'kind' };
+    expect(() => parseLineLibrary(line([ok]))).toThrow(/GR-001: needs 2–3 replies/);
+    expect(() => parseLineLibrary(line([ok, ok, ok, ok]))).toThrow(/needs 2–3/);
+    expect(() => parseLineLibrary(line([ok, { text: 'x'.repeat(91), intent: 'kind' }]))).toThrow(/over 90/);
+    expect(() => parseLineLibrary(line([ok, { text: 'Hm.', intent: 'shout' }]))).toThrow(/intent shout/);
+    expect(() => parseLineLibrary(line([{ text: 'Bye.', intent: 'leave' }, { text: 'Ta-ra.', intent: 'leave' }]))).toThrow(/one reply may say goodbye/);
+    expect(() => parseLineLibrary(line([ok, { text: 'Hi, {place}.', intent: 'kind' }]))).toThrow(/\{name\}/);
+    expect(() => parseLineLibrary(line([ok, { text: 'Hm.', intent: 'kind', next: 'bye' }]))).toThrow(/next/);
+    expect(() => parseLineLibrary(line([ok, { text: 'hello.', intent: 'joke' }]))).toThrow(/repeat/);
+  });
+
+  it('has authored replies for every greeting and talk line Quiet Mode can reach today (even mood, Stranger)', () => {
+    // GDD-GAP in DialogueScene: Quiet Mode speaks at an even mood as a Stranger until mood and Regard are mirrored.
+    for (const minute of [7 * 60, 10 * 60, 13 * 60, 16 * 60, 20 * 60, 23 * 60]) {
+      for (const kind of ['greet', 'talk'] as const) {
+        const reachable = library.lines.filter(l => lineMatches(l, ctx({ kind, minute })) && !FILLER_IDS.includes(l.id));
+        expect(reachable.length).toBeGreaterThan(0);
+        for (const l of reachable) expect(l.replies, l.id).toBeDefined();
+      }
+    }
   });
 });
 
@@ -245,7 +280,7 @@ describe('filling (B.1 step 5)', () => {
 });
 
 describe('a Quiet Mode turn', () => {
-  it('has the server turn\'s shape: one neutral line, neutral replies and Leave', () => {
+  it('has the server turn\'s shape: one line with a fitting portrait, replies to that line, and Leave', () => {
     const state = emptyQuietState();
     const { turn, pick } = quietTurn({
       lib: library, state, rng: rng(3), conversationId: 'conv', residentId: 'pell', turnIndex: 0,
@@ -253,14 +288,77 @@ describe('a Quiet Mode turn', () => {
     });
     expect(pick!.line.kind).toBe('greet');
     expect(turn).toMatchObject({ conversation_id: 'conv', resident_id: 'pell', turn_index: 0, wrap_up: false, fallback: true });
-    expect(turn.lines).toEqual([{ text: pick!.text, expr: 'neutral' }]);
-    expect(turn.choices.map(c => c.intent)).toEqual(['kind', 'curious', 'leave']);
+    expect(turn.lines).toEqual([{ text: pick!.text, expr: quietExpression(pick!.line, pick!.text) }]);
+    expect(PORTRAIT_SET).toContain(turn.lines[0]!.expr);
+    const replies = turn.choices.slice(0, -1);
+    expect(replies.length).toBeGreaterThanOrEqual(2);
+    expect(replies.length).toBeLessThanOrEqual(3);
+    expect(replies.map(r => r.text)).toEqual(pick!.line.replies!.map(r => fillLine(r.text, ctx()).replace('{name}', 'Edwina')));
+    expect(turn.choices.at(-1)).toEqual({ id: 'leave', text: 'Leave', intent: 'leave' });
     expect(state.residents.pell!.recent.map(r => r.id)).toEqual([pick!.line.id]);
+  });
+
+  it('offers a line\'s authored replies, with names filled and ids that say what they ask for', () => {
+    const gr015 = library.byId.get('GR-015')!;
+    const choices = quietReplies(gr015, fillLine(gr015.text, ctx()), ctx());
+    expect(choices).toEqual([
+      { id: 'talk1', text: 'Well enough, thanks for asking.', intent: 'kind' },
+      { id: 'news2', text: 'Slowly. Anything I should know about today?', intent: 'curious' },
+      { id: 'talk3', text: "Ask me after I've found the bakery.", intent: 'joke' }
+    ]);
+    const gr068 = library.byId.get('GR-068')!;
+    expect(quietReplies(gr068, fillLine(gr068.text, ctx()), ctx())[0]!.text).toBe("That's me. Pleased to meet you, Edwina.");
+  });
+
+  it('derives replies from a line\'s tags when it has none: the weather, the place, the news', () => {
+    const rain = library.byId.get('CX-009')!;
+    const seeds = Array.from({ length: 8 }, (_, seed) => quietReplies(rain, rain.text, ctx(), seed));
+    for (const replies of seeds) {
+      expect(replies).toHaveLength(3);
+      expect(replies.map(r => r.intent)).toEqual(['kind', 'curious', 'joke']);
+    }
+    expect(seeds.some(r => r[1]!.text === WEATHER_REPLIES.rain!.curious[0]!.text)).toBe(true);
+    const elm = library.byId.get('CX-040')!;
+    expect(Array.from({ length: 8 }, (_, seed) => quietReplies(elm, elm.text, ctx(), seed)[0]!.text)).toContain(ZONE_REPLIES.commons!.warm[0]!.text);
+    const tollmen = library.byId.get('CX-062')!;
+    expect(replyCue(tollmen, tollmen.text, ctx())).toMatchObject({ kind: 'ctx', event: 'tollmen_near' });
+    expect(quietReplies(tollmen, tollmen.text, ctx(), 1)).toEqual(
+      derivedReplies(replyCue(tollmen, tollmen.text, ctx()), 1).map((r, i) => ({ id: `talk${i + 1}`, text: r.text.replace(/, \{name\}/, ', Edwina'), intent: r.intent })));
+  });
+
+  it('answers a reply that asks for the news with a ctx line', () => {
+    const state = emptyQuietState();
+    const { pick } = quietTurn({
+      lib: library, state, rng: rng(5), conversationId: 'conv', residentId: 'pell', turnIndex: 1,
+      input: { kind: 'choice', choice_id: 'news2', text: 'Slowly. Anything I should know about today?', intent: 'curious' },
+      context: (({ kind: _k, ...rest }) => rest)(ctx())
+    });
+    expect(pick!.line.kind).toBe('ctx');
+  });
+
+  it('picks a portrait from the line: mood tags, events and words', () => {
+    const expr = (id: string) => { const l = library.byId.get(id)!; return quietExpression(l, fillLine(l.text, ctx())); };
+    expect(expr('GR-001')).toBe('sad');        // glum
+    expect(expr('GR-007')).toBe('warm');       // bright
+    expect(expr('CX-062')).toBe('worried');    // Tollmen on the corner
+    expect(expr('RX-037')).toBe('surprised');  // a scuffle
+    expect(expr('CX-010')).toBe('worried');    // mind the puddles
+    expect(expr('ST-016')).toBe('neutral');
+    expect(expr('RX-053')).toBe('warm');       // goodbye
+    expect(expr('GR-068')).toBe('warm');       // a greeting
+    expect(expr('GR-063')).toBe('neutral');    // a Wary greeting
+    const all = new Set(library.lines.map(l => quietExpression(l, l.text)));
+    for (const e of all) expect(PORTRAIT_SET).toContain(e);
+    expect(all.size).toBeGreaterThanOrEqual(5);
   });
 
   it('maps inputs to kinds and wraps up on Leave or after six exchanges', () => {
     expect(kindFor({ kind: 'open' }, 0)).toBe('greet');
     expect(kindFor({ kind: 'choice', choice_id: 'news', text: "What's the news?", intent: 'curious' }, 1)).toBe('ctx');
+    expect(kindFor({ kind: 'choice', choice_id: 'news3', text: 'Who lit that?', intent: 'curious' }, 1)).toBe('ctx');
+    expect(kindFor({ kind: 'choice', choice_id: 'a', text: 'Anything new on the street?', intent: 'curious' }, 1)).toBe('ctx');
+    expect(kindFor({ kind: 'choice', choice_id: 'talk1', text: 'Fair enough.', intent: 'kind' }, 1)).toBe('talk');
+    expect(kindFor({ kind: 'say', text: "What's the news, then?" }, 2)).toBe('ctx');
     expect(kindFor({ kind: 'say', text: 'Nice hat.' }, 2)).toBe('talk');
     expect(kindFor({ kind: 'choice', choice_id: 'leave', text: 'Leave', intent: 'leave' }, 2)).toBe('bye');
     expect(kindFor({ kind: 'say', text: 'And another thing' }, 6)).toBe('bye');
@@ -272,13 +370,18 @@ describe('a Quiet Mode turn', () => {
     expect(turn.choices).toEqual([{ id: 'leave', text: 'Leave', intent: 'leave' }]);
   });
 
-  it('gives narrated-action residents narrated lines', () => {
+  it('gives narrated-action residents narrated lines, and things to do in reply', () => {
     const { turn, pick } = quietTurn({
       lib: library, state: emptyQuietState(), rng: rng(1), conversationId: 'c', residentId: 'bastien', turnIndex: 0, narrated: true,
       input: { kind: 'open' }, context: { ...(({ kind: _k, ...rest }) => rest)(ctx()), speaker: { id: 'bastien', firstName: 'Bastien' } }
     });
     expect(pick).toBeNull();
     expect(turn.lines[0]!.text).toMatch(/^\(Bastien .*\)$/);
+    expect(turn.lines[0]!.expr).toBe('warm');
+    expect(turn.choices).toHaveLength(4);
+    expect(turn.choices.slice(0, 3).map(c => c.text)).toEqual(
+      derivedReplies({ text: turn.lines[0]!.text, kind: 'animal' }, replyHash('c:0')).map(r => r.text));
+    expect(turn.choices.slice(0, 3).map(c => c.intent)).toEqual(['kind', 'curious', 'joke']);
   });
 
   it('restores a saved state and shrugs off junk', () => {
