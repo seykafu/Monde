@@ -20,8 +20,9 @@
     "verify:puzzles": "python3 tools/verify_puzzles.py",
     "build": "npm run build -w @monde/client && npm run build -w @monde/server",
     "build:itch": "npm run build:itch -w @monde/client",
-    "ci": "npm run typecheck && npm run lint && npm run lint:content && npm test && npm run verify:puzzles && npm run build && npm run smoke:server",
+    "ci": "npm run typecheck && npm run lint && npm run lint:content && npm run scenes && npm test && npm run verify:puzzles && npm run build && npm run smoke:server",
     "lint:content": "tsx tools/lint-content.ts",
+    "scenes": "tsx tools/compile-scenes.ts",
     "smoke:server": "bash tools/smoke-server.sh"
   },
   "devDependencies": {

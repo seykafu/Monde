@@ -19,6 +19,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run lint:content
+      - run: npm run scenes
       - run: npm test
       - run: npm run verify:puzzles
       - run: npm run build

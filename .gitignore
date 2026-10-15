@@ -10,3 +10,4 @@ coverage/
 *.log
 .fly/
 .ref/
+client/src/story/scenes.gen.json

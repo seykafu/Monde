@@ -3895,7 +3895,9 @@ set by Project completion or agent behavior, not by a scene.
 ### 13.1 Script format
 
 Scripted scenes are authored in a light, engine-parseable markdown format. The build step
-(`scripts/story/compile.mjs`) compiles them to `src/story/scenes.gen.ts`. Any line the compiler can't
+(`npm run scenes`: `tools/compile-scenes.ts` with the parser in `shared/src/script/`) compiles them to
+`client/src/story/scenes.gen.json`. Scenes live as editable files in `content/scenes/`; this section is the
+design record. Any line the compiler can't
 parse fails the build.
 
 **Scene header**
@@ -8438,6 +8440,8 @@ the canonical names, and the document has been normalized to them:
 | `romance_N_bloomed` + `{romance_pair_N}` | The first three NPC couples to reach Together (§9.11), in order |
 | `kasimir_priya_dating` · `teo_ines_dating` · `augusta_roz_dating` | The seeded romances reach Courting |
 | `ending_e1` … `ending_e4` | Set by S23's routing (§10.5) |
+| `vanes_coin_returned` | The player hands the retainer back at Vane's office (an interact option while `vanes_coin` is held); clears `vanes_coin` (§10.6) |
+| `game_complete` · `ending_eN_seen` | Set at the end of each epilogue |
 
 ---
 

@@ -9,3 +9,4 @@ export * from "./outputs";
 export * from "./clamps";
 export * from "./modelSchema";
 export * from "./expr";
+export * from "./script";
