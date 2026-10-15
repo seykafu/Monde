@@ -761,8 +761,12 @@ export class Portrait {
   private readonly overlay: G;
   private readonly images: [Phaser.GameObjects.Image, Phaser.GameObjects.Image];
   private readonly label: Phaser.GameObjects.Text | null;
+  /** The coloured panel behind the drawn bust. Drawn art is a cut-out on a transparent background, so it hides. */
+  private readonly frame: G;
   /** A dark veil over the frame while the player speaks (darker, never see-through). */
   private readonly veil: G;
+  /** 0 → 1 while dimmed; drawn art darkens by tint, since a veil would show its rectangle. */
+  private dimLevel = { v: 0 };
   private active = 0;
   private shown: string | null = null;
   /** The expression id last asked for (before mapping), so art that arrives later can honour it. */
@@ -773,7 +777,7 @@ export class Portrait {
 
   constructor(private readonly scene: Phaser.Scene, private readonly opts: PortraitOptions) {
     this.root = scene.add.container(opts.x, opts.y);
-    const frame = scene.add.graphics();
+    const frame = this.frame = scene.add.graphics();
     drawFrame(frame, opts.look);
     this.body = scene.add.container(W / 2, H);
     const at = <T extends Phaser.GameObjects.Components.Transform>(o: T): T => { o.setPosition(-W / 2, -H); return o; };
@@ -784,7 +788,7 @@ export class Portrait {
     drawOverlay(this.overlay, opts.look);
     this.images = [0, 1].map(() => scene.add.image(0, 0, '__MISSING').setOrigin(0.5, 1).setVisible(false)) as [Phaser.GameObjects.Image, Phaser.GameObjects.Image];
     this.body.add([this.bust, ...this.faces, ...this.images, this.overlay]);
-    this.label = opts.label
+    this.label = opts.label && import.meta.env.DEV
       ? scene.add.text(W - 12, 12, '', { fontFamily: FAMILY_BODY, fontSize: '13px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE }).setOrigin(1, 0)
       : null;
     this.veil = scene.add.graphics().setAlpha(0);
@@ -819,6 +823,10 @@ export class Portrait {
       this.faces.forEach(f => f.setVisible(false));
       this.bust.setVisible(false);
       this.overlay.setVisible(false);
+      this.frame.setVisible(false);
+      this.label?.setVisible(false);
+      this.veil.setVisible(false);
+      this.applyDim();
       this.fade(image, this.images[prev].visible ? this.images[prev] : null, instant || first);
     } else {
       const face = this.faces[next].clear().setVisible(true);
@@ -826,6 +834,9 @@ export class Portrait {
       this.images.forEach(i => i.setVisible(false));
       this.bust.setVisible(true);
       this.overlay.setVisible(true);
+      this.frame.setVisible(true);
+      this.label?.setVisible(true);
+      this.veil.setVisible(true);
       this.fade(face, this.faces[prev], instant || first);
     }
     if (instant || first) return;
@@ -848,6 +859,18 @@ export class Portrait {
     if (this.destroyed) return;
     this.dim?.stop();
     this.dim = this.scene.tweens.add({ targets: this.veil, alpha: dim ? 0.4 : 0, duration: 120 });
+    this.scene.tweens.killTweensOf(this.dimLevel);
+    this.scene.tweens.add({ targets: this.dimLevel, v: dim ? 1 : 0, duration: 120, onUpdate: () => this.applyDim() });
+  }
+
+  /** Darken the art's pixels only (a 40% veil's worth), leaving its transparent background untouched. */
+  private applyDim(): void {
+    const k = Math.round(255 * (1 - 0.4 * this.dimLevel.v));
+    const tint = (k << 16) | (k << 8) | k;
+    for (const image of this.images) {
+      if (this.dimLevel.v > 0) image.setTint(tint);
+      else image.clearTint();
+    }
   }
 
   destroy(): void {
