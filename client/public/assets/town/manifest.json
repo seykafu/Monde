@@ -1,0 +1,901 @@
+{
+ "anchor": {
+  "h": 50,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 39,
+  "width": 0.81
+ },
+ "apple_tree": {
+  "h": 125,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 109,
+  "width": 2.27
+ },
+ "augusta_house": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 195,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 101
+ },
+ "bakery": {
+  "foot": [
+   4,
+   4
+  ],
+  "h": 180,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 170
+ },
+ "bandstand": {
+  "foot": [
+   2,
+   4
+  ],
+  "h": 155,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 116
+ },
+ "barrel": {
+  "h": 34,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 26,
+  "width": 0.54
+ },
+ "bench": {
+  "h": 45,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 72,
+  "width": 1.5
+ },
+ "bertrand_house": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 195,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 102
+ },
+ "bicycle": {
+  "h": 34,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 56,
+  "width": 1.17
+ },
+ "birch": {
+  "h": 175,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 80,
+  "width": 1.67
+ },
+ "boathouse": {
+  "foot": [
+   3,
+   5
+  ],
+  "h": 170,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 165
+ },
+ "bollard": {
+  "h": 30,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 24,
+  "width": 0.5
+ },
+ "bunkhouse": {
+  "foot": [
+   4,
+   3
+  ],
+  "h": 110,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 188
+ },
+ "bunting": {
+  "h": 29,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 144,
+  "width": 3.0
+ },
+ "buoy": {
+  "h": 14,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 30,
+  "width": 0.62
+ },
+ "bush_flowering": {
+  "h": 44,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 49,
+  "width": 1.02
+ },
+ "bush_round": {
+  "h": 44,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 44,
+  "width": 0.92
+ },
+ "cafe_liss": {
+  "foot": [
+   3,
+   4
+  ],
+  "h": 165,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 167
+ },
+ "cannery": {
+  "foot": [
+   6,
+   6
+  ],
+  "h": 225,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 306
+ },
+ "cat_sleeping": {
+  "h": 23,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 28,
+  "width": 0.58
+ },
+ "clocktower": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 335,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 81
+ },
+ "constabulary": {
+  "foot": [
+   4,
+   4
+  ],
+  "h": 165,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 183
+ },
+ "crane": {
+  "h": 270,
+  "kind": "prop",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 166,
+  "width": 3.46
+ },
+ "crates": {
+  "h": 40,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 28,
+  "width": 0.58
+ },
+ "duck": {
+  "h": 22,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 12,
+  "width": 0.25
+ },
+ "fence": {
+  "h": 27,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 48,
+  "width": 1.0
+ },
+ "fish_crates": {
+  "h": 38,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 42,
+  "width": 0.88
+ },
+ "fish_market": {
+  "foot": [
+   5,
+   3
+  ],
+  "h": 110,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 232
+ },
+ "fishing_boat": {
+  "h": 88,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 170,
+  "width": 3.54
+ },
+ "flower_pots": {
+  "h": 34,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 35,
+  "width": 0.73
+ },
+ "flowerbed": {
+  "h": 35,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 72,
+  "width": 1.5
+ },
+ "footbridge": {
+  "h": 75,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 190,
+  "width": 3.96
+ },
+ "founders_house": {
+  "foot": [
+   3,
+   4
+  ],
+  "h": 215,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 160
+ },
+ "fountain": {
+  "h": 150,
+  "kind": "prop",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 140,
+  "width": 2.92
+ },
+ "garden_shed": {
+  "foot": [
+   2,
+   2
+  ],
+  "h": 100,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 88
+ },
+ "general_store": {
+  "foot": [
+   5,
+   4
+  ],
+  "h": 175,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 227
+ },
+ "glasshouse": {
+  "foot": [
+   5,
+   4
+  ],
+  "h": 150,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 242
+ },
+ "gull": {
+  "h": 22,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 20,
+  "width": 0.42
+ },
+ "gull_and_anchor": {
+  "foot": [
+   5,
+   4
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 223
+ },
+ "handcart": {
+  "h": 68,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 70,
+  "width": 1.46
+ },
+ "harbormaster_house": {
+  "foot": [
+   3,
+   3
+  ],
+  "h": 205,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 167
+ },
+ "hedge": {
+  "h": 21,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 48,
+  "width": 1.0
+ },
+ "lamp_post": {
+  "h": 112,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 20,
+  "width": 0.42
+ },
+ "lamplighter_cottage": {
+  "foot": [
+   4,
+   3
+  ],
+  "h": 150,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 181
+ },
+ "lantern_office": {
+  "foot": [
+   3,
+   4
+  ],
+  "h": 190,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 163
+ },
+ "library": {
+  "foot": [
+   6,
+   4
+  ],
+  "h": 205,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 277
+ },
+ "lighthouse": {
+  "foot": [
+   3,
+   3
+  ],
+  "h": 360,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 123
+ },
+ "lilypads": {
+  "h": 44,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 44,
+  "width": 0.92
+ },
+ "lobster_pots": {
+  "h": 44,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 41,
+  "width": 0.85
+ },
+ "market_hall": {
+  "foot": [
+   5,
+   5
+  ],
+  "h": 195,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 236
+ },
+ "market_stall": {
+  "h": 100,
+  "kind": "prop",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 122,
+  "width": 2.54
+ },
+ "nell_cottage": {
+  "foot": [
+   3,
+   3
+  ],
+  "h": 130,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 153
+ },
+ "net_rack": {
+  "h": 80,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 117,
+  "width": 2.44
+ },
+ "notice_board": {
+  "h": 70,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 64,
+  "width": 1.33
+ },
+ "oak": {
+  "h": 175,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 155,
+  "width": 3.23
+ },
+ "okafor_house": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 190,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 118
+ },
+ "old_elm": {
+  "h": 270,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 272,
+  "width": 5.67
+ },
+ "pell_house": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 190,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 103
+ },
+ "picnic_table": {
+  "h": 49,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 76,
+  "width": 1.58
+ },
+ "pine": {
+  "h": 195,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 97,
+  "width": 2.02
+ },
+ "planter": {
+  "h": 34,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 50,
+  "width": 1.04
+ },
+ "postbox": {
+  "h": 56,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 18,
+  "width": 0.38
+ },
+ "reeds": {
+  "h": 46,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 36,
+  "width": 0.75
+ },
+ "rock": {
+  "h": 38,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 44,
+  "width": 0.92
+ },
+ "rowboat": {
+  "h": 43,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 100,
+  "width": 2.08
+ },
+ "signpost": {
+  "h": 80,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 52,
+  "width": 1.08
+ },
+ "st_brigids": {
+  "foot": [
+   4,
+   4
+  ],
+  "h": 175,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 169
+ },
+ "stone_wall": {
+  "h": 18,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 48,
+  "width": 1.0
+ },
+ "storefront_a": {
+  "foot": [
+   3,
+   3
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 128
+ },
+ "storefront_b": {
+  "foot": [
+   3,
+   3
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 130
+ },
+ "storefront_c": {
+  "foot": [
+   3,
+   3
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 123
+ },
+ "sundial": {
+  "h": 55,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 38,
+  "width": 0.79
+ },
+ "tall_grass": {
+  "h": 30,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 30,
+  "width": 0.62
+ },
+ "teo_cottage": {
+  "foot": [
+   3,
+   3
+  ],
+  "h": 135,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 137
+ },
+ "ticket_booth": {
+  "foot": [
+   2,
+   2
+  ],
+  "h": 110,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 72
+ },
+ "town_hall": {
+  "foot": [
+   6,
+   4
+  ],
+  "h": 215,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 281
+ },
+ "townhouse_a": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 115
+ },
+ "townhouse_b": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 111
+ },
+ "townhouse_c": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 108
+ },
+ "townhouse_d": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 185,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 99
+ },
+ "vane_office": {
+  "foot": [
+   3,
+   2
+  ],
+  "h": 80,
+  "kind": "building",
+  "states": [
+   "restored"
+  ],
+  "w": 153
+ },
+ "veg_bed": {
+  "h": 59,
+  "kind": "prop",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 96,
+  "width": 2.0
+ },
+ "well": {
+  "h": 92,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 66,
+  "width": 1.38
+ },
+ "wharf_cottage": {
+  "foot": [
+   2,
+   3
+  ],
+  "h": 130,
+  "kind": "building",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 116
+ },
+ "willow": {
+  "h": 175,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 178,
+  "width": 3.71
+ }
+}
