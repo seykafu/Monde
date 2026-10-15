@@ -102,7 +102,7 @@ describe('filtering and scoring (B.1 steps 1–2)', () => {
   it('scores ev 8 · w 4 · z 3 · r:= 3 · t 2 · m 2 · r: 1', () => {
     const s = (id: string) => lineScore(library.byId.get(id)!);
     expect(s('ST-046')).toBe(0);
-    expect(s('GR-001')).toBe(2 + 2);
+    expect(s('GR-001')).toBe(2 + 2 + 1); // t + m + r:Stranger (B.2.1 rows carry r:Stranger)
     expect(s('RX-001')).toBe(8 + 1);
     expect(s('GR-061')).toBe(3 + 2);
     expect(s('CX-086')).toBe(8 + 3);
