@@ -130,7 +130,7 @@ TIB [neutral]: It is now.
 N: Bastien shifts on the windowsill. The book beneath him stays warm.
 {regard: tib +3}
 [[if flag.pz03_solved]]
-{memory: margo, "The new Fellow came to the library. Tib broke a table and found Aurélien's Almanac under it. The Fellow solved the ledger margin in one sitting. The map was in the sixth book of tides. Technically a minor irregularity.", importance: 10}
+{memory: margo, "The new Fellow came to the library. Tib broke a table; Aurélien's Almanac was under it. The Fellow solved the ledger margin in one sitting. Map: sixth book of tides. A minor irregularity.", importance: 10}
 {memory: tib, "Took the Almanac from under the wobbly table and used the dictionary. The Fellow and Margo found the map. Six lanterns. I counted twice.", importance: 8}
 [[else]]
 {memory: margo, "The new Fellow came to the library. Tib found the Almanac under a table. The ledger margin is on the felt, unsolved. The Fellow wanted to think. I respect that. I was not calm.", importance: 8}

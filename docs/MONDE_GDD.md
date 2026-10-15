@@ -4606,7 +4606,7 @@ TIB [neutral]: It is now.
 N: Bastien shifts on the windowsill. The book beneath him stays warm.
 {regard: tib +3}
 [[if flag.pz03_solved]]
-{memory: margo, "The new Fellow came to the library. Tib broke a table and found Aurélien's Almanac under it. The Fellow solved the ledger margin in one sitting. The map was in the sixth book of tides. Technically a minor irregularity.", importance: 10}
+{memory: margo, "The new Fellow came to the library. Tib broke a table; Aurélien's Almanac was under it. The Fellow solved the ledger margin in one sitting. Map: sixth book of tides. A minor irregularity.", importance: 10}
 {memory: tib, "Took the Almanac from under the wobbly table and used the dictionary. The Fellow and Margo found the map. Six lanterns. I counted twice.", importance: 8}
 [[else]]
 {memory: margo, "The new Fellow came to the library. Tib found the Almanac under a table. The ledger margin is on the felt, unsolved. The Fellow wanted to think. I respect that. I was not calm.", importance: 8}
@@ -5407,7 +5407,7 @@ SABLE [neutral]: She'll have read it by now. Go and see her. Tonight.
 SABLE [neutral]: Not for her sake. I want to know what you do when you know.
 N: She turns back to the stone and sets a line of type so fast you only hear it.
 N: In the forme, upside down and backward, the headline is already set.
-{memory: sable, "Showed the Fellow the Option Clause. They read page nine twice and asked what the Wharf was worth to Nell. I gave Pell three days. The Fellow is going to see her tonight. I'll know what they are by the morning.", importance: 10}
+{memory: sable, "Showed the Fellow the Option Clause. They read page nine twice and asked what the Wharf was worth to Nell. I gave Pell three days. The Fellow sees her tonight. I'll know what they are by morning.", importance: 10}
 [[if flag.sable_knows_coin]]
 {memory: sable, "The Fellow told me about Vane's retainer before I made them. Fifty a week. I'll hold that against nobody. Yet.", importance: 7}
 [[elif flag.vanes_coin]]

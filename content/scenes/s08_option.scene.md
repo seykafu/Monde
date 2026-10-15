@@ -56,7 +56,7 @@ SABLE [neutral]: She'll have read it by now. Go and see her. Tonight.
 SABLE [neutral]: Not for her sake. I want to know what you do when you know.
 N: She turns back to the stone and sets a line of type so fast you only hear it.
 N: In the forme, upside down and backward, the headline is already set.
-{memory: sable, "Showed the Fellow the Option Clause. They read page nine twice and asked what the Wharf was worth to Nell. I gave Pell three days. The Fellow is going to see her tonight. I'll know what they are by the morning.", importance: 10}
+{memory: sable, "Showed the Fellow the Option Clause. They read page nine twice and asked what the Wharf was worth to Nell. I gave Pell three days. The Fellow sees her tonight. I'll know what they are by morning.", importance: 10}
 [[if flag.sable_knows_coin]]
 {memory: sable, "The Fellow told me about Vane's retainer before I made them. Fifty a week. I'll hold that against nobody. Yet.", importance: 7}
 [[elif flag.vanes_coin]]
