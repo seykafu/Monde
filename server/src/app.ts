@@ -6,6 +6,7 @@ import { createDatabase } from "./db/client.js";
 import { createRedis } from "./redis.js";
 
 import { registerWorldRoutes } from "./worlds/routes.js";
+import { registerSnapshotRoutes } from "./worlds/snapshots.js";
 import type { WorldDatabase } from "./worlds/createWorld.js";
 import { promptVersion } from "./mind/promptBuilder.js";
 import { createMindClient, type MindClient } from "./mind/mindClient.js";
@@ -93,5 +94,6 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   const nightRunner = options.nightRunner
     ?? (db ? new NightRunner({ db, mind, contentDir: config.MONDE_CONTENT_DIR, log: app.log }) : undefined);
   registerNightRoutes(app, db, nightRunner);
+  registerSnapshotRoutes(app, config, db, nightRunner);
   return app;
 }

@@ -29,6 +29,13 @@
       "when": 1792028220585,
       "tag": "0003_g13_friendship",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792030098081,
+      "tag": "0004_w06_world_snapshots",
+      "breakpoints": true
     }
   ]
 }

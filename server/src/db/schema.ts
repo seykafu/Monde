@@ -18,6 +18,7 @@ export const worlds = pgTable("worlds", {
   seed: integer("seed").notNull(), day: integer("day").notNull().default(1),
   minute: integer("minute").notNull().default(360), status: text("status").notNull(),
   branchId: uuid("branch_id").notNull(), createdAt: createdAt(),
+  parentWorldId: uuid("parent_world_id"),
   aiSpendDay: integer("ai_spend_day").notNull(), aiSpendUsd: numeric("ai_spend_usd").notNull().default("0"),
   /** The Fellowship application (GDD §11.1), set by PATCH /v1/worlds/:w/player. Null until the player fills it in. */
   player: jsonb("player").$type<PlayerProfile>(),
@@ -142,6 +143,10 @@ export const snapshots = pgTable("snapshots", {
   branchId: uuid("branch_id").notNull(),
   day: integer("day").notNull(),
   objectKey: text("object_key").notNull(),
+  minute: integer("minute"),
+  label: text("label"),
+  checkpoint: boolean("checkpoint").notNull().default(false),
+  payload: jsonb("payload").$type<import("../worlds/snapshots.js").SnapshotPayload>(),
   createdAt: createdAt(),
 }, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
 export const aiLog = pgTable("ai_log", {
