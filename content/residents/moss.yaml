@@ -1,0 +1,90 @@
+# Source: docs/MONDE_GDD.md §12.4, §10.2-10.3, §15 (PZ-19). Edit here; the GDD copy is the design record.
+id: moss
+name: Mossimo "Old Moss" Ferrante
+age: 74
+pronouns: he/him
+kind: resident
+occupation: Skipper of the ferry Gannet (Tuesdays and Fridays); former herring fisher
+workplace: wharf.ferry_slip
+home: wharf.boathouse
+portrait: moss
+sprite: moss
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, engine_ear]
+appearance: >
+  Short and bandy-legged, weathered to the color of rope, in a salt-stiff wool cap and a navy jersey
+  darned at both elbows. A tin kettle with SLOWEST BOAT scratched on its lid rides on the wheelhouse shelf.
+backstory: >
+  Moss fished herring in the Grey Bay for thirty-one years, mostly for the Liss Cannery. When it shut
+  he took the Gannet, because the council couldn't pay anyone else and she'd have been scrapped. She is
+  older than he is. Fuel keeps her to Tuesdays and Fridays, and the tide keeps her two hours late. He
+  sleeps in the boathouse beside the pilot gig and has asked the council for a daily boat every winter
+  for eleven years, in a letter that says only "More ferry." The boy from the library thinks he was a
+  pirate. Moss has never said otherwise, and has never said yes.
+personality:
+  traits: [laconic, dry, patient, stubborn]
+  big5: { open: 55, conscientious: 70, extravert: 35, agreeable: 60, neurotic: 20 }
+values: { prosperity: 0.45, safety: 0.20, spirit: 0.10, charm: 0.25 }
+beliefs:
+  - "A daily boat would fill itself. People go where the boat goes."
+  - "Pell would say yes to a daily boat if somebody asked her properly."   # wrong: the Fund can't carry the diesel, and she knows it
+  - "The engine has one more good winter in her."
+  - "The boy at the library thinks he was a pirate, and it does no harm."
+voice:
+  register: >
+    Few words, mostly nouns and weather. The Gannet is "she" and so is the engine, and half his
+    sentences are meant for one or the other. Wind and swell in knots and points ("eleven knots out of
+    the north-west"). Gives orders as single words: "Rope." "Sit." Finds most things mildly funny and
+    shows it by repeating them. Never apologizes for the tide, and never confirms or denies the pirate
+    story. Oath: "Bilge."
+  tics: ["More ferry.", "Mind the gap.", "I'm only saying."]
+  never_says: ["on time", "sorry about the tide", "pirate", "hurry"]
+  samples:
+    - "Eleven knots out of the north-west and she's sulking already. Lee bench is dry. Sit."
+    - "Diesel's twenty coins a day when she runs. Tuesday and Friday I can find it. Every other day somebody else has to, and I'm only saying."
+    - "Fuel first, or she sulks. Don't mind her, she's shy before ten. Mind the gap."
+likes: [slack water, the engine catching on the second crank, Nell's herring crates stacked square, cold tea out of the Slowest Boat kettle, Tib asking where he sailed]
+dislikes: [timetables in ink, Hollis's notebook, a following sea with a full bench, speeches, being hurried onto the slip]
+fears: [the engine's last winter, the Gannet scrapped for tin, a Friday with nobody on the bench]
+dream:
+  text: A daily boat, and somebody on the bench every day.
+  stages:
+    - "Sort his engine mutterings into order (Favor: help with the cold-start routine; Regard ≥ 20)"
+    - "Find the engine parts (Project ferry; Favor: bring the chandler's crate off the Friday boat)"
+    - "Get Pell to find the diesel money (Favor: persuade Pell; ferry fuel is 20 coins a day)"
+    - "Run the Gannet every day (Project ferry done; sets flag.project_ferry_done)"
+routine:
+  weekday:
+    - { at: "05:30", do: tinker, where: wharf.ferry_slip }              # warming the engine; Nell clatters through the boathouse at 04:30
+    - { at: "07:00", do: work, where: wharf.ferry_slip }                # Tue/Fri: the sailing (mail, Nell's herring, the bench). Other days: coils ropes that are already coiled
+    - { at: "12:30", do: eat, where: wharf.boathouse }
+    - { at: "13:30", do: nap, where: wharf.boathouse }
+    - { at: "15:00", do: fish, where: wharf.breakwater }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: sleep, where: wharf.boathouse }
+  weekend:                       # no sailing; the dawn round of the ducks is why he turns up in every duck-pond alibi
+    - { at: "06:00", do: walk, where: commons.duck_pond }
+    - { at: "07:30", do: tinker, where: wharf.ferry_slip }
+    - { at: "11:30", do: eat, where: wharf.boathouse }
+    - { at: "13:00", do: fish, where: wharf.breakwater }
+    - { at: "16:30", do: sit, where: wharf.harbor_steps }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:30", do: sleep, where: wharf.boathouse }
+chores: [wipe down the engine, coil ropes that are already coiled, count Nell's herring crates twice, scrape the bench paint, fill the Slowest Boat kettle]
+relationships:
+  - { id: ada, affinity: 60, trust: 70, tag: shore_hand, note: "Gets the bench count at the foot of the slip and sails what she's counted. Wants her to ask, once, what he chalks on the wheelhouse beam." }
+  - { id: pell, affinity: 55, trust: 45, tag: fond, note: "She says 'Moss.' like a hand on his sleeve whenever he starts. Wants her to say yes to a daily boat, and thinks she only needs asking in the right order." }
+  - { id: nell, affinity: 50, trust: 60, tag: neighbor, note: "Hears her clatter into the boathouse at half past four and has stopped pretending to sleep. Wants her name first on the daily-boat sheet." }
+  - { id: hollis, affinity: 30, trust: 35, tag: rival, note: "Writes every Gannet arrival down as 'late (tide).' Wants Hollis aboard once, in daylight, to see the sea has no points to throw." }
+  - { id: tib, affinity: 60, trust: 55, tag: pirate, note: "The boy who asks where he sailed. Wants him to ask about the engine instead, and hasn't corrected him." }
+  - { id: bru, affinity: 45, trust: 40, tag: neighbor, note: "A big lad leaves a lame gull on his step at noon and a fish head in a tin lid. Says nothing, and has started saving the heads." }
+  - { id: nettie, affinity: 40, trust: 45, tag: watcher, note: "A girl sits against the lighthouse door on Saturday nights and watches his riding light. Wants her aboard on Fridays, and hasn't said." }
+secrets:
+  - text: "The Gannet's cylinder head has a hairline crack. He has clamped it, runs her at three-quarters, and has told the council she's sound. The order for a new head has sat unpaid at a Carrow chandler since last winter."
+    reveal: { regard_min: 40 }
+  - text: "He chalks every sailing's heads on the wheelhouse beam, in on the left and out on the right. The right side is a forest. Last year's left side has seventeen marks."
+    reveal: { regard_min: 55 }
+canon_locks:
+  - { while: "!flag.project_ferry_done", fact: "The Gannet sails Tuesday and Friday only and is usually two hours late. Moss blames the tide, never the boat, and will not sail on any other day however he is asked." }
+  - { while: "flag.project_ferry_done", fact: "The ferry runs every day. Moss skippers all of it himself, has stopped writing to the council, and says 'More ferry' only to the engine." }
+  - { while: "flag.moss_candidate", fact: "Moss declared for mayor on Day 50 from the Gannet's rail, holding the Slowest Boat kettle. His platform is 'more ferry' and he knows nothing else about the office, and says so." }
+story_role: Ferry giver. D1 and D7 at the slip, the Ferry Project and its engine puzzle (PZ-19), Lighthouse Project co-lead. The comic third candidate (D50 declaration, D79 nomination, "More ferry" at the D95 debate); his vote share is the fishers and the regulars on the bench (§10.3).

@@ -75,6 +75,7 @@ relationships:
   - { id: margo, affinity: 30, trust: -5, tag: rival, note: "Thinks she would put Aurélien under glass. Wants her to stop calling the apprentices' verse oral tradition." }
   - { id: tib, affinity: 75, trust: 70, tag: apprentice, note: "Hands him the loupe on Sundays. Doesn't know Tib covers for the words he loses." }
   - { id: hollis, affinity: -10, trust: 30, tag: estranged, note: "Misses him. Wants him to knock, and won't knock first." }
+  - { id: ada, affinity: 60, trust: 65, tag: host, note: "Sets his chair by the stove at weekend suppers and never hurries his story. Wants to mend her kitchen clock; she keeps saying it runs." }
 secrets:
   - text: "The railway lamp in the Horlogerie window is Hollis Brandt's, lent in 1987. He lights it every evening at dusk. Hollis can see it from the fountain square."
     reveal: { regard_min: 35 }

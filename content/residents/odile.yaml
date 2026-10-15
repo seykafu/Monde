@@ -75,6 +75,8 @@ relationships:
   - { id: kasimir, affinity: 50, trust: 60, tag: fond, note: "Wants the left oven door properly fixed. He has looked at it twice and won't send a bill." }
   - { id: bastien, affinity: 30, trust: 20, tag: tolerates, note: "Feeds him crusts and calls him a nuisance." }
   - { id: claudine, affinity: 60, trust: -40, tag: absent, note: "Her daughter, in the city. Wants her to have written, and is afraid she has." }
+  - { id: bru, affinity: 35, trust: 20, tag: wary, note: "Hands him the burnt end and won't be Madame'd. Wants him to hang the pan back on its hook himself." }
+  - { id: nettie, affinity: 30, trust: 0, tag: wary, note: "Takes one currant off the end of the case on Saturdays. Leaves the day-old there on purpose and says nothing. Wants her to ask for the loaf." }
 secrets:
   - text: "Every Sunday she leaves a loaf on the Mercer step and tells the shop it's returns."
     reveal: { regard_min: 40 }

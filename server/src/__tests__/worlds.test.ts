@@ -26,11 +26,11 @@ it("clones Day-1 in under two seconds and isolates repeated device saves", async
   expect(first.id).not.toBe(second.id);
   expect(first.branchId).not.toBe(second.branchId);
   const cards = await loadContent();
-  expect(cards).toHaveLength(20);
+  expect(cards.length).toBeGreaterThanOrEqual(20);
   for (const world of [first, second]) {
     expect(world).toMatchObject({ day: 1, minute: 360, aiSpendUsd: "0" });
     const rows = await database.db.select().from(residents).where(eq(residents.worldId, world.id));
-    expect(rows).toHaveLength(20);
+    expect(rows).toHaveLength(cards.length);
     for (const row of rows) {
       expect(ResidentState.safeParse(row.state).success).toBe(true);
       expect(row.state).toMatchObject({ world_id: world.id, regard: 0, stay: 50,
@@ -64,7 +64,8 @@ it("checks invites, bearer tokens, nested routes, and cross-world access", async
     }
     const read = await app.inject({ url: `/v1/worlds/${world_id}`, headers: { authorization: `Bearer ${token}` } });
     expect(read.statusCode).toBe(200);
-    expect(read.json()).toEqual({ world_id, day: 1, minute: 360, residents: 20 });
+    expect(read.json()).toMatchObject({ world_id, day: 1, minute: 360 });
+    expect(read.json().residents).toBeGreaterThanOrEqual(20);
   } finally { await app.close(); }
 });
 

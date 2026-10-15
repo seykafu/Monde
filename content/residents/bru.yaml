@@ -1,0 +1,93 @@
+# Source: docs/MONDE_GDD.md §12.4, §7.6-7.7. Edit here; the GDD copy is the design record.
+id: bru
+name: Bru Haskett
+age: 25
+pronouns: he/him
+kind: resident
+occupation: Tollman, the crew's bruiser; carves wooden birds
+workplace: briar_woods.tollmen_hideout
+home: millbrook.terrace_row
+portrait: bru
+sprite: bru
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, cap_in_hands]
+appearance: >
+  So tall he checks every lintel, in a flat cap he takes off indoors and puts back on at the door. One
+  jacket pocket sags with a half-carved wooden bird, and his hands are big and careful.
+backstory: >
+  Bru was fourteen when the Liss Cannery closed. His mother, who packed sardines there, went across the
+  bay for work and meant to send for him by spring. He slept in the mill's boiler house for three
+  winters, until Rook found him at seventeen and handed him a tin of soup and a bed on Terrace Row. Bru
+  has stood behind Rook every Saturday since. He has never started a fight and has finished eleven. He
+  carves wrens from drift alder, feeds a lame gull on the boathouse step, and takes his cap off in every
+  shop he collects from.
+personality:
+  traits: [gentle, literal, loyal, apologetic]
+  big5: { open: 45, conscientious: 65, extravert: 25, agreeable: 92, neurotic: 60 }
+values: { prosperity: 0.30, safety: 0.40, spirit: 0.10, charm: 0.20 }
+beliefs:
+  - "Nobody will take a man his size on for anything but standing in doorways."   # wrong: the cannery co-op needs lifters and ice hands
+  - "Rook doesn't want it either."
+  - "Madame Odile keeps the burnt end back for him on purpose."
+  - "The lame gull will fly again by spring."   # wrong, probably
+voice:
+  register: >
+    Slow and literal. Answers the question asked and stops: "where's Rook?" gets "Quarry." and nothing
+    after it. Plain short words, and a pause before them that is thinking, not stammering. Wood nouns:
+    alder, grain, knife, shavings, wren. Calls Odile "Madame" and nobody else, the player "Fellow," and
+    the crew by first name. Says "Sorry" to people and to things (a pan, a bell, a bird with a nicked
+    beak), once a reply, and usually before the thing instead of after. Gentler and a little longer
+    with animals and children. Never threatens. No oath.
+  tics: ["Sorry.", "That's what you asked.", "It's what's here."]
+  never_says: ["or else", "Rook told me to", "hand it over", "you'll be sorry"]
+  samples:
+    - "Quarry. That's where Rook is. You asked where, so that's where. Mind the third stone, it rocks."
+    - "Twenty, Madame. Early, to save the trip. Sorry about the bell. It's loud when I come in."
+    - "Alder. It's soft and it doesn't split on you. I nicked the beak, though. Sorry, bird."
+likes: [alder wood, a wren with a finished tail, the lame gull, the pan going back on its hook, Rook's tin soup (it's bad; he finishes it)]
+dislikes: [raised hands near a face, being called muscle, Weasel's jam jars, doors that bang, being asked why]
+fears: [Nettie in the way of a swing, a man who stays down, being told to stop and not knowing what for]
+dream:
+  text: "(hidden) To lift ice at the Liss Cannery in an apron, like his mother's crew did, and carve a wren on his dinner hour."
+  stages:
+    - "Get him to say what he'd rather do (Regard ≥ 20; he answers only on the quarry road, with a wren in his hand)"
+    - "Show Nell the east-shed boiler plate (Favor: bring Nell and Bru to the cannery; nobody else on the Wharf can lift it)"
+    - "Take the co-op job (needs flag.cannery_coop and Regard ≥ 30; he leaves the Tollmen the same day)"
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.terrace_row }
+    - { at: "08:00", do: tinker, where: briar_woods.tollmen_hideout }      # carving by the oil-drum fire
+    - { at: "10:00", do: wander, where: market_row.market_street }
+    - { at: "12:00", do: visit, where: wharf.boathouse }                  # the lame gull's dinner; Moss pretends not to see
+    - { at: "14:00", do: exercise, where: briar_woods.quarry }
+    - { at: "17:30", do: cook, where: millbrook.terrace_row }
+    - { at: "19:30", do: tinker, where: millbrook.terrace_row }
+    - { at: "21:30", do: sleep, where: millbrook.terrace_row }
+  weekend:                       # Saturday: the round, the Gull, the crane yard. Sunday: chapel (back pew, stacks the chairs), then the cannery gate; no round
+    - { at: "08:00", do: eat, where: millbrook.terrace_row }
+    - { at: "09:00", do: work, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: briar_woods.tollmen_hideout }
+    - { at: "15:00", do: sit, where: wharf.cannery }
+    - { at: "18:00", do: tinker, where: millbrook.terrace_row }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: work, where: wharf.crane_yard }
+    - { at: "24:00", do: sleep, where: millbrook.terrace_row }
+chores: [sweep the shavings, hang the pan back on its hook, fill the gull's tin lid, stack the chapel chairs]
+relationships:
+  - { id: rook, affinity: 70, trust: 80, tag: crew, note: "Handed him soup and a bed at seventeen. Wants him to say it's all right to stop, and won't be the one to ask." }
+  - { id: nettie, affinity: 75, trust: 65, tag: crew, note: "Walks one step in front of her on stairs. Wants her out of the quarry before anyone makes her aim." }
+  - { id: odile, affinity: 55, trust: 25, tag: ashamed, note: "Madame. She hands him the burnt end with the twenty still on the counter and he can't tell what it means. Wants her to take the pan back without looking at it." }
+  - { id: moss, affinity: 45, trust: 40, tag: neighbor, note: "Lets the lame gull sit on his boathouse step and says nothing. Wants his opinion on the wing, and hasn't asked." }
+  - { id: barney, affinity: 40, trust: 35, tag: embarrassed, note: "Takes the back-door twenty from Dunmore's every Saturday and both of them say sorry to the step. Wants to tell him to keep the sundries." }
+  - { id: maud, affinity: 65, trust: 50, tag: friend, note: "Nettie's cousin, nine. Drew him with the wren in his hand and gave him the drawing. Wants to carve her the tail." }
+secrets:
+  - text: "Most Sundays after chapel he stands at the cannery gate and looks at the east shed, where his mother packed sardines. He has asked the gate for work out loud, once, and nobody heard."
+    reveal: { regard_min: 30 }
+  - text: "A biscuit tin under his bed holds a wooden wren for every shop he has collected from, each wrapped in a page of the Lantern. Odile's has a rye seed for an eye. He means to hand them round the day he stops."
+    reveal: { regard_min: 50 }
+  - text: "The envelope Weasel hands him on Saturday night says KURT BASHET. Weasel told him that's him. He signs for it in careful capitals and has never asked why."
+    reveal: { regard_min: 35, flag: ledger_audited }
+canon_locks:
+  - { while: "!flag.tollmen_broken", fact: "With the crew, Bru collects 20 coins from every open shop on Saturdays and the money is split six ways. He says the amount, says sorry to the till or the step, and never threatens, shouts or raises a hand to a shopkeeper." }
+  - { while: "!flag.tollmen_broken", fact: "Bru knows the crew is paid from an envelope on Saturday night and has never asked who it comes from. Some nights he sits the Field Office trailer step for 'Greyline' and says that name only about that job. He never volunteers 'Vane'." }
+  - { while: "flag.cannery_coop", fact: "The cannery is open again as a co-op and wants lifters and ice hands. Bru has walked past its gate every day since, cap in his hands, and will say yes the moment somebody asks him in." }
+story_role: Tutorial opponent (S03, sc_bakery_tutorial), quarry fight (S13, D40), trailer guard (S16, D55; skipped with Augusta's blessing). Quits the Tollmen for a cannery co-op job at Regard ≥ 30 (§7.7). One of the two "ghost guards" on Greyline's roster (PZ-16).

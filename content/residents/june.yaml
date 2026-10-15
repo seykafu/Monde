@@ -73,6 +73,7 @@ relationships:
   - { id: ines, affinity: 35, trust: 30, tag: neighbor, note: "Hears her typing through the wall at night. Wants her to come hear the bandstand." }
   - { id: teo, affinity: 45, trust: 45, tag: friend, note: "Plays beside the glass. He waters to her tempo." }
   - { id: hester, affinity: 45, trust: 50, tag: employer, note: "Gives her the morning shift and a free cup. Wants June to say whether she is staying, so she can hire for winter." }
+  - { id: ada, affinity: 45, trust: 50, tag: ticket, note: "Sold her the ticket and said the date out loud, nothing else. Wants to ask for another date and hasn't found the two coins' worth of nerve." }
 secrets:
   - text: "She has written a seven-song set for the bandstand, in case. The last song is for Roz and has no words yet."
     reveal: { regard_min: 40 }

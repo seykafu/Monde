@@ -76,6 +76,8 @@ relationships:
   - { id: felix, affinity: 55, trust: 60, tag: teacher, note: "Best teacher, worst news. Hates that Mr. Amari is cheerful about the school closing." }
   - { id: bastien, affinity: 80, trust: 50, tag: friend, note: "Thinks the cat knows where the Marks are." }
   - { id: ada, affinity: 85, trust: 80, tag: mother, note: "Sells the tickets and tells him nothing about who is leaving. Wants him home before the lamps come on." }
+  - { id: nettie, affinity: 10, trust: 5, tag: wary, note: "Maud's cousin. Fourteen steps from the school gate to her lamp-post. Wants to know if it's true she never shoots at people." }
+  - { id: moss, affinity: 65, trust: 55, tag: pirate, note: "Won't say yes and won't say no when he asks about the pirate days. Wants him to say yes, just once." }
 secrets:
   - text: "He found a Mark Margo doesn't have, behind a bollard near the ferry slip, and is saving it for a day she's sad enough to need it."
     reveal: { regard_min: 40 }

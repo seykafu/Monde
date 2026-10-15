@@ -1,0 +1,96 @@
+# Source: docs/MONDE_GDD.md §12.4, §7.6-7.7. Edit here; the GDD copy is the design record.
+id: nettie
+name: Nettie Szabo
+age: 19
+pronouns: she/her
+kind: resident
+occupation: Tollman, the lookout (slingshot)
+workplace: briar_woods.tollmen_hideout
+home: millbrook.terrace_row
+portrait: nettie
+sprite: nettie
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, sidelong]
+appearance: >
+  Short and quick, in a hooded jacket two sizes too big, with a slingshot hanging from her belt like a
+  set of keys. Her eyes go over a stranger like a customs officer's, and she is usually standing a step
+  higher than you are.
+backstory: >
+  Nettie lives on Terrace Row with her grandmother Ilona, a few doors from her cousin Maud, who is nine
+  and in Felix Amari's class. She left that class at fifteen when Gran's pension stopped covering the
+  coal. Rook gave her a slingshot and a ledge over Market Row; the rule about people was her own. In
+  four years she has hit lamps, bottles, a weathercock and the exact crust a gull was holding, and
+  nobody who was standing there. She takes one currant a Saturday from Odile's case and Odile lets her.
+  On Saturday nights Rook sends her to the breakwater, far from the crane yard, and she has stopped
+  asking why.
+personality:
+  traits: [bossy, quick, loyal, prickly]
+  big5: { open: 65, conscientious: 55, extravert: 78, agreeable: 30, neurotic: 55 }
+values: { prosperity: 0.30, safety: 0.10, spirit: 0.35, charm: 0.25 }
+beliefs:
+  - "Rook posts her on the lookout because she's the best shot in Monde."   # wrong: he keeps her on the ledge and the breakwater so she is out of the fights and out of the van's sight
+  - "Odile is keeping count of the currants and means to bill her."   # wrong: Odile leaves the day-old on the end of the case on purpose
+  - "Maud's school closes at the end of the year, and the Row will say it was always going to."
+  - "A pebble at somebody's boot is only manners."
+voice:
+  register: >
+    Quick and bossy, with a kid sister's sarcasm. Gives orders as if she'd been promoted: "Move."
+    "Stand there." "Not that foot." Lookout nouns: ledge, rota, the Row, the clear, a pebble by weight.
+    Narrates the street in short calls ("Milk cart, clear."). Calls Rook "Boss," Bru "Bru" as you would
+    a large dog you love, and the player "Fellow" like a dare. Says "I never shoot at people" aloud,
+    louder when she's doubted. When she's rattled she stops talking and fixes something small, a cup of
+    water or a loaf put back. Oath: "Blast."
+  tics: ["Easy.", "Visitor.", "I never shoot at people."]
+  never_says: ["sorry", "please", "I'm scared", "shoot at you"]
+  samples:
+    - "Row's clear, baker's door is shut and the milk cart's twenty minutes late. You've got till the cart, Fellow. Say your piece."
+    - "I never shoot at people. I shoot at the ground by your boot, and you'd be amazed how many take the hint."
+    - "Maud drew me in her margin with a hood the size of a tent. Mr. Amari pinned it on the wall. Don't tell Boss, he'll want one."
+likes: [high ledges, the Row at six in the morning, Odile's currants, Maud's drawings, a clean hit on the mill weathercock]
+dislikes: [being posted at the back, Weasel's jam jars, being called kid, people who flinch, Rook's tin soup]
+fears: [the day somebody makes her aim, Maud's desk going empty, Bru getting hurt on a Saturday she wasn't looking]
+dream:
+  text: "(hidden) To keep the light at Point Lumière: a lookout who watches the sea instead of the Row."
+  stages:
+    - "Get her to say it (Regard ≥ 25; only on a high ledge, and only if you don't look at her)"
+    - "Save Maud's seat (Millbrook School reaches 20 pupils; sets flag.school_saved; with Regard ≥ 40 she quits the Tollmen)"
+    - "Walk her up the lighthouse stair (needs flag.project_lighthouse_done)"
+    - "Ask Moss to take her on the Gannet's deck on sailing days (Favor: persuade Moss)"
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.terrace_row }
+    - { at: "08:00", do: walk, where: millbrook.school }                 # walks Maud to the door
+    - { at: "09:30", do: work, where: market_row.market_street }         # lookout, from the awning of a shut storefront
+    - { at: "12:30", do: eat, where: briar_woods.tollmen_hideout }
+    - { at: "14:00", do: exercise, where: briar_woods.quarry }           # slingshot practice, Rook watching
+    - { at: "15:30", do: walk, where: millbrook.school }                 # collects Maud at the gate
+    - { at: "18:00", do: eat, where: millbrook.terrace_row }
+    - { at: "21:30", do: sleep, where: millbrook.terrace_row }
+  weekend:                       # Saturday: the round, then the breakwater while the crew meets the van. Sunday: no round, chapel with Ilona
+    - { at: "08:00", do: eat, where: millbrook.terrace_row }
+    - { at: "09:00", do: work, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: briar_woods.tollmen_hideout }
+    - { at: "15:00", do: exercise, where: briar_woods.quarry }
+    - { at: "18:00", do: eat, where: millbrook.terrace_row }
+    - { at: "21:00", do: sit, where: wharf.breakwater }
+    - { at: "23:30", do: sleep, where: millbrook.terrace_row }
+chores: [oil the sling band, chalk the lookout rota on the hideout wall, sort pebbles by weight, walk Maud to the school door]
+relationships:
+  - { id: rook, affinity: 80, trust: 70, tag: crew, note: "Calls him Boss and means it. Wants him to say why it's the breakwater on Saturday nights and not the crane yard." }
+  - { id: bru, affinity: 70, trust: 75, tag: crew, note: "Checks he's eaten. Wants him to stop saying sorry to the pan before the pan has done anything." }
+  - { id: odile, affinity: 35, trust: -10, tag: wary, note: "One currant off the end of the case every Saturday and Odile never says a word. Wants to know whether that's manners or a trap." }
+  - { id: tib, affinity: 15, trust: 0, tag: wary, note: "Maud's classmate, who counts her steps at the school gate. Wants to know what he does with the number." }
+  - { id: felix, affinity: 55, trust: 50, tag: former_teacher, note: "Taught her long division until she was fifteen and never once said what she'd be. Wants the school saved so Maud keeps her desk." }
+  - { id: moss, affinity: 40, trust: 50, tag: looks_up_to, note: "Watches the Gannet's riding light from the breakwater on Saturday nights. Wants a turn on his deck, and hasn't asked." }
+  - { id: ada, affinity: 35, trust: 45, tag: wary, note: "Asks her the Carrow fare 'for a friend.' Wants it to be less than it is." }
+  - { id: maud, affinity: 90, trust: 85, tag: cousin, note: "Nine. Draws her in the margin of her slate. Wants her to have all the school Nettie left." }
+  - { id: ilona, affinity: 85, trust: 70, tag: grandmother, note: "Gran counts the coal and doesn't ask what the lookout rota is for. Wants Nettie to say, and Nettie can't." }
+secrets:
+  - text: "Every Saturday night she sits with her back against the dark lighthouse door at the end of the breakwater and tells herself she's on lookout. She has never been allowed near the crane yard and has stopped asking why."
+    reveal: { regard_min: 35 }
+  - text: "She has priced a one-way fare to Carrow with Ada three times, 'for a friend.' The fare money is in a sock at the bottom of Ilona's coal scuttle."
+    reveal: { regard_min: 50 }
+canon_locks:
+  - { while: "true", fact: "Nettie has never fired her slingshot at a person and says so aloud. Her shots go at the ground by someone's feet, or at whatever is in their hand. Startle only." }
+  - { while: "!flag.tollmen_broken", fact: "Nettie is the Tollmen's lookout and goes on the Saturday round. Rook keeps her out of the crane yard on Saturday nights, and she doesn't know who pays the crew's wage. She never says 'Vane' or 'Greyline'." }
+  - { while: "!flag.school_saved", fact: "Millbrook School has nine pupils and closes unless it reaches twenty by Day 51. Her cousin Maud is in Felix's class. Nettie knows the number and the date and says 'twenty' as if it were a price." }
+story_role: Tutorial and quarry opponent (S03, S13), the Tollman who says aloud that she never shoots at people. Quits the Tollmen when the school is saved and Regard ≥ 40 (§7.7). Rook's runner to the Mercer door after D45. One of the two "ghost guards" on Greyline's roster (PZ-16).

@@ -74,6 +74,7 @@ relationships:
   - { id: bertrand, affinity: -45, trust: -20, tag: estranged, note: "Holds him to blame for the clock stopping. Sits facing the tower every Sunday at 16:17." }
   - { id: augusta, affinity: 30, trust: 40, tag: tolerated, note: "Reports trespass on his own platform to her. Wants an official notice that says Keeper." }
   - { id: rosalind, affinity: 40, trust: 40, tag: regular, note: "One cider at 18:00, gone by 19:00. Doesn't say Maren's name in the pub." }
+  - { id: moss, affinity: -15, trust: 10, tag: rival, note: "Two hours eleven late on a Tuesday, and the tide gets the blame. Logs the Gannet 'late (tide)' in the notebook. Wants an apology and doesn't expect one." }
 secrets:
   - text: "On the day the mill closed he held the last mill train ten minutes for the families to say goodbye, and logged it as on time. It's the only false line in forty-one years of logs."
     reveal: { regard_min: 50 }

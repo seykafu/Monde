@@ -44,7 +44,7 @@ function dialogueInput(c: PersonaCard, overrides: Partial<DialogueInput> = {}): 
     flags: [],
     scene: { day: 4, weekday: "Fri", minute: 17 * 60 + 30, place: "old_quarter.library", weather: "fog" },
     doing: "work at old_quarter.mayor_office",
-    player: { name: "Ada", pronouns: "she/her", background: "Tinkerer" },
+    player: { name: "Quillon", pronouns: "she/her", background: "Tinkerer" },
     memories: [memory("The Fellow cleared the drain on Lamplighter Lane.")],
     topics: ["the lamps on Lamplighter Lane", "the Fund envelopes", "Friday's ferry"],
     playerSaid: "Evening.",
@@ -114,7 +114,7 @@ describe("blocks 1-3 are byte-stable", () => {
     expect(userText(second)).not.toBe(userText(first));
     for (const block of first.system) expect(block.cache_control).toEqual({ type: "ephemeral" });
     expect(first.system).toHaveLength(3);
-    expect(systemText(second)).not.toContain("Ada");
+    expect(systemText(second)).not.toContain("Quillon");
     expect(systemText(second)).not.toContain("asked about the Fund");
   });
 

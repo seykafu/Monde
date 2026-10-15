@@ -1,0 +1,95 @@
+# Source: docs/MONDE_GDD.md §12.4, §8 (Mail Round), §13.3 (S01a). Edit here; the GDD copy is the design record.
+id: ada
+name: Ada Okafor
+age: 38
+pronouns: she/her
+kind: resident
+occupation: Ferry ticket clerk; keeps the post at the same hatch
+workplace: wharf.ticket_booth
+home: old_quarter.okafor_house
+portrait: ada
+sprite: ada
+portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, counting]
+appearance: >
+  Tall for the booth, so she ducks to speak through the hatch, with a pencil behind each ear, ink on
+  the heel of her right hand and a rubber stamp on a cord at her wrist.
+backstory: >
+  Ada has sold the Gannet's tickets for nine years and the post across the same hatch since the post
+  office shut. Six years ago her husband bought a one-way at that hatch to look for work on the
+  mainland. She stamped it and said nothing, and he has sent a postal order every Christmas since. Her
+  son Tib reads the manifest upside down through the hatch every Friday, and she lets him think she
+  hasn't noticed. She keeps a tin marked STUBS for torn-up return halves, a ledger for the one-ways,
+  and the manifest in pencil. She knows who is leaving. She has never told a soul.
+personality:
+  traits: [brisk, exact, guarded, dry]
+  big5: { open: 40, conscientious: 92, extravert: 38, agreeable: 50, neurotic: 58 }
+values: { prosperity: 0.35, safety: 0.30, spirit: 0.20, charm: 0.15 }
+beliefs:
+  - "Tib hasn't noticed whose names go in the book."   # wrong: he reads the manifest upside down through the hatch and has counted
+  - "Anyone who asks a fare twice has already decided."   # wrong: Nettie Szabo has asked three times and bought nothing
+  - "The Friday boat takes out more than it brings."
+  - "Edwina counts the lamps because she can't count the boat."
+voice:
+  register: >
+    Brisk and exact; speaks in tallies. Almost every sentence is a count, a price or a day ("That's
+    four coins, and a Friday."). Booth nouns: fare, stub, manifest, one-way, return, stamp, hatch,
+    bench. Calls Pell "Edwina," Tib "Tobias" when the lamps are coming on, and the player "Fellow."
+    Answers what was asked and prices what wasn't. Never advises a leaver: she names the day and the
+    fare and stamps it. When a question gets near anyone's ticket she turns to the post sacks or the
+    manifest. No oath.
+  tics: ["That's a count.", "Your money.", "Stamped."]
+  never_says: ["safe travels", "are you sure", "I'll miss you", "don't go"]
+  samples:
+    - "That's four coins, and a Friday. Stand behind the line, the hatch sticks."
+    - "Who's on Friday's boat? I sell tickets, Fellow, I don't read them back. There's forty envelopes to sort. Hold the sack."
+    - "Tobias Okafor. Lamps are coming on and you're on the wrong side of the fountain. I said quarter to six. It's five past."
+likes: [a manifest that adds up, pencils sharpened with a knife, a freshly inked stamp pad, Tib's handwriting on a postcard, tea that stays hot long enough to finish]
+dislikes: [being pitied, "safe travels", anyone leaning on the hatch, visitors at bedtime, stubs torn crooked]
+fears: [writing Tib's name on a one-way, a Christmas with no postal order, the hatch closing for good]
+dream:
+  text: "To fill the tin marked STUBS: one torn-up return half for every person who stays."
+  stages:
+    - "Let the Fellow carry the post (Mail Round; Regard ≥ 20)"
+    - "Chalk an arrivals board on the booth wall (Favor: bring a board and chalk from Dunmore's; needs flag.first_arrival_seen)"
+    - "A full bench on a sailing day (Favor: walk a new arrival to the hatch to buy a return)"
+    - "Burn the letter to her sister (needs flag.school_saved)"
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.okafor_house }
+    - { at: "08:15", do: work, where: wharf.ticket_booth }               # Tue/Fri: sailings; other days the post and parcels
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: wharf.ticket_booth }
+    - { at: "16:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: old_quarter.okafor_house }
+    - { at: "20:30", do: write, where: old_quarter.okafor_house }        # the day's book; some nights the letter
+    - { at: "22:00", do: sleep, where: old_quarter.okafor_house }
+  weekend:                       # Saturday morning the booth does the post; Sunday it's shut and she does the book at home. Bertrand eats at her table at 18:00
+    - { at: "07:30", do: eat, where: old_quarter.okafor_house }
+    - { at: "09:00", do: work, where: wharf.ticket_booth }
+    - { at: "12:30", do: eat, where: old_quarter.okafor_house }
+    - { at: "14:00", do: write, where: old_quarter.okafor_house }
+    - { at: "15:30", do: walk, where: wharf.ferry_slip }                  # the empty slip; June is usually on it
+    - { at: "17:00", do: cook, where: old_quarter.okafor_house }
+    - { at: "18:00", do: eat, where: old_quarter.okafor_house }
+    - { at: "22:00", do: sleep, where: old_quarter.okafor_house }
+chores: [total the manifest, sharpen the pencils, sort the post sacks, ink the stamp pad, wipe the hatch ledge]
+relationships:
+  - { id: tib, affinity: 95, trust: 75, tag: son, note: "Home before the lamps and out of the book. Reads his handwriting in the manifest margin and says nothing. Wants him to stop counting the dark windows." }
+  - { id: moss, affinity: 60, trust: 70, tag: shore_hand, note: "Gives him the bench count and no more. Wants to know what he chalks on the wheelhouse beam, and won't ask." }
+  - { id: pell, affinity: 60, trust: 65, tag: first_names, note: "Calls her Edwina and gives her the Friday count unsoftened, which is why she asks for it. Wants her to stop reading the boat for good news." }
+  - { id: june, affinity: 40, trust: 45, tag: ticket, note: "Sold her the ticket and wrote the date in pencil. Wants her to come to the hatch and name a different date, and will say two coins and nothing else." }
+  - { id: nettie, affinity: 40, trust: 40, tag: watching, note: "Gives her the Friday time every time she asks 'for a friend.' Wants her to ask for a return." }
+  - { id: bertrand, affinity: 50, trust: 60, tag: guest, note: "Feeds him at the weekend table, chair by the stove. Has seen Tib finish his sentences and says nothing to either. Wants him to take the spare bed when there's frost on his stairs." }
+  - { id: chidi_okafor, affinity: 60, trust: 50, tag: nephew, note: "Writes that he's between things. She sends the fare in the reply, unrequested. Wants him home, and has never written the word." }
+secrets:
+  - text: "Under the booth shelf, in pencil, are the names of everyone who has asked the Carrow fare more than once without buying. This spring: Priya Ramaswamy and Nettie Szabo. She has never let either know she's noticed."
+    reveal: { regard_min: 55 }
+  - text: "A letter to her sister across the bay, asking her to take Tib if the school closes, has been in the ledger drawer since March. It's unposted. She has written it three times and kept the best."
+    reveal: { regard_min: 60 }
+  - text: "She sold June Castellanos a ticket for the ferry after the Regatta. She wrote the date in pencil, and a date in pencil can be changed for two coins."
+    reveal: { regard_min: 65 }
+canon_locks:
+  - { while: "true", fact: "Ada tells nobody who has bought a ticket, asked a fare or is leaving. She names the day, the fare and the stamp. Asked about a person's ticket, she turns to a chore: the manifest, the post sacks, the stamp pad." }
+  - { while: "!flag.project_ferry_done", fact: "The Gannet sails Tuesday and Friday. A one-way to Carrow is four coins, and a booked date can be changed at the hatch for two. The rest of the week the hatch handles the post and parcels." }
+  - { while: "!flag.school_saved", fact: "Millbrook School has nine pupils and closes unless it reaches twenty by Day 51. Ada knows the number and the date, does not discuss them, and tells Tib to eat his supper." }
+story_role: Ferry ticket clerk and Mail Round giver (D2). D1 at the slip (the return half, the tin marked STUBS). Her booth is the clock on every departure arc; she sold June's ticket and says nothing until a Confidant asks the right way. Tib's mother.

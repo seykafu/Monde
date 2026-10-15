@@ -74,6 +74,7 @@ relationships:
   - { id: tib, affinity: 70, trust: 65, tag: pupil, note: "Sharpest in the room and the most likely to bolt if the school goes." }
   - { id: priya, affinity: 50, trust: 55, tag: colleague, note: "Wants her to stay and hasn't said so." }
   - { id: kasimir, affinity: 50, trust: 55, tag: friend, note: "Counts the desks through the workshop window every Sunday and says nothing." }
+  - { id: nettie, affinity: 55, trust: 45, tag: former_pupil, note: "Left at fifteen with long division half done. Wants her to come and look at Maud's desk." }
 secrets:
   - text: "Every Sunday he walks past Kasimir's workshop and counts the desks under the tarps through the window. Eleven. He has never said a word."
     reveal: { regard_min: 35 }

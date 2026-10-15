@@ -77,6 +77,8 @@ relationships:
   - { id: augusta, affinity: 60, trust: 70, tag: ally, note: "Gave her the title Captain six years ago in place of the raise she asked for. The one person who tells her no. Ignores the deputy requests because the Fund can't carry the wages." }
   - { id: bertrand, affinity: 65, trust: 60, tag: old_friend, note: "Only he calls her Eddie, since Arthur. Wants him to see a doctor about his stairs and hasn't managed to say so." }
   - { id: frye, affinity: 50, trust: 70, tag: clerk, note: "Keeps the archive key and has never opened the Streetlight file. Wants him to keep not opening it." }
+  - { id: moss, affinity: 55, trust: 50, tag: fond, note: "Meets every boat he skippers and says 'Moss.' before he finishes the sentence. Wants him to stop saying 'more ferry' until the Fund can carry the diesel." }
+  - { id: ada, affinity: 60, trust: 65, tag: friend, note: "Takes the Friday count from the booth every week and calls it a courtesy. Wants Ada to say, just once, that a boat will fill." }
 secrets:
   - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the clerk, keeps the key and has never opened that file."
     reveal: { flag: option_known }

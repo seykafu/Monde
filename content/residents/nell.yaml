@@ -73,6 +73,7 @@ relationships:
   - { id: augusta, affinity: 35, trust: 45, tag: wary, note: "Gave her the van sightings in January and heard nothing since. Wants a stakeout, not a notebook." }
   - { id: bastien, affinity: 35, trust: 25, tag: tolerates, note: "Fish heads daily, with complaints." }
   - { id: barney, affinity: 70, trust: 80, tag: brother, note: "Keeps the till and the books. Wants him to stop looking at the floor whenever the Tollmen come up." }
+  - { id: moss, affinity: 45, trust: 55, tag: neighbor, note: "Her herring rides his boat and arrives two hours late, blamed on the tide. Wants a date for a daily boat, same as she wants one from Pell." }
 secrets:
   - text: "She keeps a log of the grey van's Saturday visits to the crane yard in the back of her tide table: thirty-one so far, each with the minute of arrival."
     reveal: { regard_min: 45 }
