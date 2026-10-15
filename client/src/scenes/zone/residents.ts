@@ -30,6 +30,7 @@ import type { ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
 import { placeRegistry } from '../../world/places';
 import { personaCards } from '../../world/residents';
+import { PREWARM_RANGE } from '../../mind/prewarm';
 
 const SIM_KEY = 'monde.residents';
 /** Off-screen tick: one executor sample per resident per real second (§19.2). */
@@ -207,6 +208,9 @@ export class ResidentLayer {
   private overlayOn = false;
   private readout?: Phaser.GameObjects.Text;
   private warned = 0;
+  /** Called when a visible resident comes within PREWARM_RANGE (6 tiles, §9.10 step 1) of the player (M-05). */
+  onApproach?: (residentId: string) => void;
+  private near = new Set<string>();
 
   /** Create every actor up front (hidden), so they all belong to the world camera. */
   constructor(private readonly scene: Phaser.Scene, private readonly zone: ZoneDef, private readonly projection: ObliqueProjection,
@@ -266,6 +270,11 @@ export class ResidentLayer {
     this.sim.events.emit('talk-requested', { residentId: id, zone: this.zone.id, day: this.clock.day, minute: this.clock.exactMinute });
   }
 
+  /** A resident's routine state as drawn this frame (held while they're talking), or null off this board. */
+  stateOf(id: string): ResidentState | null {
+    return this.byId.get(id)?.state ?? null;
+  }
+
   update(dtMs: number, player: Position): void {
     const day = this.clock.day, minute = this.clock.exactMinute;
     const dMin = day === this.lastDay && Number.isFinite(this.lastMinute) ? minute - this.lastMinute : 0;
@@ -290,6 +299,18 @@ export class ResidentLayer {
     const pointer = this.pointerWorld();
     for (const a of live) this.draw(a, player, pointer, dtMs);
     if (this.overlayOn) this.drawOverlay(live);
+    if (this.onApproach) this.approach(live, player);
+  }
+
+  /** Report residents as they come into prewarm range (once per approach; the caller rate-limits). */
+  private approach(live: readonly Actor[], player: Position): void {
+    const near = new Set<string>();
+    for (const a of live) {
+      if (!a.pos || !a.state?.visible || Math.hypot(a.pos.x - player.x, a.pos.y - player.y) > PREWARM_RANGE) continue;
+      near.add(a.profile.id);
+      if (!this.near.has(a.profile.id)) this.onApproach?.(a.profile.id);
+    }
+    this.near = near;
   }
 
   // ── Internals ─────────────────────────────────────────────────────────────

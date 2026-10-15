@@ -20,6 +20,7 @@ import { Clock, DAY_START, SOLAR_NOON, formatClock, formatDate, formatGameTime, 
 import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, type DailyWeather, type WeatherKind, type WeatherNow } from '../sim/weather';
 import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
 import { ResidentLayer } from './zone/residents';
+import { attachDialogue } from './DialogueScene';
 
 // ── Time, light and weather (W-04) ───────────────────────────────────────────
 // One Clock for the whole game lives in the registry, so it keeps running across
@@ -258,6 +259,8 @@ export class ZoneScene extends Phaser.Scene {
     this.syncFigure();
     // Before the world snapshot below, so every resident sprite belongs to the world camera.
     this.residents = new ResidentLayer(this, this.zone, this.projection, this.clock, DEV_KEYS);
+    // E beside a resident opens the dialogue panel over this scene; walking near one prewarms it (M-05).
+    attachDialogue(this, { residents: this.residents, zone: this.zone, clock: this.clock, weather: () => this.now });
     const world = this.children.list.slice();
     const camera = this.cameras.main;
     camera.setOrigin(0, 0).setZoom(RENDER_SCALE);

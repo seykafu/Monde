@@ -7,6 +7,8 @@ lines:
         - dawn
       m:
         - glum
+      r:
+        - Stranger
     text: Morning, I suppose. Don't mind me.
   - id: GR-002
     kind: greet
@@ -15,6 +17,8 @@ lines:
         - dawn
       m:
         - glum
+      r:
+        - Stranger
     text: It's early and I'm already tired of it.
   - id: GR-003
     kind: greet
@@ -23,6 +27,8 @@ lines:
         - dawn
       m:
         - low
+      r:
+        - Stranger
     text: Morning. The day's barely started and it already feels long.
   - id: GR-004
     kind: greet
@@ -31,6 +37,8 @@ lines:
         - dawn
       m:
         - low
+      r:
+        - Stranger
     text: Oh, hello, {player}. I didn't see you there.
   - id: GR-005
     kind: greet
@@ -39,6 +47,8 @@ lines:
         - dawn
       m:
         - even
+      r:
+        - Stranger
     text: Morning, {player}. Fresh one, isn't it?
   - id: GR-006
     kind: greet
@@ -47,6 +57,8 @@ lines:
         - dawn
       m:
         - even
+      r:
+        - Stranger
     text: Morning. Early start, or a late finish?
   - id: GR-007
     kind: greet
@@ -55,6 +67,8 @@ lines:
         - dawn
       m:
         - bright
+      r:
+        - Stranger
     text: Morning, {player}! Today feels like a good one.
   - id: GR-008
     kind: greet
@@ -63,6 +77,8 @@ lines:
         - dawn
       m:
         - bright
+      r:
+        - Stranger
     text: There you are! Lovely start to the day.
   - id: GR-009
     kind: greet
@@ -71,6 +87,8 @@ lines:
         - dawn
       m:
         - glowing
+      r:
+        - Stranger
     text: Good morning! I woke up smiling and I don't know why.
   - id: GR-010
     kind: greet
@@ -79,6 +97,8 @@ lines:
         - dawn
       m:
         - glowing
+      r:
+        - Stranger
     text: "{player}! What a morning to be out and about!"
   - id: GR-011
     kind: greet
@@ -87,6 +107,8 @@ lines:
         - morning
       m:
         - glum
+      r:
+        - Stranger
     text: Mm. Morning. It hasn't been much of one.
   - id: GR-012
     kind: greet
@@ -95,6 +117,8 @@ lines:
         - morning
       m:
         - glum
+      r:
+        - Stranger
     text: Oh, hello. I'm not much company today.
   - id: GR-013
     kind: greet
@@ -103,6 +127,8 @@ lines:
         - morning
       m:
         - low
+      r:
+        - Stranger
     text: Morning, {player}. Getting there, one hour at a time.
   - id: GR-014
     kind: greet
@@ -111,6 +137,8 @@ lines:
         - morning
       m:
         - low
+      r:
+        - Stranger
     text: Hello. I'm a bit slow today, so bear with me.
   - id: GR-015
     kind: greet
@@ -119,6 +147,8 @@ lines:
         - morning
       m:
         - even
+      r:
+        - Stranger
     text: Morning, {player}. How's your day shaping up?
   - id: GR-016
     kind: greet
@@ -127,6 +157,8 @@ lines:
         - morning
       m:
         - even
+      r:
+        - Stranger
     text: Morning. Nice to see a face I know.
   - id: GR-017
     kind: greet
@@ -135,6 +167,8 @@ lines:
         - morning
       m:
         - bright
+      r:
+        - Stranger
     text: Morning, {player}! Good to see you.
   - id: GR-018
     kind: greet
@@ -143,6 +177,8 @@ lines:
         - morning
       m:
         - bright
+      r:
+        - Stranger
     text: Hello there! Going well so far, I'd say.
   - id: GR-019
     kind: greet
@@ -151,6 +187,8 @@ lines:
         - morning
       m:
         - glowing
+      r:
+        - Stranger
     text: Morning, {player}! I could hug the whole street.
   - id: GR-020
     kind: greet
@@ -159,6 +197,8 @@ lines:
         - morning
       m:
         - glowing
+      r:
+        - Stranger
     text: What a day already! Come on, tell me everything.
   - id: GR-021
     kind: greet
@@ -167,6 +207,8 @@ lines:
         - midday
       m:
         - glum
+      r:
+        - Stranger
     text: It's midday and I'm already counting the hours.
   - id: GR-022
     kind: greet
@@ -175,6 +217,8 @@ lines:
         - midday
       m:
         - glum
+      r:
+        - Stranger
     text: Lunchtime, I think. Not hungry. Hello.
   - id: GR-023
     kind: greet
@@ -183,6 +227,8 @@ lines:
         - midday
       m:
         - low
+      r:
+        - Stranger
     text: Hello, {player}. Halfway through and I'm flagging.
   - id: GR-024
     kind: greet
@@ -191,6 +237,8 @@ lines:
         - midday
       m:
         - low
+      r:
+        - Stranger
     text: Oh, hello. I keep forgetting to eat.
   - id: GR-025
     kind: greet
@@ -199,6 +247,8 @@ lines:
         - midday
       m:
         - even
+      r:
+        - Stranger
     text: Nearly afternoon. Have you eaten yet, {player}?
   - id: GR-026
     kind: greet
@@ -207,6 +257,8 @@ lines:
         - midday
       m:
         - even
+      r:
+        - Stranger
     text: Midday already. Where does the morning go?
   - id: GR-027
     kind: greet
@@ -215,6 +267,8 @@ lines:
         - midday
       m:
         - bright
+      r:
+        - Stranger
     text: Hello, {player}! Perfect time for a bite, I'd say.
   - id: GR-028
     kind: greet
@@ -223,6 +277,8 @@ lines:
         - midday
       m:
         - bright
+      r:
+        - Stranger
     text: Lunchtime! My favorite time of day, after all the others.
   - id: GR-029
     kind: greet
@@ -231,6 +287,8 @@ lines:
         - midday
       m:
         - glowing
+      r:
+        - Stranger
     text: "{player}! Have you eaten? Eat with me. I insist."
   - id: GR-030
     kind: greet
@@ -239,6 +297,8 @@ lines:
         - midday
       m:
         - glowing
+      r:
+        - Stranger
     text: Midday and everything's right. Don't ask me why.
   - id: GR-031
     kind: greet
@@ -247,6 +307,8 @@ lines:
         - afternoon
       m:
         - glum
+      r:
+        - Stranger
     text: Afternoon. It's dragging, isn't it?
   - id: GR-032
     kind: greet
@@ -255,6 +317,8 @@ lines:
         - afternoon
       m:
         - glum
+      r:
+        - Stranger
     text: Oh. It's you. Hello. Sorry, long day.
   - id: GR-033
     kind: greet
@@ -263,6 +327,8 @@ lines:
         - afternoon
       m:
         - low
+      r:
+        - Stranger
     text: Afternoon, {player}. Nearly through it, I think.
   - id: GR-034
     kind: greet
@@ -271,6 +337,8 @@ lines:
         - afternoon
       m:
         - low
+      r:
+        - Stranger
     text: Hello. I could do with a sit-down.
   - id: GR-035
     kind: greet
@@ -279,6 +347,8 @@ lines:
         - afternoon
       m:
         - even
+      r:
+        - Stranger
     text: Afternoon, {player}. Getting much done?
   - id: GR-036
     kind: greet
@@ -287,6 +357,8 @@ lines:
         - afternoon
       m:
         - even
+      r:
+        - Stranger
     text: Afternoon. The day's turned the corner, I'd say.
   - id: GR-037
     kind: greet
@@ -295,6 +367,8 @@ lines:
         - afternoon
       m:
         - bright
+      r:
+        - Stranger
     text: Afternoon, {player}! The day's treating me well.
   - id: GR-038
     kind: greet
@@ -303,6 +377,8 @@ lines:
         - afternoon
       m:
         - bright
+      r:
+        - Stranger
     text: Hello! I've been hoping to bump into you.
   - id: GR-039
     kind: greet
@@ -311,6 +387,8 @@ lines:
         - afternoon
       m:
         - glowing
+      r:
+        - Stranger
     text: Afternoon, {player}! I'm having a wonderful day. Join in.
   - id: GR-040
     kind: greet
@@ -319,6 +397,8 @@ lines:
         - afternoon
       m:
         - glowing
+      r:
+        - Stranger
     text: There you are! Best part of the day, this.
   - id: GR-041
     kind: greet
@@ -327,6 +407,8 @@ lines:
         - evening
       m:
         - glum
+      r:
+        - Stranger
     text: Evening. Glad it's nearly over, to be honest.
   - id: GR-042
     kind: greet
@@ -335,6 +417,8 @@ lines:
         - evening
       m:
         - glum
+      r:
+        - Stranger
     text: Mm. Evening. Don't ask how it went.
   - id: GR-043
     kind: greet
@@ -343,6 +427,8 @@ lines:
         - evening
       m:
         - low
+      r:
+        - Stranger
     text: Evening, {player}. I'll be glad to put my feet up.
   - id: GR-044
     kind: greet
@@ -351,6 +437,8 @@ lines:
         - evening
       m:
         - low
+      r:
+        - Stranger
     text: Evening. It's been a long one.
   - id: GR-045
     kind: greet
@@ -359,6 +447,8 @@ lines:
         - evening
       m:
         - even
+      r:
+        - Stranger
     text: Evening, {player}. Heading home, or heading out?
   - id: GR-046
     kind: greet
@@ -367,6 +457,8 @@ lines:
         - evening
       m:
         - even
+      r:
+        - Stranger
     text: Evening. Quiet one, so far.
   - id: GR-047
     kind: greet
@@ -375,6 +467,8 @@ lines:
         - evening
       m:
         - bright
+      r:
+        - Stranger
     text: Evening, {player}! Just right for a slow walk, I'd say.
   - id: GR-048
     kind: greet
@@ -383,6 +477,8 @@ lines:
         - evening
       m:
         - bright
+      r:
+        - Stranger
     text: Evening! Lovely time of day, this.
   - id: GR-049
     kind: greet
@@ -391,6 +487,8 @@ lines:
         - evening
       m:
         - glowing
+      r:
+        - Stranger
     text: Evening, {player}! What a day. What a lovely day.
   - id: GR-050
     kind: greet
@@ -399,6 +497,8 @@ lines:
         - evening
       m:
         - glowing
+      r:
+        - Stranger
     text: Good evening! I'd stay out till midnight if I could.
   - id: GR-051
     kind: greet
@@ -407,6 +507,8 @@ lines:
         - night
       m:
         - glum
+      r:
+        - Stranger
     text: Late, isn't it? Can't sleep. Never can.
   - id: GR-052
     kind: greet
@@ -415,6 +517,8 @@ lines:
         - night
       m:
         - glum
+      r:
+        - Stranger
     text: Night, then. Not a good one, so far.
   - id: GR-053
     kind: greet
@@ -423,6 +527,8 @@ lines:
         - night
       m:
         - low
+      r:
+        - Stranger
     text: Still up? Me too. Neither of us should be.
   - id: GR-054
     kind: greet
@@ -431,6 +537,8 @@ lines:
         - night
       m:
         - low
+      r:
+        - Stranger
     text: Hello, {player}. Late, isn't it?
   - id: GR-055
     kind: greet
@@ -439,6 +547,8 @@ lines:
         - night
       m:
         - even
+      r:
+        - Stranger
     text: The evening's gone. Late one, {player}?
   - id: GR-056
     kind: greet
@@ -447,6 +557,8 @@ lines:
         - night
       m:
         - even
+      r:
+        - Stranger
     text: Hello. Nearly time for bed, I'd say.
   - id: GR-057
     kind: greet
@@ -455,6 +567,8 @@ lines:
         - night
       m:
         - bright
+      r:
+        - Stranger
     text: Still up, {player}? Good company beats a good pillow.
   - id: GR-058
     kind: greet
@@ -463,6 +577,8 @@ lines:
         - night
       m:
         - bright
+      r:
+        - Stranger
     text: Night, {player}! The quiet hours are the best ones.
   - id: GR-059
     kind: greet
@@ -471,6 +587,8 @@ lines:
         - night
       m:
         - glowing
+      r:
+        - Stranger
     text: Look at us, out past bedtime! I love it.
   - id: GR-060
     kind: greet
@@ -479,6 +597,8 @@ lines:
         - night
       m:
         - glowing
+      r:
+        - Stranger
     text: Night, {player}! I'm far too happy to sleep.
   - id: GR-061
     kind: greet
