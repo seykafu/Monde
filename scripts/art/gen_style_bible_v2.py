@@ -136,16 +136,12 @@ Background: the ENTIRE background is one flat, solid, pure magenta (#FF00FF). No
 PATH_RE = re.compile(r"(/[^`'\"\s]*?generated_images/[^`'\"\s]*?\.png)")
 
 
-def run(job_id: str, out_dir: str) -> str:
-    ref, prompt = JOBS[job_id]
-    cmd = ["codex", "exec", "-m", MODEL, "--skip-git-repo-check", "-s", "read-only", "-C", out_dir]
-    if ref:
-        ref_png = os.path.join(out_dir, ref + ".png")
-        if not os.path.exists(ref_png):
-            return f"{job_id}: SKIPPED (style key {ref} missing)"
+def run_job(label: str, prompt: str, ref_png: str | None, out: str) -> str:
+    """One image through Codex; copies the generated file to `out`, or saves a log next to it on failure."""
+    cmd = ["codex", "exec", "-m", MODEL, "--skip-git-repo-check", "-s", "read-only", "-C", os.path.dirname(out)]
+    if ref_png:
         cmd += ["--image", ref_png]
     cmd.append("-")
-    out = os.path.join(out_dir, f"{job_id}.png")
     text_out = ""
     for _ in range(2):
         proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8",
@@ -154,12 +150,22 @@ def run(job_id: str, out_dir: str) -> str:
         paths = [p for p in PATH_RE.findall(text_out) if os.path.exists(p)]
         if paths:
             shutil.copyfile(paths[-1], out)
-            return f"{job_id}: ok"
+            return f"{label}: ok"
         if "usage limit" in text_out.lower():
             break
-    with open(os.path.join(out_dir, f"{job_id}.log"), "w", encoding="utf-8") as f:
+    with open(os.path.splitext(out)[0] + ".log", "w", encoding="utf-8") as f:
         f.write(text_out)
-    return f"{job_id}: FAILED (log saved)"
+    return f"{label}: FAILED (log saved)"
+
+
+def run(job_id: str, out_dir: str) -> str:
+    ref, prompt = JOBS[job_id]
+    ref_png = None
+    if ref:
+        ref_png = os.path.join(out_dir, ref + ".png")
+        if not os.path.exists(ref_png):
+            return f"{job_id}: SKIPPED (style key {ref} missing)"
+    return run_job(job_id, prompt, ref_png, os.path.join(out_dir, f"{job_id}.png"))
 
 
 def main() -> int:
