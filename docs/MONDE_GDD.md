@@ -1038,6 +1038,32 @@ Haiku 5.5's minimum cacheable prefix is 512 tokens, so every breakpoint above qu
 serialization is mandatory (sorted keys, no timestamps in blocks 1–3), or caching silently stops working.
 The server monitors `usage.cache_read_input_tokens`.
 
+#### 9.10.3 Conversation sessions and compaction
+
+A resident remembers a conversation in three tiers (D18):
+
+1. **The live session (verbatim).** While the panel is open, the resident sees every line of this
+   conversation, word for word. When the player leaves (Leave, walking off, or the resident wrapping up),
+   the session stays **resumable for 5 game minutes** (`RESUME_WINDOW`, one constant). Talking to the
+   same resident again inside the window continues the same conversation: same history, a "back again"
+   cue to the model, and at least 2 more exchanges even if the 6-exchange cap was reached. A new in-game
+   day always ends the window.
+2. **The conversation summary.** Once the window passes, the session is compacted: one low-effort Haiku
+   call writes a summary (≤ 60 words, first person, from the resident's side) plus the facts worth
+   keeping (promises, asks, what they learned about the player, topics, how they felt after). Offline or
+   on failure, the engine writes a template summary from the turns' topics and memories. The summary is
+   also the resident's episodic memory of the conversation. The verbatim turns stay in the database for
+   analytics but are never sent to the model again.
+3. **The history digest.** Each resident keeps a rolling **"history with the Fellow"** (≤ 150 words).
+   When more than 6 summaries are waiting, the oldest 4 are merged into the digest by one low-effort
+   call, so the history never stops growing in time and never grows in tokens.
+
+**In the prompt**, the digest and the last 6 summaries open the session's first user message
+(`<history_with_player>`), and the live session's turns are real user/assistant turns after it. The
+fourth cache breakpoint sits on the last earlier turn, so each new turn reads the conversation so far
+from the prompt cache; the per-turn dynamic context (time, mood, retrieved memories, `<player_said>`)
+goes only in the final user message.
+
 #### 9.10.2 Dialogue output contract
 
 ```json
@@ -10039,6 +10065,8 @@ Marks → library size 120 masters.
 | D14 | A deterministic, seeded voter model | Fair, reproducible, explainable elections |
 | D15 | Art direction: cartoon cozy, Fire Emblem × Stardew Valley (§16.1), replacing "Ravage, warmer" | Kasey's call (2026-10-14): friendlier, more distinctive, better fit for a cozy game |
 | D16 | Stardew-style friendship: hearts for Regard, model-judged replies with engine caps, labelled NPC↔NPC ties (§9.11) | Kasey's call (2026-10-14): better replies should visibly earn friendship, and residents befriend, fall out with and court each other |
+| D17 | Desktop first: the same Phaser/TypeScript game packaged with Electron for Mac and Windows (Steam later); the web build stays for demos and playtests | Kasey's call (2026-10-14): a big game sells and saves better as a desktop install; no engine rewrite |
+| D18 | Conversation sessions: verbatim while live, resumable for 5 game minutes, then compacted into a summary and a rolling digest (§9.10.3) | Kasey's call (2026-10-14): residents keep the thread of a moment, and long-term history stays bounded in tokens |
 
 ### 21.2 Open questions for Kasey
 
