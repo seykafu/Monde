@@ -2,6 +2,8 @@
 **/dist
 client/*
 !client/package.json
+desktop/*
+!desktop/package.json
 docs/
 .ref/
 .git
@@ -9,3 +11,5 @@ docs/
 **/.env.*
 **/coverage
 release/
+art_sources/
+scripts/art/
