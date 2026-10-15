@@ -13,6 +13,7 @@
 //     and anyone standing too close to another resident eases apart, so two never overlap exactly.
 // Each is drawn as a walking character sprite (four facings, idle and walk cycle; see "Figures" below),
 // with a name tag near the player or under the pointer and a small emote bubble for what they're doing.
+// Residents with a tie who meet in view float its emote now and then (§9.11.3), and the player learns the tie.
 
 import Phaser from 'phaser';
 import type { ObliqueProjection } from '../../render/ObliqueProjection';
@@ -33,6 +34,11 @@ import { personaCards } from '../../world/residents';
 import { PREWARM_RANGE } from '../../mind/prewarm';
 import { CharacterSprite } from '../../render/characterSprite';
 import { BASTIEN_LOOK, residentLook, type Look } from '../../render/character/look';
+import { PAIR_EMOTE_RULES, PairEmoteThrottle, inSight, nearPairs, type Spot } from '../../friendship/emotes';
+import { pairEmote } from '../../friendship/knownTies';
+import type { EmoteIcon } from '../../friendship/icons';
+import { emoteTexture } from '../../ui/hearts';
+import { learnSeen, livePlansFor, tieMap } from '../friendship';
 
 const SIM_KEY = 'monde.residents';
 /** Off-screen tick: one executor sample per resident per real second (§19.2). */
@@ -67,7 +73,10 @@ export function sharedResidentSim(scene: Phaser.Scene): ResidentSim {
   let sim = scene.registry.get(SIM_KEY) as ResidentSim | undefined;
   if (!sim) {
     const wanted = Number(query.get('npcs')) || 0;
-    sim = new ResidentSim(personaCards, { zones, graph: new ZoneGraph(zones), registry: placeRegistry }, Math.max(0, wanted - personaCards.length));
+    // The dawn package's model plans replace templates for their day (G-13 client, scenes/friendship.ts).
+    const registry = scene.registry;
+    sim = new ResidentSim(personaCards, { zones, graph: new ZoneGraph(zones), registry: placeRegistry }, Math.max(0, wanted - personaCards.length),
+      day => livePlansFor(registry, day));
     scene.registry.set(SIM_KEY, sim);
   }
   return sim;
@@ -170,6 +179,12 @@ export class ResidentLayer {
   /** Called when a visible resident comes within PREWARM_RANGE (6 tiles, §9.10 step 1) of the player (M-05). */
   onApproach?: (residentId: string) => void;
   private near = new Set<string>();
+  /** Tie emotes over residents who meet (§9.11.3): a pool made up front (so it belongs to the world camera). */
+  private readonly emotePool: Phaser.GameObjects.Image[];
+  private floating: { img: Phaser.GameObjects.Image; pair: Actor[]; ms: number }[] = [];
+  private readonly emoteThrottle = new PairEmoteThrottle();
+  private emoteClock = 0;
+  private emoteCheck = 0;
 
   /** Create every actor up front (hidden), so they all belong to the world camera. */
   constructor(private readonly scene: Phaser.Scene, private readonly zone: ZoneDef, private readonly projection: ObliqueProjection,
@@ -193,6 +208,7 @@ export class ResidentLayer {
     });
     this.byId = new Map(this.actors.map(a => [a.profile.id, a]));
     this.overlay = scene.add.graphics().setDepth(DEPTH.DARKNESS + 0.5).setVisible(false);
+    this.emotePool = Array.from({ length: 8 }, () => scene.add.image(0, 0, emoteTexture(scene, 'heart')).setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK + 0.01).setVisible(false));
     const off = this.sim.events.on('talk-requested', e =>
       console.info(`[residents] talk-requested: ${e.residentId} (${this.sim.profile(e.residentId)?.name}) on Day ${e.day} at ${Math.floor(e.minute / 60)}:${String(Math.floor(e.minute % 60)).padStart(2, '0')}`));
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, off);
@@ -260,6 +276,64 @@ export class ResidentLayer {
     for (const a of live) this.draw(a, player, pointer, dtMs);
     if (this.overlayOn) this.drawOverlay(live);
     if (this.onApproach) this.approach(live, player);
+    this.pairEmotes(live, player, dtMs);
+  }
+
+  // ── Tie emotes (§9.11.3, §16.5) ──────────────────────────────────────────
+
+  /**
+   * Residents with a tie who meet in view: the player learns the tie ("seen"), and now and then (PairEmoteThrottle)
+   * the pair floats its emote over the two of them: ♪ Friends, ♥ Close friends or sweethearts, … Rivals, 💢 Enemies.
+   */
+  private pairEmotes(live: readonly Actor[], player: Position, dtMs: number): void {
+    this.emoteClock += dtMs;
+    this.emoteCheck += dtMs;
+    this.driftEmotes(dtMs);
+    if (this.emoteCheck < PAIR_EMOTE_RULES.checkMs) return;
+    this.emoteCheck = 0;
+    const spots: Spot[] = [];
+    for (const a of live) if (a.pos && a.state?.visible && a.alpha > 0.5 && !a.talking) spots.push({ id: a.profile.id, x: a.pos.x, y: a.pos.y });
+    if (spots.length < 2) return;
+    const ties = tieMap(this.scene.registry);
+    const at = new Map(spots.map(s => [s.id, s]));
+    const meeting = nearPairs(spots).filter(p => ties.has(p.key) && inSight(p, at, player));
+    if (!meeting.length) return;
+    learnSeen(this.scene.registry, meeting.map(p => [p.a, p.b] as const), this.clock.day);
+    const key = this.emoteThrottle.pick(meeting.filter(p => pairEmote(ties.get(p.key)!)), this.emoteClock);
+    const emote = key ? pairEmote(ties.get(key)!) : null;
+    if (!key || !emote) return;
+    const pair = key.split('+').map(id => this.byId.get(id)).filter((a): a is Actor => !!a);
+    if (pair.length === 2) this.floatEmote(pair, emote.id);
+  }
+
+  private floatEmote(pair: Actor[], id: EmoteIcon): void {
+    const img = this.emotePool.find(i => !i.visible && !this.floating.some(f => f.img === i));
+    if (!img) return;
+    img.setTexture(emoteTexture(this.scene, id)).setAlpha(0).setScale(0.4).setVisible(true);
+    this.floating.push({ img, pair, ms: 0 });
+  }
+
+  /** The top of what's drawn over a resident's head: the name tag, else the activity bubble, else the head. */
+  private headTop(a: Actor): number {
+    if (a.label.visible) return a.label.y - a.label.height;
+    if (a.bubble.visible) return a.bubble.y - a.bubble.displayHeight;
+    return a.sprite.y - (a.animal ? 26 : 50);
+  }
+
+  /** A floating emote stays over its pair (between them, above the taller), pops in, rises a little and fades. */
+  private driftEmotes(dtMs: number): void {
+    const show = PAIR_EMOTE_RULES.showMs;
+    this.floating = this.floating.filter(f => {
+      f.ms += dtMs;
+      if (f.ms >= show || f.pair.some(a => !a.sprite.visible)) { f.img.setVisible(false); return false; }
+      const t = f.ms / show, pop = Math.min(1, f.ms / 160);
+      const x = f.pair.reduce((s, a) => s + a.sprite.x, 0) / f.pair.length;
+      const top = Math.min(...f.pair.map(a => this.headTop(a))) - 3;
+      f.img.setPosition(x, top - 10 * Math.sin((t * Math.PI) / 2))
+        .setScale(0.4 + 0.6 * (1 - (1 - pop) ** 3) + (pop < 1 ? 0.15 * Math.sin(pop * Math.PI) : 0))
+        .setAlpha(Math.min(...f.pair.map(a => a.alpha)) * Math.min(1, f.ms / 120, (show - f.ms) / 420));
+      return true;
+    });
   }
 
   /** Report residents as they come into prewarm range (once per approach; the caller rate-limits). */

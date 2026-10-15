@@ -14,7 +14,8 @@ import { attachPostPipeline } from '../render/postPipelines';
 import { SUN, castFrom, torchShadow, type Sun } from '../render/sun';
 import { sunShadow } from '../render/sunClock';
 import { DEPTH, actorDepth } from '../render/depth';
-import { CharacterSprite, playerLook, preloadCharacterSheets } from '../render/characterSprite';
+import { CharacterSprite, PLAYER_LOOK_KEY, playerLook, preloadCharacterSheets } from '../render/characterSprite';
+import { ensureFellow } from '../fellow/state';
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from '../util/constants';
 import { zones } from '../world/zones';
 import type { Point, ZoneDef } from '../world/zoneFormat';
@@ -24,7 +25,10 @@ import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, ty
 import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
 import { ResidentLayer } from './zone/residents';
 import { attachDialogue } from './DialogueScene';
-import { PillarStrip, attachTown, openTownLedger } from './TownLedgerScene';
+import { PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
+import { attachDawnSync } from './friendship';
+import { openPeople } from './PeopleScene';
+import { attachStory, type StoryAttachment } from './story/attach';
 
 // ── Time, light and weather (W-04) ───────────────────────────────────────────
 // One Clock for the whole game lives in the registry, so it keeps running across
@@ -221,6 +225,8 @@ export class ZoneScene extends Phaser.Scene {
   private interact?: () => void;
   /** The small Pillar strip under the clock (G-01); P hides it. */
   private pillarStrip!: PillarStrip;
+  /** Scripted scenes (G-10): zone, place and minute triggers; StoryScene plays them over this scene. */
+  private story!: StoryAttachment;
   constructor() { super('Zone'); }
 
   /** Drawn character sheets listed in assets/sprites/manifest.json (none yet: everyone uses the procedural rig). */
@@ -269,11 +275,22 @@ export class ZoneScene extends Phaser.Scene {
         .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK);
     }
     // The player: a drawn sheet if the manifest lists one, else the procedural rig. The shadow shows the same frame.
+    // Arriving without a signed Fellowship form (?skiptitle=1, the demo) signs a default one ("Fellow", the default look).
+    ensureFellow(this.registry);
     this.avatar = new CharacterSprite(this, 'player', playerLook(this.registry));
     this.figure = this.add.image(0, 0, this.avatar.sheet.key);
     this.shadow = this.add.image(0, 0, this.avatar.sheet.key).setTintFill(0).setAlpha(0).setDepth(DEPTH.SHADOW);
     this.avatar.apply(this.figure);
     this.avatar.apply(this.shadow, false);
+    // A form signed while the town waits (the story's {charcreate}) re-dresses the player.
+    const relook = (_parent: unknown, key: string) => {
+      if (key !== PLAYER_LOOK_KEY) return;
+      this.avatar = new CharacterSprite(this, 'player', playerLook(this.registry), this.avatar.anim.facing);
+      this.avatar.apply(this.figure);
+      this.avatar.apply(this.shadow, false);
+    };
+    this.registry.events.on(Phaser.Data.Events.SET_DATA, relook).on(Phaser.Data.Events.CHANGE_DATA, relook);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.registry.events.off(Phaser.Data.Events.SET_DATA, relook).off(Phaser.Data.Events.CHANGE_DATA, relook));
     this.buildNight();
     this.buildWeather();
     this.syncFigure();
@@ -281,6 +298,8 @@ export class ZoneScene extends Phaser.Scene {
     this.residents = new ResidentLayer(this, this.zone, this.projection, this.clock, DEV_KEYS);
     // E beside a resident opens the dialogue panel over this scene; walking near one prewarms it (M-05).
     attachDialogue(this, { residents: this.residents, zone: this.zone, clock: this.clock, weather: () => this.now });
+    this.story = attachStory(this, { zone: this.zone, clock: this.clock, residents: this.residents, position: () => this.position,
+      weather: () => this.now, entry: data, busy: () => this.transitioning });
     const world = this.children.list.slice();
     const camera = this.cameras.main;
     camera.setOrigin(0, 0).setZoom(RENDER_SCALE);
@@ -293,7 +312,7 @@ export class ZoneScene extends Phaser.Scene {
     const ui = this.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT);
     ui.ignore(world);
     const title = this.add.text(24, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce', backgroundColor: '#28372d' });
-    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  L: town ledger  ·  East / west road: change district', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
+    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  L: town ledger  ·  J: people  ·  East / west road: change district', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
     const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
     this.prompt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 50, '', { fontFamily: FAMILY_BODY, fontSize: '22px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 12, y: 6 } }).setOrigin(0.5);
@@ -318,16 +337,19 @@ export class ZoneScene extends Phaser.Scene {
     }
     // The town's numbers live beside the clock, with Day-1 values, and its dawn pass runs on the clock's dawn (G-01).
     attachTown(this.registry, clock);
+    // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
+    attachDawnSync(this.registry, clock, { weatherSeed: () => this.saveWeatherSeed(), town: () => getTown(this.registry) });
     return clock;
   }
 
-  /** L opens the Town Ledger (it holds the clock while open); P shows or hides the HUD Pillar strip. */
+  /** L opens the Town Ledger and J the People page (each holds the clock while open); P shows or hides the HUD Pillar strip. */
   private installTownKeys(): void {
     const seen = new WeakSet<KeyboardEvent>();
     const onKey = (event: KeyboardEvent) => {
       if (seen.has(event) || event.repeat || this.transitioning) return;
       seen.add(event);
       if (event.code === 'KeyL' || event.key === 'l' || event.key === 'L') openTownLedger(this, this.clock);
+      else if (event.code === 'KeyJ' || event.key === 'j' || event.key === 'J') openPeople(this, this.clock);
       else if (event.code === 'KeyP' || event.key === 'p' || event.key === 'P') this.pillarStrip.toggle();
     };
     this.input.keyboard?.on('keydown', onKey);
@@ -664,6 +686,7 @@ export class ZoneScene extends Phaser.Scene {
     this.avatar.apply(this.figure);
     this.avatar.apply(this.shadow, false);
     this.syncFigure(); this.followPlayer();
+    this.story.update(this.position);
     // Residents take precedence over doors.
     const talk = this.residents.talkTarget(this.position);
     const place = talk ? undefined : nearbyPlace(this.zone, this.position);

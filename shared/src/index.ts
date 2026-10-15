@@ -13,3 +13,7 @@ export * from "./script";
 export * from './save';
 export * from "./replies";
 export * from "./friendship";
+export * from "./friendshipData";
+export * from "./look";
+export * from "./player";
+export * from "./events";

@@ -1,0 +1,128 @@
+// What the client knows of friendship (GDD §9.11; MVP G-13 client). Pure: no Phaser, no DOM.
+//
+// Regard lives on the server (§9.4); the client mirrors it per resident from each turn's applied Regard so the
+// hearts can show, also in Quiet Mode. Before the server has said anything the mirror starts from the Background's
+// starting Regard (§11.1: a Homecomer's six old neighbours) or 0. Quiet Mode turns earn nothing: the server judges
+// replies and owns the caps, so the client never invents a gain offline.
+//
+// The dawn package brings the town's ties and last night's milestones, the letters and Favors, and the model plans;
+// applyDawn folds them in. Every function returns a new state (the registry keeps one and replaces it).
+import {
+  BACKGROUND_STARTS, emptyFriendship, orderedPair, pairKey, pairLabel, type Background, type DawnFavorData,
+  type DawnLetterData, type PersonaCard, type PlanOutput, type SavedBond, type SavedFriendship, type TieData,
+  type TieMilestoneData, type TurnRegard
+} from '@monde/shared';
+import type { DawnPackage } from '../mind/dawn';
+import { learnTies, tieIndex } from './knownTies';
+import { printedMilestones, romanceNews, dawnLines, type RomanceNews } from './milestones';
+
+export type FriendshipState = SavedFriendship;
+export { emptyFriendship };
+
+/**
+ * GDD-GAP: §6.6 doesn't say how long milestones stay on record. The client keeps two weeks of them (the Dawn
+ * Report reads the latest night's; the People page reads the labels, not this list).
+ */
+export const MILESTONE_DAYS = 14;
+/** GDD-GAP: letters wait for the Letters tab (§18); the client keeps the 60 most recent. */
+export const LETTERS_KEPT = 60;
+
+// ── Regard ──────────────────────────────────────────────────────────────────
+
+/** The Regard the client assumes before the server reports any (§11.1 Background starts). */
+export function seedRegard(background: Background | null | undefined, residentId: string): number {
+  return background ? BACKGROUND_STARTS[background]?.regard[residentId] ?? 0 : 0;
+}
+
+/** The mirrored Regard toward the player (the seed for someone the client has never heard from). */
+export const regardOf = (state: FriendshipState, id: string, seed = 0): number => state.residents[id]?.regard ?? seed;
+
+/** The player spoke with a resident on `day`: they're met from now on. */
+export function meet(state: FriendshipState, id: string, day: number, seed = 0): FriendshipState {
+  const bond = state.residents[id];
+  const next: SavedBond = bond
+    ? { ...bond, last_talk_day: Math.max(bond.last_talk_day, day) }
+    : { regard: seed, source: 'seed', met_day: day, last_talk_day: day, likes: [] };
+  return { ...state, residents: { ...state.residents, [id]: next } };
+}
+
+/**
+ * One turn on `day`: a server turn's applied Regard replaces the mirror; a Quiet Mode turn (no Regard) changes
+ * nothing but the talk day.
+ */
+export function recordTurn(state: FriendshipState, id: string, day: number, regard: TurnRegard | null | undefined, seed = 0): FriendshipState {
+  const met = meet(state, id, day, seed);
+  if (!regard || !Number.isFinite(regard.after)) return met;
+  const bond = met.residents[id]!;
+  const value = Math.max(-100, Math.min(100, regard.after));
+  return { ...met, residents: { ...met.residents, [id]: { ...bond, regard: value, source: 'server' } } };
+}
+
+/** Residents the player has met, in the order they were met (then by id). */
+export const metResidents = (state: FriendshipState): string[] =>
+  Object.entries(state.residents).sort(([a, x], [b, y]) => x.met_day - y.met_day || (a < b ? -1 : 1)).map(([id]) => id);
+
+// ── Ties ────────────────────────────────────────────────────────────────────
+
+export type TieCard = Pick<PersonaCard, 'id' | 'relationships'>;
+
+/**
+ * The Day-1 ties from the cards' relationships (§12.3), labelled by the same rule as the server's (§9.11.3). The
+ * server seeds its relationships from these cards, so before the first online dawn (and in Quiet Mode, which never
+ * has one) this is the town as it stood on Day 1.
+ */
+export function cardTies(cards: readonly TieCard[]): TieData[] {
+  const ids = new Set(cards.map(c => c.id));
+  const affinity = new Map<string, number>();
+  const pairs = new Map<string, [string, string]>();
+  for (const c of cards) for (const r of c.relationships) {
+    if (r.id === c.id || !ids.has(r.id)) continue;
+    affinity.set(`${c.id}>${r.id}`, r.affinity);
+    pairs.set(pairKey(c.id, r.id), orderedPair(c.id, r.id));
+  }
+  const out: TieData[] = [];
+  for (const [, [a, b]] of [...pairs].sort(([x], [y]) => (x < y ? -1 : 1))) {
+    const label = pairLabel(affinity.get(`${a}>${b}`), affinity.get(`${b}>${a}`));
+    if (label !== 'strangers') out.push({ a, b, label, romance: null });
+  }
+  return out;
+}
+
+/** The ties as the client knows them now: the last dawn's, else Day 1's from the cards. */
+export const currentTies = (state: FriendshipState, cards: readonly TieCard[]): TieData[] => state.ties?.pairs ?? cardTies(cards);
+
+// ── The dawn ────────────────────────────────────────────────────────────────
+
+export interface DawnApplied {
+  state: FriendshipState;
+  /** The friendship lines for this morning's summary (Dawn Report, §6.6). */
+  lines: string[];
+  printed: TieMilestoneData[];
+  romance: RomanceNews[];
+}
+
+const byId = <T extends { id: string }>(xs: readonly T[]): T[] => [...new Map(xs.map(x => [x.id, x])).values()];
+
+/**
+ * Fold a dawn package in: the ties and their milestones, the tiers, the model plans that were applied, the letters
+ * (each once) and the open Favors. The milestones the Dawn Report prints (and any romance news) become known ties:
+ * the player read them this morning.
+ */
+export function applyDawn(state: FriendshipState, pkg: DawnPackage, opts: { names: Readonly<Record<string, string>>; plans: Readonly<Record<string, PlanOutput>> }): DawnApplied {
+  const day = pkg.day;
+  const tiers = Object.fromEntries(pkg.plans.map(p => [p.resident_id, p.tier]));
+  const printed = printedMilestones(pkg.ties.milestones, tiers);
+  const romance = state.ties ? romanceNews(state.ties.pairs, pkg.ties.pairs) : [];
+  const lines = dawnLines(printed, romance, opts.names);
+  const milestones = [...state.milestones.filter(m => !pkg.ties.milestones.some(n => n.day === m.day && pairKey(n.a, n.b) === pairKey(m.a, m.b))), ...pkg.ties.milestones]
+    .filter(m => m.day > day - MILESTONE_DAYS);
+  const letters: DawnLetterData[] = byId([...state.letters, ...pkg.letters]).slice(-LETTERS_KEPT);
+  const favors: DawnFavorData[] = byId([...state.favors, ...pkg.favors]).filter(f => f.expires_day >= day);
+  let next: FriendshipState = {
+    ...state, ties: { day, pairs: pkg.ties.pairs }, milestones, tiers, plans: { day, plans: { ...opts.plans } }, letters, favors,
+    report: { day, lines }
+  };
+  const index = tieIndex(pkg.ties.pairs);
+  next = learnTies(next, [...printed.map(m => [m.a, m.b] as const), ...romance.map(r => [r.a, r.b] as const)], day, 'read', index);
+  return { state: next, lines, printed, romance };
+}

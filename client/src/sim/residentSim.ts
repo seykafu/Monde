@@ -6,9 +6,9 @@
 // function of (plan, minute), both views always agree, and the zone you walk into is populated from the
 // same answer the 1 Hz tick would give.
 
-import type { PersonaCard } from '@monde/shared';
+import type { PersonaCard, PlanOutput } from '@monde/shared';
 import { TypedEmitter, type TownEvents } from './events';
-import { dayPlansFor, syntheticPlans, type DayPlan } from './plans';
+import { dayPlansFor, syntheticPlans, withLivePlans, type DayPlan } from './plans';
 import { RoutineExecutor, type ExecutorWorld, type ResidentState } from './routineExecutor';
 
 export type SimCard = Pick<PersonaCard, 'id' | 'name' | 'kind' | 'routine'>;
@@ -39,6 +39,9 @@ export interface BoardCounts {
 
 export const displayName = (name: string): string => /"([^"]+)"/.exec(name)?.[1] ?? name;
 
+/** The day's live plans from the mind by resident (the dawn package's model plans), or null for templates only. */
+export type LivePlans = (day: number) => Readonly<Record<string, PlanOutput>> | null;
+
 export class ResidentSim {
   readonly events = new TypedEmitter<TownEvents>();
   readonly executor: RoutineExecutor;
@@ -49,9 +52,10 @@ export class ResidentSim {
   private planById = new Map<string, DayPlan>();
   private last: ResidentState[] = [];
   private lastKey = '';
+  private liveRef: Readonly<Record<string, PlanOutput>> | null = null;
 
   /** `extra` synthetic residents (jittered copies of the cards) join the canon ones (dev `?npcs=`). */
-  constructor(private readonly cards: readonly SimCard[], world: ExecutorWorld, private readonly extra = 0) {
+  constructor(private readonly cards: readonly SimCard[], world: ExecutorWorld, private readonly extra = 0, private readonly livePlans?: LivePlans) {
     this.executor = new RoutineExecutor(world);
     const profiles: ResidentProfile[] = cards.map((c, index) => ({ id: c.id, name: displayName(c.name), kind: c.kind, index }));
     for (let k = cards.length; k < cards.length + extra; k++) {
@@ -64,11 +68,14 @@ export class ResidentSim {
 
   profile(id: string): ResidentProfile | undefined { return this.byId.get(id); }
 
-  /** The day's plans (rebuilt when the day changes). */
+  /** The day's plans (rebuilt when the day changes, or when the day's live plans arrive). */
   plansFor(day: number): readonly DayPlan[] {
-    if (day !== this.day) {
+    const live = this.livePlans?.(day) ?? null;
+    if (day !== this.day || live !== this.liveRef) {
       this.day = day;
-      const base = dayPlansFor(this.cards, day);
+      this.liveRef = live;
+      const templates = dayPlansFor(this.cards, day);
+      const base = live ? withLivePlans(templates, live).plans : templates;
       this.plans = this.extra > 0 ? syntheticPlans(base, base.length + this.extra, true) : base;
       this.planById = new Map(this.plans.map(p => [p.resident, p]));
       this.lastKey = '';

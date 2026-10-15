@@ -95,6 +95,32 @@ export function blocksFromPlanOutput(blocks: PlanOutput['blocks']): DayPlanBlock
   });
 }
 
+/**
+ * A live plan from the mind (§9.7, M-07) in place of a template: the template's night (where they slept) and its
+ * blocks from the plan. Null when the plan can't run (no blocks, times out of order or past 26:00, a block with no
+ * place), so the template stands.
+ */
+export function liveDayPlan(template: DayPlan, plan: PlanOutput): DayPlan | null {
+  if (!plan.blocks.length) return null;
+  let blocks: DayPlanBlock[];
+  try { blocks = blocksFromPlanOutput(plan.blocks); } catch { return null; }
+  if (blocks.some(b => !b.place.trim())) return null;
+  return { ...template, routine: 'live', blocks };
+}
+
+/** Template plans with the valid live ones swapped in (G-13 client: the dawn package's model plans). */
+export function withLivePlans(templates: readonly DayPlan[], live: Readonly<Record<string, PlanOutput>>): { plans: DayPlan[]; applied: string[]; rejected: string[] } {
+  const applied: string[] = [], rejected: string[] = [];
+  const plans = templates.map(t => {
+    const plan = live[t.resident];
+    if (!plan) return t;
+    const swapped = liveDayPlan(t, plan);
+    (swapped ? applied : rejected).push(t.resident);
+    return swapped ?? t;
+  });
+  return { plans, applied, rejected };
+}
+
 /** The template plan for one resident on one weekday. Last night is yesterday's routine's last block. */
 export function dayPlan(card: RoutineCard, day: Weekday): DayPlan {
   const blocks = blocksFromRoutine(routineFor(card, day));

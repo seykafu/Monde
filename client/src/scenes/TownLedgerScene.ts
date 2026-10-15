@@ -22,6 +22,7 @@ import { optionGauge } from '../town/optionClause';
 import { PILLARS, communityWorkRoom, createTownState, todayChange, COMMUNITY_WORK_WEEKLY_CAP, type Pillar, type TownState } from '../town/pillars';
 import { runDawnsThrough, type DawnReport } from '../town/townEngine';
 import { DIALOGUE_SCENE } from './DialogueScene';
+import { friendshipLines } from './friendship';
 
 export const TOWN_LEDGER_SCENE = 'TownLedger';
 /** The TownState in the game registry. */
@@ -65,7 +66,8 @@ export const attachTown = (registry: Phaser.Data.DataManager, clock: Clock): voi
 
 /** Open the Ledger over `host` (no-op if it, or the dialogue panel, is already up). */
 export const openTownLedger = (host: Phaser.Scene, clock: Clock): void => {
-  if (host.scene.isActive(TOWN_LEDGER_SCENE) || host.scene.isActive(DIALOGUE_SCENE)) return;
+  // 'People' is PeopleScene's key (it imports this file, so the key is spelled out here).
+  if (host.scene.isActive(TOWN_LEDGER_SCENE) || host.scene.isActive(DIALOGUE_SCENE) || host.scene.isActive('People')) return;
   host.scene.launch(TOWN_LEDGER_SCENE, { host: host.scene.key, clock } satisfies LedgerOpen);
 };
 
@@ -321,8 +323,12 @@ export class TownLedgerScene extends Phaser.Scene {
     this.drawRightColumn(g, town);
 
     // Footer: the last dawn, and the keys.
+    // This morning's line: the town's dawn, then the friendship news (G-13: milestones and romance, at most two).
     const report = this.registry.get(DAWN_REPORT_KEY) as DawnReport | undefined;
-    if (report && report.day === town.day) this.text(PX + 44, PY + PH - 38, dawnLine(report), 14, { italic: true, color: MUTED, wrap: 620 });
+    const ties = friendshipLines(this.registry, town.day);
+    const morning = [report && report.day === town.day ? `${dawnLine(report)}.` : null, ...ties.slice(0, 2), ties.length > 2 ? `And ${ties.length - 2} more.` : null]
+      .filter((s): s is string => !!s).join(' ');
+    if (morning) this.text(PX + 44, PY + PH - 22, morning, 14, { italic: true, color: MUTED, wrap: 620 }).setOrigin(0, 1);
     this.text(PX + PW - 44, PY + PH - 38, `L or Esc to close${DEV_KEYS ? '  ·  dev ]: +1 hour' : ''}`, 14, { family: FAMILY_UI, color: MUTED, align: 'right' });
   }
 

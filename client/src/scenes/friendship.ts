@@ -1,0 +1,182 @@
+// Friendship's Phaser side (GDD §9.11; MVP G-13 client): the registry's FriendshipState and the dawn package.
+//
+// The pure rules live in src/friendship (hearts, state, known ties, milestones, emotes) and src/mind/dawn.ts (the
+// night and the dawn package). This file keeps one FriendshipState in the game registry (`monde.friendship`, saved
+// with the game) and runs the dawn sync on every dawn of the clock:
+//   online   hold the clock ("dawn"), POST the night of yesterday, GET today's package (polling briefly while the
+//            night is still working), then fold it in: the model plans replace templates (ResidentSim reads them
+//            from here), the ties, milestones, letters and Favors are kept, and this morning's friendship lines go
+//            to `monde.dawnTies` for the Ledger's dawn line and the Dawn Report (M-10);
+//   offline  nothing: templates, and the ties the client last knew (Day 1's from the cards before any).
+// A game loaded mid-day whose save has no plans for that day asks for the day's package again (no night).
+import type Phaser from 'phaser';
+import type { PlanOutput, SaveGame, TieData, TieMilestoneData, TurnRegard } from '@monde/shared';
+import { getMind } from '../mind/api';
+import { DAWN_SYNC, modelPlans, nightEvents, syncDawn, type NightRequest } from '../mind/dawn';
+import { applyDawn, cardTies, emptyFriendship, meet, recordTurn, regardOf, seedRegard, type FriendshipState } from '../friendship/state';
+import { heardPairs, learnTies, nameIndex, tieIndex, townName } from '../friendship/knownTies';
+import type { RomanceNews } from '../friendship/milestones';
+import { personaCards } from '../world/residents';
+import type { Clock } from '../sim/clock';
+import { dailyWeather, describeWeather } from '../sim/weather';
+import type { Pillars } from '../town/pillars';
+
+/** The FriendshipState in the game registry. */
+export const FRIENDSHIP_KEY = 'monde.friendship';
+/** This morning's friendship news: `DawnTiesNews`, for the Ledger and the Dawn Report (M-10). */
+export const DAWN_TIES_KEY = 'monde.dawnTies';
+/** Same keys save/runtime.ts uses. */
+const CLOCK_KEY = 'monde.clock';
+const OFFLINE_EVENTS_KEY = 'monde.offline.events';
+
+export interface DawnTiesNews {
+  day: number;
+  /** Lines in print order (romance, then milestones). */
+  lines: string[];
+  milestones: TieMilestoneData[];
+  romance: RomanceNews[];
+  /** How the package came: complete, partial (the night was still working when the client stopped waiting). */
+  status: 'complete' | 'partial';
+}
+
+type Registry = Phaser.Data.DataManager;
+
+export const getFriendship = (registry: Registry): FriendshipState =>
+  (registry.get(FRIENDSHIP_KEY) as FriendshipState | undefined) ?? emptyFriendship();
+
+/** Apply `fn`; the registry is written (and `changedata` fires) only when the state actually changed. */
+export function updateFriendship(registry: Registry, fn: (state: FriendshipState) => FriendshipState): FriendshipState {
+  const before = getFriendship(registry);
+  const after = fn(before);
+  if (after !== before || !registry.has(FRIENDSHIP_KEY)) registry.set(FRIENDSHIP_KEY, after);
+  return after;
+}
+
+/** What the town calls each resident in lines ("Pell", "June", "Captain Reyes"). */
+export const TOWN_NAMES: Readonly<Record<string, string>> = Object.fromEntries(personaCards.map(c => [c.id, townName(c)]));
+const NAMES = nameIndex(personaCards);
+/** Day 1's ties from the cards: what the client knows before its first online dawn (and always in Quiet Mode). */
+const CARD_TIES = cardTies(personaCards);
+
+let tiesMemo: { pairs: readonly TieData[]; index: Map<string, TieData> } | null = null;
+/** The ties as the client knows them now (the last dawn's, else Day 1's), by pair key (memoised per list). */
+export function tieMap(registry: Registry): Map<string, TieData> {
+  const pairs = getFriendship(registry).ties?.pairs ?? CARD_TIES;
+  if (tiesMemo?.pairs !== pairs) tiesMemo = { pairs, index: tieIndex(pairs) };
+  return tiesMemo.index;
+}
+
+/** The Regard a resident starts at before the server says (the signed Background's start, §11.1). */
+export const seedFor = (id: string): number => seedRegard(getMind().player?.background, id);
+
+/** The mirrored Regard toward the player. */
+export const regardFor = (registry: Registry, id: string): number => regardOf(getFriendship(registry), id, seedFor(id));
+
+/** The dialogue opened: the player has met them. */
+export const meetResident = (registry: Registry, id: string, day: number): FriendshipState =>
+  updateFriendship(registry, s => meet(s, id, day, seedFor(id)));
+
+/**
+ * One dialogue turn. A server turn's applied Regard replaces the mirror (Quiet Mode turns have none and change
+ * nothing). A live line that names another resident teaches the player that tie ("heard"); Quiet Mode's authored
+ * lines name residents at random, so they don't.
+ */
+export function recordDialogueTurn(registry: Registry, id: string, day: number, turn: { regard?: TurnRegard | null; lines: readonly { text: string }[] }, live: boolean): void {
+  updateFriendship(registry, s => {
+    let next = recordTurn(s, id, day, turn.regard ?? null, seedFor(id));
+    if (live) next = learnTies(next, heardPairs(turn.lines.map(l => l.text), id, NAMES), day, 'heard', tieMap(registry));
+    return next;
+  });
+}
+
+/** Pairs the player saw together on screen. */
+export const learnSeen = (registry: Registry, pairs: readonly (readonly [string, string])[], day: number): void => {
+  if (pairs.length) updateFriendship(registry, s => learnTies(s, pairs, day, 'seen', tieMap(registry)));
+};
+
+/** The day's live plans for ResidentSim: the model plans the dawn applied, if they're for `day`. */
+export function livePlansFor(registry: Registry, day: number): Readonly<Record<string, PlanOutput>> | null {
+  const plans = getFriendship(registry).plans; // read every frame per resident: no allocation here
+  return plans && plans.day === day ? plans.plans : null;
+}
+
+/** This morning's friendship lines for `day` (the latest dawn's news, or the saved report after a load). */
+export function friendshipLines(registry: Registry, day: number): string[] {
+  const news = registry.get(DAWN_TIES_KEY) as DawnTiesNews | undefined;
+  if (news?.day === day) return news.lines;
+  const report = getFriendship(registry).report;
+  return report?.day === day ? report.lines : [];
+}
+
+// ── The dawn ────────────────────────────────────────────────────────────────
+
+export interface DawnSyncOptions {
+  /** The world's weather seed (tomorrow's forecast goes to the night's plans). */
+  weatherSeed: () => number;
+  /** The town's Pillars and census, for the night's reflections. */
+  town: () => { pillars: Pillars; census: number } | undefined;
+}
+
+const clampPillar = (v: number): number => Math.max(0, Math.min(100, Math.round(v * 10) / 10));
+
+/** The night of `day`: the client's town events of that day and the town's facts, with the next day's weather. */
+function nightRequest(registry: Registry, day: number, opts: DawnSyncOptions): NightRequest {
+  const town = opts.town();
+  const tomorrow = dailyWeather(opts.weatherSeed(), day + 1);
+  const events = nightEvents((registry.get(OFFLINE_EVENTS_KEY) as SaveGame['offline_events'] | undefined) ?? [], day);
+  return {
+    day,
+    ...(events.length ? { events } : {}),
+    town: {
+      ...(town ? {
+        pillars: { prosperity: clampPillar(town.pillars.prosperity), safety: clampPillar(town.pillars.safety), spirit: clampPillar(town.pillars.spirit), charm: clampPillar(town.pillars.charm) },
+        census: Math.max(0, Math.round(town.census))
+      } : {}),
+      weather_tomorrow: describeWeather({ kind: tomorrow.kind, intensity: 0.6 }).toLowerCase()
+    }
+  };
+}
+
+const attached = new WeakSet<Clock>();
+let syncSeq = 0;
+
+/** Run the dawn sync on every dawn of this clock (once per clock; it outlives zone changes). */
+export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncOptions): void {
+  if (attached.has(clock)) return;
+  attached.add(clock);
+  if (!registry.has(FRIENDSHIP_KEY)) registry.set(FRIENDSHIP_KEY, emptyFriendship());
+
+  const run = async (day: number, withNight: boolean): Promise<void> => {
+    const mind = getMind();
+    if (!mind.enabled) return; // Quiet Mode: templates and the last known ties.
+    const seq = ++syncSeq;
+    // §9.8: the residents' day starts on the night's plans, so time waits for them (a few seconds at most).
+    clock.pause('dawn');
+    const safety = setTimeout(() => clock.resume('dawn'), DAWN_SYNC.budgetMs + 10_000);
+    try {
+      const result = await syncDawn({
+        postNight: body => mind.postNight(body), getDawn: d => mind.getDawn(d),
+        sleep: ms => new Promise(resolve => setTimeout(resolve, ms)), now: () => performance.now()
+      }, day, withNight ? nightRequest(registry, day - 1, opts) : null);
+      // A newer dawn, or a load that replaced the game meanwhile, owns the state now.
+      if (seq !== syncSeq || registry.get(CLOCK_KEY) !== clock) return;
+      if (!result.pkg) { console.info(`[dawn] Day ${day}: ${result.reason}; templates and the last known ties`); return; }
+      const plans = modelPlans(result.pkg.plans);
+      const applied = applyDawn(getFriendship(registry), result.pkg, { names: TOWN_NAMES, plans });
+      registry.set(FRIENDSHIP_KEY, applied.state);
+      registry.set(DAWN_TIES_KEY, {
+        day, lines: applied.lines, milestones: applied.printed, romance: applied.romance, status: result.status
+      } satisfies DawnTiesNews);
+      console.info(`[dawn] Day ${day}: ${result.status} after ${result.polls} read${result.polls === 1 ? '' : 's'} · ${Object.keys(plans).length} model plans · ${result.pkg.ties.pairs.length} ties · ${applied.lines.length} lines · ${result.pkg.letters.length} letters · ${result.pkg.favors.length} favors`);
+    } catch (error) {
+      console.warn('[dawn] sync failed; keeping templates', error);
+    } finally {
+      clearTimeout(safety);
+      clock.resume('dawn');
+    }
+  };
+
+  clock.onDawn(t => { void run(t.day, true); });
+  // A save from mid-day (or the dawn autosave, written before the package came) has no plans for today yet.
+  if (clock.day > 1 && getFriendship(registry).plans?.day !== clock.day) void run(clock.day, false);
+}

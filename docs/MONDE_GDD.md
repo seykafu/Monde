@@ -4201,7 +4201,7 @@ All scenes use the §13.1 format and the same reading conventions as §13.4: eac
 - **Speakers.** `ARRIVAL` and the slot/regard/memory alias `arrival` stand for the first generated arrival (S05). Tokens `{arrival.name}`, `{arrival.trade}`, `{arrival.reason}` are filled from that resident's card and are valid in Quiet Mode.
 - **Expression variables.** `appeal` (the blended score from §6.2), `ferry_day` (true on a sailing day) and `player.why` (`fresh_start`, `to_help`, `running`, `curious`, from the Fellowship form) are read-only. They are new to the expression list and are repeated in §13.3a.
 - **Summoned scenes.** Festival and appointment scenes (S10a/b, S11) are summoned when their window opens: the engine fades the player to the place with a one-line confirmation. If the player is asleep or in a Scuffle, the window waits for the next valid moment.
-- **Quiet Mode.** Every `{ai_line}` carries an authored `{fallback}`. `{ai_open}` handoffs degrade to a canned three-line exchange per resident; their `topic` strings are written to be readable as that fallback brief.
+- **Quiet Mode.** Every `{ai_line}` carries an authored `{fallback}`. `{ai_open}` handoffs degrade to a canned, branching exchange per cue, written in `content/lines/scripted.yaml` and found by scene id and resident: the resident's lines with portraits, then 2–3 replies for the Fellow at each of the cue's `turns`, ending in a close that hands back to the script (`npm run lint:content` requires one for every Spring cue). A cue with none falls back to ordinary Quiet Mode small talk. Their `topic` strings are written to be readable as that fallback brief.
 
 ---
 
@@ -9778,7 +9778,8 @@ contract is `client/src/render/character/sheet.ts`.
   feet never skate. Idle breathes at `fps.idle`.
 - **The rig's own sheet** follows the same contract: 32×48 cells, idle 3 (rest, breathe, blink), walk 4,
   at most 24 colours a frame. It draws any `CharacterLook` (skin, hair colour and style, eyes, top,
-  bottom and its style, shoes, accessory), which is what W-07 character creation will fill in.
+  bottom and its style, shoes, accessory, plus §11.1's build, height and outfit cut with its trim layer),
+  which W-07's Fellowship form fills in; residents keep the plain cut on the medium, tall body.
 - **Example:** the 4×4 walk-only player sheet from `scripts/art/gen_style_bible_v2.py`
   (`walk_sheet_player`) installs as `"player": { "idle": 0 }`.
 

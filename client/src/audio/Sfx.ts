@@ -405,6 +405,12 @@ const crowd = (duration: number, vol: number, freq: number, pulses = 4): void =>
 };
 const effects = {
   click: sfxClick, hover: sfxHover, confirm: sfxConfirm, cancel: sfxCancel, page_turn: sfxPageTurn,
+  // A new whole heart (§9.11.2): two soft glass notes, a fifth apart, rising.
+  heart_chime: () => {
+    tone({ freq: 1318.5, duration: 0.55, vol: 0.022, send: 0.6 });
+    tone({ freq: 1975.5, duration: 0.9, vol: 0.02, at: 0.12, send: 0.7 });
+    tone({ freq: 3951, duration: 0.5, vol: 0.004, at: 0.12, send: 0.7 });
+  },
   typewriter_tick: () => noise({ duration: 0.018, vol: 0.025, freq: 1700 }),
   voice_blip: (opts: SfxOptions = {}) => {
     let hash = 0; for (const c of opts.resident ?? 'narrator') hash = (Math.imul(hash, 31) + c.charCodeAt(0)) >>> 0;

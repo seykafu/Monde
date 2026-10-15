@@ -35,6 +35,7 @@ import type { ResidentLayer } from './zone/residents';
 import { browserStorage, getMind, uuid, type TalkResult } from '../mind/api';
 import { talkContext } from '../mind/context';
 import { lineLibrary } from '../mind/lineLibrary';
+import { scriptedTurn, type ScriptedExchange } from '../mind/scripted';
 import { loadQuietState, loadTextSpeed, saveQuietState, saveTextSpeed } from '../mind/prefs';
 import { firstName, quietContext, quietTurn, QUIET_CHOICES, type QuietState } from '../mind/quietMode';
 import { DialogueReader, MS_PER_CHAR, TEXT_SPEEDS, type TextSpeed } from '../mind/reader';
@@ -42,6 +43,9 @@ import type { TalkChoice, TalkContext, TalkInput, TalkTurn } from '../mind/types
 import { Portrait } from '../dialogue/portrait';
 import { PORTRAIT_H, PORTRAIT_W, portraitLook, shadeColour, type PortraitLook } from '../dialogue/portraitModel';
 import { Backlog, type LogEntry } from '../dialogue/backlog';
+import { HeartRowView, heartTexture } from '../ui/hearts';
+import { HEART_ANIMATION, heartFeedback, type HeartFeedback } from '../friendship/hearts';
+import { meetResident, recordDialogueTurn, regardFor } from './friendship';
 import { callName, isBareLeave, normalizeChoices, type PersonaCard } from '@monde/shared';
 
 export const DIALOGUE_SCENE = 'Dialogue';
@@ -55,7 +59,19 @@ export interface DialogueOpen {
   /** Where the resident is and what they're doing (the routine executor's state). */
   state: ResidentState | null;
   weather: WeatherNow;
+  /** A scripted {ai_open} handoff (§13.1): what the conversation is about, sent as the scene's activity (≤ 120). */
+  topic?: string;
+  /** {ai_open}'s cap: once the resident has answered this many replies, only Leave is offered. */
+  turns?: number;
+  /** The scene's `zone.place`, when the conversation belongs to a scripted scene. */
+  place?: string;
+  /** The canned exchange for this {ai_open} cue (content/lines/scripted.yaml): Quiet Mode plays it instead of small talk. */
+  scripted?: ScriptedExchange;
 }
+
+/** On `game.events` when the panel closes, however it closed: the story resumes a scene on it. */
+export const DIALOGUE_CLOSED = 'monde:dialogue-closed';
+export interface DialogueClosed { residentId: string; exchanges: number; log: readonly LogEntry[] }
 
 /**
  * Wire a zone scene for dialogue: open the panel on `talk-requested`, and prewarm residents the player walks
@@ -207,6 +223,8 @@ export class DialogueScene extends Phaser.Scene {
   private speed: TextSpeed = 'normal';
   private quiet!: QuietState;
   private quietLine: string | null = null;
+  /** The scripted exchange's node shown at each turn (by turn index), so a retried turn finds its place again. */
+  private scriptedNodes: Record<number, string> = {};
   private reader!: DialogueReader;
   // Presentation.
   private body!: Phaser.GameObjects.Text;
@@ -240,6 +258,9 @@ export class DialogueScene extends Phaser.Scene {
   private focus = 0;
   private menu: Phaser.GameObjects.GameObject[] = [];
   private say: { input: HTMLInputElement; hint: Phaser.GameObjects.Text } | null = null;
+  /** The name plate's hearts (§9.11.1), and a turn's Regard feedback waiting for the reply to be read (§9.11.2). */
+  private hearts: HeartRowView | null = null;
+  private feedback: HeartFeedback | null = null;
 
   constructor() { super(DIALOGUE_SCENE); }
 
@@ -249,6 +270,8 @@ export class DialogueScene extends Phaser.Scene {
     this.card = entry.card;
     this.look = portraitLook(entry.card, rosterColour(entry.index));
     this.context = talkContext({ day: data.clock.day, minute: data.clock.minute, state: data.state, zone: data.zone, weather: data.weather });
+    if (data.topic) this.context = { ...this.context, current_activity: data.topic.slice(0, 120) };
+    if (data.place) this.context = { ...this.context, place: data.place };
     this.conversationId = uuid();
     this.exchange = 0;
     this.turn = null;
@@ -263,6 +286,7 @@ export class DialogueScene extends Phaser.Scene {
     this.speed = loadTextSpeed(browserStorage());
     this.quiet = loadQuietState(quietStorage);
     this.quietLine = null;
+    this.scriptedNodes = {};
     this.shownBody = '';
     this.shownExpr = '';
     this.restExpr = 'neutral';
@@ -279,6 +303,8 @@ export class DialogueScene extends Phaser.Scene {
     this.playerUntil = 0;
     this.log = [];
     this.backlog = null;
+    this.hearts = null;
+    this.feedback = null;
   }
 
   create(): void {
@@ -306,12 +332,18 @@ export class DialogueScene extends Phaser.Scene {
     const name = this.add.text(PLATE_X + 20, PLATE_Y + PLATE_H / 2, displayName(this.card.name), {
       fontFamily: FAMILY_HEADING, fontSize: '23px', color: CREAM, resolution: RENDER_SCALE
     }).setOrigin(0, 0.5).setDepth(11);
-    this.plateW = Math.max(PORTRAIT_W + 8, Math.ceil(name.width) + 40);
+    // Hearts after the name (§9.11.1): the Regard the client mirrors; they fill or drain after a reply that moved it.
+    meetResident(this.registry, this.card.id, this.open.clock.day);
+    const heartsX = PLATE_X + 20 + Math.ceil(name.width) + 16;
+    this.hearts = new HeartRowView(this, heartsX, PLATE_Y + PLATE_H / 2, 2, 1);
+    this.hearts.container.setDepth(11);
+    this.hearts.setRegard(regardFor(this.registry, this.card.id));
+    this.plateW = Math.max(PORTRAIT_W + 8, heartsX - PLATE_X + this.hearts.width + 16);
     const plate = this.add.graphics().setDepth(10);
     plate.fillStyle(PLATE, 1).fillRoundedRect(PLATE_X, PLATE_Y, this.plateW, PLATE_H, 9);
     plate.lineStyle(2, GOLD, 0.85).strokeRoundedRect(PLATE_X, PLATE_Y, this.plateW, PLATE_H, 9);
     this.shimmer = this.add.graphics().setDepth(12).setBlendMode(Phaser.BlendModes.ADD);
-    this.residentPlate = [name];
+    this.residentPlate = [name, this.hearts.container];
     // The player's plate, on the right, shown while their own line is up.
     const you = this.add.text(0, PLATE_H / 2, 'You', { fontFamily: FAMILY_HEADING, fontSize: '21px', color: '#e9f4ea', resolution: RENDER_SCALE }).setOrigin(0.5);
     const youW = Math.ceil(you.width) + 44;
@@ -396,6 +428,7 @@ export class DialogueScene extends Phaser.Scene {
     if (lineExpr) this.restExpr = lineExpr;
     this.setExpr(lineExpr ?? (this.thinking && !this.reader.hasText ? 'thinking' : this.restExpr));
     const status = this.reader.status();
+    if (this.feedback && !this.generating && status === 'done') this.playFeedback(this.feedback);
     if (!this.generating && this.turn && status === 'done' && !this.choicesShown && !this.farewell && !this.say) this.showChoices();
     this.more.setText(status === 'more' ? 'More ▾' : status === 'next' ? '▸' : this.farewell && status === 'done' ? 'Close ▸' : '');
     this.drawShimmer(time);
@@ -457,6 +490,9 @@ export class DialogueScene extends Phaser.Scene {
     this.turn = this.tidy(turn);
     for (const line of this.turn.lines) this.log.push({ who: 'resident', text: line.text });
     this.exchange = turn.turn_index + 1;
+    // §9.11.2: the server's applied Regard (Quiet Mode turns carry none); shown once the reply has been read.
+    recordDialogueTurn(this.registry, this.card.id, this.open.clock.day, turn, source === 'server' && !turn.fallback);
+    this.feedback = source === 'server' ? heartFeedback(turn.regard) : null;
     if (this.reader.finish(this.turn) === 'reset') this.restartQuietly();
     if (DEV_MARK) {
       const what = source === 'quiet' ? `quiet${this.quietLine ? ` · ${this.quietLine}` : ''}${reason ? ` (${reason})` : ''}` : turn.fallback ? 'server fallback' : 'live';
@@ -473,18 +509,28 @@ export class DialogueScene extends Phaser.Scene {
    */
   private tidy(turn: TalkTurn): TalkTurn {
     const leave = turn.choices.find(c => isBareLeave(c)) ?? LEAVE;
-    if (turn.wrap_up) return { ...turn, choices: [leave] };
+    if (turn.wrap_up || (this.open.turns !== undefined && turn.turn_index >= this.open.turns)) return { ...turn, wrap_up: true, choices: [leave] };
     const replies = normalizeChoices(turn.choices, { cue: { text: turn.lines.at(-1)?.text ?? '' }, name: callName(this.card.name) });
     return { ...turn, choices: [...replies, leave] };
   }
 
   private makeQuietTurn(input: TalkInput, turnIndex: number): TalkTurn {
     const { clock, weather, zone } = this.open;
-    // GDD-GAP: resident mood and Regard live on the server and aren't mirrored to the client yet (§9.4), and
-    // there's no client event log or flag store, so Quiet Mode speaks at an even mood, as a Stranger, with no
-    // town event and no flags set.
+    // An {ai_open} cue with a written exchange: play it while the conversation is still on its branches (it opened
+    // here); once a live turn has come in between, there's nothing to continue and ordinary Quiet Mode takes over.
+    const canned = this.open.scripted && scriptedTurn(this.open.scripted, this.scriptedNodes[turnIndex - 1] ?? null, input, {
+      conversationId: this.conversationId, residentId: this.card.id, turnIndex, vars: { name: firstName(this.card.name), player: getMind().playerName }
+    });
+    if (canned) {
+      this.scriptedNodes[turnIndex] = canned.at;
+      this.quietLine = `${this.open.scripted!.key}:${canned.at}`;
+      return canned.turn;
+    }
+    // GDD-GAP: resident mood lives on the server and isn't mirrored to the client yet (§9.4), and there's no client
+    // event log or flag store, so Quiet Mode speaks at an even mood, with no town event and no flags set. Regard is
+    // the client's mirror (scenes/friendship.ts): the last the server reported, or the Background's start.
     const { kind: _kind, ...context } = quietContext({
-      kind: 'talk', day: clock.day, minute: clock.minute, weather: weather.kind, zone: zone.id, valence: 0, regard: 0,
+      kind: 'talk', day: clock.day, minute: clock.minute, weather: weather.kind, zone: zone.id, valence: 0, regard: regardFor(this.registry, this.card.id),
       event: null, speaker: { id: this.card.id, name: this.card.name }, player: getMind().playerName, residents: FIRST_NAMES
     });
     const rng = new Rng(hashString(`${this.conversationId}:${turnIndex}`));
@@ -572,6 +618,34 @@ export class DialogueScene extends Phaser.Scene {
   private closeLog(): void {
     this.backlog?.destroy();
     this.backlog = null;
+  }
+
+  /**
+   * §9.11.2 feedback, after the reply: the hearts fill or drain half a heart at a time, a small ♥ floats up from
+   * the portrait (a cracked one for a loss), and each new whole heart plays the chime.
+   */
+  private playFeedback(f: HeartFeedback): void {
+    this.feedback = null;
+    const hearts = this.hearts;
+    if (!hearts) return;
+    this.floatHeart(f.float, HEART_ANIMATION.leadMs);
+    f.steps.forEach((row, i) => {
+      if (i === 0) return;
+      this.time.delayedCall(HEART_ANIMATION.leadMs + i * HEART_ANIMATION.stepMs, () => {
+        if (this.closed) return;
+        hearts.set(row, true);
+        if (f.chimes.includes(i)) playSfx('heart_chime');
+      });
+    });
+  }
+
+  private floatHeart(kind: HeartFeedback['float'], delay: number): void {
+    // From the portrait's right edge at cheek height, rising clear of the frame.
+    const x = PORTRAIT_X + PORTRAIT_W + 14, y = PORTRAIT_Y + 112;
+    const img = this.add.image(x, y, heartTexture(this, kind === 'heart' ? 'full' : 'cracked')).setScale(0).setAlpha(0).setDepth(30);
+    this.tweens.add({ targets: img, delay, alpha: 1, scale: 3, duration: 200, ease: 'Back.easeOut' });
+    this.tweens.add({ targets: img, delay: delay + 120, y: y - 64, duration: 1150, ease: 'Sine.easeOut' });
+    this.tweens.add({ targets: img, delay: delay + 850, alpha: 0, duration: 420, onComplete: () => img.destroy() });
   }
 
   private drawShimmer(time: number): void {
@@ -843,5 +917,6 @@ export class DialogueScene extends Phaser.Scene {
     this.closeLog();
     this.input.keyboard?.removeCapture('SPACE,TAB');
     this.pauseWorld(false);
+    this.game.events.emit(DIALOGUE_CLOSED, { residentId: this.card.id, exchanges: this.exchange, log: [...this.log] } satisfies DialogueClosed);
   }
 }

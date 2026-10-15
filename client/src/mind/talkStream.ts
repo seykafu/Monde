@@ -5,7 +5,7 @@
 // start over, so everything from attempt 1 is void. The final `turn` is authoritative: if its lines carry on
 // from what was streamed the typewriter just keeps going; if they don't (an authored fallback after a
 // streamed attempt), the client clears and starts again.
-import { INTENTS, type Intent } from '@monde/shared';
+import { INTENTS, type Intent, type TurnRegard } from '@monde/shared';
 import type { SseEvent } from './sse';
 import type { LineDelta, TalkChoice, TalkEvent, TalkLine, TalkTurn } from './types';
 
@@ -22,6 +22,19 @@ function asChoice(v: unknown): TalkChoice | null {
     ? { id: v.id, text: v.text, intent: v.intent } : null;
 }
 
+const isNumber = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+
+/** The turn's applied Regard (G-13), or null if it's missing or malformed (the hearts then show no change). */
+export function asTurnRegard(v: unknown): TurnRegard | null {
+  if (!isObject(v) || !isNumber(v.before) || !isNumber(v.after)) return null;
+  const { before, after } = v;
+  return {
+    before, after, delta: isNumber(v.delta) ? v.delta : after - before,
+    hearts_before: isNumber(v.hearts_before) ? v.hearts_before : 0, hearts_after: isNumber(v.hearts_after) ? v.hearts_after : 0,
+    first_chat: v.first_chat === true, capped: v.capped === true
+  };
+}
+
 /** A `turn` payload, or null if it isn't one (no lines, a bad choice, a missing field). */
 export function asTurn(v: unknown): TalkTurn | null {
   if (!isObject(v) || !isString(v.conversation_id) || !isString(v.resident_id) || !isInt(v.turn_index, 0)) return null;
@@ -30,7 +43,8 @@ export function asTurn(v: unknown): TalkTurn | null {
   if (lines.length === 0 || lines.some(l => !l) || choices.some(c => !c)) return null;
   return {
     conversation_id: v.conversation_id, resident_id: v.resident_id, turn_index: v.turn_index,
-    lines: lines as TalkLine[], choices: choices as TalkChoice[], wrap_up: v.wrap_up, fallback: v.fallback === true
+    lines: lines as TalkLine[], choices: choices as TalkChoice[], wrap_up: v.wrap_up, fallback: v.fallback === true,
+    ...('regard' in v ? { regard: asTurnRegard(v.regard) } : {})
   };
 }
 

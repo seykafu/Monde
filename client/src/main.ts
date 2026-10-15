@@ -4,6 +4,9 @@ import { ZoneScene } from "./scenes/ZoneScene";
 import { DioramaDemoScene } from "./scenes/DioramaDemoScene";
 import { DialogueScene } from "./scenes/DialogueScene";
 import { TownLedgerScene } from "./scenes/TownLedgerScene";
+import { PeopleScene } from "./scenes/PeopleScene";
+import { StoryScene } from "./scenes/StoryScene";
+import { FellowshipScene } from "./scenes/FellowshipScene";
 import { getMind } from "./mind/api";
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from "./util/constants";
 import { installRenderScale } from "./util/renderScale";
@@ -18,15 +21,17 @@ const game = new Phaser.Game({
   pixelArt: false,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   scene: new URLSearchParams(window.location.search).get("demo") === "1"
-    ? [DioramaDemoScene, TitleScene, ZoneScene, DialogueScene, TownLedgerScene, SaveMenuScene]
+    ? [DioramaDemoScene, TitleScene, FellowshipScene, ZoneScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
     : new URLSearchParams(window.location.search).get("skiptitle") === "1"
-      ? [ZoneScene, TitleScene, DioramaDemoScene, DialogueScene, TownLedgerScene, SaveMenuScene]
-      : [TitleScene, ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene, SaveMenuScene]
+      // Skips the Fellowship form too: ZoneScene signs a default application (fellow/state.ts ensureFellow).
+      ? [ZoneScene, TitleScene, FellowshipScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
+      : [TitleScene, FellowshipScene, ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
 });
 
 // Join (or create) this device's world on monde-mind; without an invite code the game plays in Quiet Mode.
 const mind = getMind();
-void mind.ensureWorld();
+// Then send a Fellowship application that couldn't reach the server last time (fail soft; §11.1).
+void mind.ensureWorld().then(() => mind.syncPlayer());
 
 // Dev-only handle for debugging and the capture harness.
 if (import.meta.env.DEV) Object.assign(window as unknown as Record<string, unknown>, { __game: game, __mind: mind });
