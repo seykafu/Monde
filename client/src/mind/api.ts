@@ -49,6 +49,7 @@ export interface Session {
   device_id: string;
   world_id: string;
   token: string;
+  branch_id?: string;
   /** The server the world lives on: a different VITE_MIND_URL starts a new world. */
   base_url: string;
 }
@@ -161,6 +162,38 @@ export class MindClient {
       this.wentOffline('player profile', error);
       return false;
     }
+  }
+
+  // TODO W-06: server snapshot/restore endpoints and Tigris persistence are a separate task.
+  async createSnapshot(day: number, minute: number, label: string): Promise<{
+    world_id: string | null; branch_id: string | null; snapshot_id: string | null;
+  }> {
+    const link = { world_id: this.worldId, branch_id: this.session?.branch_id ?? null, snapshot_id: null as string | null };
+    if (!this.online) return link;
+    try {
+      const res = await this.authed('/snapshots', { method: 'POST', body: JSON.stringify({ day, minute, label }) }, REQUEST_TIMEOUT_MS);
+      if (!res?.ok) return link; // 404 during rollout is expected; never prevents a local save.
+      const body = await res.json() as { snapshot_id?: unknown; branch_id?: unknown };
+      if (typeof body.snapshot_id === 'string') link.snapshot_id = body.snapshot_id;
+      if (typeof body.branch_id === 'string') link.branch_id = body.branch_id;
+    } catch { /* Offline: local engine state remains playable. */ }
+    return link;
+  }
+
+  async restoreSnapshot(link: { world_id: string | null; snapshot_id: string | null }): Promise<boolean> {
+    if (this.opts.offline || !this.session || !link.world_id || !link.snapshot_id) return false;
+    try {
+      const res = await this.fetchWithin(`${this.baseUrl}/v1/worlds/${encodeURIComponent(link.world_id)}/snapshots/${encodeURIComponent(link.snapshot_id)}/restore`, {
+        method: 'POST', headers: { authorization: `Bearer ${this.session.token}`, 'content-type': 'application/json' }, body: '{}'
+      }, REQUEST_TIMEOUT_MS);
+      if (!res.ok) return false;
+      const body = await res.json() as { world_id?: unknown; token?: unknown; branch_id?: unknown };
+      if (typeof body.world_id !== 'string' || typeof body.token !== 'string' || typeof body.branch_id !== 'string') return false;
+      this.session = { ...this.session, world_id: body.world_id, token: body.token, branch_id: body.branch_id };
+      this.offlineUntil = 0;
+      this.write(STORAGE_KEYS.session, JSON.stringify(this.session));
+      return true;
+    } catch { return false; }
   }
 
   /** Warm the resident's prompt cache (§9.10 step 1). Fire and forget: never rejects. */

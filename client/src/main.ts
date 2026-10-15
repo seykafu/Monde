@@ -1,3 +1,4 @@
+import { TitleScene, SaveMenuScene } from "./scenes/TitleScene";
 import Phaser from "phaser";
 import { ZoneScene } from "./scenes/ZoneScene";
 import { DioramaDemoScene } from "./scenes/DioramaDemoScene";
@@ -17,7 +18,10 @@ const game = new Phaser.Game({
   pixelArt: false,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   scene: new URLSearchParams(window.location.search).get("demo") === "1"
-    ? [DioramaDemoScene, ZoneScene, DialogueScene, TownLedgerScene] : [ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene]
+    ? [DioramaDemoScene, TitleScene, ZoneScene, DialogueScene, TownLedgerScene, SaveMenuScene]
+    : new URLSearchParams(window.location.search).get("skiptitle") === "1"
+      ? [ZoneScene, TitleScene, DioramaDemoScene, DialogueScene, TownLedgerScene, SaveMenuScene]
+      : [TitleScene, ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene, SaveMenuScene]
 });
 
 // Join (or create) this device's world on monde-mind; without an invite code the game plays in Quiet Mode.

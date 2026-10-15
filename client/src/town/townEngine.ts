@@ -1,3 +1,4 @@
+import { SavedTown } from '@monde/shared';
 // The town engine's dawn pass (GDD §6, §6.6).
 //
 // At 06:00 each day, in this order:
@@ -159,3 +160,7 @@ export const runDawnsThrough = (state: TownState, day: number, ctx: Omit<DawnCon
   return { state: s, reports };
 };
 
+
+/** Detached, validated engine state for save files; never serializes scene objects. */
+export const serialize = (state: TownState): TownState => SavedTown.parse(state);
+export const restore = (raw: unknown): TownState => SavedTown.parse(raw);

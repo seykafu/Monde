@@ -1,3 +1,5 @@
+import type { SaveGame } from '@monde/shared';
+import { attachSaves } from '../save/runtime';
 import Phaser from 'phaser';
 import { Grid } from '../combat/Grid';
 import { buildDiorama, type DioramaResult } from '../render/diorama/Diorama';
@@ -12,10 +14,11 @@ import { attachPostPipeline } from '../render/postPipelines';
 import { SUN, castFrom, torchShadow, type Sun } from '../render/sun';
 import { sunShadow } from '../render/sunClock';
 import { DEPTH, actorDepth } from '../render/depth';
+import { CharacterSprite, playerLook, preloadCharacterSheets } from '../render/characterSprite';
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from '../util/constants';
 import { zones } from '../world/zones';
 import type { Point, ZoneDef } from '../world/zoneFormat';
-import { movePlayer, nearbyPlace, placeName, type Position } from '../world/player';
+import { movePlayer, resolveEdge, nearbyPlace, placeName, type Position } from '../world/player';
 import { Clock, DAY_START, SOLAR_NOON, formatClock, formatDate, formatGameTime, parseClock } from '../sim/clock';
 import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, type DailyWeather, type WeatherKind, type WeatherNow } from '../sim/weather';
 import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
@@ -182,6 +185,8 @@ export class ZoneScene extends Phaser.Scene {
   private projection!: ObliqueProjection;
   private figure!: Phaser.GameObjects.Image;
   private shadow!: Phaser.GameObjects.Image;
+  /** The player's sheet and walk/idle animation (render/characterSprite); shown on both figure and shadow. */
+  private avatar!: CharacterSprite;
   private prompt!: Phaser.GameObjects.Text;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private transitioning = false;
@@ -218,14 +223,29 @@ export class ZoneScene extends Phaser.Scene {
   private pillarStrip!: PillarStrip;
   constructor() { super('Zone'); }
 
-  create(data: { zone?: string; arrive?: Point } = {}): void {
+  /** Drawn character sheets listed in assets/sprites/manifest.json (none yet: everyone uses the procedural rig). */
+  preload(): void { preloadCharacterSheets(this); }
+
+  create(data: { zone?: string; arrive?: Point; savedPlayer?: SaveGame['player'] } = {}): void {
     this.zone = zones[data.zone ?? 'old_quarter']!;
     this.transitioning = false;
     this.resetLight();
     this.clock = this.sharedClock();
-    this.daily = dailyWeather(WORLD_SEED, this.clock.day);
+    const savedWeather = this.registry.get('monde.save.weather') as SaveGame['weather'] | undefined;
+    this.daily = savedWeather?.daily.day === this.clock.day ? savedWeather.daily : dailyWeather(this.saveWeatherSeed(), this.clock.day);
     const [x, y] = data.arrive ?? this.zone.spawn;
-    this.position = { x: x + 0.5, y: y + 0.5 };
+    this.position = data.savedPlayer ? { x: data.savedPlayer.x, y: data.savedPlayer.y } : { x: x + 0.5, y: y + 0.5 };
+    let facing = data.savedPlayer?.facing ?? 0;
+    let lastPosition = { ...this.position };
+    attachSaves(this, this.clock, () => {
+      const dx = this.position.x - lastPosition.x, dy = this.position.y - lastPosition.y;
+      if (dx || dy) facing = Math.atan2(dy, dx);
+      lastPosition = { ...this.position };
+      // A dawn during an edge fade belongs to the destination doorstep.
+      const edge = resolveEdge(this.zone, this.position);
+      return edge ? { zone: edge.zone, x: edge.arrive[0] + 0.5, y: edge.arrive[1] + 0.5, facing }
+        : { zone: this.zone.id, ...this.position, facing };
+    }, this.saveWeatherSeed(), () => !this.transitioning);
     const grid = new Grid(this.zone);
     const elevation = elevationFor(this.zone);
     this.projection = new ObliqueProjection({ originX: 0, originY: 0,
@@ -248,15 +268,12 @@ export class ZoneScene extends Phaser.Scene {
       this.add.text(p.x, p.y - 22, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#343d34' })
         .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK);
     }
-    if (!this.textures.exists('town-player')) {
-      const g = this.make.graphics({ x: 0, y: 0 });
-      g.fillStyle(0x69b8ac).fillRoundedRect(6, 15, 20, 27, 4);
-      g.fillStyle(0xf2d5b3).fillCircle(16, 9, 8);
-      g.fillStyle(0x384138).fillRect(8, 40, 6, 8).fillRect(18, 40, 6, 8);
-      g.generateTexture('town-player', 32, 48); g.destroy();
-    }
-    this.figure = this.add.image(0, 0, 'town-player').setOrigin(0.5, 1);
-    this.shadow = this.add.image(0, 0, 'town-player').setOrigin(0.5, 1).setTintFill(0).setAlpha(0).setDepth(DEPTH.SHADOW);
+    // The player: a drawn sheet if the manifest lists one, else the procedural rig. The shadow shows the same frame.
+    this.avatar = new CharacterSprite(this, 'player', playerLook(this.registry));
+    this.figure = this.add.image(0, 0, this.avatar.sheet.key);
+    this.shadow = this.add.image(0, 0, this.avatar.sheet.key).setTintFill(0).setAlpha(0).setDepth(DEPTH.SHADOW);
+    this.avatar.apply(this.figure);
+    this.avatar.apply(this.shadow, false);
     this.buildNight();
     this.buildWeather();
     this.syncFigure();
@@ -315,6 +332,10 @@ export class ZoneScene extends Phaser.Scene {
     };
     this.input.keyboard?.on('keydown', onKey);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.input.keyboard?.off('keydown', onKey));
+  }
+
+  private saveWeatherSeed(): number {
+    return (this.registry.get('monde.save.weather') as SaveGame['weather'] | undefined)?.seed ?? WORLD_SEED;
   }
 
   private resetLight(): void {
@@ -444,7 +465,7 @@ export class ZoneScene extends Phaser.Scene {
     const key = day * 10000 + Math.floor(minute * 4);
     if (!force && key === this.lightKey) return;
     this.lightKey = key;
-    if (this.daily.day !== day) this.daily = dailyWeather(WORLD_SEED, day);
+    if (this.daily.day !== day) this.daily = dailyWeather(this.saveWeatherSeed(), day);
     const override = this.registry.get(WEATHER_OVERRIDE_KEY) as WeatherKind | 'auto' | undefined;
     this.now = override && override !== 'auto' ? { kind: override, intensity: 1 } : weatherAt(this.daily, minute);
     const { kind, intensity } = this.now;
@@ -634,8 +655,14 @@ export class ZoneScene extends Phaser.Scene {
     this.residents.update(dt, this.position);
     if (this.transitioning || !this.keys) return;
     const down = (...names: string[]) => names.some(name => this.keys[name]!.isDown) ? 1 : 0;
-    const result = movePlayer(this.zone, this.position, { x: down('D', 'RIGHT') - down('A', 'LEFT'), y: down('S', 'DOWN') - down('W', 'UP') }, delta / 1000);
+    const input = { x: down('D', 'RIGHT') - down('A', 'LEFT'), y: down('S', 'DOWN') - down('W', 'UP') };
+    const from = this.position;
+    const result = movePlayer(this.zone, this.position, input, delta / 1000);
     this.position = result.position;
+    // Facing from the keys; walk frames from the distance actually covered (none while pushing a wall).
+    this.avatar.step({ intent: input, moved: { x: this.position.x - from.x, y: this.position.y - from.y }, dtMs: dt });
+    this.avatar.apply(this.figure);
+    this.avatar.apply(this.shadow, false);
     this.syncFigure(); this.followPlayer();
     // Residents take precedence over doors.
     const talk = this.residents.talkTarget(this.position);
