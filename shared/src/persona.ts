@@ -117,5 +117,7 @@ export const PersonaCard = z.object({
   canon_locks: z.array(CanonLock),
   story_role: z.string().optional(),
   will_scuffle: z.boolean().optional(),
+  /** §9.11.3: `false` opts the resident out of romance (the ladder never starts for them). Absent means eligible. */
+  romance: z.boolean().optional(),
 });
 export type PersonaCard = z.infer<typeof PersonaCard>;

@@ -30,6 +30,10 @@ export const residents = pgTable("residents", {
   state: jsonb("state").$type<ResidentState>().notNull(),
   tier: text("tier").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  /** §9.11.2 talk ledger (shared/friendship.ts TalkLedger): the day `talk_gain` counts, and the last day they spoke. */
+  talkDay: integer("talk_day"),
+  talkGain: integer("talk_gain").notNull().default(0),
+  lastTalkDay: integer("last_talk_day"),
 }, (t) => [primaryKey({ columns: [t.worldId, t.id] })]);
 export const relationships = pgTable("relationships", {
   worldId: worldId(),
@@ -42,7 +46,22 @@ export const relationships = pgTable("relationships", {
   feelingKind: text("feeling_kind"),
   feelingIntensity: integer("feeling_intensity").notNull().default(0),
   lastSeenDay: integer("last_seen_day"),
+  /** §9.11.3 daily cap ledger (shared/friendship.ts AffinityEdge): capped net change applied on `net_day`. */
+  netDay: integer("net_day"),
+  net: integer("net").notNull().default(0),
+  /** Encounters this pair has had (the ladder's "5+ shared encounters", §9.11.3). */
+  encounters: integer("encounters").notNull().default(0),
 }, (t) => [primaryKey({ columns: [t.worldId, t.fromId, t.toId] })]);
+/** §9.11.3 tie milestones: a pair's label changed on the night of `day` (a < b). Read by the dawn package. */
+export const tieMilestones = pgTable("tie_milestones", {
+  worldId: worldId(),
+  day: integer("day").notNull(),
+  aId: text("a_id").notNull(),
+  bId: text("b_id").notNull(),
+  kind: text("kind").notNull(),
+  fromLabel: text("from_label").notNull(),
+  toLabel: text("to_label").notNull(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.day, t.aId, t.bId] })]);
 export const memories = pgTable("memories", {
   worldId: worldId(),
   id: text("id").notNull(),

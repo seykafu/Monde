@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
 import type Anthropic from "@anthropic-ai/sdk";
 import { and, eq } from "drizzle-orm";
-import type { PersonaCard, PlanOutput, ReflectionOutput } from "@monde/shared";
+import type { GossipOutput, PersonaCard, PlanOutput, ReflectionOutput } from "@monde/shared";
 import { buildApp } from "../../app.js";
 import { parseConfig } from "../../config.js";
 import { loadContent } from "../../content/loadContent.js";
@@ -48,8 +48,13 @@ function plan(resident: string, day: number): PlanOutput {
     barks: ["Morning.", "Mind the step.", "Fog again."], seek_player: null, intentions: ["Keep the lamps lit."],
   };
 }
+/** An encounter that went pleasantly both ways (§9.11.3, summary mode). */
+const met: GossipOutput = {
+  lines: null, a_delta: { affinity: 1, trust: 0 }, b_delta: { affinity: 1, trust: 1 }, news_passed: [], feeling_change: null,
+};
 const happy = (call: NightCall): NightReply =>
-  call.kind === "reflect" ? { output: reflection(call.resident) } : { output: plan(call.resident, 2) };
+  call.kind === "reflect" ? { output: reflection(call.resident) } : call.kind === "gossip" ? { output: met } : { output: plan(call.resident, 2) };
+const residentCalls = (mind: FakeNightMind) => mind.calls.filter((c) => c.kind !== "gossip");
 
 function fake(respond: (call: NightCall) => NightReply = happy, delayMs = 0): FakeNightMind {
   return new FakeNightMind((call) => { bodies.push(call.body); return respond(call); }, delayMs);
@@ -154,10 +159,23 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(mind.callsFor("reflect", "bru")).toHaveLength(1);
     expect(mind.callsFor("plan", "bru")).toHaveLength(0);
     expect(mind.calls.some((c) => c.resident === "nettie")).toBe(false);
-    // Core first: every Core reflection is under way before Ada's first call.
-    const lastCoreReflection = Math.max(...mind.calls.map((c, i) => (c.kind === "reflect" && coreIds().includes(c.resident) ? i : -1)));
-    expect(mind.calls.findIndex((c) => c.resident === "ada")).toBeGreaterThan(lastCoreReflection);
-    expect(mind.calls.findIndex((c) => c.resident === "bru")).toBeGreaterThan(mind.calls.findIndex((c) => c.resident === "ada"));
+    // Core first (§9.8). Encounters queue before any reflection, at the priority of their better-detailed side, so
+    // every encounter with a Core side is under way before Ada's (Acquainted) first call, and every encounter with a
+    // Core or Acquainted side before Bru's (Ambient). A reflection waits for that resident's own encounters, so a
+    // free slot may go to lower-tier work meanwhile (work-conserving), never ahead of a queued higher-tier call.
+    const core = new Set(coreIds());
+    const sides = (c: NightCall) => c.resident.split("+");
+    const lastEncounterWith = (ids: ReadonlySet<string>) =>
+      Math.max(...mind.calls.map((c, i) => (c.kind === "gossip" && sides(c).some((id) => ids.has(id)) ? i : -1)));
+    const first = (id: string) => mind.calls.findIndex((c) => c.resident === id);
+    expect(mind.callsFor("gossip").some((c) => sides(c).includes("ada"))).toBe(true);
+    expect(first("ada")).toBeGreaterThan(lastEncounterWith(core));
+    expect(first("bru")).toBeGreaterThan(lastEncounterWith(new Set([...core, "ada"])));
+    for (const [i, call] of mind.calls.entries()) {
+      if (call.kind !== "reflect") continue;
+      const own = mind.calls.map((c, j) => (c.kind === "gossip" && sides(c).includes(call.resident) ? j : -1)).filter((j) => j >= 0);
+      for (const j of own) expect(j, `${call.resident} reflected before an encounter`).toBeLessThan(i);
+    }
     expect((await storedPlans(env.worldId, 2)).map((p) => p.residentId)).toContain("ada");
     expect((await storedPlans(env.worldId, 2)).map((p) => p.residentId)).not.toContain("bru");
   });
@@ -194,9 +212,11 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(late).toMatchObject({ pending: 0, complete: true });
     expect(late.plans.filter((p: { source: string }) => p.source === "model")).toHaveLength(core.length);
     // A repeat of the same night reports instead of running again.
+    const encounters = mind.callsFor("gossip").length;
     const again = await night(env, { day: 1 });
     expect(again.json()).toMatchObject({ already: true, done: core.length, pending: 0, complete: true });
-    expect(mind.calls).toHaveLength(core.length * 2);
+    expect(residentCalls(mind)).toHaveLength(core.length * 2);
+    expect(mind.callsFor("gossip")).toHaveLength(encounters);
   }, 30_000);
 
   it("falls back per resident: template plans and mood drift, logged", async () => {
@@ -321,12 +341,26 @@ describe("night pass rules and hygiene", () => {
   });
 
   it("never sends sampling parameters, thinking settings or an assistant prefill on a plan or reflection", () => {
-    expect(bodies.length).toBeGreaterThan(50);
-    for (const body of bodies) {
+    const night = bodies.filter((body) => !JSON.stringify(body.messages).includes("<gossip mode="));
+    expect(night.length).toBeGreaterThan(50);
+    for (const body of night) {
       for (const key of ["temperature", "top_p", "top_k", "thinking", "stream"]) expect(body).not.toHaveProperty(key);
       expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 900, output_config: { effort: "low" } });
       expect(body.output_config?.format?.type).toBe("json_schema");
       expect(body.messages.every((m) => m.role === "user")).toBe(true);
+    }
+  });
+
+  it("runs encounters as summary-mode Gossip calls with thinking disabled and nothing else", () => {
+    const gossip = bodies.filter((body) => JSON.stringify(body.messages).includes("<gossip mode="));
+    expect(gossip.length).toBeGreaterThan(10);
+    for (const body of gossip) {
+      for (const key of ["temperature", "top_p", "top_k", "stream"]) expect(body).not.toHaveProperty(key);
+      expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 400, thinking: { type: "disabled" } });
+      expect(body.output_config?.effort).toBeUndefined();
+      expect(body.output_config?.format?.type).toBe("json_schema");
+      expect(body.messages.every((m) => m.role === "user")).toBe(true);
+      expect(JSON.stringify(body.messages)).toContain('<gossip mode=\\"summary\\">');
     }
   });
 });

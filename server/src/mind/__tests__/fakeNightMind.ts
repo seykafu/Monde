@@ -1,7 +1,8 @@
 /**
  * A MindClient for night-pass tests. Night calls run concurrently, so instead of a script queue (fakeMind.ts) a
- * responder function answers each createMessage by kind ("plan" | "reflect") and resident id. Every request body
- * is recorded, and the fake tracks how many calls are in flight at once.
+ * responder function answers each createMessage by kind ("plan" | "reflect" | "gossip") and resident id (for an
+ * encounter, the pair key "a+b"). Every request body is recorded, and the fake tracks how many calls are in flight
+ * at once.
  */
 import type Anthropic from "@anthropic-ai/sdk";
 import type { MindClient } from "../mindClient.js";
@@ -13,7 +14,8 @@ export type NightReply =
   | { hang: true };
 
 export interface NightCall {
-  kind: "plan" | "reflect";
+  kind: "plan" | "reflect" | "gossip";
+  /** The resident, or for an encounter the pair key ("june+odile"). */
   resident: string;
   body: Anthropic.MessageCreateParamsNonStreaming;
 }
@@ -33,6 +35,12 @@ function userText(body: Anthropic.MessageCreateParamsNonStreaming): string {
 
 export function describeCall(body: Anthropic.MessageCreateParamsNonStreaming): Omit<NightCall, "body"> {
   const text = userText(body);
+  if (text.includes("<gossip mode=")) {
+    const a = /<a id="([a-z0-9_]+)">/.exec(text)?.[1];
+    const b = /<b id="([a-z0-9_]+)">/.exec(text)?.[1];
+    if (!a || !b) throw new Error("FakeNightMind: gossip without ids");
+    return { kind: "gossip", resident: `${a}+${b}` };
+  }
   const kind = text.includes("<plan_request>") ? "plan" : text.includes("<reflect_request>") ? "reflect" : null;
   if (!kind) throw new Error("FakeNightMind: not a plan or reflection request");
   const system = Array.isArray(body.system) ? body.system.map((b) => b.text).join("\n") : String(body.system);

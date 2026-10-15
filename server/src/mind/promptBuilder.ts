@@ -740,6 +740,8 @@ export function buildGossipRequest(input: GossipInput): MindRequest {
   const news = (items: GossipSide["news"]) => bullets(items.map((n) => `[${n.id}] ${prose(n.text)}`), "(nothing new)");
   const user = fillTemplate(loadTemplates().gossip, {
     mode: input.mode,
+    a_id: input.a.card.id,
+    b_id: input.b.card.id,
     a_name: prose(input.a.card.name),
     b_name: prose(input.b.card.name),
     place: input.place,

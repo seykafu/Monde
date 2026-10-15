@@ -4,7 +4,8 @@ import type { DialogueTurnOutput, ReflectionOutput, GossipOutput } from "./outpu
 export const LIMITS = {
   dialogue: { regard: 5, regardHeart: 7, mood: 10, maxLines: 3, maxChoices: 3, lineChars: 220, choiceChars: 90 },
   reflection: { relationship: 10, regard: 8, stance: 15, mood: 15, feeling: 15, beliefs: 12 },
-  gossip: { relationship: 6, feeling: 10 },
+  /** §9.11.3: an encounter, summary or live, moves each direction by −3..+3. */
+  gossip: { relationship: 3, feeling: 10 },
   memoryImportance: { min: 1, max: 10 },
 } as const;
 

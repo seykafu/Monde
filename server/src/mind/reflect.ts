@@ -13,8 +13,8 @@
  */
 import { and, count, eq, gte, inArray } from "drizzle-orm";
 import {
-  MVP_FAVOR_TEMPLATES, ReflectionOutput, ResidentState, clamp, clampReflection,
-  type FavorTemplate, type Memory, type PersonaCard,
+  MVP_FAVOR_TEMPLATES, ROMANTIC_FEELINGS, ReflectionOutput, ResidentState, applyAffinity, clamp, clampReflection,
+  romanceEligible, type FavorTemplate, type Memory, type PersonaCard,
 } from "@monde/shared";
 import { aiLog, favors, letters, memories, relationships, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
@@ -337,21 +337,37 @@ async function persistReflection(db: WorldDatabase, args: PersistArgs): Promise<
 
     if (output) {
       for (const delta of output.relationship_deltas) {
+        // §9.11.3: crush and love only between residents who may court (adults, not family, not spoken for).
+        let change = delta.feeling;
+        if (change && ROMANTIC_FEELINGS.has(change.kind)) {
+          const [other] = await tx.select({ card: residents.card, state: residents.state }).from(residents)
+            .where(and(eq(residents.worldId, worldId), eq(residents.id, delta.id)));
+          if (!other || !romanceEligible({ card: args.card, flags: row.state.flags }, { card: other.card, flags: other.state.flags })) {
+            dropped.push(`${change.kind} for ${delta.id} dropped (romance rules)`);
+            change = null;
+          }
+        }
         const edge = and(eq(relationships.worldId, worldId), eq(relationships.fromId, residentId), eq(relationships.toId, delta.id));
         const [existing] = await tx.select().from(relationships).where(edge).for("update");
+        // §9.11.3: gossip heard moves affinity −10..+10, inside the pair's ±6 a day (with tonight's encounters).
+        // GDD-GAP: the cap wins over the source's range, so a reflection moves a pair at most 6 a night.
+        const moved = applyAffinity(
+          existing ? { affinity: existing.affinity, netDay: existing.netDay, net: existing.net } : { affinity: 0, netDay: null, net: 0 },
+          day, delta.affinity, "gossip",
+        ).edge;
         if (existing) {
-          const feeling = applyFeeling({ kind: existing.feelingKind as FeelingKind | null, intensity: existing.feelingIntensity }, delta.feeling);
+          const feeling = applyFeeling({ kind: existing.feelingKind as FeelingKind | null, intensity: existing.feelingIntensity }, change);
           await tx.update(relationships).set({
-            affinity: clamp(existing.affinity + delta.affinity, -100, 100),
+            affinity: moved.affinity, netDay: moved.netDay, net: moved.net,
             trust: clamp(existing.trust + delta.trust, -100, 100),
             feelingKind: feeling.kind, feelingIntensity: feeling.intensity,
           }).where(edge);
         } else {
           // GDD-GAP: someone new in their life. The tag vocabulary is authored per card; "acquaintance" until it isn't.
-          const feeling = applyFeeling({ kind: null, intensity: 0 }, delta.feeling);
+          const feeling = applyFeeling({ kind: null, intensity: 0 }, change);
           await tx.insert(relationships).values({
-            worldId, fromId: residentId, toId: delta.id, affinity: delta.affinity, trust: delta.trust,
-            tag: "acquaintance", note: "", feelingKind: feeling.kind, feelingIntensity: feeling.intensity,
+            worldId, fromId: residentId, toId: delta.id, affinity: moved.affinity, netDay: moved.netDay, net: moved.net,
+            trust: delta.trust, tag: "acquaintance", note: "", feelingKind: feeling.kind, feelingIntensity: feeling.intensity,
           });
         }
       }

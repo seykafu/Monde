@@ -6,8 +6,10 @@
  *   → 200 {day, next_day, done, pending, complete, tiers, elapsed_ms, already?} within 4 s; unfinished work
  *     continues in the background. 409 if the world is already past that night.
  * GET  /v1/worlds/:w/dawn/:day
- *   → 200 {day, weekday, plans[{resident_id, tier, source, plan}], letters[…], favors[…], pending, complete}.
- *     Letters are marked delivered as they're returned.
+ *   → 200 {day, weekday, plans[{resident_id, tier, source, plan}], letters[…], favors[…],
+ *          ties: {pairs[{a, b, label, romance}], milestones[{day, a, b, kind, from, to}]}, pending, complete}.
+ *     Letters are marked delivered as they're returned. `ties` (G-13) lists every pair of residents who have met
+ *     (a < b; label per §9.11.3, romance stage from their flags) and the milestones recorded the night before.
  */
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";

@@ -1,0 +1,403 @@
+/**
+ * Resident ↔ resident encounters in the night pass (GDD §9.11.3 "Encounters"; MVP G-13).
+ *
+ *   Day N's plans (the stored plan, else the routine template)
+ *     → findMeetings: pairs at the same place in overlapping blocks (30+ minutes, or any overlap when one of them
+ *       named the other in that block's `with`), asleep doesn't count
+ *     → chooseEncounters: a seeded roll per world + day + pair against encounterChance (shared/friendship.ts),
+ *       at most 3 encounters per resident, Core pairs first
+ *     → resolveEncounter: Core/Acquainted pairs get one summary-mode Gossip call (no lines, only effects) through
+ *       the world's semaphore; Ambient pairs, calls over the night's cap, and any call that fails take the Ambient
+ *       rule. Then one transaction: affinity (±3 an encounter, +1 for planned time together, inside the pair's ±6
+ *       a day), trust, a feeling (romance only between residents who may court), last_seen_day, the encounter
+ *       count, a short memory for each side (tonight's reflection reads it) and the ai_log row.
+ * The player within earshot (a live exchange as speech bubbles) is the client's; the server always summarises.
+ */
+import { and, eq, inArray } from "drizzle-orm";
+import {
+  AFFINITY_SOURCES, GossipOutput, ROMANTIC_FEELINGS, ambientEncounterDelta, applyAffinity, clamp, clampGossip,
+  encounterChance, encounterRoll, orderedPair, pairKey, pairMean,
+  type PersonaCard, type PlanOutput, type ResidentState,
+} from "@monde/shared";
+import { aiLog, memories, relationships } from "../db/schema.js";
+import type { WorldDatabase } from "../worlds/createWorld.js";
+import { callModel, type CallFailure } from "./callModel.js";
+import { weekdayOf } from "./context.js";
+import type { CallRecord } from "./dialogue.js";
+import { nightLogRow, type NightJobDeps } from "./nightJob.js";
+import { apiParams, buildGossipRequest, promptVersion, type RelationshipView } from "./promptBuilder.js";
+import { applyFeeling, type FeelingKind } from "./reflect.js";
+import { hhmmToMinutes } from "./templatePlan.js";
+import type { Tier } from "./tiers.js";
+
+/** GDD-GAP: §9.11.3 doesn't bound encounters per resident; 3 a day keeps a busy market from flooding one evening. */
+export const ENCOUNTERS_PER_RESIDENT = 3;
+/** GDD-GAP: §9.15 budgets 80 summary-mode gossips a day; past that, encounters take the Ambient rule. */
+export const MODEL_ENCOUNTERS_PER_NIGHT = 80;
+/** GDD-GAP: "the same place" needs a duration; half an hour together is a meeting, a nod in passing isn't. */
+export const MIN_OVERLAP_MINUTES = 30;
+/** Asleep or napping at the same address (June and Ines at the pub rooms) isn't meeting. */
+const APART_VERBS: ReadonlySet<string> = new Set(["sleep", "nap"]);
+/** Up to this many of each side's notable memories of the day go into the prompt as news. */
+export const NEWS_PER_SIDE = 3;
+/** GDD-GAP: news is what made the day: memories of importance 5+ (the Acquainted reflection trigger, §9.8). */
+export const NEWS_IMPORTANCE = 5;
+
+export const TIER_ORDER: Readonly<Record<Tier, number>> = { core: 0, acquainted: 1, ambient: 2 };
+
+// ---------------------------------------------------------------------------------------------------------------
+// Who meets (pure)
+// ---------------------------------------------------------------------------------------------------------------
+
+export interface DayPlan { residentId: string; blocks: readonly PlanOutput["blocks"][number][] }
+
+export interface Meeting {
+  /** Ids in order (a < b). */
+  a: string;
+  b: string;
+  place: string;
+  /** When the overlap starts (minutes since midnight). */
+  minute: number;
+  /** Minutes they share at `place`. */
+  overlap: number;
+  /** One of them named the other in the block they shared (`with`): planned time together. */
+  planned: boolean;
+}
+
+interface Interval { resident: string; start: number; end: number; with: ReadonlySet<string> }
+
+const minutes = (text: string): number | null => {
+  try { return hhmmToMinutes(text); } catch { return null; }
+};
+
+/** Prefer the planned meeting, then the longer one, then the earlier one. */
+const better = (x: Meeting, y: Meeting): boolean =>
+  x.planned !== y.planned ? x.planned : x.overlap !== y.overlap ? x.overlap > y.overlap : x.minute < y.minute;
+
+/**
+ * Every pair whose plans put them at the same place at the same time: planned (named in `with`) with any overlap,
+ * otherwise for 30 minutes or more. One meeting per pair, at the place that mattered most.
+ */
+export function findMeetings(plans: readonly DayPlan[], minOverlap = MIN_OVERLAP_MINUTES): Meeting[] {
+  const byPlace = new Map<string, Interval[]>();
+  for (const plan of plans) {
+    for (const block of plan.blocks) {
+      if (APART_VERBS.has(block.action) || block.place.startsWith("offmap.")) continue;
+      const start = minutes(block.start);
+      const end = minutes(block.end);
+      if (start === null || end === null || end <= start) continue;
+      let list = byPlace.get(block.place);
+      if (!list) { list = []; byPlace.set(block.place, list); }
+      list.push({ resident: plan.residentId, start, end, with: new Set(block.with) });
+    }
+  }
+  const best = new Map<string, Meeting>();
+  for (const [place, list] of byPlace) {
+    list.sort((x, y) => x.start - y.start || x.end - y.end || (x.resident < y.resident ? -1 : 1));
+    for (let i = 0; i < list.length; i++) {
+      const x = list[i]!;
+      for (let j = i + 1; j < list.length && list[j]!.start < x.end; j++) {
+        const y = list[j]!;
+        if (x.resident === y.resident) continue;
+        const overlap = Math.min(x.end, y.end) - Math.max(x.start, y.start);
+        if (overlap <= 0) continue;
+        const [a, b] = orderedPair(x.resident, y.resident);
+        const meeting: Meeting = {
+          a, b, place, minute: Math.max(x.start, y.start), overlap, planned: x.with.has(y.resident) || y.with.has(x.resident),
+        };
+        const key = pairKey(a, b);
+        const seen = best.get(key);
+        if (!seen || better(meeting, seen)) best.set(key, meeting);
+      }
+    }
+  }
+  return [...best.values()]
+    .filter((m) => m.planned || m.overlap >= minOverlap)
+    .sort((x, y) => (pairKey(x.a, x.b) < pairKey(y.a, y.b) ? -1 : 1));
+}
+
+export interface Encounter extends Meeting {
+  /** The pair's mean affinity when the night began (null: strangers). */
+  mean: number | null;
+  chance: number;
+  roll: number;
+  /** Who judges it: one summary-mode Gossip call, or the Ambient rule. */
+  mode: "model" | "rule";
+  /** Semaphore priority: the better-detailed side's tier (a Core resident's reflection waits on it). */
+  priority: number;
+}
+
+export interface ChooseOptions {
+  seed: number | string;
+  day: number;
+  /** The pair's mean affinity, or null if they've never met. */
+  mean: (a: string, b: string) => number | null;
+  tier: (id: string) => Tier;
+  /** False with no API key: everything takes the rule. */
+  modelEnabled: boolean;
+  perResident?: number;
+  modelCap?: number;
+}
+
+/**
+ * Roll every meeting (seeded per world, day and pair, so a night replays the same), keep the ones that happen,
+ * Core pairs first (then planned, known before strangers, the surest rolls), at most 3 per resident; pairs with
+ * a Core or Acquainted side are model-judged up to the night's cap.
+ */
+export function chooseEncounters(meetings: readonly Meeting[], options: ChooseOptions): Encounter[] {
+  const perResident = options.perResident ?? ENCOUNTERS_PER_RESIDENT;
+  const modelCap = options.modelCap ?? MODEL_ENCOUNTERS_PER_NIGHT;
+  const rank = (m: Meeting) => TIER_ORDER[options.tier(m.a)] + TIER_ORDER[options.tier(m.b)];
+  const happened = meetings.flatMap((m) => {
+    const mean = options.mean(m.a, m.b);
+    const chance = encounterChance(mean, m.planned);
+    const roll = encounterRoll(options.seed, options.day, m.a, m.b);
+    return roll < chance ? [{ ...m, mean, chance, roll }] : [];
+  });
+  happened.sort((x, y) => rank(x) - rank(y)
+    || Number(y.planned) - Number(x.planned)
+    || Number(y.mean !== null) - Number(x.mean !== null)
+    || x.roll - y.roll
+    || (pairKey(x.a, x.b) < pairKey(y.a, y.b) ? -1 : 1));
+
+  const count = new Map<string, number>();
+  let models = 0;
+  const chosen: Encounter[] = [];
+  for (const m of happened) {
+    if ((count.get(m.a) ?? 0) >= perResident || (count.get(m.b) ?? 0) >= perResident) continue;
+    count.set(m.a, (count.get(m.a) ?? 0) + 1);
+    count.set(m.b, (count.get(m.b) ?? 0) + 1);
+    const ambientPair = options.tier(m.a) === "ambient" && options.tier(m.b) === "ambient";
+    const model = options.modelEnabled && !ambientPair && models < modelCap;
+    if (model) models++;
+    chosen.push({
+      ...m, mode: model ? "model" : "rule",
+      priority: Math.min(TIER_ORDER[options.tier(m.a)], TIER_ORDER[options.tier(m.b)]),
+    });
+  }
+  return chosen;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Judging the encounter
+// ---------------------------------------------------------------------------------------------------------------
+
+export interface SideDelta { affinity: number; trust: number }
+export interface EncounterOutcome {
+  /** How a's view of b changes, and b's of a: −3..+3 each (§9.11.3). */
+  a: SideDelta;
+  b: SideDelta;
+  /** A feeling change for one side, already checked against the romance rules. */
+  feeling: { who: "a" | "b"; kind: FeelingKind; delta: number } | null;
+  /** Ids of the news that changed hands (propagation itself is M-08). */
+  news: string[];
+}
+
+export type EncounterValidation =
+  | { ok: true; outcome: EncounterOutcome; adjustments: string[] }
+  | { ok: false; category: "schema"; detail: string };
+
+/**
+ * Parse and clamp one summary-mode Gossip reply. Deltas are clamped to ±3 (clampGossip), lines are dropped (summary
+ * mode has none), news ids must be ones offered, and a crush or love between residents who may not court (a child,
+ * family, someone spoken for, an opt-out) is dropped.
+ */
+export function validateEncounter(raw: string, ctx: { offered: ReadonlySet<string>; romanceAllowed: boolean }): EncounterValidation {
+  let json: unknown;
+  try {
+    json = JSON.parse(raw);
+  } catch (error) {
+    return { ok: false, category: "schema", detail: `not JSON: ${error instanceof Error ? error.message : String(error)}` };
+  }
+  const parsed = GossipOutput.safeParse(json);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    return { ok: false, category: "schema", detail: issue ? `${issue.path.join(".") || "(root)"}: ${issue.message}` : "invalid" };
+  }
+  const adjustments: string[] = [];
+  const out = clampGossip(parsed.data);
+  if (parsed.data.lines?.length) adjustments.push("lines dropped (summary mode)");
+  let feeling = out.feeling_change;
+  if (feeling && ROMANTIC_FEELINGS.has(feeling.kind) && !ctx.romanceAllowed) {
+    adjustments.push(`${feeling.kind} dropped (romance rules)`);
+    feeling = null;
+  }
+  const news = [...new Set(out.news_passed)].filter((id) => ctx.offered.has(id));
+  if (news.length !== out.news_passed.length) adjustments.push("unknown news ids dropped");
+  return { ok: true, adjustments, outcome: { a: out.a_delta, b: out.b_delta, feeling, news } };
+}
+
+/** The Ambient rule as an outcome: the same small step both ways, no trust, no feelings. */
+export function ruleOutcome(valenceA: number, valenceB: number, mean: number | null): EncounterOutcome {
+  const delta = ambientEncounterDelta(valenceA, valenceB, mean);
+  return { a: { affinity: delta, trust: 0 }, b: { affinity: delta, trust: 0 }, feeling: null, news: [] };
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Memories (pure)
+// ---------------------------------------------------------------------------------------------------------------
+
+const OUTCOME_TEXT: Readonly<Record<string, string>> = {
+  "-3": "It went badly.",
+  "-2": "We got on each other's nerves.",
+  "-1": "It was a little stiff.",
+  "0": "Nothing much passed between us.",
+  "1": "Pleasant enough.",
+  "2": "We got on well.",
+  "3": "It was the best part of the day.",
+};
+
+/** The memory one side keeps of an encounter (first person about self, third about the other, §9.6). */
+export function encounterMemoryText(otherName: string, planned: boolean, change: number): string {
+  const step = String(clamp(Math.round(change), -3, 3));
+  return `${planned ? "Spent time with" : "Ran into"} ${otherName}. ${OUTCOME_TEXT[step]}`;
+}
+
+/**
+ * GDD-GAP: §9.6 has no importance for meeting someone. An ordinary encounter is 3, one that moved how they feel by
+ * 2 or more is 4: below the Acquainted reflection trigger (5, §9.8), so meeting someone never buys a reflection on
+ * its own, but tonight's reflection sees it.
+ */
+export const encounterImportance = (change: number): number => (Math.abs(change) >= 2 ? 4 : 3);
+export const encounterValence = (change: number): number => clamp(Math.round(change), -3, 3);
+export const encounterMemoryId = (day: number, a: string, b: string, self: string): string => `met_${day}_${pairKey(a, b)}_${self}`;
+
+// ---------------------------------------------------------------------------------------------------------------
+// Resolving one encounter (I/O)
+// ---------------------------------------------------------------------------------------------------------------
+
+/** One side of an encounter as the night pass loaded it. */
+export interface EncounterSide {
+  card: PersonaCard;
+  state: ResidentState;
+  /** This side's view of the other when the night began, or null. */
+  view: RelationshipView | null;
+  /** What this side could tell the other: notable memories of the day. */
+  news: readonly { id: string; text: string }[];
+}
+
+export interface EncounterContext {
+  worldId: string;
+  day: number;
+  flags: readonly string[];
+  names: Readonly<Record<string, string>>;
+  romanceAllowed: boolean;
+}
+
+export interface EncounterResult {
+  key: string;
+  mode: "model" | "rule";
+  /** "ok", or why the rule stood in for the model. */
+  reason: "ok" | "rule" | CallFailure | "schema";
+  /** Affinity actually applied, each direction (encounter + together, after the daily cap). */
+  applied: { ab: number; ba: number };
+  adjustments: string[];
+}
+
+/** Resolve one chosen encounter: the model (or the rule), then persist. Throws only on database errors. */
+export async function resolveEncounter(
+  deps: NightJobDeps, ctx: EncounterContext, encounter: Encounter, a: EncounterSide, b: EncounterSide,
+): Promise<EncounterResult> {
+  const key = pairKey(encounter.a, encounter.b);
+  const rule = () => ruleOutcome(a.state.mood.valence, b.state.mood.valence, encounter.mean);
+  if (encounter.mode === "rule" || !deps.mind.enabled) {
+    const applied = await persistEncounter(deps.db, ctx, encounter, rule(), null, null);
+    return { key, mode: "rule", reason: "rule", applied, adjustments: [] };
+  }
+
+  const version = promptVersion();
+  const request = buildGossipRequest({
+    a: { card: a.card, view: a.view, news: a.news }, b: { card: b.card, view: b.view, news: b.news },
+    flags: ctx.flags, names: ctx.names, day: ctx.day, weekday: weekdayOf(ctx.day), minute: encounter.minute,
+    place: encounter.place, mode: "summary",
+  });
+  const result = await callModel(deps.mind, apiParams("gossip", request), {
+    timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
+  });
+  const fallback = async (reason: EncounterResult["reason"], call: CallRecord | null, detail?: unknown): Promise<EncounterResult> => {
+    (reason === "unavailable" ? deps.log.info : deps.log.warn).call(deps.log, { pair: key, day: ctx.day, reason, detail },
+      "encounter fell back to the Ambient rule");
+    const applied = await persistEncounter(deps.db, ctx, encounter, rule(), call, version);
+    return { key, mode: "rule", reason, applied, adjustments: [] };
+  };
+  if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);
+
+  const offered = new Set([...a.news, ...b.news].map((n) => n.id));
+  const validated = validateEncounter(result.text, { offered, romanceAllowed: ctx.romanceAllowed });
+  if (!validated.ok) return fallback("schema", { ...result.call, validation: validated.category }, validated.detail);
+  const applied = await persistEncounter(deps.db, ctx, encounter, validated.outcome, result.call, version, true);
+  if (validated.adjustments.length) deps.log.info({ pair: key, day: ctx.day, adjustments: validated.adjustments }, "encounter adjusted");
+  return { key, mode: "model", reason: "ok", applied, adjustments: validated.adjustments };
+}
+
+type RelationshipRow = typeof relationships.$inferSelect;
+
+/**
+ * One transaction: both directed rows (created at 0 if this is their first meeting), affinity under the daily cap,
+ * trust, the feeling, last_seen_day and the encounter count; a memory for each side; the ai_log row. Rows are
+ * locked in id order so two encounters can't deadlock.
+ */
+async function persistEncounter(
+  db: WorldDatabase, ctx: EncounterContext, encounter: Encounter, outcome: EncounterOutcome,
+  call: CallRecord | null, version: string | null, model = false,
+): Promise<{ ab: number; ba: number }> {
+  const { worldId, day } = ctx;
+  const { a, b } = encounter;
+  const applied = { ab: 0, ba: 0 };
+  await db.transaction(async (tx) => {
+    // GDD-GAP: someone new in their life, as in reflect.ts: "acquaintance" until the card vocabulary says otherwise.
+    await tx.insert(relationships).values([
+      { worldId, fromId: a, toId: b, affinity: 0, trust: 0, tag: "acquaintance", note: "" },
+      { worldId, fromId: b, toId: a, affinity: 0, trust: 0, tag: "acquaintance", note: "" },
+    ]).onConflictDoNothing();
+    const rows = await tx.select().from(relationships).where(and(
+      eq(relationships.worldId, worldId), inArray(relationships.fromId, [a, b]), inArray(relationships.toId, [a, b]),
+    )).orderBy(relationships.fromId).for("update");
+    const edge = (from: string, to: string): RelationshipRow => rows.find((r) => r.fromId === from && r.toId === to)!;
+
+    const update = async (row: RelationshipRow, side: "a" | "b"): Promise<number> => {
+      const delta = side === "a" ? outcome.a : outcome.b;
+      let next = applyAffinity({ affinity: row.affinity, netDay: row.netDay, net: row.net }, day, delta.affinity, "encounter");
+      let total = next.applied;
+      if (encounter.planned) {
+        next = applyAffinity(next.edge, day, AFFINITY_SOURCES.together, "together");
+        total += next.applied;
+      }
+      const feeling = outcome.feeling?.who === side
+        ? applyFeeling({ kind: row.feelingKind as FeelingKind | null, intensity: row.feelingIntensity }, outcome.feeling)
+        : { kind: row.feelingKind as FeelingKind | null, intensity: row.feelingIntensity };
+      await tx.update(relationships).set({
+        affinity: next.edge.affinity, netDay: next.edge.netDay, net: next.edge.net,
+        trust: clamp(row.trust + delta.trust, -100, 100),
+        feelingKind: feeling.kind, feelingIntensity: feeling.intensity,
+        lastSeenDay: Math.max(row.lastSeenDay ?? day, day), encounters: row.encounters + 1,
+      }).where(and(eq(relationships.worldId, worldId), eq(relationships.fromId, row.fromId), eq(relationships.toId, row.toId)));
+      return total;
+    };
+    applied.ab = await update(edge(a, b), "a");
+    applied.ba = await update(edge(b, a), "b");
+
+    const memory = (self: string, other: string, change: number) => ({
+      worldId, id: encounterMemoryId(day, a, b, self), residentId: self, day, minute: encounter.minute, kind: "did",
+      text: encounterMemoryText(ctx.names[other] ?? other, encounter.planned, change), who: [other], wherePlace: encounter.place,
+      importance: encounterImportance(change), valence: encounterValence(change),
+    });
+    await tx.insert(memories).values([memory(a, b, applied.ab), memory(b, a, applied.ba)]).onConflictDoNothing();
+    if (call) await tx.insert(aiLog).values(nightLogRow(worldId, pairKey(a, b), "gossip", version ?? promptVersion(), call, !model));
+  });
+  return applied;
+}
+
+/** A side's view of the other as the prompt builder takes it. */
+export function relationshipView(row: RelationshipRow | undefined): RelationshipView | null {
+  if (!row) return null;
+  return {
+    id: row.toId, affinity: row.affinity, trust: row.trust, tag: row.tag,
+    feeling: row.feelingKind ? { kind: row.feelingKind as FeelingKind, intensity: row.feelingIntensity } : null,
+  };
+}
+
+/** The mean affinity of a pair from rows keyed "from>to" (null: they've never met). */
+export function meanOf(rows: ReadonlyMap<string, Pick<RelationshipRow, "affinity">>, a: string, b: string): number | null {
+  return pairMean(rows.get(`${a}>${b}`)?.affinity, rows.get(`${b}>${a}`)?.affinity);
+}

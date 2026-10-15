@@ -110,7 +110,8 @@ describe("reflectResident", () => {
     expect(state.beliefs.join(" ")).not.toContain("internet");
     expect(state.dream).toEqual({ stage: 0, notes: "Nearly said it to the Fellow." });
 
-    expect(await edge(env.worldId, "margo")).toMatchObject({ affinity: 60, trust: 52, feelingKind: "admiration", feelingIntensity: 15 });
+    // +25 clamps to +10 (§9.17), and a pair moves at most ±6 a day (§9.11.3): 50 → 56.
+    expect(await edge(env.worldId, "margo")).toMatchObject({ affinity: 56, net: 6, netDay: DAY, trust: 52, feelingKind: "admiration", feelingIntensity: 15 });
     expect(await edge(env.worldId, "frye")).toMatchObject({ affinity: 52, trust: 71 });
     expect(await edge(env.worldId, "june")).toMatchObject({ affinity: 4, trust: 2, tag: "acquaintance" });
     expect(await edge(env.worldId, "ghost")).toBeUndefined();

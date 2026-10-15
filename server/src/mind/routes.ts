@@ -7,14 +7,18 @@
  *   event: line_delta  {index, text_so_far, attempt}   lines as they stream (attempt 2 replaces attempt 1)
  *   event: thinking    {text: "Hm."}                   nothing visible after 2.5 s
  *   event: error       {code, message}                 the turn failed; a fallback turn follows
- *   event: turn        {conversation_id, resident_id, turn_index, lines[{text, expr}], choices, wrap_up, fallback}
+ *   event: turn        {conversation_id, resident_id, turn_index, lines[{text, expr}], choices, wrap_up, fallback,
+ *                       regard}
  * `turn` is always last and is authoritative: the client replaces any streamed text with its lines.
+ * `regard` (G-13, §9.11.2) is the Regard change the engine actually applied this turn, after the first-chat bonus,
+ * the +6 daily cap and the clamp: {before, after, delta, hearts_before, hearts_after, first_chat, capped}
+ * (shared TurnRegard), or null when nothing was saved (the turn couldn't be persisted).
  */
 import type { OutgoingHttpHeaders } from "node:http";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { Intent, PlaceId, ResidentId, type DialogueTurnOutput } from "@monde/shared";
+import { Intent, PlaceId, ResidentId, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
 import { aiLog, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { buildDialogueRequest, promptVersion } from "./promptBuilder.js";
@@ -148,9 +152,9 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       });
       return forced ? forceWrapUp(turn) : turn;
     };
-    const sendTurn = (output: DialogueTurnOutput, fallback: boolean) => send("turn", {
+    const sendTurn = (output: DialogueTurnOutput, fallback: boolean, regard: TurnRegard | null) => send("turn", {
       conversation_id: body.conversation_id, resident_id: body.resident_id, turn_index: ctx.turnIndex,
-      lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback,
+      lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback, regard,
     });
 
     try {
@@ -180,8 +184,9 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       const fallback = failure !== null;
       if (failure) request.log.warn({ failure, calls: calls.map((c) => c.validation) }, "dialogue fell back");
 
+      let regard: TurnRegard | null;
       try {
-        await persistTurn(db!, {
+        regard = await persistTurn(db!, {
           worldId, residentId: body.resident_id, conversationId: body.conversation_id, turnIndex: ctx.turnIndex,
           day: body.context.day, minute: body.context.minute, place: body.context.place, playerInput: playerText,
           output, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
@@ -189,15 +194,15 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       } catch (error) {
         request.log.error({ err: error, calls }, "persisting the dialogue turn failed");
         send("error", { code: "persist_failed", message: "The turn couldn't be saved; using an authored line." });
-        sendTurn(fallbackFor(ctx), true);
+        sendTurn(fallbackFor(ctx), true, null);
         return;
       }
       if (failure) send("error", failure);
-      sendTurn(output, fallback);
+      sendTurn(output, fallback, regard);
     } catch (error) {
       request.log.error({ err: error }, "talk stream failed");
       send("error", { code: "internal", message: "Something went wrong; using an authored line." });
-      sendTurn(fallbackFor(ctx), true);
+      sendTurn(fallbackFor(ctx), true, null);
     } finally {
       if (!raw.writableEnded) raw.end();
     }

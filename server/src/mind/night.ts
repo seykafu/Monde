@@ -13,6 +13,10 @@
  *                    computed at dawn
  *      Each resident's plan waits for their reflection (the plan reads the new beliefs). Model calls take a slot
  *      in the world's semaphore (8 in flight, §9.8), Core before Acquainted before Ambient;
+ *      Before any of them, the friendship pass (G-13, §9.11; ties.ts, encounters.ts): neglect, weekly drift and
+ *      tonight's encounters from Day N's plans. Encounter calls queue first, each at the priority of its better-
+ *      detailed side (Core first), and a resident's reflection waits for their own encounters so it can mention
+ *      them. When every job is done, label changes are recorded as tie milestones for the dawn;
  *   4. answers when everything is done or after 4 s, whichever comes first (§9.8 night pass budget, §19.7).
  *      Whatever isn't finished keeps running in the background and is still persisted; the response says how
  *      many residents are done and how many are pending. Until a plan lands, the dawn package serves the
@@ -23,6 +27,7 @@ import { z } from "zod";
 import { TownEvent } from "@monde/shared";
 import { events, memories, plans, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
+import { TIER_ORDER, resolveEncounter, type Encounter } from "./encounters.js";
 import type { MindClient } from "./mindClient.js";
 import { SILENT_LOG, type NightJobDeps, type NightLog, type NightWorld } from "./nightJob.js";
 import { loadPlaceRegistry } from "./places.js";
@@ -31,6 +36,7 @@ import { clockTime } from "./promptBuilder.js";
 import { reflectResident } from "./reflect.js";
 import { WorldSemaphores } from "./semaphore.js";
 import { DAY_START } from "./templatePlan.js";
+import { prepareFriendship, recordMilestones, type FriendshipNight } from "./ties.js";
 import { countTiers, recomputeTiers, type Tier, type TierCounts } from "./tiers.js";
 
 /** §9.8, §19.7: the night transition shows for at most 4 seconds. */
@@ -83,8 +89,6 @@ export interface NightJob {
   /** A model plan for tomorrow. Ambient residents get the template at dawn instead. */
   plan: boolean;
 }
-
-const TIER_ORDER: Record<Tier, number> = { core: 0, acquainted: 1, ambient: 2 };
 
 /**
  * GDD-GAP: §9.8 has quiet Acquainted residents reflect "every 2nd day" without saying which; it's the even days,
@@ -332,22 +336,57 @@ export class NightRunner {
     };
     const jobs = nightJobs(tiers, new Map(tops.map((t) => [t.residentId, t.top ?? 0])), day);
     for (const job of jobs) run.jobs.set(job.residentId, "pending");
-    await Promise.all(jobs.map((job) => this.runJob(run, world, job)));
+
+    // G-13: neglect, drift and tonight's encounters. Friendship never holds the night up: if it fails, the
+    // reflections and plans run without it.
+    let friendship: FriendshipNight | null = null;
+    try {
+      friendship = await prepareFriendship(db, { worldId, day, tiers, modelEnabled: this.options.mind.enabled, flags: world.flags });
+    } catch (error) {
+      this.log.error({ err: error, worldId, day }, "friendship pass failed; reflections run without encounters");
+    }
+    const waits = new Map<string, Promise<void>[]>();
+    const encounters = (friendship?.encounters ?? []).map((encounter) => {
+      const work = this.runEncounter(run, friendship!, encounter);
+      for (const id of [encounter.a, encounter.b]) waits.set(id, [...(waits.get(id) ?? []), work]);
+      return work;
+    });
+    await Promise.all([...encounters, ...jobs.map((job) => this.runJob(run, world, job, waits.get(job.residentId) ?? []))]);
+
+    if (friendship) {
+      await recordMilestones(db, worldId, day, friendship.before)
+        .catch((error: unknown) => { this.log.error({ err: error, worldId, day }, "recording tie milestones failed"); });
+    }
   }
 
-  private async runJob(run: NightRun, world: NightWorld, job: NightJob): Promise<void> {
+  private deps(worldId: string, priority: number): NightJobDeps {
     const signal = this.controller.signal;
-    const deps: NightJobDeps = {
+    return {
       db: this.options.db,
       mind: this.options.mind,
-      gate: (task) => this.gates.run(run.worldId, task, TIER_ORDER[job.tier], signal),
+      gate: (task) => this.gates.run(worldId, task, priority, signal),
       signal,
       callTimeoutMs: this.options.callTimeoutMs ?? NIGHT_CALL_TIMEOUT_MS,
       log: this.log,
       now: this.options.now,
     };
+  }
+
+  /** One encounter. Never rejects: a failure is logged and the residents' reflections go ahead. */
+  private async runEncounter(run: NightRun, friendship: FriendshipNight, encounter: Encounter): Promise<void> {
+    const [a, b] = friendship.sides(encounter);
+    await resolveEncounter(this.deps(run.worldId, encounter.priority), friendship.context(encounter), encounter, a, b)
+      .catch((error: unknown) => {
+        this.log.error({ err: error, worldId: run.worldId, day: run.day, pair: `${encounter.a}+${encounter.b}` }, "encounter failed");
+      });
+  }
+
+  private async runJob(run: NightRun, world: NightWorld, job: NightJob, encounters: readonly Promise<void>[]): Promise<void> {
+    const deps = this.deps(run.worldId, TIER_ORDER[job.tier]);
     const context = { worldId: run.worldId, day: run.day, residentId: job.residentId, tier: job.tier };
     try {
+      // Tonight's reflection reads tonight's encounters.
+      await Promise.all(encounters);
       if (job.reflect) {
         await reflectResident(deps, world, job.residentId)
           .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); });

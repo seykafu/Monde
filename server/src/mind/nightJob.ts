@@ -1,6 +1,6 @@
 /**
- * What every night job (reflection, plan) gets from the night runner (night.ts): the world facts loaded once per
- * night, and the database, Mind client, concurrency gate and deadlines.
+ * What every night job (reflection, plan, encounter) gets from the night runner (night.ts): the world facts loaded
+ * once per night, and the database, Mind client, concurrency gate and deadlines.
  */
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { aiLog } from "../db/schema.js";
@@ -51,9 +51,9 @@ export interface NightJobDeps {
   now?: () => number;
 }
 
-/** The ai_log row for one night call (§19.6). */
+/** The ai_log row for one night call (§19.6). An encounter's "resident" is the pair key ("june+odile"). */
 export function nightLogRow(
-  worldId: string, residentId: string, kind: "reflect" | "plan", version: string, call: CallRecord, fallback: boolean,
+  worldId: string, residentId: string, kind: "reflect" | "plan" | "gossip", version: string, call: CallRecord, fallback: boolean,
 ): typeof aiLog.$inferInsert {
   return aiLogRow({ worldId, residentId, kind, promptVersion: version, call, fallback });
 }
