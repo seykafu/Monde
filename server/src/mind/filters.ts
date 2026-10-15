@@ -65,6 +65,10 @@ export const STYLE: readonly string[] = [
   "tapestry", "healing", "closure", "stakeholders?", "revitali[sz](?:e|es|ed|ing|ation)", "give back",
   "safe space", "i'?d rather not say", "a story for another day", "here'?s the thing", "at the end of the day",
   "i want you to know that", "how can i help", "great question",
+  // The banned "Not X, Y" / "It isn't X. It's Y." construction (§12.1), in its common spoken forms.
+  "it'?s not (?:a |an |the )?[\\p{L}' -]{1,30}[,;:—-]+ ?(?:it'?s|that'?s)",
+  "it isn'?t (?:a |an |the )?[\\p{L}' -]{1,30}[.,;:—-]+ ?it'?s",
+  "not (?:a|an|the) [\\p{L}' -]{1,30}[,;—-]+ ?but (?:a|an|the) [\\p{L}]+",
 ];
 
 const GROUPS: readonly { group: FilterGroup; pattern: RegExp }[] = [

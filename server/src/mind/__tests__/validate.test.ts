@@ -217,3 +217,13 @@ describe("fourth-wall filter is phrase-level", () => {
       expect(lexicalHits(line).some((h) => h.group === "self_reference")).toBe(true);
     });
 });
+
+describe("banned Not-X-Y construction", () => {
+  it.each(["Mind the drip, it's not a puddle, it's a claim.", "It isn't a shop. It's a waiting room.",
+           "Not a bakery, but a habit."])("rejects %s", (line) => {
+    expect(lexicalHits(line).some((h) => h.group === "style")).toBe(true);
+  });
+  it.each(["It's not raining yet.", "Not today.", "It's not much, but it's warm."])("allows %s", (line) => {
+    expect(lexicalHits(line).filter((h) => h.group === "style")).toEqual([]);
+  });
+});
