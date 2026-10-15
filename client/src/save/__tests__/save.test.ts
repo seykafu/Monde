@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { migrateSave, SaveGame } from '@monde/shared';
+import { baseSkills, migrateSave, SaveGame, startingSkills } from '@monde/shared';
+import { lookFromChoices, randomChoices } from '../../fellow/options';
 import { Clock } from '../../sim/clock';
 import { dailyWeather } from '../../sim/weather';
 import { createTownState, applyPillarDelta } from '../../town/pillars';
@@ -18,7 +19,10 @@ function state(): GameState {
     weather: { seed: 42, daily: dailyWeather(42, 4), override: null },
     story_flags: { station_open: true }, quiet: { ...emptyQuietState(), player: ['GR-001'] },
     offline_events: [{ day: 4, minute: 780, resident_id: 'pell', type: 'talk', data: { text: 'Hello' } }],
-    player_name: 'Fellow', playtime: 325 };
+    player_name: 'Wren', playtime: 325,
+    fellow: { profile: { name: 'Wren', pronouns: 'xe/xem/xyr', background: 'scrapper', why: 'running', loves: 'old clocks' },
+      look: lookFromChoices({ ...randomChoices(() => 0.7), outfit: 'dungarees' }) },
+    skills: startingSkills('scrapper') };
 }
 const save = () => collect(state(), 'manual', 'Slot 1', '2026-10-14T12:00:00.000Z');
 
@@ -31,11 +35,18 @@ describe('save format and restore', () => {
     expect(file.town.pillars.charm).not.toBe(99);
     expect(() => migrateSave({ ...file, town: {} })).toThrow();
     expect(() => migrateSave({ ...file, inventory: { arbitrary: 1 } })).toThrow();
+    expect(() => migrateSave({ ...file, fellow: { ...file.fellow, look: { ...file.fellow.look, hairStyle: 'mohawk' } } })).toThrow();
+    expect(() => migrateSave({ ...file, skills: { ...file.skills, grit: { level: 11, xp: 0 } } })).toThrow();
   });
   it('migrates v1 and rejects unknown future and pre-format versions cleanly', () => {
     const file = save();
     expect(migrateSave(file)).toEqual(file);
-    expect(() => migrateSave({ ...file, schema_version: 2 })).toThrow('Unsupported save schema version 2');
+    // A v1 file (W-06): no fellow, an empty skills placeholder. It comes back with no profile, the default look and level-1 skills.
+    const { fellow: _fellow, ...rest } = file;
+    const v1 = { ...rest, schema_version: 1, skills: {} };
+    expect(migrateSave(v1)).toEqual({ ...file, fellow: { profile: null, look: null }, skills: baseSkills() });
+    expect(() => migrateSave({ ...v1, skills: { grit: 3 } })).toThrow();
+    expect(() => migrateSave({ ...file, schema_version: 3 })).toThrow('Unsupported save schema version 3');
     expect(() => migrateSave({ ...file, schema_version: 0 })).toThrow('Unsupported save schema version 0');
   });
   it('collect → restore retains the clock, town, player, memory, weather and offline log', () => {

@@ -12,6 +12,8 @@
 import { readSse } from './sse';
 import { parseTalkEvent } from './talkStream';
 import { PrewarmGate } from './prewarm';
+import { parseDawnPackage, type DawnPackage, type NightRequest } from './dawn';
+import { PlayerProfile as PlayerProfileSchema } from '@monde/shared';
 import type { LineDelta, PlayerProfile, TalkRequest, TalkTurn } from './types';
 
 export const DEFAULT_MIND_URL = 'https://monde-mind-staging.fly.dev';
@@ -19,7 +21,9 @@ export const STORAGE_KEYS = {
   device: 'monde.mind.device',
   session: 'monde.mind.session',
   invite: 'monde.mind.invite',
-  player: 'monde.player'
+  player: 'monde.player',
+  /** "1" once the server has the stored profile (or refused it); anything else means send it on the next connect. */
+  playerSynced: 'monde.player.synced'
 } as const;
 
 /**
@@ -116,6 +120,8 @@ export class MindClient {
   private offlineUntil = 0;
   private inviteRejected = false;
   private profile: PlayerProfile | null = null;
+  private profileSynced = true;
+  private syncing: Promise<boolean> | null = null;
   private readonly now: () => number;
 
   constructor(private readonly opts: MindOptions) {
@@ -128,8 +134,11 @@ export class MindClient {
     this.inviteCode = given ?? this.read(STORAGE_KEYS.invite);
     const stored = this.readJson(STORAGE_KEYS.session);
     if (isSession(stored) && stored.base_url === this.baseUrl && stored.device_id === this.deviceId) this.session = stored;
-    const profile = this.readJson(STORAGE_KEYS.player) as PlayerProfile | null;
-    if (profile && typeof profile.name === 'string') this.profile = profile;
+    const profile = PlayerProfileSchema.safeParse(this.readJson(STORAGE_KEYS.player));
+    if (profile.success) {
+      this.profile = profile.data;
+      this.profileSynced = this.read(STORAGE_KEYS.playerSynced) === '1';
+    }
   }
 
   /** The server will be tried for the next turn (a session exists and the client isn't cooling off). */
@@ -139,6 +148,10 @@ export class MindClient {
   get worldId(): string | null { return this.session?.world_id ?? null; }
   /** What Quiet Mode lines call the player. */
   get playerName(): string { return this.profile?.name ?? DEFAULT_PLAYER_NAME; }
+  /** The stored Fellowship application, if one was signed on this device. */
+  get player(): PlayerProfile | null { return this.profile ? { ...this.profile } : null; }
+  /** The server has the stored application (or there is none to send). */
+  get playerSynced(): boolean { return this.profileSynced; }
 
   /** The session, creating the world on first run. Null means Quiet Mode. Never rejects. */
   ensureWorld(): Promise<Session | null> {
@@ -149,19 +162,47 @@ export class MindClient {
     return this.pending;
   }
 
-  /** Save the Fellowship application (§11.1) locally and on the server. True if the server took it. */
+  /**
+   * Save the Fellowship application (§11.1) locally and send it to the server. True if the server took it.
+   * Offline (or without a world) it stays marked unsent and goes on the next connect (syncPlayer).
+   */
   async setPlayer(profile: PlayerProfile): Promise<boolean> {
     this.profile = { ...profile };
     this.write(STORAGE_KEYS.player, JSON.stringify(this.profile));
+    this.markSynced(false);
+    return this.syncPlayer();
+  }
+
+  /**
+   * Send the stored application if the server doesn't have it yet. Never rejects; true once the server has it.
+   * A 4xx (a name the server's filter refuses) isn't retried: the local profile stands and the server keeps its own.
+   */
+  syncPlayer(): Promise<boolean> {
+    if (this.profileSynced || !this.profile) return Promise.resolve(this.profileSynced);
+    if (this.opts.offline) return Promise.resolve(false);
+    this.syncing ??= this.sendPlayer().finally(() => { this.syncing = null; });
+    return this.syncing;
+  }
+
+  private async sendPlayer(): Promise<boolean> {
+    const profile = this.profile;
+    if (!profile) return true;
     try {
       const res = await this.authed(`/player`, { method: 'PATCH', body: JSON.stringify(profile) }, REQUEST_TIMEOUT_MS);
       if (!res) return false;
-      if (!res.ok) this.log('warn', `player profile rejected (${res.status})`, await res.text().catch(() => ''));
-      return res.ok;
+      if (res.ok) { if (this.profile === profile) this.markSynced(true); return true; }
+      this.log('warn', `player profile rejected (${res.status})`, await res.text().catch(() => ''));
+      if (res.status >= 400 && res.status < 500 && this.profile === profile) this.markSynced(true);
+      return false;
     } catch (error) {
       this.wentOffline('player profile', error);
       return false;
     }
+  }
+
+  private markSynced(synced: boolean): void {
+    this.profileSynced = synced;
+    this.write(STORAGE_KEYS.playerSynced, synced ? '1' : '0');
   }
 
   // TODO W-06: server snapshot/restore endpoints and Tigris persistence are a separate task.
@@ -214,6 +255,37 @@ export class MindClient {
     void this.prewarm(residentId, day);
   }
 
+  /** POST the night (§19.4; mind/dawn.ts). The HTTP status (409: already passed), or null without a server. Never rejects. */
+  async postNight(body: NightRequest): Promise<number | null> {
+    if (!this.enabled || this.now() < this.offlineUntil) return null;
+    try {
+      const res = await this.authed('/night', { method: 'POST', body: JSON.stringify(body) }, REQUEST_TIMEOUT_MS);
+      if (!res) return null;
+      if (!res.ok && res.status !== 409) this.log('warn', `night ${body.day}: HTTP ${res.status}`, await res.text().catch(() => ''));
+      else await res.body?.cancel().catch(() => undefined);
+      return res.status;
+    } catch (error) {
+      this.wentOffline('night', error);
+      return null;
+    }
+  }
+
+  /** GET the dawn package for `day` (§19.4), or null without a server or a usable answer. Never rejects. */
+  async getDawn(day: number): Promise<DawnPackage | null> {
+    if (!this.enabled || this.now() < this.offlineUntil) return null;
+    try {
+      const res = await this.authed(`/dawn/${day}`, { method: 'GET' }, REQUEST_TIMEOUT_MS);
+      if (!res) return null;
+      if (!res.ok) { this.log('warn', `dawn ${day}: HTTP ${res.status}`, await res.text().catch(() => '')); return null; }
+      const pkg = parseDawnPackage(await res.json());
+      if (!pkg) this.log('warn', `dawn ${day}: not a dawn package`);
+      return pkg;
+    } catch (error) {
+      this.wentOffline('dawn', error);
+      return null;
+    }
+  }
+
   /**
    * One dialogue turn. Streams deltas and the thinking beat to the handlers and resolves with the final turn:
    * the server's, or the handlers' Quiet Mode fallback when the server can't be used. Resolves null only when
@@ -259,6 +331,8 @@ export class MindClient {
         else turn = e.data;
       });
       if (!turn) return quiet('stream ended without a turn');
+      // Back in touch: send an application that couldn't go earlier.
+      if (!this.profileSynced) void this.syncPlayer();
       return { turn, source: 'server' };
     } catch (error) {
       if (h.signal?.aborted) return null;
@@ -293,6 +367,8 @@ export class MindClient {
       this.session = { device_id: this.deviceId, world_id: body.world_id, token: body.token, base_url: this.baseUrl };
       this.write(STORAGE_KEYS.session, JSON.stringify(this.session));
       this.log('info', `world ${body.world_id} created`);
+      // A new world doesn't know the player yet: send the application once this call has returned.
+      if (this.profile) { this.markSynced(false); queueMicrotask(() => { void this.syncPlayer(); }); }
       return this.session;
     } catch (error) {
       this.wentOffline('create world', error);

@@ -11,5 +11,5 @@ export function restore(raw: unknown): GameState {
   else clock.setTime(save.clock.day, save.clock.minute);
   return { clock, town: restoreTown(save.town), player: save.player, weather: save.weather,
     story_flags: save.story_flags, quiet: save.quiet, offline_events: save.offline_events,
-    player_name: save.summary.player_name, playtime: save.summary.playtime };
+    player_name: save.summary.player_name, playtime: save.summary.playtime, fellow: save.fellow, skills: save.skills };
 }

@@ -1,6 +1,6 @@
 // Wire types for monde-mind's dialogue API (GDD §9.10, §19.4; MVP M-05). Mirrors server/src/mind/routes.ts:
 // the client never imports server code, so the shapes are restated here and checked at runtime (talkStream.ts).
-import type { Intent } from '@monde/shared';
+import type { Intent, TurnRegard } from '@monde/shared';
 
 export interface TalkLine { text: string; expr: string }
 export interface TalkChoice { id: string; text: string; intent: Intent }
@@ -17,6 +17,11 @@ export interface TalkTurn {
   wrap_up: boolean;
   /** An authored line stood in for the model (server fallback or client Quiet Mode). Rendered the same. */
   fallback: boolean;
+  /**
+   * The Regard change the server applied this turn (G-13, §9.11.2): null when it saved nothing, absent on Quiet
+   * Mode turns (the client never judges replies).
+   */
+  regard?: TurnRegard | null;
 }
 
 export type TalkInput =
@@ -57,11 +62,5 @@ export type TalkEvent =
   | { type: 'error'; data: { code: string; message: string } }
   | { type: 'turn'; data: TalkTurn };
 
-/** The player's Fellowship application as the server stores it (GDD §11.1; server/src/mind/player.ts). */
-export interface PlayerProfile {
-  name: string;
-  pronouns: string;
-  background: 'homecomer' | 'tinkerer' | 'scrapper' | 'organizer';
-  why: 'fresh_start' | 'to_help' | 'running_from_something' | 'curious';
-  loves: string;
-}
+/** The player's Fellowship application (GDD §11.1): one schema for client and server (@monde/shared player.ts). */
+export type { PlayerProfile } from '@monde/shared';

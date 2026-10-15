@@ -10,12 +10,13 @@
 import Phaser from 'phaser';
 import { CharacterAnimator, type AnimInput } from './character/anim';
 import { DEFAULT_PLAYER_LOOK, lookHash, lookKey, type CharacterLook, type Look } from './character/look';
-import { renderSheet } from './character/rig';
+import { renderBadge, renderSheet } from './character/rig';
+import { PLAYER_LOOK_KEY } from '../fellow/state';
 import { PROCEDURAL_LAYOUT, columns, frameFor, layoutFrom, parseManifest, parseMeta, type Facing, type SheetLayout } from './character/sheet';
 
 const MANIFEST_KEY = 'monde.sprites.manifest';
-/** Registry key W-07 character creation sets to the player's CharacterLook. */
-export const PLAYER_LOOK_KEY = 'monde.playerLook';
+/** Registry key W-07 character creation (fellow/state.ts) sets to the player's CharacterLook. */
+export { PLAYER_LOOK_KEY };
 
 const drawnKey = (id: string): string => `sheet:${id}`;
 const metaKey = (id: string): string => `sheet-meta:${id}`;
@@ -90,6 +91,25 @@ function drawnLayout(scene: Phaser.Scene, id: string): SheetLayout | null {
   }
   if (problems.length) console.warn(`[sprites] ${id}: ${problems.join('; ')}`);
   return data.layout;
+}
+
+/**
+ * The player's badge (GDD §11.1): a bust cut from the layered sprite, as a texture (BADGE_W × BADGE_H px, hard
+ * edged). Built once per distinct look; the Fellowship form's signature line uses it, the Journal and letters will.
+ */
+export function badgeTexture(scene: Phaser.Scene, look: Look): string {
+  const key = `badge:${lookKey(look)}`;
+  if (scene.textures.exists(key)) return key;
+  const badge = renderBadge(look);
+  const tex = scene.textures.createCanvas(key, badge.width, badge.height);
+  if (tex) {
+    const ctx = tex.getContext(), img = ctx.createImageData(badge.width, badge.height);
+    img.data.set(badge.data);
+    ctx.putImageData(img, 0, 0);
+    tex.refresh();
+    tex.setFilter(Phaser.Textures.FilterMode.NEAREST);
+  }
+  return key;
 }
 
 /** Number the cells row-major (as Phaser numbers a spritesheet) and keep the pixels hard-edged. */

@@ -29,7 +29,7 @@ import {
 import { aiLogRow, persistTurn } from "./effects.js";
 import { LEAVE_CHOICE, THINKING_BEAT, fallbackTurn } from "./fallback.js";
 import { tokensOf, type MindClient } from "./mindClient.js";
-import { PlayerProfile, PlayerProfilePatch } from "./player.js";
+import { PlayerProfile, PlayerProfilePatch, savePlayerProfile, storedProfile } from "./player.js";
 import { costUsd } from "./pricing.js";
 
 export interface MindRouteOptions {
@@ -107,7 +107,8 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     const [world] = await db!.select({ player: worlds.player }).from(worlds).where(eq(worlds.id, request.params.w));
     const merged = PlayerProfile.safeParse({ ...(world?.player ?? {}), ...patch.data });
     if (!merged.success) return reply.code(400).send({ error: "incomplete player profile", issues: issues(merged.error) });
-    await db!.update(worlds).set({ player: merged.data }).where(eq(worlds.id, request.params.w));
+    // Also applies the Background's starting Regard (a Homecomer's six old neighbours, §11.1).
+    await savePlayerProfile(db!, request.params.w, storedProfile(world?.player), merged.data);
     return { player: merged.data };
   });
 

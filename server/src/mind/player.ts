@@ -1,37 +1,29 @@
 /**
  * The player's Fellowship application (GDD §11.1), stored on the world row and fed to dialogue prompts as the
- * <player> block (§9.10.1). Only the fields residents can know about live here; looks (build, hair…) are
- * client-only.
+ * <player> block (§9.10.1). The schema is shared with the client (@monde/shared player.ts); the server adds its
+ * word filter on the name and stays the authority. Only the fields residents can know about live here; looks
+ * (build, hair…) are client-only.
+ *
+ * Saving a profile also applies the Background's starting Regard (§11.1: a Homecomer starts at Regard 20 with
+ * Pell, Bertrand, Odile, Hollis, Roz and Delphine). Regard lives on the server, so this is where it happens.
  */
-import { z } from "zod";
+import { and, eq, inArray } from "drizzle-orm";
+import {
+  PlayerName as SharedPlayerName, PlayerProfile as SharedPlayerProfile, ResidentState, regardStartsFor,
+  type PlayerProfile as SharedProfile,
+} from "@monde/shared";
+import { residents, worlds } from "../db/schema.js";
+import type { WorldDatabase } from "../worlds/createWorld.js";
 import type { PlayerView } from "./promptBuilder.js";
 import { lexicalHits } from "./filters.js";
 
-export const BACKGROUNDS = ["homecomer", "tinkerer", "scrapper", "organizer"] as const;
-/** "Why Monde?" (§11.1): a fresh start · to help · running from something · curious. */
-export const WHY_MONDE = ["fresh_start", "to_help", "running_from_something", "curious"] as const;
+export { BACKGROUNDS, WHY_MONDE, LOVES } from "@monde/shared";
 
-const PRESET_PRONOUNS = ["she/her", "he/him", "they/them"] as const;
-/** Custom pronouns are subject/object/possessive (§11.1), e.g. "xe/xem/xyr". */
-const CUSTOM_PRONOUNS = /^[a-z]{1,8}\/[a-z]{1,8}\/[a-z]{1,8}$/;
-
-export const PlayerName = z.string().trim().min(1).max(16, "name is at most 16 characters")
-  .refine((name) => !/[<>{}\p{Cc}]/u.test(name), "name has characters that aren't allowed")
+export const PlayerName = SharedPlayerName
   .refine((name) => !lexicalHits(name).some((hit) => hit.group === "profanity"), "that name isn't allowed");
 
-export const PlayerProfile = z.object({
-  name: PlayerName,
-  pronouns: z.string().trim().toLowerCase().refine(
-    (p) => (PRESET_PRONOUNS as readonly string[]).includes(p) || CUSTOM_PRONOUNS.test(p),
-    "pronouns are she/her, he/him, they/them or subject/object/possessive",
-  ),
-  background: z.enum(BACKGROUNDS),
-  why: z.enum(WHY_MONDE),
-  // GDD-GAP: §11.1 lists "Something you love" as a pick from 12 but names only six (rain, old books, the sea,
-  // bread, music, puzzles…). Until the list is written down, accept one short lowercase phrase.
-  loves: z.string().trim().toLowerCase().min(1).max(24).regex(/^[a-z][a-z '-]*$/, "loves is a short phrase"),
-}).strict();
-export type PlayerProfile = z.infer<typeof PlayerProfile>;
+export const PlayerProfile = SharedPlayerProfile.extend({ name: PlayerName });
+export type PlayerProfile = SharedProfile;
 
 /** PATCH body: any subset of the profile. The merged result must be a complete profile. */
 export const PlayerProfilePatch = PlayerProfile.partial().strict()
@@ -46,7 +38,7 @@ const BACKGROUND_TEXT: Record<PlayerProfile["background"], string> = {
 const WHY_TEXT: Record<PlayerProfile["why"], string> = {
   fresh_start: "Came for a fresh start",
   to_help: "Came to help",
-  running_from_something: "Running from something",
+  running: "Running from something",
   curious: "Came out of curiosity",
 };
 
@@ -62,4 +54,35 @@ export function playerView(profile: PlayerProfile | null | undefined): PlayerVie
     background: `${BACKGROUND_TEXT[profile.background]}. ${WHY_TEXT[profile.why]}. Loves ${profile.loves}`,
     sharedPast: null,
   };
+}
+
+/** A stored profile, read leniently (older rows may predate a schema change); null if it no longer parses. */
+export function storedProfile(raw: unknown): PlayerProfile | null {
+  const parsed = SharedPlayerProfile.safeParse(raw);
+  return parsed.success ? parsed.data : null;
+}
+
+/**
+ * Save a complete profile on the world and apply its Background's starting Regard, in one transaction. Regard
+ * starts are floors (Regard already above them stays) and apply only when the Background changes, so re-sending
+ * the same application never re-applies them. Returns the residents whose Regard was raised.
+ */
+export async function savePlayerProfile(db: WorldDatabase, worldId: string, before: PlayerProfile | null, after: PlayerProfile): Promise<string[]> {
+  const starts = regardStartsFor(before, after);
+  const ids = Object.keys(starts);
+  return db.transaction(async (tx) => {
+    await tx.update(worlds).set({ player: after }).where(eq(worlds.id, worldId));
+    if (!ids.length) return [];
+    const rows = await tx.select({ id: residents.id, state: residents.state }).from(residents)
+      .where(and(eq(residents.worldId, worldId), inArray(residents.id, ids)));
+    const raised: string[] = [];
+    for (const row of rows) {
+      const floor = starts[row.id]!;
+      if (row.state.regard >= floor) continue;
+      await tx.update(residents).set({ state: ResidentState.parse({ ...row.state, regard: floor }), updatedAt: new Date() })
+        .where(and(eq(residents.worldId, worldId), eq(residents.id, row.id)));
+      raised.push(row.id);
+    }
+    return raised.sort();
+  });
 }

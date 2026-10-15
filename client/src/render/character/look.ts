@@ -1,15 +1,15 @@
 // What a character looks like, as data (GDD §11.1 creation fields, §16.1/§16.5 sprite style).
 //
-// The procedural rig (rig.ts) draws any CharacterLook; W-07 character creation will build one from the
-// Fellowship application, and residents get one from their id and roster colour until real sheets
-// exist. Pure: no Phaser, no DOM.
+// The procedural rig (rig.ts) draws any CharacterLook. The shape of the data (and its zod schema, for saves)
+// lives in @monde/shared look.ts; this module adds the palettes, the defaults and the residents' placeholder
+// looks. W-07 character creation (fellow/options.ts) builds the player's from the Fellowship application.
+// Pure: no Phaser, no DOM.
 
-export const HAIR_STYLES = ['short', 'cropped', 'bob', 'long', 'ponytail', 'bun'] as const;
-export type HairStyle = (typeof HAIR_STYLES)[number];
-export const BOTTOM_STYLES = ['trousers', 'shorts', 'skirt'] as const;
-export type BottomStyle = (typeof BOTTOM_STYLES)[number];
-export const ACCESSORIES = ['none', 'scarf', 'apron', 'glasses'] as const;
-export type Accessory = (typeof ACCESSORIES)[number];
+import type { Accessory, BottomStyle, Build, CharacterLookData, HairStyle, Height, OutfitCut } from '@monde/shared';
+import { HAIR_STYLES } from '@monde/shared';
+
+export { ACCESSORIES, BOTTOM_STYLES, BUILDS, HAIR_STYLES, HEIGHTS, OUTFIT_CUTS } from '@monde/shared';
+export type { Accessory, BottomStyle, Build, HairStyle, Height, OutfitCut } from '@monde/shared';
 
 export interface CharacterLook {
   kind: 'human';
@@ -18,7 +18,7 @@ export interface CharacterLook {
   hair: number;
   hairStyle: HairStyle;
   eyes: number;
-  /** Shirt, jumper or jacket. */
+  /** Shirt, jumper or jacket (a bib cut's bib). */
   top: number;
   bottom: number;
   bottomStyle: BottomStyle;
@@ -26,7 +26,20 @@ export interface CharacterLook {
   accessory: Accessory;
   /** Scarf / apron colour (glasses use a dark frame whatever this is). */
   accessoryColour: number;
+  /** §11.1's three builds. Absent: medium. */
+  build?: Build;
+  /** §11.1's two heights. Absent: tall (the residents' height). */
+  height?: Height;
+  /** How the top is cut (§11.1's six starter outfits, or the residents' plain top). Absent: plain. */
+  outfit?: OutfitCut;
+  /** The layer under a bib (a pinafore's blouse, dungarees' shirt): sleeves and shoulders. Absent: the top. */
+  trim?: number;
 }
+
+// The client's look and the save's schema must describe the same thing.
+type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
+const lookMatchesSchema: Same<CharacterLook, CharacterLookData> = true;
+void lookMatchesSchema;
 
 /** Bastien and any later animals: a small cat rig with the same sheet layout. */
 export interface CatLook {
@@ -43,21 +56,31 @@ export interface CatLook {
 export type Look = CharacterLook | CatLook;
 
 // ── Palettes ────────────────────────────────────────────────────────────────
-// GDD §11.1 asks for 10 skin swatches and 12 hair colours; these are the placeholder ramps' base tones
-// (the first six skins and seven hairs are the colours the old resident billboards used).
+// GDD §11.1: 10 skin swatches, 12 hair colours, 8 eye colours; §16.5: 16 cloth colours. These are the ramps'
+// base tones (the first six skins and seven hairs are the colours the old resident billboards used, so
+// residents keep indexing them in this order; the form shows skins sorted light to dark).
 
 export const SKIN_TONES = [0xf2d5b3, 0xe3b48c, 0xc68e64, 0x8d5a3b, 0xf6e1cb, 0xa86f48, 0xfbe3c8, 0xd9a274, 0x6e4430, 0xb8825a] as const;
 export const HAIR_COLOURS = [0x3b2a20, 0x6b4a2b, 0xb7b2a8, 0x1f1a17, 0x9c4a26, 0xd9c28a, 0x50392b, 0x2c2a3a, 0xe2e0d8, 0x7a3b2a, 0xc98b4a, 0x5c5048] as const;
 export const EYE_COLOURS = [0x3a2a22, 0x4a6b8a, 0x4f6b3a, 0x6b4a2b, 0x2e3a4a, 0x7a6a3a, 0x3b3b3b, 0x5a3a5a] as const;
+/** Cloth for the starter outfits' recolourable slots: warm, bright and sea-glass, per §16.1's palette. */
+export const CLOTH_COLOURS = [
+  0x3f9e94, 0x6b4f3a, 0x4a3428, 0xc0504d, 0xd9a93a, 0x6a8fb5, 0x46536a, 0x5fa36a,
+  0x8a6aa8, 0xe8dcc0, 0x4d5a3c, 0x7a4b3a, 0xd98a7a, 0x2f2a28, 0x9aa3a8, 0xb8865a
+] as const;
 const BOTTOMS = [0x5b4636, 0x46536a, 0x4d5a3c, 0x6b5a48, 0x4a4552, 0x7a4b3a, 0x48586a, 0x5e4b5e] as const;
 const SHOES = [0x4a3428, 0x2f2a28, 0x5e3f2c, 0x3d3a44, 0x6a4a34] as const;
 const ACCENTS = [0xe8dcc0, 0xc0504d, 0xd9a93a, 0x6a8fb5, 0x8a6aa8, 0x5fa36a] as const;
 
-/** The player before W-07 character creation: short brown hair, a teal jumper, brown trousers and boots. */
+/**
+ * The player before the Fellowship application is signed (and after "Rub it out"): short brown hair, a teal
+ * knitted jumper, brown trousers and boots. fellow/options.ts DEFAULT_CHOICES describes the same look.
+ */
 export const DEFAULT_PLAYER_LOOK: CharacterLook = {
   kind: 'human', skin: 0xf2d5b3, hair: 0x6b4a2b, hairStyle: 'short', eyes: 0x3a2a22,
   top: 0x3f9e94, bottom: 0x6b4f3a, bottomStyle: 'trousers', shoes: 0x4a3428,
-  accessory: 'none', accessoryColour: 0xe8dcc0
+  accessory: 'none', accessoryColour: 0xe8dcc0,
+  build: 'medium', height: 'tall', outfit: 'jumper'
 };
 
 /** Bastien (content/residents/bastien.yaml): an orange tabby with a white bib. */
@@ -75,7 +98,8 @@ const pick = <T>(list: readonly T[], n: number): T => list[(((n >>> 0) % list.le
 /**
  * A resident's placeholder look: their roster colour on the top, everything else varied by id.
  * Skin and hair come from the same palettes and hash bits as the old billboards (read unsigned: the old
- * signed read gave about half the residents no hair colour at all).
+ * signed read gave about half the residents no hair colour at all). Hair styles come from the first six, so
+ * residents look the same as before §11.1's extra styles and builds existed.
  */
 export function residentLook(id: string, colour: number): CharacterLook {
   const h = lookHash(id);
@@ -83,15 +107,16 @@ export function residentLook(id: string, colour: number): CharacterLook {
   const r = lookHash(`${id}:look`);
   const accessory: Accessory = r % 7 === 0 ? 'glasses' : r % 7 === 1 ? 'scarf' : r % 7 === 2 ? 'apron' : 'none';
   return {
-    kind: 'human', skin, hair, hairStyle: pick(HAIR_STYLES, r >>> 3), eyes: pick(EYE_COLOURS, r >>> 6),
+    kind: 'human', skin, hair, hairStyle: pick(HAIR_STYLES.slice(0, 6), r >>> 3), eyes: pick(EYE_COLOURS, r >>> 6),
     top: colour, bottom: pick(BOTTOMS, r >>> 9), bottomStyle: (r >>> 12) % 4 === 0 ? 'skirt' : (r >>> 12) % 4 === 1 ? 'shorts' : 'trousers',
     shoes: pick(SHOES, r >>> 15), accessory, accessoryColour: pick(ACCENTS, r >>> 18)
   };
 }
 
-/** A stable key for a look, so two characters with the same look share one texture. */
+/** A stable key for a look, so two characters with the same look share one texture (key order and absent fields don't matter). */
 export function lookKey(look: Look): string {
-  return Object.entries(look).map(([k, v]) => `${k}=${typeof v === 'number' ? v.toString(16) : v}`).join(',');
+  return Object.entries(look).filter(([, v]) => v !== undefined).sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}=${typeof v === 'number' ? v.toString(16) : v}`).join(',');
 }
 
 // ── Colour helpers ──────────────────────────────────────────────────────────
@@ -102,6 +127,8 @@ export const rgb = (r: number, g: number, b: number): number => (clampByte(r) <<
 export const mix = (a: number, b: number, t: number): number =>
   rgb(ch(a, 16) + (ch(b, 16) - ch(a, 16)) * t, ch(a, 8) + (ch(b, 8) - ch(a, 8)) * t, ch(a, 0) + (ch(b, 0) - ch(a, 0)) * t);
 export const scale = (c: number, f: number): number => rgb(ch(c, 16) * f, ch(c, 8) * f, ch(c, 0) * f);
+/** Perceived lightness 0..255 (Rec. 601 weights), for sorting swatches. */
+export const luma = (c: number): number => 0.299 * ch(c, 16) + 0.587 * ch(c, 8) + 0.114 * ch(c, 0);
 
 /** The warm near-black every outline leans toward (§16.1: soft dark outlines, never pure black). */
 export const INK = 0x2a1c22;
