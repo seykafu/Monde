@@ -24,9 +24,10 @@
  */
 import { and, count, eq, inArray, lte, max } from "drizzle-orm";
 import { z } from "zod";
-import { TownEvent } from "@monde/shared";
+import { CLIENT_EVENT_BATCH_LIMIT, TownEvent, type EventIngestionResult } from "@monde/shared";
 import { events, memories, plans, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
+import { eventTransaction, ingestClientEvents, ingestInTransaction } from "./eventIngestion.js";
 import { TIER_ORDER, resolveEncounter, type Encounter } from "./encounters.js";
 import type { MindClient } from "./mindClient.js";
 import { SILENT_LOG, type NightJobDeps, type NightLog, type NightWorld } from "./nightJob.js";
@@ -70,6 +71,8 @@ export const NightBody = z.object({
   day: z.number().int().min(1).max(100_000),
   /** Today's town events (for the reflections' town facts) and tomorrow's scheduled ones (for the plans). */
   events: z.array(TownEvent).max(500).optional(),
+  /** Offline log; identical envelope elements to POST /events. Per-item rejections are returned as ingestion. */
+  client_events: z.array(z.unknown()).max(CLIENT_EVENT_BATCH_LIMIT).optional(),
   town: z.object({
     pillars: z.object({ prosperity: Pillar, safety: Pillar, spirit: Pillar, charm: Pillar }).optional(),
     census: z.number().int().min(0).max(100_000).optional(),
@@ -127,6 +130,7 @@ export interface NightRunnerOptions {
 }
 
 export interface NightReport {
+  ingestion?: EventIngestionResult;
   day: number;
   next_day: number;
   /** Residents whose night work has finished (model output or fallback). */
@@ -152,6 +156,7 @@ interface NightRun {
   tiers: TierCounts | null;
   jobs: Map<string, "pending" | "done">;
   work: Promise<void>;
+  ingestion?: EventIngestionResult;
 }
 
 /** Resolve after `promise` settles or `ms` pass, whichever is first. */
@@ -192,7 +197,10 @@ export class NightRunner {
     const byDay = this.runs.get(worldId);
     const existing = byDay?.get(day);
     if (existing) {
-      if (Math.max(...byDay!.keys()) === day) return { status: 200, body: { ...this.report(existing, elapsed()), already: true } };
+      if (Math.max(...byDay!.keys()) === day) {
+        const ingestion = body.client_events ? await ingestClientEvents(this.options.db, worldId, body.client_events, { contentDir: this.options.contentDir, nightDay: day }) : undefined;
+        return { status: 200, body: { ...this.report(existing, elapsed()), ingestion, already: true } };
+      }
       return this.alreadyPassed(worldId, day, elapsed());
     }
     if (this.closing) return { status: 503, body: { error: "the server is shutting down", day } };
@@ -202,14 +210,18 @@ export class NightRunner {
     this.track(run);
     let claimed: boolean;
     try {
-      claimed = await this.claim(worldId, day);
+      const claim = await this.claim(worldId, day, body.client_events);
+      claimed = claim.claimed;
+      run.ingestion = claim.ingestion;
     } catch (error) {
       this.untrack(run);
       throw error;
     }
     if (!claimed) {
       this.untrack(run);
-      return this.alreadyPassed(worldId, day, elapsed());
+      const result = await this.alreadyPassed(worldId, day, elapsed());
+      if (result.status === 200) result.body.ingestion = run.ingestion;
+      return result;
     }
 
     this.active.add(run);
@@ -268,10 +280,14 @@ export class NightRunner {
   }
 
   /** Advance the world past Day N if it isn't already. True if this call did it. */
-  private async claim(worldId: string, day: number): Promise<boolean> {
-    const rows = await this.options.db.update(worlds).set({ day: day + 1, minute: DAY_START })
-      .where(and(eq(worlds.id, worldId), lte(worlds.day, day))).returning();
-    return rows.length > 0;
+  private async claim(worldId: string, day: number, batch?: unknown[]): Promise<{ claimed: boolean; ingestion?: EventIngestionResult }> {
+    return eventTransaction(this.options.db, async tx => {
+      // Ingestion and the day claim commit together, before reflections read any memory or flags.
+      const ingestion = batch ? await ingestInTransaction(tx, worldId, batch, { contentDir: this.options.contentDir, nightDay: day }) : undefined;
+      const rows = await tx.update(worlds).set({ day: day + 1, minute: DAY_START })
+        .where(and(eq(worlds.id, worldId), lte(worlds.day, day))).returning();
+      return { claimed: rows.length > 0, ingestion };
+    });
   }
 
   /** The night was claimed before (by another request, process or an earlier run): report what's stored. */
@@ -295,7 +311,7 @@ export class NightRunner {
       if (state === "done") done++;
       else pending++;
     }
-    return { day: run.day, next_day: run.day + 1, done, pending, complete: run.finished, tiers: run.tiers, elapsed_ms: elapsedMs };
+    return { day: run.day, next_day: run.day + 1, done, pending, complete: run.finished, tiers: run.tiers, elapsed_ms: elapsedMs, ingestion: run.ingestion };
   }
 
   private async execute(run: NightRun, body: NightBody): Promise<void> {
@@ -324,6 +340,7 @@ export class NightRunner {
     const tomorrow = all.filter((e) => e.day === day + 1).sort((a, b) => a.minute - b.minute);
 
     const town = body.town ?? {};
+    const [worldRow] = await db.select({ flags: worlds.storyFlags }).from(worlds).where(eq(worlds.id, worldId));
     const world: NightWorld = {
       worldId,
       day,
@@ -332,7 +349,7 @@ export class NightRunner {
       town: { pillars: town.pillars ?? DAY_ONE_PILLARS, census: town.census ?? DAY_ONE_CENSUS, events: today.map(eventLine) },
       forecast: town.weather_tomorrow ?? UNKNOWN_FORECAST,
       eventsTomorrow: tomorrow.map(eventLine),
-      flags: [],
+      flags: worldRow?.flags ?? [],
     };
     const jobs = nightJobs(tiers, new Map(tops.map((t) => [t.residentId, t.top ?? 0])), day);
     for (const job of jobs) run.jobs.set(job.residentId, "pending");

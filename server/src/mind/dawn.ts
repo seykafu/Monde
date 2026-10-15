@@ -8,7 +8,7 @@
  * with M-10 and G-02.
  */
 import { and, asc, eq, gte, lte } from "drizzle-orm";
-import type { DawnTies, PlanOutput } from "@monde/shared";
+import type { DawnTies, PlanOutput, RegardSnapshot } from "@monde/shared";
 import { favors, letters, plans, residents } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { weekdayOf } from "./context.js";
@@ -41,13 +41,14 @@ export interface DawnPackage {
   letters: DawnLetter[];
   favors: DawnFavor[];
   ties: DawnTies;
+  regard: RegardSnapshot;
 }
 
 const byId = <T extends { id: string }>(a: T, b: T): number => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
 export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: number): Promise<DawnPackage> {
   const [rows, stored, proposed, ties] = await Promise.all([
-    db.select({ id: residents.id, card: residents.card, tier: residents.tier }).from(residents).where(eq(residents.worldId, worldId)),
+    db.select({ id: residents.id, card: residents.card, state: residents.state, tier: residents.tier }).from(residents).where(eq(residents.worldId, worldId)),
     db.select().from(plans).where(and(eq(plans.worldId, worldId), eq(plans.day, day))),
     // New since yesterday: proposed last night (or during yesterday's conversations) and still open today.
     db.select().from(favors).where(and(
@@ -76,5 +77,6 @@ export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: 
       created_day: f.createdDay, expires_day: f.expiresDay,
     })),
     ties,
+    regard: Object.fromEntries(rows.map(r => [r.id, r.state.regard])),
   };
 }

@@ -22,6 +22,8 @@ export const worlds = pgTable("worlds", {
   aiSpendDay: integer("ai_spend_day").notNull(), aiSpendUsd: numeric("ai_spend_usd").notNull().default("0"),
   /** The Fellowship application (GDD §11.1), set by PATCH /v1/worlds/:w/player. Null until the player fills it in. */
   player: jsonb("player").$type<PlayerProfile>(),
+  storyFlags: text("story_flags").array().notNull().default([]),
+  flagsRevision: integer("flags_revision").notNull().default(0),
 });
 const worldId = () => uuid("world_id").notNull().references(() => worlds.id, { onDelete: "cascade" });
 export const residents = pgTable("residents", {
@@ -160,3 +162,9 @@ export const aiLog = pgTable("ai_log", {
   firstTokenMs: integer("first_token_ms"), stopReason: text("stop_reason").notNull(),
   validation: text("validation").notNull(), fallback: boolean("fallback").notNull(), createdAt: createdAt(),
 });
+
+/** Durable, world-scoped ingestion receipts, including scene cue aliases. */
+export const processedClientEvents = pgTable("processed_client_events", {
+  worldId: worldId(),
+  key: text("key").notNull(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.key] })]);

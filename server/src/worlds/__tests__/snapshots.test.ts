@@ -80,7 +80,9 @@ it("branches the complete saved mind, isolates later changes and can run the nex
   for (const table of [s.relationships, s.memories, s.events, s.plans, s.favors, s.letters, s.tieMilestones]) {
     const rows = await db.select().from(table).where(eq(table.worldId, branch.world_id));
     const key = table === s.tieMilestones ? "tieMilestones" : table === s.relationships ? "relationships" : table === s.memories ? "memories" : table === s.events ? "events" : table === s.plans ? "plans" : table === s.favors ? "favors" : "letters";
-    expect(rows).toEqual(p[key].map((row) => ({ ...row, worldId: branch.world_id })));
+    // SQL without ORDER BY has no stable row order; compare the complete keyed row set.
+    expect(rows).toHaveLength(p[key].length);
+    expect(rows).toEqual(expect.arrayContaining(p[key].map((row) => ({ ...row, worldId: branch.world_id }))));
   }
   expect(await db.select().from(s.dialogueTurns).where(eq(s.dialogueTurns.worldId, branch.world_id))).toHaveLength(1);
   expect(await db.select().from(s.aiLog).where(eq(s.aiLog.worldId, branch.world_id))).toHaveLength(0);

@@ -1,0 +1,115 @@
+import { randomUUID } from "node:crypto";
+import { and, eq, inArray } from "drizzle-orm";
+import { ClientEvent, applyScriptedRegard, type EventIngestionResult, type RegardSnapshot } from "@monde/shared";
+import { events, memories, plans, processedClientEvents, residents, worlds } from "../db/schema.js";
+import type { WorldDatabase } from "../worlds/createWorld.js";
+import { loadPlaceRegistry } from "./places.js";
+import { templatePlan } from "./templatePlan.js";
+import { loadPlacePositions, witnesses } from "./witnessing.js";
+
+type Transaction = Parameters<Parameters<WorldDatabase["transaction"]>[0]>[0];
+export async function currentRegard(db: WorldDatabase | Transaction, worldId: string): Promise<RegardSnapshot> {
+  const rows = await db.select({ id: residents.id, state: residents.state }).from(residents).where(eq(residents.worldId, worldId));
+  return Object.fromEntries(rows.map(r => [r.id, r.state.regard]));
+}
+export interface IngestionOptions { contentDir?: string; nightDay?: number; }
+/** Lock the world before receipts/effects, and resident rows before changing state. The entire batch commits
+ * atomically; rejected items have no effects or receipts. Replays with a changed payload still cannot apply twice. */
+export async function ingestClientEvents(db: WorldDatabase, worldId: string, batch: readonly unknown[], options: IngestionOptions = {}): Promise<EventIngestionResult> {
+  return eventTransaction(db, tx => ingestInTransaction(tx, worldId, batch, options));
+}
+/** Existing reflection/favor writers can lock a resident before the world. PostgreSQL may abort a
+ * transaction in that race; retry the entire rolled-back batch, never individual effects.
+ * GDD-GAP: allow two retries for transient database conflicts, then surface the failure. */
+export async function eventTransaction<T>(db: WorldDatabase, work: (tx: Transaction) => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try { return await db.transaction(work); }
+    catch (error) {
+      let cause: unknown = error;
+      let retry = false;
+      for (let depth = 0; depth < 5 && cause && typeof cause === "object"; depth++) {
+        if ("code" in cause && (cause.code === "40P01" || cause.code === "40001")) { retry = true; break; }
+        cause = "cause" in cause ? cause.cause : null;
+      }
+      if (!retry || attempt >= 2) throw error;
+    }
+  }
+}
+export async function ingestInTransaction(tx: Transaction, worldId: string, batch: readonly unknown[], options: IngestionOptions = {}): Promise<EventIngestionResult> {
+  const [world] = await tx.select().from(worlds).where(eq(worlds.id, worldId)).for("update");
+  if (!world) throw new Error("Unknown world");
+  const [registry, positions] = await Promise.all([loadPlaceRegistry(options.contentDir), loadPlacePositions(options.contentDir)]);
+  const result: EventIngestionResult = { accepted: [], duplicates: [], rejected: [], regard: {} };
+  const rows = await tx.select().from(residents).where(eq(residents.worldId, worldId)).for("update");
+  const byId = new Map(rows.map(r => [r.id, r]));
+  const planDays = new Map<number, Map<string, typeof plans.$inferSelect.plan>>();
+  for (const raw of batch) {
+    const parsed = ClientEvent.safeParse(raw);
+    const id = typeof raw === "object" && raw !== null && "id" in raw && typeof raw.id === "string" ? raw.id : "";
+    if (!parsed.success) {
+      result.rejected.push({ id, reason: parsed.error.issues.map(i => `${i.path.join(".")}: ${i.message}`).join("; ") });
+      continue;
+    }
+    const e = parsed.data;
+    const keys = [JSON.stringify(["id", e.id])];
+    if (e.kind === "scripted_memory" || e.kind === "scripted_regard") keys.push(JSON.stringify(["cue", e.kind, e.scene_id, e.cue_key]));
+    const receipts = await tx.select().from(processedClientEvents).where(and(eq(processedClientEvents.worldId, worldId), inArray(processedClientEvents.key, keys)));
+    if (receipts.length) {
+      // Remember a new id that aliases an already applied cue, too.
+      await tx.insert(processedClientEvents).values({ worldId, key: keys[0]! }).onConflictDoNothing();
+      result.duplicates.push(e.id); continue;
+    }
+    let reason: string | undefined;
+    if (options.nightDay !== undefined && (e.day > options.nightDay || world.day > options.nightDay)) reason = "event is outside this unprocessed night";
+    if (e.kind === "gift" || e.kind === "community_work") reason = "not implemented; retain for a future client";
+    if ("place" in e && !registry.ids.has(e.place)) reason = "unknown place";
+    if ("resident" in e && !byId.has(e.resident)) reason = "unknown resident";
+    if ("participants" in e && e.participants.some(id => id !== "player" && !byId.has(id))) reason = "unknown participant";
+    if (e.kind === "flags" && e.revision <= world.flagsRevision) reason = "stale flags revision";
+    if (reason) { result.rejected.push({ id: e.id, reason }); continue; }
+
+    if (e.kind === "town_event") {
+      // A legacy event row must not produce a second set of memories.
+      const inserted = await tx.insert(events).values({ worldId, id: e.id, day: e.day, minute: e.minute,
+        type: e.type, wherePlace: e.place, who: e.participants, importance: e.importance, tags: [e.type], summary: e.summary,
+      }).onConflictDoNothing().returning();
+      if (!inserted.length) { result.duplicates.push(e.id); }
+      else {
+        let byResident = planDays.get(e.day);
+        if (!byResident) {
+          const stored = await tx.select().from(plans).where(and(eq(plans.worldId, worldId), eq(plans.day, e.day)));
+          byResident = new Map(stored.map(p => [p.residentId, p.plan]));
+          planDays.set(e.day, byResident);
+        }
+        for (const row of rows) {
+          const participant = e.participants.includes(row.id);
+          if (!participant && !witnesses((byResident.get(row.id) ?? templatePlan(row.card, e.day)).blocks, e.place, e.minute, positions)) continue;
+          await tx.insert(memories).values({ worldId, id: randomUUID(), residentId: row.id, day: e.day, minute: e.minute,
+            kind: participant ? "did" : "saw", text: `${participant ? "I took part: " : "I saw: "}${e.summary}`.slice(0, 200),
+            who: e.participants, wherePlace: e.place, importance: e.importance,
+            // GDD-GAP: event/cue valence isn't authored. Neutral until a reflection interprets it.
+            valence: 0, sourceEvent: e.id });
+        }
+        result.accepted.push(e.id);
+      }
+    } else if (e.kind === "scripted_memory") {
+      await tx.insert(memories).values({ worldId, id: randomUUID(), residentId: e.resident, day: e.day, minute: e.minute,
+        kind: "scripted", text: e.text, who: ["player", e.resident], wherePlace: e.place, importance: e.importance, valence: 0 });
+      result.accepted.push(e.id);
+    } else if (e.kind === "scripted_regard") {
+      const row = byId.get(e.resident)!;
+      row.state = { ...row.state, regard: applyScriptedRegard(row.state.regard, e.delta) };
+      await tx.update(residents).set({ state: row.state, updatedAt: new Date() })
+        .where(and(eq(residents.worldId, worldId), eq(residents.id, e.resident)));
+      result.accepted.push(e.id);
+    } else if (e.kind === "flags") {
+      world.storyFlags = [...new Set(e.flags)].sort();
+      world.flagsRevision = e.revision;
+      await tx.update(worlds).set({ storyFlags: world.storyFlags, flagsRevision: e.revision }).where(eq(worlds.id, worldId));
+      result.accepted.push(e.id);
+    }
+    await tx.insert(processedClientEvents).values(keys.map(key => ({ worldId, key })));
+  }
+  result.regard = await currentRegard(tx, worldId);
+  return result;
+}

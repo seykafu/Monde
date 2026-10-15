@@ -16,6 +16,7 @@ export const SNAPSHOT_MAX_BYTES = 2 * 1024 * 1024;
 type JsonRow<T> = { [K in keyof T]: T[K] extends Date ? string : T[K] };
 export interface SnapshotPayload {
   version: 1;
+  processedClientEvents?: (typeof s.processedClientEvents.$inferSelect)[];
   world: JsonRow<typeof s.worlds.$inferSelect>;
   residents: JsonRow<typeof s.residents.$inferSelect>[];
   relationships: (typeof s.relationships.$inferSelect)[];
@@ -64,6 +65,7 @@ export function registerSnapshotRoutes(app: FastifyInstance, config: Config, db:
           throw new SnapshotError(409, "Snapshot storage is full of protected checkpoints");
         }
         const data = {
+          processedClientEvents: await tx.select().from(s.processedClientEvents).where(eq(s.processedClientEvents.worldId, worldId)),
           version: 1, world: { ...world, day, minute },
           residents: await tx.select().from(s.residents).where(eq(s.residents.worldId, worldId)),
           relationships: await tx.select().from(s.relationships).where(eq(s.relationships.worldId, worldId)),
@@ -106,6 +108,7 @@ export function registerSnapshotRoutes(app: FastifyInstance, config: Config, db:
         if (p.residents.length) await tx.insert(s.residents).values(p.residents.map((r) => ({ ...r, worldId, state: { ...r.state, world_id: worldId }, updatedAt: new Date(r.updatedAt) })));
         if (p.relationships.length) await tx.insert(s.relationships).values(p.relationships.map((r) => ({ ...r, worldId })));
         if (p.memories.length) await tx.insert(s.memories).values(p.memories.map((r) => ({ ...r, worldId })));
+        if (p.processedClientEvents?.length) await tx.insert(s.processedClientEvents).values(p.processedClientEvents.map(r => ({ ...r, worldId })));
         if (p.events.length) await tx.insert(s.events).values(p.events.map((r) => ({ ...r, worldId })));
         if (p.plans.length) await tx.insert(s.plans).values(p.plans.map((r) => ({ ...r, worldId })));
         if (p.favors.length) await tx.insert(s.favors).values(p.favors.map((r) => ({ ...r, worldId })));

@@ -13,6 +13,7 @@ import { createMindClient, type MindClient } from "./mind/mindClient.js";
 import { registerMindRoutes } from "./mind/routes.js";
 import type { DialogueTimings } from "./mind/dialogue.js";
 import { NightRunner } from "./mind/night.js";
+import { registerEventRoutes } from "./mind/eventRoutes.js";
 import { registerNightRoutes } from "./mind/nightRoutes.js";
 
 type Check = "ok" | "down" | "off";
@@ -94,6 +95,7 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   const nightRunner = options.nightRunner
     ?? (db ? new NightRunner({ db, mind, contentDir: config.MONDE_CONTENT_DIR, log: app.log }) : undefined);
   registerNightRoutes(app, db, nightRunner);
+  registerEventRoutes(app, db, config.MONDE_CONTENT_DIR);
   registerSnapshotRoutes(app, config, db, nightRunner);
   return app;
 }

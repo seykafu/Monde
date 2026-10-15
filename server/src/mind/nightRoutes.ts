@@ -2,12 +2,12 @@
  * Night and dawn routes (GDD §19.4; MVP M-07). Both sit under /v1/worlds/:w, so the world-token hook in
  * worlds/routes.ts authorizes them.
  *
- * POST /v1/worlds/:w/night   {day, events?: TownEvent[], town?: {pillars?, census?, weather_tomorrow?}}
- *   → 200 {day, next_day, done, pending, complete, tiers, elapsed_ms, already?} within 4 s; unfinished work
+ * POST /v1/worlds/:w/night   {day, events?: TownEvent[], client_events?: ClientEvent[], town?: {pillars?, census?, weather_tomorrow?}}
+ *   → 200 {day, next_day, done, pending, complete, tiers, elapsed_ms, already?, ingestion?} within 4 s; unfinished work
  *     continues in the background. 409 if the world is already past that night.
  * GET  /v1/worlds/:w/dawn/:day
  *   → 200 {day, weekday, plans[{resident_id, tier, source, plan}], letters[…], favors[…],
- *          ties: {pairs[{a, b, label, romance}], milestones[{day, a, b, kind, from, to}]}, pending, complete}.
+ *          ties: {pairs[{a, b, label, romance}], milestones[{day, a, b, kind, from, to}]}, regard, pending, complete}.
  *     Letters are marked delivered as they're returned. `ties` (G-13) lists every pair of residents who have met
  *     (a < b; label per §9.11.3, romance stage from their flags) and the milestones recorded the night before.
  */

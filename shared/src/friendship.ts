@@ -492,3 +492,9 @@ export interface DawnTies {
   /** Milestones from the night before this dawn. */
   milestones: TieMilestoneView[];
 }
+
+/** Scripted cues are outside the talk cap (§13.1). GDD-GAP: no per-cue bound is authored;
+ * cap the delta to ±100, then clamp the final Regard to its §9.4 range. */
+export function applyScriptedRegard(regard: number, delta: number): number {
+  return clampTo(regard + clampTo(Math.round(delta), -100, 100), REGARD_MIN, REGARD_MAX);
+}

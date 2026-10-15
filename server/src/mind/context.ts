@@ -35,10 +35,7 @@ export interface ResidentPrefix {
   card: PersonaCard;
   state: ResidentState;
   relationships: RelationshipView[];
-  /**
-   * World story flags. GDD-GAP: flags are client-owned engine state (§19.5) and no endpoint syncs them yet
-   * (the events batch is M-06), so canon locks and secret reveals see no flags until then.
-   */
+  /** World story flags synced by M-06; shared by prewarm and dialogue. */
   flags: string[];
   /** Display names by resident id (stable: from the cards). */
   names: Record<string, string>;
@@ -54,7 +51,8 @@ export function weekdayOf(day: number): string {
 export async function loadResidentPrefix(db: WorldDatabase, worldId: string, residentId: string): Promise<ResidentPrefix | null> {
   const [row] = await db.select().from(residents).where(and(eq(residents.worldId, worldId), eq(residents.id, residentId)));
   if (!row) return null;
-  const [edges, everyone] = await Promise.all([
+  const [worldRows, edges, everyone] = await Promise.all([
+    db.select({ flags: worlds.storyFlags }).from(worlds).where(eq(worlds.id, worldId)),
     db.select().from(relationships).where(and(eq(relationships.worldId, worldId), eq(relationships.fromId, residentId))),
     db.select({ id: residents.id, name: sql<string>`${residents.card}->>'name'` }).from(residents).where(eq(residents.worldId, worldId)),
   ]);
@@ -67,7 +65,7 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
       id: e.toId, affinity: e.affinity, trust: e.trust, tag: e.tag,
       feeling: e.feelingKind ? { kind: e.feelingKind as NonNullable<RelationshipView["feeling"]>["kind"], intensity: e.feelingIntensity } : null,
     })),
-    flags: [],
+    flags: worldRows[0]?.flags ?? [],
     names,
   };
 }
