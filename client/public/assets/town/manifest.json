@@ -359,6 +359,15 @@
   ],
   "w": 88
  },
+ "gate_pillar": {
+  "h": 72,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 28,
+  "width": 0.58
+ },
  "general_store": {
   "foot": [
    5,
@@ -586,6 +595,15 @@
   ],
   "w": 118
  },
+ "old_bell": {
+  "h": 52,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 43,
+  "width": 0.9
+ },
  "old_elm": {
   "h": 270,
   "kind": "prop",
@@ -642,6 +660,15 @@
   ],
   "w": 18,
   "width": 0.38
+ },
+ "public_scale": {
+  "h": 78,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 83,
+  "width": 1.73
  },
  "reeds": {
   "h": 46,

@@ -148,4 +148,29 @@ describe('the shipped town', () => {
   it('has a lamp to see by in every district', () => {
     for (const z of shipped) expect(z.town!.props.filter(p => p.sprite === 'lamp_post').length, z.id).toBeGreaterThanOrEqual(4);
   });
+  // §16.4.1 "The Spring districts": the boards share one layout of the town, so a road leaves one board where
+  // it enters the next, and the Liss keeps its columns and runs on downstream across every edge it crosses.
+  it('lines the boards up: joined edges meet, and the river runs on across them', () => {
+    const byId = Object.fromEntries(shipped.map(z => [z.id, z]));
+    const opposite = { north: 'south', south: 'north', east: 'west', west: 'east' } as const;
+    const border = (z: (typeof shipped)[number], side: keyof typeof opposite) => {
+      const n = side === 'north' || side === 'south' ? z.width : z.height;
+      return Array.from({ length: n }, (_, i) => {
+        const [x, y] = side === 'north' ? [i, 0] : side === 'south' ? [i, z.height - 1] : side === 'west' ? [0, i] : [z.width - 1, i];
+        return z.tiles[y * z.width + x]!;
+      });
+    };
+    let riverCrossings = 0;
+    for (const z of shipped) for (const e of z.edges) {
+      const t = byId[e.zone]!, back = t.edges.find(r => r.zone === z.id && r.side === opposite[e.side])!;
+      expect([back.from, back.to], `${z.id} ${e.side} → ${t.id}`).toEqual([e.from, e.to]);
+      const here = border(z, e.side), there = border(t, opposite[e.side]);
+      const rivers = (row: typeof here) => row.flatMap((tile, i) => (tile.kind === 'river' ? [`${i}:${tile.flow}`] : []));
+      expect(rivers(there), `the river across ${z.id} ${e.side} → ${t.id}`).toEqual(rivers(here));
+      const leaving = here.filter(tile => tile.kind === 'river');
+      if (e.side === 'south' || e.side === 'north') riverCrossings += leaving.length;
+      for (const tile of leaving) expect(tile.flow, `${z.id} ${e.side}`).toBe('south'); // the Liss runs down to the bay
+    }
+    expect(riverCrossings, 'the Liss crosses Commons → Market Row → Wharf, both ways round').toBeGreaterThanOrEqual(12);
+  });
 });

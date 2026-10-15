@@ -116,8 +116,9 @@ describe('zone graph', () => {
   const graph = new ZoneGraph(zones);
 
   it('builds portals from every edge, with door-to-edge distances', () => {
-    expect(graph.portals.old_quarter!.map(p => [p.to, p.exit])).toEqual([['market_row', [39, 16]]]);
-    expect(graph.portals.market_row!.map(p => [p.to, p.exit])).toEqual([['old_quarter', [0, 10]], ['commons', [8, 0]], ['wharf', [18, 19]]]);
+    expect(graph.portals.old_quarter!.map(p => [p.to, p.exit])).toEqual([['market_row', [47, 12]]]); // the High Street's east end
+    // Market Street over the bridge, Commons Lane and Wharf Road from the Market Cross.
+    expect(graph.portals.market_row!.map(p => [p.to, p.exit])).toEqual([['old_quarter', [0, 12]], ['commons', [30, 0]], ['wharf', [30, 33]]]);
     for (const zone of Object.values(zones)) for (const place of zone.places) {
       for (const d of Object.values(graph.doorToEdge[zone.id]![place.id]!)) expect(d, `${zone.id}.${place.id}`).toBeLessThan(Infinity);
     }
@@ -131,7 +132,7 @@ describe('zone graph', () => {
     const cafe = zones.market_row!.places.find(p => p.id === 'cafe_liss')!.door;
     const route = graph.route({ zone: 'old_quarter', tile: cottage }, { zone: 'market_row', tile: cafe })!;
     expect(route.legs.map(l => l.zone)).toEqual(['old_quarter', 'market_row']);
-    expect(route.legs[0]!.points.at(-1)!.x).toBeGreaterThan(39.9); // steps off the east edge
+    expect(route.legs[0]!.points.at(-1)!.x).toBeGreaterThan(zones.old_quarter!.width - 0.1); // steps off the east edge
     expect(route.legs[1]!.points[0]!.x).toBeLessThan(0.1);          // and on at Market Row's west edge
     for (const leg of route.legs) {
       const walk = zones[leg.zone]!.walkability;
@@ -140,7 +141,7 @@ describe('zone graph', () => {
     expect(route.length).toBeCloseTo(route.legs.reduce((s, l) => s + l.length, 0), 9);
     expect(graph.estimateMinutes({ zone: 'old_quarter', tile: cottage }, { zone: 'market_row', tile: cafe }, 2)).toBeCloseTo(route.length / 2, 9);
     // Same-zone routes are a single leg; unknown zones have no route.
-    expect(graph.route({ zone: 'market_row', tile: cafe }, { zone: 'market_row', tile: [4, 7] })!.legs).toHaveLength(1);
+    expect(graph.route({ zone: 'market_row', tile: cafe }, { zone: 'market_row', tile: [6, 7] })!.legs).toHaveLength(1); // the café terrace
     expect(graph.route({ zone: 'millbrook', tile: [0, 0] }, { zone: 'market_row', tile: cafe })).toBeNull();
   });
 });

@@ -31,8 +31,8 @@ import { Rng } from '../util/rng';
 /**
  * GDD-GAP: §19.2 moves residents "at path-time rates" without a speed. Residents walk at 0.8× the
  * player's 4 tiles/s (W-02), a stroll beside the player's brisk walk: 3.2 tiles per real second, which at
- * 0.75 s per game minute (§5.3) is 2.4 tiles per game minute. Crossing the Old Quarter (≈ 40 tiles) takes
- * about 17 game minutes; Lamplighter Lane to Café Liss about 25.
+ * 0.75 s per game minute (§5.3) is 2.4 tiles per game minute. Crossing the Old Quarter (≈ 48 tiles) takes
+ * about 20 game minutes; Lamplighter Lane to Café Liss about 25.
  */
 export const RESIDENT_SPEED = 3.2;
 export const TILES_PER_GAME_MINUTE = (RESIDENT_SPEED * MS_PER_GAME_MINUTE) / 1000;
@@ -49,18 +49,18 @@ const FAILED_ROUTE_MINUTES = 5;
 const STROLL_VERBS: ReadonlySet<string> = new Set(['walk', 'wander', 'exercise']);
 
 /**
- * GDD-GAP: §2.3 names the districts but not how they join, and only the Old Quarter and Market Row are
- * built (their only edges join each other). Until the other zones exist and their edges link up, a
- * resident bound for one leaves the board by one of these provisional roads (border cells of the built
- * maps). A built zone's real edge into a zone always wins over this table.
+ * GDD-GAP: §2.3 names the districts but not how they join. §16.4.1 now lays out the four Spring boards; until
+ * the other zones exist and their edges link up, a resident bound for one leaves the board by one of these
+ * provisional roads (the road ends drawn at the built boards' borders). A built zone's real edge into a zone
+ * always wins over this table.
  */
 export const OFFBOARD_ROADS: Readonly<Record<string, Loc>> = {
-  millbrook: { zone: 'old_quarter', tile: [0, 16] },    // west, up the Liss valley to the mill
-  briar_woods: { zone: 'old_quarter', tile: [21, 29] }, // south, past the vacant houses
-  station_hill: { zone: 'old_quarter', tile: [25, 0] }, // north, between the Library and the Lantern
-  commons: { zone: 'market_row', tile: [8, 0] },        // north, past the Market Hall
-  wharf: { zone: 'market_row', tile: [18, 19] },        // south, down the back alley to the water
-  offmap: { zone: 'market_row', tile: [35, 10] }        // east, the coast road out of town
+  millbrook: { zone: 'old_quarter', tile: [0, 12] },    // west, the High Street out to the Millbrook road
+  briar_woods: { zone: 'old_quarter', tile: [21, 35] }, // south, the cart road past the green
+  station_hill: { zone: 'old_quarter', tile: [37, 0] }, // north, the cart road between Bertrand's and the Constabulary
+  commons: { zone: 'market_row', tile: [30, 0] },       // north, Commons Lane from the Market Cross
+  wharf: { zone: 'market_row', tile: [30, 33] },        // south, Wharf Road from the Market Cross
+  offmap: { zone: 'market_row', tile: [55, 12] }        // east, Market Street out along the coast road
 };
 
 /**

@@ -1,98 +1,211 @@
-# Market Row (GDD §2.3): the covered Market Hall, Fournier & Fille, Dunmore's, the Gull & Anchor and Cafe Liss
-# along the north side of Market Street, the market stalls (bare until the Market Hall reopens), and the nine
-# empty storefronts facing the back alley. Zone format v2 (world/zoneFormat.ts).
+# Market Row (GDD 2.3): half the shutters down, striped awnings. Market Street runs east from the Old Quarter's
+# bridge over the Liss: Cafe Liss on the riverbank, the Gull & Anchor, the old ironmonger's (the Tollmen's
+# bench outside), Dunmore's and Fournier & Fille on its north side, then the Market Cross, where Commons Lane
+# goes north to the Commons gate and Wharf Road south to the quay; the covered Market Hall on the Cross (its
+# west door nearest the Wharf road, PZ-04) and five empty shops east of it. The market's bare stalls stand on
+# the flags south of the street; Lower Row behind them has three more empty shops (No. 9, MR-4). The back
+# alley runs behind the north side (behind Cafe Liss, S16). Zone format v2 (world/zoneFormat.ts).
 format: 2
 id: market_row
 name: Market Row
-size: [36, 20]
+size: [56, 34]
 terrain: |
-  ''''''':::''''''''''''''''''''''''''
-  ''''''':::,,,,,,,,,,,,,,,,,,,,,,,,,,
-  ...............................ppppp
-  ...............................ppppp
-  ...............................ppppp
-  ...............................ppppp
-  ...............................ppppp
-  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-  ....................................
-  ....................................
-  ....................................
-  ....................................
-  ....................................
-  ....................................
-  ....................................
-  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-  ,,,,,,,,,,,,,,,,.....,,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,.....,,,,,,,,,,,,,,,
+  ''vvv:''''''''''''''''''''''':::''''''''''''''''''''''''
+  ''vvv:''''''''''''''''''''''':::''''''''''''''''''''''''
+  ,,vvv:,,,,,,,,,,,,,,,,,,,,,,,:::,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:..........................,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:..........................,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvvpp,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvvpp,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvvpp,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvvpp,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv.bbbbbbbbbbbbbbbbbbbbbb.....bbbbbbbbbbbbbbbbbbbbbbb
+  ........................................................
+  ........................................................
+  ........................................................
+  ,,vvv.bbbbbbbbbbbbbbbbbbbbbb.....bbbbbbbbbbbbbbbbbbbbbbb
+  ,,vvv:,ppppppppppppppppppppp,rrr,bbbbbbbbbbbbbbbbbbbbbb,
+  ,,vvv:,ppppppppppppppppppppp,rrr,,,,,,:,,,,,,,rrrrrrrrr,
+  ,,vvv:,ppppppppppppppppppppp,rrr,,,,,,:,,,,,,,rrrrrrrrr,
+  ,,vvv:,ppppppppppppppppppppp,rrr,::::::::::::,rrrrrrrrr,
+  ,,vvv:,ppppppppppppppppppppp,rrr,,,,,,:,,,,,,,rrrrrrrrr,
+  ,,vvv:,ppppppppppppppppppppp,rrr,,,,,,:,,,,,,,rrrrrrrrr,
+  ,,vvv:,ppppppppppppppppppppp,rrr,,,,,,:,,,,,,,,,,,,,,,,,
+  ,,vvv:,,,,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,,,,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,,,,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,,,,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:.......................rrr........................
+  ,,vvv:.......................rrr........................
+  ,,vvv:,,,,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,:::::::::::::::,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,:,mmm,mmm,mmm,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,:,mmm,mmm,mmm,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,vvv:,:,,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,
+  ''vvv:'''''''''''''''''''''''rrr''''''''''''''''''''''''
 buildings:
-  - { id: market_hall, sprite: market_hall, at: [1, 2], door: [3, 7] }
-  - { id: bakery, sprite: bakery, at: [10, 3], door: [12, 7] }
-  - { id: general_store, sprite: general_store, at: [15, 3], door: [16, 7] }
-  - { id: gull_and_anchor, sprite: gull_and_anchor, at: [21, 3], door: [23, 7] }
-  - { id: cafe_liss, sprite: cafe_liss, at: [28, 3], door: [29, 7] }
-  - { id: storefront_1, sprite: storefront_a, at: [1, 12], door: [2, 15] }
-  - { id: storefront_2, sprite: storefront_b, at: [5, 12], door: [7, 15] }
-  - { id: storefront_3, sprite: storefront_c, at: [9, 12], door: [11, 15] }
-  - { id: storefront_4, sprite: storefront_a, at: [13, 12], door: [14, 15] }
-  - { id: storefront_5, sprite: storefront_b, at: [20, 12], door: [22, 15] }
-  - { id: storefront_6, sprite: storefront_c, at: [23, 12], door: [25, 15] }
-  - { id: storefront_7, sprite: storefront_a, at: [26, 12], door: [27, 15] }
-  - { id: storefront_8, sprite: storefront_b, at: [29, 12], door: [31, 15] }
-  - { id: storefront_9, sprite: storefront_c, at: [32, 12], door: [34, 15] }
+  # The north side of Market Street, west to east from the bridge (S01b walks it the other way).
+  - { id: cafe_liss, sprite: cafe_liss, at: [7, 6], door: [8, 10] }
+  - { id: gull_and_anchor, sprite: gull_and_anchor, at: [11, 6], door: [13, 10] }
+  - { id: storefront_6, sprite: storefront_b, at: [16, 7], door: [18, 10] }
+  - { id: general_store, sprite: general_store, at: [20, 6], door: [21, 10] }
+  - { id: bakery, sprite: bakery, at: [25, 6], door: [27, 10] }
+  - { id: market_hall, sprite: market_hall, at: [32, 5], door: [34, 10] }
+  - { id: storefront_1, sprite: storefront_a, at: [38, 7], door: [39, 10] }
+  - { id: storefront_2, sprite: storefront_b, at: [41, 7], door: [43, 10] }
+  - { id: storefront_3, sprite: storefront_c, at: [44, 7], door: [46, 10] }
+  - { id: storefront_4, sprite: storefront_a, at: [48, 7], door: [49, 10] }
+  - { id: storefront_5, sprite: storefront_c, at: [51, 7], door: [53, 10] }
+  # Lower Row, behind the market: three more empty shops (No. 9 is Aurelien's old print shop, MR-4).
+  - { id: storefront_7, sprite: storefront_c, at: [9, 23], door: [11, 26] }
+  - { id: storefront_8, sprite: storefront_a, at: [13, 23], door: [14, 26] }
+  - { id: storefront_9, sprite: storefront_b, at: [17, 23], door: [19, 26] }
+  - { sprite: townhouse_d, at: [22, 23], state: faded }
+  - { sprite: townhouse_b, at: [25, 23] }
+  # Lower Row east of the road: lived-in houses and one gone quiet.
+  - { sprite: townhouse_c, at: [33, 23] }
+  - { sprite: townhouse_a, at: [36, 23], state: faded }
+  - { sprite: townhouse_b, at: [39, 23] }
+  - { sprite: garden_shed, at: [43, 24] }
+  - { sprite: townhouse_d, at: [47, 23] }
+  - { sprite: townhouse_c, at: [50, 23], state: faded }
+  - { sprite: garden_shed, at: [52, 16] }
 props:
-  # The market: stalls down the middle of the street, bunting between the lamps.
-  - { sprite: market_stall, at: [9, 9], offset: [24, 0] }
-  - { sprite: market_stall, at: [13, 9], offset: [24, 0] }
-  - { sprite: market_stall, at: [22, 9], offset: [24, 0] }
-  - { sprite: market_stall, at: [26, 9], offset: [24, 0] }
-  - { sprite: lamp_post, at: [6, 7] }
-  - { sprite: lamp_post, at: [14, 7] }
-  - { sprite: lamp_post, at: [20, 7] }
-  - { sprite: lamp_post, at: [27, 7] }
-  - { sprite: lamp_post, at: [34, 7] }
-  - { sprite: lamp_post, at: [4, 11] }
-  - { sprite: lamp_post, at: [31, 11] }
-  - { sprite: bunting, at: [16, 7], offset: [24, 0] }
-  - { sprite: bunting, at: [30, 7], offset: [24, 0] }
-  - { sprite: flower_pots, at: [9, 7] }
-  - { sprite: flower_pots, at: [26, 7] }
-  - { sprite: barrel, at: [19, 7] }
-  - { sprite: crates, at: [18, 7], offset: [6, 0] }
-  - { sprite: signpost, at: [0, 7] }
-  - { sprite: bicycle, at: [32, 8] }
-  # Cafe Liss's terrace.
-  - { sprite: planter, at: [31, 2] }
-  - { sprite: picnic_table, at: [33, 4] }
-  - { sprite: flower_pots, at: [35, 6] }
-  - { sprite: bench, at: [32, 6] }
-  - { sprite: bush_flowering, at: [35, 2] }
-  # Behind the shops.
-  - { sprite: hedge, line: [[11, 1], [35, 1]] }
-  - { sprite: bush_round, at: [3, 1] }
-  - { sprite: bush_flowering, at: [5, 1] }
-  # The back alley.
-  - { sprite: crates, at: [3, 17] }
-  - { sprite: barrel, at: [4, 17] }
-  - { sprite: handcart, at: [10, 17] }
-  - { sprite: barrel, at: [24, 17] }
-  - { sprite: crates, at: [28, 17] }
-  - { sprite: lamp_post, at: [15, 17] }
-  - { sprite: lamp_post, at: [21, 17] }
-  - { sprite: fence, line: [[0, 18], [14, 18]] }
-  - { sprite: fence, line: [[22, 18], [35, 18]] }
-  - { sprite: oak, at: [3, 19] }
-  - { sprite: apple_tree, at: [12, 19] }
-  - { sprite: willow, at: [30, 19] }
+  # The bridge: stone parapets along the deck's edges.
+  - { sprite: stone_wall, at: [2, 11], offset: [0, -15], solid: false }
+  - { sprite: stone_wall, at: [2, 13], offset: [0, 15], solid: false }
+  - { sprite: stone_wall, at: [3, 11], offset: [0, -15], solid: false }
+  - { sprite: stone_wall, at: [3, 13], offset: [0, 15], solid: false }
+  - { sprite: stone_wall, at: [4, 11], offset: [0, -15], solid: false }
+  - { sprite: stone_wall, at: [4, 13], offset: [0, 15], solid: false }
+  - { sprite: lamp_post, at: [1, 10] }
+  - { sprite: lamp_post, at: [5, 14] }
+  # The cafe terrace and the towpath.
+  - { sprite: picnic_table, at: [5, 8] }
+  - { sprite: flower_pots, at: [5, 6] }
+  - { sprite: planter, at: [6, 9] }
+  - { sprite: bicycle, at: [10, 10] }
+  # Along the north pavement: lamps in the gaps, the Tollmen's bench, pots by the doors.
+  - { sprite: bench, at: [16, 10] }
+  - { sprite: lamp_post, at: [19, 10] }
+  - { sprite: barrel, at: [24, 10], offset: [10, 0] }
+  - { sprite: flower_pots, at: [29, 10] }
+  - { sprite: public_scale, at: [32, 10] }
+  - { sprite: lamp_post, at: [37, 10] }
+  - { sprite: flower_pots, at: [40, 10] }
+  - { sprite: lamp_post, at: [47, 10] }
+  - { sprite: planter, at: [54, 10] }
+  # The south pavement: lamps, a postbox, the market's bunting.
+  - { sprite: lamp_post, at: [8, 14] }
+  - { sprite: lamp_post, at: [14, 14] }
+  - { sprite: lamp_post, at: [20, 14] }
+  - { sprite: lamp_post, at: [26, 14] }
+  - { sprite: lamp_post, at: [34, 14] }
+  - { sprite: lamp_post, at: [40, 14] }
+  - { sprite: lamp_post, at: [46, 14] }
+  - { sprite: lamp_post, at: [52, 14] }
+  - { sprite: postbox, at: [33, 14] }
+  - { sprite: notice_board, at: [36, 14] }
+  - { sprite: signpost, at: [28, 14] }
+  # The market: stalls in two rows either side of the pump (bare until the Market Hall reopens), crates and barrels between.
+  - { sprite: market_stall, at: [9, 17], offset: [24, 0] }
+  - { sprite: market_stall, at: [13, 17], offset: [24, 0] }
+  - { sprite: market_stall, at: [21, 17], offset: [24, 0] }
+  - { sprite: market_stall, at: [25, 17], offset: [24, 0] }
+  - { sprite: market_stall, at: [9, 20], offset: [24, 0] }
+  - { sprite: market_stall, at: [25, 20], offset: [24, 0] }
+  - { sprite: well, at: [17, 19], offset: [24, 0] }
+  - { sprite: flowerbed, at: [15, 19] }
+  - { sprite: flowerbed, at: [20, 19] }
+  - { sprite: bench, at: [17, 21], offset: [24, 0] }
+  - { sprite: bunting, at: [10, 15], offset: [24, 0] }
+  - { sprite: bunting, at: [16, 15], offset: [24, 0] }
+  - { sprite: bunting, at: [22, 15], offset: [24, 0] }
+  - { sprite: crates, at: [12, 17] }
+  - { sprite: crates, at: [12, 16] }
+  - { sprite: barrel, at: [16, 17] }
+  - { sprite: crates, at: [20, 17] }
+  - { sprite: handcart, at: [13, 20], offset: [12, 0] }
+  - { sprite: barrel, at: [22, 21] }
+  - { sprite: crates, at: [23, 21] }
+  - { sprite: flower_pots, at: [27, 21] }
+  - { sprite: crates, at: [8, 21] }
+  - { sprite: fish_crates, at: [24, 16] }
+  - { sprite: cat_sleeping, at: [24, 10], offset: [-8, 2], lift: 0 }
+  # Cross Green: an oak, benches facing the Hall, flowerbeds; the carters' yard beyond.
+  - { sprite: oak, at: [35, 20] }
+  - { sprite: bench, at: [36, 17] }
+  - { sprite: bench, at: [40, 17] }
+  - { sprite: flowerbed, at: [34, 16] }
+  - { sprite: flowerbed, at: [41, 20] }
+  - { sprite: birch, at: [43, 17] }
+  - { sprite: flowerbed, at: [38, 19] }
+  - { sprite: bush_flowering, at: [37, 19] }
+  - { sprite: handcart, at: [48, 17] }
+  - { sprite: crates, at: [49, 16] }
+  - { sprite: crates, at: [50, 16] }
+  - { sprite: barrel, at: [51, 19] }
+  - { sprite: barrel, at: [52, 19] }
+  - { sprite: crates, at: [47, 20] }
+  - { sprite: lobster_pots, at: [54, 19] }
+  - { sprite: fence, line: [[46, 21], [54, 21]] }
+  - { sprite: hedge, line: [[33, 22], [45, 22]] }
+  - { sprite: lamp_post, at: [45, 15] }
+  # Lower Row: back gardens behind a hedge, lamps along the lane.
+  - { sprite: hedge, line: [[6, 22], [27, 22]] }
+  - { sprite: lamp_post, at: [12, 28] }
+  - { sprite: lamp_post, at: [21, 28] }
+  - { sprite: lamp_post, at: [28, 26] }
+  - { sprite: flower_pots, at: [8, 26] }
+  - { sprite: barrel, at: [20, 26] }
+  # The allotments by the river and the riverside walk.
+  - { sprite: veg_bed, at: [9, 31], offset: [24, 0] }
+  - { sprite: veg_bed, at: [13, 31], offset: [24, 0] }
+  - { sprite: veg_bed, at: [17, 31], offset: [24, 0] }
+  - { sprite: handcart, at: [22, 31] }
+  - { sprite: fence, line: [[8, 32], [21, 32]] }
+  - { sprite: willow, at: [1, 6] }
+  - { sprite: willow, at: [0, 22] }
+  - { sprite: willow, at: [1, 30] }
+  - { sprite: bench, at: [6, 24] }
+  - { sprite: bench, at: [6, 18] }
+  - { sprite: apple_tree, at: [25, 31] }
+  - { sprite: lamp_post, at: [38, 28] }
+  - { sprite: lamp_post, at: [48, 28] }
+  - { sprite: flower_pots, at: [35, 26] }
+  - { sprite: bicycle, at: [41, 26] }
+  - { sprite: flower_pots, at: [49, 26] }
+  - { sprite: apple_tree, at: [34, 31] }
+  - { sprite: pine, at: [38, 32] }
+  - { sprite: oak, at: [44, 31] }
+  - { sprite: apple_tree, at: [49, 30] }
+  - { sprite: birch, at: [53, 31] }
+  - { sprite: hedge, line: [[33, 29], [55, 29]] }
+  # The back alley and the yards behind the shops.
+  - { sprite: crates, at: [9, 4] }
+  - { sprite: barrel, at: [10, 4] }
+  - { sprite: handcart, at: [19, 3] }
+  - { sprite: barrel, at: [24, 3] }
+  - { sprite: crates, at: [27, 4] }
+  - { sprite: lamp_post, at: [15, 3] }
+  - { sprite: fence, line: [[6, 2], [28, 2]] }
+  - { sprite: lamp_post, at: [32, 3] }
+  - { sprite: hedge, line: [[33, 2], [55, 2]] }
+  - { sprite: apple_tree, at: [40, 1] }
+  - { sprite: oak, at: [50, 1] }
+  - { sprite: pine, at: [35, 1] }
+  - { sprite: birch, at: [26, 1] }
+  - { sprite: oak, at: [12, 1] }
 scatter:
-  - { sprites: [tall_grass, tall_grass, bush_round, rock], on: [grass], density: 0.08, seed: 21, keepout: { kinds: [cobble, brick, gravel], radius: 0, doors: 2 } }
-  - { sprites: [tall_grass], on: [meadow], density: 0.3, seed: 22 }
+  - { sprites: [tall_grass, tall_grass, bush_round, bush_flowering, rock], on: [grass], density: 0.06, seed: 21, keepout: { kinds: [cobble, brick, plaza, road, gravel], radius: 1, doors: 2 } }
+  - { sprites: [tall_grass, tall_grass, bush_flowering], on: [meadow], density: 0.25, seed: 22 }
+  - { sprites: [reeds], on: [grass, meadow, gravel], density: 0.5, seed: 23, near: { kinds: [river], radius: 1 }, keepout: { kinds: [cobble, plaza], radius: 1, doors: 2 } }
 places:
-  - { id: market_street, rect: [0, 7, 36, 5], door: [18, 10] }
-  - { id: back_alley, rect: [0, 15, 36, 3], door: [18, 16] }
+  - { id: market_street, rect: [0, 10, 56, 12], door: [18, 12] }
+  - { id: back_alley, rect: [6, 3, 23, 2], door: [17, 4] }
 edges:
-  - { side: west, from: 9, to: 11, zone: old_quarter, arrive: [38, 16] }
-  - { side: north, from: 7, to: 9, zone: commons, arrive: [19, 28] }
-  - { side: south, from: 17, to: 19, zone: wharf, arrive: [18, 1] }
-spawn: [1, 10]
+  - { side: west, from: 11, to: 13, zone: old_quarter, arrive: [46, 12] }
+  - { side: north, from: 29, to: 31, zone: commons, arrive: [30, 36] }
+  - { side: south, from: 29, to: 31, zone: wharf, arrive: [30, 1] }
+spawn: [30, 12]

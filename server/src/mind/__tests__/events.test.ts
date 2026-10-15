@@ -97,9 +97,9 @@ describe("M-06 client ingestion", () => {
   it("uses exact event-day plans, radius and half-open times; participants need not be present; yesterday's Scuffle reaches dialogue", async () => {
     const env = await setup();
     await setPlan(env, "odile", [block("market_row.bakery")]);
-    await setPlan(env, "pell", [block("market_row.market_street")]); // sqrt(52) > 6 from bakery
-    await setPlan(env, "teo", [block("market_row.market_hall")]); // sqrt(50) > 6
-    await setPlan(env, "ines", [block("market_row.storefront_3")]); // > 6
+    await setPlan(env, "pell", [block("market_row.market_street")]); // sqrt(85) > 6 from the bakery door
+    await setPlan(env, "teo", [block("market_row.market_hall")]); // 7 > 6, across the Market Cross
+    await setPlan(env, "ines", [block("market_row.storefront_3")]); // 19 > 6, east of the Hall; 3 from storefront_2
     await setPlan(env, "rook", [block("offmap.mainland", "00:00", "26:00", "sleep")]);
     await setPlan(env, "augusta", [block("market_row.bakery", "09:00", "10:00")]);
     await setPlan(env, "ada", [block("market_row.bakery", "10:01", "11:00")]);

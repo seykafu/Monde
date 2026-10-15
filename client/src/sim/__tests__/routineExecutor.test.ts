@@ -55,7 +55,8 @@ describe('routine executor', () => {
       ['10:00', 'visit', 'old_quarter.founders_house'],
       ['21:00', 'sleep', 'old_quarter.lamplighter_cottage']
     ]);
-    const route = world.graph.route({ zone: 'old_quarter', tile: [5, 22] }, { zone: 'old_quarter', tile: [36, 6] })!;
+    const tile = (place: string) => world.zones.old_quarter!.places.find(q => q.id === place)!.door;
+    const route = world.graph.route({ zone: 'old_quarter', tile: tile('lamplighter_cottage') }, { zone: 'old_quarter', tile: tile('founders_house') })!;
     const walk = route.length / TILES_PER_GAME_MINUTE;
     // Out of the cottage door at 10:00 − walk…
     const [leave, arrive] = flips(ex, p, 420, 700, s => s.traveling !== null);
@@ -103,7 +104,7 @@ describe('routine executor', () => {
 
   it('walks residents bound for unbuilt zones off the board edge and back', () => {
     const ex = new RoutineExecutor(world);
-    expect(ex.resolve('millbrook.school')).toMatchObject({ kind: 'offboard', zone: null, offZone: 'millbrook', road: { zone: 'old_quarter', tile: [0, 16] } });
+    expect(ex.resolve('millbrook.school')).toMatchObject({ kind: 'offboard', zone: null, offZone: 'millbrook', road: { zone: 'old_quarter', tile: [0, 12] } });
     const tib = plan('tib', 'old_quarter.okafor_house', [
       ['07:30', 'eat', 'old_quarter.okafor_house'],
       ['08:30', 'attend', 'millbrook.school'],
@@ -120,7 +121,7 @@ describe('routine executor', () => {
     // Back on the same road, at the edge, the leg's length before the library visit.
     const firstSeen = ex.stateAt(tib, back!);
     expect(firstSeen.position!.x).toBeLessThan(1);
-    expect(firstSeen.position!.y).toBeCloseTo(16.5, 0);
+    expect(firstSeen.position!.y).toBeCloseTo(12.5, 0); // the High Street's west end
     expect(ex.stateAt(tib, 945)).toMatchObject({ zone: 'old_quarter', traveling: null, visible: false, place: 'old_quarter.library' });
     // From an unbuilt zone to a built one across town: in from the west road, through Market Row, and down
     // the real edge into the Wharf (its provisional road is gone now the board exists).

@@ -1,122 +1,200 @@
-# The Old Quarter (GDD §2.3): cobbles, gas lamps, the civic row along the high street, Fountain Square and
-# its dry fountain, St Brigid's, the Lamplighter's Cottage on Lamplighter Lane, and the vacant row behind it
-# with the Liss's millrace running down past it to the south. Zone format v2 (world/zoneFormat.ts).
+# The Old Quarter (GDD 2.3): cobbles, gas lamps, gulls on gutters. The civic row on the High Street's north
+# side, west to east: St Brigid's (the old bell by its gate, OQ-1), the Founder's House, the Town Hall, the
+# stopped clocktower, the library, the Lantern, Bertrand's clock shop, the road to Station Hill, the
+# Constabulary and Augusta's. Fountain Square opens south of the street, its dry fountain and bronze heron
+# in the middle, lived-in houses on Heron Lane to the west and the empty terrace on Bell Row to the east. The
+# road to Briar Woods runs south from the square past the green; Lamplighter Lane, the narrowest street, turns
+# east off it, and the Lamplighter's Cottage is the last on the left (S01c). The High Street runs east to
+# Market Row's bridge and west to the Millbrook road. Zone format v2 (world/zoneFormat.ts).
 format: 2
 id: old_quarter
 name: Old Quarter
-size: [40, 30]
+size: [48, 36]
 terrain: |
-  ,,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,,...,,,,,,,,,,,,,,
-  ,.............................,,,,,....,
-  ,.............................,''',....,
-  ,.............................,''',....,
-  ,.............................,,,,,....,
-  ,......................................,
-  ,......................................,
-  ,,,,,,,,..,,,,bbbbbbbbbbbb,,,..,,,,,,,,,
-  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
-  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
-  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
-  ,'',,,,,..,,,,bppppppppppb,,,..,,,,,,,,,
-  ,.............bppppppppppb.............,
-  ,,,,,,,,,,,,,,bppppppppppb,,,,,,,,,,,,,,
-  r.............bppppppppppb..............
-  r.............bbbbbbbbbbbb..............
-  r.............bbbbbbbbbbbb..............
-  ,,,,,,,,,,,,,,,,,,,,,,:,,,,,,.vv.,,,,,,,
-  ,,,,,,,,,,,,,,,,,,'''':,,,,,,.vv.,,,,,,,
-  ,,,,,,,,,,,,,,,,,,'''':,,,,,,.vv.,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,,,:,,,,,,.vv.,,,,,,,
-  ,.............................==.......,
-  ,.............................==.......,
-  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
-  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
-  ,.............................==.......,
-  ,,,,,,,,,,,,,,,,,,,,:::,,,,,,,vv,,,,,,,,
+  '''''''''''''''''''''''''''''''''''''rr'''''''''
+  '''''''''''''''''''''''''''''''''''''rr'''''''''
+  ':::::',,,,,,::::::,,,,,,,,,,,,,,,,,,rr,,,,,,,,,
+  ''':''',,,,,,::::::,,,,,::::,,,,,,,,,rr,,,,,,,,,
+  ''':''',,,,,,::::::,,,,,::::,,,,,,,,,rr,,,,,,,,,
+  ''':''',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,rr,,,,,,,,,
+  ''''''',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,rr,,,,,,,,,
+  ''''''',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,rr,,,,,,,,,
+  ''''''',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,rr,,,,,,,,,
+  ''''''',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,rr,,,,,,,,,
+  ,bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb..bbbbbbbbb
+  ................................................
+  ................................................
+  ................................................
+  ,bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+  ,,,,,,,,,,,,,bpppppppppppppppb,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,bpppppppppppppppb,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,bpppppppppppppppb,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,bpppppppppppppppb,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,bpppppppppppppppb,,,,,,,,,,,,,,,,,,
+  ,............bpppppppppppppppb..................
+  ,............bpppppppppppppppb..................
+  ,,,,,,,,,,,,,bpppppppppppppppb,,,,,,,,,,,,,,,,,,
+  ,,mm,,mm,,,,,bbbbbbbbbbbbbbbbb,,,,,,,,,,,,,,,,,,
+  ,,mm,,mm,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,:,,,,,,,,,rrr.....................:::,
+  ,,,,,,:::::::::,,,,,rrr.....................:::,
+  ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ''''''''''''''''''''rrr'''''''''''''''''''''''''
+  ''''''''''''''''''''rrr'''''''''''''''''''''''''
 buildings:
-  - { id: town_hall, sprite: town_hall, at: [2, 2], door: [5, 6] }
-  - { id: clocktower, sprite: clocktower, at: [10, 3], door: [10, 6] }
-  - { id: library, sprite: library, at: [14, 2], door: [16, 6] }
-  - { id: lantern_office, sprite: lantern_office, at: [27, 2], door: [29, 6] }
-  - { id: founders_house, sprite: founders_house, at: [35, 2], door: [36, 6] }
-  - { id: st_brigids, sprite: st_brigids, at: [3, 9], door: [4, 13] }
-  - { id: pell_house, sprite: pell_house, at: [10, 10], door: [10, 13] }
-  - { id: bertrand_house, sprite: bertrand_house, at: [26, 10], door: [26, 13] }
-  - { id: constabulary, sprite: constabulary, at: [33, 9], door: [34, 13] }
-  - { id: lamplighter_cottage, sprite: lamplighter_cottage, at: [3, 19], door: [5, 22] }
-  - { id: okafor_house, sprite: okafor_house, at: [9, 19], door: [9, 22] }
-  - { id: augusta_house, sprite: augusta_house, at: [13, 19], door: [13, 22] }
-  - { id: vacant_house_39, sprite: townhouse_a, at: [2, 25], door: [3, 28] }
-  - { id: vacant_house_40, sprite: townhouse_b, at: [5, 25], door: [6, 28] }
-  - { id: vacant_house_41, sprite: townhouse_c, at: [8, 25], door: [8, 28] }
-  - { id: vacant_house_42, sprite: townhouse_d, at: [11, 25], door: [12, 28] }
-  - { id: vacant_house_43, sprite: townhouse_a, at: [14, 25], door: [15, 28] }
-  - { id: vacant_house_44, sprite: townhouse_b, at: [17, 25], door: [18, 28] }
-  - { id: vacant_house_45, sprite: townhouse_c, at: [23, 25], door: [23, 28] }
-  - { id: vacant_house_46, sprite: townhouse_d, at: [26, 25], door: [27, 28] }
-  - { id: vacant_house_47, sprite: townhouse_a, at: [34, 25], door: [35, 28] }
+  # The civic row on the High Street's north side, west to east (OQ-3's datestones: chapel 1839, Founder's 1838, hall 1841, tower 1842, library 1850, Lantern 1903, constabulary 1888).
+  - { id: st_brigids, sprite: st_brigids, at: [2, 6], door: [3, 10] }
+  - { id: founders_house, sprite: founders_house, at: [8, 6], door: [9, 10] }
+  - { id: town_hall, sprite: town_hall, at: [12, 6], door: [15, 10] }
+  - { id: clocktower, sprite: clocktower, at: [19, 7], door: [19, 10] }
+  - { id: library, sprite: library, at: [22, 6], door: [24, 10] }
+  - { id: lantern_office, sprite: lantern_office, at: [29, 6], door: [31, 10] }
+  - { id: bertrand_house, sprite: bertrand_house, at: [33, 7], door: [33, 10] }
+  - { id: constabulary, sprite: constabulary, at: [40, 6], door: [41, 10] }
+  - { id: augusta_house, sprite: augusta_house, at: [45, 7], door: [45, 10] }
+  # Heron Lane, west of the square: lived-in houses.
+  - { id: pell_house, sprite: pell_house, at: [2, 17], door: [2, 20] }
+  - { id: okafor_house, sprite: okafor_house, at: [6, 17], door: [6, 20] }
+  - { id: vacant_house_39, sprite: townhouse_c, at: [9, 17], door: [9, 20] }
+  # Bell Row, east of the square: the empty terrace.
+  - { id: vacant_house_40, sprite: townhouse_a, at: [31, 17], door: [32, 20] }
+  - { id: vacant_house_41, sprite: townhouse_b, at: [34, 17], door: [35, 20] }
+  - { id: vacant_house_42, sprite: townhouse_d, at: [37, 17], door: [38, 20] }
+  - { id: vacant_house_43, sprite: townhouse_c, at: [40, 17], door: [40, 20] }
+  - { id: vacant_house_44, sprite: townhouse_a, at: [43, 17], door: [44, 20] }
+  # Lamplighter Lane: three empty houses, then the Lamplighter's Cottage, last on the left (S01c).
+  - { id: vacant_house_45, sprite: townhouse_b, at: [25, 25], door: [26, 28] }
+  - { id: vacant_house_46, sprite: townhouse_d, at: [28, 25], door: [29, 28] }
+  - { id: vacant_house_47, sprite: townhouse_a, at: [31, 25], door: [32, 28] }
+  - { id: lamplighter_cottage, sprite: lamplighter_cottage, at: [37, 25], door: [39, 28] }
 props:
-  # Fountain Square: the dry fountain and its bronze heron, benches, beds, a lamp at each corner.
-  - { sprite: fountain, at: [20, 12], offset: [-24, 0] }
-  - { sprite: bench, at: [16, 9] }
-  - { sprite: bench, at: [23, 9] }
-  - { sprite: bench, at: [16, 14] }
-  - { sprite: bench, at: [23, 14] }
-  - { sprite: cat_sleeping, at: [23, 14], offset: [-6, 2], lift: 13 }
-  - { sprite: flowerbed, at: [17, 12] }
-  - { sprite: flowerbed, at: [23, 12] }
-  - { sprite: lamp_post, at: [13, 8] }
-  - { sprite: lamp_post, at: [26, 8] }
-  - { sprite: lamp_post, at: [13, 14] }
-  - { sprite: lamp_post, at: [26, 14] }
-  # The high street.
-  - { sprite: lamp_post, at: [8, 5] }
-  - { sprite: lamp_post, at: [21, 5] }
-  - { sprite: postbox, at: [22, 5] }
-  - { sprite: lamp_post, at: [30, 5] }
-  - { sprite: bicycle, at: [31, 5] }
-  - { sprite: notice_board, at: [12, 8] }
-  - { sprite: planter, at: [4, 8] }
-  - { sprite: planter, at: [6, 8] }
-  - { sprite: planter, at: [34, 8] }
-  - { sprite: flower_pots, at: [37, 7] }
-  - { sprite: signpost, at: [38, 14] }
-  # Trees behind the civic row, in the pocket garden, the churchyard and the green.
-  - { sprite: oak, at: [9, 1] }
-  - { sprite: birch, at: [21, 1] }
-  - { sprite: pine, at: [28, 1] }
-  - { sprite: oak, at: [37, 1] }
-  - { sprite: oak, at: [32, 4] }
-  - { sprite: birch, at: [1, 10] }
-  - { sprite: pine, at: [38, 11] }
-  - { sprite: willow, at: [1, 20] }
-  - { sprite: apple_tree, at: [19, 19] }
-  - { sprite: oak, at: [26, 20] }
-  - { sprite: well, at: [24, 19] }
-  - { sprite: bench, at: [20, 21] }
-  - { sprite: birch, at: [36, 19] }
-  - { sprite: bush_flowering, at: [34, 20] }
-  # Lamplighter Lane and the back lane.
-  - { sprite: lamp_post, at: [8, 21] }
-  - { sprite: lamp_post, at: [16, 21] }
-  - { sprite: lamp_post, at: [28, 21] }
-  - { sprite: lamp_post, at: [35, 21] }
-  - { sprite: lamp_post, at: [10, 29] }
-  - { sprite: lamp_post, at: [26, 29] }
-  - { sprite: flower_pots, at: [7, 21] }
-  - { sprite: hedge, line: [[1, 24], [18, 24]] }
-  - { sprite: hedge, line: [[24, 24], [28, 24]] }
-  - { sprite: hedge, line: [[33, 24], [38, 24]] }
+  # Fountain Square: the dry fountain and its bronze heron, benches round it, beds, a lamp at each corner.
+  - { sprite: fountain, at: [21, 19] }
+  - { sprite: bench, at: [18, 17] }
+  - { sprite: bench, at: [25, 17] }
+  - { sprite: bench, at: [18, 21] }
+  - { sprite: bench, at: [25, 21] }
+  - { sprite: cat_sleeping, at: [25, 21], offset: [-6, 2], lift: 13 }
+  - { sprite: flowerbed, at: [16, 19] }
+  - { sprite: flowerbed, at: [27, 19] }
+  - { sprite: flowerbed, at: [19, 19], offset: [2, 0] }
+  - { sprite: flowerbed, at: [23, 19], offset: [-6, 0] }
+  - { sprite: flower_pots, at: [20, 20], offset: [0, 4] }
+  - { sprite: flower_pots, at: [22, 20], offset: [0, 4] }
+  - { sprite: planter, at: [21, 16] }
+  - { sprite: planter, at: [22, 22] }
+  - { sprite: bush_flowering, at: [14, 17] }
+  - { sprite: bush_flowering, at: [28, 17] }
+  - { sprite: bicycle, at: [15, 21] }
+  - { sprite: lamp_post, at: [14, 15] }
+  - { sprite: lamp_post, at: [28, 15] }
+  - { sprite: lamp_post, at: [14, 22] }
+  - { sprite: lamp_post, at: [28, 22] }
+  - { sprite: apple_tree, at: [16, 23] }
+  - { sprite: apple_tree, at: [26, 23] }
+  # The High Street: lamps on both pavements, a postbox, the bicycle at the Lantern, the old bell by the chapel gate (OQ-1).
+  - { sprite: lamp_post, at: [7, 10] }
+  - { sprite: lamp_post, at: [11, 10] }
+  - { sprite: lamp_post, at: [21, 10] }
+  - { sprite: lamp_post, at: [28, 10] }
+  - { sprite: lamp_post, at: [36, 10] }
+  - { sprite: lamp_post, at: [39, 10] }
+  - { sprite: lamp_post, at: [44, 10] }
+  - { sprite: lamp_post, at: [4, 14] }
+  - { sprite: lamp_post, at: [10, 14] }
+  - { sprite: lamp_post, at: [32, 14] }
+  - { sprite: lamp_post, at: [38, 14] }
+  - { sprite: lamp_post, at: [46, 14] }
+  - { sprite: postbox, at: [27, 10] }
+  # Gulls on the gutters.
+  - { sprite: gull, at: [14, 10], offset: [-10, 0], lift: 150 }
+  - { sprite: gull, at: [24, 10], offset: [30, 0], lift: 150, flip: true }
+  - { sprite: gull, at: [41, 10], offset: [10, 0], lift: 120 }
+  - { sprite: bicycle, at: [32, 10] }
+  - { sprite: notice_board, at: [18, 10] }
+  - { sprite: signpost, at: [1, 14] }
+  - { sprite: signpost, at: [39, 9], flip: true }
+  - { sprite: gate_pillar, at: [2, 10] }
+  - { sprite: gate_pillar, at: [4, 10] }
+  - { sprite: old_bell, at: [5, 10], offset: [4, 0] }
+  - { sprite: planter, at: [2, 14] }
+  - { sprite: flower_pots, at: [26, 14] }
+  # St Brigid's churchyard: yews, a hedge round it.
+  - { sprite: pine, at: [1, 4] }
+  - { sprite: pine, at: [6, 3] }
+  - { sprite: pine, at: [0, 8] }
+  - { sprite: hedge, line: [[0, 1], [6, 1]] }
+  - { sprite: hedge, line: [[7, 2], [7, 9]] }
+  # The gardens behind the civic row.
+  - { sprite: oak, at: [10, 2] }
+  - { sprite: flowerbed, at: [14, 3] }
+  - { sprite: flowerbed, at: [17, 3] }
+  - { sprite: birch, at: [20, 2] }
+  - { sprite: bench, at: [25, 4] }
+  - { sprite: apple_tree, at: [29, 2] }
+  - { sprite: oak, at: [34, 2] }
+  - { sprite: pine, at: [43, 2] }
+  - { sprite: birch, at: [46, 3] }
+  - { sprite: hedge, line: [[8, 1], [36, 1]] }
+  # Heron Lane and the back gardens: veg beds, a washing-day garden, the well on the green.
+  - { sprite: lamp_post, at: [5, 21] }
+  - { sprite: flower_pots, at: [4, 20] }
+  - { sprite: planter, at: [8, 20] }
+  - { sprite: fence, line: [[1, 25], [12, 25]] }
+  - { sprite: veg_bed, at: [2, 24], offset: [24, 0], state: restored }
+  - { sprite: veg_bed, at: [6, 24], offset: [24, 0], state: restored }
+  - { sprite: bush_round, at: [9, 23] }
+  - { sprite: flower_pots, at: [11, 24] }
+  - { sprite: bush_flowering, at: [11, 23] }
+  # Bell Row: lamps, an old handcart, weeds by the doors.
+  - { sprite: lamp_post, at: [33, 21] }
+  - { sprite: lamp_post, at: [42, 21] }
+  - { sprite: handcart, at: [46, 20] }
+  - { sprite: barrel, at: [39, 20] }
+  - { sprite: hedge, line: [[30, 23], [47, 23]] }
+  # Lamplighter Lane: the oldest lamps in town, front gardens, the cottage's gate.
+  - { sprite: lamp_post, at: [24, 30] }
+  - { sprite: lamp_post, at: [30, 30] }
+  - { sprite: lamp_post, at: [36, 30] }
+  - { sprite: lamp_post, at: [43, 27] }
+  - { sprite: flower_pots, at: [41, 28], offset: [8, -6] }
+  - { sprite: bush_flowering, at: [35, 26] }
+  - { sprite: bush_round, at: [34, 25] }
+  - { sprite: apple_tree, at: [44, 25] }
+  - { sprite: fence, line: [[23, 31], [43, 31]] }
+  - { sprite: hedge, line: [[24, 24], [35, 24]] }
+  # The green west of the Briar road: the well, the old orchard, benches.
+  - { sprite: well, at: [10, 28], offset: [0, -8] }
+  - { sprite: bench, at: [7, 28] }
+  - { sprite: bench, at: [13, 28] }
+  - { sprite: apple_tree, at: [5, 27] }
+  - { sprite: apple_tree, at: [15, 27] }
+  - { sprite: apple_tree, at: [5, 31] }
+  - { sprite: apple_tree, at: [15, 31] }
+  - { sprite: oak, at: [1, 29] }
+  - { sprite: willow, at: [18, 30] }
+  - { sprite: lamp_post, at: [19, 25] }
+  - { sprite: pine, at: [46, 32] }
+  - { sprite: oak, at: [40, 33] }
+  - { sprite: birch, at: [27, 33] }
+  - { sprite: apple_tree, at: [31, 33] }
+  - { sprite: apple_tree, at: [35, 34] }
+  - { sprite: bush_flowering, at: [33, 33] }
+  - { sprite: bench, at: [38, 33] }
+  - { sprite: birch, at: [43, 34] }
+  - { sprite: birch, at: [2, 33] }
 scatter:
-  - { sprites: [tall_grass, tall_grass, tall_grass, bush_round, bush_flowering, rock], on: [grass], density: 0.07, seed: 11, keepout: { kinds: [cobble, brick, plaza, gravel, boards, river], radius: 1, doors: 2 } }
-  - { sprites: [tall_grass], on: [meadow], density: 0.25, seed: 12 }
-  - { sprites: [reeds], on: [grass], density: 0.7, seed: 13, near: { kinds: [river], radius: 1 } }
+  - { sprites: [tall_grass, tall_grass, tall_grass, bush_round, bush_flowering, rock], on: [grass], density: 0.07, seed: 11, keepout: { kinds: [cobble, brick, plaza, gravel, road], radius: 1, doors: 2 } }
+  - { sprites: [tall_grass, tall_grass, bush_flowering], on: [meadow], density: 0.25, seed: 12 }
 places:
-  - { id: fountain_square, rect: [14, 8, 12, 8], door: [19, 15] }
-  - { id: lamplighter_lane, rect: [1, 22, 37, 2], door: [5, 22] }
+  - { id: fountain_square, rect: [13, 15, 17, 9], door: [21, 23] }
+  - { id: lamplighter_lane, rect: [23, 28, 21, 2], door: [26, 29] }
 edges:
-  - { side: east, from: 15, to: 17, zone: market_row, arrive: [1, 10] }
-spawn: [5, 22]
+  - { side: east, from: 11, to: 13, zone: market_row, arrive: [1, 12] }
+spawn: [39, 28]

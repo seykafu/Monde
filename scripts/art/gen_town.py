@@ -196,6 +196,13 @@ TOWN: dict[str, dict] = {
     "fish_crates": prop("stacked fish crates with ice and silver fish", 1.0),
     "buoy": prop("a red-and-white striped buoy lying on its side", 0.6),
     "anchor": prop("an old rusty ship's anchor leaning upright", 0.8),
+    # ---- Riddle objects the trail names (GDD §14): part 2 of the town lift
+    "old_bell": prop("an old bronze church bell, green with patina, resting mouth-down on a low square stone "
+                     "plinth, its iron clapper visible under the rim, moss on the plinth", 0.9),
+    "public_scale": prop("an old cast-iron public beam balance on a short iron post: a crossbeam with two round iron "
+                         "pans hanging from chains, the left pan stuck lower than the right, rust patches", 1.0),
+    "gate_pillar": prop("a square stone gate pillar with a round stone ball on top, a little moss, an iron hinge pin "
+                        "on one side", 0.6),
     # ---- Life
     "duck": prop("a single white farmyard duck, standing", 0.4),
     "gull": prop("a single seagull standing", 0.4),

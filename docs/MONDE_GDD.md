@@ -9789,8 +9789,8 @@ no characters, no UI. Draw at native 1280×720.
 
 #### 16.4.1 Zone files and the town board (format v2, D20)
 
-*Added 2026-10-15 with the town lift (part 1). The four MVP districts are in this format; part 2 redesigns
-their layouts.* A zone is `content/zones/<id>.zone.yaml`, compiled by `client/src/world/zoneFormat.ts` (the
+*Added 2026-10-15 with the town lift (part 1); the four MVP districts were redesigned in this format in part 2
+(see "The Spring districts" below).* A zone is `content/zones/<id>.zone.yaml`, compiled by `client/src/world/zoneFormat.ts` (the
 format's reference, with a commented example) and drawn by `client/src/render/town/`. The v1 greybox
 format still loads.
 
@@ -9855,6 +9855,40 @@ spawn: [5, 22]
   only smoke, ducks, the fountain and glints. The ground bakes into chunk textures (8×6 tiles) round the
   camera first and the rest in idle time, once per zone per session; sprites and water tiles are culled to
   the camera.
+
+**The Spring districts (town lift part 2).** The four boards share one layout of the town, so edges and the
+river line up across them:
+
+- **How they join.** Market Row (56×34) is the hub. The Old Quarter (48×36) lies west of it: the High Street
+  and Market Street are the same road (rows 11–13), crossing the Liss on a stone bridge at Market Row's west
+  end. The Commons (48×38) lies north and the Wharf (56×40) south, on the town's north–south axis
+  (columns 29–31): the Commons gate, Commons Lane, the Market Cross, Wharf Road and the ferry slip. Unbuilt
+  zones are reached by roads off the Old Quarter (Millbrook west along the High Street, Station Hill north,
+  Briar Woods south) and Market Street runs on east as the coast road.
+- **The Liss** flows south the whole way: in under the Commons' woodland edge, through the duck pond's two
+  lobes and under the footbridge, out of the Commons' south-west corner, down Market Row's west side
+  (columns 2–4, the café terrace on its bank, the bridge carrying the road), and down the Wharf's west side,
+  where it opens into the harbour by the boathouse.
+- **What each board holds.** *Old Quarter:* the civic row on the High Street's north side (St Brigid's with
+  the old bell by its gate, the Founder's House, Town Hall, clocktower, library, the Lantern, Bertrand's
+  shop, the Constabulary), Fountain Square south of it with houses on Heron Lane and the empty terrace on Bell
+  Row either side, the Briar road south past the green and well, and Lamplighter Lane, its cottage last on the
+  left. *Market Row:* Café Liss, the Gull & Anchor, the old ironmonger's, Dunmore's and Fournier & Fille on
+  the north side, the Market Hall on the Cross with the public scale by its steps, five empty shops east of
+  it; the market's stalls on the flags south of the street, Lower Row behind them (three more empty shops),
+  the back alley behind the north side, Cross Green, the carters' yard and the allotments by the river.
+  *Wharf:* the fishermen's terraces on Net Lane and Quay Street, the cannery, bunkhouse and Vane's trailer,
+  the fish market and its net racks, the crane yard, the stone quay, the harbour steps, the ferry slip with
+  the ticket booth and Pell's bunting, and the breakwater out to Point Lumière. *Commons:* the broken
+  glasshouse, Teo's cottage and the community garden in the north, the bandstand on its round, the sundial
+  lawn with the Old Elm to its north-east, the picnic lawn, the pond and footbridge, and the railing with
+  its gate on Market Row.
+- **Riddle objects on the board.** The trail's physical answers stand where §14 puts them: the old bell on
+  its plinth by St Brigid's gate (OQ-1), the bronze heron (OQ-2), the public scale by the Market Hall steps
+  (MR-1), the ferry slip's bollards (WF-1), the net racks marching inland from the quay so their seaward end
+  is the south (WF-2), the boathouse (WF-3), the lighthouse at the breakwater's end (WF-4/5), the Commons
+  gate posts (CM-1), the sundial and the Old Elm north-east of it (CM-2), the glasshouse (CM-3), the
+  footbridge (CM-4) and the bandstand (CM-5).
 
 ### 16.5 Sprites
 

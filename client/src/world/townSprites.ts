@@ -154,6 +154,10 @@ export const SPRITE_META: Readonly<Record<string, SpriteMeta>> = {
   fish_crates: { block: [1, 1] },
   buoy: { block: [0, 0], water: true },
   anchor: { block: [1, 1] },
+  // ── riddle objects (GDD §14): the chapel gate's old bell (OQ-1), the public scale (MR-1), the Commons gate post (CM-1) ──
+  old_bell: { block: [1, 1] },
+  public_scale: { block: [1, 1] },
+  gate_pillar: { block: [1, 1] },
   // ── animals (placed as props; the town's life layer animates its own) ──
   duck: { block: [0, 0], water: true, shore: true },
   gull: { block: [0, 0], shore: true },

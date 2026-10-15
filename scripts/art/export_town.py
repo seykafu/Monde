@@ -61,6 +61,7 @@ SIZE: dict[str, tuple[str, int]] = {
     "fence": ("w", 48), "stone_wall": ("w", 48), "market_stall": ("h", 100), "bunting": ("w", 144), "picnic_table": ("w", 76),
     "rowboat": ("w", 100), "fishing_boat": ("w", 170), "bollard": ("h", 30), "net_rack": ("h", 80), "lobster_pots": ("h", 44),
     "fish_crates": ("h", 38), "buoy": ("w", 30), "anchor": ("h", 50),
+    "old_bell": ("h", 52), "public_scale": ("h", 78), "gate_pillar": ("h", 72),
     # life
     "duck": ("h", 22), "gull": ("h", 22), "cat_sleeping": ("w", 28),
 }
