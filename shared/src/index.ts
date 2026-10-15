@@ -17,3 +17,4 @@ export * from "./friendshipData";
 export * from "./look";
 export * from "./player";
 export * from "./events";
+export * from "./conversation.js";

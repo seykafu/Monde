@@ -26,7 +26,11 @@ export interface SnapshotPayload {
   favors: (typeof s.favors.$inferSelect)[];
   letters: (typeof s.letters.$inferSelect)[];
   tieMilestones: (typeof s.tieMilestones.$inferSelect)[];
+  /** Turns of conversations not yet compacted; compacted ones live on as summaries and the digest (§9.10.3). */
   dialogueTurns: JsonRow<typeof s.dialogueTurns.$inferSelect>[];
+  conversationSessions?: JsonRow<typeof s.conversationSessions.$inferSelect>[];
+  conversationSummaries?: (typeof s.conversationSummaries.$inferSelect)[];
+  conversationDigests?: (typeof s.conversationDigests.$inferSelect)[];
 }
 const Body = z.object({
   day: z.number().int().min(1).max(100_000), minute: z.number().int().min(0).max(1439),
@@ -75,7 +79,7 @@ export function registerSnapshotRoutes(app: FastifyInstance, config: Config, db:
           favors: await tx.select().from(s.favors).where(and(eq(s.favors.worldId, worldId), inArray(s.favors.status, [...LIVE_FAVOR_STATUSES]))),
           letters: await tx.select().from(s.letters).where(and(eq(s.letters.worldId, worldId), eq(s.letters.delivered, false))),
           tieMilestones: await tx.select().from(s.tieMilestones).where(eq(s.tieMilestones.worldId, worldId)),
-          dialogueTurns: await tx.select().from(s.dialogueTurns).where(eq(s.dialogueTurns.worldId, worldId)),
+          ...await conversationState(tx, worldId),
         };
         const json = JSON.stringify(data);
         const bytes = Buffer.byteLength(json, "utf8");
@@ -115,11 +119,29 @@ export function registerSnapshotRoutes(app: FastifyInstance, config: Config, db:
         if (p.letters.length) await tx.insert(s.letters).values(p.letters.map((r) => ({ ...r, worldId })));
         if (p.tieMilestones.length) await tx.insert(s.tieMilestones).values(p.tieMilestones.map((r) => ({ ...r, worldId })));
         if (p.dialogueTurns.length) await tx.insert(s.dialogueTurns).values(p.dialogueTurns.map((r) => ({ ...r, worldId, createdAt: new Date(r.createdAt) })));
+        if (p.conversationSessions?.length) await tx.insert(s.conversationSessions).values(p.conversationSessions.map((r) => ({ ...r, worldId, createdAt: new Date(r.createdAt) })));
+        if (p.conversationSummaries?.length) await tx.insert(s.conversationSummaries).values(p.conversationSummaries.map((r) => ({ ...r, worldId })));
+        if (p.conversationDigests?.length) await tx.insert(s.conversationDigests).values(p.conversationDigests.map((r) => ({ ...r, worldId })));
         return branch!;
       });
       return { world_id: world.id, token: worldToken(world.id, world.deviceId, config.MONDE_TOKEN_SECRET ?? "monde-local-development-only"), branch_id: world.branchId };
     } catch (error) { return failure(error, reply); }
   });
+}
+
+/** Conversation memory for a snapshot: open sessions with their turns, plus every summary and digest. */
+async function conversationState(tx: Pick<WorldDatabase, "select">, worldId: string) {
+  const sessions = await tx.select().from(s.conversationSessions)
+    .where(and(eq(s.conversationSessions.worldId, worldId), eq(s.conversationSessions.compacted, false)));
+  const open = sessions.map((row) => row.id);
+  return {
+    conversationSessions: sessions,
+    dialogueTurns: open.length
+      ? await tx.select().from(s.dialogueTurns).where(and(eq(s.dialogueTurns.worldId, worldId), inArray(s.dialogueTurns.conversationId, open)))
+      : [],
+    conversationSummaries: await tx.select().from(s.conversationSummaries).where(eq(s.conversationSummaries.worldId, worldId)),
+    conversationDigests: await tx.select().from(s.conversationDigests).where(eq(s.conversationDigests.worldId, worldId)),
+  };
 }
 
 function failure(error: unknown, reply: import("fastify").FastifyReply) {

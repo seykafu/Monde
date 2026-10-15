@@ -50,7 +50,13 @@ it("branches the complete saved mind, isolates later changes and can run the nex
   await db.insert(s.favors).values(["proposed", "completed"].map((status) => ({ worldId, id: status, residentId: r.id, template: "fetch", target: "flour", text: "Flour please", status, createdDay: 1, expiresDay: 5, reward: {} })));
   await db.insert(s.letters).values([false, true].map((delivered) => ({ worldId, id: String(delivered), fromId: r.id, toId: "player", day: 1, text: "Hello", delivered })));
   await db.insert(s.tieMilestones).values({ worldId, day: 1, aId: "a", bId: "b", kind: "friendship", fromLabel: "stranger", toLabel: "friend" });
-  await db.insert(s.dialogueTurns).values({ worldId, id: "talk/0", residentId: r.id, conversationId: "talk", day: 1, minute: 500, fallback: true, output: { lines: [{ text: "Hello", expr: "neutral" }], choices: [], effects: { regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: "" }, wrap_up: false } });
+  const turn = (conversationId: string) => ({ worldId, id: `${conversationId}/0`, residentId: r.id, conversationId, day: 1, minute: 500, fallback: true, output: { lines: [{ text: "Hello", expr: "neutral" as const }], choices: [], effects: { regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: "" }, wrap_up: false } });
+  const session = (id: string, compacted: boolean) => ({ worldId, id, residentId: r.id, openedDay: 1, openedMinute: 490, lastDay: 1, lastMinute: 500, place: "commons.duck_pond", compacted, history: compacted ? "" : "[]", system: [] });
+  // An open session keeps its verbatim turns; a compacted one survives as its summary and the digest (§9.10.3).
+  await db.insert(s.conversationSessions).values([session("talk", false), session("old", true)]);
+  await db.insert(s.dialogueTurns).values([turn("talk"), turn("old")]);
+  await db.insert(s.conversationSummaries).values({ worldId, conversationId: "old", residentId: r.id, day: 1, minute: 400, summary: "We talked about flour.", facts: { promises: [], asks: [], learned_about_player: [] }, topics: ["flour"], feltAfter: "content" });
+  await db.insert(s.conversationDigests).values({ worldId, residentId: r.id, digest: "Met the Fellow once." });
   const saved = await e.save();
   expect(saved.statusCode).toBe(200);
   const id = saved.json().snapshot_id as string;
@@ -84,7 +90,10 @@ it("branches the complete saved mind, isolates later changes and can run the nex
     expect(rows).toHaveLength(p[key].length);
     expect(rows).toEqual(expect.arrayContaining(p[key].map((row) => ({ ...row, worldId: branch.world_id }))));
   }
-  expect(await db.select().from(s.dialogueTurns).where(eq(s.dialogueTurns.worldId, branch.world_id))).toHaveLength(1);
+  expect((await db.select().from(s.dialogueTurns).where(eq(s.dialogueTurns.worldId, branch.world_id))).map((t) => t.conversationId)).toEqual(["talk"]);
+  expect((await db.select().from(s.conversationSessions).where(eq(s.conversationSessions.worldId, branch.world_id))).map((x) => x.id)).toEqual(["talk"]);
+  expect(await db.select().from(s.conversationSummaries).where(eq(s.conversationSummaries.worldId, branch.world_id))).toHaveLength(1);
+  expect(await db.select().from(s.conversationDigests).where(eq(s.conversationDigests.worldId, branch.world_id))).toHaveLength(1);
   expect(await db.select().from(s.aiLog).where(eq(s.aiLog.worldId, branch.world_id))).toHaveLength(0);
   expect(await db.select().from(s.residents).where(eq(s.residents.worldId, worldId))).toEqual(oldResidents);
   expect(await db.select().from(s.memories).where(eq(s.memories.worldId, worldId))).toEqual(oldMemories);

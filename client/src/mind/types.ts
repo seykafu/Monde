@@ -8,6 +8,8 @@ export interface TalkChoice { id: string; text: string; intent: Intent }
 /** The `turn` event: always last on the stream and authoritative over anything streamed before it. */
 export interface TalkTurn {
   conversation_id: string;
+  resumed?: boolean;
+  history?: { who: 'player' | 'resident'; text: string }[];
   resident_id: string;
   /** 0-based exchange number within the conversation. */
   turn_index: number;

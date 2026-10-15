@@ -12,7 +12,7 @@
  */
 import type Anthropic from "@anthropic-ai/sdk";
 import { DialogueTurnOutput, LIMITS, modelOutputFormat } from "@monde/shared";
-import { apiParams, containsAnswer, requestSettings, type MindRequest } from "./promptBuilder.js";
+import { apiParams, containsAnswer, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
 import { completeWords, lexicalHits } from "./filters.js";
 import { LineTextExtractor } from "./partialJson.js";
@@ -34,8 +34,8 @@ export interface DialogueTimings {
 
 export const DEFAULT_TIMINGS: DialogueTimings = { thinkingMs: 2500, firstTextMs: 6000, attemptMs: 12000 };
 
-/** §9.10 step 6: up to 6 exchanges, then the resident wraps up. The 7th exchange (index 6) is forced. */
-export const MAX_EXCHANGES = 6;
+/** §9.10 step 6: the sixth exchange wraps up; a resumed session may grant two more. */
+export { MAX_EXCHANGES } from "@monde/shared";
 export const WRAP_UP_NOTE = "This is your last line in this conversation: bring it to a natural close and set wrap_up to true.";
 
 /** One model call, for the ai_log row (§19.6). */
@@ -63,6 +63,7 @@ export interface TurnFailure {
 export interface GenerateResult {
   /** The validated, clamped turn, or null when the caller must use the authored fallback. */
   output: DialogueTurnOutput | null;
+  rawOutput?: string;
   failure: TurnFailure | null;
   calls: CallRecord[];
   /** What validation changed on the accepted output (clamped deltas, mapped expressions…), for logs. */
@@ -124,14 +125,14 @@ export function dialogueParams(request: MindRequest, notes: readonly string[] = 
  * (measured on staging 2026-10-14: a schema-less prewarm cached 5.8k tokens, the real turn then wrote 7.2k).
  * `max_tokens: 0` rejects a format, so the prewarm asks for one token and ignores it (stop_reason max_tokens).
  */
-export function prewarmParams(prefix: ResidentPrefix, day: number): Anthropic.MessageCreateParamsNonStreaming {
+export function prewarmParams(prefix: ResidentPrefix, day: number, history = ""): Anthropic.MessageCreateParamsNonStreaming {
   const settings = requestSettings("dialogue");
   return {
     model: settings.model,
     max_tokens: 1,
     ...(settings.thinking ? { thinking: settings.thinking } : {}),
     system: prefixSystemBlocks(prefix, day),
-    messages: [{ role: "user", content: "warmup" }],
+    messages: [{ role: 'user', content: [{ type: 'text', text: `<history_with_player>\n${speech(history)}\n</history_with_player>`, cache_control: { type: 'ephemeral' } }] }, { role: 'user', content: 'warmup' }],
     output_config: { format: modelOutputFormat(DialogueTurnOutput) },
   } as Anthropic.MessageCreateParamsNonStreaming;
 }
@@ -266,7 +267,7 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
       const validated = validateTurn(textOf(message), options.validation);
       if (validated.ok) {
         record(tokens, stopReason, "ok");
-        return { output: validated.output, failure: null, calls, adjustments: validated.adjustments };
+        return { output: validated.output, rawOutput: textOf(message), failure: null, calls, adjustments: validated.adjustments };
       }
       record(tokens, stopReason, validated.category);
       corrective = correctiveNote(validated.category);

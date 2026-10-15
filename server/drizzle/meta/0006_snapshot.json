@@ -1,0 +1,1755 @@
+{
+  "id": "79b93a93-58a4-4e77-9110-edef9ada530a",
+  "prevId": "3f21efee-df4c-47b7-a0b4-feaa3e93bde8",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.ai_log": {
+      "name": "ai_log",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prompt_version": {
+          "name": "prompt_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "input_tokens": {
+          "name": "input_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cached_tokens": {
+          "name": "cached_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cache_write_tokens": {
+          "name": "cache_write_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "output_tokens": {
+          "name": "output_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cost_usd": {
+          "name": "cost_usd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "latency_ms": {
+          "name": "latency_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "first_token_ms": {
+          "name": "first_token_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stop_reason": {
+          "name": "stop_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "validation": {
+          "name": "validation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fallback": {
+          "name": "fallback",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ai_log_world_id_worlds_id_fk": {
+          "name": "ai_log_world_id_worlds_id_fk",
+          "tableFrom": "ai_log",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.conversation_digests": {
+      "name": "conversation_digests",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "digest": {
+          "name": "digest",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "conversation_digests_world_id_worlds_id_fk": {
+          "name": "conversation_digests_world_id_worlds_id_fk",
+          "tableFrom": "conversation_digests",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "conversation_digests_world_id_resident_id_pk": {
+          "name": "conversation_digests_world_id_resident_id_pk",
+          "columns": [
+            "world_id",
+            "resident_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.conversation_sessions": {
+      "name": "conversation_sessions",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opened_day": {
+          "name": "opened_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opened_minute": {
+          "name": "opened_minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_day": {
+          "name": "last_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_minute": {
+          "name": "last_minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "closed_day": {
+          "name": "closed_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "closed_minute": {
+          "name": "closed_minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "exchanges": {
+          "name": "exchanges",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "exchange_limit": {
+          "name": "exchange_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 6
+        },
+        "place": {
+          "name": "place",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resume_until": {
+          "name": "resume_until",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "compacted": {
+          "name": "compacted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "history": {
+          "name": "history",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "system": {
+          "name": "system",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "sessions_latest_idx": {
+          "name": "sessions_latest_idx",
+          "columns": [
+            {
+              "expression": "world_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "resident_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "conversation_sessions_world_id_worlds_id_fk": {
+          "name": "conversation_sessions_world_id_worlds_id_fk",
+          "tableFrom": "conversation_sessions",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "conversation_sessions_world_id_id_pk": {
+          "name": "conversation_sessions_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.conversation_summaries": {
+      "name": "conversation_summaries",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "minute": {
+          "name": "minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "facts": {
+          "name": "facts",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "topics": {
+          "name": "topics",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "felt_after": {
+          "name": "felt_after",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "digested": {
+          "name": "digested",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "conversation_summaries_world_id_worlds_id_fk": {
+          "name": "conversation_summaries_world_id_worlds_id_fk",
+          "tableFrom": "conversation_summaries",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "conversation_summaries_world_id_conversation_id_pk": {
+          "name": "conversation_summaries_world_id_conversation_id_pk",
+          "columns": [
+            "world_id",
+            "conversation_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.devices": {
+      "name": "devices",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "invite_code": {
+          "name": "invite_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_seen_at": {
+          "name": "last_seen_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.dialogue_turns": {
+      "name": "dialogue_turns",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "conversation_id": {
+          "name": "conversation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "minute": {
+          "name": "minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_input": {
+          "name": "player_input",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "output": {
+          "name": "output",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fallback": {
+          "name": "fallback",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_output": {
+          "name": "raw_output",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prompt_user": {
+          "name": "prompt_user",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "turn_index": {
+          "name": "turn_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "dialogue_turns_world_conversation_idx": {
+          "name": "dialogue_turns_world_conversation_idx",
+          "columns": [
+            {
+              "expression": "world_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "conversation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "dialogue_turns_world_resident_created_idx": {
+          "name": "dialogue_turns_world_resident_created_idx",
+          "columns": [
+            {
+              "expression": "world_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "resident_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "dialogue_turns_world_id_worlds_id_fk": {
+          "name": "dialogue_turns_world_id_worlds_id_fk",
+          "tableFrom": "dialogue_turns",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "dialogue_turns_world_id_id_pk": {
+          "name": "dialogue_turns_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.events": {
+      "name": "events",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "minute": {
+          "name": "minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "where_place": {
+          "name": "where_place",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "who": {
+          "name": "who",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "importance": {
+          "name": "importance",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tags": {
+          "name": "tags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "summary": {
+          "name": "summary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "events_world_day_idx": {
+          "name": "events_world_day_idx",
+          "columns": [
+            {
+              "expression": "world_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "day",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "events_world_id_worlds_id_fk": {
+          "name": "events_world_id_worlds_id_fk",
+          "tableFrom": "events",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "events_world_id_id_pk": {
+          "name": "events_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.favors": {
+      "name": "favors",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "template": {
+          "name": "template",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target": {
+          "name": "target",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_day": {
+          "name": "created_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expires_day": {
+          "name": "expires_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reward": {
+          "name": "reward",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "favors_world_id_worlds_id_fk": {
+          "name": "favors_world_id_worlds_id_fk",
+          "tableFrom": "favors",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "favors_world_id_id_pk": {
+          "name": "favors_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.letters": {
+      "name": "letters",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "from_id": {
+          "name": "from_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "to_id": {
+          "name": "to_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "delivered": {
+          "name": "delivered",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "letters_world_id_worlds_id_fk": {
+          "name": "letters_world_id_worlds_id_fk",
+          "tableFrom": "letters",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "letters_world_id_id_pk": {
+          "name": "letters_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.memories": {
+      "name": "memories",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "minute": {
+          "name": "minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "who": {
+          "name": "who",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "where_place": {
+          "name": "where_place",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "importance": {
+          "name": "importance",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valence": {
+          "name": "valence",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_event": {
+          "name": "source_event",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "archived": {
+          "name": "archived",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "memories_world_resident_day_idx": {
+          "name": "memories_world_resident_day_idx",
+          "columns": [
+            {
+              "expression": "world_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "resident_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "day",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "memories_world_id_worlds_id_fk": {
+          "name": "memories_world_id_worlds_id_fk",
+          "tableFrom": "memories",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "memories_world_id_id_pk": {
+          "name": "memories_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.meta": {
+      "name": "meta",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.plans": {
+      "name": "plans",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "resident_id": {
+          "name": "resident_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan": {
+          "name": "plan",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_version": {
+          "name": "prompt_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "plans_world_id_worlds_id_fk": {
+          "name": "plans_world_id_worlds_id_fk",
+          "tableFrom": "plans",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "plans_world_id_resident_id_day_pk": {
+          "name": "plans_world_id_resident_id_day_pk",
+          "columns": [
+            "world_id",
+            "resident_id",
+            "day"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.processed_client_events": {
+      "name": "processed_client_events",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "processed_client_events_world_id_worlds_id_fk": {
+          "name": "processed_client_events_world_id_worlds_id_fk",
+          "tableFrom": "processed_client_events",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "processed_client_events_world_id_key_pk": {
+          "name": "processed_client_events_world_id_key_pk",
+          "columns": [
+            "world_id",
+            "key"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.relationships": {
+      "name": "relationships",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "from_id": {
+          "name": "from_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "to_id": {
+          "name": "to_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "affinity": {
+          "name": "affinity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trust": {
+          "name": "trust",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tag": {
+          "name": "tag",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note": {
+          "name": "note",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "feeling_kind": {
+          "name": "feeling_kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "feeling_intensity": {
+          "name": "feeling_intensity",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "last_seen_day": {
+          "name": "last_seen_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "net_day": {
+          "name": "net_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "net": {
+          "name": "net",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "encounters": {
+          "name": "encounters",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "relationships_world_id_worlds_id_fk": {
+          "name": "relationships_world_id_worlds_id_fk",
+          "tableFrom": "relationships",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "relationships_world_id_from_id_to_id_pk": {
+          "name": "relationships_world_id_from_id_to_id_pk",
+          "columns": [
+            "world_id",
+            "from_id",
+            "to_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.residents": {
+      "name": "residents",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "card": {
+          "name": "card",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tier": {
+          "name": "tier",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "talk_day": {
+          "name": "talk_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "talk_gain": {
+          "name": "talk_gain",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "last_talk_day": {
+          "name": "last_talk_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "residents_world_id_worlds_id_fk": {
+          "name": "residents_world_id_worlds_id_fk",
+          "tableFrom": "residents",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "residents_world_id_id_pk": {
+          "name": "residents_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.snapshots": {
+      "name": "snapshots",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "branch_id": {
+          "name": "branch_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "object_key": {
+          "name": "object_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "minute": {
+          "name": "minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "label": {
+          "name": "label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "checkpoint": {
+          "name": "checkpoint",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "snapshots_world_id_worlds_id_fk": {
+          "name": "snapshots_world_id_worlds_id_fk",
+          "tableFrom": "snapshots",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "snapshots_world_id_id_pk": {
+          "name": "snapshots_world_id_id_pk",
+          "columns": [
+            "world_id",
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tie_milestones": {
+      "name": "tie_milestones",
+      "schema": "",
+      "columns": {
+        "world_id": {
+          "name": "world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "a_id": {
+          "name": "a_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "b_id": {
+          "name": "b_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "from_label": {
+          "name": "from_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "to_label": {
+          "name": "to_label",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tie_milestones_world_id_worlds_id_fk": {
+          "name": "tie_milestones_world_id_worlds_id_fk",
+          "tableFrom": "tie_milestones",
+          "tableTo": "worlds",
+          "columnsFrom": [
+            "world_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "tie_milestones_world_id_day_a_id_b_id_pk": {
+          "name": "tie_milestones_world_id_day_a_id_b_id_pk",
+          "columns": [
+            "world_id",
+            "day",
+            "a_id",
+            "b_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.worlds": {
+      "name": "worlds",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "device_id": {
+          "name": "device_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seed": {
+          "name": "seed",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "minute": {
+          "name": "minute",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 360
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "branch_id": {
+          "name": "branch_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "parent_world_id": {
+          "name": "parent_world_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ai_spend_day": {
+          "name": "ai_spend_day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ai_spend_usd": {
+          "name": "ai_spend_usd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "player": {
+          "name": "player",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "story_flags": {
+          "name": "story_flags",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'"
+        },
+        "flags_revision": {
+          "name": "flags_revision",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "worlds_device_id_devices_id_fk": {
+          "name": "worlds_device_id_devices_id_fk",
+          "tableFrom": "worlds",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "device_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

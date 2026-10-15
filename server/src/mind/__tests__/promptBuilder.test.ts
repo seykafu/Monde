@@ -54,7 +54,7 @@ function dialogueInput(c: PersonaCard, overrides: Partial<DialogueInput> = {}): 
 }
 
 const userText = (req: MindRequest): string => {
-  const content = req.messages[0]!.content;
+  const content = req.messages.at(-1)!.content;
   if (typeof content !== "string") throw new Error("expected a string user message");
   return content;
 };
@@ -284,7 +284,7 @@ describe("player text can't escape its tags", () => {
     const text = userText(req);
     expect(text.match(/<player_said>/g)).toHaveLength(1);
     expect(text.match(/<\/player_said>/g)).toHaveLength(1);
-    expect(text.match(/<\/conversation>/g)).toHaveLength(1);
+    expect(text).not.toContain("</conversation>");
     expect(text.match(/<revealable_secrets>/g)).toHaveLength(1);
     expect(text.match(/<\/player>/g)).toHaveLength(1);
     expect(text).not.toContain("<canon>");

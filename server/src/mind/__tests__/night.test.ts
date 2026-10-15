@@ -364,3 +364,35 @@ describe("night pass rules and hygiene", () => {
     }
   });
 });
+
+
+it('compacts the day’s leftover sessions before reflections read memories', async () => {
+  const mind = fake();
+  const env = await setup(mind);
+  const { selectSession } = await import('../sessions.js');
+  const { persistTurn } = await import('../effects.js');
+  const { message } = await import('./fakeMind.js');
+  const { conversationSummaries } = await import('../../db/schema.js');
+  const id = randomUUID();
+  await selectSession(database.db, { worldId: env.worldId, residentId: 'pell', requestedId: id, open: true,
+    scene: { day: 1, minute: 600, place: 'old_quarter.library', weather: 'fog' } });
+  await persistTurn(database.db, { worldId: env.worldId, residentId: 'pell', conversationId: id,
+    day: 1, minute: 600, place: 'old_quarter.library', playerInput: null, turnIndex: 0,
+    output: { lines: [{ text: 'The Fellow came to visit.', expr: 'warm' }], choices: [], wrap_up: false,
+      effects: { regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: 'books' } },
+    fallback: false, calls: [], recordTurn: true, promptVersion: 'test' });
+  const original = mind.createMessage.bind(mind);
+  mind.createMessage = async (params, options) => {
+    const user = JSON.stringify(params.messages);
+    if (user.includes('Summarize this conversation')) return message(JSON.stringify({ summary: 'I discussed the brass bookmark with the Fellow.',
+      facts: { promises: [], asks: [], learned_about_player: [] }, topics: ['books'], felt_after: 'warm' }), 'end_turn');
+    if (user.includes('<reflect_request>')) {
+      const summaries = await database.db.select().from(conversationSummaries).where(eq(conversationSummaries.worldId, env.worldId));
+      expect(summaries).toHaveLength(1);
+    }
+    return original(params, options);
+  };
+  await night(env, { day: 1 });
+  await env.runner.idle(env.worldId);
+  expect(mind.callsFor('reflect', 'pell').map(c => JSON.stringify(c.body.messages)).join()).toContain('brass bookmark');
+});

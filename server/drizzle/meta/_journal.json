@@ -43,6 +43,13 @@
       "when": 1792032229628,
       "tag": "0005_m06_client_events",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792034990805,
+      "tag": "0006_d18_conversation_sessions",
+      "breakpoints": true
     }
   ]
 }

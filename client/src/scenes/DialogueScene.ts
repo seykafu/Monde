@@ -208,6 +208,7 @@ export class DialogueScene extends Phaser.Scene {
   private look!: PortraitLook;
   private context!: TalkContext;
   private conversationId = '';
+  private serverConversationId: string | null = null;
   /** Exchanges completed (the next turn's index). */
   private exchange = 0;
   private turn: TalkTurn | null = null;
@@ -273,6 +274,7 @@ export class DialogueScene extends Phaser.Scene {
     if (data.topic) this.context = { ...this.context, current_activity: data.topic.slice(0, 120) };
     if (data.place) this.context = { ...this.context, place: data.place };
     this.conversationId = uuid();
+    this.serverConversationId = null;
     this.exchange = 0;
     this.turn = null;
     this.source = 'quiet';
@@ -487,6 +489,15 @@ export class DialogueScene extends Phaser.Scene {
     this.generating = false;
     this.thinkTimer?.remove();
     this.source = source;
+    if (source === 'server') {
+      this.conversationId = turn.conversation_id;
+      this.serverConversationId = turn.conversation_id;
+      if (turn.resumed) {
+        this.log = [...(turn.history ?? []), { who: 'resident', text: '(picking up where you left off)' }];
+        const touch = this.add.text(PANEL_X + 24, PANEL_Y - 24, '(picking up where you left off)', { fontSize: '14px', color: '#e4c77f' });
+        this.time.delayedCall(3500, () => touch.destroy());
+      }
+    }
     this.turn = this.tidy(turn);
     for (const line of this.turn.lines) this.log.push({ who: 'resident', text: line.text });
     this.exchange = turn.turn_index + 1;
@@ -911,6 +922,7 @@ export class DialogueScene extends Phaser.Scene {
 
   /** On shutdown, however it came: give the world back. */
   private teardown(): void {
+    if (this.serverConversationId) void getMind().closeTalk(this.card.id, this.serverConversationId, this.context.day, this.context.minute);
     this.closed = true;
     this.abort?.abort();
     this.closeSay(false);

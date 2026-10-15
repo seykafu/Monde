@@ -1,3 +1,7 @@
+import { closeSession, historyFor, selectSession } from "./sessions.js";
+import { compactSession } from "./compaction.js";
+import { WorldSemaphores } from "./semaphore.js";
+import { SILENT_LOG } from "./nightJob.js";
 /**
  * monde-mind HTTP routes for M-05 (GDD §19.4): the player profile, live dialogue over Server-Sent Events and the
  * proximity prewarm. All three sit under /v1/worlds/:w and are authorized by the world token hook in
@@ -16,15 +20,15 @@
  */
 import type { OutgoingHttpHeaders } from "node:http";
 import type { FastifyInstance, FastifyReply } from "fastify";
-import { eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { Intent, PlaceId, ResidentId, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
-import { aiLog, worlds } from "../db/schema.js";
+import { SUMMARY_TIMEOUT_MS, Intent, PlaceId, ResidentId, normalizeChoices, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
+import { aiLog, dialogueTurns, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
-import { buildDialogueRequest, promptVersion } from "./promptBuilder.js";
+import { buildDialogueRequest, promptVersion, speech } from "./promptBuilder.js";
 import { loadDialogueContext, loadResidentPrefix, type DialogueContext } from "./context.js";
 import {
-  MAX_EXCHANGES, WRAP_UP_NOTE, generateTurn, prewarmParams, type CallRecord, type DialogueTimings, type TurnFailure,
+  WRAP_UP_NOTE, generateTurn, prewarmParams, type CallRecord, type DialogueTimings, type TurnFailure,
 } from "./dialogue.js";
 import { aiLogRow, persistTurn } from "./effects.js";
 import { LEAVE_CHOICE, THINKING_BEAT, fallbackTurn } from "./fallback.js";
@@ -57,7 +61,7 @@ export const TalkBody = z.object({
   ]),
   context: z.object({
     day: z.number().int().min(1),
-    minute: z.number().int().min(0).max(1560),
+    minute: z.number().int().min(360).max(1560),
     place: PlaceId,
     weather: z.string().trim().min(1).max(40),
     current_activity: z.string().trim().min(1).max(120).nullish(),
@@ -97,6 +101,18 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
   const now = options.now ?? (() => Date.now());
   const interval = options.prewarmIntervalMs ?? PREWARM_INTERVAL_MS;
   const lastPrewarm = new Map<string, number>();
+  const sessions = new WorldSemaphores(1);
+  const models = new WorldSemaphores(8);
+  const background = new Set<Promise<void>>();
+  app.addHook('onClose', async () => { await Promise.allSettled([...background]); });
+
+  app.post<{ Params: { w: string } }>('/v1/worlds/:w/talk/close', async (request, reply) => {
+    const parsed = z.object({ resident_id: ResidentId, conversation_id: z.uuid(), day: z.number().int().min(1), minute: z.number().int().min(360).max(1560) }).safeParse(request.body);
+    if (!parsed.success) return reply.code(400).send({ error: 'invalid close request' });
+    const b = parsed.data;
+    const closed = await sessions.run(`${request.params.w}:${b.resident_id}`, () => closeSession(db!, request.params.w, b.resident_id, b.conversation_id, b.day, b.minute));
+    return { closed };
+  });
 
   // ------------------------------------------------------------------------------------------------------------
   // Player profile (GDD §11.1)
@@ -120,93 +136,120 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     if (!parsed.success) return reply.code(400).send({ error: "invalid talk request", issues: issues(parsed.error) });
     const body = parsed.data;
     const worldId = request.params.w;
-    const playerText = body.input.kind === "open" ? null : body.input.text;
-    const loaded = await loadDialogueContext(db!, {
-      worldId, residentId: body.resident_id, conversationId: body.conversation_id, scene: body.context,
-      playerText, playerSaid: playerText ?? "(walks up to you)",
-    });
-    if (!loaded.ok) {
-      return loaded.error === "unknown_resident"
-        ? reply.code(404).send({ error: "unknown resident" })
-        : reply.code(409).send({ error: "conversation belongs to another resident" });
-    }
-    const ctx = loaded.context;
-    if (body.context.riddle && !ctx.riddle) {
-      request.log.warn({ riddle: body.context.riddle.id }, "unknown riddle id; no hint guard on this turn");
-    }
-
-    reply.hijack();
-    const raw = reply.raw;
-    raw.writeHead(200, sseHeaders(reply));
-    raw.flushHeaders();
-    const send = (event: string, data: unknown) => {
-      if (!raw.writableEnded && !raw.destroyed) raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-    };
-    const clientGone = new AbortController();
-    raw.on("close", () => { if (!raw.writableFinished) clientGone.abort(); });
-
-    const forced = ctx.turnIndex >= MAX_EXCHANGES;
-    const fallbackFor = (context: DialogueContext): DialogueTurnOutput => {
-      const turn = fallbackTurn({
-        card: context.prefix.card, state: context.prefix.state, playerName: context.playerName,
-        turnIndex: context.turnIndex, riddle: context.riddle,
+    return sessions.run(`${worldId}:${body.resident_id}`, async () => {
+      const selected = await selectSession(db!, { worldId, residentId: body.resident_id, requestedId: body.conversation_id, open: body.input.kind === 'open', scene: body.context });
+      if ('error' in selected) return reply.code(selected.error === 'unknown_resident' ? 404 : 409).send({ error: selected.error });
+      body.conversation_id = selected.session.id;
+      const playerText = body.input.kind === "open" ? null : body.input.text;
+      const loaded = await loadDialogueContext(db!, {
+        worldId, residentId: body.resident_id, conversationId: body.conversation_id, scene: body.context,
+        playerText, playerSaid: playerText ?? "(walks up to you)",
       });
-      return forced ? forceWrapUp(turn) : turn;
-    };
-    const sendTurn = (output: DialogueTurnOutput, fallback: boolean, regard: TurnRegard | null) => send("turn", {
-      conversation_id: body.conversation_id, resident_id: body.resident_id, turn_index: ctx.turnIndex,
-      lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback, regard,
-    });
-
-    try {
-      let calls: CallRecord[] = [];
-      let output: DialogueTurnOutput;
-      let failure: TurnFailure | null = null;
-      try {
-        const result = await generateTurn({
-          mind,
-          request: buildDialogueRequest(ctx.input),
-          notes: forced ? [WRAP_UP_NOTE] : [],
-          validation: ctx.validation,
-          timings: options.timings,
-          signal: clientGone.signal,
-          onLineDelta: (delta) => send("line_delta", delta),
-          onThinking: () => send("thinking", { text: THINKING_BEAT }),
-        });
-        calls = result.calls;
-        failure = result.failure;
-        output = result.output ? (forced ? forceWrapUp(result.output) : result.output) : fallbackFor(ctx);
-        if (result.adjustments.length) request.log.info({ adjustments: result.adjustments }, "dialogue output adjusted");
-      } catch (error) {
-        request.log.error({ err: error }, "dialogue generation crashed");
-        failure = { code: "api_error", message: "The turn failed; using an authored line." };
-        output = fallbackFor(ctx);
+      if (!loaded.ok) {
+        return loaded.error === "unknown_resident"
+          ? reply.code(404).send({ error: "unknown resident" })
+          : reply.code(409).send({ error: "conversation belongs to another resident" });
       }
-      const fallback = failure !== null;
-      if (failure) request.log.warn({ failure, calls: calls.map((c) => c.validation) }, "dialogue fell back");
+      const ctx = loaded.context;
+      ctx.input.sessionHistory = selected.session.history;
+      ctx.input.sessionSystem = selected.session.system;
+      if (selected.resumed) ctx.input.resumedAfter = selected.afterMinutes;
+      const previous = selected.resumed ? await db!.select().from(dialogueTurns).where(and(eq(dialogueTurns.worldId, worldId), eq(dialogueTurns.conversationId, body.conversation_id))).orderBy(asc(dialogueTurns.turnIndex)) : [];
+      const backlog = previous.flatMap(t => [...(t.playerInput ? [{ who: 'player', text: t.playerInput }] : []), ...t.output.lines.map(l => ({ who: 'resident', text: l.text }))]);
+      if (body.context.riddle && !ctx.riddle) {
+        request.log.warn({ riddle: body.context.riddle.id }, "unknown riddle id; no hint guard on this turn");
+      }
 
-      let regard: TurnRegard | null;
-      try {
-        regard = await persistTurn(db!, {
-          worldId, residentId: body.resident_id, conversationId: body.conversation_id, turnIndex: ctx.turnIndex,
-          day: body.context.day, minute: body.context.minute, place: body.context.place, playerInput: playerText,
-          output, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
+      reply.hijack();
+      const raw = reply.raw;
+      raw.writeHead(200, sseHeaders(reply));
+      raw.flushHeaders();
+      const send = (event: string, data: unknown) => {
+        if (!raw.writableEnded && !raw.destroyed) raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+      };
+      const clientGone = new AbortController();
+      raw.on("close", () => { if (!raw.writableFinished) clientGone.abort(); });
+
+      const forced = ctx.turnIndex >= selected.session.exchangeLimit - 1;
+      const applyLimit = (turn: DialogueTurnOutput): DialogueTurnOutput => {
+        if (forced) return forceWrapUp(turn);
+        if (ctx.turnIndex + 1 < selected.session.resumeUntil) return { ...turn, wrap_up: false,
+          choices: normalizeChoices(turn.choices, { cue: { text: turn.lines.at(-1)?.text ?? '' } }) };
+        return turn;
+      };
+      const fallbackFor = (context: DialogueContext): DialogueTurnOutput => {
+        const turn = fallbackTurn({
+          card: context.prefix.card, state: context.prefix.state, playerName: context.playerName,
+          turnIndex: context.turnIndex, riddle: context.riddle,
         });
+        return applyLimit(turn);
+      };
+      const sendTurn = (output: DialogueTurnOutput, fallback: boolean, regard: TurnRegard | null) => send("turn", {
+        conversation_id: body.conversation_id, resident_id: body.resident_id, turn_index: ctx.turnIndex,
+        resumed: selected.resumed, history: backlog,
+        lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback, regard,
+      });
+
+      try {
+        let calls: CallRecord[] = [];
+        let rawOutput: string | undefined;
+        const built = buildDialogueRequest(ctx.input);
+        const promptUser = `${selected.resumed ? `<resumed after_minutes="${selected.afterMinutes}"/>\n` : ''}<player_said> ${speech(playerText ?? '(walks up to you)')} </player_said>`;
+        let output: DialogueTurnOutput;
+        let failure: TurnFailure | null = null;
+        try {
+          const result = await generateTurn({
+            mind,
+            request: built,
+            notes: forced ? [WRAP_UP_NOTE] : [],
+            validation: ctx.validation,
+            timings: options.timings,
+            signal: clientGone.signal,
+            onLineDelta: (delta) => send("line_delta", delta),
+            onThinking: () => send("thinking", { text: THINKING_BEAT }),
+          });
+          calls = result.calls;
+          rawOutput = result.rawOutput;
+          failure = result.failure;
+          output = result.output ? applyLimit(result.output) : fallbackFor(ctx);
+          if (result.adjustments.length) request.log.info({ adjustments: result.adjustments }, "dialogue output adjusted");
+        } catch (error) {
+          request.log.error({ err: error }, "dialogue generation crashed");
+          failure = { code: "api_error", message: "The turn failed; using an authored line." };
+          output = fallbackFor(ctx);
+        }
+        const fallback = failure !== null;
+        if (failure) request.log.warn({ failure, calls: calls.map((c) => c.validation) }, "dialogue fell back");
+
+        let regard: TurnRegard | null;
+        try {
+          regard = await persistTurn(db!, {
+            worldId, residentId: body.resident_id, conversationId: body.conversation_id, turnIndex: ctx.turnIndex,
+            day: body.context.day, minute: body.context.minute, place: body.context.place, playerInput: playerText,
+            output, rawOutput, promptUser, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
+          });
+        } catch (error) {
+          request.log.error({ err: error, calls }, "persisting the dialogue turn failed");
+          send("error", { code: "persist_failed", message: "The turn couldn't be saved; using an authored line." });
+          sendTurn(fallbackFor(ctx), true, null);
+          return;
+        }
+        if (failure) send("error", failure);
+        sendTurn(output, fallback, regard);
       } catch (error) {
-        request.log.error({ err: error, calls }, "persisting the dialogue turn failed");
-        send("error", { code: "persist_failed", message: "The turn couldn't be saved; using an authored line." });
+        request.log.error({ err: error }, "talk stream failed");
+        send("error", { code: "internal", message: "Something went wrong; using an authored line." });
         sendTurn(fallbackFor(ctx), true, null);
-        return;
+      } finally {
+        if (!raw.writableEnded) raw.end();
+        if (selected.staleId) {
+          const work = compactSession({ db: db!, mind, gate: task => models.run(worldId, task), callTimeoutMs: SUMMARY_TIMEOUT_MS, log: SILENT_LOG }, worldId, selected.staleId)
+            .catch((error: unknown) => { request.log.error({ err: error }, 'conversation compaction failed; night pass will retry'); });
+          background.add(work);
+          void work.finally(() => background.delete(work));
+        }
       }
-      if (failure) send("error", failure);
-      sendTurn(output, fallback, regard);
-    } catch (error) {
-      request.log.error({ err: error }, "talk stream failed");
-      send("error", { code: "internal", message: "Something went wrong; using an authored line." });
-      sendTurn(fallbackFor(ctx), true, null);
-    } finally {
-      if (!raw.writableEnded) raw.end();
-    }
+    });
   });
 
   // ------------------------------------------------------------------------------------------------------------
@@ -232,7 +275,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     if (lastPrewarm.size > 10_000) for (const [k, t] of lastPrewarm) if (at - t >= interval) lastPrewarm.delete(k);
     lastPrewarm.set(key, at);
 
-    const params = prewarmParams(prefix, day);
+    const params = prewarmParams(prefix, day, await historyFor(db!, worldId, residentId));
     const started = performance.now();
     try {
       const message = await mind.createMessage(params, { signal: AbortSignal.timeout(options.prewarmTimeoutMs ?? 5000) });

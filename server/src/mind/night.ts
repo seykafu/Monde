@@ -1,3 +1,4 @@
+import { compactNight } from "./compaction.js";
 /**
  * The night pass (GDD §9.7, §9.8; §19.4 POST /v1/worlds/:w/night; MVP M-07).
  *
@@ -317,6 +318,7 @@ export class NightRunner {
   private async execute(run: NightRun, body: NightBody): Promise<void> {
     const { db } = this.options;
     const { worldId, day } = run;
+    await compactNight(this.deps(worldId, 0), worldId, day);
     const tiers = await recomputeTiers(db, worldId, day);
     run.tiers = countTiers(tiers);
 

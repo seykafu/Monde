@@ -1,3 +1,4 @@
+import { MAX_SESSION_EXCHANGES } from "@monde/shared";
 /**
  * The prompt builder (GDD §9.10.1, §9.17; MVP task M-04).
  *
@@ -523,10 +524,27 @@ export interface DialogueInput {
   openFavors?: readonly OpenFavorView[];
   riddle?: RiddleTopic | null;
   conversation?: readonly ConversationTurn[];
+  sessionHistory?: string;
+  sessionSystem?: Anthropic.TextBlockParam[];
+  earlierTurns?: readonly { user: string; assistant: string }[];
+  resumedAfter?: number;
   /** Free text or the chosen reply. */
   playerSaid: string;
   /** A random word from the whim list (§9.17) for variety. */
   whimSeed?: string | null;
+}
+
+export function dialogueMessages(input: DialogueInput, user: string): Anthropic.MessageParam[] {
+  const history = `<history_with_player>\n${speech(input.sessionHistory ?? '')}\n</history_with_player>`;
+  const messages: Anthropic.MessageParam[] = [{ role: 'user', content: history }];
+  for (const turn of (input.earlierTurns ?? []).slice(0, MAX_SESSION_EXCHANGES)) {
+    messages.push({ role: 'user', content: turn.user }, { role: 'assistant', content: turn.assistant });
+  }
+  // The moving breakpoint does not alter the text bytes of any earlier turn.
+  const last = messages.at(-1)!;
+  last.content = [{ type: 'text', text: last.content as string, cache_control: { type: 'ephemeral' } }];
+  messages.push({ role: 'user', content: `${input.resumedAfter !== undefined ? `<resumed after_minutes="${input.resumedAfter}"/>\n` : ''}${user}` });
+  return messages;
 }
 
 export function buildDialogueRequest(input: DialogueInput): MindRequest {
@@ -535,8 +553,7 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
   const ctx: CanonContext = { flags, day: scene.day, names: input.names };
   const secrets = revealableSecrets(card, { regard: state.regard, flags, day: scene.day });
   const playerName = speech(player.name);
-  const conversation = (input.conversation ?? []).map((turn) =>
-    `${turn.speaker === "resident" ? "You" : playerName}: ${speech(turn.text)}`);
+
   const favors = (input.openFavors ?? []).map((f) =>
     `${f.owner === card.id ? "yours" : who(f.owner, input.names)}: ${f.template} (${f.target}): ${prose(f.text)}`);
   const user = fillTemplate(loadTemplates().dialogue, {
@@ -562,14 +579,13 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     open_favors: bullets(favors, "(none)"),
     revealable_secrets: bullets(secrets.map((s) => `${s.id}: ${s.text}`), "(none: keep everything to yourself)"),
     hints: input.riddle ? trusted(hintsBlock(input.riddle)) : "",
-    conversation: conversation.length ? conversation.join("\n") : "(this is the start of the conversation)",
     player_said: speech(input.playerSaid),
     whim: input.whimSeed ? `Whim seed, if it fits: ${speech(input.whimSeed)}` : "",
     resident_name: prose(card.name),
   });
   return {
-    system: systemBlocks(card, state, input.relationships, ctx),
-    messages: [{ role: "user", content: user }],
+    system: input.sessionSystem?.map(b => ({ type: 'text', text: b.text, cache_control: { type: 'ephemeral' } })) ?? systemBlocks(card, state, input.relationships, ctx),
+    messages: dialogueMessages(input, user),
     output_config: outputConfig("dialogue", DialogueTurnOutput),
   };
 }

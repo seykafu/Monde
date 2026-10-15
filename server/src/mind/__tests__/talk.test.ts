@@ -117,10 +117,11 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect(deltas[0]!.data).toMatchObject({ index: 0, attempt: 1 });
     expect(deltas.filter((d) => d.data.index === 0).at(-1)!.data.text_so_far).toBe(good().lines[0]!.text);
     expect(deltas.filter((d) => d.data.index === 1).at(-1)!.data.text_so_far).toBe("Tea's stewed.");
-    expect(events.some((e) => e.event === "error" || e.event === "thinking")).toBe(false);
+    // Under the full suite the scheduler can cross the scaled 40 ms thinking threshold.
+    expect(events.some((e) => e.event === "error")).toBe(false);
 
     const turn = finalTurn(events);
-    expect(turn).toEqual({
+    expect(turn).toMatchObject({
       conversation_id: body.conversation_id, resident_id: "pell", turn_index: 0, fallback: false, wrap_up: false,
       lines: good().lines,
       choices: [{ id: "a", text: "Eighty-one of how many?", intent: "curious" }, { id: "b", text: "I'll sit.", intent: "kind" }],
@@ -299,25 +300,22 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["ok", "echo", "ok"]);
   });
 
-  it("forces wrap_up on the 7th exchange and carries the conversation so far", async () => {
-    const replies = ["Lamps first.", "Then tea.", "Then the Fund.", "Then Bertrand.", "Then the ferry.", "Then supper.", "Off you go."];
-    const mind = new FakeMind(replies.map((line) => ({ output: good([line]) })));
+  it("forces wrap_up on the sixth exchange and carries exact earlier turns", async () => {
+    const replies = ["Lamps first.", "Then tea.", "Then the Fund.", "Then Bertrand.", "Then the ferry.", "Off you go."];
+    const mind = new FakeMind(replies.map(line => ({ output: good([line]) })));
     const env = await setup(mind);
     const conversation_id = randomUUID();
     const turns = [];
-    for (let i = 0; i < 7; i++) {
-      const input = i === 0 ? { kind: "open" } : { kind: "choice", choice_id: "a", text: `Question ${i}?`, intent: "curious" };
+    for (let i = 0; i < 6; i++) {
+      const input = i === 0 ? { kind: "open" } : { kind: "say", text: `Question ${i}?` };
       turns.push(finalTurn(sse((await talk(env, payload({ conversation_id, input }))).payload)));
     }
-    expect(turns.map((t) => t.turn_index)).toEqual([0, 1, 2, 3, 4, 5, 6]);
-    expect(turns.map((t) => t.wrap_up)).toEqual([false, false, false, false, false, false, true]);
-    expect(turns[6].choices).toEqual([{ id: "a", text: "Leave", intent: "leave" }]);
-    expect(userBlocks(mind.streams[5]!)).not.toContain(WRAP_UP_NOTE);
-    expect(userBlocks(mind.streams[6]!).at(-1)).toBe(WRAP_UP_NOTE);
-    const lastPrompt = userBlocks(mind.streams[6]!)[0]!;
-    expect(lastPrompt).toContain("Fellow: Question 5?");
-    expect(lastPrompt).toContain("You: Then supper.");
-    expect((await turnsOf(env.worldId)).map((t) => t.playerInput)).toEqual([null, ...[1, 2, 3, 4, 5, 6].map((i) => `Question ${i}?`)]);
+    expect(turns.map(t => t.wrap_up)).toEqual([false, false, false, false, false, true]);
+    expect(userBlocks(mind.streams[5]!).at(-1)).toBe(WRAP_UP_NOTE);
+    expect(JSON.stringify(mind.streams[5]!.messages)).toContain('Question 4?');
+    expect(JSON.stringify(mind.streams[5]!.messages)).toContain('Then the ferry.');
+    expect(mind.streams[5]!.messages.filter(m => m.role === 'assistant')).toHaveLength(5);
+    expect((await talk(env, payload({ conversation_id, input: { kind: 'say', text: 'Again?' } }))).statusCode).toBe(409);
   });
 
   it("stores a proposed favor once per resident", async () => {
@@ -365,10 +363,11 @@ describe("POST /v1/worlds/:w/prewarm", () => {
     const warm = mind.creates[0]!;
     expect(warm).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 1, thinking: { type: "disabled" } });
     expect(warm).not.toHaveProperty("stream");
-    expect(warm.messages).toEqual([{ role: "user", content: "warmup" }]);
+    expect(warm.messages.at(-1)).toEqual({ role: "user", content: "warmup" });
 
     await talk(env, payload());
     expect(JSON.stringify(mind.streams[0]!.system)).toBe(JSON.stringify(warm.system));
+    expect(mind.streams[0]!.messages[0]).toEqual(warm.messages[0]);
     // The schema is part of the cached prefix: the prewarm must carry the same format as a real turn.
     const formatOf = (p: object) => JSON.stringify((p as { output_config?: { format?: unknown } }).output_config?.format);
     expect(formatOf(warm)).toBe(formatOf(mind.streams[0]!));
@@ -465,7 +464,79 @@ describe("auth and API hygiene", () => {
     for (const body of allBodies) {
       for (const key of ["temperature", "top_p", "top_k"]) expect(body).not.toHaveProperty(key);
       expect(body.messages.at(-1)!.role).toBe("user");
-      expect(body.messages.every((m) => m.role === "user")).toBe(true);
+      expect((JSON.stringify(body).match(/"cache_control"/g) ?? []).length).toBeLessThanOrEqual(4);
     }
   });
+});
+
+describe('D18 conversation sessions', () => {
+  it('resumes at five minutes with the server id, backlog, exact cached history and two extra exchanges', async () => {
+    const mind = new FakeMind(Array.from({ length: 8 }, (_, i) => ({ output: good([`Line ${i}.`], {}, { wrap_up: i === 6 }) })));
+    const env = await setup(mind);
+    const id = randomUUID();
+    for (let i = 0; i < 6; i++) await talk(env, payload({ conversation_id: id, input: i ? { kind: 'say', text: `Word ${i}` } : { kind: 'open' } }));
+    const close = await env.app.inject({ method: 'POST', url: `/v1/worlds/${env.worldId}/talk/close`, headers: env.headers,
+      payload: { resident_id: 'pell', conversation_id: id, day: 4, minute: 1050 } });
+    expect(close.json()).toEqual({ closed: true });
+    const resumed = finalTurn(sse((await talk(env, payload({ context: { minute: 1055 } }))).payload));
+    expect(resumed).toMatchObject({ conversation_id: id, resumed: true, turn_index: 6, wrap_up: false });
+    expect(resumed.history).toHaveLength(11);
+    expect(userBlocks(mind.streams[6]!)[0]).toContain('<resumed after_minutes="5"/>');
+    const last = finalTurn(sse((await talk(env, payload({ conversation_id: id, context: { minute: 1055 }, input: { kind: 'say', text: 'One more thought.' } }))).payload));
+    expect(last).toMatchObject({ turn_index: 7, wrap_up: true });
+    const text = (m: Anthropic.MessageParam) => typeof m.content === 'string' ? m.content : m.content.map(b => b.type === 'text' ? b.text : '').join('\n');
+    for (let i = 1; i < mind.streams.length; i++) {
+      const previous = mind.streams[i - 1]!, current = mind.streams[i]!;
+      expect(current.system).toEqual(mind.streams[0]!.system);
+      for (let j = 0; j < previous.messages.length - 1; j++) expect(text(current.messages[j]!)).toBe(text(previous.messages[j]!));
+      expect(current.messages.at(-1)!.role).toBe('user');
+      expect(current.messages.slice(0, -1).map(text).join()).not.toContain('<scene>');
+      expect(text(current.messages.at(-1)!)).toContain('<scene>');
+      expect((JSON.stringify(current).match(/"cache_control"/g) ?? [])).toHaveLength(4);
+    }
+    const stored = await turnsOf(env.worldId);
+    expect(text(mind.streams[7]!.messages[14]!)).toBe(stored[6]!.rawOutput);
+    expect(mind.streams[7]!.messages.filter(m => m.role === 'assistant')).toHaveLength(7);
+    const next = finalTurn(sse((await talk(env, payload({ context: { minute: 1055 } }))).payload));
+    expect(next.resumed).toBe(false);
+    expect(next.conversation_id).not.toBe(id);
+  });
+
+  it.each([{ day: 4, minute: 1056 }, { day: 5, minute: 360 }])('starts fresh and compacts after the window or day change: %j', async context => {
+    const mind = new FakeMind([{ output: good(['The lamps need tending.']) }, { output: good(['A fresh morning.']) }]);
+    const env = await setup(mind);
+    const first = finalTurn(sse((await talk(env, payload())).payload));
+    const second = finalTurn(sse((await talk(env, payload({ context }))).payload));
+    expect(second.conversation_id).not.toBe(first.conversation_id);
+    expect(second).toMatchObject({ resumed: false, turn_index: 0, history: [] });
+    expect(mind.streams[1]!.messages.filter(m => m.role === 'assistant')).toHaveLength(0);
+    expect(JSON.stringify(mind.streams[1]!.messages[0])).toContain('the lamps');
+    await env.app.close(); // waits for post-response background compaction
+    const { conversationSessions, conversationSummaries } = await import('../../db/schema.js');
+    const [summary] = await database.db.select().from(conversationSummaries).where(eq(conversationSummaries.worldId, env.worldId));
+    expect(summary).toMatchObject({ conversationId: first.conversation_id, topics: ['the lamps'] });
+    expect(summary!.summary.split(/\s+/).length).toBeLessThanOrEqual(60);
+    const [old] = await database.db.select().from(conversationSessions).where(and(eq(conversationSessions.worldId, env.worldId), eq(conversationSessions.id, first.conversation_id)));
+    expect(old!.compacted).toBe(true);
+    const memoryRows = await database.db.select().from(memories).where(eq(memories.worldId, env.worldId));
+    expect(memoryRows.find(m => m.id === `said_${first.conversation_id}/0`)!.archived).toBe(true);
+    expect(memoryRows.find(m => m.id === `conversation_${first.conversation_id}`)).toMatchObject({ archived: false, kind: 'said', importance: 4 });
+  });
+});
+
+it('does not wait for a compaction model call before finishing the new reply', async () => {
+  const mind = new FakeMind([{ output: good(['An old subject.']) }, { output: good(['A new subject.']) }]);
+  const env = await setup(mind);
+  await talk(env, payload());
+  let release!: () => void;
+  let started!: () => void;
+  const startedCall = new Promise<void>(resolve => { started = resolve; });
+  const held = new Promise<void>(resolve => { release = resolve; });
+  const original = mind.createMessage.bind(mind);
+  mind.createMessage = async params => { started(); await held; return original(params); };
+  try {
+    const response = await talk(env, payload({ context: { minute: 1056 } }));
+    expect(finalTurn(sse(response.payload))).toMatchObject({ turn_index: 0, resumed: false });
+    await startedCall;
+  } finally { release(); }
 });

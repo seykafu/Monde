@@ -217,6 +217,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         openFavors,
         riddle: riddleState ? riddleTopic(riddleState.record, riddleState.allowed) : null,
         conversation,
+        earlierTurns: turns.map(t => ({ user: t.promptUser ?? `<player_said>${t.playerInput ?? '(walks up to you)'}</player_said>`, assistant: t.rawOutput ?? JSON.stringify(t.output) })),
         playerSaid: args.playerSaid,
         whimSeed: null,
       },

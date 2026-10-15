@@ -131,6 +131,8 @@ export const dialogueTurns = pgTable("dialogue_turns", {
   playerInput: text("player_input"),
   output: jsonb("output").$type<DialogueTurnOutput>().notNull(),
   fallback: boolean("fallback").notNull(),
+  rawOutput: text("raw_output"),
+  promptUser: text("prompt_user"),
   /** 0-based exchange number inside the conversation (the id is `<conversation_id>/<turn_index>`). */
   turnIndex: integer("turn_index").notNull().default(0),
   createdAt: createdAt(),
@@ -168,3 +170,29 @@ export const processedClientEvents = pgTable("processed_client_events", {
   worldId: worldId(),
   key: text("key").notNull(),
 }, (t) => [primaryKey({ columns: [t.worldId, t.key] })]);
+
+/** D18: immutable prompt prefix and bounded live conversation. */
+export const conversationSessions = pgTable("conversation_sessions", {
+  worldId: worldId(), id: text("id").notNull(), residentId: text("resident_id").notNull(),
+  openedDay: integer("opened_day").notNull(), openedMinute: integer("opened_minute").notNull(),
+  lastDay: integer("last_day").notNull(), lastMinute: integer("last_minute").notNull(),
+  closedDay: integer("closed_day"), closedMinute: integer("closed_minute"),
+  exchanges: integer("exchanges").notNull().default(0), exchangeLimit: integer("exchange_limit").notNull().default(6),
+  place: text("place").notNull(),
+  resumeUntil: integer("resume_until").notNull().default(0),
+  compacted: boolean("compacted").notNull().default(false),
+  history: text("history").notNull(),
+  system: jsonb("system").$type<import("@anthropic-ai/sdk").default.TextBlockParam[]>().notNull(),
+  createdAt: createdAt(),
+}, t => [primaryKey({ columns: [t.worldId, t.id] }), index("sessions_latest_idx").on(t.worldId, t.residentId, t.createdAt)]);
+export const conversationSummaries = pgTable("conversation_summaries", {
+  worldId: worldId(), conversationId: text("conversation_id").notNull(), residentId: text("resident_id").notNull(),
+  day: integer("day").notNull(), minute: integer("minute").notNull(),
+  summary: text("summary").notNull(),
+  facts: jsonb("facts").$type<{ promises: string[]; asks: string[]; learned_about_player: string[] }>().notNull(),
+  topics: text("topics").array().notNull(), feltAfter: text("felt_after").notNull(),
+  digested: boolean("digested").notNull().default(false),
+}, t => [primaryKey({ columns: [t.worldId, t.conversationId] })]);
+export const conversationDigests = pgTable("conversation_digests", {
+  worldId: worldId(), residentId: text("resident_id").notNull(), digest: text("digest").notNull(),
+}, t => [primaryKey({ columns: [t.worldId, t.residentId] })]);

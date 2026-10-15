@@ -24,9 +24,6 @@ resident_name.
 {{revealable_secrets}}
 </revealable_secrets>
 {{hints}}
-<conversation>
-{{conversation}}
-</conversation>
 <player_said> {{player_said}} </player_said>
 {{whim}}
 Reply as {{resident_name}}.

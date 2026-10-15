@@ -6,7 +6,7 @@
  */
 import { and, eq, inArray } from "drizzle-orm";
 import { ResidentState, applyTalkTurn, clamp, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
-import { aiLog, dialogueTurns, favors, memories, residents } from "../db/schema.js";
+import { aiLog, conversationSessions, dialogueTurns, favors, memories, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import type { CallRecord } from "./dialogue.js";
 import { LIVE_FAVOR_STATUSES } from "./context.js";
@@ -93,6 +93,8 @@ export interface PersistTurnArgs {
   /** What the player said (choice or free text); null when they walked up. */
   playerInput: string | null;
   output: DialogueTurnOutput;
+  rawOutput?: string;
+  promptUser?: string;
   fallback: boolean;
   calls: readonly CallRecord[];
   promptVersion: string;
@@ -158,10 +160,18 @@ export async function persistTurn(db: WorldDatabase, args: PersistTurnArgs): Pro
       await tx.insert(dialogueTurns).values({
         worldId, id: dialogueTurnId(args.conversationId, args.turnIndex), residentId, conversationId: args.conversationId,
         day: args.day, minute: args.minute, playerInput: args.playerInput, output, fallback: args.fallback,
-        turnIndex: args.turnIndex,
+        turnIndex: args.turnIndex, rawOutput: args.rawOutput ?? JSON.stringify(output), promptUser: args.promptUser,
       });
     }
+    if (args.recordTurn) await tx.update(conversationSessions).set({
+      exchanges: args.turnIndex + 1, lastDay: args.day, lastMinute: args.minute,
+      ...(output.wrap_up ? { closedDay: args.day, closedMinute: args.minute } : {}),
+    }).where(and(eq(conversationSessions.worldId, worldId), eq(conversationSessions.id, args.conversationId)));
     if (args.calls.length) {
+      const [world] = await tx.select().from(worlds).where(eq(worlds.id, worldId)).for('update');
+      if (world && world.aiSpendDay <= args.day) await tx.update(worlds).set({ aiSpendDay: args.day,
+        aiSpendUsd: String((world.aiSpendDay === args.day ? Number(world.aiSpendUsd) : 0) + args.calls.reduce((sum, call) => sum + call.costUsd, 0)),
+      }).where(eq(worlds.id, worldId));
       await tx.insert(aiLog).values(args.calls.map((call) => aiLogRow({
         worldId, residentId, kind: "dialogue", promptVersion: args.promptVersion, call, fallback: args.fallback,
       })));

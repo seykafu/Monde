@@ -42,6 +42,8 @@ export function asTurn(v: unknown): TalkTurn | null {
   const lines = v.lines.map(asLine), choices = v.choices.map(asChoice);
   if (lines.length === 0 || lines.some(l => !l) || choices.some(c => !c)) return null;
   return {
+    ...('resumed' in v ? { resumed: v.resumed === true } : {}),
+    ...(Array.isArray(v.history) ? { history: v.history.flatMap(h => isObject(h) && (h.who === 'player' || h.who === 'resident') && isString(h.text) ? [{ who: h.who, text: h.text }] : []) } : {}),
     conversation_id: v.conversation_id, resident_id: v.resident_id, turn_index: v.turn_index,
     lines: lines as TalkLine[], choices: choices as TalkChoice[], wrap_up: v.wrap_up, fallback: v.fallback === true,
     ...('regard' in v ? { regard: asTurnRegard(v.regard) } : {})
