@@ -1,7 +1,8 @@
 import { fileURLToPath } from "node:url";
 import { parseConfig } from "../config.js";
 
-const url = parseConfig().DATABASE_URL;
+const config = parseConfig();
+const url = config.DATABASE_DIRECT_URL ?? config.DATABASE_URL;
 if (!url) {
   console.info("DATABASE_URL is unset; skipping migrations.");
 } else {
