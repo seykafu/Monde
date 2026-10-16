@@ -4,7 +4,10 @@ import { loadContent } from "../../content/loadContent.js";
 import { ECHO_THRESHOLD, correctiveNote, echoOverlap, validateTurn, wordTrigrams, type ValidationContext } from "../validate.js";
 import { completeWords, lexicalHits } from "../filters.js";
 import { checkedExpression, expressionFor } from "../expressions.js";
-import { FALLBACK_LINES, FALLBACK_REPLIES, FILLER_LINES, STUMPED_LINE, authoredHint, fallbackTurn } from "../fallback.js";
+import {
+  FALLBACK_LINES, FALLBACK_REPLIES, FILLER_LINES, MET_LINES, MET_REPLIES, MOMENT_LINES, MOMENT_REPLIES, STUMPED_LINE, authoredHint,
+  fallbackMoment, fallbackTurn,
+} from "../fallback.js";
 import { REPLY_POOLS, WEATHER_REPLIES, ZONE_REPLIES, derivedReplies, fillReply, type Reply } from "@monde/shared";
 import { RIDDLES } from "../riddles.js";
 
@@ -215,7 +218,8 @@ describe("fallback turns", () => {
     expect(fallbackTurn({ ...base, state: state(0, -90) }).lines[0]!.text).toBe(FALLBACK_LINES.Stranger.low);
     expect(fallbackTurn({ ...base, state: state(25, 0) }).lines[0]!.text).toBe("Hello again, Ada. How are you getting on?");
     expect(fallbackTurn({ ...base, state: state(80, 90) }).lines[0]!.text).toBe(FALLBACK_LINES.Confidant.high);
-    expect(fallbackTurn({ ...base, turnIndex: 1, state: state(0, 0) }).lines[0]!.text).toBe(FILLER_LINES[0]);
+    // Walking back up to a conversation that's still open: picking up, not a greeting.
+    expect(MOMENT_LINES.resume).toContain(fallbackTurn({ ...base, turnIndex: 1, state: state(0, 0) }).lines[0]!.text);
   });
 
   it("is effect-free, maps the portrait, and offers replies to the line it shows", () => {
@@ -265,11 +269,13 @@ describe("fallback turns", () => {
   });
 
   it("every authored line and reply passes the lexical filters", () => {
-    const all = [...Object.values(FALLBACK_LINES).flatMap((row) => Object.values(row)), ...FILLER_LINES, STUMPED_LINE];
+    const all = [...Object.values(FALLBACK_LINES).flatMap((row) => Object.values(row)), ...FILLER_LINES, STUMPED_LINE,
+      ...Object.values(MET_LINES), ...Object.values(MOMENT_LINES).flat()];
     for (const line of all) expect(lexicalHits(line.replaceAll("{player}", "Ada"))).toEqual([]);
     const pools = [...Object.values(REPLY_POOLS), ...Object.values(WEATHER_REPLIES), ...Object.values(ZONE_REPLIES)];
     const replies: Reply[] = [
       ...Object.values(FALLBACK_REPLIES).flatMap((row) => Object.values(row).flat()),
+      ...Object.values(MET_REPLIES).flat(), ...Object.values(MOMENT_REPLIES).flat().filter((r) => r.text !== "{question}"),
       ...pools.flatMap((pool) => [...pool.warm, ...pool.curious, ...pool.wry]),
     ];
     for (const reply of replies) {
@@ -277,6 +283,77 @@ describe("fallback turns", () => {
       expect(lexicalHits(text), text).toEqual([]);
       expect(text.length, text).toBeLessThanOrEqual(90);
     }
+  });
+});
+
+describe("mid-conversation fallbacks answer the moment", () => {
+  const state = { regard: 0, mood: { valence: 0, energy: 50, stress: 0, emotion: "content" as const, intensity: 10 } };
+  const greetings = new Set([...Object.values(FALLBACK_LINES).flatMap((row) => Object.values(row)), ...Object.values(MET_LINES)]);
+  const greetingReplies = new Set([...Object.values(FALLBACK_REPLIES).flatMap((row) => Object.values(row).flat()), ...Object.values(MET_REPLIES).flat()].map((r) => r.text));
+  const mid = (playerText: string, extra: Partial<Parameters<typeof fallbackTurn>[0]> = {}) =>
+    fallbackTurn({ card: card("odile"), state, playerName: "Wren", turnIndex: 2, playerText, ...extra });
+
+  it("never greets after the opener, whatever the Fellow said", () => {
+    const lines = ["What do you bake first thing?", "I grew up in a lighthouse up north.", "I'm homesick today.", "Thanks.",
+      "Your bread is fine I guess.", "Why?", "Eighty-one of how many?", "Right."];
+    for (const [i, text] of lines.entries()) {
+      for (const turnIndex of [1, 2, 5]) {
+        const out = mid(text, { turnIndex, said: [] });
+        expect(greetings.has(out.lines[0]!.text), `${text} → ${out.lines[0]!.text}`).toBe(false);
+        expect(out.choices.some((c) => greetingReplies.has(c.text)), `${text} replies`).toBe(false);
+        expect(out.choices.length).toBeGreaterThanOrEqual(2);
+        expect(out.choices.filter((c) => c.intent === "leave").length, `${i}`).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it("stalls honestly on a question and offers it back, a change of subject and a way out", () => {
+    const out = mid("What do you bake first thing in the morning?");
+    expect(MOMENT_LINES.question).toContain(out.lines[0]!.text);
+    expect(out.choices.map((c) => c.text)).toEqual([
+      "What do you bake first thing in the morning?", "Never mind. What's keeping you busy today?", "I'll let you get on.",
+    ]);
+    expect(out.choices[2]!.intent).toBe("leave");
+    expect(out.wrap_up).toBe(false);
+    // A rambling question offers back just its last question; one too long to fit is dropped, not cut.
+    const ramble = mid("Came up past the water tower, got turned around twice, a goat stared me down, anyway. When did the last train run?");
+    expect(ramble.choices[0]!.text).toBe("When did the last train run?");
+    const long = mid(`${"Very long question ".repeat(6)}about trains?`);
+    expect(long.choices.map((c) => c.text)).toEqual(["Never mind. What's keeping you busy today?", "I'll let you get on."]);
+  });
+
+  it("keeps the intent of a reply the Fellow picked when asking it again", () => {
+    expect(mid("Why do you call it the old lady?", { intent: "joke" }).choices[0]).toMatchObject({ text: "Why do you call it the old lady?", intent: "joke" });
+  });
+
+  it("meets a feeling with care, a goodbye with a send-off (and wrap-up), anything else with an acknowledgement", () => {
+    expect(fallbackMoment({ playerText: "Honestly, I'm a bit homesick today. I don't know anyone here yet.", turnIndex: 1 })).toBe("feeling");
+    expect(MOMENT_LINES.feeling.map((l) => l.replaceAll("{player}", "Wren"))).toContain(mid("I'm a bit homesick today.").lines[0]!.text);
+    const bye = mid("I should get going. Thanks for the chat, June.");
+    expect(MOMENT_LINES.bye.map((l) => l.replaceAll("{player}", "Wren"))).toContain(bye.lines[0]!.text);
+    expect(bye.wrap_up).toBe(true);
+    expect(mid("Take care.", { intent: "leave" }).wrap_up).toBe(true);
+    expect(fallbackMoment({ playerText: "Is it far? See you there?", turnIndex: 1 })).toBe("question");
+    expect(MOMENT_LINES.statement).toContain(mid("Your bread is fine I guess.").lines[0]!.text);
+    expect(fallbackMoment({ playerText: "Thanks, that's kind.", turnIndex: 1 })).toBe("thanks");
+    expect(fallbackMoment({ playerText: "I'm Wren, by the way. I grew up in a lighthouse keeper's family up north.", turnIndex: 1 })).toBe("intro");
+    expect(mid("I'm Wren, by the way.").lines[0]!.text).toMatch(/^Wren\b/);
+    expect(fallbackMoment({ playerText: "I'm a bit lost.", turnIndex: 1 })).toBe("statement");
+  });
+
+  it("doesn't repeat a line the resident already said in this conversation", () => {
+    const first = mid("Why?").lines[0]!.text;
+    const second = mid("Why, though?", { said: [first] }).lines[0]!.text;
+    expect(second).not.toBe(first);
+    expect(MOMENT_LINES.question).toContain(second);
+  });
+
+  it("opens with 'it's you again', not 'we haven't met', for a Stranger the Fellow has talked with before", () => {
+    const opener = { card: card("odile"), state, playerName: "Wren", turnIndex: 0 };
+    expect(fallbackTurn(opener).lines[0]!.text).toBe(FALLBACK_LINES.Stranger.even);
+    const again = fallbackTurn({ ...opener, met: true });
+    expect(again.lines[0]!.text).toBe(MET_LINES.even);
+    expect(again.choices.map((c) => c.text)).toEqual(MET_REPLIES.even.map((r) => r.text));
   });
 });
 

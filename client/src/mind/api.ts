@@ -1,3 +1,4 @@
+import { ChatReply, type ChatBody } from '@monde/shared';
 // monde-mind client (GDD §9.10, §9.14, §19.4; MVP M-05). No Phaser; the network and storage are injected so
 // the bootstrap and the stream run under vitest with fakes.
 //
@@ -16,6 +17,7 @@ import { parseDawnPackage, type DawnPackage, type NightRequest } from './dawn';
 import { EventIngestionResult, PlayerProfile as PlayerProfileSchema, type ClientEvent } from '@monde/shared';
 import type { PostOutcome } from './events';
 import type { LineDelta, PlayerProfile, TalkRequest, TalkTurn } from './types';
+import { mindStatus, type MindStatus } from './connection';
 
 export const DEFAULT_MIND_URL = 'https://monde-mind-staging.fly.dev';
 export const STORAGE_KEYS = {
@@ -122,7 +124,7 @@ export class MindClient {
   readonly baseUrl: string;
   readonly deviceId: string;
   readonly prewarmGate = new PrewarmGate();
-  private readonly inviteCode: string | null;
+  private inviteCode: string | null;
   private session: Session | null = null;
   private pending: Promise<Session | null> | null = null;
   private offlineUntil = 0;
@@ -149,6 +151,24 @@ export class MindClient {
     }
   }
 
+  /** Bounded, fully validated ambient exchange. Caller owns the authored offline fallback. */
+  async chat(body: ChatBody, signal?: AbortSignal): Promise<ChatReply | null> {
+    if (!this.enabled || this.now() < this.offlineUntil || signal?.aborted) return null;
+    const controller = new AbortController();
+    const abort = () => controller.abort();
+    signal?.addEventListener('abort', abort, { once: true });
+    // GDD-GAP: two server attempts (12 s) plus transport slack; includes reading the JSON body.
+    const timer = setTimeout(abort, 16000);
+    try {
+      const res = await this.authed('/chat', { method: 'POST', body: JSON.stringify(body), signal: controller.signal });
+      if (!res?.ok) return null;
+      const parsed = ChatReply.safeParse(await res.json());
+      if (!parsed.success || parsed.data.lines.some((l, i) => l.speaker !== (i % 2 ? body.b : body.a))) return null;
+      return parsed.data;
+    } catch { return null; }
+    finally { clearTimeout(timer); signal?.removeEventListener('abort', abort); }
+  }
+
   /** The server will be tried for the next turn (a session exists and the client isn't cooling off). */
   get online(): boolean { return !this.opts.offline && this.session !== null && this.now() >= this.offlineUntil; }
   /** Could the client reach a world at all (offline flag, no invite and no session mean never). */
@@ -160,6 +180,53 @@ export class MindClient {
   get player(): PlayerProfile | null { return this.profile ? { ...this.profile } : null; }
   /** The server has the stored application (or there is none to send). */
   get playerSynced(): boolean { return this.profileSynced; }
+
+  /** Where things stand with the server, for the HUD dot and Settings (mind/connection.ts). */
+  get status(): MindStatus {
+    return mindStatus({
+      offline: !!this.opts.offline, hasSession: this.session !== null, hasInvite: this.inviteCode !== null,
+      inviteRejected: this.inviteRejected, coolingOff: this.now() < this.offlineUntil
+    });
+  }
+  /** The invite code in use (from `?invite=`, `--invite=` or Settings), if any. */
+  get invite(): string | null { return this.inviteCode; }
+
+  /**
+   * Set or clear the invite code (Settings on the title screen), remember it, and try to join at once if there's
+   * no world yet. Resolves with the status that leaves. Never rejects.
+   */
+  async setInvite(code: string | null): Promise<MindStatus> {
+    const given = code?.trim() || null;
+    if (given) this.write(STORAGE_KEYS.invite, given);
+    else this.remove(STORAGE_KEYS.invite);
+    this.inviteCode = given;
+    this.inviteRejected = false;
+    this.offlineUntil = 0;
+    if (given && !this.session && !this.opts.offline) {
+      await this.ensureWorld();
+      if (this.session && !this.profileSynced) void this.syncPlayer();
+    }
+    return this.status;
+  }
+
+  /** Try the server now instead of waiting out the cooldown (the HUD's gentle retry). Never rejects. */
+  async reconnect(): Promise<MindStatus> {
+    if (this.opts.offline) return this.status;
+    this.offlineUntil = 0;
+    if (!this.session) {
+      await this.ensureWorld();
+      return this.status;
+    }
+    try {
+      const res = await this.fetchWithin(`${this.baseUrl}/v1/health`, { method: 'GET' }, REQUEST_TIMEOUT_MS);
+      await res.body?.cancel().catch(() => undefined);
+      if (!res.ok) this.offlineUntil = this.now() + OFFLINE_COOLDOWN_MS;
+      else if (!this.profileSynced) void this.syncPlayer();
+    } catch (error) {
+      this.wentOffline('reconnect', error);
+    }
+    return this.status;
+  }
 
   /** The session, creating the world on first run. Null means Quiet Mode. Never rejects. */
   ensureWorld(): Promise<Session | null> {

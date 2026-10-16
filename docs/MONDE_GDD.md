@@ -998,7 +998,13 @@ Acquainted or Core, time window valid) and rejects or repairs it otherwise.
 4. Lines stream into the typewriter as they arrive. **Targets:** first visible character ≤ 0.8 s p50
    and ≤ 1.5 s p95. If nothing has arrived by **2.5 s**, the resident plays an authored "thinking" beat
    ("Hm." plus a fidget). By **6 s**, the line falls back to the authored library and the call is
-   abandoned.
+   abandoned. Inside that window a call that has produced nothing isn't left to hang: at 2.5 s the same
+   request goes out again alongside it (the first to stream wins, the other is cancelled), and a call that
+   fails before its first text is retried at once if 1.5 s or more remain. The server opens its API
+   connection at boot, so the first turn after a deploy doesn't pay for it. A reply cut short (the
+   `max_tokens` cap of 900, or a stream that stalls or drops after it started) is **salvaged**: its whole
+   lines are kept (an unfinished one back to its last whole sentence), choices come from the last line,
+   and effects only if they arrived whole.
 5. On completion the server validates (§9.13), applies clamped effects, persists the turn, and sends
    the choices.
 6. The player picks a choice, types a line (if free text is enabled), offers a gift, or leaves. Up to
@@ -1018,7 +1024,12 @@ characters) is available and on by default. It passes a cheap moderation check f
 **Novelty and anti-repetition.**
 - **Topic cards:** the engine gives each conversation 3 candidate topics scored from the resident's
   recent memories, unresolved feelings, open Favors, the day's town events and their dream. The model
-  starts from one. The resident's last 10 topics with the player are listed as "already discussed."
+  starts from one. The cards are offered only when there's nothing to answer (the opener, or a lull like
+  "Right."): while the Fellow has said something, the resident answers it first and doesn't change the
+  subject. The resident's last 10 topics with the player are listed as "already discussed."
+- **Fallbacks follow the conversation:** only the opener greets. Mid-conversation the authored line answers
+  the moment (an honest stall that offers the question back, care for a feeling, a send-off for a goodbye,
+  an acknowledgement otherwise), and its replies carry on, change the subject or leave.
 - **Echo check:** the server compares each new line with that resident's last 20 lines (word trigram
   overlap). Above 0.35 overlap, it regenerates once with a "say it differently" note, then falls back.
 - **Residents start things too:** `seek_player` intents make residents walk up and open a conversation.
@@ -1032,7 +1043,7 @@ characters) is available and on by default. It passes a cheap moderation check f
 | 1 | **World Bible** (setting, era rules, tone, rating rules, voice bible digest §12.1, anti-patterns, output contract). Identical for every world and resident. | ~2,500 | Per release | Breakpoint 1 (hit almost always, shared by all players) |
 | 2 | **Persona Card** (§9.3) with canon locks evaluated | ~900–1,200 | Rarely | Breakpoint 2 |
 | 3 | **Beliefs + relationship summary** (top 8 relationships as one-liners) | ~300–500 | Nightly | Breakpoint 3 |
-| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: time, place, weather, mood, needs, player, memories, topics, Favors, hints and `<player_said>`. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
+| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: `<player_said>` first, with one line saying what to do with it ("Respond to this first…"), then a compact scene and mood line, the player, memories (retrieved on the Fellow's words and the line they answer), topics (opener or lull only), Favors, secrets and hints. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
 
 Haiku 5.5's minimum cacheable prefix is 512 tokens, so every breakpoint above qualifies. Byte-stable
 serialization is mandatory (sorted keys, no timestamps in blocks 1–3), or caching silently stops working.
@@ -1294,6 +1305,11 @@ world's AI budget is exhausted (§9.15), or when the player chooses **Offline** 
 | Dawn Report | Generated | Templates (Appendix B.5) |
 | Memories | Server | Logged locally, uploaded at the next online night pass, which runs one catch-up reflection per affected resident |
 
+**Quiet Mode is visible.** The HUD shows a small Online/Offline dot (hover for why, click to retry; an
+unreachable server is retried at 15 s, 30 s, then every 60 s), and a dialogue panel speaking written lines
+says "offline · written lines" under it. The invite code can be typed in Settings on the title screen as
+well as passed as `?invite=` or `--invite=`.
+
 Everything authored (riddles, puzzles, scripted scenes, Projects, Scuffles, the election) works the
 same offline. **Quiet Mode must be a complete, shippable game.** The AI layer adds a lot, but the game
 can't depend on it.
@@ -1357,6 +1373,7 @@ Build the eval set **before** the vertical slice ships its AI layer (`/claude-ap
 | Safety | A red-team set of 300 player inputs (injection, abuse, real-world baiting, romance-the-NPC) | 0 unsafe outputs; ≥ 95% handled in-world |
 | JSON / effects | Validation pass rate | ≥ 99.5% first pass |
 | Latency | First character p50 / p95 | ≤ 0.8 s / ≤ 1.5 s |
+| Responsiveness | `tools/eval-dialogue.ts`: 18 scripted conversations (questions, callbacks, feelings, jokes, rudeness, picked replies, riddles, goodbyes); fallback rate, stop reasons, latency, and a Sonnet 5.5 judge on "responds to the player's line", "remembers when relevant" and "in character" (1–5) | Fallback < 2% of turns; responds ≥ 4.5; remembers ≥ 4.0 |
 | Cost | 100-day headless soak with scripted player behavior, real API | ≤ $6 Standard |
 | "Would talk again" | Playtest survey per resident | ≥ 70% "yes" for Core |
 
@@ -1384,18 +1401,17 @@ OUTPUT: valid JSON matching the provided schema. Lines are speech only, with opt
 
 **Dialogue** (user message, dynamic):
 ```
-<scene> Day {day} ({weekday}, {season}), {time}, {place_desc}. Weather: {weather}. </scene>
-<you_now> Mood: {emotion} ({intensity}); energy {energy}; stress {stress}. Doing: {current_block}. </you_now>
+<player_said> {text or chosen reply} </player_said>
+{one-line directive: "Respond to this first: …" (or open / lull / goodbye / gift)}
+<scene> Day {day} ({weekday}, {season}), {time}, {place_desc}. Weather: {weather}. You: {emotion} ({intensity}), energy {energy}, stress {stress}. Doing: {current_block}. </scene>
 <player> Name: {name} ({pronouns}). Your regard: {regard_tier}. Background: {background}. </player>
 <memories> {top_8_memories} </memories>
-<topics_to_choose_from> {3 topic cards} </topics_to_choose_from>
+<topics_to_choose_from> {3 topic cards: on the opener or a lull only} </topics_to_choose_from>
 <already_discussed> {recent_topics} </already_discussed>
 <open_favors> {…} </open_favors>
 <revealable_secrets> {only ids + text the engine allows now} </revealable_secrets>
 <hints allowed="{n}"> {only if the topic is a riddle} </hints>
-<conversation> {turns so far} </conversation>
-<player_said> {text or chosen reply} </player_said>
-Reply as {name_of_resident}.
+Reply as {name_of_resident}, answering the Fellow first.
 ```
 
 **Plan** (tomorrow, at `effort: "low"`):

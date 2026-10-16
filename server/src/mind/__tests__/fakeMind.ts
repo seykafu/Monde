@@ -17,6 +17,8 @@ export type Script =
     delayMs?: number;
     /** Extra delay before the first delta (to trip the thinking beat). */
     firstDelayMs?: number;
+    /** Stream only this many characters, then go silent until aborted (a stalled or dropped stream). */
+    stallAfter?: number;
   }
   | { hang: true }
   | { error: unknown };
@@ -44,6 +46,8 @@ export class FakeMind implements MindClient {
   readonly creates: Anthropic.MessageCreateParamsNonStreaming[] = [];
   /** What createMessage does: resolve like a max_tokens: 0 prewarm, or throw. */
   createBehavior: { error?: unknown } = {};
+  /** Boot warm-ups (MindClient.warm). */
+  warmed = 0;
 
   constructor(private readonly scripts: Script[] = []) {}
 
@@ -67,12 +71,23 @@ export class FakeMind implements MindClient {
     const text = typeof script.output === "string" ? script.output : JSON.stringify(script.output);
     const size = script.chunk ?? 12;
     if (script.firstDelayMs) await sleep(script.firstDelayMs);
-    for (let i = 0; i < text.length; i += size) {
+    const end = script.stallAfter ?? text.length;
+    for (let i = 0; i < end; i += size) {
       await sleep(script.delayMs ?? 1);
       if (options.signal.aborted) throw new Error("aborted by signal");
-      options.onText(text.slice(i, i + size));
+      options.onText(text.slice(i, Math.min(i + size, end)));
+    }
+    if (script.stallAfter !== undefined) {
+      return new Promise((_, reject) => {
+        if (options.signal.aborted) reject(new Error("aborted by signal"));
+        options.signal.addEventListener("abort", () => reject(new Error("aborted by signal")), { once: true });
+      });
     }
     return message(text, script.stopReason ?? "end_turn", script.usage);
+  }
+
+  async warm(): Promise<void> {
+    this.warmed += 1;
   }
 
   async createMessage(params: Anthropic.MessageCreateParamsNonStreaming): Promise<Anthropic.Message> {

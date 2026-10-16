@@ -11,15 +11,15 @@
  *       rule. Then one transaction: affinity (±3 an encounter, +1 for planned time together, inside the pair's ±6
  *       a day), trust, a feeling (romance only between residents who may court), last_seen_day, the encounter
  *       count, a short memory for each side (tonight's reflection reads it) and the ai_log row.
- * The player within earshot (a live exchange as speech bubbles) is the client's; the server always summarises.
+ * Live chats share persistEncounter; the memory receipt prevents a second encounter in the night pass.
  */
 import { and, eq, inArray } from "drizzle-orm";
 import {
   AFFINITY_SOURCES, GossipOutput, ROMANTIC_FEELINGS, ambientEncounterDelta, applyAffinity, clamp, clampGossip,
-  encounterChance, encounterRoll, orderedPair, pairKey, pairMean,
+  encounterChance, encounterRoll, orderedPair, pairKey, pairMean, pairLabel, tieMilestone,
   type PersonaCard, type PlanOutput, type ResidentState,
 } from "@monde/shared";
-import { aiLog, memories, relationships } from "../db/schema.js";
+import { aiLog, memories, relationships, tieMilestones } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { callModel, type CallFailure } from "./callModel.js";
 import { weekdayOf } from "./context.js";
@@ -299,6 +299,10 @@ export async function resolveEncounter(
   deps: NightJobDeps, ctx: EncounterContext, encounter: Encounter, a: EncounterSide, b: EncounterSide,
 ): Promise<EncounterResult> {
   const key = pairKey(encounter.a, encounter.b);
+  const [met] = await deps.db.select({ id: memories.id }).from(memories).where(and(
+    eq(memories.worldId, ctx.worldId), eq(memories.id, encounterMemoryId(ctx.day, encounter.a, encounter.b, encounter.a)),
+  ));
+  if (met) return { key, mode: "rule", reason: "rule", applied: { ab: 0, ba: 0 }, adjustments: ["already met today"] };
   const rule = () => ruleOutcome(a.state.mood.valence, b.state.mood.valence, encounter.mean);
   if (encounter.mode === "rule" || !deps.mind.enabled) {
     const applied = await persistEncounter(deps.db, ctx, encounter, rule(), null, null);
@@ -337,7 +341,7 @@ type RelationshipRow = typeof relationships.$inferSelect;
  * trust, the feeling, last_seen_day and the encounter count; a memory for each side; the ai_log row. Rows are
  * locked in id order so two encounters can't deadlock.
  */
-async function persistEncounter(
+export async function persistEncounter(
   db: WorldDatabase, ctx: EncounterContext, encounter: Encounter, outcome: EncounterOutcome,
   call: CallRecord | null, version: string | null, model = false,
 ): Promise<{ ab: number; ba: number }> {
@@ -355,6 +359,12 @@ async function persistEncounter(
     )).orderBy(relationships.fromId).for("update");
     const edge = (from: string, to: string): RelationshipRow => rows.find((r) => r.fromId === from && r.toId === to)!;
 
+    // The encounter memory is the durable receipt. Check AFTER locking both edges: live/night races are safe.
+    const [receipt] = await tx.select({ id: memories.id }).from(memories).where(and(
+      eq(memories.worldId, worldId), eq(memories.id, encounterMemoryId(day, a, b, a)),
+    ));
+    if (receipt) return;
+    const before = pairLabel(edge(a, b).affinity, edge(b, a).affinity);
     const update = async (row: RelationshipRow, side: "a" | "b"): Promise<number> => {
       const delta = side === "a" ? outcome.a : outcome.b;
       let next = applyAffinity({ affinity: row.affinity, netDay: row.netDay, net: row.net }, day, delta.affinity, "encounter");
@@ -383,6 +393,19 @@ async function persistEncounter(
       importance: encounterImportance(change), valence: encounterValence(change),
     });
     await tx.insert(memories).values([memory(a, b, applied.ab), memory(b, a, applied.ba)]).onConflictDoNothing();
+    // Only offered memory ids survive validation; copy provenance and reduce importance by one hop.
+    for (const id of outcome.news) {
+      const [source] = await tx.select().from(memories).where(and(eq(memories.worldId, worldId), eq(memories.id, id)));
+      if (!source || ![a, b].includes(source.residentId)) continue;
+      const recipient = source.residentId === a ? b : a;
+      await tx.insert(memories).values({ ...source, id: `heard_${day}_${recipient}_${id}`, residentId: recipient,
+        day, minute: encounter.minute, kind: "heard", text: `${ctx.names[source.residentId] ?? source.residentId} told me: ${source.text}`, importance: Math.max(1, source.importance - 1),
+        who: [...new Set([...source.who, source.residentId])], wherePlace: encounter.place,
+      }).onConflictDoNothing();
+    }
+    const after = pairLabel(edge(a, b).affinity + applied.ab, edge(b, a).affinity + applied.ba);
+    const kind = tieMilestone(before, after);
+    if (kind) await tx.insert(tieMilestones).values({ worldId, day, aId: orderedPair(a, b)[0], bId: orderedPair(a, b)[1], kind, fromLabel: before, toLabel: after }).onConflictDoNothing();
     if (call) await tx.insert(aiLog).values(nightLogRow(worldId, pairKey(a, b), "gossip", version ?? promptVersion(), call, !model));
   });
   return applied;

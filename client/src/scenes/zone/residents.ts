@@ -1,3 +1,4 @@
+import { Chatter } from './chatter';
 // On-screen residents for ZoneScene (MVP W-05; GDD §16.5, §19.2).
 //
 // The town's residents live in one ResidentSim (sim/residentSim.ts), shared through the registry like the
@@ -173,6 +174,7 @@ const EMOTES: Readonly<Record<string, Draw>> = {
 
 export class ResidentLayer {
   readonly sim: ResidentSim;
+  readonly chatter: Chatter;
   private readonly actors: Actor[];
   private readonly byId: Map<string, Actor>;
   private roster = new Set<string>();
@@ -197,6 +199,7 @@ export class ResidentLayer {
   constructor(private readonly scene: Phaser.Scene, private readonly zone: ZoneDef, private readonly projection: ObliqueProjection,
     private readonly clock: Clock, private readonly dev: boolean) {
     this.sim = sharedResidentSim(scene);
+    this.chatter = new Chatter(scene, clock);
     this.actors = this.sim.profiles.map(profile => {
       const animal = profile.kind === 'animal', colour = residentColour(profile.index);
       const actor = { profile, animal, colour } as Actor;
@@ -242,14 +245,15 @@ export class ResidentLayer {
       const d = Math.hypot(a.pos.x - player.x, a.pos.y - player.y);
       if (d <= bestD) { best = a; bestD = d; }
     }
-    return best ? { id: best.profile.id, name: best.profile.name } : null;
+    const other = best ? this.byId.get(this.chatter.partner(best.profile.id) ?? '') : null;
+    return best ? { id: best.profile.id, name: other ? `${best.profile.name} & ${other.profile.name} (join)` : best.profile.name } : null;
   }
 
   /** E pressed beside a resident: emit `talk-requested` and hold them, facing the player, till the player leaves. */
   requestTalk(id: string): void {
     const actor = this.byId.get(id);
     if (!actor) return;
-    actor.talking = true;
+    actor.talking = !this.chatter.partner(id);
     this.sim.events.emit('talk-requested', { residentId: id, zone: this.zone.id, day: this.clock.day, minute: this.clock.exactMinute });
   }
 
@@ -284,6 +288,12 @@ export class ResidentLayer {
     if (this.overlayOn) this.drawOverlay(live);
     if (this.onApproach) this.approach(live, player);
     this.pairEmotes(live, player, dtMs);
+    const view = this.scene.cameras.main.worldView;
+    this.chatter.update(dtMs, live.filter(a => a.pos && a.state).map(a => ({
+      id: a.profile.id, x: a.pos!.x, y: a.pos!.y, place: a.state!.place, idle: !a.state!.moving,
+      visible: a.alpha > 0.5 && a.state!.visible && view.contains(a.sprite.x, a.sprite.y), talking: a.talking,
+      screenX: a.sprite.x, screenY: a.sprite.y,
+    })), player);
   }
 
   // ── Tie emotes (§9.11.3, §16.5) ──────────────────────────────────────────
@@ -374,7 +384,9 @@ export class ResidentLayer {
   }
 
   private advance(a: Actor, day: number, minute: number, dMin: number, dtMs: number, player: Position): void {
-    if (a.talking) {
+    if (this.chatter.partner(a.profile.id)) {
+      a.delay += dMin;
+    } else if (a.talking) {
       a.delay += dMin; // frozen at the moment they were asked
       if (a.pos && Math.hypot(a.pos.x - player.x, a.pos.y - player.y) > TALK_RELEASE) a.talking = false;
     } else {
@@ -450,8 +462,9 @@ export class ResidentLayer {
     }
     // Facing: toward the player while talking (standing: talkers idle), else the way they walk.
     // Walk frames follow the distance actually drawn, so a held or hurrying walker's feet keep pace.
-    const intent = a.talking ? { x: player.x - pos.x, y: player.y - pos.y } : s.moving ? s.facing : null;
-    const moved = a.pos && !a.talking ? { x: pos.x - a.pos.x, y: pos.y - a.pos.y } : { x: 0, y: 0 };
+    const partner = this.byId.get(this.chatter.partner(a.profile.id) ?? '')?.pos;
+    const intent = partner ? { x: partner.x - pos.x, y: partner.y - pos.y } : a.talking ? { x: player.x - pos.x, y: player.y - pos.y } : s.moving ? s.facing : null;
+    const moved = a.pos && !a.talking && !partner ? { x: pos.x - a.pos.x, y: pos.y - a.pos.y } : { x: 0, y: 0 };
     a.avatar.step({ intent, moved, dtMs });
     a.pos = pos;
   }

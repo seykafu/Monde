@@ -6,7 +6,7 @@ import { createTestDatabase } from '../../db/testDatabase.js';
 import { conversationDigests, conversationSummaries, memories, worlds } from '../../db/schema.js';
 import { createWorld } from '../../worlds/createWorld.js';
 import { selectSession } from '../sessions.js';
-import { compactSession, rollDigest } from '../compaction.js';
+import { compactSession, rollDigest, templateSummary } from '../compaction.js';
 import { persistTurn } from '../effects.js';
 import { SILENT_LOG, type NightJobDeps } from '../nightJob.js';
 import { DisabledMindClient } from '../mindClient.js';
@@ -85,4 +85,12 @@ it('uses low-effort structured model output, enforces word bounds and checks sto
   await compactSession(deps(mind), other.worldId, other.id);
   const [fallback] = await database.db.select().from(conversationSummaries).where(eq(conversationSummaries.worldId, other.worldId));
   expect(fallback!.summary).toContain('I spoke with the Fellow');
+});
+
+it('quotes what the Fellow said in a template summary, so a later conversation can recall it', () => {
+  const effects = { regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: 'clocktower and the oven door' };
+  const turn = (playerInput: string | null) => ({ playerInput, output: { lines: [{ text: 'Hm.', expr: 'neutral' }], choices: [], effects, wrap_up: false } });
+  const { summary } = templateSummary([turn(null), turn("I tinker with old clocks. I'm hoping to get the clocktower going again."), turn('Right.')]);
+  expect(summary).toBe(`I spoke with the Fellow about clocktower and the oven door. The Fellow said: "I tinker with old clocks. I'm hoping to get the clocktower going again."`);
+  expect(templateSummary([turn('Ok.')]).summary).toBe('I spoke with the Fellow about clocktower and the oven door.');
 });

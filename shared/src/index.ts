@@ -22,3 +22,4 @@ export * from './economy';
 export * from './riddles';
 export * from './favorEngine';
 export * from './press';
+export * from './chatter';

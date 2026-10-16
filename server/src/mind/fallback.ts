@@ -8,14 +8,20 @@
  * contractions, full stops, no backstory, nothing a particular resident couldn't say.
  *
  * Every authored turn offers 2–3 replies to the line it shows (§9.10 "Player input"): the fifteen tier × mood
- * lines have their own; fillers, riddle hints and narrated lines take replies derived from the line
+ * lines have their own; riddle hints and narrated lines take replies derived from the line
  * (shared/src/replies.ts). The client adds Leave.
+ *
+ * Only the opener greets. Mid-conversation the fallback answers the moment the Fellow made (fallbackMoment): a
+ * question gets an honest stall that asks for it again and offers to repeat it, a feeling gets a little care, a
+ * goodbye gets seen off, anything else a short acknowledgement; and its replies carry the conversation on (ask
+ * again, change the subject, go) rather than restart it. A resident who has talked with the Fellow before never
+ * opens with "we haven't met".
  */
 import {
-  callName, derivedReplies, fillReply, moodBand, normalizeChoices, regardTier, type DialogueTurnOutput, type MoodBand,
-  type PersonaCard, type RegardTier, type Reply, type ReplyCue, type ResidentState,
+  REPLY_CHARS, callName, derivedReplies, fillReply, moodBand, normalizeChoices, regardTier, replyHash, type DialogueTurnOutput,
+  type Intent, type MoodBand, type PersonaCard, type RegardTier, type Reply, type ReplyCue, type ResidentState,
 } from "@monde/shared";
-import { containsAnswer } from "./promptBuilder.js";
+import { containsAnswer, turnFocus } from "./promptBuilder.js";
 import type { RiddleRecord } from "./riddles.js";
 import { expressionFor } from "./expressions.js";
 
@@ -56,6 +62,53 @@ export const FALLBACK_LINES: Readonly<Record<RegardTier, Readonly<Record<MoodGro
 
 /** Appendix B.2.5, always valid mid-conversation. */
 export const FILLER_LINES: readonly string[] = ["Hm.", "Right.", "Well. There it is.", "Mm-hm.", "Funny old day."];
+
+/** Stranger-tier openers for someone the resident has talked with before (a history, or a resumed session). */
+export const MET_LINES: Readonly<Record<MoodGroup, string>> = {
+  low: "Oh, it's you. Not much company today, I'm afraid.",
+  even: "Oh, it's you again. Go on, then.",
+  high: "You again. Good timing.",
+};
+
+/**
+ * What the Fellow's last move was, for a mid-conversation fallback. `open` is the opener (they walked up, first
+ * time); `resume` is walking back up to a conversation that's still open.
+ */
+export type FallbackMoment = "open" | "resume" | "question" | "feeling" | "thanks" | "bye" | "intro" | "statement";
+
+/** Lines for each mid-conversation moment, house style (§12.1), in no resident's particular voice. `{player}` is the player's name. */
+export const MOMENT_LINES: Readonly<Record<Exclude<FallbackMoment, "open">, readonly string[]>> = {
+  resume: ["Back again. Where were we?", "There you are. Where were we?"],
+  question: [
+    "Hm. Lost my thread. Ask me that again?",
+    "Sorry, I was miles away. Say that again?",
+    "Give me a minute with that one.",
+    "Ask me again in a bit. My head's elsewhere.",
+  ],
+  feeling: [
+    "That's a hard one. Sit a minute, if you like.",
+    "Hm. That takes a while to wear off. Stay a bit.",
+    "I'm sorry, {player}. It does get easier. Slowly.",
+  ],
+  thanks: ["Don't mention it.", "Any time, {player}."],
+  intro: ["{player}, is it? I'll remember that.", "{player}. Good. Now I've a name for you."],
+  bye: ["Mind how you go, {player}.", "Go on, then. Mind the cobbles.", "Off you go. Come back when you like."],
+  statement: ["Hm. Is that right?", "Mm. Go on.", "Well. There it is.", "Fair enough."],
+};
+
+/** The Fellow said how they feel (a low feeling: these get care, not a shrug). */
+const FEELING = /\b(?:homesick|lonely|sad|miss(?:ing)? (?:home|my|them|her|him)|tired|worried|scared|afraid|nervous|awful|don't know anyone|on my own|hard day|bad day|(?:feel|feeling|felt) (?:low|down|lost|rough|odd))\b/i;
+
+export function fallbackMoment(input: Pick<FallbackInput, "playerText" | "intent" | "turnIndex">): FallbackMoment {
+  const text = input.playerText?.trim();
+  if (!text) return input.turnIndex > 0 ? "resume" : "open";
+  if (turnFocus(text, input.intent) === "bye") return "bye";
+  if (text.includes("?")) return "question";
+  if (FEELING.test(text)) return "feeling";
+  if (/\bthank/i.test(text)) return "thanks";
+  if (/\b(?:[Ii]'m|[Ii] am|[Mm]y name's|[Mm]y name is|[Cc]all me)\s+[A-Z]/.test(text.replace(/[’]/g, "'"))) return "intro";
+  return "statement";
+}
 
 /** Narrated-action residents (Bastien) never speak (§9.3 voice modes). `{name}` is their first name. */
 const ANIMAL_LINES: Readonly<Record<MoodGroup, string>> = {
@@ -102,16 +155,45 @@ export const FALLBACK_REPLIES: Readonly<Record<RegardTier, Readonly<Record<MoodG
   },
 };
 
+/** Stranger-tier replies to MET_LINES, in the same order: warm, curious, wry. */
+export const MET_REPLIES: Readonly<Record<MoodGroup, readonly Reply[]>> = {
+  low: [bye("Another time, then. Look after yourself."), c("Is everything all right?"), j("I'm not much company either. We'd suit.")],
+  even: [k("Just saying hello."), c("How's the day treating you?"), j("I'll try to be more interesting this time.")],
+  high: [k("Good to see you too."), c("Good timing for what?"), j("I do try.")],
+};
+
+/**
+ * Replies to a mid-conversation fallback: carry on (ask again, say more), change the subject, or go. A question
+ * is offered back word for word when it fits a reply (`{question}`).
+ */
+export const MOMENT_REPLIES: Readonly<Record<Exclude<FallbackMoment, "open">, readonly Reply[]>> = {
+  resume: [k("You were telling me something."), c("Where did we leave it?"), bye("Only passing. I'll let you get on.")],
+  question: [c("{question}"), c("Never mind. What's keeping you busy today?"), bye("I'll let you get on.")],
+  feeling: [k("Thanks. I'd like that."), c("Does it get easier, do you think?"), bye("I'll be all right. I'll let you get on.")],
+  thanks: [k("I mean it, though."), c("Anything I can do for you?"), bye("I'll let you get on.")],
+  intro: [k("Good to meet you properly."), c("And what do people call you?"), bye("I'll let you get on.")],
+  bye: [bye("Take care, {name}."), c("Same time tomorrow?"), j("I'll try not to get lost on the way.")],
+  statement: [k("Anyway. How's your day been?"), c("What do you make of it?"), bye("I'll let you get on.")],
+};
+
 export const LEAVE_CHOICE: DialogueTurnOutput["choices"][number] = { id: "a", text: "Leave", intent: "leave" };
 
 export interface FallbackInput {
   card: PersonaCard;
   state: Pick<ResidentState, "regard" | "mood">;
   playerName: string;
-  /** 0-based exchange number: the opener uses the tier × mood line, later turns alternate with fillers. */
+  /** 0-based exchange number: only the opener (0, the Fellow walking up) greets. */
   turnIndex: number;
   /** On a riddle-topic turn, the authored hint text replaces the line (§14.2). */
   riddle?: { record: RiddleRecord; allowed: number } | null;
+  /** What the Fellow said this turn (their words or the reply they picked); null when they walked up. */
+  playerText?: string | null;
+  /** The intent of the reply they picked, when they picked one. */
+  intent?: Intent | null;
+  /** The resident's lines so far in this conversation: a fallback doesn't repeat one. */
+  said?: readonly string[];
+  /** They've talked before (a history with the Fellow, or a resumed session). */
+  met?: boolean;
 }
 
 const firstName = (card: PersonaCard): string => card.name.replace(/"[^"]*"/g, " ").trim().split(/\s+/)[0] ?? card.id;
@@ -126,24 +208,46 @@ export function authoredHint(record: RiddleRecord, allowed: number): string | nu
   return null;
 }
 
+/** The first line of `pool` (from a stable start) that the resident hasn't said in this conversation. */
+function freshLine(pool: readonly string[], input: FallbackInput): string {
+  const said = new Set((input.said ?? []).map((line) => line.trim()));
+  const start = replyHash(`${input.playerText ?? ""}|${input.turnIndex}`) % pool.length;
+  for (let i = 0; i < pool.length; i++) {
+    const line = pool[(start + i) % pool.length]!.replaceAll("{player}", input.playerName);
+    if (!said.has(line)) return line;
+  }
+  return pool[start]!.replaceAll("{player}", input.playerName);
+}
+
 export function fallbackLine(input: FallbackInput): string {
   const group = MOOD_GROUP[moodBand(input.state.mood.valence)];
-  const filler = input.turnIndex % 2 === 1;
+  const moment = fallbackMoment(input);
   if (input.card.voice.mode === "narrated_action") {
-    return (filler ? ANIMAL_FILLER : ANIMAL_LINES[group]).replaceAll("{name}", firstName(input.card));
+    return (moment === "open" ? ANIMAL_LINES[group] : ANIMAL_FILLER).replaceAll("{name}", firstName(input.card));
   }
   if (input.riddle) return authoredHint(input.riddle.record, input.riddle.allowed) ?? STUMPED_LINE;
-  const line = filler
-    ? FILLER_LINES[Math.floor(input.turnIndex / 2) % FILLER_LINES.length]!
-    : FALLBACK_LINES[regardTier(input.state.regard)][group];
+  if (moment !== "open") return freshLine(MOMENT_LINES[moment], input);
+  const tier = regardTier(input.state.regard);
+  const line = input.met && tier === "Stranger" ? MET_LINES[group] : FALLBACK_LINES[tier][group];
   return line.replaceAll("{player}", input.playerName);
 }
 
 const CHOICE_IDS = ["a", "b", "c"] as const;
 
+/** The Fellow's question as a reply they can pick to ask it again: the whole line, or its last question if shorter. */
+function askAgain(text: string): string | null {
+  const whole = text.replace(/\s+/g, " ").trim();
+  if (whole.length <= REPLY_CHARS) return whole;
+  const questions = whole.match(/[^.!?]*\?/g) ?? [];
+  const last = questions.at(-1)?.trim();
+  return last && last.length <= REPLY_CHARS ? last : null;
+}
+
 /** 2–3 replies to the line `fallbackLine` shows for this input (ids a, b, c; the client adds Leave). */
 export function fallbackChoices(input: FallbackInput, text = fallbackLine(input)): DialogueTurnOutput["choices"] {
   const name = callName(input.card.name);
+  const moment = fallbackMoment(input);
+  const group = MOOD_GROUP[moodBand(input.state.mood.valence)];
   let cue: ReplyCue;
   let replies: readonly Reply[];
   if (input.card.voice.mode === "narrated_action") {
@@ -152,26 +256,30 @@ export function fallbackChoices(input: FallbackInput, text = fallbackLine(input)
   } else if (input.riddle) {
     cue = { text, kind: text === STUMPED_LINE ? "stumped" : "riddle" };
     replies = derivedReplies(cue, input.turnIndex);
-  } else if (input.turnIndex % 2 === 1) {
-    cue = { text, kind: "talk" };
-    replies = derivedReplies(cue, input.turnIndex);
+  } else if (moment !== "open") {
+    cue = { text, kind: moment === "bye" ? "bye" : "talk" };
+    const again = moment === "question" ? askAgain(input.playerText ?? "") : null;
+    const intent: Intent = input.intent && input.intent !== "leave" ? input.intent : "curious";
+    replies = MOMENT_REPLIES[moment].flatMap((r) => (r.text !== "{question}" ? [r] : again ? [{ text: again, intent }] : []));
   } else {
     cue = { text, kind: "greet", mood: moodBand(input.state.mood.valence) };
-    replies = FALLBACK_REPLIES[regardTier(input.state.regard)][MOOD_GROUP[moodBand(input.state.mood.valence)]];
+    const tier = regardTier(input.state.regard);
+    replies = input.met && tier === "Stranger" ? MET_REPLIES[group] : FALLBACK_REPLIES[tier][group];
   }
   const filled = replies.map((r) => ({ text: fillReply(r.text, { name, player: input.playerName }), intent: r.intent }));
   return normalizeChoices(filled, { cue, name, seed: input.turnIndex }).map((choice, i) => ({ ...choice, id: CHOICE_IDS[i]! }));
 }
 
-/** A complete, effect-free turn in the dialogue contract's shape. */
+/** A complete, effect-free turn in the dialogue contract's shape. A goodbye wraps the conversation up. */
 export function fallbackTurn(input: FallbackInput): DialogueTurnOutput {
   const text = fallbackLine(input);
+  const bye = !input.riddle && input.card.voice.mode !== "narrated_action" && fallbackMoment(input) === "bye";
   return {
     lines: [{ text, expr: expressionFor(input.card, input.state.mood.emotion) }],
     choices: fallbackChoices(input, text),
     effects: {
       regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: "",
     },
-    wrap_up: false,
+    wrap_up: bye,
   };
 }

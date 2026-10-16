@@ -44,6 +44,14 @@ export interface MindSettings {
 }
 
 /**
+ * GDD-GAP: §9.17 gives dialogue no max_tokens. A whole turn (up to 3 lines of 220 characters, 3 choices, effects
+ * and JSON keys) measured 331 output tokens p50 and 381 p95 on staging (ai_log, 2026-10-15), and the old cap of 400
+ * cut 2 of 19 turns short. 900 is over twice the longest seen; a reply that still hits it is salvaged (salvage.ts).
+ * The cap costs nothing unless it's used.
+ */
+export const DIALOGUE_MAX_TOKENS = 900;
+
+/**
  * Haiku 5.5 rules: no temperature / top_p / top_k (non-default sampling is a 400) and no assistant prefill.
  * Dialogue, gossip and the pre-check run with thinking disabled (valid at the default effort) for latency;
  * plans and reflections keep adaptive thinking at effort "low". Variety comes from persona, memory, topic
@@ -52,7 +60,7 @@ export interface MindSettings {
 export function requestSettings(kind: MindCallKind): MindSettings {
   switch (kind) {
     case "dialogue":
-      return { model: MIND_MODEL, max_tokens: 400, thinking: { type: "disabled" } };
+      return { model: MIND_MODEL, max_tokens: DIALOGUE_MAX_TOKENS, thinking: { type: "disabled" } };
     case "gossip":
       return { model: MIND_MODEL, max_tokens: 400, thinking: { type: "disabled" } };
     case "precheck":
@@ -101,7 +109,7 @@ type Templates = Readonly<Record<TemplateName, string>>;
  * Bump when the code-side serialization below changes in a way the template files don't show (list formats,
  * field order), so the logged prompt version still changes.
  */
-const SERIALIZER_VERSION = "m04.1";
+const SERIALIZER_VERSION = "m05.2";
 
 /**
  * Where the templates live. Source runs read them next to this file. The bundled server (tsup → server/dist)
@@ -515,9 +523,48 @@ export interface DialogueInput {
   resumedAfter?: number;
   /** Free text or the chosen reply. */
   playerSaid: string;
+  /**
+   * What this turn has to answer (turnFocus). Defaults to "open" when the Fellow walked up (playerSaid is
+   * WALK_UP) and to "reply" otherwise.
+   */
+  focus?: TurnFocus;
   /** A random word from the whim list (§9.17) for variety. */
   whimSeed?: string | null;
 }
+
+/** What `<player_said>` holds when the Fellow walks up rather than speaks. */
+export const WALK_UP = "(walks up to you)";
+
+/**
+ * What this turn is answering, which decides the one-line directive under `<player_said>` and whether the topic
+ * cards are offered:
+ *   open   the Fellow walked up: open the conversation (topic cards offered)
+ *   reply  they said something or picked a reply: respond to it first (no topic cards)
+ *   lull   their line gives little to answer ("Right.", "Hm."): respond, then pick up a thread (topic cards offered)
+ *   bye    they're leaving: see them off
+ *   gift   the engine describes a gift or a shared meal: react to it
+ */
+export type TurnFocus = "open" | "reply" | "lull" | "bye" | "gift";
+
+const BYE_WORDS = /\b(?:good ?bye|bye|farewell|see you|take care|so long|get going|be going|be off|head off|heading off|must go|should go|have to go|got to go|let you get on|leave you to it)\b/i;
+const LULL_LINE = /^(?:ok(?:ay)?|right|hm+|mm+(?:-hm)?|ah|oh|yes|yeah|no|sure|fine|alright|all right|i see|cool|nice|huh|fair enough|well|indeed|go on)[\s.!,]*$/i;
+
+/** Classify the Fellow's words (null when they walked up). Pure, so the fallback can use it too. */
+export function turnFocus(text: string | null | undefined, intent?: string | null): TurnFocus {
+  if (text == null || text.trim() === "" || text === WALK_UP) return "open";
+  if (intent === "leave" || (BYE_WORDS.test(text) && !text.includes("?"))) return "bye";
+  if (LULL_LINE.test(text.trim())) return "lull";
+  return "reply";
+}
+
+/** The line under `<player_said>`: what to do with it, first. */
+export const FOCUS_DIRECTIVES: Readonly<Record<TurnFocus, string>> = {
+  open: "The Fellow has just walked up to you. Open the conversation: a remark about something in front of you or one of the topics below.",
+  reply: "Respond to this first: answer what the Fellow asked, react to what they told you, or follow on from the reply they picked. Add something of your own after that only if it comes naturally.",
+  lull: "Respond to this first. It gives you little to answer, so then pick up a thread from this conversation or one of the topics below.",
+  bye: "Respond to this first: the Fellow is taking their leave. See them off in a line or two and set wrap_up to true.",
+  gift: "Respond to this first: react to it in your own way.",
+};
 
 export function dialogueMessages(input: DialogueInput, user: string): Anthropic.MessageParam[] {
   const history = `<history_with_player>\n${speech(input.sessionHistory ?? '')}\n</history_with_player>`;
@@ -538,6 +585,12 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
   const ctx: CanonContext = { flags, day: scene.day, names: input.names };
   const secrets = revealableSecrets(card, { regard: state.regard, flags, day: scene.day });
   const playerName = speech(player.name);
+  const focus = input.focus ?? (input.playerSaid === WALK_UP ? "open" : "reply");
+  // Topic cards invite a change of subject, so they're offered only when there's nothing to answer (§9.10).
+  const offerTopics = focus === "open" || focus === "lull";
+  const topics = offerTopics
+    ? trusted(`<topics_to_choose_from>\n${bullets(input.topics.map((t) => escapeSlot(prose(t))), "(whatever is in front of you)")}\n</topics_to_choose_from>`)
+    : "";
 
   const favors = (input.openFavors ?? []).map((f) =>
     `${f.owner === card.id ? "yours" : who(f.owner, input.names)}: ${f.template} (${f.target}): ${prose(f.text)}`);
@@ -559,14 +612,16 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     player_background: clause(player.background),
     shared_past: player.sharedPast ? `Shared past you may recall: ${prose(player.sharedPast)}` : "",
     memories: bullets(input.memories.slice(0, DIALOGUE_MEMORIES).map(memoryLine), "(nothing comes to mind)"),
-    topics: bullets(input.topics.map(prose), "(whatever is in front of you)"),
+    topics,
     already_discussed: state.recent_topics.length ? state.recent_topics.map(prose).join(", ") : "(nothing yet)",
     open_favors: bullets(favors, "(none)"),
     revealable_secrets: bullets(secrets.map((s) => `${s.id}: ${s.text}`), "(none: keep everything to yourself)"),
     hints: input.riddle ? trusted(hintsBlock(input.riddle)) : "",
     player_said: speech(input.playerSaid),
+    focus: FOCUS_DIRECTIVES[focus],
     whim: input.whimSeed ? `Whim seed, if it fits: ${speech(input.whimSeed)}` : "",
     resident_name: prose(card.name),
+    reply_note: focus === "open" ? "" : ", answering the Fellow first",
   });
   return {
     system: input.sessionSystem?.map(b => ({ type: 'text', text: b.text, cache_control: { type: 'ephemeral' } })) ?? systemBlocks(card, state, input.relationships, ctx),

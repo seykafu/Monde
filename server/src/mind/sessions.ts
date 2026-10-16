@@ -1,10 +1,11 @@
 /** D18 session selection. All writes are serialized against the resident row. */
 import { randomUUID } from "node:crypto";
 import { and, asc, desc, eq, lte, isNull, or } from "drizzle-orm";
-import { MAX_EXCHANGES, MAX_SESSION_EXCHANGES, RECENT_SUMMARIES, RESUME_EXCHANGES, RESUME_WINDOW, SUMMARY_WORDS } from "@monde/shared";
+import { MAX_EXCHANGES, MAX_SESSION_EXCHANGES, RECENT_SUMMARIES, RESUME_EXCHANGES, RESUME_WINDOW } from "@monde/shared";
 import { conversationDigests, conversationSessions, conversationSummaries, dialogueTurns, residents } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { loadResidentPrefix, prefixSystemBlocks, type TalkScene } from "./context.js";
+import { templateSummary } from "./compaction.js";
 
 export type Session = typeof conversationSessions.$inferSelect;
 export const sessionWhere = (worldId: string, id: string) => and(eq(conversationSessions.worldId, worldId), eq(conversationSessions.id, id));
@@ -21,9 +22,7 @@ export async function historyFor(db: WorldDatabase, worldId: string, residentId:
     if (summaries.some(s => s.conversationId === session.id)) continue;
     const turns = await db.select().from(dialogueTurns).where(and(eq(dialogueTurns.worldId, worldId), eq(dialogueTurns.conversationId, session.id))).orderBy(asc(dialogueTurns.turnIndex));
     if (!turns.length) continue;
-    const topics = [...new Set(turns.map(t => t.output.effects.topic).filter(Boolean))];
-    const facts = turns.flatMap(t => t.output.effects.memory ? [t.output.effects.memory.text] : []);
-    entries.push({ day: session.lastDay, minute: session.lastMinute, text: `I spoke with the Fellow about ${topics.join(', ')}. ${facts.join(' ')}`.trim().split(/\s+/).slice(0, SUMMARY_WORDS).join(' ') });
+    entries.push({ day: session.lastDay, minute: session.lastMinute, text: templateSummary(turns).summary });
   }
   return [digest?.digest ?? '', ...entries.sort((a, b) => a.day - b.day || a.minute - b.minute).slice(-RECENT_SUMMARIES).map(s => s.text)].filter(Boolean).join('\n');
 }

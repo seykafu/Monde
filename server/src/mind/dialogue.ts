@@ -5,8 +5,14 @@
  *     → on a validation failure, regenerate ONCE with a corrective note → else the authored fallback.
  *
  * Deadlines (§9.10 step 4): if nothing visible has streamed by 2.5 s the caller gets `onThinking` (the client
- * plays "Hm."); if the model has produced no text by 6 s the call is abandoned. Refusals, max_tokens stops,
- * timeouts and API errors go straight to the fallback: none of them is fixed by asking again inside the budget.
+ * plays "Hm."); if the model has produced no text by 6 s the call is abandoned. Inside that window a call that
+ * has produced nothing is not left to hang: at 2.5 s the same request is sent again alongside it (a hedge; the
+ * first to stream wins and the other is cancelled), and a call that fails outright before its first text is
+ * retried at once if there's time. Both target a dead or stalled connection (a cold machine after a deploy).
+ *
+ * A reply cut short (stop_reason `max_tokens`, or a stream that stalls or drops after it started) is salvaged
+ * (salvage.ts): the whole lines are kept, choices come from the last line, and effects only if they arrived
+ * whole. Refusals, timeouts with nothing streamed and API errors go to the authored fallback.
  *
  * This module has no I/O of its own beyond the MindClient: the route streams, effects.ts persists.
  */
@@ -19,6 +25,7 @@ import { LineTextExtractor } from "./partialJson.js";
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
 import { correctiveNote, validateTurn, type ValidationContext } from "./validate.js";
 import { prefixSystemBlocks, type ResidentPrefix } from "./context.js";
+import { salvageTurn } from "./salvage.js";
 
 export interface DialogueTimings {
   /** §9.10: nothing visible by 2.5 s → the authored "thinking" beat. */
@@ -30,9 +37,18 @@ export interface DialogueTimings {
    * Haiku speeds a 400-token turn takes 2-4 s, so 12 s per attempt is generous without letting a turn hang.
    */
   attemptMs: number;
+  /**
+   * GDD-GAP: §9.10 says nothing about a call that simply never answers. With no text after this long the same
+   * request goes out again in parallel and the first to stream wins. Staging's first token is ~0.9 s p50 and
+   * ~1.8 s p95 (ai_log, 2026-10-15), so 2.5 s (the thinking beat) is past the normal tail and leaves the second
+   * call 3.5 s before the 6 s fallback. The duplicate reads the same prompt cache, so it costs little.
+   */
+  hedgeMs: number;
+  /** A call that fails before any text is retried at once only if at least this long is left before `firstTextMs`. */
+  retryWindowMs: number;
 }
 
-export const DEFAULT_TIMINGS: DialogueTimings = { thinkingMs: 2500, firstTextMs: 6000, attemptMs: 12000 };
+export const DEFAULT_TIMINGS: DialogueTimings = { thinkingMs: 2500, firstTextMs: 6000, attemptMs: 12000, hedgeMs: 2500, retryWindowMs: 1500 };
 
 /** §9.10 step 6: the sixth exchange wraps up; a resumed session may grant two more. */
 export { MAX_EXCHANGES } from "@monde/shared";
@@ -49,7 +65,11 @@ export interface CallRecord {
   firstTokenMs: number | null;
   /** The API's stop_reason, or "none" when no message came back (timeout, error, no key). */
   stopReason: string;
-  /** "ok", a validation category ("schema", "lexical:brand", "riddle", "echo"), or what stopped the call. */
+  /**
+   * "ok", a validation category ("schema", "lexical:brand", "riddle", "echo"), "salvaged" / "salvaged:<code>"
+   * (a cut-short reply whose whole lines were kept), "hedge_lost" / "retried:<code>" (an extra call of the same
+   * attempt that didn't supply the turn), or what stopped the call.
+   */
   validation: string;
 }
 
@@ -68,6 +88,8 @@ export interface GenerateResult {
   calls: CallRecord[];
   /** What validation changed on the accepted output (clamped deltas, mapped expressions…), for logs. */
   adjustments: string[];
+  /** The output was rebuilt from a reply that was cut short (max_tokens, or a stream that stopped). */
+  salvaged: boolean;
 }
 
 export interface LineDelta {
@@ -140,12 +162,38 @@ export function prewarmParams(prefix: ResidentPrefix, day: number, history = "")
 const textOf = (message: Anthropic.Message): string =>
   message.content.flatMap((block) => (block.type === "text" ? [block.text] : [])).join("");
 
+/** A call of an attempt that didn't supply its result (a hedge that lost, a first try that failed). */
+interface ExtraCall { tokens: CallTokens; latencyMs: number; firstTokenMs: number | null; validation: string }
+
 type Attempt =
-  | { kind: "message"; message: Anthropic.Message; latencyMs: number; firstTokenMs: number | null }
-  | { kind: "failed"; code: "timeout" | "aborted" | "unavailable" | "api_error"; error: unknown; tokens: CallTokens; latencyMs: number; firstTokenMs: number | null };
+  | { kind: "message"; message: Anthropic.Message; latencyMs: number; firstTokenMs: number | null; extra: ExtraCall[] }
+  | {
+    kind: "failed"; code: "timeout" | "aborted" | "unavailable" | "api_error"; error: unknown; tokens: CallTokens; latencyMs: number;
+    firstTokenMs: number | null; extra: ExtraCall[];
+  };
 
-const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+/** GDD-GAP: after abandoning a call, wait this long for the SDK to report the usage it saw (input is billed). */
+const SETTLE_MS = 250;
 
+interface Leg {
+  controller: AbortController;
+  started: number;
+  first: number | null;
+  done: boolean;
+  settled: number | null;
+  /** Cancelled because the other call streamed first. */
+  lost: boolean;
+  message?: Anthropic.Message;
+  error?: unknown;
+}
+
+const originalError = (error: unknown): unknown => (error instanceof MindStreamError ? error.original : error);
+const tokensOfError = (error: unknown): CallTokens => (error instanceof MindStreamError ? error.tokens : NO_TOKENS);
+
+/**
+ * One attempt: a streamed call, plus at most one more of the same request (the hedge at `hedgeMs`, or a fast retry
+ * when the first fails before any text). Whichever streams first supplies the attempt; the other is cancelled.
+ */
 async function callOnce(
   mind: MindClient,
   params: Anthropic.MessageCreateParamsNonStreaming,
@@ -154,52 +202,110 @@ async function callOnce(
   onText: (delta: string) => void,
   now: () => number,
 ): Promise<Attempt> {
-  const controller = new AbortController();
-  // Assigned from timer and abort callbacks; the cast keeps TypeScript from narrowing it to null.
-  let stopped = null as "timeout" | "aborted" | null;
   const start = now();
-  let first = null as number | null;
-  const stop = (why: "timeout" | "aborted") => { stopped ??= why; controller.abort(); };
-  const firstTimer = setTimeout(() => { if (first === null) stop("timeout"); }, timings.firstTextMs);
-  const totalTimer = setTimeout(() => stop("timeout"), timings.attemptMs);
+  // Assigned from timer and abort callbacks; the casts keep TypeScript from narrowing them to null.
+  let stopped = null as "timeout" | "aborted" | null;
+  let stoppedAt = 0;
+  let winner = null as Leg | null;
+  const legs: Leg[] = [];
+  let wake: () => void = () => undefined;
+  const changed = () => wake();
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  const later = (ms: number, fn: () => void) => { timers.push(setTimeout(fn, ms)); };
+
+  const launch = (): void => {
+    const leg: Leg = { controller: new AbortController(), started: now(), first: null, done: false, settled: null, lost: false };
+    legs.push(leg);
+    const call = mind.streamMessage(params, {
+      signal: leg.controller.signal,
+      onText: (delta) => {
+        if (stopped || (winner && winner !== leg)) return;
+        if (!winner) {
+          winner = leg;
+          leg.first = now();
+          for (const other of legs) if (other !== leg && !other.done) { other.lost = true; other.controller.abort(); }
+        }
+        onText(delta);
+      },
+    });
+    call.then((message) => { leg.message = message; }, (error: unknown) => { leg.error = error; })
+      .finally(() => { leg.done = true; leg.settled = now(); changed(); });
+  };
+  const stop = (why: "timeout" | "aborted"): void => {
+    if (stopped) return;
+    stopped = why;
+    stoppedAt = now();
+    for (const leg of legs) leg.controller.abort();
+    later(SETTLE_MS, changed);
+    changed();
+  };
+
+  later(timings.firstTextMs, () => { if (!winner) stop("timeout"); });
+  later(timings.attemptMs, () => stop("timeout"));
+  later(timings.hedgeMs, () => {
+    if (!stopped && !winner && legs.length === 1 && !legs[0]!.done) { launch(); changed(); }
+  });
   const onOuterAbort = () => stop("aborted");
   outer?.addEventListener("abort", onOuterAbort, { once: true });
-  if (outer?.aborted) stop("aborted");
-  const elapsed = () => Math.round(now() - start);
-  const firstMs = () => (first === null ? null : Math.round(first - start));
 
-  const call = mind.streamMessage(params, {
-    signal: controller.signal,
-    onText: (delta) => {
-      if (stopped) return;
-      if (first === null) first = now();
-      onText(delta);
-    },
+  const elapsed = () => Math.round(now() - start);
+  const sinceStart = (leg: Leg | null) => (leg?.first == null ? null : Math.round(leg.first - start));
+  const extras = (main: Leg | null): ExtraCall[] => legs.filter((leg) => leg !== main).map((leg) => {
+    const code = originalError(leg.error) instanceof MindUnavailableError ? "unavailable" : "api_error";
+    return {
+      tokens: leg.message ? tokensOf(leg.message.usage) : tokensOfError(leg.error),
+      latencyMs: Math.round((leg.settled ?? now()) - leg.started),
+      firstTokenMs: leg.first === null ? null : Math.round(leg.first - leg.started),
+      validation: leg.lost ? "hedge_lost" : `retried:${code}`,
+    };
   });
-  // Whatever happens below, a late rejection from an abandoned call must not go unhandled.
-  call.catch(() => undefined);
-  const abandoned = new Promise<"abandoned">((resolve) => {
-    if (controller.signal.aborted) resolve("abandoned");
-    else controller.signal.addEventListener("abort", () => resolve("abandoned"), { once: true });
+  const failed = (code: Extract<Attempt, { kind: "failed" }>["code"], leg: Leg | null): Attempt => ({
+    kind: "failed", code, error: originalError(leg?.error), tokens: tokensOfError(leg?.error), latencyMs: elapsed(),
+    firstTokenMs: sinceStart(leg), extra: extras(leg),
   });
-  try {
-    const result = await Promise.race([call, abandoned]);
-    if (result === "abandoned" || stopped) {
-      // The SDK rejects right after an abort; give it a moment so the usage it saw (input is billed) is logged.
-      const settled = await Promise.race([call.then(() => null, (error: unknown) => error), sleep(250).then(() => null)]);
-      const tokens = settled instanceof MindStreamError ? settled.tokens : NO_TOKENS;
-      return { kind: "failed", code: stopped ?? "timeout", error: settled, tokens, latencyMs: elapsed(), firstTokenMs: firstMs() };
+  const codeOf = (leg: Leg): "unavailable" | "api_error" =>
+    originalError(leg.error) instanceof MindUnavailableError ? "unavailable" : "api_error";
+
+  const decide = (): Attempt | null => {
+    if (stopped) {
+      const main = winner ?? legs.at(-1) ?? null;
+      if (legs.some((leg) => !leg.done) && now() - stoppedAt < SETTLE_MS) return null;
+      return failed(stopped, main);
     }
-    return { kind: "message", message: result, latencyMs: elapsed(), firstTokenMs: firstMs() };
-  } catch (error) {
-    const tokens = error instanceof MindStreamError ? error.tokens : NO_TOKENS;
-    const original = error instanceof MindStreamError ? error.original : error;
-    const code = stopped ?? (original instanceof MindUnavailableError ? "unavailable" : "api_error");
-    return { kind: "failed", code, error: original, tokens, latencyMs: elapsed(), firstTokenMs: firstMs() };
+    if (!winner) {
+      // A call can end without any text (a refusal, an empty reply): that's its answer.
+      const quiet = legs.find((leg) => leg.done && leg.message);
+      if (quiet) winner = quiet;
+    }
+    if (winner) {
+      if (!winner.done) return null;
+      for (const leg of legs) if (leg !== winner && !leg.done) { leg.lost = true; leg.controller.abort(); }
+      if (winner.message) {
+        return { kind: "message", message: winner.message, latencyMs: elapsed(), firstTokenMs: sinceStart(winner), extra: extras(winner) };
+      }
+      return failed(codeOf(winner), winner);
+    }
+    if (legs.length > 0 && legs.every((leg) => leg.done)) {
+      const last = legs.at(-1)!;
+      const left = timings.firstTextMs - (now() - start);
+      if (legs.length === 1 && codeOf(last) !== "unavailable" && left >= timings.retryWindowMs) { launch(); return null; }
+      return failed(codeOf(last), last);
+    }
+    return null;
+  };
+
+  try {
+    if (outer?.aborted) stop("aborted");
+    else launch();
+    for (;;) {
+      const result = decide();
+      if (result) return result;
+      await new Promise<void>((resolve) => { wake = resolve; });
+    }
   } finally {
-    clearTimeout(firstTimer);
-    clearTimeout(totalTimer);
+    for (const timer of timers) clearTimeout(timer);
     outer?.removeEventListener("abort", onOuterAbort);
+    for (const leg of legs) if (!leg.done) leg.controller.abort();
   }
 }
 
@@ -207,6 +313,19 @@ async function callOnce(
 function streamSafe(text: string, validation: ValidationContext): boolean {
   if (lexicalHits(text).length > 0) return false;
   return !validation.riddle; // Riddle-topic output is held until the complete turn has passed the guard.
+}
+
+/**
+ * Rebuild and validate a reply that was cut short. Null when no whole line survives or the rebuilt turn fails
+ * validation (it isn't regenerated: a cut-short reply has already used the time a second attempt would need).
+ */
+function salvage(raw: string, validation: ValidationContext): { output: DialogueTurnOutput; rawOutput: string; adjustments: string[] } | null {
+  const rebuilt = salvageTurn(raw);
+  if (!rebuilt) return null;
+  const rawOutput = JSON.stringify(rebuilt.turn);
+  const validated = validateTurn(rawOutput, validation);
+  if (!validated.ok) return null;
+  return { output: validated.output, rawOutput, adjustments: [`salvaged ${JSON.stringify(rebuilt.kept)}`, ...validated.adjustments] };
 }
 
 export async function generateTurn(options: GenerateOptions): Promise<GenerateResult> {
@@ -219,6 +338,7 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
   const thinkingTimer = setTimeout(() => {
     if (!visible && !finished) options.onThinking?.();
   }, timings.thinkingMs);
+  const fail = (code: TurnFailureCode): GenerateResult => ({ output: null, failure: failure(code), calls, adjustments: [], salvaged: false });
 
   try {
     let corrective: string | null = null;
@@ -226,8 +346,10 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
       const params = dialogueParams(options.request, corrective ? [...notes, corrective] : notes);
       const extractor = new LineTextExtractor();
       const shown: string[] = [];
+      let raw = "";
       let suppressed = false;
       const onText = (delta: string) => {
+        raw += delta;
         for (const line of extractor.push(delta)) {
           if (suppressed || line.index >= LIMITS.dialogue.maxLines) continue;
           // Hold back a word still being typed: "game" may become "gamekeeper", and "smartph" must not show.
@@ -241,38 +363,59 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
         }
       };
       const result = await callOnce(options.mind, params, timings, options.signal, onText, now);
+      for (const extra of result.extra) {
+        calls.push({ attempt, model: params.model, costUsd: costUsd(extra.tokens), stopReason: "none", ...extra });
+      }
       const record = (tokens: CallTokens, stopReason: string, validation: string): void => {
         calls.push({
           attempt, model: params.model, tokens, costUsd: costUsd(tokens), latencyMs: result.latencyMs,
           firstTokenMs: result.firstTokenMs, stopReason, validation,
         });
       };
+      const salvaged = (tokens: CallTokens, stopReason: string, validation: string): GenerateResult | null => {
+        const kept = salvage(raw, options.validation);
+        if (!kept) return null;
+        record(tokens, stopReason, validation);
+        return { ...kept, failure: null, calls, salvaged: true };
+      };
 
       if (result.kind === "failed") {
+        // It started and then stalled or dropped: keep what already streamed rather than swap in a filler.
+        if (result.firstTokenMs !== null && result.code !== "aborted") {
+          const kept = salvaged(result.tokens, "none", `salvaged:${result.code}`);
+          if (kept) return kept;
+        }
         record(result.tokens, "none", result.code);
-        return { output: null, failure: failure(result.code), calls, adjustments: [] };
+        return fail(result.code);
       }
       const { message } = result;
       const tokens = tokensOf(message.usage);
       const stopReason = message.stop_reason ?? "none";
       // Always check stop_reason before reading content (AGENTS.md; refusals have no server-side fallback on Haiku).
-      if (stopReason === "refusal" || stopReason === "max_tokens") {
+      if (stopReason === "refusal") {
         record(tokens, stopReason, stopReason);
-        return { output: null, failure: failure(stopReason), calls, adjustments: [] };
+        return fail("refusal");
+      }
+      if (stopReason === "max_tokens") {
+        raw = textOf(message) || raw;
+        const kept = salvaged(tokens, stopReason, "salvaged");
+        if (kept) return kept;
+        record(tokens, stopReason, stopReason);
+        return fail("max_tokens");
       }
       if (stopReason !== "end_turn" && stopReason !== "stop_sequence") {
         record(tokens, stopReason, `stop:${stopReason}`);
-        return { output: null, failure: failure("invalid_output"), calls, adjustments: [] };
+        return fail("invalid_output");
       }
       const validated = validateTurn(textOf(message), options.validation);
       if (validated.ok) {
         record(tokens, stopReason, "ok");
-        return { output: validated.output, rawOutput: textOf(message), failure: null, calls, adjustments: validated.adjustments };
+        return { output: validated.output, rawOutput: textOf(message), failure: null, calls, adjustments: validated.adjustments, salvaged: false };
       }
       record(tokens, stopReason, validated.category);
       corrective = correctiveNote(validated.category);
     }
-    return { output: null, failure: failure("invalid_output"), calls, adjustments: [] };
+    return fail("invalid_output");
   } finally {
     finished = true;
     clearTimeout(thinkingTimer);

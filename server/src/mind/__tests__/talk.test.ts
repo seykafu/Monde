@@ -11,7 +11,8 @@ import { createWorld } from "../../worlds/createWorld.js";
 import { worldToken } from "../../worlds/routes.js";
 import type { MindClient } from "../mindClient.js";
 import { WRAP_UP_NOTE } from "../dialogue.js";
-import { FALLBACK_LINES, FALLBACK_REPLIES } from "../fallback.js";
+import { DIALOGUE_MAX_TOKENS } from "../promptBuilder.js";
+import { FALLBACK_LINES, FALLBACK_REPLIES, MOMENT_LINES } from "../fallback.js";
 import { RIDDLES } from "../riddles.js";
 import { correctiveNote } from "../validate.js";
 import { FakeMind, allBodies } from "./fakeMind.js";
@@ -138,7 +139,7 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect(memory).toMatchObject({ residentId: "pell", kind: "said", who: ["player"], wherePlace: "old_quarter.fountain_square", importance: 4, day: 4, valence: 2 });
 
     const request = mind.streams[0]!;
-    expect(request).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 400, thinking: { type: "disabled" } });
+    expect(request).toMatchObject({ model: "claude-haiku-5-5", max_tokens: DIALOGUE_MAX_TOKENS, thinking: { type: "disabled" } });
     expect(request.output_config?.format?.type).toBe("json_schema");
     expect(request.system).toHaveLength(3);
     expect(userBlocks(request)[0]).toContain("Name: Fellow (they/them)");
@@ -207,6 +208,82 @@ describe("POST /v1/worlds/:w/talk", () => {
     const events = sse((await talk(env, payload())).payload);
     expect(events.find((e) => e.event === "error")!.data.code).toBe("max_tokens");
     expect(finalTurn(events).fallback).toBe(true);
+  });
+
+  it("salvages a reply cut short by max_tokens: whole lines kept, no half-read effects", async () => {
+    const full = JSON.stringify(good());
+    const mind = new FakeMind([{ output: full.slice(0, full.indexOf('"memory"') + 15), stopReason: "max_tokens" }]);
+    const env = await setup(mind);
+    const events = sse((await talk(env, payload())).payload);
+    expect(events.some((e) => e.event === "error")).toBe(false);
+    const turn = finalTurn(events);
+    expect(turn).toMatchObject({ fallback: false, salvaged: true, lines: good().lines });
+    expect(turn.choices.map((c: { text: string }) => c.text)).toEqual(["Eighty-one of how many?", "I'll sit."]);
+    expect(mind.streams).toHaveLength(1);
+    expect((await logs(env.worldId)).map((l) => [l.stopReason, l.validation, l.fallback])).toEqual([["max_tokens", "salvaged", false]]);
+    // Only the day's first-chat bonus moved Regard: the cut-off regard_delta, topic and memory weren't applied.
+    expect(turn.regard).toMatchObject({ delta: 1, first_chat: true });
+    expect((await residentState(env.worldId)).recent_topics).toEqual([]);
+    expect(await database.db.select().from(memories).where(eq(memories.worldId, env.worldId))).toEqual([]);
+  });
+
+  it("keeps the lines that already streamed when a stream stalls after starting", async () => {
+    const full = JSON.stringify(good());
+    const mind = new FakeMind([{ output: full, stallAfter: full.indexOf('"choices"') + 4, chunk: 8 }]);
+    const env = await setup(mind, { dialogueTimings: { ...TIMINGS, attemptMs: 400 } });
+    const turn = finalTurn(sse((await talk(env, payload())).payload));
+    expect(turn).toMatchObject({ fallback: false, salvaged: true, lines: good().lines });
+    expect(turn.choices.length).toBeGreaterThanOrEqual(2); // padded from the last line
+    expect((await logs(env.worldId)).map((l) => [l.stopReason, l.validation])).toEqual([["none", "salvaged:timeout"]]);
+  });
+
+  it("retries at once when a call fails before any text, if the 6 s window allows", async () => {
+    const mind = new FakeMind([{ error: new Error("socket hang up") }, { output: good() }]);
+    const env = await setup(mind, { dialogueTimings: { ...TIMINGS, firstTextMs: 2000, retryWindowMs: 100 } });
+    const turn = finalTurn(sse((await talk(env, payload())).payload));
+    expect(turn).toMatchObject({ fallback: false, lines: good().lines });
+    expect(mind.streams).toHaveLength(2);
+    expect(JSON.stringify(mind.streams[1])).toBe(JSON.stringify(mind.streams[0]));
+    expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["retried:api_error", "ok"]);
+  });
+
+  it("doesn't retry a failed call when the window has no room left", async () => {
+    const mind = new FakeMind([{ error: new Error("socket hang up") }]);
+    const env = await setup(mind);
+    const events = sse((await talk(env, payload())).payload);
+    expect(events.find((e) => e.event === "error")!.data.code).toBe("api_error");
+    expect(finalTurn(events).fallback).toBe(true);
+    expect(mind.streams).toHaveLength(1);
+  });
+
+  it("hedges a call that has produced nothing: the first to stream wins, the other is cancelled", async () => {
+    const mind = new FakeMind([{ hang: true }, { output: good() }]);
+    const env = await setup(mind, { dialogueTimings: { ...TIMINGS, hedgeMs: 60, firstTextMs: 2000 } });
+    const turn = finalTurn(sse((await talk(env, payload())).payload));
+    expect(turn).toMatchObject({ fallback: false, lines: good().lines });
+    expect(mind.streams).toHaveLength(2);
+    expect((await logs(env.worldId)).map((l) => [l.validation, l.fallback])).toEqual([["hedge_lost", false], ["ok", false]]);
+  });
+
+  it("answers a mid-conversation failure with a line about the moment, never a greeting", async () => {
+    const mind = new FakeMind([{ output: good() }, { hang: true }]);
+    const env = await setup(mind);
+    const body = payload();
+    await talk(env, body);
+    const question = "What do you bake first thing in the morning?";
+    const events = sse((await talk(env, payload({ conversation_id: body.conversation_id, input: { kind: "say", text: question } }))).payload);
+    const turn = finalTurn(events);
+    expect(turn).toMatchObject({ fallback: true, turn_index: 1, wrap_up: false });
+    expect(MOMENT_LINES.question).toContain(turn.lines[0].text);
+    expect(Object.values(FALLBACK_LINES).flatMap((row) => Object.values(row))).not.toContain(turn.lines[0].text);
+    expect(turn.choices[0]).toMatchObject({ text: question });
+  });
+
+  it("warms the API connection once when the server starts", async () => {
+    const mind = new FakeMind();
+    const env = await setup(mind);
+    await env.app.ready();
+    expect(mind.warmed).toBe(1);
   });
 
   it("plays the thinking beat at 2.5 s and abandons the call at 6 s (scaled down here)", async () => {

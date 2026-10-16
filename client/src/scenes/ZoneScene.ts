@@ -36,6 +36,7 @@ import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
 import { ResidentLayer } from './zone/residents';
 import { attachDialogue } from './DialogueScene';
 import { PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
+import { MindStatusDot } from '../ui/mindStatus';
 import { applyServerRegard, attachDawnSync } from './friendship';
 import { attachEventSync } from './events';
 import { openPeople } from './PeopleScene';
@@ -255,6 +256,8 @@ export class ZoneScene extends Phaser.Scene {
   private aimedFor?: DailyWeather;
   private hud!: Hud;
   private hudIcon = '';
+  /** Online/Offline: whether residents speak for themselves or from written lines (§9.14). */
+  private mindDot?: MindStatusDot;
   /** The town's residents on this board (W-05); off-screen ones tick at 1 Hz inside it. */
   private residents!: ResidentLayer;
   /** What E does right now (set every frame along with the prompt). */
@@ -696,7 +699,8 @@ export class ZoneScene extends Phaser.Scene {
       arrow
     };
     this.pillarStrip = new PillarStrip(this, x0, y0 + H + 6, W).onClick(() => openTownLedger(this, this.clock));
-    return [bg, ...Object.values(this.hud), ...this.pillarStrip.objects, ...this.buildHintCard(x0, W)];
+    this.mindDot = new MindStatusDot(this, x0 + W - 14, y0 + 14, y0 + H + 4);
+    return [bg, ...Object.values(this.hud), ...this.pillarStrip.objects, ...this.mindDot.objects, ...this.buildHintCard(x0, W)];
   }
 
   // ── The Next hint (story/hint.ts) ──────────────────────────────────────────
@@ -766,6 +770,7 @@ export class ZoneScene extends Phaser.Scene {
     hud.weather.setText(`${describeWeather(this.now)}${overridden ? ' (dev)' : ''}`);
     hud.wind.setText(`${this.daily.wind} wind`);
     hud.arrow.setAngle(windToward(this.daily.wind)).setX(hud.wind.x - hud.wind.width - 12);
+    this.mindDot?.update(this.time.now);
     const icon = `${this.now.kind}:${dark > 0.5 ? 'night' : 'day'}`;
     if (icon !== this.hudIcon) { this.hudIcon = icon; this.drawWeatherIcon(hud.icon, this.now.kind, dark > 0.5); }
   }

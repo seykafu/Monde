@@ -1,3 +1,5 @@
+import { JoinedChatter } from './zone/joinChatter';
+import type { ChatterJoin } from './zone/chatter';
 import { updateFriendship } from "./friendship";
 import { favorBook, chooseFavor, favorProof, finishFavor } from "../friendship/favors";
 import { openPeople } from './PeopleScene';
@@ -28,7 +30,8 @@ import { quietStorage } from '../save/session';
 // doesn't continue it); then the body clears and starts again, quietly. If nothing is visible by 2.5 s the
 // resident plays the "Hm." thinking beat. The final `turn` brings the choices: 1–3 (keys or click),
 // "Say something…" (a DOM text input, ≤ 140 characters), Gift, Leave, Log, and a small "⋯" menu with Report
-// line and the text speed. Quiet Mode and server fallback turns look exactly the same (`?dev` adds a tiny marker).
+// line and the text speed. Quiet Mode turns carry a small "offline · written lines" note under the panel (§9.14);
+// a server fallback looks like a live turn (`?dev` adds a tiny marker).
 import Phaser from 'phaser';
 import { FAMILY_BODY, FAMILY_HEADING, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { getMusic } from '../audio/Music';
@@ -45,6 +48,7 @@ import { Rng } from '../util/rng';
 import type { ResidentLayer } from './zone/residents';
 import { browserStorage, getMind, uuid, type TalkResult } from '../mind/api';
 import { talkContext } from '../mind/context';
+import { offlineMarker } from '../mind/connection';
 import { lineLibrary } from '../mind/lineLibrary';
 import { scriptedTurn, type ScriptedExchange } from '../mind/scripted';
 import { loadQuietState, loadTextSpeed, saveQuietState, saveTextSpeed } from '../mind/prefs';
@@ -62,6 +66,8 @@ import { callName, isBareLeave, normalizeChoices, type PersonaCard } from '@mond
 export const DIALOGUE_SCENE = 'Dialogue';
 
 export interface DialogueOpen {
+  /** Join an overheard exchange; both routines remain held until shutdown. */
+  chatter?: ChatterJoin;
   /** The scene underneath: its input is paused while the panel is open. */
   host: string;
   clock: Clock;
@@ -96,8 +102,10 @@ export function attachDialogue(host: Phaser.Scene, opts: { residents: ResidentLa
       host: host.scene.key, clock: opts.clock, residentId: e.residentId, zone: opts.zone,
       state: opts.residents.stateOf(e.residentId), weather: opts.weather(), playerPosition: opts.playerPosition?.()
     };
+    data.chatter = opts.residents.chatter.join(e.residentId);
     host.scene.launch(DIALOGUE_SCENE, data);
   });
+  opts.residents.chatter.weather = () => opts.weather().kind;
   opts.residents.onApproach = id => { if (CARDS.has(id)) getMind().prewarmNear(id, opts.clock.day, opts.clock.minute); };
   host.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { off(); opts.residents.onApproach = undefined; });
 }
@@ -216,6 +224,8 @@ class PanelButton {
 
 export class DialogueScene extends Phaser.Scene {
   private open!: DialogueOpen;
+  private joined: JoinedChatter | null = null;
+  private secondaryPortrait: Portrait | null = null;
   private shownReplies: TalkChoice[] = [];
   private card!: PersonaCard;
   private look!: PortraitLook;
@@ -245,6 +255,10 @@ export class DialogueScene extends Phaser.Scene {
   private echo!: Phaser.GameObjects.Text;
   private more!: Phaser.GameObjects.Text;
   private devMark!: Phaser.GameObjects.Text;
+  /** "offline · written lines" under the panel while residents speak from the line library (§9.14). */
+  private offlineNote!: Phaser.GameObjects.Text;
+  /** The code of this turn's server `error` event, if any (`unavailable`: the server has no model either). */
+  private serverError: string | null = null;
   private toastText!: Phaser.GameObjects.Text;
   private portrait!: Portrait;
   private plateW = 0;
@@ -281,6 +295,9 @@ export class DialogueScene extends Phaser.Scene {
 
   init(data: DialogueOpen): void {
     this.open = data;
+    const other = data.chatter ? CARDS.get(data.chatter.secondary) : undefined;
+    this.joined = other && data.chatter ? new JoinedChatter(data.chatter, displayName(other.card.name), displayName(CARDS.get(data.residentId)!.card.name), other.card.voice.mode === 'narrated_action') : null;
+    this.secondaryPortrait = null;
     const entry = CARDS.get(data.residentId)!;
     this.card = entry.card;
     this.look = portraitLook(entry.card, rosterColour(entry.index));
@@ -302,6 +319,7 @@ export class DialogueScene extends Phaser.Scene {
     this.speed = loadTextSpeed(browserStorage());
     this.quiet = loadQuietState(quietStorage);
     this.quietLine = null;
+    this.serverError = null;
     this.scriptedNodes = {};
     this.shownBody = '';
     this.shownExpr = '';
@@ -317,7 +335,8 @@ export class DialogueScene extends Phaser.Scene {
     this.playerLine = null;
     this.playerStart = 0;
     this.playerUntil = 0;
-    this.log = [];
+    this.log = (data.chatter?.lines ?? []).map(l => ({ who: 'resident', text: `${displayName(CARDS.get(l.speaker)?.card.name ?? l.speaker)}: ${l.text}` }));
+    if (this.joined) this.context = { ...this.context, current_activity: `Talking with ${this.joined.name} and the Fellow. ${data.chatter?.lines.at(-1)?.text ?? ''}`.slice(0, 120) };
     this.backlog = null;
     this.hearts = null;
     this.feedback = null;
@@ -339,6 +358,12 @@ export class DialogueScene extends Phaser.Scene {
 
     // Portrait (left), then the panel over its lower edge.
     this.portrait = new Portrait(this, { residentId: this.card.id, look: this.look, x: PORTRAIT_X, y: PORTRAIT_Y, label: true });
+    if (this.joined) {
+      const other = CARDS.get(this.joined.join.secondary)!;
+      this.secondaryPortrait = new Portrait(this, { residentId: other.card.id, look: portraitLook(other.card, rosterColour(other.index)),
+        x: PORTRAIT_X + PORTRAIT_W + 20, y: PORTRAIT_Y, label: true });
+      this.secondaryPortrait.setDimmed(true);
+    }
     this.setExpr('neutral');
     const panel = this.add.graphics();
     panel.fillStyle(INK, 0.95).fillRoundedRect(PANEL_X, PANEL_Y, PANEL_W, PANEL_H, 14);
@@ -387,6 +412,9 @@ export class DialogueScene extends Phaser.Scene {
     this.devMark = this.add.text(PANEL_X + 14, PANEL_Y + PANEL_H - 8, '', {
       fontFamily: FAMILY_BODY, fontSize: '11px', color: '#8f8a78', resolution: RENDER_SCALE
     }).setOrigin(0, 1).setVisible(DEV_MARK);
+    this.offlineNote = this.add.text(PANEL_X + PANEL_W - 22, PANEL_Y + PANEL_H + 3, '', {
+      fontFamily: FAMILY_BODY, fontSize: '12px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE
+    }).setOrigin(1, 0);
     // Small notes ("Thanks. That line has been noted.") along the panel's foot, clear of the choices.
     this.toastText = this.add.text(PANEL_X + PANEL_W / 2, PANEL_Y + PANEL_H - 22, '', {
       fontFamily: FAMILY_BODY, fontSize: '16px', color: CREAM, backgroundColor: '#28372d', padding: { x: 12, y: 6 }, resolution: RENDER_SCALE
@@ -457,6 +485,7 @@ export class DialogueScene extends Phaser.Scene {
   private async send(input: TalkInput, echo: string | null): Promise<void> {
     if (input.kind === 'gift' || input.kind === 'meal') this.context = { ...this.context, riddle: null };
     const seq = ++this.requestSeq;
+    this.serverError = null;
     this.generating = true;
     this.turn = null;
     this.thinking = null;
@@ -482,7 +511,7 @@ export class DialogueScene extends Phaser.Scene {
             signal: abort.signal, fallback,
             onLineDelta: d => { if (seq === this.requestSeq && this.reader.delta(d) === 'reset') this.restartQuietly(); },
             onThinking: t => this.onThinking(t, seq),
-            onError: e => { if (DEV_MARK) this.devMark.setText(`server fell back: ${e.code}`); }
+            onError: e => { if (seq === this.requestSeq) this.serverError = e.code; if (DEV_MARK) this.devMark.setText(`server fell back: ${e.code}`); }
           })
         : { turn: fallback(), source: 'quiet', reason: 'offline' };
     } catch (error) {
@@ -495,6 +524,12 @@ export class DialogueScene extends Phaser.Scene {
       const fellow = getFellow(this.registry);
       // GDD-GAP: each completed reply earns 5 Heart XP, including Quiet Mode.
       if (fellow) setFellow(this.registry, { ...fellow, skills: gainXp(fellow.skills, 'heart', 5) });
+    }
+    if (this.joined) {
+      const comment = await this.joined.comment(input, this.context, abort.signal);
+      if (this.closed || seq !== this.requestSeq) return;
+      if (comment) result.turn = { ...result.turn, lines: [...result.turn.lines,
+        ...comment.lines.map(l => ({ ...l, text: `${this.joined!.name}: ${l.text}` }))] };
     }
     this.onTurn(result.turn, result.source, result.reason);
   }
@@ -514,7 +549,7 @@ export class DialogueScene extends Phaser.Scene {
       this.conversationId = turn.conversation_id;
       this.serverConversationId = turn.conversation_id;
       if (turn.resumed) {
-        this.log = [...(turn.history ?? []), { who: 'resident', text: '(picking up where you left off)' }];
+        this.log = [...(this.open.chatter ? this.log : []), ...(turn.history ?? []), { who: 'resident', text: '(picking up where you left off)' }];
         const touch = this.add.text(PANEL_X + 24, PANEL_Y - 24, '(picking up where you left off)', { fontSize: '14px', color: '#e4c77f' });
         this.time.delayedCall(3500, () => touch.destroy());
       }
@@ -530,6 +565,7 @@ export class DialogueScene extends Phaser.Scene {
     this.feedback = this.giftFeedback ?? (source === 'server' ? heartFeedback(turn.regard) : null);
     this.giftFeedback = null;
     if (this.reader.finish(this.turn) === 'reset') this.restartQuietly();
+    this.offlineNote.setText(offlineMarker(source, reason, this.serverError) ?? '');
     if (DEV_MARK) {
       const what = source === 'quiet' ? `quiet${this.quietLine ? ` · ${this.quietLine}` : ''}${reason ? ` (${reason})` : ''}` : turn.fallback ? 'server fallback' : 'live';
       this.devMark.setText(`${what} · turn ${turn.turn_index}${turn.wrap_up ? ' · wrap-up' : ''}`);
@@ -617,9 +653,14 @@ export class DialogueScene extends Phaser.Scene {
   }
 
   private setExpr(expr: string): void {
-    if (expr === this.shownExpr) return;
-    this.shownExpr = expr;
-    this.portrait.setExpression(expr);
+    const secondary = !!this.joined && (this.reader.stream.lines[this.reader.line] ?? '').startsWith(`${this.joined.name}:`);
+    const key = this.joined ? `${secondary}:${expr}` : expr;
+    if (key === this.shownExpr) return;
+    this.shownExpr = key;
+    this.portrait.setDimmed(secondary);
+    this.secondaryPortrait?.setDimmed(!secondary);
+    if (secondary) this.secondaryPortrait?.setExpression(expr);
+    else this.portrait.setExpression(expr);
   }
 
   // ── The player's line and the Log ─────────────────────────────────────────
@@ -1005,6 +1046,7 @@ export class DialogueScene extends Phaser.Scene {
 
   /** On shutdown, however it came: give the world back. */
   private teardown(): void {
+    this.joined?.close(this.context);
     if (this.serverConversationId) void getMind().closeTalk(this.card.id, this.serverConversationId, this.context.day, this.context.minute);
     this.closed = true;
     this.abort?.abort();

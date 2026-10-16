@@ -30,7 +30,7 @@ import { z } from "zod";
 import { SUMMARY_TIMEOUT_MS, Intent, PlaceId, ResidentId, normalizeChoices, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
 import { aiLog, dialogueTurns, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
-import { buildDialogueRequest, promptVersion, speech } from "./promptBuilder.js";
+import { WALK_UP, buildDialogueRequest, promptVersion, speech } from "./promptBuilder.js";
 import { loadDialogueContext, loadResidentPrefix, type DialogueContext } from "./context.js";
 import {
   WRAP_UP_NOTE, generateTurn, prewarmParams, type CallRecord, type DialogueTimings, type TurnFailure,
@@ -113,6 +113,9 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
   const models = new WorldSemaphores(8);
   const background = new Set<Promise<void>>();
   app.addHook('onClose', async () => { await Promise.allSettled([...background]); });
+  // A machine that has just started (a deploy, a cold start) opens its Anthropic connection now, not on the
+  // first player's turn. Never blocks startup and never fails it.
+  app.addHook('onReady', async () => { void mind.warm?.().catch(() => undefined); });
 
   app.post<{ Params: { w: string } }>('/v1/worlds/:w/talk/close', async (request, reply) => {
     const parsed = z.object({ resident_id: ResidentId, conversation_id: z.uuid(), day: z.number().int().min(1), minute: z.number().int().min(360).max(1560) }).safeParse(request.body);
@@ -156,9 +159,10 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         if (receipt.rejected.length) return reply.code(400).send({ error: receipt.rejected[0]!.reason });
       }
       const playerText = body.input.kind === "open" ? null : body.input.text;
+      const playerIntent = body.input.kind === "choice" ? body.input.intent : null;
       const loaded = await loadDialogueContext(db!, {
         worldId, residentId: body.resident_id, conversationId: body.conversation_id, scene: body.context,
-        playerText, playerSaid: playerText ?? "(walks up to you)",
+        playerText, playerIntent, playerSaid: playerText ?? WALK_UP,
       });
       if (!loaded.ok) {
         return loaded.error === "unknown_resident"
@@ -168,6 +172,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       const ctx = loaded.context;
       // GDD-GAP: the ±7 Heart judgment range unlocks with the L3 Regard perk.
       ctx.validation.heartPerk = (body.context.heart_level ?? 1) >= 3;
+      if (giftItem) ctx.input.focus = 'gift';
       if (giftItem) ctx.input.playerSaid = body.input.kind === 'meal' ? `The player shares ${giftItem.name} with you. React in character; the engine already applied the meal's Regard.` : `The player gives you ${giftItem.name}. Your engine-decided reaction is ${matchGift(giftItem, ctx.prefix.card)}. React in character; do not award Regard for this gift (already applied outside conversation).`;
       ctx.input.sessionHistory = selected.session.history;
       ctx.input.sessionSystem = selected.session.system;
@@ -196,9 +201,12 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         return turn;
       };
       const fallbackFor = (context: DialogueContext): DialogueTurnOutput => {
+        // Mid-conversation the authored line answers the moment (fallback.ts), never greets again.
         const turn = fallbackTurn({
           card: context.prefix.card, state: context.prefix.state, playerName: context.playerName,
-          turnIndex: context.turnIndex, riddle: context.riddle,
+          turnIndex: context.turnIndex, riddle: context.riddle, playerText, intent: playerIntent,
+          said: (context.input.conversation ?? []).filter((t) => t.speaker === "resident").map((t) => t.text),
+          met: selected.resumed || (selected.session.history ?? "").trim() !== "",
         });
         if (giftItem) {
           const reaction = matchGift(giftItem, context.prefix.card);
@@ -208,17 +216,20 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         return applyLimit(turn);
       };
       let proposedFavors: Favor[] = [];
+      let salvaged = false;
       const sendTurn = (output: DialogueTurnOutput, fallback: boolean, regard: TurnRegard | null) => send("turn", {
         conversation_id: body.conversation_id, resident_id: body.resident_id, turn_index: ctx.turnIndex,
         resumed: selected.resumed, history: backlog,
         lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback, regard, favors: proposedFavors,
+        // The model's reply was cut short and its whole lines kept (dialogue.ts); for logs and evals.
+        ...(salvaged && !fallback ? { salvaged: true } : {}),
       });
 
       try {
         let calls: CallRecord[] = [];
         let rawOutput: string | undefined;
         const built = buildDialogueRequest(ctx.input);
-        const promptUser = `${selected.resumed ? `<resumed after_minutes="${selected.afterMinutes}"/>\n` : ''}<player_said> ${speech(playerText ?? '(walks up to you)')} </player_said>`;
+        const promptUser = `${selected.resumed ? `<resumed after_minutes="${selected.afterMinutes}"/>\n` : ''}<player_said> ${speech(playerText ?? WALK_UP)} </player_said>`;
         let output: DialogueTurnOutput;
         let failure: TurnFailure | null = null;
         try {
@@ -235,7 +246,9 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           calls = result.calls;
           rawOutput = result.rawOutput;
           failure = result.failure;
+          salvaged = result.salvaged;
           output = result.output ? applyLimit(result.output) : fallbackFor(ctx);
+          if (result.salvaged) request.log.warn({ calls: calls.map((c) => [c.stopReason, c.validation, c.tokens.output]) }, "dialogue reply cut short; whole lines salvaged");
           if (result.adjustments.length) request.log.info({ adjustments: result.adjustments }, "dialogue output adjusted");
         } catch (error) {
           request.log.error({ err: error }, "dialogue generation crashed");

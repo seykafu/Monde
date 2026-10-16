@@ -5,6 +5,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Config } from "../config.js";
 import { NO_TOKENS, type CallTokens } from "./pricing.js";
+import { MIND_MODEL } from "./promptBuilder.js";
 
 export interface StreamOptions {
   /** Aborts the call (deadline or client gone). The returned promise then rejects. */
@@ -20,7 +21,15 @@ export interface MindClient {
   streamMessage(params: Anthropic.MessageCreateParamsNonStreaming, options: StreamOptions): Promise<Anthropic.Message>;
   /** A plain `client.messages.create(params)` (used for `max_tokens: 0` prewarms, which reject `stream: true`). */
   createMessage(params: Anthropic.MessageCreateParamsNonStreaming, options?: { signal?: AbortSignal }): Promise<Anthropic.Message>;
+  /**
+   * Open the connection to the API without spending tokens (DNS, TLS, the SDK's first request), so the first
+   * dialogue turn after a deploy or a cold start doesn't pay for it. Optional; never rejects.
+   */
+  warm?(): Promise<void>;
 }
+
+/** GDD-GAP: the boot warm-up gets the prewarm's 5 s; it runs once, in the background. */
+export const WARM_TIMEOUT_MS = 5000;
 
 /** Thrown by DisabledMindClient: no API key, so no call was made. */
 export class MindUnavailableError extends Error {
@@ -64,6 +73,15 @@ export class AnthropicMindClient implements MindClient {
 
   createMessage(params: Anthropic.MessageCreateParamsNonStreaming, options: { signal?: AbortSignal } = {}): Promise<Anthropic.Message> {
     return this.anthropic.messages.create(params, { signal: options.signal });
+  }
+
+  /** A Models API lookup: free, and it leaves a warm connection behind for the first turn. */
+  async warm(model: string = MIND_MODEL): Promise<void> {
+    try {
+      await this.anthropic.models.retrieve(model, {}, { signal: AbortSignal.timeout(WARM_TIMEOUT_MS) });
+    } catch {
+      // Nothing to do: the first turn will just open its own connection.
+    }
   }
 }
 

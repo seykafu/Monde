@@ -15,7 +15,7 @@ import {
 import { memories, plans, relationships, residents, tieMilestones, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import {
-  NEWS_IMPORTANCE, NEWS_PER_SIDE, chooseEncounters, findMeetings, meanOf, relationshipView,
+  NEWS_IMPORTANCE, NEWS_PER_SIDE, encounterMemoryId, chooseEncounters, findMeetings, meanOf, relationshipView,
   type Encounter, type EncounterContext, type EncounterSide,
 } from "./encounters.js";
 import { templatePlan } from "./templatePlan.js";
@@ -66,7 +66,7 @@ export interface PrepareOptions {
 
 export async function prepareFriendship(db: WorldDatabase, options: PrepareOptions): Promise<FriendshipNight> {
   const { worldId, day } = options;
-  const [[world], rows, edges, planRows, newsRows] = await Promise.all([
+  const [[world], rows, edges, planRows, newsRows, metRows] = await Promise.all([
     db.select({ seed: worlds.seed }).from(worlds).where(eq(worlds.id, worldId)),
     db.select({ id: residents.id, card: residents.card, state: residents.state }).from(residents).where(eq(residents.worldId, worldId)),
     db.select().from(relationships).where(eq(relationships.worldId, worldId)),
@@ -74,7 +74,9 @@ export async function prepareFriendship(db: WorldDatabase, options: PrepareOptio
     db.select().from(memories).where(and(
       eq(memories.worldId, worldId), eq(memories.day, day), eq(memories.archived, false), gte(memories.importance, NEWS_IMPORTANCE),
     )),
+    db.select({ id: memories.id }).from(memories).where(and(eq(memories.worldId, worldId), eq(memories.day, day), eq(memories.kind, "did"))),
   ]);
+  const met = new Set(metRows.map(m => m.id));
   const cards = new Map<string, PersonaCard>(rows.map((r) => [r.id, r.card]));
   const states = new Map<string, ResidentState>(rows.map((r) => [r.id, r.state]));
   const residentIds = new Set(cards.keys());
@@ -84,7 +86,7 @@ export async function prepareFriendship(db: WorldDatabase, options: PrepareOptio
   // Day N as the residents lived it: last night's plan, or the routine the client ran.
   const planFor = new Map(planRows.map((p) => [p.residentId, p.plan]));
   const dayPlans = rows.map((r) => ({ residentId: r.id, blocks: (planFor.get(r.id) ?? templatePlan(r.card, day)).blocks }));
-  const encounters = chooseEncounters(findMeetings(dayPlans), {
+  const encounters = chooseEncounters(findMeetings(dayPlans).filter(m => !met.has(encounterMemoryId(day, m.a, m.b, m.a))), {
     seed: world?.seed ?? 0, day, mean: (a, b) => meanOf(byEdge, a, b),
     tier: (id) => options.tiers.get(id) ?? "ambient", modelEnabled: options.modelEnabled,
   });
@@ -92,7 +94,7 @@ export async function prepareFriendship(db: WorldDatabase, options: PrepareOptio
   const neglected = await applyNeglect(db, worldId, day);
   const meeting = new Set(encounters.map((e) => pairKey(e.a, e.b)));
   const drifted = await applyDrift(db, worldId, day, edges.filter((e) =>
-    residentIds.has(e.fromId) && residentIds.has(e.toId) && !meeting.has(pairKey(e.fromId, e.toId))));
+    residentIds.has(e.fromId) && residentIds.has(e.toId) && !meeting.has(pairKey(e.fromId, e.toId)) && !met.has(encounterMemoryId(day, e.fromId, e.toId, e.fromId))));
 
   // News: each side's notable memories of the day, minus what the other already knows (same source event).
   const newsOf = new Map<string, { id: string; text: string; source: string | null; importance: number }[]>();

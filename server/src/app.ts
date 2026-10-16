@@ -1,3 +1,4 @@
+import { registerChatRoutes } from './mind/chatRoutes.js';
 import { randomUUID } from "node:crypto";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
@@ -89,6 +90,7 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   const db = testDb ?? database?.db;
   const mind = options.mind ?? createMindClient(config);
   registerWorldRoutes(app, config, db);
+  registerChatRoutes(app, db, mind);
   registerMindRoutes(app, db, {
     mind,
     timings: options.dialogueTimings,

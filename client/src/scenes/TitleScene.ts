@@ -3,6 +3,8 @@ import { FAMILY_BODY, GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from '../util/cons
 import { finishSaving, loadGame, resetGame, saveGame, saveStorage } from '../save/runtime';
 import { IndexedDBSaveStorage } from '../save/storage';
 import { formatSummary, MANUAL_SLOTS, sortForMenu, type SaveEntry } from '../save/slots';
+import { getMind } from '../mind/api';
+import { maskInvite, statusDetail, validInvite } from '../mind/connection';
 
 type Choice = { text: string; run?: () => void | Promise<void> };
 /** Thin shared presentation for title and pause; persistence lives outside Phaser. */
@@ -13,6 +15,8 @@ class SaveMenuBase extends Phaser.Scene {
   private busy = false;
   private message!: Phaser.GameObjects.Text;
   private back: () => void = () => undefined;
+  /** Settings' invite-code field (a DOM input over the canvas), while it's open. */
+  private inviteInput: { input: HTMLInputElement; place: () => void } | null = null;
   protected pausedGame = false;
   constructor(key: string) { super(key); }
   create(): void {
@@ -23,7 +27,7 @@ class SaveMenuBase extends Phaser.Scene {
     this.add.text(70, 48, this.pausedGame ? 'A quiet moment' : 'Monde', { fontFamily: FAMILY_BODY, fontSize: '38px', color: '#394a3b' });
     this.message = this.add.text(70, GAME_HEIGHT - 72, '', { fontFamily: FAMILY_BODY, fontSize: '15px', color: '#705740', wordWrap: { width: GAME_WIDTH - 140 } });
     const onKey = (event: KeyboardEvent) => {
-      if (event.repeat || this.busy) return;
+      if (event.repeat || this.busy || this.inviteInput) return;
       if (event.key === 'Escape') this.back();
       else if (event.key === 'Enter') this.activate(this.focus);
       else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
@@ -36,7 +40,7 @@ class SaveMenuBase extends Phaser.Scene {
       }
     };
     this.input.keyboard?.on('keydown', onKey);
-    this.events.once('shutdown', () => this.input.keyboard?.off('keydown', onKey));
+    this.events.once('shutdown', () => { this.input.keyboard?.off('keydown', onKey); this.closeInvite(); });
     void this.home().catch(error => this.error(error));
   }
   private error(error: unknown): void { this.message.setText(`Could not complete that: ${error instanceof Error ? error.message : String(error)}`); }
@@ -81,10 +85,78 @@ class SaveMenuBase extends Phaser.Scene {
         { text: 'Continue', run: entries[0] ? () => loadGame(this, entries[0]!.save) : undefined },
         { text: 'New Game', run: () => this.newGame() },
         { text: 'Load', run: async () => this.loadList(sortForMenu(await saveStorage.list())) },
-        { text: 'Settings', run: () => { this.message.setText('Settings will be available here soon.'); } }
+        { text: 'Settings', run: () => this.settings() }
       ], () => undefined);
     }
   }
+  /**
+   * Settings: the town's mind (GDD §9.14). Online residents speak for themselves; without an invite code (or a
+   * reachable server) they speak written lines. The desktop app passes `--invite=`; here it can be typed instead.
+   */
+  private settings(): void {
+    const mind = getMind();
+    this.message.setText(statusDetail(mind.status));
+    const retry = mind.status === 'unreachable' || mind.status === 'connecting';
+    this.show([
+      { text: `Invite code: ${maskInvite(mind.invite)}`, run: () => this.askInvite() },
+      ...(mind.invite ? [{ text: 'Clear invite code', run: async () => { await mind.setInvite(null); this.settings(); } }] : []),
+      ...(retry ? [{ text: 'Try to reconnect', run: async () => { this.message.setText('Trying the town…'); await mind.reconnect(); this.settings(); } }] : []),
+      { text: 'Back', run: () => this.home() }
+    ], () => { void this.home().catch(error => this.error(error)); });
+  }
+
+  private askInvite(): void {
+    this.closeInvite();
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 64;
+    input.placeholder = 'Invite code';
+    input.setAttribute('aria-label', 'Invite code');
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    Object.assign(input.style, {
+      position: 'fixed', zIndex: '10', boxSizing: 'border-box', margin: '0', padding: '0 0.6em', outline: 'none',
+      background: '#fff8e6', color: '#394a3b', border: '2px solid #92542e', borderRadius: '8px', fontFamily: 'Georgia, serif'
+    } satisfies Partial<CSSStyleDeclaration>);
+    const place = () => {
+      const rect = this.game.canvas.getBoundingClientRect();
+      const s = rect.width / GAME_WIDTH;
+      Object.assign(input.style, {
+        left: `${rect.left + 70 * s}px`, top: `${rect.top + (GAME_HEIGHT - 130) * s}px`, width: `${380 * s}px`, height: `${40 * s}px`, fontSize: `${18 * s}px`
+      });
+    };
+    place();
+    window.addEventListener('resize', place);
+    this.inviteInput = { input, place };
+    this.message.setText('Type the invite code, then Enter · Esc to cancel');
+    // Keys typed here are the input's: the menu's own keys (Enter, Esc, arrows) must not fire underneath.
+    input.addEventListener('keydown', e => {
+      e.stopPropagation();
+      if (e.key === 'Escape') { e.preventDefault(); this.closeInvite(); this.settings(); return; }
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      const code = input.value.trim();
+      if (!validInvite(code)) { this.message.setText('Invite codes are letters, numbers, - and _ (up to 64).'); return; }
+      this.closeInvite();
+      this.message.setText('Joining the town…');
+      void getMind().setInvite(code).then(status => {
+        if (!this.sys.isActive()) return;
+        this.settings();
+        this.message.setText(status === 'online' ? 'Joined. Residents will speak for themselves.'
+          : status === 'no_invite' ? "That invite code wasn't accepted. Residents will speak written lines." : statusDetail(status));
+      });
+    });
+    document.body.appendChild(input);
+    input.focus();
+  }
+
+  private closeInvite(): void {
+    if (!this.inviteInput) return;
+    window.removeEventListener('resize', this.inviteInput.place);
+    this.inviteInput.input.remove();
+    this.inviteInput = null;
+  }
+
   /**
    * New Game: straight to the ferry slip at 09:50 (scenes/story/attach.ts), where S01a plays and Pell hands over the
    * Fellowship application at its {charcreate} cue (GDD §11.1).

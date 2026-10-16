@@ -12,7 +12,7 @@ import {
 import { dialogueTurns, events, favors, memories, relationships, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import {
-  revealableSecrets, systemBlocks, type CanonContext, type ConversationTurn, type DialogueInput, type OpenFavorView,
+  revealableSecrets, systemBlocks, turnFocus, type CanonContext, type ConversationTurn, type DialogueInput, type OpenFavorView,
   type RelationshipView,
 } from "./promptBuilder.js";
 import { playerView, type PlayerProfile } from "./player.js";
@@ -103,6 +103,8 @@ export interface DialogueContextArgs {
   playerSaid: string;
   /** The player's own words this turn (null when they just walked up), for retrieval relevance. */
   playerText: string | null;
+  /** The intent of the reply the player picked (choices only), for the turn's focus. */
+  playerIntent?: string | null;
 }
 
 /** How many memories to score per turn: the newest N, which is plenty for the 8 that make the prompt. */
@@ -157,10 +159,18 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
     tags: m.sourceEvent ? tagsByEvent.get(m.sourceEvent) ?? [] : [],
   }));
 
+  const conversation: ConversationTurn[] = turns.flatMap((t) => [
+    ...(t.playerInput ? [{ speaker: "player" as const, text: t.playerInput }] : []),
+    ...t.output.lines.map((line) => ({ speaker: "resident" as const, text: line.text })),
+  ]);
+
   const riddle = scene.riddle ? riddleRecord(scene.riddle.id) : null;
   const riddleState = riddle && scene.riddle ? { record: riddle, allowed: scene.riddle.hints_allowed } : null;
   const playerText = args.playerText ?? "";
-  const terms = contentWords([playerText, scene.current_activity ?? "", scene.weather].join(" "));
+  // Memories are keyed on the exchange: the Fellow's words, and the resident's last line they're answering (so
+  // "Why?" or "What did you mean?" still finds what that line was about).
+  const lastResidentLine = [...conversation].reverse().find((t) => t.speaker === "resident")?.text ?? "";
+  const terms = contentWords([playerText, lastResidentLine, scene.current_activity ?? "", scene.weather].join(" "));
   if (riddle) { terms.add("riddle"); terms.add(riddle.id.toLowerCase()); }
   const retrieved = retrieveMemories(memoryList, {
     today: scene.day,
@@ -186,11 +196,6 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
     const template = FavorTemplate.safeParse(f.template);
     return template.success ? [{ owner: f.residentId, template: template.data, target: f.target, text: f.text }] : [];
   });
-
-  const conversation: ConversationTurn[] = turns.flatMap((t) => [
-    ...(t.playerInput ? [{ speaker: "player" as const, text: t.playerInput }] : []),
-    ...t.output.lines.map((line) => ({ speaker: "resident" as const, text: line.text })),
-  ]);
 
   const recentLines = recentRows.flatMap((r) => [...r.output.lines].reverse().map((line) => line.text)).slice(0, ECHO_WINDOW);
   const player = playerView(world?.player as PlayerProfile | null | undefined);
@@ -219,6 +224,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         conversation,
         earlierTurns: turns.map(t => ({ user: t.promptUser ?? `<player_said>${t.playerInput ?? '(walks up to you)'}</player_said>`, assistant: t.rawOutput ?? JSON.stringify(t.output) })),
         playerSaid: args.playerSaid,
+        focus: turnFocus(args.playerText, args.playerIntent),
         whimSeed: null,
       },
       validation: {
