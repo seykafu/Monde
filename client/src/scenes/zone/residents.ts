@@ -1,4 +1,9 @@
-import { Chatter } from './chatter';
+import { Chatter, type ChatterActor } from './chatter';
+import { Greetings } from './greetings';
+import { spotAt } from './chatterRules';
+import { installChatterDev, type ChatterDevHost } from './chatterDev';
+import { callName } from '@monde/shared';
+import { cameraView } from '../../render/town/TownBoard';
 // On-screen residents for ZoneScene (MVP W-05; GDD §16.5, §19.2).
 //
 // The town's residents live in one ResidentSim (sim/residentSim.ts), shared through the registry like the
@@ -32,6 +37,7 @@ import type { ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
 import { placeRegistry } from '../../world/places';
 import { personaCards } from '../../world/residents';
+import { findCard } from '../../world/roster';
 import { PREWARM_RANGE } from '../../mind/prewarm';
 import { CharacterSprite } from '../../render/characterSprite';
 import { BASTIEN_LOOK, lookFromCard, residentLook, type Look } from '../../render/character/look';
@@ -121,9 +127,15 @@ const residentColour = (index: number): number =>
   Phaser.Display.Color.HSLToColor(((index * 137.508) % 360) / 360, 0.52, 0.56).color;
 
 const cardLooks = new Map(personaCards.flatMap(c => (c.look ? [[c.id, c.look] as const] : [])));
+const cardNames = new Map(personaCards.map(c => [c.id, c.name]));
+/** Residents who speak in narrated actions (Bastien): their bubbles say what they do. */
+const NARRATED: ReadonlySet<string> = new Set(personaCards.filter(c => c.voice.mode === 'narrated_action').map(c => c.id));
+/** What a bubble and `{name}` call them, as the dialogue does ("Old Moss", "June", "Captain Reyes"). */
+const firstNameOf = (p: ResidentProfile): string => callName(cardNames.get(p.id) ?? p.name);
 
 const lookFor = (profile: ResidentProfile, colour: number): Look => {
-  const look = cardLooks.get(profile.id);
+  // G-02: a generated resident wears their card's look (their library portrait's, shared/src/arrivals/library.ts).
+  const look = cardLooks.get(profile.id) ?? findCard(profile.id)?.look;
   if (look) return lookFromCard(look, colour);
   return profile.kind === 'animal' ? { ...BASTIEN_LOOK, collar: colour } : residentLook(profile.id, colour);
 };
@@ -175,8 +187,18 @@ const EMOTES: Readonly<Record<string, Draw>> = {
 export class ResidentLayer {
   readonly sim: ResidentSim;
   readonly chatter: Chatter;
+  /** Passing greetings (greetings.ts). */
+  readonly greetings: Greetings;
+  /** Dev: residents stood where the dev hook put them (chatterDev.ts), routines held, until their exchange ends. */
+  private readonly staged = new Map<string, Vec>();
+  private stagedMs = 0;
+  private lastPlayer: Position | null = null;
+  /** This frame: the social spot each standing on-board resident is at (zone `social:`), or null. */
+  private readonly spots = new Map<Actor, string | null>();
   private readonly actors: Actor[];
   private readonly byId: Map<string, Actor>;
+  /** Objects made after the zone was built (G-02 newcomers): the UI camera must not draw them. */
+  private readonly camerasToSkip: () => Phaser.Cameras.Scene2D.Camera[];
   private roster = new Set<string>();
   private tickMs = Infinity;
   private lastMinute = NaN;
@@ -200,28 +222,50 @@ export class ResidentLayer {
     private readonly clock: Clock, private readonly dev: boolean) {
     this.sim = sharedResidentSim(scene);
     this.chatter = new Chatter(scene, clock);
-    this.actors = this.sim.profiles.map(profile => {
-      const animal = profile.kind === 'animal', colour = residentColour(profile.index);
-      const actor = { profile, animal, colour } as Actor;
-      const avatar = new CharacterSprite(scene, profile.id, lookFor(profile, colour));
-      const sprite = scene.add.image(0, 0, avatar.sheet.key).setVisible(false);
-      avatar.apply(sprite);
-      return Object.assign(actor, {
-        avatar, sprite,
-        shadow: scene.add.ellipse(0, 0, animal ? 18 : 22, 7, 0x000000, 0.22).setDepth(DEPTH.SHADOW).setVisible(false),
-        label: scene.add.text(0, 0, profile.name, { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#28372dcc', padding: { x: 3, y: 1 }, resolution: RENDER_SCALE })
-          .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setVisible(false),
-        bubble: scene.add.image(0, 0, '__DEFAULT').setOrigin(0.2, 1).setDepth(DEPTH.OVER_DARK - 0.01).setVisible(false),
-        delay: 0, blockedMs: 0, passing: false, talking: false,
-        offset: { x: 0, y: 0 }, base: null, pos: null, state: null, alpha: 0, emoteKey: ''
-      });
-    });
+    this.greetings = new Greetings(scene, clock);
+    this.greetings.weather = () => this.chatter.weather();
+    this.chatter.onStart = (a, b) => this.greetings.note(a, b);
+    this.actors = this.sim.profiles.map(profile => this.makeActor(profile));
     this.byId = new Map(this.actors.map(a => [a.profile.id, a]));
+    this.camerasToSkip = () => scene.cameras.cameras.filter(c => c !== scene.cameras.main);
     this.overlay = scene.add.graphics().setDepth(DEPTH.DARKNESS + 0.5).setVisible(false);
     this.emotePool = Array.from({ length: 8 }, () => scene.add.image(0, 0, emoteTexture(scene, 'heart')).setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK + 0.01).setVisible(false));
     const off = this.sim.events.on('talk-requested', e =>
       console.info(`[residents] talk-requested: ${e.residentId} (${this.sim.profile(e.residentId)?.name}) on Day ${e.day} at ${Math.floor(e.minute / 60)}:${String(Math.floor(e.minute % 60)).padStart(2, '0')}`));
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, off);
+    if (import.meta.env.DEV) scene.events.once(Phaser.Scenes.Events.SHUTDOWN, installChatterDev(this.devHost(), query));
+  }
+
+  private makeActor(profile: ResidentProfile): Actor {
+    const scene = this.scene;
+    const animal = profile.kind === 'animal', colour = residentColour(profile.index);
+    const actor = { profile, animal, colour } as Actor;
+    const avatar = new CharacterSprite(scene, profile.id, lookFor(profile, colour));
+    const sprite = scene.add.image(0, 0, avatar.sheet.key).setVisible(false);
+    avatar.apply(sprite);
+    return Object.assign(actor, {
+      avatar, sprite,
+      shadow: scene.add.ellipse(0, 0, animal ? 18 : 22, 7, 0x000000, 0.22).setDepth(DEPTH.SHADOW).setVisible(false),
+      label: scene.add.text(0, 0, profile.name, { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#28372dcc', padding: { x: 3, y: 1 }, resolution: RENDER_SCALE })
+        .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setVisible(false),
+      bubble: scene.add.image(0, 0, '__DEFAULT').setOrigin(0.2, 1).setDepth(DEPTH.OVER_DARK - 0.01).setVisible(false),
+      delay: 0, blockedMs: 0, passing: false, talking: false,
+      offset: { x: 0, y: 0 }, base: null, pos: null, state: null, alpha: 0, emoteKey: ''
+    });
+  }
+
+  /**
+   * G-02: residents who joined the sim after this board was built (a household off this morning's ferry) get their
+   * actors now; the UI camera is told to skip them, as it skips the world built in create().
+   */
+  syncActors(): void {
+    for (const profile of this.sim.profiles) {
+      if (this.byId.has(profile.id)) continue;
+      const actor = this.makeActor(profile);
+      this.actors.push(actor);
+      this.byId.set(profile.id, actor);
+      for (const cam of this.camerasToSkip()) cam.ignore([actor.sprite, actor.shadow, actor.label, actor.bubble]);
+    }
   }
 
   /** Screen-space dev readout (for the UI camera); empty outside dev builds. */
@@ -275,25 +319,87 @@ export class ResidentLayer {
     const live: Actor[] = [];
     for (const a of this.actors) {
       if (jump) { a.delay = 0; a.talking = false; a.passing = false; a.blockedMs = 0; }
-      if (!this.roster.has(a.profile.id) && a.delay === 0 && !a.talking) { this.hide(a); continue; }
+      if (!this.roster.has(a.profile.id) && a.delay === 0 && !a.talking && !this.staged.has(a.profile.id)) { this.hide(a); continue; }
       this.advance(a, day, minute, dMin, dtMs, player);
       if (a.base) live.push(a);
       else this.hide(a);
     }
     // Pass 2: offsets (keep right, sidestep the player, personal space), then draw.
     const sec = dtMs / 1000;
+    this.spots.clear();
+    if (this.zone.social.length) for (const a of live) if (a.base && !a.state?.moving) this.spots.set(a, spotAt(this.zone.social, a.base));
     for (const a of live) this.place(a, live, player, sec, dtMs);
     const pointer = this.pointerWorld();
     for (const a of live) this.draw(a, player, pointer, dtMs);
     if (this.overlayOn) this.drawOverlay(live);
     if (this.onApproach) this.approach(live, player);
     this.pairEmotes(live, player, dtMs);
-    const view = this.scene.cameras.main.worldView;
-    this.chatter.update(dtMs, live.filter(a => a.pos && a.state).map(a => ({
-      id: a.profile.id, x: a.pos!.x, y: a.pos!.y, place: a.state!.place, idle: !a.state!.moving,
-      visible: a.alpha > 0.5 && a.state!.visible && view.contains(a.sprite.x, a.sprite.y), talking: a.talking,
-      screenX: a.sprite.x, screenY: a.sprite.y,
-    })), player);
+    // Residents talking to each other (chatter.ts) and nodding as they pass (greetings.ts).
+    const view = this.viewRect();
+    const talkers = this.talkers(live, view);
+    this.chatter.update(dtMs, talkers, player, view);
+    this.greetings.update(dtMs, talkers, player, view, id => this.chatter.partner(id) !== null || this.chatter.speaking(id));
+    this.lastPlayer = player;
+    if (this.staged.size) this.unstageWhenDone(dtMs);
+  }
+
+  /**
+   * The world rectangle on screen. Not `camera.worldView`, which assumes Phaser's centre zoom pivot: this camera zooms
+   * about its top-left (util/renderScale), so worldView sits half a screen down and right of the real view (that hid
+   * everyone up or left of the player from the old chatter, and stopped any exchange there at once).
+   */
+  private viewRect(): Phaser.Geom.Rectangle {
+    const v = cameraView(this.scene.cameras.main);
+    return new Phaser.Geom.Rectangle(v.x0, v.y0, v.x1 - v.x0, v.y1 - v.y0);
+  }
+
+  /** Whether a speech bubble is up over a resident (their name tag and activity emote step aside for it). */
+  private speaking(id: string): boolean { return this.chatter.speaking(id) || this.greetings.speaking(id); }
+
+  /** The on-board residents as the chatter sees them: where, at which social spot, whether on screen, head and feet. */
+  private talkers(live: readonly Actor[], view: Phaser.Geom.Rectangle): ChatterActor[] {
+    // A running exchange carries on while its pair is within a quarter-screen margin of the view.
+    const mx = view.width / 4, my = view.height / 4;
+    const out: ChatterActor[] = [];
+    for (const a of live) {
+      if (!a.pos || !a.state) continue;
+      const shown = a.alpha > 0.5 && a.state.visible, sx = a.sprite.x, sy = a.sprite.y;
+      out.push({
+        id: a.profile.id, x: a.pos.x, y: a.pos.y, place: a.state.place, spot: spotAt(this.zone.social, a.pos),
+        idle: !a.state.moving, moving: a.state.moving, talking: a.talking,
+        visible: shown && view.contains(sx, sy),
+        near: shown && sx > view.x - mx && sx < view.right + mx && sy > view.y - my && sy < view.bottom + my,
+        name: firstNameOf(a.profile), animal: a.animal || NARRATED.has(a.profile.id),
+        headX: sx, headY: sy - (a.animal ? 26 : 50), footY: sy,
+      });
+    }
+    return out;
+  }
+
+  // ── Dev: stand two residents together and start them talking (chatterDev.ts) ──
+
+  private devHost(): ChatterDevHost {
+    const host: ChatterDevHost = {
+      zoneId: this.zone.id,
+      walkability: this.zone.walkability,
+      player: () => this.lastPlayer,
+      residents: () => this.actors.map(a => ({ id: a.profile.id, name: a.profile.name, x: a.pos?.x ?? null, y: a.pos?.y ?? null,
+        place: a.state?.place ?? null, spot: a.pos ? spotAt(this.zone.social, a.pos) : null, visible: !!a.state?.visible && a.alpha > 0.5 })),
+      stage: (id, at) => { if (at) { this.staged.set(id, at); this.stagedMs = 0; } else this.staged.delete(id); },
+      staged: () => [...this.staged.keys()],
+      startChatter: (a, b, mode) => this.chatter.force(a, b, this.talkers(this.actors.filter(x => x.base), this.viewRect()), this.lastPlayer ?? { x: 0, y: 0 }, mode),
+      greet: (a, b) => this.greetings.force(a, b, this.talkers(this.actors.filter(x => x.base), this.viewRect())),
+      readout: () => ({ chatter: this.chatter.state(), bubbles: [...this.chatter.bubbleState(), ...this.greetings.state()].filter(b => b.owner),
+        counts: { ...this.chatter.count, greetings: this.greetings.count }, staged: host.staged() }),
+    };
+    return host;
+  }
+
+  /** Staged residents go back to their day once nothing holds them: no exchange, no bubble, a moment after. */
+  private unstageWhenDone(dtMs: number): void {
+    const held = [...this.staged.keys()].some(id => this.chatter.partner(id) || this.speaking(id));
+    this.stagedMs = held ? 0 : this.stagedMs + dtMs;
+    if (this.stagedMs > 2500) this.staged.clear();
   }
 
   // ── Tie emotes (§9.11.3, §16.5) ──────────────────────────────────────────
@@ -309,7 +415,7 @@ export class ResidentLayer {
     if (this.emoteCheck < PAIR_EMOTE_RULES.checkMs) return;
     this.emoteCheck = 0;
     const spots: Spot[] = [];
-    for (const a of live) if (a.pos && a.state?.visible && a.alpha > 0.5 && !a.talking) spots.push({ id: a.profile.id, x: a.pos.x, y: a.pos.y });
+    for (const a of live) if (a.pos && a.state?.visible && a.alpha > 0.5 && !a.talking && !this.speaking(a.profile.id)) spots.push({ id: a.profile.id, x: a.pos.x, y: a.pos.y });
     if (spots.length < 2) return;
     const ties = tieMap(this.scene.registry);
     const at = new Map(spots.map(s => [s.id, s]));
@@ -342,7 +448,7 @@ export class ResidentLayer {
     const show = PAIR_EMOTE_RULES.showMs;
     this.floating = this.floating.filter(f => {
       f.ms += dtMs;
-      if (f.ms >= show || f.pair.some(a => !a.sprite.visible)) { f.img.setVisible(false); return false; }
+      if (f.ms >= show || f.pair.some(a => !a.sprite.visible || this.speaking(a.profile.id))) { f.img.setVisible(false); return false; }
       const t = f.ms / show, pop = Math.min(1, f.ms / 160);
       const x = f.pair.reduce((s, a) => s + a.sprite.x, 0) / f.pair.length;
       const top = Math.min(...f.pair.map(a => this.headTop(a))) - 3;
@@ -369,6 +475,7 @@ export class ResidentLayer {
   /** The 1 Hz off-screen tick: everyone's state, this board's roster, the dev readout. */
   private tick(day: number): void {
     this.tickMs = 0;
+    if (this.sim.profiles.length !== this.actors.length) this.syncActors();
     const minute = this.clock.minute;
     const states = this.sim.tick(day, minute);
     this.roster = this.sim.boardRoster(this.zone.id, day, minute, LOOKAHEAD_MIN);
@@ -384,6 +491,16 @@ export class ResidentLayer {
   }
 
   private advance(a: Actor, day: number, minute: number, dMin: number, dtMs: number, player: Position): void {
+    const staged = this.staged.get(a.profile.id);
+    if (staged) {
+      // Dev (chatterDev.ts): stood here, routine held, standing still on this board.
+      a.delay += dMin;
+      const s = this.sim.sample(a.profile.id, day, minute - a.delay);
+      a.state = s && { ...s, zone: this.zone.id, position: { ...staged }, tile: [Math.floor(staged.x), Math.floor(staged.y)], visible: true,
+        moving: false, facing: null, traveling: null, path: null };
+      a.base = a.state ? staged : null;
+      return;
+    }
     if (this.chatter.partner(a.profile.id)) {
       a.delay += dMin;
     } else if (a.talking) {
@@ -462,11 +579,28 @@ export class ResidentLayer {
     }
     // Facing: toward the player while talking (standing: talkers idle), else the way they walk.
     // Walk frames follow the distance actually drawn, so a held or hurrying walker's feet keep pace.
-    const partner = this.byId.get(this.chatter.partner(a.profile.id) ?? '')?.pos;
+    // Standing at a gathering spot, they turn to the nearest company there (or the spot itself) instead of the street.
+    const partner = this.byId.get(this.chatter.partner(a.profile.id) ?? '')?.pos ?? (!s.moving && !a.talking ? this.company(a, live) : null);
     const intent = partner ? { x: partner.x - pos.x, y: partner.y - pos.y } : a.talking ? { x: player.x - pos.x, y: player.y - pos.y } : s.moving ? s.facing : null;
     const moved = a.pos && !a.talking && !partner ? { x: pos.x - a.pos.x, y: pos.y - a.pos.y } : { x: 0, y: 0 };
     a.avatar.step({ intent, moved, dtMs });
     a.pos = pos;
+  }
+
+  /** At a social spot: the nearest other resident standing at the same one, else the spot itself; null elsewhere. */
+  private company(a: Actor, live: readonly Actor[]): Vec | null {
+    const spot = this.spots.get(a);
+    if (!a.base || !spot) return null;
+    let best: Vec | null = null, bestD = 3;
+    for (const o of live) {
+      if (o === a || !o.base || !o.state?.visible || this.spots.get(o) !== spot) continue;
+      const d = Math.hypot(o.base.x - a.base.x, o.base.y - a.base.y);
+      if (d < bestD) { best = o.pos ?? o.base; bestD = d; }
+    }
+    if (best) return best;
+    const s = this.zone.social.find(x => x.id === spot)!;
+    const at = { x: s.at[0] + 0.5, y: s.at[1] + 0.5 };
+    return Math.hypot(at.x - a.base.x, at.y - a.base.y) > 0.3 ? at : null;
   }
 
   private draw(a: Actor, player: Position, pointer: Vec | null, dtMs: number): void {
@@ -486,13 +620,16 @@ export class ResidentLayer {
     const hovered = pointer !== null && Math.abs(pointer.x - x) < 15 && pointer.y > foot - (a.animal ? 26 : 48) && pointer.y < foot;
     const near = Math.hypot(pos.x - player.x, pos.y - player.y) <= NAME_RANGE;
     // The emote bubble sits just over the head; the name tag (when shown) above it.
-    const emote = shown && (a.talking ? 'talk' : !s.moving ? s.activity : null);
+    // A speech bubble (chatter, greetings) takes the place of the emote and the name tag: it carries the name. Both of a
+    // talking pair drop theirs, so the listener's tag doesn't sit under the speaker's bubble.
+    const speaking = this.speaking(a.profile.id) || this.chatter.partner(a.profile.id) !== null;
+    const emote = shown && !speaking && (a.talking ? 'talk' : !s.moving ? s.activity : null);
     const key = emote ? ensureEmote(this.scene, emote) : null;
     if (key) {
       if (key !== a.emoteKey) { a.emoteKey = key; a.bubble.setTexture(key); }
       a.bubble.setPosition(x + 4, top + 2).setAlpha(a.alpha).setVisible(true);
     } else a.bubble.setVisible(false);
-    a.label.setPosition(x, key ? top - 17 : top - 2).setAlpha(a.alpha).setVisible(shown && a.alpha > 0.5 && (near || hovered || a.talking));
+    a.label.setPosition(x, key ? top - 17 : top - 2).setAlpha(a.alpha).setVisible(shown && !speaking && a.alpha > 0.5 && (near || hovered || a.talking));
   }
 
   private hide(a: Actor, resetFade = true): void {

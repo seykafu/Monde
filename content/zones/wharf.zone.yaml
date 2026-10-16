@@ -257,6 +257,11 @@ places:
   - { id: harbor_steps, rect: [21, 25, 3, 3], door: [22, 24] }
   - { id: crane_yard, rect: [36, 15, 13, 7], door: [42, 22] }
   - { id: breakwater, rect: [40, 25, 14, 14], door: [51, 24] }
+# Gathering spots (§16.4.1, world/zoneFormat.ts): where residents stop to talk. A socialize or eat block at the place
+# (the template days' lunch and late-afternoon stops, shared/src/gathering.ts) stands them round the spot.
+social:
+  - { id: quay, place: harbor_steps, at: [22, 23], radius: 2 }          # the quay's bollards over the harbour steps
+  - { id: slip_bollards, place: ferry_slip, at: [30, 23], radius: 2 }  # the slip head, the Gannet's bollards
 edges:
   - { side: north, from: 29, to: 31, zone: market_row, arrive: [30, 32] }
 spawn: [30, 25]

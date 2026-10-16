@@ -12,8 +12,8 @@ describe('plan conversion', () => {
     expect((['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const).map(routineKind))
       .toEqual(['weekday', 'weekday', 'weekday', 'weekday', 'weekday', 'weekend', 'weekend']);
     const odile = card('odile');
-    expect(dayPlan(odile, 'Mon').blocks.map(b => b.place)).toEqual(odile.routine.weekday.map(b => b.where));
-    expect(dayPlan(odile, 'Sun').blocks.map(b => b.place)).toEqual(odile.routine.weekend.map(b => b.where));
+    expect(dayPlan(odile, 'Mon', { lingers: false }).blocks.map(b => b.place)).toEqual(odile.routine.weekday.map(b => b.where));
+    expect(dayPlan(odile, 'Sun', { lingers: false }).blocks.map(b => b.place)).toEqual(odile.routine.weekend.map(b => b.where));
     expect(dayPlan(odile, 'Sun').blocks[1]).toMatchObject({ action: 'attend', place: 'old_quarter.st_brigids', start: '09:30' });
     // Day 1 is a Tuesday (§3.2); Day 5 a Saturday.
     expect(dayPlansFor([odile], 1)[0]!.routine).toBe('weekday');

@@ -1,3 +1,4 @@
+import { attachScuffles, attachScuffleClock, scuffleInteraction, recoverScuffle } from '../scuffles/interaction';
 import { attachPuzzles, puzzleInteraction } from '../puzzles/interaction';
 import { attachProjects, attachProjectsClock, type ProjectsAttachment } from '../projects/attach';
 import { favorInteraction } from "../friendship/favors";
@@ -44,6 +45,8 @@ import { applyServerRegard, attachDawnSync } from './friendship';
 import { attachEventSync } from './events';
 import { openPeople } from './PeopleScene';
 import { attachStory, type StoryAttachment } from './story/attach';
+import { attachMigration } from './migration';
+import { attachArrivals } from './zone/arrivals';
 import { closingToast, type StoryHint } from '../story/hint';
 import { DIALOGUE_SCENE } from './DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE } from './StoryScene';
@@ -304,6 +307,7 @@ export class ZoneScene extends Phaser.Scene {
     let lastPosition = { ...this.position };
     attachEconomyClock(this, this.clock);
     attachPuzzles(this, this.clock);
+    attachScuffles(this, this.clock);
     attachSaves(this, this.clock, () => {
       const waking = this.registry.get('monde.save.wakePlayer') as SaveGame['player'] | undefined;
       if (waking) return waking;
@@ -410,6 +414,9 @@ export class ZoneScene extends Phaser.Scene {
     this.projects = attachProjects(this, { zone: this.zone, clock: this.clock, residents: this.residents, projection: this.projection,
       position: () => this.position, weather: () => this.now, toast: text => this.showToast(text),
       refreshBoard: () => this.town?.refresh(this.townLook()), busy: () => this.transitioning });
+    // G-02: newcomers off the ferry, leavers to the slip, and the Gannet's timetable on the Wharf.
+    attachArrivals(this, { zone: this.zone, clock: this.clock, residents: this.residents, board: this.town,
+      refreshBoard: () => this.town?.refresh(this.townLook()), toast: text => this.showToast(text) });
     this.askAction = null;
     this.projectCache = { at: 0, key: '', project: null, ask: null };
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E') as Record<string, Phaser.Input.Keyboard.Key>;
@@ -433,7 +440,10 @@ export class ZoneScene extends Phaser.Scene {
       this.registry.set(CLOCK_KEY, clock);
     }
     // The town's numbers live beside the clock, with Day-1 values, and its dawn pass runs on the clock's dawn (G-01).
+    attachScuffleClock(this, clock);
     attachTown(this.registry, clock);
+    // G-02: arrivals and departures, right after the town's dawn (it reads the arrival roll).
+    attachMigration(this.registry, clock);
     // The Projects' dawn (G-03): after the town's, before the Dawn Report, so the paper has last night's hours in.
     attachProjectsClock(this.registry, clock);
     // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
@@ -868,6 +878,7 @@ export class ZoneScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
+    if (recoverScuffle(this, this.clock)) return;
     this.updateMusic(time);
     // Time runs while walking (GDD §5.3); a long frame (a backgrounded tab) doesn't skip the evening.
     const dt = Math.min(delta, 250);
@@ -914,8 +925,9 @@ export class ZoneScene extends Phaser.Scene {
     const project = place ? this.projectCache.project : null;
     this.askAction = talk ? this.projectCache.ask : null;
     const puzzle = place ? puzzleInteraction(this, this.clock, `${this.zone.id}.${place.id}`, project) : null;
-    this.prompt.setText(talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : place ? `E: ${puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!talk || !!mark || !!place);
-    this.interact = talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? puzzle?.run ?? project?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined);
+    const scuffle = !talk && !mark ? scuffleInteraction(this, this.clock, this.zone, this.position) : null;
+    this.prompt.setText(scuffle ? `E: ${scuffle.label}` : talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : place ? `E: ${puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!scuffle || !!talk || !!mark || !!place);
+    this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? puzzle?.run ?? project?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined));
     if (result.edge) {
       this.transitioning = true;
       const edge = result.edge;

@@ -47,7 +47,7 @@ export async function requestCheckpoint(key: string): Promise<void> {
   }
 }
 export function resetGame(scene: Phaser.Scene): void {
-  for (const key of ['monde.press.pending', 'monde.press.seed', 'monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.puzzles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies', 'monde.projects']) scene.registry.remove(key);
+  for (const key of ['monde.press.pending', 'monde.press.seed', 'monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.puzzles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies', 'monde.projects', 'monde.scuffles', 'monde.scuffle.recovery', 'monde.scuffle.offers']) scene.registry.remove(key);
   clearFellow(scene.registry);
   saveQuietState(quietStorage, emptyQuietState());
   capture = undefined; dawnSave = undefined;
@@ -64,6 +64,7 @@ export async function loadGame(scene: Phaser.Scene, save: SaveGame): Promise<voi
   resetGame(scene);
   scene.registry.set('monde.puzzles', state.puzzles);
   scene.registry.set('monde.riddles', state.riddles);
+  scene.registry.set('monde.scuffles', state.scuffles);
   if (state.projects) scene.registry.set('monde.projects', state.projects);
   scene.registry.set('monde.clock', state.clock);
   scene.registry.set('monde.town', state.town);
@@ -107,6 +108,7 @@ export function attachSaves(scene: Phaser.Scene, clock: Clock, player: () => Sav
     puzzles: scene.registry.get('monde.puzzles') as SaveGame['puzzles'] | undefined,
     riddles: scene.registry.get('monde.riddles') as SaveGame['riddles'] | undefined,
     friendship: scene.registry.get('monde.friendship') as SaveGame['friendship'] | undefined,
+    scuffles: scene.registry.get('monde.scuffles') as SaveGame['scuffles'] | undefined,
     projects: scene.registry.get('monde.projects') as SaveGame['projects'] | undefined
   }, 'manual', '');
   capture = take;

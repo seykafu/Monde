@@ -146,7 +146,7 @@ describe('routine executor', () => {
 function soak(ex: RoutineExecutor, plans: readonly DayPlan[]): { stuck: string[]; offTile: string[]; failures: string[] } {
   const stuck: string[] = [], offTile: string[] = [];
   const failures = plans.flatMap(p => ex.timeline(p).failures.map(f => `${p.resident}: ${f}`));
-  const progress = new Map<string, { value: number; since: number }>();
+  const progress = new Map<string, { leg: string; value: number; since: number }>();
   for (let minute = DAY_START; minute <= PASS_OUT; minute++) {
     for (const s of ex.statesAt(plans, minute)) {
       if (s.position) {
@@ -154,10 +154,11 @@ function soak(ex: RoutineExecutor, plans: readonly DayPlan[]): { stuck: string[]
         if (!zone.walkability[Math.floor(s.position.y)]?.[Math.floor(s.position.x)]) offTile.push(`${s.id} ${s.zone} ${s.position.x.toFixed(2)},${s.position.y.toFixed(2)} @${minute}`);
       }
       if (s.visible && (!s.zone || !s.position)) offTile.push(`${s.id} visible nowhere @${minute}`);
-      // Stuck: traveling with no progress for more than 30 in-game minutes.
+      // Stuck: traveling with no progress for more than 30 in-game minutes (setting off on the next walk is progress).
       const last = progress.get(s.id);
       if (!s.traveling) { progress.delete(s.id); continue; }
-      if (!last || s.traveling.progress > last.value + 1e-9) progress.set(s.id, { value: s.traveling.progress, since: minute });
+      const leg = `${s.traveling.from}>${s.traveling.to}`;
+      if (!last || last.leg !== leg || s.traveling.progress > last.value + 1e-9) progress.set(s.id, { leg, value: s.traveling.progress, since: minute });
       else if (minute - last.since > 30) stuck.push(`${s.id} @${minute}`);
     }
   }

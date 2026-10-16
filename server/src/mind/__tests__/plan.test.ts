@@ -3,7 +3,7 @@ import type { PersonaCard, PlanOutput } from "@monde/shared";
 import { loadContent } from "../../content/loadContent.js";
 import { loadPlaceRegistry, openPlacesFor, placeHours, type PlaceRegistry } from "../places.js";
 import { MAX_CHANGES, modelMinutes, planVerbs, validatePlan, type PlanValidationContext } from "../plan.js";
-import { templatePlan } from "../templatePlan.js";
+import { routineBlocks, templatePlan, withoutMinutes } from "../templatePlan.js";
 
 let cards: PersonaCard[];
 let registry: PlaceRegistry;
@@ -18,9 +18,12 @@ const ctx = (id = "odile", day = DAY): PlanValidationContext => ({
 type Block = PlanOutput["blocks"][number];
 const brief = (blocks: readonly Block[]) => blocks.map((b) => `${b.start}-${b.end} ${b.action}@${b.place}`);
 
-/** The template for Odile with some blocks replaced (by start time) and extras. */
+/** Odile's bare routine as plan blocks: what a model's plan is measured against (the template adds outdoor stops). */
+const routine = (id = "odile", day = DAY): Block[] => withoutMinutes(routineBlocks(card(id), day));
+
+/** Odile's routine with some blocks replaced (by start time) and extras. */
 function modelPlan(replace: Record<string, Partial<Omit<Block, "action"> & { action: string }>> = {}, extra: Partial<Record<keyof PlanOutput, unknown>> = {}) {
-  const blocks = templatePlan(card("odile"), DAY).blocks.map((b) => ({ ...b, ...replace[b.start] }));
+  const blocks = routine().map((b) => ({ ...b, ...replace[b.start] }));
   return JSON.stringify({ blocks, whim: null, barks: [], seek_player: null, intentions: [], ...extra });
 }
 
@@ -111,7 +114,7 @@ describe("validatePlan", () => {
       blocks: [blocks[4], blocks[0], blocks[1]], whim: null, barks: [], seek_player: null, intentions: [],
     }));
     expect(result.changed).toBe(0);
-    expect(brief(result.plan.blocks)).toEqual(brief(templatePlan(card("odile"), DAY).blocks));
+    expect(brief(result.plan.blocks)).toEqual(brief(routine()));
     expect(result.adjustments).toEqual(expect.arrayContaining(["blocks sorted by start", "13:00-16:00 filled from the routine"]));
   });
 
@@ -123,7 +126,7 @@ describe("validatePlan", () => {
     ];
     const result = valid(JSON.stringify({ blocks: split, whim: null, barks: [], seek_player: null, intentions: [] }));
     expect(result.changed).toBe(0);
-    expect(brief(result.plan.blocks)).toEqual(brief(templatePlan(card("odile"), DAY).blocks));
+    expect(brief(result.plan.blocks)).toEqual(brief(routine()));
   });
 
   it("reads 00:00-02:00 as the small hours of the same game day", () => {

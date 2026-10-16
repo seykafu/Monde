@@ -179,6 +179,12 @@ places:
   - { id: sundial_lawn, rect: [13, 27, 11, 8], door: [18, 33] }
   - { id: duck_pond, rect: [4, 8, 17, 17], door: [16, 16] }
   - { id: footbridge, rect: [9, 15, 6, 3], door: [9, 16] }
+# Gathering spots (§16.4.1, world/zoneFormat.ts): where residents stop to talk. A socialize or eat block at the place
+# (the template days' lunch and late-afternoon stops, shared/src/gathering.ts) stands them round the spot.
+social:
+  - { id: picnic_tables, place: picnic_lawn, at: [39, 27], radius: 2 }
+  - { id: sundial_benches, place: sundial_lawn, at: [18, 32], radius: 2 }
+  - { id: garden_well, place: community_garden, at: [46, 8] }           # the well by the garden gate
 edges:
   - { side: south, from: 29, to: 31, zone: market_row, arrive: [30, 1] }
 spawn: [30, 35]

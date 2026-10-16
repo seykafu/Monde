@@ -1,0 +1,248 @@
+# Ambient lines (GDD §9.11.3, §9.14): what residents say to each other in the street with no call to the town's
+# mind. The nod when two pass (greetings, then a reply), and the short exchanges when two stop together and the
+# exchange isn't a live one (scenes/zone/chatter.ts). Parsed by client/src/scenes/zone/ambientLines.ts.
+#
+# Rules for every line, as for the server's fallback exchanges (shared/src/chatter.ts): no invented news, jobs,
+# relatives or secrets, so any two residents can say them; plain words; no modern things.
+#
+#   to:  the pair's tie: strangers, acquaintances, friends, close_friends, rivals, enemies. Any tie when absent.
+#   t:   time bands: dawn (06-09), morning (09-12), midday (12-14), afternoon (14-18), evening (18-22), night (22-02).
+#        Any time when absent.
+#   w:   weather: sun, cloud, rain, fog, wind, snow. A line with `w` is said only in that weather.
+#   reply: (greetings) the answers the other gives to this one; a greeting without them gets a plain reply.
+#   {name}: what the other resident is called ("Odile", "Old Moss", "Captain Reyes").
+# Greetings and replies are at most 60 characters, exchange lines at most 110.
+
+greetings:
+  # `reply`: what the other says back to this one (else a plain reply from `replies` below).
+  # Strangers and acquaintances: a nod and a word.
+  - { to: [strangers, acquaintances], t: [dawn], text: "Morning." }
+  - { to: [strangers, acquaintances], t: [dawn], text: "You're up early, {name}.", reply: ["So are you.", "Couldn't sleep."] }
+  - { to: [strangers, acquaintances], t: [dawn, morning], text: "Morning, {name}." }
+  - { to: [strangers, acquaintances], t: [morning], text: "All right, {name}?", reply: ["Can't complain.", "Fair to middling."] }
+  - { to: [strangers, acquaintances], t: [midday], text: "{name}. Busy, busy.", reply: ["Always.", "Never stops."] }
+  - { to: [strangers, acquaintances], t: [midday, afternoon], text: "Afternoon, {name}." }
+  - { to: [strangers, acquaintances], t: [afternoon], text: "Keeping well?", reply: ["Can't complain. Well. I could.", "Well enough, thanks."] }
+  - { to: [strangers, acquaintances], t: [evening], text: "Evening, {name}." }
+  - { to: [strangers, acquaintances], t: [evening], text: "That's the day done, then.", reply: ["Near enough.", "Not a minute too soon."] }
+  - { to: [strangers, acquaintances], t: [night], text: "Late one, {name}.", reply: ["Isn't it just.", "Too late."] }
+  - { to: [strangers, acquaintances], t: [night], text: "Mind how you go." }
+  - { to: [strangers, acquaintances], text: "(nods)" }
+  - { to: [strangers, acquaintances], text: "{name}." }
+  # Friends: a little warmer, rarely stopping.
+  - { to: [friends], t: [dawn, morning], text: "Morning, {name}! Kettle on later?", reply: ["Always.", "If you bring the biscuits."] }
+  - { to: [friends], text: "There you are, {name}.", reply: ["Here I am.", "Never far."] }
+  - { to: [friends], text: "Hello, you." }
+  - { to: [friends], text: "{name}! Can't stop. Later?", reply: ["Later!", "I'll find you."] }
+  - { to: [friends], t: [midday], text: "Eaten yet, {name}?", reply: ["Not yet. Don't tell anyone.", "Hours ago. Starving again."] }
+  - { to: [friends], t: [afternoon], text: "Still going, {name}?", reply: ["Just about.", "Somebody has to."] }
+  - { to: [friends], t: [evening], text: "See you at the Anchor?", reply: ["If my feet let me.", "Wouldn't miss it."] }
+  - { to: [friends], t: [night], text: "Get home safe, {name}." }
+  # Close friends.
+  - { to: [close_friends], text: "Oh, it's you. Good.", reply: ["Only me.", "Charmed, I'm sure."] }
+  - { to: [close_friends], text: "Don't you dare walk past me, {name}.", reply: ["As if I would."] }
+  - { to: [close_friends], text: "{name}! Come by later, will you?", reply: ["Wouldn't miss it.", "Put the kettle on."] }
+  - { to: [close_friends], t: [dawn, morning], text: "Morning, sunshine.", reply: ["Too early for sunshine."] }
+  - { to: [close_friends], t: [evening, night], text: "Walk you home after?", reply: ["Same as always."] }
+  # Rivals and enemies: the grumble.
+  - { to: [rivals], text: "Hm. {name}." }
+  - { to: [rivals], text: "Oh. You.", reply: ["Yes. Me."] }
+  - { to: [rivals], text: "Don't let me keep you, {name}.", reply: ["You never have."] }
+  - { to: [rivals], text: "Still here, then.", reply: ["Unfortunately."] }
+  - { to: [rivals], t: [dawn, morning], text: "Morning. More or less." }
+  - { to: [rivals], text: "Mind where you're walking.", reply: ["You first."] }
+  - { to: [enemies], text: "(looks straight through {name})", reply: ["(says nothing, pointedly)"] }
+  - { to: [enemies], text: "Not today, {name}.", reply: ["Gladly."] }
+  - { to: [enemies], text: "Keep walking.", reply: ["Gladly."] }
+  # Weather, for anyone on speaking terms.
+  - { w: [rain], text: "Wet enough for you, {name}?", reply: ["I've been drier in the harbour.", "Only just."] }
+  - { w: [rain], to: [strangers, acquaintances, friends, close_friends], text: "Lovely weather for gulls.", reply: ["And ducks.", "Not for me."] }
+  - { w: [fog], text: "Is that you, {name}? Can't see a thing.", reply: ["That's the idea, {name}."] }
+  - { w: [wind], text: "Hold onto your hat, {name}.", reply: ["Lost one already this year."] }
+  - { w: [snow], text: "Careful, {name}. Cobbles are glass.", reply: ["I've noticed. So has my knee."] }
+  - { w: [sun], to: [strangers, acquaintances, friends, close_friends], text: "Look at that sky, {name}.", reply: ["Don't say it out loud.", "Don't jinx it."] }
+
+# Plain replies, for a greeting that has none of its own: they answer anything.
+replies:
+  - { to: [strangers, acquaintances], t: [dawn, morning], text: "Morning." }
+  - { to: [strangers, acquaintances], t: [midday, afternoon], text: "Afternoon." }
+  - { to: [strangers, acquaintances], t: [evening], text: "Evening." }
+  - { to: [strangers, acquaintances], t: [night], text: "Night, {name}." }
+  - { to: [strangers, acquaintances], text: "(nods)" }
+  - { to: [strangers, acquaintances], text: "And to you." }
+  - { to: [strangers, acquaintances], text: "{name}." }
+  - { to: [friends, close_friends], text: "Hello, {name}!" }
+  - { to: [friends, close_friends], text: "Ha. Later, {name}." }
+  - { to: [friends, close_friends], t: [dawn, morning], text: "Morning, you." }
+  - { to: [friends, close_friends], t: [evening, night], text: "Evening, you." }
+  - { to: [close_friends], text: "There you are." }
+  - { to: [rivals], text: "{name}." }
+  - { to: [rivals], text: "Hm." }
+  - { to: [enemies], text: "(says nothing, pointedly)" }
+  - { to: [enemies], text: "(looks away)" }
+
+# A resident's own greetings, used about half the time when one fits (their voice, persona cards); answered with a
+# plain reply.
+voices:
+  ada:
+    - { text: "That's two of us out early, {name}.", t: [dawn] }
+    - { text: "Four minutes late, {name}. Not that I count." }
+  augusta:
+    - { text: "{name}. Noted." }
+    - { text: "Afternoon. All quiet your end?", t: [midday, afternoon] }
+  bertrand:
+    - { text: "Ah, {name}. Running a touch fast today." }
+    - { text: "Good day, my dear." }
+  bru:
+    - { text: "Hm." }
+    - { text: "{name}." }
+  delphine:
+    - { text: "Good day, {name}." }
+  felix:
+    - { text: "Goodness. Good morning, {name}.", t: [dawn, morning] }
+    - { text: "Let's see. {name}! Hello." }
+  hollis:
+    - { text: "On time, {name}. For once." }
+    - { text: "Late, {name}. Late." , to: [rivals, enemies] }
+  ines:
+    - { text: "Good afternoon. As discussed.", t: [midday, afternoon] }
+    - { text: "To be clear, I'm only passing." }
+  june:
+    - { text: "Hey, friend." }
+    - { text: "Mm. Morning, friend.", t: [dawn, morning] }
+    - { text: "One, two... oh, hi, {name}." }
+  kasimir:
+    - { text: "Hm. Could be." }
+    - { text: "{name}." }
+  margo:
+    - { text: "{name}. You're overdue." , to: [friends, close_friends] }
+    - { text: "Afternoon. Quietly, please.", t: [midday, afternoon] }
+  moss:
+    - { text: "Wind's backing." }
+    - { text: "Tide's turning, {name}." }
+    - { text: "{name}." }
+  nell:
+    - { text: "Look who it is." }
+    - { text: "Look. Can't stop." }
+    - { text: "And who's paying for this weather?", w: [rain, wind, fog] }
+  nettie:
+    - { text: "Move." }
+    - { text: "Clear. Oh, it's you." }
+  odile:
+    - { text: "Eat something, {name}." }
+    - { text: "Hm. Morning.", t: [dawn, morning] }
+    - { text: "Mind the step." }
+  pell:
+    - { text: "Now then, {name}. Keeping well?" }
+    - { text: "Good morning, dear.", t: [dawn, morning] }
+  priya:
+    - { text: "Still upright, {name}? Good." }
+    - { text: "Mind that ankle." }
+  rook:
+    - { text: "{name}." }
+    - { text: "Move along." , to: [rivals, enemies] }
+  rosalind:
+    - { text: "All right, pet?" }
+    - { text: "Evening, pet. Tap's on.", t: [evening, night] }
+  sable:
+    - { text: "On the record, {name}?" }
+    - { text: "Anything for the paper? No? Shame." }
+  teo:
+    - { text: "Oh. Sorry. Hello." }
+    - { text: "It's, well. Morning, {name}.", t: [dawn, morning] }
+  tib:
+    - { text: "{name}! Hi! Can't stop. Counting." }
+    - { text: "Hi. Obviously busy." }
+  vane:
+    - { text: "{name}. Good to see you." }
+    - { text: "May I be frank? Lovely day." }
+
+# For a speaker whose voice is narrated (Bastien): what they do instead of speaking.
+animals:
+  - "(winds once round {name}'s ankles)"
+  - "(blinks slowly at {name})"
+  - "(sits, and looks at {name} as if owed something)"
+  - "(sniffs {name}'s boots, unimpressed)"
+  - "(flicks an ear and walks on)"
+  - "(stops, considers {name}, and washes a paw)"
+
+# What a resident says to an animal.
+to_animals:
+  - "Hello, {name}. No fish today."
+  - "Off you go, {name}."
+  - "Who's a handsome cat? Not you."
+  - "Don't look at me like that, {name}."
+  - "Morning, puss."
+
+exchanges:
+  # Any two, any time.
+  - lines: ["Busy one today?", "Busy enough. You?", "Can't complain. Well, I could."]
+  - lines: ["Is it me, or are the gulls louder this year?", "It's not you."]
+  - lines: ["A little rest does no harm.", "Quite right. The errands can wait a moment."]
+  - lines: ["Haven't seen you down this way in a while.", "Errands. Always errands.", "Aren't they just."]
+  - lines: ["Smell that? Salt and bread.", "That's Monde for you. Nothing else smells like it."]
+    t: [dawn, morning]
+  - lines: ["Stopping for lunch?", "If I can find a bench that isn't damp."]
+    t: [midday]
+  - lines: ["Long afternoon.", "They all are, this end of the day.", "Mm. Nearly there."]
+    t: [afternoon]
+  - lines: ["That's the day, then.", "Near enough. The kettle's waiting."]
+    t: [evening]
+  - lines: ["Shouldn't you be in bed?", "Shouldn't you?"]
+    t: [night]
+  # Weather.
+  - lines: ["Wet enough for you?", "I've been drier in the harbour.", "Haven't we all."]
+    w: [rain]
+  - lines: ["Can't see the end of the street.", "Saves you waving at people."]
+    w: [fog]
+  - lines: ["Hold onto your hat.", "Already lost one this year. Gulls have it now."]
+    w: [wind]
+  - lines: ["Look at that sky.", "Don't say it out loud. It'll hear you."]
+    w: [sun]
+  - lines: ["Mind the cobbles. Like glass, they are.", "I've noticed. So has my knee."]
+    w: [snow]
+  # Friends.
+  - to: [friends, close_friends]
+    lines: ["There you are. I was hoping I'd catch you.", "Caught me. Walk a little with me?", "Only a little. I've a list as long as my arm."]
+  - to: [friends, close_friends]
+    lines: ["You look done in.", "I am done in. Thank you for noticing.", "Sit a minute, then. It'll keep."]
+  - to: [friends, close_friends]
+    t: [midday]
+    lines: ["Eaten yet?", "Not since this morning.", "Then you're having half of mine."]
+  - to: [friends, close_friends]
+    t: [evening]
+    lines: ["See you at the Anchor later?", "If my feet let me.", "They always say no. They never mean it."]
+  - to: [friends, close_friends]
+    t: [dawn, morning]
+    lines: ["Sleep well?", "The gulls had other ideas.", "They always do."]
+  - to: [friends]
+    lines: ["I keep meaning to come round.", "You keep saying that.", "One day I will. Put the kettle on."]
+  - to: [friends]
+    t: [afternoon]
+    lines: ["Is this afternoon ever going to end?", "Not before I've finished my list.", "Then I'll see you at midnight."]
+  # Close friends.
+  - to: [close_friends]
+    lines: ["Oh, good. A face I like.", "Only the one?", "Don't push it."]
+  - to: [close_friends]
+    lines: ["I saved you the sunny end of the bench.", "You're a saint.", "A saint who wants half your biscuit."]
+  - to: [close_friends]
+    lines: ["You'd tell me if something was wrong, wouldn't you?", "First thing. You know I would."]
+  - to: [close_friends]
+    t: [evening, night]
+    lines: ["Walk me home after?", "Same as always."]
+  # Rivals and enemies.
+  - to: [rivals, enemies]
+    lines: ["You always have to have the last word.", "Only when you leave it lying about."]
+  - to: [rivals]
+    lines: ["Fancy meeting you here.", "Nobody fancies it."]
+  - to: [rivals]
+    lines: ["Don't let me hold you up.", "You never have."]
+  - to: [rivals]
+    lines: ["Still in one piece, then.", "No thanks to you.", "I'll take that as a thank you."]
+  - to: [rivals]
+    t: [midday]
+    lines: ["That's my bench, you know.", "It's the town's bench.", "Then the town can share it with me."]
+  - to: [enemies]
+    lines: ["I've nothing to say to you.", "Good. Say it somewhere else."]
+  - to: [enemies]
+    lines: ["You're in my way.", "Then walk round."]

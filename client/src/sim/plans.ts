@@ -11,7 +11,7 @@
 // after "23:00" is 24:30). Times before 06:00 at the head of a routine are that morning, before the
 // player's day starts (Odile is at her ovens from 04:00).
 
-import type { PersonaCard, PlanOutput, RoutineBlock } from '@monde/shared';
+import { withLingers, type PersonaCard, type PlanOutput, type RoutineBlock } from '@monde/shared';
 import { MIDNIGHT, PASS_OUT, weekdayOf, type Weekday } from './clock';
 import { Rng } from '../util/rng';
 
@@ -32,6 +32,12 @@ export interface DayPlanBlock {
    * the executor stands them on its open cells, outdoors, instead of at the place's door or anywhere in it.
    */
   area?: readonly [number, number, number, number];
+  /**
+   * Where in a gathering this resident stands (routineExecutor.ts `withSeats`): residents meeting at the same place and
+   * time split into groups of two or three, a social spot each, and take different cells round it. Client-only, like
+   * `area`.
+   */
+  seat?: { group: number; groups: number; index: number };
 }
 
 export interface DayPlan {
@@ -126,9 +132,15 @@ export function withLivePlans(templates: readonly DayPlan[], live: Readonly<Reco
   return { plans, applied, rejected };
 }
 
-/** The template plan for one resident on one weekday. Last night is yesterday's routine's last block. */
-export function dayPlan(card: RoutineCard, day: Weekday): DayPlan {
-  const blocks = blocksFromRoutine(routineFor(card, day));
+/**
+ * The template plan for one resident on one weekday: the routine's blocks with the day's outdoor stops at the district's
+ * gathering place (shared/src/gathering.ts; the server's templatePlan adds the same ones), or the bare routine with
+ * `lingers: false`. Last night is yesterday's routine's last block.
+ */
+export function dayPlan(card: RoutineCard, day: Weekday, opts: { lingers?: boolean } = {}): DayPlan {
+  const routine = blocksFromRoutine(routineFor(card, day));
+  const blocks = opts.lingers === false ? routine
+    : withLingers(routine, card, day, l => block(l.startMin, l.endMin, l.action, l.place, [], ''));
   const yesterday = routineFor(card, previousWeekday(day));
   const last = yesterday[yesterday.length - 1]!;
   return {

@@ -11,5 +11,5 @@ export function restore(raw: unknown): GameState {
   else clock.setTime(save.clock.day, save.clock.minute);
   return { inventory: save.inventory, coins: save.coins, economy: save.economy, clock, town: restoreTown(save.town), player: save.player, weather: save.weather,
     story_flags: save.story_flags, quiet: save.quiet, client_events: save.client_events,
-    player_name: save.summary.player_name, playtime: save.summary.playtime, fellow: save.fellow, skills: save.skills, puzzles: save.puzzles, riddles: save.riddles, friendship: save.friendship, projects: save.projects };
+    player_name: save.summary.player_name, playtime: save.summary.playtime, fellow: save.fellow, skills: save.skills, puzzles: save.puzzles, riddles: save.riddles, friendship: save.friendship, projects: save.projects, scuffles: save.scuffles };
 }

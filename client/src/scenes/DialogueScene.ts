@@ -56,7 +56,8 @@ import { firstName, quietContext, quietTurn, QUIET_CHOICES, type QuietState } fr
 import { DialogueReader, MS_PER_CHAR, TEXT_SPEEDS, type TextSpeed } from '../mind/reader';
 import type { TalkChoice, TalkContext, TalkInput, TalkTurn } from '../mind/types';
 import { Portrait } from '../dialogue/portrait';
-import { PORTRAIT_H, PORTRAIT_W, portraitLook, shadeColour, type PortraitLook } from '../dialogue/portraitModel';
+import { PORTRAIT_H, PORTRAIT_W, portraitArtId, portraitLook, shadeColour, type PortraitLook } from '../dialogue/portraitModel';
+import { rosterEntry } from '../world/roster';
 import { Backlog, type LogEntry } from '../dialogue/backlog';
 import { HeartRowView, heartTexture } from '../ui/hearts';
 import { HEART_ANIMATION, heartFeedback, type HeartFeedback } from '../friendship/hearts';
@@ -110,7 +111,8 @@ export function attachDialogue(host: Phaser.Scene, opts: { residents: ResidentLa
   host.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { off(); opts.residents.onApproach = undefined; });
 }
 
-const CARDS: ReadonlyMap<string, { card: PersonaCard; index: number }> = new Map(personaCards.map((card, index) => [card.id, { card, index }]));
+/** Everyone with a card, the generated residents who have arrived included (G-02, world/roster.ts). */
+const CARDS: Pick<ReadonlyMap<string, { card: PersonaCard; index: number }>, 'has' | 'get'> = { has: id => !!rosterEntry(id), get: id => rosterEntry(id) };
 /** {resident:<id>} in Quiet Mode lines: every card's first name (nobody has left town yet). */
 const FIRST_NAMES: Readonly<Record<string, string>> = Object.fromEntries(personaCards.map(c => [c.id, firstName(c.name)]));
 const DEV_MARK = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('dev');
@@ -357,10 +359,10 @@ export class DialogueScene extends Phaser.Scene {
     this.add.zone(0, 0, GAME_WIDTH, GAME_HEIGHT).setOrigin(0).setInteractive().on('pointerdown', () => this.advance());
 
     // Portrait (left), then the panel over its lower edge.
-    this.portrait = new Portrait(this, { residentId: this.card.id, look: this.look, x: PORTRAIT_X, y: PORTRAIT_Y, label: true });
+    this.portrait = new Portrait(this, { residentId: portraitArtId(this.card), look: this.look, x: PORTRAIT_X, y: PORTRAIT_Y, label: true });
     if (this.joined) {
       const other = CARDS.get(this.joined.join.secondary)!;
-      this.secondaryPortrait = new Portrait(this, { residentId: other.card.id, look: portraitLook(other.card, rosterColour(other.index)),
+      this.secondaryPortrait = new Portrait(this, { residentId: portraitArtId(other.card), look: portraitLook(other.card, rosterColour(other.index)),
         x: PORTRAIT_X + PORTRAIT_W + 20, y: PORTRAIT_Y, label: true });
       this.secondaryPortrait.setDimmed(true);
     }
@@ -653,7 +655,8 @@ export class DialogueScene extends Phaser.Scene {
   }
 
   private setExpr(expr: string): void {
-    const secondary = !!this.joined && (this.reader.stream.lines[this.reader.line] ?? '').startsWith(`${this.joined.name}:`);
+    // A joined exchange sets the first expression in create(), before the reader exists.
+    const secondary = !!this.joined && !!this.reader && (this.reader.stream.lines[this.reader.line] ?? '').startsWith(`${this.joined.name}:`);
     const key = this.joined ? `${secondary}:${expr}` : expr;
     if (key === this.shownExpr) return;
     this.shownExpr = key;

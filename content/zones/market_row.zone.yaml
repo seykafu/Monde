@@ -218,6 +218,13 @@ scatter:
 places:
   - { id: market_street, rect: [0, 10, 56, 12], door: [18, 12] }
   - { id: back_alley, rect: [6, 3, 23, 2], door: [17, 4] }
+# Gathering spots (§16.4.1, world/zoneFormat.ts): where residents stop to talk. A socialize or eat block at the place
+# (the template days' lunch and late-afternoon stops, shared/src/gathering.ts) stands them round the spot.
+social:
+  - { id: pump, place: market_street, at: [17, 20] }                     # in front of the market pump, among the stalls
+  - { id: cafe_terrace, place: market_street, at: [5, 8] }              # the picnic table on the river bank
+  - { id: pub_front, place: market_street, at: [13, 11] }               # outside the Gull & Anchor
+  - { id: cross_green, place: market_street, at: [38, 17], radius: 2 }  # the benches facing the Hall
 edges:
   - { side: west, from: 11, to: 13, zone: old_quarter, arrive: [46, 12] }
   - { side: north, from: 29, to: 31, zone: commons, arrive: [30, 36] }

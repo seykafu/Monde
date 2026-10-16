@@ -14,7 +14,7 @@ const FOUNTAIN: Shift = { resident: 'kasimir', action: 'volunteer', place: 'old_
 
 describe('spliceShift', () => {
   it('cuts what the resident had planned around the shift and keeps the rest of their day', () => {
-    const plan = dayPlan(card('pell'), 'Wed');
+    const plan = dayPlan(card('pell'), 'Wed', { lingers: false });
     const out = spliceShift(plan, { ...FOUNTAIN, resident: 'pell' });
     const covering = out.blocks.filter(b => b.endMin > 600 && b.startMin < 780);
     expect(covering).toHaveLength(1);

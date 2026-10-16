@@ -14,7 +14,9 @@
 //
 // Places (§9.5):
 //   open      open ground (fountain_square, market_street…): they stand at a spot of their own inside it
-//             and stay visible; walk / wander / exercise blocks stroll between spots.
+//             and stay visible; walk / wander / exercise blocks stroll between spots; socialize / eat blocks
+//             stand round one of the place's social spots (the benches, the pump), the same one for everybody
+//             there at the time, so they're together.
 //   building  a place with walls: they walk to its door and go in (invisible) until they leave.
 //   interior  a room with no street door of its own (bakery_flat, pub_rooms, mayor_office…): the
 //             building it's in, as above.
@@ -22,10 +24,10 @@
 //             toward it on a built board, step off the edge, and come back the same way.
 //   unresolved an id no zone knows: treated as off-board, and recorded in `warnings`.
 
-import type { Point, ZoneDef } from '../world/zoneFormat';
+import type { Point, SocialSpot, ZoneDef } from '../world/zoneFormat';
 import { borderPoint, borderSide, centre, cumulative, isWalkable, pointAlong, type Loc, type Vec, type ZoneGraph } from '../world/nav';
 import { MS_PER_GAME_MINUTE } from './clock';
-import { hashString, type DayPlan, type PlanAction } from './plans';
+import { hashString, type DayPlan, type DayPlanBlock, type PlanAction } from './plans';
 import { Rng } from '../util/rng';
 
 /**
@@ -53,6 +55,41 @@ const STROLL_VERBS: ReadonlySet<string> = new Set(['walk', 'wander', 'exercise']
  */
 const WORK_VERBS: ReadonlySet<string> = new Set(['volunteer']);
 const WORK_DWELL: readonly [number, number] = [12, 18];
+/**
+ * Verbs that gather residents at their place's social spots (zone `social:`, §16.4.1) instead of a spot of their own:
+ * the template days' lunch and late-afternoon stops (shared/src/gathering.ts), and any plan's time in company there.
+ */
+export const GATHER_VERBS: ReadonlySet<string> = new Set(['socialize', 'eat']);
+/**
+ * Residents gathering at the same place on the same weekday share a spot when their blocks' middles fall in the same
+ * three hours (12:00-15:00 holds every lunch stop, 15:00-18:00 every late-afternoon one). Art tuning, not a game rule.
+ */
+export const GATHER_BAND = 180;
+const gatherKey = (b: Pick<DayPlanBlock, 'place' | 'startMin' | 'endMin'>): string => `${b.place}|${Math.floor((b.startMin + b.endMin) / 2 / GATHER_BAND)}`;
+
+/** At most this many residents stand round one social spot; a bigger gathering spreads over the place's spots. */
+const GROUP = 3;
+
+/**
+ * Seats for the day's gatherings: the socialize / eat blocks at the same place and in the same band are one gathering;
+ * it splits into groups of two or three (one spot each, round the place's spots) and each member gets a cell of their
+ * own at their group's spot. Plans with no such block are returned as they were (the executor caches timelines by plan).
+ */
+export function withSeats(plans: readonly DayPlan[]): DayPlan[] {
+  const isGathering = (b: DayPlanBlock) => GATHER_VERBS.has(b.action) && !b.area;
+  const size = new Map<string, number>();
+  for (const p of plans) for (const b of p.blocks) if (isGathering(b)) size.set(gatherKey(b), (size.get(gatherKey(b)) ?? 0) + 1);
+  const taken = new Map<string, number>();
+  return plans.map(plan => {
+    if (!plan.blocks.some(isGathering)) return plan;
+    return { ...plan, blocks: plan.blocks.map(b => {
+      if (!isGathering(b)) return b;
+      const key = gatherKey(b), n = taken.get(key) ?? 0, groups = Math.ceil(size.get(key)! / GROUP);
+      taken.set(key, n + 1);
+      return { ...b, seat: { group: n % groups, groups, index: Math.floor(n / groups) } };
+    }) };
+  });
+}
 const STROLL_DWELL: readonly [number, number] = [3, 7];
 
 /**
@@ -175,8 +212,21 @@ export class RoutineExecutor {
   private readonly areas = new Map<string, PlaceInfo>();
   private readonly timelines = new WeakMap<DayPlan, Timeline>();
   private readonly roads = new Map<string, Loc>();
+  private readonly social = new Map<string, readonly SocialSpot[]>();
 
   constructor(readonly world: ExecutorWorld) {}
+
+  /** The social spots of an open place (zone `social:`), in file order. */
+  socialSpots(placeId: string): readonly SocialSpot[] {
+    let spots = this.social.get(placeId);
+    if (!spots) {
+      const info = this.resolve(placeId);
+      const zone = info.kind === 'open' && info.zone ? this.world.zones[info.zone] : undefined;
+      spots = zone?.social?.filter(s => s.place === placeId) ?? [];
+      this.social.set(placeId, spots);
+    }
+    return spots;
+  }
 
   // ── Places ────────────────────────────────────────────────────────────────
 
@@ -261,9 +311,19 @@ export class RoutineExecutor {
     return road;
   }
 
-  private anchor(plan: DayPlan, placeId: string, area?: readonly [number, number, number, number]): Anchor {
+  private anchor(plan: DayPlan, placeId: string, block?: DayPlanBlock): Anchor {
+    const area = block?.area;
     const info = area ? this.resolveArea(placeId, area) : this.resolve(placeId);
     if (!info.zone) return { info, zone: null, tile: null, visible: false, key: `off:${info.offZone}:${placeId}` };
+    const gather = !area && block && GATHER_VERBS.has(block.action) ? this.socialSpots(placeId) : [];
+    if (gather.length) {
+      // A group to a spot; groups that must share one (a place with fewer spots) interleave, so no two share a cell.
+      const seat = block!.seat, n = gather.length;
+      const spot = gather[(hashString(`${gatherKey(block!)}|${plan.weekday}`) + (seat?.group ?? 0)) % n]!;
+      const cell = seat ? seat.index * Math.ceil(seat.groups / n) + Math.floor(seat.group / n) : hashString(`${plan.resident}@${spot.id}`);
+      const tile = spot.stand[(cell + (seat ? hashString(spot.id) : 0)) % spot.stand.length]!;
+      return { info: { ...info, spots: spot.stand }, zone: info.zone, tile, visible: true, key: `${info.zone}:${tile[0]},${tile[1]}` };
+    }
     const tile = info.kind === 'open' && info.spots.length > 0
       ? info.spots[hashString(`${plan.resident}@${placeId}`) % info.spots.length]!
       : info.door!;
@@ -287,7 +347,7 @@ export class RoutineExecutor {
     let free = -Infinity;
     plan.blocks.forEach((b, index) => {
       if (!(b.endMin > b.startMin)) return; // a zero-length block is a no-op
-      const next = this.anchor(plan, b.place, b.area);
+      const next = this.anchor(plan, b.place, b);
       const pieces = this.journey(here, next, failures);
       const minutes = pieces.reduce((sum, p) => sum + p.minutes, 0);
       const depart = Math.max(free, b.startMin - minutes);

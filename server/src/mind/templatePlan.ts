@@ -3,17 +3,18 @@
  * PlanOutput-shaped day. It is the plan whenever the model's is missing or invalid, and the plan Ambient residents
  * get every day.
  *
- * It must match the client's routine executor (client/src/sim/plans.ts, `blocksFromRoutine`), so a dawn package
- * and an offline client build the same day:
+ * It must match the client's template days (client/src/sim/plans.ts, `dayPlan`), so a dawn package and an offline
+ * client build the same day:
  *   - weekday routine Mon-Fri, weekend routine Sat-Sun; Day 1 is a Tuesday (context.weekdayOf);
  *   - each block runs from its `at` to the next block's `at`, and the last one (sleep) runs to 26:00;
  *   - times read in order, so one earlier than the one before it is after midnight ("00:30" after "23:00" is
- *     24:30); times before 06:00 at the head of a routine are that morning (Odile is at her ovens from 04:00).
+ *     24:30); times before 06:00 at the head of a routine are that morning (Odile is at her ovens from 04:00);
+ *   - then the day's outdoor stops are spliced in (shared/src/gathering.ts `withLingers`, by resident and weekday).
  * Plan times are "HH:MM" with hours past midnight written on as 24:xx-26:00, as the client parses them.
  *
  * Pure: no I/O.
  */
-import type { PersonaCard, PlanOutput, RoutineBlock, Verb } from "@monde/shared";
+import { withLingers, type PersonaCard, type PlanOutput, type RoutineBlock, type Verb } from "@monde/shared";
 import { weekdayOf } from "./context.js";
 
 /** §5.2: the day starts at 06:00 and the player passes out at 26:00 (02:00). Minutes since midnight. */
@@ -91,9 +92,19 @@ export function overnight(card: RoutineCard, day: number): { action: Verb; place
 
 const strip = ({ startMin: _s, endMin: _e, ...block }: TimedBlock): PlanBlock => block;
 
+/**
+ * The routine with its outdoor stops (shared/src/gathering.ts): around lunch and late afternoon a resident may step out
+ * to the district's gathering place for half an hour. The client's template days add the same stops. Plan validation
+ * (plan.ts) still measures a model's plan against the bare routine, `routineBlocks`.
+ */
+export function templateBlocks(card: RoutineCard, day: number): TimedBlock[] {
+  return withLingers(routineBlocks(card, day), card, weekdayOf(day),
+    (l) => timedBlock(l.startMin, l.endMin, l.action, l.place, [], ""));
+}
+
 /** The template plan for one resident on one game day. No whim, barks, seek_player or intentions. */
 export function templatePlan(card: RoutineCard, day: number): PlanOutput {
-  return { blocks: routineBlocks(card, day).map(strip), whim: null, barks: [], seek_player: null, intentions: [] };
+  return { blocks: templateBlocks(card, day).map(strip), whim: null, barks: [], seek_player: null, intentions: [] };
 }
 
 export const withoutMinutes = (blocks: readonly TimedBlock[]): PlanBlock[] => blocks.map(strip);

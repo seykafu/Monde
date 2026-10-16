@@ -942,6 +942,16 @@ stale canon.
 `visit`, `attend`, `exercise`, `tinker`, `write`, `pray`, `wander`, `sit`, `volunteer`. Bastien only
 uses: `sleep`, `wander`, `sit`, `follow`, `beg`.
 
+**Outdoor stops.** A routine turned into a template day (Ambient residents, Quiet Mode, any plan that falls
+back) gets up to two short stops at a gathering place of the district the resident goes on to: around lunch
+(40 minutes from 12:00–12:45) and late in the afternoon (35 minutes from 16:30–17:15), the start fixed per
+weekday so a district's residents arrive together, each resident stopping on about seven weekdays in ten. A
+stop never interrupts sleep, a nap, a service, company already planned or a Project shift (it stops short of
+one), isn't made on the way out of town, and makes an `eat` block it covers lunch on the bench. At the place
+they stand round its social spots (§16.4.1), two or three to a spot. The client and the server build the same
+template day (`shared/src/gathering.ts`); a model's plan is still measured against the bare routine.
+GDD-GAP: the windows, lengths and the 70% are tuning, not design.
+
 ### 9.8 Levels of detail and scheduling
 
 | Tier | Who | Plan | Reflection | Live dialogue |
@@ -1203,6 +1213,16 @@ unresolved topics). Then:
   scene.
 - **If not:** the same template runs in "summary" mode: no lines, only effects (relationship deltas,
   `heard` memories, a possible feeling change). It's cheaper, and the player hears about it later.
+
+**On the board** (`client/src/scenes/zone/chatter.ts`). Earshot is 10 tiles from the player. Two residents
+at the same social spot (§16.4.1), or two standing within 3 tiles, may start talking, one exchange on a board
+every 15 s and a pair every 3 game hours. The exchange is live only when the player is within 6 tiles of both
+and has stopped to listen (stood still 2.5 s), at most one every 45 s and 20 a game day (the server's own
+cap, ≈ $0.0044 a day at §9.15's price); otherwise it is authored (`content/lines/ambient.yaml`, no call).
+It carries on while the pair stays together and near the view, however the camera scrolls. Two residents
+passing close (1.5 tiles, one of them walking) nod and say a word each, by their tie and the time of day, a
+resident's own voice now and then (no call; one at a time, a pair every 4 game hours). GDD-GAP: all these
+numbers are tuning.
 
 **Gossip propagation.** Every town event has a reach. Each night, residents who know about an event
 pass it to residents they meet the next day, with probability `0.6 × importance/10 × affinity_factor`,
@@ -4765,11 +4785,17 @@ ODILE [neutral]: He's got my pan. You've got eyes.
 {scuffle: sc_bakery_tutorial}
 [[if scuffle.won]]
 {set: sc_tutorial_won}
+[[if scuffle.talked_down]]
+N: Bru turns Odile's pan by the handle and hangs it back on its hook. Nettie lets the pebble fall into her pocket.
+BRU [worried]: All right. We can leave it. Just today.
+ODILE [neutral]: Today is a perfectly good place to start.
+[[else]]
 N: Bru sits down in the doorway, winded, his back against the frame and his cap over one eye. He holds the pan out to Odile, handle first.
 BRU [worried]: Sorry, Madame.
 ODILE [neutral]: (takes the pan and hangs it on its hook) There's a bun on the end. Take it. You're no use hungry.
 NETTIE [angry]: (already half over the counter, a loaf of rye under her arm as if nobody can see it) This isn't over!
 ODILE [neutral]: Hm. Take the one behind. That's yesterday's.
+[[end]]
 N: Odile's twenty coins sit in a row on the counter where Bru dropped them. She counts them twice and puts them back in the till.
 {pillar: safety +1}
 {regard: odile +8}
@@ -4780,10 +4806,15 @@ ROOK [neutral]: Fellow. (a small nod) Saturday.
 N: He goes. The whistle on his chest swings once and hangs still. Bru touches his cap to Odile and follows. Nettie goes last and doesn't look at anyone.
 [[else]]
 {set: sc_tutorial_lost}
+[[if scuffle.fled]]
+N: You step out of the doorway. Odile watches you go, then puts the dustpan against the wall.
+ODILE [neutral]: Tea later, Fellow. Catch your breath.
+[[else]]
 N: The floor arrives first. Then a sack of flour, which bursts, which is how you find out it was a good sack.
 ODILE [surprised]: (hands on hips; the flour hasn't settled) You swing like you're hailing the ferry.
 BRU [worried]: Sorry. Sorry, Fellow. Are you all right? Sorry.
 NETTIE [neutral]: (palming Odile's twenty off the counter) Told you. New ones are always easy.
+[[end]]
 {regard: odile +3}
 N: Across the street the man in the cap hasn't moved. He watches the way you watch weather.
 ROOK [neutral]: Haskett. Szabo. Shift's over.
@@ -9845,6 +9876,8 @@ scatter:                   # seeded set dressing
       near: { kinds: [river], radius: 1 }, keepout: { kinds: [cobble], radius: 1, doors: 2 } }
 places:                    # open ground, as v1; buildings with an id are places already
   - { id: fountain_square, rect: [14, 8, 12, 8], door: [19, 15] }
+social:                    # gathering spots: where residents stop to talk
+  - { id: fountain_benches_west, place: fountain_square, at: [18, 19], radius: 2 }
 edges:
   - { side: east, from: 15, to: 17, zone: market_row, arrive: [1, 10] }
 spawn: [5, 22]
@@ -9888,12 +9921,25 @@ spawn: [5, 22]
   as stacked blocks); each cell is its own billboard, so people sort in front of and behind it.
 - **Scatter** is deterministic per seed and rule, only on free ground away from doors, edges and the
   spawn, and walk-through unless `solid: true`.
+- **Gathering spots** (`social:`) are where residents stop to talk: the Fountain Square benches, the market
+  pump, the café terrace, the pub front and Cross Green on Market Row, the quay over the harbour steps and the
+  slip head on the Wharf, the picnic tables, the sundial benches and the garden well on the Commons. Each names
+  the open place it belongs to (it may stand just outside the rect, a frontage, 4 tiles at most) and a tile
+  (`at`, often the bench or pump itself) with a `radius` (1–3 tiles, default 1.5); the compiled zone lists them
+  as `zone.social` (`{ id, place, at, stand }`), `stand` being the walkable cells within the radius, off every
+  door and reachable from the spawn. A `socialize` or `eat` block at the place (the template days' outdoor
+  stops, §9.7, or any plan's) stands its residents round one of its spots, two or three to a spot, a cell
+  each; two at the same spot may talk (§9.11.3). Every gathering place in `shared/src/gathering.ts` has a
+  spot, and a spot only on those places (a test checks). GDD-GAP: the green's well in the Old Quarter isn't a
+  registered place (§9.5), so it has no spot.
 - **Validation.** Unknown sprites, overlapping footprints, doors not on walkable ground or not at the
   front edge, props in buildings or on the wrong side of the waterline, and any door or edge the spawn
   cannot reach are load errors; so are a scenery house with no `home:`, a home held by two buildings, a
   Mark placed twice, a Mark with no reachable ground at or beside it, a Mark drawn behind a building or a
   tree nearer the camera, lettering in characters the pixel font lacks, and a datestone, sign or number on
-  a sprite with no lintel, sign panel or plate for it.
+  a sprite with no lintel, sign panel or plate for it; and a gathering spot on a building or an unknown
+  place, more than 4 tiles from its place, named twice, with a radius outside 1–3, or with fewer than two
+  cells to stand on.
 - **On the board.** Buildings and props are billboards sorted with the people by their ground line, and
   fade to 35% while the player is behind them; contact shadows, sun shadows from the clock (props lean,
   buildings shear along the ground) and lamp shadows at night; lamp pools and heads, lit windows found in

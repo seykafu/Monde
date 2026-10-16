@@ -1,3 +1,4 @@
+import { TollmenState, SavedScuffles, emptyScuffles } from './scuffles';
 import { Inventory, Wallet, Economy, emptyEconomy } from './economy';
 import { z } from 'zod';
 import { SavedRiddles, emptyRiddles } from './riddles';
@@ -5,12 +6,16 @@ import { CharacterLookData } from './look';
 import { PlayerProfile, Skills, baseSkills } from './player';
 import { SavedFriendship, emptyFriendship } from './friendshipData';
 import { ClientEvent } from './events';
+import { TownPeople } from './arrivals/people';
 
 const n = z.number().finite();
 const count = n.int().nonnegative();
 const day = n.int().positive();
 const pillars = z.object({ prosperity: n, safety: n, spirit: n, charm: n });
 export const SavedTown = z.object({
+  tollmen: TollmenState.optional(),
+  /** G-02: the generated residents (arrivals and departures); old saves have none. */
+  people: TownPeople.optional(),
   day, pillars, dayStart: pillars, census: count, fund: n,
   homes: z.object({ occupied: count, vacant_restorable: count, restored_free: count }),
   flags: z.record(z.string(), z.boolean()), openJobs: count, tollmenLevelMax: n,
@@ -110,6 +115,7 @@ export const SaveGame = z.object({
     spell: z.object({ from: n, until: n }).nullable(), fogUntil: n.nullable(), eveningFog: z.boolean()
   }) }),
   town: SavedTown,
+  scuffles: SavedScuffles.default(emptyScuffles),
   // Facing is radians in world coordinates (+x = 0), independent of renderer animation frames.
   player: z.object({ zone: z.string(), x: n, y: n, facing: n }),
   story_flags: z.record(z.string(), z.union([z.boolean(), n, z.string()])),

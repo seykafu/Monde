@@ -49,6 +49,11 @@ import { DIORAMA_ELEV_STEP as ELEV, DIORAMA_TILE_H as TH, DIORAMA_TILE_W as TW }
 //     - { sprites: [tall_grass, bush_round], on: [grass], density: 0.05, seed: 3,
 //         near: { kinds: [pond], radius: 2 }, keepout: { kinds: [cobble], radius: 1, doors: 2 } }
 //   places:                  # open ground, as v1: { id, rect: [x, y, w, h], door }
+//   social:                  # gathering spots: where residents stop to talk (sim/routineExecutor.ts, scenes/zone/chatter.ts)
+//     - { id: pump, place: market_street, at: [17, 20] }
+//       # place: the open place (from places:) it belongs to; it may stand just outside the rect (a frontage, 4 tiles at
+//       # most). A socialize or eat block at that place stands residents on the walkable cells within `radius` tiles of
+//       # `at` (default 1.5; 1 to 3), off doors and reachable from the spawn; at least two of them.
 //   edges:                   # as v1
 //   spawn: [x, y]
 //
@@ -56,7 +61,7 @@ import { DIORAMA_ELEV_STEP as ELEV, DIORAMA_TILE_H as TH, DIORAMA_TILE_W as TW }
 // `block` in townSprites.ts, or `solid:`). Every door and edge cell must be walkable and reachable from the
 // spawn; footprints and solid props may not overlap; sprites must exist; floating props go on water.
 // A Mark must have ground to stand on beside it (its own tile or one next to it, reachable from the spawn)
-// and must not be drawn behind a building or a tree.
+// and must not be drawn behind a building or a tree. A social spot needs an open place and two cells to stand on.
 // Lamp posts are lights. Integer tile coordinates name cells; continuous positions use centres at +0.5.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -109,6 +114,21 @@ export interface MarkSpot {
   stand: Point;
 }
 
+/**
+ * A gathering spot on a board (`social:`, §16.4.1): a bench pair, the pump, the café terrace. Residents with a socialize or
+ * eat block at its place stand here (sim/routineExecutor.ts), and two standing at the same spot may talk (chatter.ts).
+ */
+export interface SocialSpot {
+  /** `zone.spot`, unique in the world. */
+  id: string;
+  /** The open place it belongs to, `zone.place`. */
+  place: string;
+  /** The tile it is about (the bench, the pump); may be solid. */
+  at: Point;
+  /** Where to stand: walkable cells within its radius, off doors, reachable from the spawn; row-major. */
+  stand: readonly Point[];
+}
+
 /** A prop on a v2 board (single placements, lines and scatter, in that order). */
 export interface TownProp {
   sprite: string;
@@ -149,6 +169,8 @@ export interface ZoneDef extends MapDef {
   town?: TownLayout;
   /** The Monde's Marks on this board (props with `mark:`), in file order. Empty on a v1 greybox. */
   marks: readonly MarkSpot[];
+  /** Gathering spots (`social:`), in file order. Empty on a v1 greybox. */
+  social: readonly SocialSpot[];
 }
 
 /** The Marks on a board, typed (the riddle system reads these). */
@@ -265,7 +287,7 @@ function compileGreybox(raw: Record<string, unknown>): ZoneDef {
   const spawn = f.point(raw.spawn);
   check(walkable(spawn), 'Spawn on solid tile');
   const edges = parseEdges(raw, f, walkable);
-  return { ...map, tiles, places, props, edges, spawn, walkability, format: 1, marks: [] };
+  return { ...map, tiles, places, props, edges, spawn, walkability, format: 1, marks: [], social: [] };
 }
 
 // ── v2: the town ────────────────────────────────────────────────────────────
@@ -474,6 +496,9 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
   for (const p of places) check(reached[at(p.door[0], p.door[1])], `Place unreachable from the spawn: ${p.id}`);
   for (const e of edges) for (let n = e.from; n <= e.to; n++) { const c = edgeCell(f, e.side, n); check(reached[at(c[0], c[1])], `Edge unreachable from the spawn: ${e.side} ${n}`); }
 
+  // Gathering spots: an open place's, near it, with ground to stand on.
+  const social = parseSocial(raw, f, id, places, buildings, (x, y) => walkable([x, y]) && reached[at(x, y)] === 1);
+
   // The Marks: ground to stand on beside each (its own tile first, then in front, the sides, behind), and art
   // no building, tree or other prop nearer the camera hides (props by the middle half of their art).
   const groundY = (x: number, y: number) => y * TH - tiles[at(x, Math.min(y, height - 1))]!.elev * ELEV;
@@ -504,7 +529,42 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
   });
 
   const map: MapDef = { id, name: string(raw.name), width, height, tiles, startPositions: { player: [], enemy: [] } };
-  return { ...map, tiles, places, props: [], edges, spawn, walkability, format: 2, town: { buildings, props }, marks };
+  return { ...map, tiles, places, props: [], edges, spawn, walkability, format: 2, town: { buildings, props }, marks, social };
+}
+
+/** How far outside its place's rect a gathering spot may stand (a frontage: the café terrace, the quay's edge). */
+const SOCIAL_REACH = 4;
+
+function parseSocial(raw: Record<string, unknown>, f: Frame, zone: string, places: readonly Place[], buildings: readonly TownBuilding[],
+  standable: (x: number, y: number) => boolean): SocialSpot[] {
+  const ids = new Set<string>();
+  const doors = new Set(places.map(p => p.door.join(',')));
+  return list(raw.social ?? []).map(v => {
+    const o = object(v);
+    const sid = string(o.id);
+    const where = `social ${sid}`;
+    check(/^[a-z][a-z0-9_]*$/.test(sid), `${where}: id is lower_snake_case`);
+    check(!ids.has(sid), `Social spot named twice: ${sid}`);
+    ids.add(sid);
+    const placeId = string(o.place);
+    const place = places.find(p => p.id === placeId);
+    check(place, `${where}: unknown place ${placeId}`);
+    check(!buildings.some(b => b.id === placeId), `${where}: ${placeId} is a building; a gathering spot belongs to open ground`);
+    const spot = f.point(o.at);
+    const radius = o.radius === undefined ? 1.5 : o.radius;
+    check(typeof radius === 'number' && radius >= 1 && radius <= 3, `${where}: radius is 1 to 3 tiles`);
+    const [x0, y0, w, h] = place.rect;
+    const outside = Math.max(x0 - spot[0], 0, spot[0] - (x0 + w - 1)) + Math.max(y0 - spot[1], 0, spot[1] - (y0 + h - 1));
+    check(outside <= SOCIAL_REACH, `${where}: more than ${SOCIAL_REACH} tiles from ${placeId}`);
+    const stand: Point[] = [];
+    const r = Math.ceil(radius);
+    for (let y = spot[1] - r; y <= spot[1] + r; y++) for (let x = spot[0] - r; x <= spot[0] + r; x++) {
+      if (!f.inside([x, y]) || Math.hypot(x - spot[0], y - spot[1]) > radius + 1e-9 || doors.has(`${x},${y}`) || !standable(x, y)) continue;
+      stand.push([x, y]);
+    }
+    check(stand.length >= 2, `${where}: needs at least two cells to stand on within ${radius} tiles`);
+    return { id: `${zone}.${sid}`, place: `${zone}.${placeId}`, at: spot, stand };
+  });
 }
 
 /** Text to letter in code: the pixel font's characters, `|` between lines. */
