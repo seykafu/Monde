@@ -15,14 +15,14 @@ export const MUSIC_TRACKS: Readonly<Record<TrackKey, TrackDef>> = {
   market_row: { file: 'market_row.mp3', gain: 0.83, description: 'Warm, busy, cheeky' },
   wharf: { file: 'wharf.mp3', gain: 0.9, description: 'Salt air and slow swell' },
   commons: { file: 'commons.mp3', gain: 0.93, description: 'Green, open, birdsong' },
-  night: { file: 'night.mp3', gain: 1, description: 'Lamplight and hush' },
+  night: { file: 'night.mp3', gain: 0.98, description: 'Lamplight and hush' },
   cottage: { file: 'cottage.mp3', gain: 0.93, description: 'Home, safe, small' },
-  tension: { file: 'tension.mp3', gain: 1, description: 'Uneasy, restrained' },
-  scuffle: { file: 'scuffle.mp3', gain: 1, description: 'Comic, bouncy fight' },
-  vane_theme: { file: 'vane_theme.mp3', gain: 1, description: 'Smooth, too polished' },
-  tender: { file: 'tender.mp3', gain: 1, description: 'Heartfelt, hopeful' },
+  tension: { file: 'tension.mp3', gain: 0.87, description: 'Uneasy, restrained' },
+  scuffle: { file: 'scuffle.mp3', gain: 0.85, description: 'Comic, bouncy fight' },
+  vane_theme: { file: 'vane_theme.mp3', gain: 0.89, description: 'Smooth, too polished' },
+  tender: { file: 'tender.mp3', gain: 1.04, description: 'Heartfelt, hopeful' },
   arrival: { file: 'arrival.mp3', gain: 0.8, description: 'Beginning, open water' },
-  bloom_fair: { file: 'bloom_fair.mp3', gain: 1, description: 'Bright festival dance' }
+  bloom_fair: { file: 'bloom_fair.mp3', gain: 0.87, description: 'Bright festival dance' }
 };
 /** Every file a track may play, main take first. */
 export const trackFiles = (track: TrackKey): readonly TrackFile[] => [MUSIC_TRACKS[track], ...(MUSIC_TRACKS[track].alts ?? [])];
