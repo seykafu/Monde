@@ -1,4 +1,5 @@
 # GDD-GAP: stacks of 20 (tools 1), retail prices and tea +10 are provisional. Meals follow §11.3.
+# GDD-GAP: Scuffle supply prices are provisional: roll 3, salts 12, whistle 15, marbles 5 coins.
 [
   {
     "id": "bun",
@@ -261,5 +262,49 @@
     "stack": 20,
     "stamina": 0,
     "price": 15
+  },
+  {
+    "id": "bread_roll",
+    "name": "Bread roll",
+    "description": "A pocket-sized roll. Restores 8 Grit in a Scuffle.",
+    "tags": [
+      "scuffle"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 3
+  },
+  {
+    "id": "smelling_salts",
+    "name": "Smelling salts",
+    "description": "Wakes a Winded neighbour at 5 Grit.",
+    "tags": [
+      "scuffle"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 12
+  },
+  {
+    "id": "augusta_whistle",
+    "name": "Augusta’s whistle",
+    "description": "Augusta arrives after two rounds, if there is room.",
+    "tags": [
+      "scuffle"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 15
+  },
+  {
+    "id": "marbles",
+    "name": "Bag of marbles",
+    "description": "Trips the next person entering one chosen tile.",
+    "tags": [
+      "scuffle"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 5
   }
 ]

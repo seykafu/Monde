@@ -71,11 +71,17 @@ ODILE [neutral]: He's got my pan. You've got eyes.
 {scuffle: sc_bakery_tutorial}
 [[if scuffle.won]]
 {set: sc_tutorial_won}
+[[if scuffle.talked_down]]
+N: Bru turns Odile's pan by the handle and hangs it back on its hook. Nettie lets the pebble fall into her pocket.
+BRU [worried]: All right. We can leave it. Just today.
+ODILE [neutral]: Today is a perfectly good place to start.
+[[else]]
 N: Bru sits down in the doorway, winded, his back against the frame and his cap over one eye. He holds the pan out to Odile, handle first.
 BRU [worried]: Sorry, Madame.
 ODILE [neutral]: (takes the pan and hangs it on its hook) There's a bun on the end. Take it. You're no use hungry.
 NETTIE [angry]: (already half over the counter, a loaf of rye under her arm as if nobody can see it) This isn't over!
 ODILE [neutral]: Hm. Take the one behind. That's yesterday's.
+[[end]]
 N: Odile's twenty coins sit in a row on the counter where Bru dropped them. She counts them twice and puts them back in the till.
 {pillar: safety +1}
 {regard: odile +8}
@@ -86,10 +92,15 @@ ROOK [neutral]: Fellow. (a small nod) Saturday.
 N: He goes. The whistle on his chest swings once and hangs still. Bru touches his cap to Odile and follows. Nettie goes last and doesn't look at anyone.
 [[else]]
 {set: sc_tutorial_lost}
+[[if scuffle.fled]]
+N: You step out of the doorway. Odile watches you go, then puts the dustpan against the wall.
+ODILE [neutral]: Tea later, Fellow. Catch your breath.
+[[else]]
 N: The floor arrives first. Then a sack of flour, which bursts, which is how you find out it was a good sack.
 ODILE [surprised]: (hands on hips; the flour hasn't settled) You swing like you're hailing the ferry.
 BRU [worried]: Sorry. Sorry, Fellow. Are you all right? Sorry.
 NETTIE [neutral]: (palming Odile's twenty off the counter) Told you. New ones are always easy.
+[[end]]
 {regard: odile +3}
 N: Across the street the man in the cap hasn't moved. He watches the way you watch weather.
 ROOK [neutral]: Haskett. Szabo. Shift's over.
