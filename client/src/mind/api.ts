@@ -65,6 +65,8 @@ export interface MindOptions {
   baseUrl: string;
   /** From `?invite=`; falls back to the remembered one. */
   inviteCode?: string | null;
+  /** A build's own invite (VITE_MIND_INVITE, personal test builds only): used when none is given or remembered. */
+  defaultInvite?: string | null;
   /** The player chose Offline (`?offline`): never call the server. */
   offline?: boolean;
   storage: StorageLike | null;
@@ -141,7 +143,7 @@ export class MindClient {
     this.write(STORAGE_KEYS.device, this.deviceId);
     const given = opts.inviteCode?.trim() || null;
     if (given) this.write(STORAGE_KEYS.invite, given);
-    this.inviteCode = given ?? this.read(STORAGE_KEYS.invite);
+    this.inviteCode = given ?? this.read(STORAGE_KEYS.invite) ?? (opts.defaultInvite?.trim() || null);
     const stored = this.readJson(STORAGE_KEYS.session);
     if (isSession(stored) && stored.base_url === this.baseUrl && stored.device_id === this.deviceId) this.session = stored;
     const profile = PlayerProfileSchema.safeParse(this.readJson(STORAGE_KEYS.player));
@@ -552,10 +554,13 @@ export class MindClient {
 // ── The game's client ───────────────────────────────────────────────────────
 
 /** Where the server is and how to join it, from the build and the page URL. */
-export function mindConfig(search = typeof window !== 'undefined' ? window.location.search : ''): Pick<MindOptions, 'baseUrl' | 'inviteCode' | 'offline'> {
+export function mindConfig(search = typeof window !== 'undefined' ? window.location.search : ''): Pick<MindOptions, 'baseUrl' | 'inviteCode' | 'defaultInvite' | 'offline'> {
   const query = new URLSearchParams(search);
   const env = (import.meta.env?.VITE_MIND_URL as string | undefined)?.trim();
-  return { baseUrl: env || DEFAULT_MIND_URL, inviteCode: query.get('invite'), offline: query.has('offline') };
+  // Personal test builds can carry their owner's invite so they're online from the first launch. Never set it
+  // for a build that's shared: anyone with the build could join with it.
+  const invite = (import.meta.env?.VITE_MIND_INVITE as string | undefined)?.trim();
+  return { baseUrl: env || DEFAULT_MIND_URL, inviteCode: query.get('invite'), defaultInvite: invite || null, offline: query.has('offline') };
 }
 
 /** localStorage, or null where touching it throws (sandboxed iframes, blocked cookies). */

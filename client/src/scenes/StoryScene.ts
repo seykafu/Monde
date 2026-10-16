@@ -17,7 +17,7 @@ import { openPuzzle } from '../puzzles/scenes/PuzzleScene';
 // to DialogueScene (a launch option there and its DIALOGUE_CLOSED event).
 import Phaser from 'phaser';
 import { isBareLeave, type PersonaCard } from '@monde/shared';
-import { getMusic } from '../audio/Music';
+import { getMusic, holdMusic, releaseMusic } from '../audio/Music';
 import { SFX_KEYS, playSfx, type SfxKey } from '../audio/Sfx';
 import { Backlog, type LogEntry } from '../dialogue/backlog';
 import {
@@ -491,6 +491,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
 
   music(id: string): void {
     this.musicStarted = true;
+    holdMusic(this, 'story');
     getMusic(this).play(id);
   }
 
@@ -758,6 +759,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.hideButtons();
     this.closeLog();
     if (this.musicStarted) getMusic(this).stop(1200);
+    releaseMusic(this, 'story');
     if (!this.revealed) { this.scene.stop(); return; }
     this.tweens.add({ targets: this.cameras.main, alpha: 0, duration: 200, onComplete: () => this.scene.stop() });
   }
@@ -777,5 +779,6 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.session.settle();
     this.session.world?.persist();
     this.pauseWorld(false);
+    releaseMusic(this, 'story');
   }
 }

@@ -125,6 +125,15 @@ describe('session bootstrap', () => {
     expect(mind.enabled).toBe(false);
   });
 
+  it("uses a build's own invite only when none is given or remembered", () => {
+    expect(client({ inviteCode: null, defaultInvite: 'BUILD' }).invite).toBe('BUILD');
+    expect(client({ inviteCode: 'URL', defaultInvite: 'BUILD' }).invite).toBe('URL');
+    const storage = new MemoryStorage();
+    client({ inviteCode: 'SAVED', storage });
+    expect(client({ inviteCode: null, defaultInvite: 'BUILD', storage }).invite).toBe('SAVED');
+    expect(client({ inviteCode: null, defaultInvite: '  ' }).invite).toBeNull();
+  });
+
   it('reads the server and invite from the build and the URL', () => {
     expect(mindConfig('?invite=SPRING&dev')).toMatchObject({ inviteCode: 'SPRING', offline: false });
     expect(mindConfig('?offline').offline).toBe(true);

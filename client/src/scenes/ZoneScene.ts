@@ -38,6 +38,8 @@ import { ResidentLayer } from './zone/residents';
 import { attachDialogue } from './DialogueScene';
 import { PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
 import { MindStatusDot } from '../ui/mindStatus';
+import { getMusic, musicHeld } from '../audio/Music';
+import { ambientTrack } from '../audio/musicDirector';
 import { applyServerRegard, attachDawnSync } from './friendship';
 import { attachEventSync } from './events';
 import { openPeople } from './PeopleScene';
@@ -853,7 +855,20 @@ export class ZoneScene extends Phaser.Scene {
     const snap = this.town ? (v: number) => Math.round(v * RENDER_SCALE) / RENDER_SCALE : (v: number) => v;
     camera.setScroll(snap(camera.clampX(this.figure.x - camera.displayWidth / 2)), snap(camera.clampY(this.figure.y - camera.displayHeight / 2)));
   }
+  /** When the town last chose its music (ms of scene time); checked about once a second. */
+  private musicCheckedAt = -Infinity;
+
+  /** The town's background music: district by day, morning for the first hour, night after dark. */
+  private updateMusic(time: number): void {
+    if (time - this.musicCheckedAt < 1000) return;
+    this.musicCheckedAt = time;
+    if (musicHeld(this)) return;
+    const { day, minute } = this.clock;
+    getMusic(this).play(ambientTrack({ zone: this.zone.id, day, minute, darkness: darkness(day, minute) }));
+  }
+
   update(time: number, delta: number): void {
+    this.updateMusic(time);
     // Time runs while walking (GDD §5.3); a long frame (a backgrounded tab) doesn't skip the evening.
     const dt = Math.min(delta, 250);
     this.clock.advance(dt);

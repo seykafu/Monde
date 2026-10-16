@@ -5,6 +5,7 @@ import { IndexedDBSaveStorage } from '../save/storage';
 import { formatSummary, MANUAL_SLOTS, sortForMenu, type SaveEntry } from '../save/slots';
 import { getMind } from '../mind/api';
 import { maskInvite, statusDetail, validInvite } from '../mind/connection';
+import { getMusic } from '../audio/Music';
 
 type Choice = { text: string; run?: () => void | Promise<void> };
 /** Thin shared presentation for title and pause; persistence lives outside Phaser. */
@@ -21,11 +22,25 @@ class SaveMenuBase extends Phaser.Scene {
   constructor(key: string) { super(key); }
   create(): void {
     this.busy = false;
+    // The title plays the town's song (docs/AUDIO.md); the pause menu keeps whatever the town was playing.
+    if (!this.pausedGame) getMusic(this).play('main_theme');
     this.cameras.main.setZoom(RENDER_SCALE).setOrigin(0, 0);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH, GAME_HEIGHT, 0x29392f);
     this.add.rectangle(GAME_WIDTH / 2, GAME_HEIGHT / 2, GAME_WIDTH - 80, GAME_HEIGHT - 50, 0xf2e4c7);
     this.add.text(70, 48, this.pausedGame ? 'A quiet moment' : 'Monde', { fontFamily: FAMILY_BODY, fontSize: '38px', color: '#394a3b' });
     this.message = this.add.text(70, GAME_HEIGHT - 72, '', { fontFamily: FAMILY_BODY, fontSize: '15px', color: '#705740', wordWrap: { width: GAME_WIDTH - 140 } });
+    // Whether residents are live (Haiku) or speaking written lines, always in view on the title (§9.14).
+    if (!this.pausedGame) {
+      const status = this.add.text(GAME_WIDTH - 70, 58, '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#705740', align: 'right', wordWrap: { width: 360 } }).setOrigin(1, 0);
+      const refresh = () => {
+        const s = getMind().status;
+        status.setText(`${s === 'online' ? '● Live residents' : s === 'connecting' ? '◌ Joining the town…' : '○ Offline: written lines'}${s === 'no_invite' ? '\nAdd an invite code in Settings' : ''}`)
+          .setColor(s === 'online' ? '#3f6b46' : '#92542e');
+      };
+      refresh();
+      const timer = this.time.addEvent({ delay: 1000, loop: true, callback: refresh });
+      this.events.once('shutdown', () => timer.remove());
+    }
     const onKey = (event: KeyboardEvent) => {
       if (event.repeat || this.busy || this.inviteInput) return;
       if (event.key === 'Escape') this.back();
