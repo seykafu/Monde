@@ -1,3 +1,5 @@
+import { loadItems } from "../content/loadContent.js";
+import { feasibleFavor } from "./favorFeasibility.js";
 /**
  * The nightly reflection (GDD §9.6 beliefs, §9.7 step 1, §9.17 Reflect; MVP M-07).
  *
@@ -50,8 +52,6 @@ const LETTER_CHARS = 800;
 const MAX_RELATIONSHIP_DELTAS = 8;
 const MAX_STANCES = 12;
 const ISSUE_ID = /^[a-z][a-z0-9_]{0,39}$/;
-/** GDD-GAP: there is no item registry yet (inventory is G-09), so an item target is any snake_case id. */
-const ITEM_ID = /^[a-z][a-z0-9_]{1,39}$/;
 /** The night's diary entry is the last memory of the day. */
 const DIARY_MINUTE = 26 * 60;
 
@@ -95,6 +95,7 @@ export async function loadMemoriesForDay(db: WorldDatabase, worldId: string, res
 
 export interface ReflectionValidationContext {
   residentId: string;
+  itemIds?: ReadonlySet<string>;
   /** Every resident id in the world. */
   residentIds: ReadonlySet<string>;
   /** Everyone this resident already has a relationship row with (cards name a few non-residents, like Frye). */
@@ -111,7 +112,7 @@ export type ReflectionValidation =
 
 const oneLine = (text: string): string => text.replace(/\s+/g, " ").trim();
 
-/** Is this a target the template can be instantiated on? (Feasibility proper is M-09's.) */
+/** Cheap proposal validation; feasibleFavor checks reachability, existing ties and the resident’s own place before storage. */
 export function favorTargetExists(template: FavorTemplate, target: string, ctx: ReflectionValidationContext): boolean {
   const resident = target !== ctx.residentId && ctx.residentIds.has(target);
   switch (template) {
@@ -119,10 +120,10 @@ export function favorTargetExists(template: FavorTemplate, target: string, ctx: 
     case "introduce":
       return resident;
     case "help_chore":
-      return resident || ctx.places.has(target);
+      return target === ctx.residentId || resident || ctx.places.has(target);
     case "fetch":
     case "find":
-      return ITEM_ID.test(target) && !ctx.residentIds.has(target);
+      return ctx.itemIds?.has(target) ?? false;
     default:
       return false;
   }
@@ -381,10 +382,11 @@ async function persistReflection(db: WorldDatabase, args: PersistArgs): Promise<
         if ((mine?.n ?? 0) > 0) dropped.push("favor dropped (they already have one open)");
         else if ((town?.n ?? 0) >= MAX_OPEN_FAVORS) dropped.push(`favor dropped (${MAX_OPEN_FAVORS} already open in town)`);
         else {
-          await tx.insert(favors).values({
+          const contract = await feasibleFavor(tx, worldId, residentId, day, reflectionFavorId(residentId, day), output.favor);
+          if (contract) await tx.insert(favors).values({
             worldId, id: reflectionFavorId(residentId, day), residentId, template: output.favor.template,
             target: output.favor.target, text: output.favor.text, status: "proposed", createdDay: day,
-            expiresDay: day + FAVOR_EXPIRY_DAYS, reward: {},
+            expiresDay: day + FAVOR_EXPIRY_DAYS, reward: contract,
           }).onConflictDoNothing();
         }
       }
@@ -440,11 +442,13 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
   };
   if (!mind.enabled) return fallback("unavailable", null);
 
+  const itemIds = new Set((await loadItems()).map(i => i.id));
   const request = buildReflectRequest({
     card: prefix.card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names,
     day: world.day, memoriesToday: selectReflectionMemories(today, prefix, world.day), town: world.town,
     favorTemplates: PROPOSABLE_FAVORS,
   });
+  request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${[...itemIds].join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
   const result = await callModel(mind, apiParams("reflect", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
   });
@@ -452,10 +456,13 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
 
   const validated = validateReflection(result.text, {
     residentId, residentIds: world.residentIds, relationshipIds: new Set(prefix.relationships.map((r) => r.id)),
-    places: world.places.ids, stances: prefix.state.stances,
+    itemIds, places: world.places.ids, stances: prefix.state.stances,
   });
   if (!validated.ok) return fallback("schema", { ...result.call, validation: validated.category }, validated.detail);
 
+  if (validated.output.favor && !await feasibleFavor(db,world.worldId,residentId,world.day,reflectionFavorId(residentId,world.day),validated.output.favor)) {
+    validated.output.favor = null; validated.adjustments.push('favor dropped (infeasible with current items, places or relationships)');
+  }
   const dropped = await persistReflection(db, { ...base, output: validated.output, call: result.call });
   const adjustments = [...validated.adjustments, ...dropped];
   if (adjustments.length) deps.log.info({ residentId, day: world.day, adjustments }, "reflection adjusted");

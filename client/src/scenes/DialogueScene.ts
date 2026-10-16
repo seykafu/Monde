@@ -1,3 +1,5 @@
+import { updateFriendship } from "./friendship";
+import { favorBook, chooseFavor, favorProof, finishFavor } from "../friendship/favors";
 import { openPeople } from './PeopleScene';
 import { SPRING_RIDDLES } from '@monde/shared';
 import { getFellow, setFellow } from '../fellow/state';
@@ -64,6 +66,7 @@ export interface DialogueOpen {
   host: string;
   clock: Clock;
   residentId: string;
+  playerPosition?: { x: number; y: number };
   zone: ZoneDef;
   /** Where the resident is and what they're doing (the routine executor's state). */
   state: ResidentState | null;
@@ -86,12 +89,12 @@ export interface DialogueClosed { residentId: string; exchanges: number; log: re
  * Wire a zone scene for dialogue: open the panel on `talk-requested`, and prewarm residents the player walks
  * near (§9.10 step 1). Undone when the host shuts down.
  */
-export function attachDialogue(host: Phaser.Scene, opts: { residents: ResidentLayer; zone: ZoneDef; clock: Clock; weather: () => WeatherNow }): void {
+export function attachDialogue(host: Phaser.Scene, opts: { residents: ResidentLayer; zone: ZoneDef; clock: Clock; weather: () => WeatherNow; playerPosition?: () => { x: number; y: number } }): void {
   const off = opts.residents.sim.events.on('talk-requested', e => {
     if (host.scene.isActive(DIALOGUE_SCENE) || !CARDS.has(e.residentId)) return;
     const data: DialogueOpen = {
       host: host.scene.key, clock: opts.clock, residentId: e.residentId, zone: opts.zone,
-      state: opts.residents.stateOf(e.residentId), weather: opts.weather()
+      state: opts.residents.stateOf(e.residentId), weather: opts.weather(), playerPosition: opts.playerPosition?.()
     };
     host.scene.launch(DIALOGUE_SCENE, data);
   });
@@ -516,6 +519,9 @@ export class DialogueScene extends Phaser.Scene {
         this.time.delayedCall(3500, () => touch.destroy());
       }
     }
+    if (turn.favors?.length) updateFriendship(this.registry,s => ({ ...s, favor_book: [...s.favor_book,...turn.favors!.filter(f => !s.favor_book.some(old => old.id === f.id))] }));
+    const ask = favorBook(this.registry).find(f => f.resident_id === this.card.id && f.status === 'proposed' && f.expires_day >= this.open.clock.day);
+    if (ask && !turn.lines.some(l => l.text.includes(ask.text))) turn = { ...turn,lines: [...turn.lines,{ text: ask.text,expr: 'neutral' }] };
     this.turn = this.tidy(turn);
     for (const line of this.turn.lines) this.log.push({ who: 'resident', text: line.text });
     this.exchange = turn.turn_index + 1;
@@ -704,6 +710,12 @@ export class DialogueScene extends Phaser.Scene {
     this.choicesShown = true;
     this.hideButtons();
     const replies = turn.choices.filter(c => !isBareLeave(c));
+    const favor = favorBook(this.registry).find(f => f.resident_id === this.card.id && f.status === 'proposed' && f.expires_day >= this.open.clock.day);
+    if (favor) { replies.splice(0, replies.length,
+      { id: `favor_accept:${favor.id}`, text: 'Yes, I can help.', intent: 'kind' },
+      { id: `favor_decline:${favor.id}`, text: 'I can’t take that on.', intent: 'kind' }); }
+    const ready = favorBook(this.registry).find(f => f.status === 'accepted' && (f.task.kind === 'introduce' && f.resident_id === this.card.id));
+    if (ready) replies.push({ id: `favor_finish:${ready.id}`, text: ready.task.kind === 'delivery' ? 'I have a parcel for you.' : 'Let me introduce you.', intent: 'kind' });
     const selected = marks(this.registry).selected;
     if (selected && marks(this.registry).entries[selected]?.status === 'found' && ['margo', 'bertrand', 'tib'].includes(this.card.id)) {
       replies.push({ id: 'mark', text: `About ${selected}…`, intent: 'about_riddle' });
@@ -716,7 +728,7 @@ export class DialogueScene extends Phaser.Scene {
     if (!turn.wrap_up) {
       say = new PanelButton(this, CHOICE_X, 0, 214, 'Say something…', () => this.openSay(), { center: true, size: 17 });
       // Gift values are engine-owned; the next live turn supplies only the reaction line.
-      const gift = new PanelButton(this, CHOICE_X + 222, 0, 100, 'Gift', () => this.openGift(), { center: true, size: 17 });
+      const gift = new PanelButton(this, CHOICE_X + 222, 0, 100, 'Bag', () => this.openGift(), { center: true, size: 17 });
       row.push(say, gift);
       this.extraButtons.push(gift);
     }
@@ -739,6 +751,8 @@ export class DialogueScene extends Phaser.Scene {
       this.giftFeedback = heartFeedback(shared.regard);
       void this.send({ kind: 'meal', item: item.id, event_id: shared.eventId, text: `Shall we share ${item.name}?` }, `Shall we share ${item.name}?`);
     }, gift: (slot, item) => {
+      const favor = favorBook(this.registry).find(f => f.status === 'accepted' && (f.task.kind === 'delivery' ? f.task.recipient : f.resident_id) === this.card.id && f.task.item === item.id);
+      if (favor && finishFavor(this.registry, this.open.clock, favor, favorProof(this.registry, this.open.clock, favor, this.card.id, this.card.home), slot)) { this.toast('Favor completed. Thank you.'); this.showChoices(); return; }
       const given = giveGift(this.registry, this.open.clock, this.card, slot, item);
       if (!given) { this.toast('One gift each day is plenty.'); return; }
       this.giftFeedback = heartFeedback(given.regard);
@@ -765,6 +779,13 @@ export class DialogueScene extends Phaser.Scene {
   }
 
   private choose(choice: TalkChoice): void {
+    if (choice.id.startsWith('favor_')) {
+      const [action,id] = choice.id.split(':');
+      const f = favorBook(this.registry).find(x => x.id === id);
+      if (!f) return;
+      const ok = action === 'favor_finish' ? finishFavor(this.registry,this.open.clock,f,favorProof(this.registry,this.open.clock,f,this.card.id,this.card.home,this.open.playerPosition)) : chooseFavor(this.registry,f.id,this.open.clock.day,action === 'favor_accept',this.open.clock.minute);
+      this.toast(ok ? action === 'favor_finish' ? 'Favor completed.' : 'Noted in your Journal.' : 'Bring your neighbour closer first.'); this.showChoices(); return;
+    }
     if (this.closed || this.generating) return;
     if (choice.id === 'tib_duel') {
       const next = SPRING_RIDDLES.find(r => r.chain === 'T' && marks(this.registry).entries[r.id]?.status !== 'solved');

@@ -1,3 +1,4 @@
+import { Press } from "@monde/shared";
 // The night and the dawn package (GDD §9.7 step 3, §9.8, §19.4; MVP M-07 and G-13 client). Pure: the network, the
 // clock and the waiting are injected, so the polling runs under vitest with fakes.
 //
@@ -14,16 +15,18 @@ import {
 
 /** POST /v1/worlds/:w/night (server/src/mind/night.ts NightBody). */
 export interface NightRequest {
+  leaving?: import("@monde/shared").LeavingFavorNotice[];
   day: number;
   /** Scheduled / town prompt facts only (EVENTS.md); the client's own events go as `client_events`. */
   events?: TownEvent[];
   /** The event log's unsent ClientEvents up to this night (mind/events.ts), ingested before the night runs (M-06). */
   client_events?: ClientEvent[];
-  town?: { pillars?: { prosperity: number; safety: number; spirit: number; charm: number }; census?: number; weather_tomorrow?: string };
+  town?: { pillars?: { prosperity: number; safety: number; spirit: number; charm: number }; census?: number; fund?: number; weather_tomorrow?: string };
 }
 
 /** GET /v1/worlds/:w/dawn/:day, as the client keeps it (server/src/mind/dawn.ts). */
 export interface DawnPackage {
+  press?: Press | null;
   day: number;
   weekday: string;
   plans: DawnPlanData[];
@@ -49,6 +52,7 @@ export function parseDawnPackage(v: unknown): DawnPackage | null {
   const ties = isObject(v.ties) ? v.ties : {};
   const regard = RegardSnapshot.safeParse(v.regard);
   return {
+    press: Press.safeParse(v.press).success ? Press.parse(v.press) : null,
     day: v.day, weekday: typeof v.weekday === 'string' ? v.weekday : '',
     plans: each(v.plans, DawnPlanData), letters: each(v.letters, DawnLetterData), favors: each(v.favors, DawnFavorData),
     ties: { pairs: each(ties.pairs, TieData), milestones: each(ties.milestones, TieMilestoneData) },

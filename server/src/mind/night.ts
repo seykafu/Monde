@@ -1,3 +1,7 @@
+import { LeavingFavorNotice } from "@monde/shared";
+import { feasibleFavor } from "./favorFeasibility.js";
+import { favors } from "../db/schema.js";
+import { runPress } from "./press.js";
 import { compactNight } from "./compaction.js";
 /**
  * The night pass (GDD §9.7, §9.8; §19.4 POST /v1/worlds/:w/night; MVP M-07).
@@ -70,6 +74,7 @@ const TOWN_EVENTS = 8;
 const Pillar = z.number().min(0).max(100);
 export const NightBody = z.object({
   day: z.number().int().min(1).max(100_000),
+  leaving: z.array(LeavingFavorNotice).max(500).optional(),
   /** Today's town events (for the reflections' town facts) and tomorrow's scheduled ones (for the plans). */
   events: z.array(TownEvent).max(500).optional(),
   /** Offline log; identical envelope elements to POST /events. Per-item rejections are returned as ingestion. */
@@ -77,6 +82,7 @@ export const NightBody = z.object({
   town: z.object({
     pillars: z.object({ prosperity: Pillar, safety: Pillar, spirit: Pillar, charm: Pillar }).optional(),
     census: z.number().int().min(0).max(100_000).optional(),
+    fund: z.number().finite().optional(),
     weather_tomorrow: z.string().trim().min(1).max(40).optional(),
   }).optional(),
 });
@@ -376,6 +382,18 @@ export class NightRunner {
       await recordMilestones(db, worldId, day, friendship.before)
         .catch((error: unknown) => { this.log.error({ err: error, worldId, day }, "recording tie milestones failed"); });
     }
+    for (const notice of body.leaving ?? []) {
+      if (notice.deadline < day + 1 || notice.deadline > day + 3) continue;
+      await eventTransaction(db, async tx => {
+        await tx.select({ id:worlds.id }).from(worlds).where(eq(worlds.id,worldId)).for('update');
+        const id = `last_chance_${notice.resident}_${notice.deadline}`;
+        const contract = await feasibleFavor(tx, worldId, notice.resident, day + 1, id, { template: 'last_chance', target: notice.resident, text: 'Before the ferry goes, could you help me put one thing right?' }, notice);
+        const live = await tx.select().from(favors).where(eq(favors.worldId, worldId));
+        const open = live.filter(f => ['proposed','accepted'].includes(f.status) && f.expiresDay >= day + 1);
+        if (contract && open.length < 6 && !open.some(f => f.residentId === notice.resident)) await tx.insert(favors).values({ worldId, id, residentId: notice.resident, template: contract.template, target: contract.target, text: contract.text, createdDay: day + 1, expiresDay: notice.deadline, status: 'proposed', reward: contract }).onConflictDoNothing();
+      });
+    }
+    await runPress(this.deps(worldId, 0), world, body.town?.fund);
   }
 
   private deps(worldId: string, priority: number): NightJobDeps {

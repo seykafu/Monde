@@ -47,3 +47,12 @@ describe('the friendship section of a save (G-13)', () => {
     expect(() => migrateSave({ ...file, friendship: { ...emptyFriendship(), residents: { odile: { regard: 400 } } } })).toThrow();
   });
 });
+
+it('round-trips accepted, completed and expired favors together with the archived front page in v3',async () => {
+  const { instantiateFavor,fallbackPress } = await import('@monde/shared');
+  const favor = instantiateFavor({ template:'fetch',target:'bun',text:'A bun, please.' },'f','odile',{ day:3,items:new Set(['bun']),places:new Set(['market_row.bakery']),residents:new Map([['odile',{ home:'market_row.bakery',reachable:true }]]),met:() => false })!;
+  const friendship = { ...emptyFriendship(),favor_book: (['accepted','completed','expired'] as const).map(status => ({ ...favor,id:status,status })),papers:[fallbackPress(5,[],[])] };
+  const file = collect(base(friendship),'manual','Favors and papers');
+  expect(file.schema_version).toBe(3);
+  expect(migrateSave(JSON.parse(JSON.stringify(file))).friendship).toEqual(friendship);
+});

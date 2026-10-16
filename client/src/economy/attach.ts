@@ -1,3 +1,4 @@
+import { puzzleSave } from '../puzzles/runtime';
 import type Phaser from 'phaser';
 import { COMMUNITY_TASKS, baseSkills, type CommunityTask } from '@monde/shared';
 import type { Clock } from '../sim/clock';
@@ -58,7 +59,11 @@ export function attachEconomy(scene: Phaser.Scene, clock: Clock, toast: (text: s
     scene.time.delayedCall(900, () => {
       r.set(ECONOMY_KEY, done.state); r.set(COINS_KEY, { balance: done.coins }); r.set('monde.town', done.town);
       if (fellow) setFellow(r, { ...fellow, skills: done.skills });
-      appendEvent(r, done.event); clock.advanceMinutes(done.minutes); clock.resume('community-work');
+      // GDD-GAP: Duck Duty is not in the server's six-job catalogue yet; record its authored action as a
+      // scripted memory (importance 2, the existing sweeping importance), rather than queue an invalid task.
+      appendEvent(r, task.id === 'duck_duty' ? { kind:'scripted_memory',id:done.event.id,day:clock.day,minute:Math.floor(clock.minute),
+        resident:'bertrand',scene_id:'puzzles',cue_key:done.event.id,place:task.place,text:'The Fellow fed the ducks peas at the pond.',importance:2 } : done.event);
+      clock.advanceMinutes(done.minutes); clock.resume('community-work');
       const applied = done.town.pillars[task.pillar] - town.pillars[task.pillar];
       toast(`${task.name}: +${task.pay} coins · +${task.xp} ${task.skill} XP · ${task.pillar} +${Number(applied.toFixed(3))}`);
     });
@@ -73,7 +78,9 @@ export function attachEconomy(scene: Phaser.Scene, clock: Clock, toast: (text: s
       scene.input.keyboard?.resetKeys(); scene.input.keyboard?.on('keydown', answer);
     } };
     if (place === 'market_row.general_store') return { label: 'Browse meals and gifts', run: () => openBag(scene, clock, { shop: true }) };
-    const task = COMMUNITY_TASKS.find(t => t.place === place);
+    // §8 Duck Duty opens only after the pond deduction. GDD-GAP: use the existing work XP convention.
+    const duckDuty: CommunityTask = { id:'duck_duty',name:'Duck Duty',place:'commons.duck_pond',opens:6,stamina:4,minutes:15,pay:0,pillar:'spirit',effect:0.2,skill:'heart',xp:10 };
+    const task = place === duckDuty.place && puzzleSave(r).entries['PZ-06']?.solved ? duckDuty : COMMUNITY_TASKS.find(t => t.place === place);
     return task ? { label: `${task.name} (${task.stamina} Stamina · ${task.minutes} min · ${task.pay} coins)`, run: () => work(task) } : null;
   } };
 }

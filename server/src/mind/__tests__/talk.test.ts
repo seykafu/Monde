@@ -319,7 +319,7 @@ describe("POST /v1/worlds/:w/talk", () => {
   });
 
   it("stores a proposed favor once per resident", async () => {
-    const asking = (text: string) => good([text], { favor: { template: "help_chore", target: "old_quarter.lamplighter_lane", text: "Walk the lamps with me at dusk?" } });
+    const asking = (text: string) => good([text], { favor: { template: "help_chore", target: "pell", text: "Walk the lamps with me at dusk?" } });
     const env = await setup(new FakeMind([{ output: asking("Hold the ladder?") }, { output: asking("And the other one?") }]));
     await talk(env, payload());
     await talk(env, payload());

@@ -1,3 +1,4 @@
+import { openPuzzle } from '../puzzles/scenes/PuzzleScene';
 // Scripted scenes as a VN (GDD §13.1 cues, §13.3 scenes, §18 Dialogue; MVP G-10).
 //
 // Launched over ZoneScene by scenes/story/attach.ts when the director has an eligible scene. The zone keeps
@@ -549,11 +550,18 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     return (await this.ask([yes, no], false)) === 0;
   }
 
+  async puzzle(id: string): Promise<boolean> {
+    this.panelLayer.setVisible(false); this.portrait?.root.setVisible(false); this.listen(false);
+    try { return await openPuzzle(this, this.open.clock, id); }
+    finally { if (!this.closed) { this.panelLayer.setVisible(true); this.portrait?.root.setVisible(true); this.listen(true); } }
+  }
+
   async placeholder(kind: 'puzzle' | 'scuffle', id: string): Promise<boolean> {
-    // GDD-GAP: puzzles (§15) and Scuffles (§7) aren't built yet; the player picks the outcome so both branches play.
-    const what = kind === 'puzzle' ? `Puzzle ${id}` : `Scuffle ${id.replaceAll('_', ' ')}`;
+    if (kind === 'puzzle') return this.puzzle(id);
+    // GDD-GAP: Scuffles (§7) still use the existing stand-in.
+    const what = `Scuffle ${id.replaceAll('_', ' ')}`;
     this.say(`(${what} isn't built yet. How does it go?)`);
-    return (await this.ask(kind === 'puzzle' ? ['Solved', 'Not this time'] : ['Won', 'Lost'], false)) === 0;
+    return (await this.ask(['Won', 'Lost'], false)) === 0;
   }
 
   async charcreate(): Promise<boolean> {

@@ -1,3 +1,5 @@
+import { openPaper } from "./DawnReportScene";
+import { favorBook } from "../friendship/favors";
 import { MarkPages } from './MarkPages';
 import { marks } from './riddles';
 // The People page (GDD §9.11.3 "What the player sees", §18 Journal → People; MVP G-13 client).
@@ -75,6 +77,9 @@ export class PeopleScene extends Phaser.Scene {
   private portraits: Portrait[] = [];
   private hearts: HeartRowView[] = [];
   private ids: string[] = [];
+  private favorsTab = false;
+  private favorPage = 0;
+  private paperPage = 0;
   private picked = 0;
   private top = 0;
   private openedAt = 0;
@@ -164,7 +169,7 @@ export class PeopleScene extends Phaser.Scene {
     // A ribbon marker hanging from the top of the right page.
     g.fillStyle(0x9c2f3a, 1).fillRect(SPINE + BW / 2 - 70, BY - 12, 12, 64).fillTriangle(SPINE + BW / 2 - 70, BY + 52, SPINE + BW / 2 - 58, BY + 52, SPINE + BW / 2 - 64, BY + 44);
     this.add.text(LX, BY + 28, 'Journal', { fontFamily: FAMILY_DISPLAY, fontSize: '38px', color: INK_CSS, resolution: RENDER_SCALE });
-    (['People', 'Marks', 'Today'] as const).forEach((tab, i) => this.add.text(LX + 120 + i * 100, BY + 74, tab, { fontFamily: FAMILY_UI, fontSize: '17px', color: INK_CSS }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { marks(this.registry).tab = tab; this.refresh(); }));
+    (['People', 'Marks', 'Today', 'Favors'] as const).forEach((tab, i) => this.add.text(LX + 120 + i * 100, BY + 74, tab, { fontFamily: FAMILY_UI, fontSize: '17px', color: INK_CSS }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.favorsTab = tab === 'Favors'; if (tab !== 'Favors') marks(this.registry).tab = tab; this.refresh(); }));
     this.add.text(LX + 2, BY + 74, 'Pages', { fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE });
     g.fillStyle(INK, 1).fillRect(LX, BY + 100, LW, 2).fillRect(LX, BY + 104, LW, 1);
     this.add.text(BX + BW - 30, BY + BH - 30, 'W/S or ↑↓ to choose  ·  J or Esc to close', {
@@ -192,8 +197,32 @@ export class PeopleScene extends Phaser.Scene {
     this.portraits = [];
     this.hearts = [];
     this.content.removeAll(true);
+    if (this.favorsTab) {
+      const all = favorBook(this.registry);
+      this.text(LX,LIST_Y,'Favors · open / completed / expired',20);
+      all.slice(this.favorPage * 4,this.favorPage * 4 + 4).forEach((f,i) => {
+        const y = LIST_Y + 45 + i * 105;
+        this.text(LX,y,`${TOWN_NAMES[f.resident_id] ?? f.resident_id} · ${f.expires_day < this.open.clock.day && ['accepted','proposed'].includes(f.status) ? 'expired' : f.status}`,18);
+        this.text(LX,y+25,f.text,15,{ wrap: LW });
+        this.text(RX,y,`${f.task.place.replaceAll('_',' ')}
+By Day ${f.expires_day} · ${f.task.item ?? f.task.kind}
+${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
+      });
+      if (!all.length) this.text(LX,LIST_Y+60,'No favors yet. Talk to your neighbours.',17);
+      this.text(LX,610,'← Earlier',17).setInteractive().on('pointerdown',() => { this.favorPage = Math.max(0,this.favorPage-1); this.refresh(); });
+      this.text(RX,610,'Later →',17).setInteractive().on('pointerdown',() => { if ((this.favorPage+1)*4 < all.length) this.favorPage++; this.refresh(); }); return;
+    }
     const tab = marks(this.registry).tab;
-    if (tab !== 'People') { this.markPages.draw(tab); return; }
+    if (tab !== 'People') {
+      this.markPages.draw(tab);
+      if (tab === 'Today') {
+        this.text(RX,420,'Papers',24);
+        this.text(RX+160,420,'←',22).setInteractive().on('pointerdown',() => { this.paperPage = Math.max(0,this.paperPage-1); this.refresh(); });
+        this.text(RX+210,420,'→',22).setInteractive().on('pointerdown',() => { if ((this.paperPage+1)*5 < getFriendship(this.registry).papers.length) this.paperPage++; this.refresh(); });
+        [...getFriendship(this.registry).papers].reverse().slice(this.paperPage * 5,this.paperPage * 5 + 5).forEach((paper,i) => this.text(RX,457+i*31,`Day ${paper.day} · ${paper.headline.slice(0,35)}`,15).setInteractive().on('pointerdown',() => openPaper(this,{ paper,clock: this.open.clock,seed: (this.registry.get('monde.press.seed') as number | undefined) ?? (this.registry.get('monde.save.weather') as { seed: number } | undefined)?.seed ?? 0,archive: true })));
+      }
+      return;
+    }
     const g = this.add.graphics();
     this.content.add(g);
     if (!this.ids.length) {

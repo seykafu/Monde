@@ -1,3 +1,5 @@
+import { favors } from "../db/schema.js";
+import { Favor } from "@monde/shared";
 import { loadItems } from '../content/loadContent.js';
 import { ingestClientEvents } from './eventIngestion.js';
 import { matchGift } from '@monde/shared';
@@ -23,7 +25,7 @@ import { SILENT_LOG } from "./nightJob.js";
  */
 import type { OutgoingHttpHeaders } from "node:http";
 import type { FastifyInstance, FastifyReply } from "fastify";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, gte } from "drizzle-orm";
 import { z } from "zod";
 import { SUMMARY_TIMEOUT_MS, Intent, PlaceId, ResidentId, normalizeChoices, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
 import { aiLog, dialogueTurns, worlds } from "../db/schema.js";
@@ -205,10 +207,11 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         }
         return applyLimit(turn);
       };
+      let proposedFavors: Favor[] = [];
       const sendTurn = (output: DialogueTurnOutput, fallback: boolean, regard: TurnRegard | null) => send("turn", {
         conversation_id: body.conversation_id, resident_id: body.resident_id, turn_index: ctx.turnIndex,
         resumed: selected.resumed, history: backlog,
-        lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback, regard,
+        lines: output.lines, choices: output.choices, wrap_up: output.wrap_up, fallback, regard, favors: proposedFavors,
       });
 
       try {
@@ -255,6 +258,8 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           sendTurn(fallbackFor(ctx), true, null);
           return;
         }
+        proposedFavors = (await db!.select().from(favors).where(and(eq(favors.worldId,worldId),eq(favors.residentId,body.resident_id),eq(favors.status,'proposed'),gte(favors.expiresDay,body.context.day))))
+          .flatMap(f => { const parsed = Favor.safeParse(f.reward); return parsed.success ? [parsed.data] : []; });
         if (failure) send("error", failure);
         sendTurn(output, fallback, regard);
       } catch (error) {

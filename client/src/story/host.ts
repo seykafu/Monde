@@ -195,6 +195,7 @@ export interface StoryPresenter {
   confirm(text: string, yes: string, no: string): Promise<boolean>;
   /** A stand-in for a system that isn't built yet: true for the success branch. */
   placeholder(kind: 'puzzle' | 'scuffle', id: string): Promise<boolean>;
+  puzzle?(id: string): Promise<boolean>;
   /** The Fellowship form (§11.1); false when there's none to open. */
   charcreate(): Promise<boolean>;
   /** {ai_open}: a live exchange in the dialogue panel; resolves when it closes. */
@@ -309,7 +310,7 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
 
     // Systems still to come: typed placeholders.
     puzzle: async cue => {
-      const solved = (await deps.presenter()?.placeholder('puzzle', cue.id)) ?? false;
+      const solved = (await deps.presenter()?.puzzle?.(cue.id)) ?? false;
       deps.setOutcome('puzzle', { solved });
     },
     scuffle: async (sc, ctx) => {

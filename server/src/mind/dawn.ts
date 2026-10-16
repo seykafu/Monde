@@ -1,3 +1,6 @@
+import { readPress } from "./press.js";
+import type { Press } from "@monde/shared";
+import { Favor } from "@monde/shared";
 /**
  * The dawn package (GDD §9.7 step 3, §19.4 GET /v1/worlds/:w/dawn/:day; MVP M-07): what the client needs at
  * 06:00 to run the day. Plans for every resident (the night's model plan where there is one, else the routine
@@ -32,6 +35,7 @@ export interface DawnFavor {
   text: string;
   created_day: number;
   expires_day: number;
+  contract?: Favor;
 }
 
 export interface DawnPackage {
@@ -42,6 +46,7 @@ export interface DawnPackage {
   favors: DawnFavor[];
   ties: DawnTies;
   regard: RegardSnapshot;
+  press: Press | null;
 }
 
 const byId = <T extends { id: string }>(a: T, b: T): number => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
@@ -52,7 +57,7 @@ export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: 
     db.select().from(plans).where(and(eq(plans.worldId, worldId), eq(plans.day, day))),
     // New since yesterday: proposed last night (or during yesterday's conversations) and still open today.
     db.select().from(favors).where(and(
-      eq(favors.worldId, worldId), eq(favors.status, "proposed"), eq(favors.createdDay, day - 1), gte(favors.expiresDay, day),
+      eq(favors.worldId, worldId), eq(favors.status, "proposed"), lte(favors.createdDay, day), gte(favors.expiresDay, day),
     )).orderBy(asc(favors.id)),
     buildDawnTies(db, worldId, day),
   ]);
@@ -65,6 +70,7 @@ export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: 
   return {
     day,
     weekday: weekdayOf(day),
+    press: await readPress(db, worldId, day),
     plans: [...rows].sort(byId).map((r) => {
       const row = planFor.get(r.id);
       return row
@@ -75,6 +81,7 @@ export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: 
     favors: proposed.map((f) => ({
       id: f.id, resident_id: f.residentId, template: f.template, target: f.target, text: f.text,
       created_day: f.createdDay, expires_day: f.expiresDay,
+      ...(Favor.safeParse(f.reward).success ? { contract: Favor.parse(f.reward) } : {}),
     })),
     ties,
     regard: Object.fromEntries(rows.map(r => [r.id, r.state.regard])),

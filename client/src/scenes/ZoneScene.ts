@@ -1,3 +1,7 @@
+import { attachPuzzles, puzzleInteraction } from '../puzzles/interaction';
+import { favorInteraction } from "../friendship/favors";
+import { openPaper, PAPER_PENDING } from "./DawnReportScene";
+import type { Press } from "@monde/shared";
 import { markInteraction } from './markInteraction';
 import { attachEconomy, attachEconomyClock, type EconomyAttachment } from '../economy/attach';
 import type { SaveGame } from '@monde/shared';
@@ -288,6 +292,7 @@ export class ZoneScene extends Phaser.Scene {
     let facing = data.savedPlayer?.facing ?? 0;
     let lastPosition = { ...this.position };
     attachEconomyClock(this, this.clock);
+    attachPuzzles(this, this.clock);
     attachSaves(this, this.clock, () => {
       const waking = this.registry.get('monde.save.wakePlayer') as SaveGame['player'] | undefined;
       if (waking) return waking;
@@ -362,7 +367,7 @@ export class ZoneScene extends Phaser.Scene {
     // Before the world snapshot below, so every resident sprite belongs to the world camera.
     this.residents = new ResidentLayer(this, this.zone, this.projection, this.clock, DEV_KEYS);
     // E beside a resident opens the dialogue panel over this scene; walking near one prewarms it (M-05).
-    attachDialogue(this, { residents: this.residents, zone: this.zone, clock: this.clock, weather: () => this.now });
+    attachDialogue(this, { residents: this.residents, zone: this.zone, clock: this.clock, weather: () => this.now, playerPosition: () => this.position });
     this.story = attachStory(this, { zone: this.zone, clock: this.clock, residents: this.residents, position: () => this.position,
       weather: () => this.now, entry: data, busy: () => this.transitioning });
     const world = this.children.list.slice();
@@ -414,6 +419,12 @@ export class ZoneScene extends Phaser.Scene {
     // The town's numbers live beside the clock, with Day-1 values, and its dawn pass runs on the clock's dawn (G-01).
     attachTown(this.registry, clock);
     // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
+    this.events.on('update', () => {
+      const paper = this.registry.get(PAPER_PENDING) as Press | undefined;
+      if (paper && !this.scene.isActive('Dialogue') && !this.scene.isActive('DawnReport')) {
+        this.registry.remove(PAPER_PENDING); openPaper(this, { paper, clock, seed: this.saveWeatherSeed() });
+      }
+    });
     attachDawnSync(this.registry, clock, { weatherSeed: () => this.saveWeatherSeed(), town: () => getTown(this.registry) });
     // The event log (M-06): story cues, flags and town events to monde-mind; each answer's Regard replaces the mirror.
     attachEventSync(this.registry, clock, { onRegard: regard => applyServerRegard(this.registry, regard) });
@@ -856,9 +867,10 @@ export class ZoneScene extends Phaser.Scene {
     const talk = this.residents.talkTarget(this.position);
     const mark = talk ? undefined : markInteraction(this, this.clock, this.zone, this.position, { weather: this.now.kind, wind: this.daily.wind });
     const place = talk || mark ? undefined : nearbyPlace(this.zone, this.position);
-    const economy = place ? this.economy.interaction(`${this.zone.id}.${place.id}`) : null;
-    this.prompt.setText(talk ? `E: Talk to ${talk.name}` : mark ? 'E: Read the plaque' : place ? `E: ${economy?.label ?? placeName(place.id)}` : '').setVisible(!!talk || !!mark || !!place);
-    this.interact = talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? economy?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined);
+    const economy = place ? (favorInteraction(this.registry, this.clock, `${this.zone.id}.${place.id}`) ?? this.economy.interaction(`${this.zone.id}.${place.id}`)) : null;
+    const puzzle = place ? puzzleInteraction(this, this.clock, `${this.zone.id}.${place.id}`, economy) : null;
+    this.prompt.setText(talk ? `E: Talk to ${talk.name}` : mark ? 'E: Read the plaque' : place ? `E: ${puzzle?.label ?? economy?.label ?? placeName(place.id)}` : '').setVisible(!!talk || !!mark || !!place);
+    this.interact = talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? puzzle?.run ?? economy?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined);
     if (result.edge) {
       this.transitioning = true;
       const edge = result.edge;

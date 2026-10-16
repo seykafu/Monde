@@ -1,3 +1,4 @@
+import { Favor } from "@monde/shared";
 // Typed talk events and the streamed text of one turn (GDD §9.10 flow step 4). Pure.
 //
 // The server streams `line_delta {index, text_so_far, attempt}`: within an attempt a line's text only grows
@@ -46,6 +47,7 @@ export function asTurn(v: unknown): TalkTurn | null {
     ...(Array.isArray(v.history) ? { history: v.history.flatMap(h => isObject(h) && (h.who === 'player' || h.who === 'resident') && isString(h.text) ? [{ who: h.who, text: h.text }] : []) } : {}),
     conversation_id: v.conversation_id, resident_id: v.resident_id, turn_index: v.turn_index,
     lines: lines as TalkLine[], choices: choices as TalkChoice[], wrap_up: v.wrap_up, fallback: v.fallback === true,
+    ...(Array.isArray(v.favors) ? { favors: v.favors.flatMap(f => { const result = Favor.safeParse(f); return result.success ? [result.data] : []; }) } : {}),
     ...('regard' in v ? { regard: asTurnRegard(v.regard) } : {})
   };
 }

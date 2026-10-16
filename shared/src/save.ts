@@ -80,6 +80,12 @@ export const SaveGame = z.object({
    * G-13 friendship (friendshipData.ts). Optional on read: a save from before it starts with nothing known, so it
    * needs no version bump or migration step.
    */
+  /** G-06: optional on read; board histories and earned rewards survive leaving a puzzle. */
+  puzzles: z.object({
+    entries: z.record(z.string(), z.object({ cells: z.array(n.int()), undo: z.array(z.array(n.int())), elapsed: n.nonnegative(), hints: count.max(3), solved: z.boolean() })),
+    rewarded: z.array(z.string()), pendingItems: z.array(z.string()),
+    solvedDays: z.record(z.string(), day), weekly: z.record(z.string(), day)
+  }).default(() => ({ entries: {}, rewarded: [], pendingItems: [], solvedDays: {}, weekly: {} })),
   riddles: SavedRiddles.default(emptyRiddles),
   friendship: SavedFriendship.default(emptyFriendship)
 });

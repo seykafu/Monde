@@ -1,3 +1,4 @@
+import { emptyFriendship, type SavedFriendship, COMMUNITY_TASKS } from "@monde/shared";
 // The event log in the running game (GDD §9.6, §9.14; MVP M-06 client). The pure queue and its sender live in
 // mind/events.ts; this file keeps the log in the game registry (`monde.events`, saved as SaveGame.client_events) and
 // runs one EventSync per game clock:
@@ -38,6 +39,13 @@ export function appendEvent(registry: Registry, raw: unknown): ClientEvent | nul
   const { log, event, problem } = enqueue(getEventLog(registry), raw);
   if (problem && DEV) console.warn(`[events] not queued: ${problem}`, raw);
   if (log !== getEventLog(registry)) registry.set(EVENTS_KEY, log);
+  if (event && ['town_event','community_work','favor_done'].includes(event.kind)) {
+    const before = (registry.get('monde.friendship') as SavedFriendship | undefined) ?? emptyFriendship();
+    const summary = event.kind === 'town_event' ? event.summary : event.kind === 'community_work' ? `The Fellow completed ${COMMUNITY_TASKS.find(t => t.id === event.task)?.name ?? 'a chore'}.` : 'A neighbour’s favor was completed.';
+    const entry = { id:event.id,day:event.day,minute:event.minute,type:event.kind === 'town_event' ? event.type : event.kind,summary,importance:event.kind === 'town_event' ? event.importance : 2,who:'participants' in event ? event.participants : ['player'] };
+    // GDD-GAP: retain seven days of local news independently of acknowledged outbox entries.
+    registry.set('monde.friendship',{ ...before,news_log:[...before.news_log.filter(e => e.id !== entry.id && e.day >= entry.day-7),entry] });
+  }
   if (event) eventSyncFor(registry)?.notify();
   return event;
 }

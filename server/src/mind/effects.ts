@@ -1,3 +1,4 @@
+import { feasibleFavor } from "./favorFeasibility.js";
 /**
  * Applying a dialogue turn (GDD §9.1 "the engine disposes", §9.6, §9.9, §9.11.2, §19.6; MVP M-05, G-13). One
  * transaction: resident state (Regard, mood, recent topics), the talk ledger (first chat of the day, the +6 daily
@@ -15,8 +16,7 @@ import { formatUsd } from "./pricing.js";
 /** §9.4: the last 10 topics with the player. */
 export const RECENT_TOPICS = 10;
 /**
- * GDD-GAP: §9.9 says favors expire in 2-5 days and the engine sets the reward; both belong to M-09's feasibility
- * pass. A proposed favor is stored with the longest window and an empty reward until then.
+ * §9.9 permits 2–5 days. Ordinary favors use five days; feasibility instantiates their engine-owned task and reward.
  */
 const PROPOSED_FAVOR_DAYS = 5;
 
@@ -149,14 +149,15 @@ export async function persistTurn(db: WorldDatabase, args: PersistTurnArgs): Pro
       }
       if (effects.favor) {
         // §9.9: one open favor per resident. A second proposal while one is live is dropped.
-        const live = await tx.select({ id: favors.id }).from(favors).where(and(
-          eq(favors.worldId, worldId), eq(favors.residentId, residentId), inArray(favors.status, [...LIVE_FAVOR_STATUSES]),
+        const live = await tx.select({ id: favors.id, residentId: favors.residentId, expiresDay: favors.expiresDay }).from(favors).where(and(
+          eq(favors.worldId, worldId), inArray(favors.status, [...LIVE_FAVOR_STATUSES]),
         ));
-        if (live.length === 0) {
-          await tx.insert(favors).values({
+        if (live.filter(f => f.expiresDay >= args.day).length < 6 && !live.some(f => f.residentId === residentId && f.expiresDay >= args.day)) {
+          const contract = await feasibleFavor(tx, worldId, residentId, args.day, `favor_${dialogueTurnId(args.conversationId, args.turnIndex)}`, effects.favor);
+          if (contract) await tx.insert(favors).values({
             worldId, id: `favor_${dialogueTurnId(args.conversationId, args.turnIndex)}`, residentId,
             template: effects.favor.template, target: effects.favor.target, text: effects.favor.text, status: "proposed",
-            createdDay: args.day, expiresDay: args.day + PROPOSED_FAVOR_DAYS, reward: {},
+            createdDay: args.day, expiresDay: args.day + PROPOSED_FAVOR_DAYS, reward: contract,
           });
         }
       }

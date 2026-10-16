@@ -114,7 +114,7 @@ function harness(opts: { presenter?: boolean; town?: TownState } = {}) {
   const presenter: StoryPresenter = {
     backdrop: vi.fn(), music: vi.fn(), fade: vi.fn(async () => {}), wait: vi.fn(async () => {}),
     cam: vi.fn((effect: string) => effect === 'shake'), sfx: vi.fn((id: string) => id === 'bell'), thinking: vi.fn(),
-    confirm: vi.fn(async () => true), placeholder: vi.fn(async () => true), charcreate: vi.fn(async () => false),
+    confirm: vi.fn(async () => true), placeholder: vi.fn(async () => true), puzzle: vi.fn(async () => true), charcreate: vi.fn(async () => false),
     aiOpen: vi.fn(async () => [])
   };
   const deps: HandlerDeps = {
@@ -221,12 +221,13 @@ describe('cue → effect', () => {
     expect(h.warn).toHaveBeenCalledWith(expect.stringContaining('fade'));
   });
 
-  it('asks the presenter for placeholder puzzle and Scuffle outcomes', async () => {
+  it('awaits the real puzzle presenter and the Scuffle stand-in', async () => {
     const h = harness();
     await h.run({ cmd: 'puzzle', id: 'PZ-01' });
     (h.presenter.placeholder as ReturnType<typeof vi.fn>).mockResolvedValueOnce(false);
     await h.run({ cmd: 'scuffle', id: 'sc_bakery_tutorial' });
-    expect(h.presenter.placeholder).toHaveBeenNthCalledWith(1, 'puzzle', 'PZ-01');
+    expect(h.presenter.puzzle).toHaveBeenCalledWith('PZ-01');
+    expect(h.presenter.placeholder).toHaveBeenCalledWith('scuffle', 'sc_bakery_tutorial');
     expect(h.outcomes).toMatchObject({ puzzle: { solved: true }, scuffle: { won: false } });
   });
 

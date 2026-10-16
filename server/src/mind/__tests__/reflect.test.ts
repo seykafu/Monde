@@ -89,7 +89,7 @@ describe("reflectResident", () => {
       stance_deltas: [{ issue: "port_vane", delta: -40 }, { issue: "Bad Issue!", delta: 5 }],
       regard_delta: 12,
       dream_progress: { stage_done: true, note: "Nearly said it to the Fellow." },
-      favor: { template: "introduce", target: "nell", text: "Bring Nell to my office. She won't come if I ask." },
+      favor: { template: "fetch", target: "bun", text: "Could you bring a bun?" },
       letter: { to: "player", text: "Fellow, the drain on the Lane. Thank you. E. Pell" },
       diary: "The Fellow fixed the drain. I counted the lamps twice anyway.",
     })));
@@ -117,7 +117,7 @@ describe("reflectResident", () => {
     expect(await edge(env.worldId, "ghost")).toBeUndefined();
 
     const [favor] = await database.db.select().from(favors).where(eq(favors.worldId, env.worldId));
-    expect(favor).toMatchObject({ residentId: "pell", template: "introduce", target: "nell", status: "proposed", createdDay: DAY, expiresDay: DAY + 5 });
+    expect(favor).toMatchObject({ residentId: "pell", template: "fetch", target: "bun", status: "proposed", createdDay: DAY, expiresDay: DAY + 5 });
     const [letter] = await database.db.select().from(letters).where(eq(letters.worldId, env.worldId));
     expect(letter).toMatchObject({ fromId: "pell", toId: "player", day: DAY + 1, delivered: false });
     const [diary] = await database.db.select().from(memories).where(and(eq(memories.worldId, env.worldId), eq(memories.id, diaryMemoryId("pell", DAY))));
@@ -192,7 +192,7 @@ describe("reflectResident", () => {
   });
 
   it("drops a favor when the resident already has one open, or the town has six", async () => {
-    const favor = { template: "fetch" as const, target: "rye_flour", text: "Rye flour that isn't from Carrow." };
+    const favor = { template: "fetch" as const, target: "bun", text: "Rye flour that isn't from Carrow." };
     const env = await setup(new FakeNightMind(() => reply(reflection({ favor }))));
     const live = (id: string, residentId: string) => ({
       worldId: env.worldId, id, residentId, template: "fetch", target: "x", text: "x", status: "open",
@@ -213,7 +213,7 @@ describe("reflectResident", () => {
 describe("validateReflection", () => {
   const ctx: ReflectionValidationContext = {
     residentId: "pell", residentIds: new Set(["pell", "nell", "june", "margo"]), relationshipIds: new Set(["frye"]),
-    places: new Set(["old_quarter.library", "commons.community_garden"]), stances: {},
+    places: new Set(["old_quarter.library", "commons.community_garden"]), stances: {}, itemIds: new Set(["bun"]),
   };
   const check = (overrides: Partial<ReflectionOutput>) => validateReflection(JSON.stringify(reflection(overrides)), ctx);
 
@@ -226,7 +226,8 @@ describe("validateReflection", () => {
     expect(ok({ template: "deliver", target: "nobody", text: "Give it to nobody." })).toBeNull();
     expect(ok({ template: "introduce", target: "pell", text: "Meet me." })).toBeNull();
     expect(ok({ template: "help_chore", target: "old_quarter.library", text: "Hold the ladder?" })).toMatchObject({ template: "help_chore" });
-    expect(ok({ template: "fetch", target: "rye_flour", text: "Rye flour." })).toMatchObject({ target: "rye_flour" });
+    expect(ok({ template: "fetch", target: "rye_flour", text: "Rye flour." })).toBeNull();
+    expect(ok({ template: "fetch", target: "bun", text: "A bun." })).toMatchObject({ target: "bun" });
     expect(ok({ template: "fetch", target: "Rye Flour!", text: "Rye flour." })).toBeNull();
     expect(ok({ template: "last_chance", target: "june", text: "Don't go." })).toBeNull();
     expect(ok({ template: "repair", target: "old_quarter.library", text: "The step." })).toBeNull();
@@ -272,3 +273,37 @@ describe("applyFeeling", () => {
     expect(applyFeeling({ kind: "love", intensity: 40 }, null)).toEqual({ kind: "love", intensity: 40 });
   });
 });
+
+it('M-09 soak: 20 reflection-generated favors are completable with authored content and reward exactly once', async () => {
+  const { Favor, canCompleteFavor, acceptFavor } = await import('@monde/shared');
+  const { ingestClientEvents } = await import('../eventIngestion.js');
+  const { loadItems } = await import('../../content/loadContent.js');
+  const catalog = await loadItems();
+  let proposal: ReflectionOutput['favor'] = null;
+  const env = await setup(new FakeNightMind(() => reply(reflection({ favor: proposal }))));
+  const people = await database.db.select().from(residents).where(eq(residents.worldId,env.worldId));
+  const ties = await database.db.select().from(relationships).where(eq(relationships.worldId,env.worldId));
+  const stranger = people.find(p => p.id !== 'pell' && p.tier !== 'ambient' && !ties.some(t => t.fromId === 'pell' && t.toId === p.id || t.toId === 'pell' && t.fromId === p.id));
+  expect(stranger).toBeDefined();
+  for (let i=0;i<20;i++) {
+    const day = i+3, template = (['fetch','find','deliver','help_chore','introduce'] as const)[i%5]!;
+    // New introductions use a fresh world relationship; the soak may propose the same one only after resetting the fixture.
+    if (template === 'introduce') await database.db.delete(relationships).where(and(eq(relationships.worldId,env.worldId),
+      eq(relationships.fromId,'pell'),eq(relationships.toId,stranger!.id)));
+    if (template === 'introduce') await database.db.delete(relationships).where(and(eq(relationships.worldId,env.worldId),
+      eq(relationships.fromId,stranger!.id),eq(relationships.toId,'pell')));
+    proposal = { template,target: template === 'help_chore' ? 'pell' : template === 'deliver' || template === 'introduce' ? stranger!.id : catalog[i%catalog.length]!.id,text:'Could you help me with this?' };
+    const result = await reflectResident(env.deps,{ ...env.night,day },'pell'); expect(result?.source).toBe('model');
+    const [row] = await database.db.select().from(favors).where(and(eq(favors.worldId,env.worldId),eq(favors.createdDay,day)));
+    expect(row,`proposal ${i}: ${template}`).toBeDefined();
+    const f = acceptFavor(Favor.parse(row!.reward),day,[])!;
+    if (f.task.item) expect(catalog.some(item => item.id === f.task.item)).toBe(true);
+    expect(registry.ids.has(f.task.place)).toBe(true);
+    const proof = { kind:f.task.kind,place:f.task.place,resident:template === 'deliver' ? f.task.recipient : 'pell',item:f.task.item,nearby:[f.task.recipient],minutes:f.task.minutes,found:true };
+    expect(canCompleteFavor({ ...f,found:true },day,proof)).toBe(true);
+    const event = { kind:'favor_done',id:`done_${i}`,favor:f.id,resident:'pell',day,minute:600,proof };
+    const first = await ingestClientEvents(database.db,env.worldId,[event]); expect(first.accepted).toEqual([event.id]);
+    const again = await ingestClientEvents(database.db,env.worldId,[{ ...event,id:`retry_${i}` }]); expect(again.duplicates).toEqual([`retry_${i}`]);
+    expect(again.regard).toEqual(first.regard);
+  }
+},30_000);

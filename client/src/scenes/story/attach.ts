@@ -103,7 +103,7 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
   const freshGame = !held.opened && !opts.entry.zone && !opts.entry.arrive && !opts.entry.savedPlayer
     && clock.day === 1 && clock.minute === DAY_START && session.flags.serialize().length === 0;
   held.opened = true;
-  if (freshGame && opening && !['skiptitle', 'day', 'time', 'scene'].some(k => query.has(k))) {
+  if (freshGame && opening && !['skiptitle', 'day', 'time', 'scene', 'puzzle'].some(k => query.has(k))) {
     const [zoneId = ''] = opening.place.split('.');
     const target = zones[zoneId];
     if (target) {

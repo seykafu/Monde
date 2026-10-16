@@ -8,6 +8,7 @@ import { STANDARD_EXPRESSIONS } from "../persona";
 
 /** Flags declared by rule rather than listed (keep in step with tools/lint-content.ts). */
 export const FLAG_PATTERNS: readonly RegExp[] = [
+  /^pz(?:01|02|03|04|05|06|13|15|18)_solved$/,
   /^met_[a-z0-9_]+$/,
   /^project_[a-z0-9_]+_done$/,
   /^romance_\d_bloomed$/,

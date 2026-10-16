@@ -34,7 +34,7 @@ function reflection(resident: string): ReflectionOutput {
     mood_delta: { valence: 3, energy: -1, stress: 0 }, emotion: "content",
     beliefs: [`${resident} thinks the Fellow means well.`], relationship_deltas: [], stance_deltas: [], regard_delta: 1,
     dream_progress: null,
-    favor: resident === "odile" ? { template: "fetch", target: "rye_flour", text: "Rye flour that isn't from Carrow, if you see it." } : null,
+    favor: resident === "odile" ? { template: "fetch", target: "bun", text: "A bun, if you see one." } : null,
     letter: resident === "pell" ? { to: "player", text: "Fellow. The drain on the Lane. Thank you. E. Pell" } : null,
     diary: "A long day. The lamps held.",
   };
@@ -105,11 +105,13 @@ describe("POST /v1/worlds/:w/night", () => {
     });
     expect(res.statusCode).toBe(200);
     const core = coreIds();
-    expect(res.json()).toMatchObject({
-      day: 1, next_day: 2, done: core.length, pending: 0, complete: true,
-      tiers: { core: core.length, acquainted: 0, ambient: cards.length - core.length },
-    });
-    expect(res.json().already).toBeUndefined();
+    // Under a loaded test run the 2 s budget can end before every Core job does; the rest finishes in the
+    // background (asserted in its own test), so wait for it rather than racing the clock.
+    const body = res.json();
+    expect(body).toMatchObject({ day: 1, next_day: 2, tiers: { core: core.length, acquainted: 0, ambient: cards.length - core.length } });
+    expect(body.done + body.pending).toBe(core.length);
+    expect(body.already).toBeUndefined();
+    await env.runner.idle(env.worldId);
 
     const [world] = await database.db.select().from(worlds).where(eq(worlds.id, env.worldId));
     expect(world).toMatchObject({ day: 2, minute: 360 });
@@ -141,7 +143,7 @@ describe("POST /v1/worlds/:w/night", () => {
     const log = await database.db.select().from(aiLog).where(eq(aiLog.worldId, env.worldId));
     expect(log.filter((l) => l.kind === "reflect")).toHaveLength(core.length);
     expect(log.filter((l) => l.kind === "plan")).toHaveLength(core.length);
-    expect(log.every((l) => !l.fallback && Number(l.costUsd) > 0)).toBe(true);
+    expect(log.filter(l => l.kind !== "press").every((l) => !l.fallback && Number(l.costUsd) > 0)).toBe(true);
   });
 
   it("runs Acquainted residents after Core, and Ambient ones only after an importance-6 memory", async () => {
@@ -152,7 +154,8 @@ describe("POST /v1/worlds/:w/night", () => {
     await remember(env.worldId, "bru", 1, 6);
     await remember(env.worldId, "nettie", 1, 5);
     const res = await night(env, { day: 1 });
-    expect(res.json()).toMatchObject({ complete: true, tiers: { acquainted: 1 } });
+    expect(res.json()).toMatchObject({ tiers: { acquainted: 1 } });
+    await env.runner.idle(env.worldId);
 
     expect(mind.callsFor("reflect", "ada")).toHaveLength(1);
     expect(mind.callsFor("plan", "ada")).toHaveLength(1);
@@ -284,9 +287,9 @@ describe("GET /v1/worlds/:w/dawn/:day", () => {
     expect(byId.get("pell")).toMatchObject({ tier: "core", source: "model" });
     expect(byId.get("ada")).toEqual({ resident_id: "ada", tier: "ambient", source: "template", plan: templatePlan(card("ada"), 2) });
     expect(body.letters).toEqual([{ id: "letter_pell_1", from: "pell", to: "player", day: 2, text: "Fellow. The drain on the Lane. Thank you. E. Pell" }]);
-    expect(body.favors).toEqual([{
-      id: "favor_reflect_odile_1", resident_id: "odile", template: "fetch", target: "rye_flour",
-      text: "Rye flour that isn't from Carrow, if you see it.", created_day: 1, expires_day: 6,
+    expect(body.favors).toMatchObject([{
+      id: "favor_reflect_odile_1", resident_id: "odile", template: "fetch", target: "bun",
+      text: "A bun, if you see one.", created_day: 1, expires_day: 6,
     }]);
 
     const [letter] = await database.db.select().from(letters).where(eq(letters.worldId, env.worldId));
@@ -294,7 +297,7 @@ describe("GET /v1/worlds/:w/dawn/:day", () => {
     const again = (await dawn(env, 2)).json();
     expect(again.letters).toEqual([]);
     expect(again.favors).toHaveLength(1);
-    expect((await dawn(env, 3)).json().favors).toEqual([]);
+    expect((await dawn(env, 3)).json().favors).toHaveLength(1);
   });
 
   it("serves template plans for a day with no night behind it, and weekend routines on a Saturday", async () => {

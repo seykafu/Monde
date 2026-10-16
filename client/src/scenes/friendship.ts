@@ -1,3 +1,12 @@
+import { isMarketDay } from "../town/fund";
+import { isFerryDay } from "../town/migration";
+import { expireFavor } from "@monde/shared";
+import { computeAppeal } from "../town/appeal";
+import { getTown } from "./TownLedgerScene";
+import { leavingFavors, localLastChances } from "../friendship/favors";
+import YAML from "yaml";
+import headlineText from "../../../content/lines/headlines.yaml?raw";
+import { fallbackPress, type Press, type PressEvent, type HeadlineTemplate } from "@monde/shared";
 // Friendship's Phaser side (GDD §9.11; MVP G-13 client): the registry's FriendshipState and the dawn package.
 //
 // The pure rules live in src/friendship (hearts, state, known ties, milestones, emotes) and src/mind/dawn.ts (the
@@ -123,7 +132,7 @@ export interface DawnSyncOptions {
   /** The world's weather seed (tomorrow's forecast goes to the night's plans). */
   weatherSeed: () => number;
   /** The town's Pillars and census, for the night's reflections. */
-  town: () => { pillars: Pillars; census: number } | undefined;
+  town: () => { pillars: Pillars; census: number; fund?: number } | undefined;
 }
 
 const clampPillar = (v: number): number => Math.max(0, Math.min(100, Math.round(v * 10) / 10));
@@ -137,12 +146,12 @@ function nightRequest(registry: Registry, day: number, opts: DawnSyncOptions): N
   const tomorrow = dailyWeather(opts.weatherSeed(), day + 1);
   const events = sendable(getEventLog(registry), day);
   return {
-    day,
+    day, leaving: leavingFavors(registry,day+1),
     ...(events.length ? { client_events: events } : {}),
     town: {
       ...(town ? {
         pillars: { prosperity: clampPillar(town.pillars.prosperity), safety: clampPillar(town.pillars.safety), spirit: clampPillar(town.pillars.spirit), charm: clampPillar(town.pillars.charm) },
-        census: Math.max(0, Math.round(town.census))
+        census: Math.max(0, Math.round(town.census)), fund: town.fund
       } : {}),
       weather_tomorrow: describeWeather({ kind: tomorrow.kind, intensity: 0.6 }).toLowerCase()
     }
@@ -166,9 +175,21 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
   attached.add(clock);
   if (!registry.has(FRIENDSHIP_KEY)) registry.set(FRIENDSHIP_KEY, emptyFriendship());
 
+  const publish = (day: number, paper?: Press | null): void => {
+    if (getFriendship(registry).papers.some(p => p.day === day)) return;
+    const events: PressEvent[] = [...getFriendship(registry).news_log, ...getEventLog(registry).outbox.flatMap(e => e.kind === 'town_event' ? [{ id: e.id, day: e.day, minute: e.minute, type: e.type, summary: e.summary, importance: e.importance, who: e.participants }] : [])];
+    const templates = YAML.parse(headlineText) as { headlines: HeadlineTemplate[] };
+    const edition = paper ?? fallbackPress(day,events,templates.headlines,opts.town()?.fund === undefined ? {} : { coins: opts.town()!.fund! });
+    const town = getTown(registry);
+    edition.notices = [...new Set([...edition.notices, ...(isMarketDay(day) ? ['Saturday market on Market Row.'] : []), ...(isFerryDay(day,town?.flags) ? ['The ferry sails today from the Wharf.'] : []), 'Meals and gifts at the general store.'])];
+    if (!paper) edition.letters = getFriendship(registry).letters.filter(l => l.to === 'lantern' && l.day === day).slice(0,2).map(l => ({ from:l.from,text:l.text }));
+    if (town) edition.ledger = { pillars:{ ...town.pillars },dayStart:{ ...town.dayStart },census:town.census,appeal:computeAppeal(town).appeal,fund:town.fund };
+    updateFriendship(registry,s => ({ ...s, favor_book: s.favor_book.map(f => expireFavor(f,day)), papers: [...s.papers.filter(p => p.day !== day),edition] }));
+    registry.set('monde.press.seed',opts.weatherSeed()); registry.set('monde.press.pending',edition); clock.pause('paper');
+  };
   const run = async (day: number, withNight: boolean): Promise<void> => {
     const mind = getMind();
-    if (!mind.enabled) return; // Quiet Mode: templates and the last known ties.
+    if (!mind.enabled) { localLastChances(registry,day); publish(day); return; }
     const seq = ++syncSeq;
     // §9.8: the residents' day starts on the night's plans, so time waits for them (a few seconds at most).
     clock.pause('dawn');
@@ -189,7 +210,8 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
       if (!result.pkg) { console.info(`[dawn] Day ${day}: ${result.reason}; templates and the last known ties`); return; }
       const plans = modelPlans(result.pkg.plans);
       const applied = applyDawn(getFriendship(registry), result.pkg, { names: TOWN_NAMES, plans });
-      registry.set(FRIENDSHIP_KEY, applied.state);
+      registry.set(FRIENDSHIP_KEY, { ...applied.state, papers: getFriendship(registry).papers });
+      publish(day,result.pkg.press);
       registry.set(DAWN_TIES_KEY, {
         day, lines: applied.lines, milestones: applied.printed, romance: applied.romance, status: result.status
       } satisfies DawnTiesNews);
@@ -198,11 +220,12 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
       console.warn('[dawn] sync failed; keeping templates', error);
     } finally {
       clearTimeout(safety);
+      if (seq === syncSeq && registry.get(CLOCK_KEY) === clock) publish(day);
       clock.resume('dawn');
     }
   };
 
   clock.onDawn(t => { void run(t.day, true); });
   // A save from mid-day (or the dawn autosave, written before the package came) has no plans for today yet.
-  if (clock.day > 1 && getFriendship(registry).plans?.day !== clock.day) void run(clock.day, false);
+  if (clock.day > 1 && !getFriendship(registry).papers.some(p => p.day === clock.day)) void run(clock.day, false);
 }

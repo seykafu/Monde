@@ -8,6 +8,9 @@ where the design depends on it, that the solution is unique. Run after editing a
 
 Exit code 0 means every check passed.
 """
+import contextlib
+import io
+import json
 import itertools
 import re
 import sys
@@ -74,6 +77,7 @@ def pz01():
 
     rec(0)
     check("PZ-01 Under the Square: unique", len(sols) == 1, f"{len(sols)} solutions")
+    return [[sum(1 << order.index(d) for d in sol[cell]) for cell in cells] for sol in sols]
 
 
 # ---------------------------------------------------------------- PZ-02 flues
@@ -90,6 +94,7 @@ def pz02():
         if not any(any(row) for row in g):
             sols.append(presses)
     check("PZ-02 Flues: unique press set", sols == [[(1, 0), (1, 2), (2, 0), (2, 1)]], str(sols))
+    return [[r * 3 + c for r, c in sol] for sol in sols]
 
 
 # ---------------------------------------------------------------- PZ-03 almanac
@@ -112,6 +117,7 @@ def pz03():
     codes = [(3, 8), (4, 2), (10, 15), (1, 1), (1, 2), (1, 3), (8, 1), (7, 9), (1, 6)]
     msg = " ".join(words[l - 1][w - 1] for l, w in codes)
     check("PZ-03 Almanac decodes", msg == "my map sleeps in the sixth book of tides", msg)
+    return {"lines": ALMANAC, "codes": codes, "message": msg}
 
 
 # ---------------------------------------------------------------- PZ-04 market
@@ -136,6 +142,7 @@ def pz04():
             for g in itertools.permutations(G) if all(f(v, a, g) for f in rules)]
     want = (tuple(V), tuple(A), tuple(G))
     check("PZ-04 Market Day: unique", sols == [want], f"{len(sols)} solutions")
+    return sols
 
 
 # ---------------------------------------------------------------- PZ-05 lens
@@ -163,6 +170,7 @@ def pz05():
     good = [s for s in itertools.product("/\\", repeat=len(mirrors))
             if run(s) == ((0, 3, "N"), True)]
     check("PZ-05 Lens: unique", good == [("/", "\\", "/", "\\", "/")], str(good))
+    return good
 
 
 # ---------------------------------------------------------------- PZ-06 ducks
@@ -175,6 +183,7 @@ def pz06():
     }
     culprits = [c for c in says if sum(not f(c) for f in says.values()) == 1]
     check("PZ-06 Ducks: exactly one fibber -> Bertrand", culprits == ["Bertrand"], str(culprits))
+    return culprits
 
 
 # ---------------------------------------------------------------- PZ-07 tune
@@ -337,6 +346,7 @@ def pz13():
         if all(sum(ch in wiring[b] for b in on) % 2 for ch in "ABCDEF"):
             sols.append(on)
     check("PZ-13 Lamplight: unique {1,2,3,5}", sols == [[1, 2, 3, 5]], str(sols))
+    return sols
 
 
 # ---------------------------------------------------------------- PZ-14 nonogram
@@ -396,6 +406,7 @@ def pz15():
     trains = {tuple(sorted([(a, b), (c, d)])) for a, b, c, d in itertools.permutations(box, 4)
               if a < b and c < d and a + b == c + d and a * c * 12 == b * d}
     check("PZ-15 Gears: unique 10->30, 8->32", trains == {((8, 32), (10, 30))}, str(trains))
+    return sorted(trains)
 
 
 # ---------------------------------------------------------------- PZ-16 ledger
@@ -447,6 +458,7 @@ def pz18():
         if sums == gaps:
             found.add(tuple(tuple(sorted(x)) for x in groups))
     check("PZ-18 Planks: unique partition", found == {((2, 5), (4, 5), (3, 3, 5))}, str(found))
+    return sorted(found)
 
 
 # ---------------------------------------------------------------- PZ-19 engine
@@ -496,6 +508,13 @@ def riddles():
 
 
 if __name__ == "__main__":
+    if "--json" in sys.argv:
+        with contextlib.redirect_stdout(io.StringIO()):
+            facts = {f"PZ-{n:02}": fn() for n, fn in
+                     [(1, pz01), (2, pz02), (3, pz03), (4, pz04), (5, pz05),
+                      (6, pz06), (13, pz13), (15, pz15), (18, pz18)]}
+        print(json.dumps({"facts": facts, "failures": FAILURES}))
+        sys.exit(1 if FAILURES else 0)
     for fn in (pz01, pz02, pz03, pz04, pz05, pz06, pz07, pz08, pz09, pz10, pz11, pz12, pz13,
                pz14, pz15, pz16, pz17, pz18, pz19, pz20, riddles):
         fn()

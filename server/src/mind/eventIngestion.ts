@@ -1,8 +1,10 @@
+import { feasibleFavor } from "./favorFeasibility.js";
+import { Favor, canCompleteFavor } from "@monde/shared";
 import { loadItems } from '../content/loadContent.js';
 import { randomUUID } from "node:crypto";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, gte, sql } from "drizzle-orm";
 import { ClientEvent, COMMUNITY_TASKS, matchGift, giftRegard, isBirthday, applyScriptedRegard, type EventIngestionResult, type RegardSnapshot } from "@monde/shared";
-import { events, memories, plans, processedClientEvents, residents, worlds } from "../db/schema.js";
+import { events, memories, plans, processedClientEvents, residents, worlds, favors, relationships } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { loadPlaceRegistry } from "./places.js";
 import { templatePlan } from "./templatePlan.js";
@@ -61,6 +63,8 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
     } : original;
     const keys = [JSON.stringify(["id", e.id])];
     if (e.kind === "scripted_memory" || e.kind === "scripted_regard") keys.push(JSON.stringify(["cue", e.kind, e.scene_id, e.cue_key]));
+    if (e.kind === "favor_choice") keys.push(JSON.stringify(["favor_choice", e.favor]));
+    if (e.kind === "favor_done") keys.push(JSON.stringify(["favor", e.favor]));
     if (e.kind === 'gift') keys.push(JSON.stringify(['gift', e.resident, e.day]));
     const receipts = await tx.select().from(processedClientEvents).where(and(eq(processedClientEvents.worldId, worldId), inArray(processedClientEvents.key, keys)));
     if (receipts.length) {
@@ -80,7 +84,35 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
     if (e.kind === "flags" && e.revision <= world.flagsRevision) reason = "stale flags revision";
     if (reason) { result.rejected.push({ id: e.id, reason }); continue; }
 
-    if (e.kind === "town_event") {
+    if (e.kind === 'favor_choice') {
+      if (e.notice && e.notice.resident === e.resident && e.favor === `last_chance_${e.resident}_${e.notice.deadline}` && e.notice.deadline >= e.day && e.notice.deadline <= e.day + 2) {
+        const existing = await tx.select().from(favors).where(eq(favors.worldId,worldId));
+        const open = existing.filter(f => ['proposed','accepted'].includes(f.status) && f.expiresDay >= e.day);
+        if (!existing.some(f => f.id === e.favor) && open.length < 6 && !open.some(f => f.residentId === e.resident)) {
+          const contract = await feasibleFavor(tx,worldId,e.resident,e.day,e.favor,{ template:'last_chance',target:e.resident,text:'Before the ferry goes, could you help me put one thing right?' },e.notice);
+          if (contract) await tx.insert(favors).values({ worldId,id:e.favor,residentId:e.resident,template:contract.template,target:contract.target,text:contract.text,status:'proposed',createdDay:e.day,expiresDay:e.notice.deadline,reward:contract });
+        }
+      }
+      const changed = await tx.update(favors).set({ status: e.accept ? 'accepted' : 'declined' }).where(and(eq(favors.worldId,worldId),eq(favors.id,e.favor),eq(favors.residentId,e.resident),eq(favors.status,'proposed'),gte(favors.expiresDay,e.day))).returning();
+      if (!changed.length || changed[0]!.expiresDay < e.day) { result.rejected.push({ id:e.id,reason:'favor is no longer offered' }); continue; }
+      result.accepted.push(e.id);
+    } else if (e.kind === "favor_done") {
+      const [stored] = await tx.select().from(favors).where(and(eq(favors.worldId, worldId), eq(favors.id, e.favor)));
+      const parsedFavor = Favor.safeParse(stored?.reward);
+      if (!stored || !['proposed','accepted'].includes(stored.status) || !parsedFavor.success || stored.residentId !== e.resident ||
+          !canCompleteFavor({ ...parsedFavor.data, status: 'accepted', found: e.proof.found }, e.day, e.proof)) {
+        result.rejected.push({ id: e.id, reason: 'invalid or expired favor completion' }); continue;
+      }
+      const f = parsedFavor.data, row = byId.get(e.resident)!;
+      row.state = { ...row.state, regard: applyScriptedRegard(row.state.regard, f.reward.regard) };
+      await tx.update(residents).set({ state: row.state }).where(and(eq(residents.worldId, worldId), eq(residents.id, e.resident)));
+      await tx.update(favors).set({ status: 'completed' }).where(and(eq(favors.worldId, worldId), eq(favors.id, e.favor)));
+      await tx.insert(events).values({ worldId,id:e.id,day:e.day,minute:e.minute,type:'favor_done',wherePlace:f.task.place,who:['player',e.resident],importance:2,tags:['favor_done'],summary:`The Fellow completed an errand for ${row.card.name}.` }).onConflictDoNothing();
+      if (f.task.kind === 'introduce') for (const [fromId, toId] of [[f.resident_id, f.task.recipient], [f.task.recipient, f.resident_id]]) {
+        await tx.insert(relationships).values({ worldId, fromId: fromId!, toId: toId!, affinity: 10, trust: 0, tag: 'acquaintance', note: 'Introduced by the Fellow.', lastSeenDay: e.day }).onConflictDoUpdate({ target: [relationships.worldId,relationships.fromId,relationships.toId],set: { affinity: sql`least(100, ${relationships.affinity} + 10)`,lastSeenDay:e.day } });
+      }
+      result.accepted.push(e.id);
+    } else if (e.kind === "town_event") {
       // A legacy event row must not produce a second set of memories.
       const inserted = await tx.insert(events).values({ worldId, id: e.id, day: e.day, minute: e.minute,
         type: e.type, wherePlace: e.place, who: e.participants, importance: e.importance, tags: [e.type], summary: e.summary,

@@ -1,3 +1,4 @@
+import { expireFavor } from "@monde/shared";
 // What the client knows of friendship (GDD §9.11; MVP G-13 client). Pure: no Phaser, no DOM.
 //
 // Regard lives on the server (§9.4); the client mirrors it per resident so the hearts can show, also in Quiet Mode:
@@ -139,7 +140,8 @@ export function applyDawn(state: FriendshipState, pkg: DawnPackage, opts: { name
   const letters: DawnLetterData[] = byId([...state.letters, ...pkg.letters]).slice(-LETTERS_KEPT);
   const favors: DawnFavorData[] = byId([...state.favors, ...pkg.favors]).filter(f => f.expires_day >= day);
   let next: FriendshipState = applyRegardSnapshot({
-    ...state, ties: { day, pairs: pkg.ties.pairs }, milestones, tiers, plans: { day, plans: { ...opts.plans } }, letters, favors,
+    ...state, favor_book: byId([...state.favor_book, ...pkg.favors.flatMap(f => f.contract && !state.favor_book.some(old => old.id === f.id) ? [f.contract] : [])]).map(f => expireFavor(f, day)),
+    papers: pkg.press ? [...state.papers.filter(p => p.day !== day), pkg.press] : state.papers, ties: { day, pairs: pkg.ties.pairs }, milestones, tiers, plans: { day, plans: { ...opts.plans } }, letters, favors,
     report: { day, lines }
   }, pkg.regard);
   const index = tieIndex(pkg.ties.pairs);

@@ -7,6 +7,7 @@ export interface TalkChoice { id: string; text: string; intent: Intent }
 
 /** The `turn` event: always last on the stream and authoritative over anything streamed before it. */
 export interface TalkTurn {
+  favors?: import("@monde/shared").Favor[];
   conversation_id: string;
   resumed?: boolean;
   history?: { who: 'player' | 'resident'; text: string }[];

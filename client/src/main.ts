@@ -27,7 +27,7 @@ const game = new Phaser.Game({
     ? [LooksGalleryScene]
     : new URLSearchParams(window.location.search).get("demo") === "1"
     ? [DioramaDemoScene, TitleScene, FellowshipScene, ZoneScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
-    : new URLSearchParams(window.location.search).get("skiptitle") === "1"
+    : (new URLSearchParams(window.location.search).get("skiptitle") === "1" || new URLSearchParams(window.location.search).has("puzzle"))
       // Skips the Fellowship form too: ZoneScene signs a default application (fellow/state.ts ensureFellow).
       ? [ZoneScene, TitleScene, FellowshipScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
       : [TitleScene, FellowshipScene, ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]

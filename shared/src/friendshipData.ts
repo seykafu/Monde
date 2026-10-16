@@ -1,3 +1,5 @@
+import { Press, PressEventData } from "./press";
+import { Favor } from "./favorEngine";
 import { z } from "zod";
 import { PAIR_LABELS, ROMANCE_STAGES, TIE_MILESTONES } from "./friendship";
 import { PlanOutput } from "./outputs";
@@ -33,7 +35,7 @@ export type DawnLetterData = z.infer<typeof DawnLetterData>;
 /** A Favor proposed since yesterday and still open (§9.9). */
 export const DawnFavorData = z.object({
   id: z.string(), resident_id: z.string(), template: z.string(), target: z.string(), text: z.string(),
-  created_day: n.int(), expires_day: n.int(),
+  created_day: n.int(), expires_day: n.int(), contract: Favor.optional(),
 });
 export type DawnFavorData = z.infer<typeof DawnFavorData>;
 
@@ -62,6 +64,9 @@ export const SavedBond = z.object({
 export type SavedBond = z.infer<typeof SavedBond>;
 
 export const SavedFriendship = z.object({
+  favor_book: z.array(Favor).default([]),
+  papers: z.array(Press).default([]),
+  news_log: z.array(PressEventData).default([]),
   residents: z.record(z.string(), SavedBond),
   /** The last ties the server sent, and the dawn they came with; null until the first online dawn. */
   ties: z.object({ day, pairs: z.array(TieData) }).nullable(),
@@ -86,5 +91,5 @@ export const SavedFriendship = z.object({
 export type SavedFriendship = z.infer<typeof SavedFriendship>;
 
 export const emptyFriendship = (): SavedFriendship => ({
-  residents: {}, ties: null, milestones: [], known_ties: {}, tiers: {}, plans: null, letters: [], favors: [], report: null, regard: {},
+  favor_book: [], papers: [], news_log: [], residents: {}, ties: null, milestones: [], known_ties: {}, tiers: {}, plans: null, letters: [], favors: [], report: null, regard: {},
 });

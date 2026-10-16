@@ -76,7 +76,7 @@ describe('save format and restore', () => {
     const restored = restore(file);
     expect(restored.clock.time).toEqual(source.clock.time);
     const defaults = collect(source, 'manual', 'Home');
-    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy });
+    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, puzzles: defaults.puzzles, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy });
     restored.town.pillars.charm++;
     expect(restored.town.pillars.charm).not.toEqual(source.town.pillars.charm);
     expect(runDawnsThrough(restored.town, 5).state.day).toBe(5);

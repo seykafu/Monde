@@ -1,0 +1,11 @@
+import { PZ01 } from './PZ-01';
+import { PZ02 } from './PZ-02';
+import { PZ03 } from './PZ-03';
+import { PZ04 } from './PZ-04';
+import { PZ05 } from './PZ-05';
+import { PZ06 } from './PZ-06';
+import { PZ13 } from './PZ-13';
+import { PZ15 } from './PZ-15';
+import { PZ18 } from './PZ-18';
+import type { Puzzle } from './core';
+export const puzzles: Readonly<Record<string, Puzzle>> = Object.fromEntries([PZ01,PZ02,PZ03,PZ04,PZ05,PZ06,PZ13,PZ15,PZ18].map(p=>[p.id,p]));
