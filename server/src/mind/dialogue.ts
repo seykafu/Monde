@@ -17,7 +17,7 @@
  * This module has no I/O of its own beyond the MindClient: the route streams, effects.ts persists.
  */
 import type Anthropic from "@anthropic-ai/sdk";
-import { DialogueTurnOutput, LIMITS, modelOutputFormat } from "@monde/shared";
+import { DialogueTurnOutput, LIMITS, fitText, modelOutputFormat } from "@monde/shared";
 import { apiParams, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
 import { completeWords, lexicalHits } from "./filters.js";
@@ -358,7 +358,7 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
           if (suppressed || line.index >= LIMITS.dialogue.maxLines) continue;
           // Hold back a word still being typed: "game" may become "gamekeeper", and "smartph" must not show.
           const capped = line.text.slice(0, LIMITS.dialogue.lineChars);
-          const text = line.done && capped.length === line.text.length ? capped : completeWords(capped);
+          const text = line.done ? fitText(line.text, LIMITS.dialogue.lineChars) : completeWords(capped);
           if (!streamSafe(text, options.validation)) { suppressed = true; continue; }
           if (text.trim() === "" || text === shown[line.index]) continue;
           shown[line.index] = text;

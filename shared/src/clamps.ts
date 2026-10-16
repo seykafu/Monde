@@ -10,20 +10,36 @@ export const LIMITS = {
 } as const;
 
 export const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, Number.isFinite(v) ? v : 0));
+
+/**
+ * Fit text to a length cap without cutting a word in half: the last full sentence that fits (if it keeps at least
+ * half the cap), else the last whole word with an ellipsis. Text already within the cap is returned unchanged.
+ */
+export function fitText(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const room = text.slice(0, max);
+  const sentence = Math.max(...[". ", "! ", "? ", "… ", ".) ", "!) ", "?) "].map((end) => {
+    const at = room.lastIndexOf(end);
+    return at < 0 ? -1 : at + end.length - 1;
+  }));
+  if (sentence >= max / 2) return room.slice(0, sentence).trimEnd();
+  const word = room.slice(0, max - 1).replace(/\s+\S*$/, "").replace(/[\s,;:—–-]+$/, "");
+  return `${word || room.slice(0, max - 1)}…`;
+}
 const sym = (v: number, m: number): number => Math.round(clamp(v, -m, m));
 
 export function clampDialogue(out: DialogueTurnOutput, opts: { heartPerk?: boolean } = {}): DialogueTurnOutput {
   const L = LIMITS.dialogue;
   return {
     ...out,
-    lines: out.lines.slice(0, L.maxLines).map((l) => ({ ...l, text: l.text.slice(0, L.lineChars) })),
-    choices: out.choices.slice(0, L.maxChoices).map((c) => ({ ...c, text: c.text.slice(0, L.choiceChars) })),
+    lines: out.lines.slice(0, L.maxLines).map((l) => ({ ...l, text: fitText(l.text, L.lineChars) })),
+    choices: out.choices.slice(0, L.maxChoices).map((c) => ({ ...c, text: fitText(c.text, L.choiceChars) })),
     effects: {
       ...out.effects,
       regard_delta: sym(out.effects.regard_delta, opts.heartPerk ? L.regardHeart : L.regard),
       mood: { valence: sym(out.effects.mood.valence, L.mood), stress: sym(out.effects.mood.stress, L.mood) },
       memory: out.effects.memory
-        ? { text: out.effects.memory.text.slice(0, 200), importance: Math.round(clamp(out.effects.memory.importance, 1, 10)) }
+        ? { text: fitText(out.effects.memory.text, 200), importance: Math.round(clamp(out.effects.memory.importance, 1, 10)) }
         : null,
     },
   };
