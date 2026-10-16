@@ -1,3 +1,4 @@
+import type { Outcome as ScuffleOutcome } from '../combat/scuffle/engine';
 // The story host's pure parts (MVP G-10 part 2). No Phaser, no DOM: everything here runs under vitest.
 //
 // - buildStoryContext: the StoryContext the director reads, from the live game (clock, zone, the place the
@@ -106,6 +107,8 @@ export interface WorldNow {
   inScuffle?: boolean;
   /** Regard toward the player by resident, as the game mirrors it (scenes/friendship.ts regardFor); over the ledger's. */
   regard?: Readonly<Record<string, number>>;
+  /** G-02: S05's `{arrival.*}` from the first real arrival's card, once there is one (else ARRIVAL_STANDIN). */
+  arrival?: { id: string; name: string; trade: string; reason: string };
 }
 
 /** The StoryContext for the director: the live world, the ledger, and any puzzle/riddle/scuffle outcomes. */
@@ -128,7 +131,7 @@ export function buildStoryContext(world: WorldNow, ledger: StoryLedger, outcomes
       appeal: computeAppeal(town).appeal,
       ferry_day: isFerryDay(world.day, town.flags),
       coins: ledger.coins,
-      arrival: { ...ARRIVAL_STANDIN },
+      arrival: { ...(world.arrival ?? ARRIVAL_STANDIN) },
       ...outcomes
     },
     ...(world.asleep ? { asleep: true } : {}),
@@ -196,6 +199,7 @@ export interface StoryPresenter {
   confirm(text: string, yes: string, no: string): Promise<boolean>;
   /** A stand-in for a system that isn't built yet: true for the success branch. */
   placeholder(kind: 'puzzle' | 'scuffle', id: string): Promise<boolean>;
+  scuffle?(id: string, key: string): Promise<ScuffleOutcome>;
   puzzle?(id: string): Promise<boolean>;
   /** The Fellowship form (§11.1); false when there's none to open. */
   charcreate(): Promise<boolean>;
@@ -320,10 +324,14 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
       deps.setOutcome('puzzle', { solved });
     },
     scuffle: async (sc, ctx) => {
-      const won = (await deps.presenter()?.placeholder('scuffle', sc.id)) ?? false;
-      deps.setOutcome('scuffle', { won });
+      const presenter = deps.presenter();
+      const outcome = (await presenter?.scuffle?.(sc.id, effectKey(ctx))) ?? 'loss';
+      const won = outcome === 'win' || outcome === 'talk_down';
+      deps.setOutcome('scuffle', { won, lost: outcome === 'loss', fled: outcome === 'flee', talked_down: outcome === 'talk_down' });
       // A Scuffle is a §9.6 town event (importance 7): everyone in sight remembers it (server witnessing).
       once(ctx, () => {
+        // G-08's real presenter owns its event alongside the consequence transaction.
+        if (presenter?.scuffle) return;
         const world = deps.world();
         if (!world) { note(`no world to log {scuffle: ${sc.id}}`); return; }
         world.appendEvent(scuffleEvent(stamp(world, ctx), sc.id, where(ctx), won, ctx.game));

@@ -3,6 +3,8 @@ import { feasibleFavor } from "./favorFeasibility.js";
 import { favors } from "../db/schema.js";
 import { runPress } from "./press.js";
 import { compactNight } from "./compaction.js";
+import { ArrivalHousehold } from "@monde/shared";
+import { ArrivalRequest, NoticeIn, adoptHouseholds, commitArrivals, departResidents, noticeMemories, refillBuffer } from "./arrivals.js";
 /**
  * The night pass (GDD §9.7, §9.8; §19.4 POST /v1/worlds/:w/night; MVP M-07).
  *
@@ -75,6 +77,14 @@ const Pillar = z.number().min(0).max(100);
 export const NightBody = z.object({
   day: z.number().int().min(1).max(100_000),
   leaving: z.array(LeavingFavorNotice).max(500).optional(),
+  /** G-02: the town engine's arrival roll for the coming day, with the facts the draw reads (§6.4, A.3). */
+  arrivals: ArrivalRequest.optional(),
+  /** G-02: households the client wrote in Quiet Mode, for the server to adopt (A.3.8). */
+  adopt: z.array(ArrivalHousehold).max(20).optional(),
+  /** G-02: generated residents who left on the ferry during the night's day (§6.4). */
+  departed: z.array(z.string().max(80)).max(50).optional(),
+  /** G-02: Leaving Notices given at this dawn: memories for the resident and their friends (§6.4). */
+  notices: z.array(NoticeIn).max(50).optional(),
   /** Today's town events (for the reflections' town facts) and tomorrow's scheduled ones (for the plans). */
   events: z.array(TownEvent).max(500).optional(),
   /** Offline log; identical envelope elements to POST /events. Per-item rejections are returned as ingestion. */
@@ -183,6 +193,8 @@ export class NightRunner {
   private readonly runs = new Map<string, Map<number, NightRun>>();
   private readonly active = new Set<NightRun>();
   private readonly gates: WorldSemaphores;
+  /** G-02: arrival-buffer refills running after their night (never part of the night's own work). */
+  private readonly refills = new Map<string, Promise<void>>();
   private readonly controller = new AbortController();
   private readonly log: NightLog;
   private readonly now: () => number;
@@ -257,11 +269,16 @@ export class NightRunner {
     await Promise.all(runs.map((run) => run.work));
   }
 
+  /** Test hook: resolves when the world's arrival-buffer refill (started after its last night) has finished. */
+  async refilled(worldId: string): Promise<void> {
+    await this.refills.get(worldId);
+  }
+
   /** Stop taking nights, give background work `graceMs` to finish, then abort its calls (they fall back). */
   async close(graceMs = this.options.closeGraceMs ?? NIGHT_CLOSE_GRACE_MS): Promise<void> {
     this.closing = true;
-    if (this.active.size === 0) return;
-    const all = this.idle();
+    if (this.active.size === 0 && this.refills.size === 0) return;
+    const all = Promise.all([this.idle(), ...this.refills.values()]);
     await within(all, graceMs);
     if (this.active.size > 0) {
       this.log.warn({ runs: this.active.size }, "aborting unfinished night work for shutdown");
@@ -325,6 +342,19 @@ export class NightRunner {
     const { db } = this.options;
     const { worldId, day } = run;
     await compactNight(this.deps(worldId, 0), worldId, day);
+    // G-02: Quiet Mode households join and yesterday's leavers go before the tiers and the night's jobs see the town.
+    const [seedRow] = await db.select({ seed: worlds.seed }).from(worlds).where(eq(worlds.id, worldId));
+    const seed = seedRow?.seed ?? 0;
+    try {
+      if (body.adopt?.length) await adoptHouseholds(db, worldId, body.adopt);
+      if (body.departed?.length) await departResidents(db, worldId, body.departed, day);
+      if (body.notices?.length) await noticeMemories(db, worldId, day, body.notices);
+      // Tomorrow's households, from the buffer (or templates), committed first so the very first dawn read has them:
+      // it's database work only, the model never writes on a ferry day's clock.
+      if (body.arrivals) await commitArrivals({ ...this.deps(worldId, 0), seed }, worldId, body.arrivals);
+    } catch (error) {
+      this.log.error({ err: error, worldId, day }, "arrivals bookkeeping failed");
+    }
     const tiers = await recomputeTiers(db, worldId, day);
     run.tiers = countTiers(tiers);
 
@@ -394,6 +424,16 @@ export class NightRunner {
       });
     }
     await runPress(this.deps(worldId, 0), world, body.town?.fund);
+    if (body.arrivals) this.refill(worldId, seed, body.arrivals);
+  }
+
+  /** Top the world's arrival buffer up in the background, at the lowest priority (one refill per world at a time). */
+  private refill(worldId: string, seed: number, request: ArrivalRequest): void {
+    if (this.closing || this.refills.has(worldId) || !this.options.mind.enabled) return;
+    const work = refillBuffer({ ...this.deps(worldId, 3), seed }, worldId, request)
+      .then(() => undefined, (error: unknown) => { this.log.error({ err: error, worldId }, "arrival buffer refill failed"); })
+      .finally(() => { this.refills.delete(worldId); });
+    this.refills.set(worldId, work);
   }
 
   private deps(worldId: string, priority: number): NightJobDeps {

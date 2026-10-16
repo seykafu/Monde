@@ -9,7 +9,7 @@ import { Press } from "@monde/shared";
 // tolerance). Without a server (Quiet Mode, no world, a network failure) nothing changes: templates, and the ties the
 // client last knew.
 import {
-  DawnFavorData, DawnLetterData, DawnPlanData, PlanOutput, RegardSnapshot, TieData, TieMilestoneData,
+  ArrivalHousehold, DawnFavorData, DawnLetterData, DawnPlanData, PlanOutput, RegardSnapshot, TieData, TieMilestoneData,
   type ClientEvent, type TownEvent
 } from '@monde/shared';
 
@@ -22,6 +22,19 @@ export interface NightRequest {
   /** The event log's unsent ClientEvents up to this night (mind/events.ts), ingested before the night runs (M-06). */
   client_events?: ClientEvent[];
   town?: { pillars?: { prosperity: number; safety: number; spirit: number; charm: number }; census?: number; fund?: number; weather_tomorrow?: string };
+  /** G-02: the town engine's arrival roll for the coming day and what the draw reads (server/src/mind/arrivals.ts). */
+  arrivals?: {
+    day: number; households: number; youth_share: number;
+    free_homes: { home: string; beds: number; name?: string }[];
+    pillars: { prosperity: number; safety: number; spirit: number; charm: number };
+    census?: number; flags?: string[]; pupils?: number; unrestored_homes?: number;
+  };
+  /** G-02: Quiet Mode households the server hasn't got yet. */
+  adopt?: ArrivalHousehold[];
+  /** G-02: generated residents who left on the night's day. */
+  departed?: string[];
+  /** G-02: Leaving Notices given at this dawn (memories for the resident and their friends). */
+  notices?: { resident: string; day: number; deadline: number; friends?: string[] }[];
 }
 
 /** GET /v1/worlds/:w/dawn/:day, as the client keeps it (server/src/mind/dawn.ts). */
@@ -35,6 +48,10 @@ export interface DawnPackage {
   ties: { pairs: TieData[]; milestones: TieMilestoneData[] };
   /** Every resident's Regard toward the player as the server has it (M-06): it replaces the client's mirror. */
   regard?: RegardSnapshot | null;
+  /** G-02: households stepping off the ferry today, written on the server. */
+  arrivals?: ArrivalHousehold[];
+  /** G-02: every generated resident the server has (null or absent: an older server that doesn't say). */
+  generated?: string[] | null;
   /** Residents the night is still working on. */
   pending: number;
   /** Every night job has finished (its plans are final). */
@@ -57,6 +74,8 @@ export function parseDawnPackage(v: unknown): DawnPackage | null {
     plans: each(v.plans, DawnPlanData), letters: each(v.letters, DawnLetterData), favors: each(v.favors, DawnFavorData),
     ties: { pairs: each(ties.pairs, TieData), milestones: each(ties.milestones, TieMilestoneData) },
     regard: regard.success ? regard.data : null,
+    arrivals: each(v.arrivals, ArrivalHousehold),
+    generated: Array.isArray(v.generated) ? v.generated.filter((x): x is string => typeof x === 'string') : null,
     pending: typeof v.pending === 'number' && v.pending > 0 ? v.pending : 0,
     // A package that doesn't say is taken as final.
     complete: v.complete !== false

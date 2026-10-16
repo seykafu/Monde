@@ -31,6 +31,8 @@ export interface SnapshotPayload {
   conversationSessions?: JsonRow<typeof s.conversationSessions.$inferSelect>[];
   conversationSummaries?: (typeof s.conversationSummaries.$inferSelect)[];
   conversationDigests?: (typeof s.conversationDigests.$inferSelect)[];
+  /** G-02: generated households (committed and buffered). Optional: older snapshots have none. */
+  arrivals?: JsonRow<typeof s.arrivals.$inferSelect>[];
 }
 const Body = z.object({
   day: z.number().int().min(1).max(100_000), minute: z.number().int().min(0).max(1439),
@@ -79,6 +81,7 @@ export function registerSnapshotRoutes(app: FastifyInstance, config: Config, db:
           favors: await tx.select().from(s.favors).where(and(eq(s.favors.worldId, worldId), inArray(s.favors.status, [...LIVE_FAVOR_STATUSES]))),
           letters: await tx.select().from(s.letters).where(and(eq(s.letters.worldId, worldId), eq(s.letters.delivered, false))),
           tieMilestones: await tx.select().from(s.tieMilestones).where(eq(s.tieMilestones.worldId, worldId)),
+          arrivals: await tx.select().from(s.arrivals).where(eq(s.arrivals.worldId, worldId)),
           ...await conversationState(tx, worldId),
         };
         const json = JSON.stringify(data);
@@ -122,6 +125,7 @@ export function registerSnapshotRoutes(app: FastifyInstance, config: Config, db:
         if (p.conversationSessions?.length) await tx.insert(s.conversationSessions).values(p.conversationSessions.map((r) => ({ ...r, worldId, createdAt: new Date(r.createdAt) })));
         if (p.conversationSummaries?.length) await tx.insert(s.conversationSummaries).values(p.conversationSummaries.map((r) => ({ ...r, worldId })));
         if (p.conversationDigests?.length) await tx.insert(s.conversationDigests).values(p.conversationDigests.map((r) => ({ ...r, worldId })));
+        if (p.arrivals?.length) await tx.insert(s.arrivals).values(p.arrivals.map((r) => ({ ...r, worldId, createdAt: new Date(r.createdAt) })));
         return branch!;
       });
       return { world_id: world.id, token: worldToken(world.id, world.deviceId, config.MONDE_TOKEN_SECRET ?? "monde-local-development-only"), branch_id: world.branchId };

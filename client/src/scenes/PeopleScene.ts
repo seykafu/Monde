@@ -13,7 +13,11 @@ import Phaser from 'phaser';
 import { PAIR_LABEL_NAMES, regardTier, type PersonaCard, type RomanceStage, type TieSource } from '@monde/shared';
 import { FAMILY_BODY, FAMILY_DISPLAY, FAMILY_HEADING, FAMILY_UI, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import type { Clock } from '../sim/clock';
-import { personaCards } from '../world/residents';
+import { livingArrivals } from '@monde/shared';
+import { rosterEntry } from '../world/roster';
+import { homeName } from '../world/townHomes';
+import type { TownState } from '../town/pillars';
+import { portraitArtId } from '../dialogue/portraitModel';
 import { displayName } from '../sim/residentSim';
 import { Portrait } from '../dialogue/portrait';
 import { portraitLook } from '../dialogue/portraitModel';
@@ -21,7 +25,7 @@ import { knownTiesOf, pairEmote, type KnownTie } from '../friendship/knownTies';
 import { metResidents } from '../friendship/state';
 import { HeartRowView, emoteTexture } from '../ui/hearts';
 import { DIALOGUE_SCENE } from './DialogueScene';
-import { FRIENDSHIP_KEY, TOWN_NAMES, getFriendship, regardFor, tieMap } from './friendship';
+import { FRIENDSHIP_KEY, getFriendship, regardFor, tieMap, townNames } from './friendship';
 
 export const PEOPLE_SCENE = 'People';
 
@@ -39,7 +43,17 @@ export const openPeople = (host: Phaser.Scene, clock: Clock, tab?: PeopleOpen['t
   host.scene.launch(PEOPLE_SCENE, { host: host.scene.key, clock, tab } satisfies PeopleOpen);
 };
 
-const CARDS: ReadonlyMap<string, { card: PersonaCard; index: number }> = new Map(personaCards.map((card, index) => [card.id, { card, index }]));
+/** Everyone with a card, the generated residents who have arrived included (G-02, world/roster.ts). */
+const CARDS: Pick<ReadonlyMap<string, { card: PersonaCard; index: number }>, 'has' | 'get'> = { has: id => !!rosterEntry(id), get: id => rosterEntry(id) };
+/** GDD-GAP: §9.11.3 lists residents the player has met; a newcomer is listed for a week as a new face to go and meet. */
+export const NEW_FACE_DAYS = 7;
+
+/** The page's list: new faces first (newest first), then everyone met. */
+export function peopleIds(met: readonly string[], town: TownState | undefined, day: number): string[] {
+  const arrivals = livingArrivals(town?.people).filter(r => day - r.arrived_day < NEW_FACE_DAYS && !met.includes(r.card.id))
+    .sort((a, b) => b.arrived_day - a.arrived_day || a.card.id.localeCompare(b.card.id)).map(r => r.card.id);
+  return [...arrivals, ...met.filter(id => CARDS.has(id))];
+}
 /** The resident's roster colour, as their sprite and dialogue portrait wear it. */
 const rosterColour = (index: number): number => Phaser.Display.Color.HSLToColor(((index * 137.508) % 360) / 360, 0.52, 0.56).color;
 
@@ -105,13 +119,13 @@ export class PeopleScene extends Phaser.Scene {
     this.drawBook();
     this.content = this.add.container(0, 0);
     this.markPages = new MarkPages(this, this.open.clock, this.content, () => this.refresh());
-    this.ids = metResidents(getFriendship(this.registry)).filter(id => CARDS.has(id));
+    this.ids = peopleIds(metResidents(getFriendship(this.registry)), this.registry.get('monde.town') as TownState | undefined, this.open.clock.day);
     const keep = lastPicked ? this.ids.indexOf(lastPicked) : -1;
     this.picked = keep >= 0 ? keep : 0;
     this.top = Math.max(0, Math.min(this.picked - ROWS + 1, this.ids.length - ROWS));
     this.refresh();
 
-    const onChange = () => { this.ids = metResidents(getFriendship(this.registry)).filter(id => CARDS.has(id)); this.refresh(); };
+    const onChange = () => { this.ids = peopleIds(metResidents(getFriendship(this.registry)), this.registry.get('monde.town') as TownState | undefined, this.open.clock.day); this.refresh(); };
     this.registry.events.on(`changedata-${FRIENDSHIP_KEY}`, onChange);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.registry.events.off(`changedata-${FRIENDSHIP_KEY}`, onChange));
     this.input.keyboard!.on('keydown', (e: KeyboardEvent) => this.onKey(e));
@@ -202,7 +216,7 @@ export class PeopleScene extends Phaser.Scene {
       this.text(LX,LIST_Y,'Favors · open / completed / expired',20);
       all.slice(this.favorPage * 4,this.favorPage * 4 + 4).forEach((f,i) => {
         const y = LIST_Y + 45 + i * 105;
-        this.text(LX,y,`${TOWN_NAMES[f.resident_id] ?? f.resident_id} · ${f.expires_day < this.open.clock.day && ['accepted','proposed'].includes(f.status) ? 'expired' : f.status}`,18);
+        this.text(LX,y,`${townNames()[f.resident_id] ?? f.resident_id} · ${f.expires_day < this.open.clock.day && ['accepted','proposed'].includes(f.status) ? 'expired' : f.status}`,18);
         this.text(LX,y+25,f.text,15,{ wrap: LW });
         this.text(RX,y,`${f.task.place.replaceAll('_',' ')}
 By Day ${f.expires_day} · ${f.task.item ?? f.task.kind}
@@ -247,13 +261,14 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
       } else if (row > 0) {
         g.fillStyle(INK, 0.12).fillRect(LX, y, LW, 1);
       }
-      const p = new Portrait(this, { residentId: id, look: portraitLook(card, rosterColour(index)), x: LX, y: y + 5, art: true });
+      const p = new Portrait(this, { residentId: portraitArtId(card), look: portraitLook(card, rosterColour(index)), x: LX, y: y + 5, art: true });
       p.root.setScale(0.205);
       p.setExpression('neutral', true);
       this.portraits.push(p);
       const regard = regardFor(this.registry, id);
+      const fresh = this.newFace(id);
       this.text(LX + 62, y + 12, displayName(card.name), 20, { family: FAMILY_HEADING });
-      this.text(LX + 62, y + 38, regardTier(regard), 13, { family: FAMILY_UI, color: MUTED });
+      this.text(LX + 62, y + 38, fresh ? `New face · off the boat on Day ${fresh.arrived_day}` : regardTier(regard), 13, { family: FAMILY_UI, color: fresh ? BRASS_CSS : MUTED, italic: !!fresh });
       const hearts = new HeartRowView(this, LX + LW - 175, y + ROW_H / 2, 1.5, 1);
       hearts.setRegard(regard);
       this.hearts.push(hearts);
@@ -271,7 +286,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
     const bond = state.residents[id];
     const regard = regardFor(this.registry, id);
     // Portrait, with name, trade and hearts beside it.
-    const p = new Portrait(this, { residentId: id, look: portraitLook(card, rosterColour(index)), x: RX, y: BY + 40, art: true });
+    const p = new Portrait(this, { residentId: portraitArtId(card), look: portraitLook(card, rosterColour(index)), x: RX, y: BY + 40, art: true });
     p.root.setScale(0.6);
     p.setExpression(regard >= 40 ? 'warm' : regard < 0 ? 'worried' : 'neutral', true);
     this.portraits.push(p);
@@ -284,7 +299,9 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
     hearts.setRegard(regard);
     this.hearts.push(hearts);
     this.text(cx, hy + 16, regardTier(regard), 17, { family: FAMILY_UI, bold: true });
+    const arrived = livingArrivals((this.registry.get('monde.town') as TownState | undefined)?.people).find(r => r.card.id === id);
     const facts = [birthdayOf(card) ? `Birthday: ${birthdayOf(card)}` : null,
+      arrived ? `Arrived Day ${arrived.arrived_day} · ${homeName(arrived.card.home)}` : null,
       bond ? `Last spoke ${bond.last_talk_day === this.open.clock.day ? 'today' : `on Day ${bond.last_talk_day}`}` : null].filter(Boolean).join('  ·  ');
     if (facts) this.text(cx, hy + 42, facts, 14, { family: FAMILY_UI, color: MUTED });
 
@@ -310,10 +327,17 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
       const emote = pairEmote(t);
       if (emote) this.content.add(this.add.image(RX + 10, ry + 10, emoteTexture(this, emote.id)).setScale(1.5));
       else g.fillStyle(INK, 0.5).fillCircle(RX + 10, ry + 10, 3);
-      const line = this.text(RX + 30, ry, tieText(t, TOWN_NAMES[t.other] ?? t.other), 17);
+      const line = this.text(RX + 30, ry, tieText(t, townNames()[t.other] ?? t.other), 17);
       this.text(line.x + line.width + 10, ry + 3, `(${TIE_SOURCE_TEXT[t.how]})`, 13, { family: FAMILY_UI, color: MUTED });
     });
     if (ties.length > max) this.text(RX + 30, y + 26 + max * 30, `and ${ties.length - max} more`, 14, { italic: true, color: MUTED });
+  }
+
+  /** A generated resident in their first week whom the player hasn't met (the list's "new face"). */
+  private newFace(id: string): { arrived_day: number } | null {
+    if (metResidents(getFriendship(this.registry)).includes(id)) return null;
+    const r = livingArrivals((this.registry.get('monde.town') as TownState | undefined)?.people).find(a => a.card.id === id);
+    return r && this.open.clock.day - r.arrived_day < NEW_FACE_DAYS ? r : null;
   }
 
   // ── Opening and closing ──────────────────────────────────────────────────

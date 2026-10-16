@@ -27,6 +27,8 @@ import { ALL_SCENES, SPRING_SCENES, StorySession } from '../../story/session';
 import { eligibleScenes, minutes } from '../../story/triggers';
 import { placeName, type Position } from '../../world/player';
 import { personaCards } from '../../world/residents';
+import { findCard, resolveAlias } from '../../world/roster';
+import { firstArrival } from '@monde/shared';
 import type { Point, ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
 import { DIALOGUE_SCENE } from '../DialogueScene';
@@ -118,7 +120,8 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     readRiddle: id => { findMark(registry, clock, id); return marks(registry).entries[id]?.status === 'solved'; },
     now: () => ({
       day: clock.day, minute: clock.minute, zone: zone.id, place: placeAt(zone, opts.position()), town: getTown(registry), profile: fellowProfile(registry),
-      regard: Object.fromEntries(personaCards.map(c => [c.id, regardFor(registry, c.id)]))
+      regard: Object.fromEntries(personaCards.map(c => [c.id, regardFor(registry, c.id)])),
+      ...storyArrival(registry, clock.day)
     }),
     setTown: state => registry.set(TOWN_KEY, state),
     events: () => getEventLog(registry).outbox,
@@ -140,14 +143,15 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     },
     zoneName: id => zones[id]?.name ?? id,
     projectCue: (id, sceneId) => projectCue(registry, { day: clock.day, minute: clock.minute }, id, sceneId),
-    aiLine: (residentId, brief) => liveLine(getMind(), {
-      residentId, brief,
-      context: talkContext({ day: clock.day, minute: clock.minute, state: residents.stateOf(residentId), zone, weather: opts.weather() })
+    // S05's `arrival` speaks as the first real arrival (G-02, world/roster.ts).
+    aiLine: (speaker, brief) => liveLine(getMind(), {
+      residentId: resolveAlias(speaker), brief,
+      context: talkContext({ day: clock.day, minute: clock.minute, state: residents.stateOf(resolveAlias(speaker)), zone, weather: opts.weather() })
     }, { conversationId: uuid() })
   };
   session.world = world;
 
-  const dialogueFor: StoryOpen['dialogueFor'] = residentId => ({ clock, zone, state: residents.stateOf(residentId), weather: opts.weather() });
+  const dialogueFor: StoryOpen['dialogueFor'] = residentId => ({ clock, zone, state: residents.stateOf(resolveAlias(residentId)), weather: opts.weather() });
   const tryStart = (): void => {
     const manager = scene.scene;
     if (!scene.sys.isActive() || opts.busy() || clock.paused || HOLDING_SCENES.some(key => manager.isActive(key))) return;
@@ -201,6 +205,17 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     },
     place: () => lastPlace
   };
+}
+
+/** S05's `{arrival.name}`, `{arrival.trade}`, `{arrival.reason}` from the first real arrival (G-02); none before. */
+function storyArrival(registry: Phaser.Data.DataManager, day: number): { arrival?: NonNullable<ReturnType<StoryWorld['now']>['arrival']> } {
+  const town = getTown(registry);
+  const first = firstArrival(town?.people, day);
+  const card = first ? findCard(first.card.id) ?? first.card : null;
+  if (!first || !card) return {};
+  const household = [...(town?.people?.households ?? []), ...(town?.people?.pending ?? [])].find(h => h.id === first.household);
+  const trade = card.occupation.split(/[;,]/)[0]!.trim();
+  return { arrival: { id: card.id, name: card.name, trade: trade.charAt(0).toUpperCase() + trade.slice(1), reason: household?.summary ?? 'Wanted a fresh start.' } };
 }
 
 /** `window.__story`: list, play and inspect scenes from the console (dev builds or ?dev). */

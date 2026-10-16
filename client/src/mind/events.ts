@@ -28,6 +28,22 @@ export { emptyEventLog };
  */
 export const HELD_RESIDENTS: ReadonlySet<string> = new Set(['arrival']);
 
+/**
+ * G-02: S05's `arrival` has become a real resident (the first arrival, known to the server): every held event for the
+ * alias now names them, and goes with the next batch. Ids stay the same (they were given when queued).
+ */
+export function resolveHeld(log: EventLog, alias: string, id: string): EventLog {
+  let changed = false;
+  const outbox = log.outbox.map(e => {
+    let next = e;
+    if ('resident' in e && e.resident === alias) next = { ...next, resident: id } as ClientEvent;
+    if ('participants' in e && e.participants.includes(alias)) next = { ...next, participants: e.participants.map(p => (p === alias ? id : p)) } as ClientEvent;
+    if (next !== e) changed = true;
+    return next;
+  });
+  return changed ? { ...log, outbox } : log;
+}
+
 export const isHeld = (e: ClientEvent): boolean =>
   ('resident' in e && HELD_RESIDENTS.has(e.resident)) || ('participants' in e && e.participants.some(p => HELD_RESIDENTS.has(p)));
 

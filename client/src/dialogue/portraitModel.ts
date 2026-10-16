@@ -27,6 +27,11 @@ export const MANIFEST_PATH = 'assets/portraits/manifest.json';
 export const portraitUrl = (base: string, residentId: string, expr: string): string =>
   `${base}assets/portraits/${residentId}/${expr}.png`;
 export const portraitTextureKey = (residentId: string, expr: string): string => `portrait:${residentId}:${expr}`;
+/**
+ * Whose art a card shows: a generated resident wears a library bust (`lib_f42_009`, G-02, Appendix A.3.5), so its
+ * files are the library entry's; everyone else's are under their own id.
+ */
+export const portraitArtId = (card: Pick<PersonaCard, 'id' | 'portrait'>): string => (/^lib_[fma]\d{2}_\d{3}$/.test(card.portrait) ? card.portrait : card.id);
 
 // ── Expressions ─────────────────────────────────────────────────────────────
 

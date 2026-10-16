@@ -196,3 +196,27 @@ export const conversationSummaries = pgTable("conversation_summaries", {
 export const conversationDigests = pgTable("conversation_digests", {
   worldId: worldId(), residentId: text("resident_id").notNull(), digest: text("digest").notNull(),
 }, t => [primaryKey({ columns: [t.worldId, t.residentId] })]);
+
+/**
+ * G-02 arrivals (GDD §6.4, Appendix A.3): one row per generated household. `buffered` rows are written ahead by the
+ * model (cards bound to `home.own`), so a ferry day never waits on it (§9.2's arrival buffer); a ferry day commits
+ * them (`committed`: arrival day and home set, the residents inserted). Template households are written at commit
+ * time when the buffer runs short, and `adopted` ones come from the client's Quiet Mode.
+ */
+export const arrivals = pgTable("arrivals", {
+  worldId: worldId(),
+  id: text("id").notNull(),
+  status: text("status").$type<"buffered" | "committed">().notNull(),
+  archetype: text("archetype").notNull(),
+  /** The draw (archetype, members, portraits) the cards were written for. */
+  draw: jsonb("draw").notNull(),
+  /** The household's cards (PersonaCard[]), with `home.own` until committed. */
+  cards: jsonb("cards").$type<PersonaCard[]>().notNull(),
+  dreamTemplates: text("dream_templates").array().notNull(),
+  summary: text("summary").notNull(),
+  source: text("source").$type<"model" | "template">().notNull(),
+  createdDay: integer("created_day").notNull(),
+  arrivalDay: integer("arrival_day"),
+  home: text("home"),
+  createdAt: createdAt(),
+}, (t) => [primaryKey({ columns: [t.worldId, t.id] }), index("arrivals_world_status_idx").on(t.worldId, t.status)]);

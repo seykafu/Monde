@@ -233,13 +233,14 @@ describe('cue → effect', () => {
     expect(h.warn).toHaveBeenCalledWith(expect.stringContaining('fade'));
   });
 
-  it('awaits the real puzzle presenter and the Scuffle stand-in', async () => {
+  it('awaits the real puzzle and Scuffle presenters', async () => {
     const h = harness();
     await h.run({ cmd: 'puzzle', id: 'PZ-01' });
-    (h.presenter.placeholder as ReturnType<typeof vi.fn>).mockResolvedValueOnce(false);
+    h.presenter.scuffle = vi.fn(async () => 'loss' as const);
     await h.run({ cmd: 'scuffle', id: 'sc_bakery_tutorial' });
     expect(h.presenter.puzzle).toHaveBeenCalledWith('PZ-01');
-    expect(h.presenter.placeholder).toHaveBeenCalledWith('scuffle', 'sc_bakery_tutorial');
+    expect(h.presenter.scuffle).toHaveBeenCalledWith('sc_bakery_tutorial', expect.any(String));
+    expect(h.presenter.placeholder).not.toHaveBeenCalled();
     expect(h.outcomes).toMatchObject({ puzzle: { solved: true }, scuffle: { won: false } });
   });
 
@@ -249,7 +250,7 @@ describe('cue → effect', () => {
     await h.run({ cmd: 'scuffle', id: 'sc_bakery_tutorial' }, 's03:71', 's01a_ferry'); // a restarted scene
     expect(h.events).toEqual([{
       kind: 'town_event', id: 'e1', day: 1, minute: 590, type: 'scuffle', place: 'wharf.ferry_slip', participants: ['player', 'bru', 'nettie'],
-      summary: 'Fellow won a Scuffle against Bru and Nettie at Ferry Slip.', importance: 7
+      summary: 'Fellow lost a Scuffle against Bru and Nettie at Ferry Slip.', importance: 7
     }]);
     const lost = scuffleEvent({ id: 'x', day: 3, minute: 700 }, 'sc_unknown', 'market_row.bakery', false, { values: { name: 'Wren' } });
     expect(lost).toMatchObject({ participants: ['player'], summary: 'Wren lost a Scuffle at Fournier & Fille.' });

@@ -30,11 +30,13 @@ KEY_IN, KEY_OUT = 90.0, 190.0      # RGB distance from magenta: <= KEY_IN is bac
 
 
 def key(img: Image.Image) -> Image.Image:
-    """Magenta -> transparent with a soft edge and spill suppression."""
-    px = np.asarray(img.convert("RGB"), dtype=np.float32)
+    """Magenta -> transparent with a soft edge and spill suppression. A render that came back already transparent
+    keeps its own alpha (its hidden pixels can be any colour, often black)."""
+    rgba = np.asarray(img.convert("RGBA"), dtype=np.float32)
+    px = rgba[..., :3]
     r, g, b = px[..., 0], px[..., 1], px[..., 2]
     d = np.sqrt((255 - r) ** 2 + g ** 2 + (255 - b) ** 2)
-    t = np.clip((d - KEY_IN) / (KEY_OUT - KEY_IN), 0.0, 1.0)
+    t = np.minimum(np.clip((d - KEY_IN) / (KEY_OUT - KEY_IN), 0.0, 1.0), rgba[..., 3] / 255.0)
     # Edge pixels keep their colour minus the magenta that bled into them.
     spill = np.clip(np.minimum(r, b) - g, 0, None) * (t < 1.0) * (1.0 - t * 0.5)
     has = spill > 0

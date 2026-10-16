@@ -8,7 +8,7 @@ import { Favor } from "@monde/shared";
  * are read), the Favors proposed since yesterday, and the town's ties (G-13, §9.11.3): every pair of residents who
  * have met with their label and romance stage, plus the milestones of the night before (new Friends, Rivals…),
  * for the People page, emotes and the Dawn Report's lines. The Dawn Report itself, arrivals and departures come
- * with M-10 and G-02.
+ * with M-10; G-02's households landing today come as `arrivals`.
  */
 import { and, asc, eq, gte, lte } from "drizzle-orm";
 import type { DawnTies, PlanOutput, RegardSnapshot } from "@monde/shared";
@@ -17,6 +17,8 @@ import type { WorldDatabase } from "../worlds/createWorld.js";
 import { weekdayOf } from "./context.js";
 import { templatePlan } from "./templatePlan.js";
 import { buildDawnTies } from "./ties.js";
+import { arrivalsFor, generatedIds } from "./arrivals.js";
+import type { ArrivalHousehold } from "@monde/shared";
 
 export interface DawnPlan {
   resident_id: string;
@@ -47,12 +49,16 @@ export interface DawnPackage {
   ties: DawnTies;
   regard: RegardSnapshot;
   press: Press | null;
+  /** G-02: the households that step off the ferry today (§6.4), cards and homes. */
+  arrivals: ArrivalHousehold[];
+  /** G-02: every generated resident the world has (the client re-sends Quiet Mode households missing here). */
+  generated: string[];
 }
 
 const byId = <T extends { id: string }>(a: T, b: T): number => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
 export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: number): Promise<DawnPackage> {
-  const [rows, stored, proposed, ties] = await Promise.all([
+  const [rows, stored, proposed, ties, landing, generated] = await Promise.all([
     db.select({ id: residents.id, card: residents.card, state: residents.state, tier: residents.tier }).from(residents).where(eq(residents.worldId, worldId)),
     db.select().from(plans).where(and(eq(plans.worldId, worldId), eq(plans.day, day))),
     // New since yesterday: proposed last night (or during yesterday's conversations) and still open today.
@@ -60,6 +66,8 @@ export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: 
       eq(favors.worldId, worldId), eq(favors.status, "proposed"), lte(favors.createdDay, day), gte(favors.expiresDay, day),
     )).orderBy(asc(favors.id)),
     buildDawnTies(db, worldId, day),
+    arrivalsFor(db, worldId, day),
+    generatedIds(db, worldId),
   ]);
   // One statement: a letter is handed over exactly once, even if two dawn requests race.
   const delivered = await db.update(letters).set({ delivered: true })
@@ -85,5 +93,7 @@ export async function buildDawnPackage(db: WorldDatabase, worldId: string, day: 
     })),
     ties,
     regard: Object.fromEntries(rows.map(r => [r.id, r.state.regard])),
+    arrivals: landing,
+    generated,
   };
 }

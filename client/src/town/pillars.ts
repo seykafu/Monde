@@ -68,6 +68,10 @@ export type TownFlag = (typeof TOWN_FLAGS)[number];
 export type TownFlags = Partial<Record<TownFlag, boolean>>;
 
 export interface TownState {
+  /** G-08: per-zone pressure; old saves start from the calendar baseline. */
+  tollmen?: import('@monde/shared').TollmenState;
+  /** G-02: generated residents, the households on today's ferry, and who has left (shared/src/arrivals/people.ts). */
+  people?: import('@monde/shared').TownPeople;
   /** The game day these numbers belong to (runDawn moves it forward). */
   day: number;
   /** Prosperity, Safety, Spirit and Charm, each 0–100 (fractional: community work moves them by tenths). */

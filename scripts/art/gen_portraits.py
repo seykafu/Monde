@@ -8,8 +8,12 @@ People get the six; animals get the expressions their card lists (mapped onto th
 Already-generated files are skipped, so the script can be re-run after a usage limit or a rejected image
 (delete the file to redo it).
 
+The portrait library (GDD §16.2, Appendix A.3.5: generic townsfolk for generated arrivals) is drawn the same way
+from content/portraits/library.json with --library: each entry's caption is the character, its id the folder.
+
 Usage:
   python3 scripts/art/gen_portraits.py [id,id,...] [--out art_sources/portraits] [--workers 4]
+  python3 scripts/art/gen_portraits.py --library [lib_id,...]
 """
 import argparse
 import concurrent.futures as cf
@@ -35,8 +39,23 @@ def load_cards(ids: list[str] | None) -> list[dict]:
     return [c for c in cards if ids is None or c["id"] in ids]
 
 
+LIBRARY = os.path.join(ROOT, "content", "portraits", "library.json")
+
+
+def load_library(ids: list[str] | None) -> list[dict]:
+    """Library entries as card-like dicts (kind `library`): the caption is the appearance."""
+    with open(LIBRARY, encoding="utf-8") as f:
+        rows = json.load(f)["portraits"]
+    return [{"id": r["id"], "kind": "library", "name": "This townsperson", "age": r["age"],
+             "appearance": f"{r['caption']} Skin tone: {r['skin_word']} (draw it clearly that shade)."}
+            for r in rows if ids is None or r["id"] in ids]
+
+
 def describe(card: dict) -> str:
     appearance = " ".join(str(card.get("appearance", "")).split())
+    if card.get("kind") == "library":
+        return (f"an ordinary townsperson of Monde, about {card['age']} years old (no name, no props beyond what is "
+                f"described). {appearance}")
     if card.get("kind") == "animal":
         return f"{card['name']}, an animal who lives in the town. {appearance}"
     return f"{card['name']}, {card['age']}, {card.get('occupation', 'a townsperson')}. {appearance}"
@@ -61,8 +80,10 @@ def main() -> int:
     ap.add_argument("ids", nargs="?", default="")
     ap.add_argument("--out", default=os.path.join(ROOT, "art_sources", "portraits"))
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--library", action="store_true", help="draw the portrait library (content/portraits/library.json)")
     a = ap.parse_args()
-    cards = load_cards([i for i in a.ids.split(",") if i] or None)
+    wanted = [i for i in a.ids.split(",") if i] or None
+    cards = load_library(wanted) if a.library else load_cards(wanted)
     out = os.path.abspath(a.out)
 
     def job(card: dict, expr: str) -> str:
@@ -76,7 +97,8 @@ def main() -> int:
         ref = os.path.join(folder, "neutral.png")
         if not os.path.exists(ref):
             return f"{card['id']}/{expr}: SKIPPED (no neutral key)"
-        return run_job(f"{card['id']}/{expr}", expression_variant(card["name"].split()[0], EXPRESSIONS[expr]), ref, target)
+        name = "this townsperson" if card.get("kind") == "library" else card["name"].split()[0]
+        return run_job(f"{card['id']}/{expr}", expression_variant(name, EXPRESSIONS[expr]), ref, target)
 
     # Neutral keys first (each character's other expressions reference their own key).
     for phase in ("neutral", "rest"):

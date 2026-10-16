@@ -1,6 +1,6 @@
 import { Portrait } from "../dialogue/portrait";
-import { portraitLook } from "../dialogue/portraitModel";
-import { personaCards } from "../world/residents";
+import { portraitArtId, portraitLook } from "../dialogue/portraitModel";
+import { findCard } from "../world/roster";
 import Phaser from 'phaser';
 import type { Press } from '@monde/shared';
 import type { Clock } from '../sim/clock';
@@ -25,12 +25,6 @@ export class DawnReportScene extends Phaser.Scene {
     this.add.rectangle(0,0,GAME_WIDTH,GAME_HEIGHT,0xece2c8).setOrigin(0).setInteractive();
     const text = (x: number,y: number,t: string,size: number,width = 1100) => this.add.text(x,y,t,{ fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: ink, wordWrap: { width } });
     const { masthead: m } = frontPage(paper,seed);
-    for (const [i,id] of (paper.movement_residents ?? []).slice(0,2).entries()) {
-      const card = personaCards.find(c => c.id === id); if (!card) continue;
-      const portrait = new Portrait(this,{ residentId:id,look:portraitLook(card,0x66543d),x:70+i*70,y:20,art:true });
-      portrait.root.setScale(0.18); portrait.setExpression('neutral',true);
-      this.events.once('shutdown',() => portrait.destroy());
-    }
     text(420,22,'The Lantern',58).setFontFamily(FAMILY_DISPLAY);
     text(58,92,`Day ${m.day} · ${m.season} · ${m.weather} · Wind from ${m.wind} · Sunrise ${printTime(m.sunrise)} · Sunset ${printTime(m.sunset)}`,17);
     text(58,119,`LOW WATER ${m.tides.lows.map(printTime).join(' / ')}     HIGH WATER ${m.tides.highs.map(printTime).join(' / ')}`,16);
@@ -42,9 +36,25 @@ export class DawnReportScene extends Phaser.Scene {
     for (let x=1155;x<1185;x+=6) g.lineBetween(x,35,x,70);
     const town = paper.ledger;
     if (town) text(58,490,`TOWN LEDGER  ${Object.entries(town.pillars).map(([k,v]) => `${k} ${v.toFixed(1)} ${v > town.dayStart[k as keyof typeof town.pillars] ? '↑' : v < town.dayStart[k as keyof typeof town.pillars] ? '↓' : '→'}`).join(' · ')}\nCensus ${town.census} · Appeal ${town.appeal.toFixed(1)} · Fund ${town.fund} coins`,16);
-    const notices = [...paper.notices,...paper.movements];
-    text(58,553,`NOTICES\n${notices.join('\n')}`,15,550).setMaxLines(6);
-    text(660,553,`LETTERS TO THE LANTERN\n${paper.letters.map(l => `${l.from}: ${l.text}`).join('\n') || 'The letters desk is open.'}`,15,550).setMaxLines(6);
+    // §6.6: comings and goings, each with the newcomer's (or the leaver's) portrait and one line (G-02).
+    const movers = paper.movement_residents ?? [];
+    if (paper.movements.length) {
+      text(58,553,`NOTICES\n${paper.notices.join('\n')}`,15,360).setMaxLines(6);
+      text(440,553,'COMINGS AND GOINGS',15,400);
+      paper.movements.slice(0,3).forEach((line,i) => {
+        const y = 578 + i * 40, card = movers[i] ? findCard(movers[i]!) : undefined;
+        if (card) {
+          const portrait = new Portrait(this,{ residentId:portraitArtId(card),look:portraitLook(card,0x66543d),x:440,y:y - 4,art:true });
+          portrait.root.setScale(0.17); portrait.setExpression('warm',true);
+          this.events.once('shutdown',() => portrait.destroy());
+        }
+        text(488,y + 2,line,13,366).setMaxLines(2);
+      });
+      text(880,553,`LETTERS TO THE LANTERN\n${paper.letters.map(l => `${l.from}: ${l.text}`).join('\n') || 'The letters desk is open.'}`,15,340).setMaxLines(6);
+    } else {
+      text(58,553,`NOTICES\n${paper.notices.join('\n')}`,15,550).setMaxLines(6);
+      text(660,553,`LETTERS TO THE LANTERN\n${paper.letters.map(l => `${l.from}: ${l.text}`).join('\n') || 'The letters desk is open.'}`,15,550).setMaxLines(6);
+    }
     text(450,682,'Tap or Enter · Keep in Journal → Today → Papers',15);
     let closed = false;
     const close = () => { if (closed) return; closed = true; this.scene.stop(); if (!this.opened.archive) openPeople(host,clock,'Today'); };

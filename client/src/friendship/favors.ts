@@ -1,8 +1,10 @@
 import { instantiateFavor, type LeavingFavorNotice } from "@monde/shared";
-import { personaCards } from "../world/residents";
+import { allCards, findCard } from "../world/roster";
+import { livingArrivals } from "@monde/shared";
+import { departureDay, resolveNotice, stayFactors, stayInputsOf } from "../town/people";
+import { friendsInTown } from "../scenes/migration";
 import { items } from "../economy/content";
 import { getTown } from "../scenes/TownLedgerScene";
-import { isFerryDay } from "../town/migration";
 import { acceptFavor, canCompleteFavor, type Favor, type FavorProof } from '@monde/shared';
 import type Phaser from 'phaser';
 import type { Clock } from '../sim/clock';
@@ -17,9 +19,9 @@ export const favorBook = (r: Registry) => getFriendship(r).favor_book;
 export function chooseFavor(r: Registry, id: string, day: number, accept: boolean, minute = 360): boolean {
   const all = favorBook(r), f = all.find(x => x.id === id); if (!f) return false;
   if (accept && f.template !== 'last_chance' && !instantiateFavor({ template:f.template,target:f.target,text:f.text },f.id,f.resident_id,{
-    day:f.created_day,items:new Set(items.map(i => i.id)),places:new Set(personaCards.map(c => c.home)),
-    residents:new Map(personaCards.map(c => [c.id,{ home:c.home,reachable:getFriendship(r).tiers[c.id] !== 'ambient' || c.id === f.resident_id }])),
-    met:(a,b) => (getFriendship(r).ties?.pairs ?? []).some(t => t.a === a && t.b === b || t.a === b && t.b === a) || (personaCards.find(c => c.id === a)?.relationships.some(t => t.id === b) ?? false),
+    day:f.created_day,items:new Set(items.map(i => i.id)),places:new Set(allCards().map(c => c.home)),
+    residents:new Map(allCards().map(c => [c.id,{ home:c.home,reachable:getFriendship(r).tiers[c.id] !== 'ambient' || c.id === f.resident_id }])),
+    met:(a,b) => (getFriendship(r).ties?.pairs ?? []).some(t => t.a === a && t.b === b || t.a === b && t.b === a) || (findCard(a)?.relationships.some(t => t.id === b) ?? false),
   })) return false;
   const next = accept ? acceptFavor(f,day,all) : f.status === 'proposed' ? { ...f, status: 'declined' as const } : null;
   if (!next) return false;
@@ -39,8 +41,9 @@ export function finishFavor(r: Registry, clock: Clock, f: Favor, proof: FavorPro
   for (const reward of f.reward.items) { const item = itemById(reward.item); if (!item) return false; const next = addItem(bag,item,reward.count); if (!next) return false; bag = next; }
   if (!appendEvent(r,{ kind: 'favor_done', id: `favor_done_${f.id}`, favor: f.id, resident: f.resident_id, day: clock.day, minute: clock.minute, proof })) return false;
   if (f.template === 'last_chance') {
+    // §6.4: done in time, they stay (the +10 Regard is the Favor's reward).
     const town = getTown(r);
-    if (town) { const notices = { ...town.migration.notices }, lowStayNights = { ...town.migration.lowStayNights }; delete notices[f.resident_id]; delete lowStayNights[f.resident_id]; r.set('monde.town',{ ...town,migration: { notices,lowStayNights } }); }
+    if (town) r.set('monde.town', resolveNotice(town, f.resident_id, clock.day));
   }
   r.set(BAG_KEY,bag); r.set(COINS_KEY,{ balance: coinsOf(r) + f.reward.coins });
   updateFriendship(r,s => ({ ...s, favor_book: s.favor_book.map(x => x.id === f.id ? { ...x,status: 'completed' } : x) })); return true;
@@ -68,12 +71,17 @@ export function favorInteraction(r: Registry, clock: Clock, place: string): { la
 export function leavingFavors(r: Registry, day: number): LeavingFavorNotice[] {
   const town = getTown(r); if (!town) return [];
   return Object.entries(town.migration.notices).flatMap(([resident,given]) => {
-    const card = personaCards.find(c => c.id === resident); if (!card) return [];
-    let deadline = given + 2; while (!isFerryDay(deadline,town.flags)) deadline++;
+    const card = findCard(resident); if (!card) return [];
+    // §6.4: two days before the ferry they'd leave on (the first sailing at least two days after the notice).
+    const deadline = departureDay(given, town.flags);
     if (day !== deadline - 2) return [];
-    const friends = card.relationships.filter(t => t.affinity >= 40).length;
-    // GDD-GAP: cards have no years-in-Monde field. Existing residents' roots use the full 10; generated arrivals need tenure data.
-    return [{ resident,deadline,factors: { town: 60 * Object.entries(card.values).reduce((n,[k,v]) => n + v * town.pillars[k as keyof typeof town.pillars] / 100,0), friends: 20*Math.min(1,friends/4), purpose: card.occupation ? 10 : 0, roots: 10 } }];
+    // G-02: a generated resident's own Stay factors (friends from the ties, roots from their tenure); an authored
+    // card's from its card (GDD-GAP: no years-in-Monde field, so the cast keep the full 10 for roots).
+    const arrival = livingArrivals(town.people).find(a => a.card.id === resident);
+    const factors = arrival ? stayFactors(stayInputsOf(arrival, day, { friends: id => friendsInTown(r, id) }), town.pillars) : {
+      town: 60 * Object.entries(card.values).reduce((n,[k,v]) => n + v * town.pillars[k as keyof typeof town.pillars] / 100,0),
+      friends: 20*Math.min(1,card.relationships.filter(t => t.affinity >= 40).length/4), purpose: card.occupation ? 10 : 0, roots: 10 };
+    return [{ resident,deadline,factors }];
   });
 }
 export function localLastChances(r: Registry, day: number): void {
@@ -82,8 +90,8 @@ export function localLastChances(r: Registry, day: number): void {
     const id = `last_chance_${notice.resident}_${notice.deadline}`;
     if (all.some(f => f.id === id || f.resident_id === notice.resident && ['accepted','proposed'].includes(f.status)) || all.filter(f => ['accepted','proposed'].includes(f.status)).length >= 6) continue;
     const f = instantiateFavor({ template: 'last_chance',target: notice.resident,text: 'Before the ferry goes, could you help me put one thing right?' },id,notice.resident,{
-      day,items: new Set(items.map(i => i.id)), places: new Set(personaCards.map(c => c.home)),residents: new Map(personaCards.map(c => [c.id,{ home: c.home,reachable: c.kind === 'canon' || getFriendship(r).tiers[c.id] === 'acquainted' || c.id === notice.resident }])),
-      met: (a,b) => personaCards.find(c => c.id === a)?.relationships.some(t => t.id === b) ?? false, leaving: new Map([[notice.resident,notice]]),
+      day,items: new Set(items.map(i => i.id)), places: new Set(allCards().map(c => c.home)),residents: new Map(allCards().map(c => [c.id,{ home: c.home,reachable: c.kind === 'canon' || getFriendship(r).tiers[c.id] === 'acquainted' || c.id === notice.resident }])),
+      met: (a,b) => (getFriendship(r).ties?.pairs ?? []).some(t => t.a === a && t.b === b || t.a === b && t.b === a) || (findCard(a)?.relationships.some(t => t.id === b) ?? false), leaving: new Map([[notice.resident,notice]]),
     });
     if (f) updateFriendship(r,s => ({ ...s,favor_book: [...s.favor_book,f] }));
   }

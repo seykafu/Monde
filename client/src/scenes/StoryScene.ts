@@ -1,3 +1,5 @@
+import type { Outcome as ScuffleOutcome } from '../combat/scuffle/engine';
+import { openScuffle } from '../scuffles/ScuffleScene';
 import { openPuzzle } from '../puzzles/scenes/PuzzleScene';
 // Scripted scenes as a VN (GDD §13.1 cues, §13.3 scenes, §18 Dialogue; MVP G-10).
 //
@@ -26,7 +28,7 @@ import {
   bodyStyle, drawPanel, rosterColour, youPlate
 } from '../dialogue/panel';
 import { Portrait } from '../dialogue/portrait';
-import { PORTRAIT_W, portraitLook, type PortraitLook } from '../dialogue/portraitModel';
+import { PORTRAIT_W, portraitArtId, portraitLook, type PortraitLook } from '../dialogue/portraitModel';
 import { browserStorage } from '../mind/api';
 import { loadTextSpeed } from '../mind/prefs';
 import { MS_PER_CHAR, type TextSpeed } from '../mind/reader';
@@ -44,7 +46,7 @@ import type { StorySession } from '../story/session';
 import { paginateBody } from '../ui/fitText';
 import { FAMILY_BODY, FAMILY_HEADING, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { placeName } from '../world/player';
-import { personaCards } from '../world/residents';
+import { resolveAlias, rosterEntry } from '../world/roster';
 import { zones } from '../world/zones';
 import { DIALOGUE_CLOSED, DIALOGUE_SCENE, voiceFrequency, type DialogueClosed, type DialogueOpen } from './DialogueScene';
 
@@ -61,7 +63,8 @@ export interface StoryOpen {
   dialogueFor(residentId: string): Omit<DialogueOpen, 'host' | 'residentId'> | null;
 }
 
-const CARDS: ReadonlyMap<string, { card: PersonaCard; index: number }> = new Map(personaCards.map((card, index) => [card.id, { card, index }]));
+/** Everyone with a card, the generated residents included; `arrival` is S05's first real arrival once there is one (G-02). */
+const CARDS: Pick<ReadonlyMap<string, { card: PersonaCard; index: number }>, 'has' | 'get'> = { has: id => !!rosterEntry(id), get: id => rosterEntry(id) };
 /** Sound ids the scripts use under another name in the catalogue (audio/Sfx.ts). */
 const SFX_ALIASES: Readonly<Record<string, SfxKey>> = { thin_applause: 'applause_thin' };
 /** Voice blips no closer together than this (as the dialogue panel). */
@@ -372,7 +375,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
       const old = this.portrait;
       if (old) this.tweens.add({ targets: old.root, alpha: 0, duration: 140, onComplete: () => old.destroy() });
       this.speaker = speakerFor(id);
-      const portrait = new Portrait(this, { residentId: id, look: this.speaker.look, x: PORTRAIT_X, y: PORTRAIT_Y, label: true });
+      const portrait = new Portrait(this, { residentId: CARDS.has(id) ? portraitArtId(CARDS.get(id)!.card) : id, look: this.speaker.look, x: PORTRAIT_X, y: PORTRAIT_Y, label: true });
       portrait.root.setDepth(5).setAlpha(0);
       portrait.setExpression(expr ?? 'neutral', true);
       this.tweens.add({ targets: portrait.root, alpha: 1, duration: 160 });
@@ -557,12 +560,15 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     finally { if (!this.closed) { this.panelLayer.setVisible(true); this.portrait?.root.setVisible(true); this.listen(true); } }
   }
 
+  async scuffle(id: string, key: string): Promise<ScuffleOutcome> {
+    this.panelLayer.setVisible(false); this.portrait?.root.setVisible(false); this.listen(false);
+    try { return await openScuffle(this, this.open.clock, id, { key, story: true }); }
+    finally { if (!this.closed) { this.panelLayer.setVisible(true); this.portrait?.root.setVisible(true); this.listen(true); } }
+  }
+
   async placeholder(kind: 'puzzle' | 'scuffle', id: string): Promise<boolean> {
     if (kind === 'puzzle') return this.puzzle(id);
-    // GDD-GAP: Scuffles (§7) still use the existing stand-in.
-    const what = `Scuffle ${id.replaceAll('_', ' ')}`;
-    this.say(`(${what} isn't built yet. How does it go?)`);
-    return (await this.ask(['Won', 'Lost'], false)) === 0;
+    const outcome = await this.scuffle(id, `${this.sceneId ?? 'story'}:${id}`); return outcome === 'win' || outcome === 'talk_down';
   }
 
   async charcreate(): Promise<boolean> {
@@ -581,7 +587,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
       return [];
     }
     const closed = new Promise<DialogueClosed>(resolve => {
-      const on = (e: DialogueClosed) => { if (e.residentId !== cue.resident) return; this.game.events.off(DIALOGUE_CLOSED, on); resolve(e); };
+      const on = (e: DialogueClosed) => { if (e.residentId !== resolveAlias(cue.resident)) return; this.game.events.off(DIALOGUE_CLOSED, on); resolve(e); };
       this.game.events.on(DIALOGUE_CLOSED, on);
     });
     // The dialogue panel plays the written exchange whenever its Quiet Mode path is the one speaking.

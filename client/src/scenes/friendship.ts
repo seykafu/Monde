@@ -4,6 +4,8 @@ import { expireFavor } from "@monde/shared";
 import { computeAppeal } from "../town/appeal";
 import { getTown } from "./TownLedgerScene";
 import { leavingFavors, localLastChances } from "../friendship/favors";
+import { adoptDawnArrivals, nightArrivals, paperMovements } from "./migration";
+import { generatedCards } from "../world/roster";
 import { projectPaper } from "../projects/runtime";
 import YAML from "yaml";
 import headlineText from "../../../content/lines/headlines.yaml?raw";
@@ -65,6 +67,8 @@ export function updateFriendship(registry: Registry, fn: (state: FriendshipState
 
 /** What the town calls each resident in lines ("Pell", "June", "Captain Reyes"). */
 export const TOWN_NAMES: Readonly<Record<string, string>> = Object.fromEntries(personaCards.map(c => [c.id, townName(c)]));
+/** TOWN_NAMES with the generated residents (G-02) who live here now. */
+export const townNames = (): Readonly<Record<string, string>> => ({ ...TOWN_NAMES, ...Object.fromEntries(generatedCards().map(c => [c.id, townName(c)])) });
 const NAMES = nameIndex(personaCards);
 /** Day 1's ties from the cards: what the client knows before its first online dawn (and always in Quiet Mode). */
 const CARD_TIES = cardTies(personaCards);
@@ -147,7 +151,7 @@ function nightRequest(registry: Registry, day: number, opts: DawnSyncOptions): N
   const tomorrow = dailyWeather(opts.weatherSeed(), day + 1);
   const events = sendable(getEventLog(registry), day);
   return {
-    day, leaving: leavingFavors(registry,day+1),
+    day, leaving: leavingFavors(registry,day+1), ...nightArrivals(registry, day + 1),
     ...(events.length ? { client_events: events } : {}),
     town: {
       ...(town ? {
@@ -185,6 +189,9 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     const town = getTown(registry);
     edition.notices = [...new Set([...edition.notices, ...(isMarketDay(day) ? ['Saturday market on Market Row.'] : []), ...(isFerryDay(day,town?.flags) ? ['The ferry sails today from the Wharf.'] : []), 'Meals and gifts at the general store.'])];
     if (!paper) edition.letters = getFriendship(registry).letters.filter(l => l.to === 'lantern' && l.day === day).slice(0,2).map(l => ({ from:l.from,text:l.text }));
+    // G-02 (§6.6): comings and goings from the town's own roster: this morning's boat in, and anyone leaving on it.
+    const moves = paperMovements(registry, day);
+    if (moves.lines.length) { edition.movements = moves.lines; edition.movement_residents = moves.residents; }
     if (town) edition.ledger = { pillars:{ ...town.pillars },dayStart:{ ...town.dayStart },census:town.census,appeal:computeAppeal(town).appeal,fund:town.fund };
     updateFriendship(registry,s => ({ ...s, favor_book: s.favor_book.map(f => expireFavor(f,day)), papers: [...s.papers.filter(p => p.day !== day),edition] }));
     registry.set('monde.press.seed',opts.weatherSeed()); registry.set('monde.press.pending',edition); clock.pause('paper');
@@ -211,7 +218,9 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
       if (seq !== syncSeq || registry.get(CLOCK_KEY) !== clock) return;
       if (!result.pkg) { console.info(`[dawn] Day ${day}: ${result.reason}; templates and the last known ties`); return; }
       const plans = modelPlans(result.pkg.plans);
-      const applied = applyDawn(getFriendship(registry), result.pkg, { names: TOWN_NAMES, plans });
+      // G-02: the server's households for today replace the local templates before they land.
+      adoptDawnArrivals(registry, result.pkg);
+      const applied = applyDawn(getFriendship(registry), result.pkg, { names: townNames(), plans });
       registry.set(FRIENDSHIP_KEY, { ...applied.state, papers: getFriendship(registry).papers });
       publish(day,result.pkg.press);
       registry.set(DAWN_TIES_KEY, {
