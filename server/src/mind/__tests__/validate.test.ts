@@ -63,7 +63,8 @@ describe("validation pipeline", () => {
     const out = result.output;
     expect(out.effects.regard_delta).toBe(5);
     expect(out.effects.mood).toEqual({ valence: -10, stress: 10 });
-    expect(out.effects.memory).toEqual({ text: "z".repeat(200), importance: 10 });
+    // One 500-letter "word" has no boundary to cut at, so it ends in an ellipsis within the 200 cap.
+    expect(out.effects.memory).toEqual({ text: `${"z".repeat(199)}…`, importance: 10 });
     expect(out.effects.favor).toBeNull();
     expect(out.effects.topic).toHaveLength(60);
     expect(out.lines).toHaveLength(3);
