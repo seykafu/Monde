@@ -1,5 +1,5 @@
 import { getAudioSettings, subscribeAudioSettings } from './audioSettings';
-import { MUSIC_TRACKS, TRACK_KEYS, resolveMusicCue, type TrackKey } from './musicTracks';
+import { TRACK_KEYS, resolveMusicCue, trackFiles, type TrackFile, type TrackKey } from './musicTracks';
 import { generateNoteSchedule, placeholderDuration, schedulePlaceholderNote } from './placeholderMusic';
 export type MusicSource = 'file' | 'placeholder';
 interface Voice { bus: GainNode; nodes: Set<AudioScheduledSourceNode>; tick: (until: number) => void; retireAt: number }
@@ -28,20 +28,33 @@ export class MusicManager {
   private unlocked = false;
   private timer: ReturnType<typeof setInterval>;
   private abort = new AbortController();
-  private availability = new Map<TrackKey, Promise<boolean>>();
-  private buffers = new Map<TrackKey, AudioBuffer>();
+  /** Per file: does it exist? Probed once at startup for every take of every track. */
+  private availability = new Map<string, Promise<boolean>>();
+  private buffers = new Map<string, AudioBuffer>();
+  /** Which take each track played last, so alternate takes rotate. */
+  private takes = new Map<TrackKey, number>();
   private unsubscribe: () => void;
   currentTrack: TrackKey | null = null;
   source: MusicSource | null = null;
   constructor() {
-    for (const track of TRACK_KEYS) this.availability.set(track, probeMusicFile(this.url(track), this.abort.signal));
+    for (const track of TRACK_KEYS) for (const take of trackFiles(track)) this.availability.set(take.file, probeMusicFile(this.url(take.file), this.abort.signal));
     document.addEventListener('pointerdown', this.unlock);
     document.addEventListener('keydown', this.unlock);
     document.addEventListener('visibilitychange', this.visibility);
     this.unsubscribe = subscribeAudioSettings(() => this.updateVolume());
     this.timer = setInterval(() => this.tick(), 100);
   }
-  private url(track: TrackKey): string { return `${import.meta.env.BASE_URL}audio/music/${MUSIC_TRACKS[track].file}`; }
+  private url(file: string): string { return `${import.meta.env.BASE_URL}audio/music/${file}`; }
+  /** The next take of a track that exists (rotating through alternates), or null for the placeholder. */
+  private async pickTake(track: TrackKey): Promise<TrackFile | null> {
+    const files = trackFiles(track);
+    const present: TrackFile[] = [];
+    for (const take of files) if (await this.availability.get(take.file)) present.push(take);
+    if (!present.length) return null;
+    const next = ((this.takes.get(track) ?? -1) + 1) % present.length;
+    this.takes.set(track, next);
+    return present[next]!;
+  }
   private unlock = (): void => {
     if (this.disposed || document.hidden) return;
     this.context ??= new AudioContext();
@@ -74,19 +87,20 @@ export class MusicManager {
   }
   private async start(track: TrackKey, fade: number, request: number): Promise<void> {
     const ctx = this.context!;
-    let buffer = this.buffers.get(track);
-    if (!buffer && await this.availability.get(track)) {
+    const take = await this.pickTake(track);
+    let buffer = take ? this.buffers.get(take.file) : undefined;
+    if (take && !buffer) {
       try {
-        const response = await fetch(this.url(track), { signal: this.abort.signal });
+        const response = await fetch(this.url(take.file), { signal: this.abort.signal });
         if (!response.ok) throw new Error('Music fetch failed');
         buffer = await ctx.decodeAudioData(await response.arrayBuffer());
-        this.buffers.set(track, buffer);
+        this.buffers.set(take.file, buffer);
       } catch { /* Missing, invalid or unsupported file: use the placeholder. */ }
     }
     if (this.disposed || request !== this.request) return;
     const now = ctx.currentTime, bus = ctx.createGain();
     bus.connect(this.output!); bus.gain.setValueAtTime(0, now);
-    bus.gain.linearRampToValueAtTime(MUSIC_TRACKS[track].gain, now + fade);
+    bus.gain.linearRampToValueAtTime(buffer && take ? take.gain : 1, now + fade);
     if (this.active) this.retire(this.active, fade);
     const voice: Voice = { bus, nodes: new Set(), tick: () => {}, retireAt: Infinity };
     const trackNode = (node: AudioScheduledSourceNode) => {

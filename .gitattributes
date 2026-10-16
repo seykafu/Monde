@@ -1,3 +1,4 @@
 art_sources/**/*.png filter=lfs diff=lfs merge=lfs -text
 art_sources/**/*.jpg filter=lfs diff=lfs merge=lfs -text
 client/public/assets/**/*.png filter=lfs diff=lfs merge=lfs -text
+client/public/audio/**/*.mp3 filter=lfs diff=lfs merge=lfs -text

@@ -11,8 +11,13 @@ plays a **generative placeholder** (WebAudio, in code) for that track, so every 
 3. Put it in `client/public/audio/music/`.
 4. That's it. On the next load the game uses your file instead of the placeholder. To go back, delete the file.
 
-Tips: 2–3 minutes is plenty (the game crossfades into a restart at the end). Aim for even loudness across
-tracks; the game normalizes per-track volume in `client/src/audio/musicTracks.ts` if one comes out loud.
+Tips: 2–3 minutes is plenty (the game crossfades into a restart at the end). Loudness is evened out per file
+in `client/src/audio/musicTracks.ts` (each file's `gain` brings it to about −17 LUFS, measured with
+`ffmpeg -i <file> -af ebur128 -f null -`).
+
+**More than one take?** Name extra takes `<track>_2.mp3`, `<track>_3.mp3` and list them as `alts` on the track
+in `musicTracks.ts`; the game rotates through the takes that exist each time the track starts (Old Quarter has
+two).
 
 ## MVP tracks (Spring in Monde)
 

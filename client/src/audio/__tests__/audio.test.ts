@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { MUSIC_TRACKS, TRACK_KEYS, resolveMusicCue } from '../musicTracks';
+import { MUSIC_TRACKS, trackFiles, TRACK_KEYS, resolveMusicCue } from '../musicTracks';
 import { generateNoteSchedule, placeholderDuration } from '../placeholderMusic';
 import { probeMusicFile } from '../MusicManager';
 import { getAudioSettings, setAudioSettings } from '../audioSettings';
@@ -29,8 +29,17 @@ describe('MVP catalogue', () => {
     for (const key of TRACK_KEYS) {
       expect(MUSIC_TRACKS[key].file).toBe(`${key}.mp3`);
       expect(resolveMusicCue(key)).toBe(key);
-      expect(MUSIC_TRACKS[key].gain).toBe(1);
+      // Gains even out measured loudness (about −17 LUFS); keep them in a sane band.
+      for (const take of trackFiles(key)) {
+        expect(take.gain).toBeGreaterThan(0.4);
+        expect(take.gain).toBeLessThanOrEqual(1.5);
+        expect(take.file).toMatch(new RegExp(`^${key}(_\\d+)?\\.mp3$`));
+      }
     }
+  });
+  it('lists alternate takes after the main take', () => {
+    expect(trackFiles('old_quarter').map((t) => t.file)).toEqual(['old_quarter.mp3', 'old_quarter_2.mp3']);
+    expect(trackFiles('night').map((t) => t.file)).toEqual(['night.mp3']);
   });
 });
 describe('placeholder score', () => {
