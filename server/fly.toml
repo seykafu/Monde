@@ -18,7 +18,7 @@ primary_region = "iad"
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1  # staging stays warm: an auto-stopped machine failed to wake on request (2026-10-16)
 
   [[http_service.checks]]
     grace_period = "10s"
