@@ -342,28 +342,28 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect(turns.map((t) => t.output.effects.reveal_secret)).toEqual([null, "pell_s1"]);
   });
 
-  it("runs the riddle post-filter only when context.riddle is set, with the server's answers", async () => {
+  it("serves the authored hint on riddle turns without a model call; ordinary turns are unaffected", async () => {
     const leaky = good(["(Taps the plaque.) Sounds like the old bell by the chapel gate."]);
-    const mind = new FakeMind([{ output: leaky, chunk: 4 }, { output: leaky }, { output: leaky }]);
+    const mind = new FakeMind([{ output: leaky, chunk: 4 }]);
     const env = await setup(mind);
 
     const riddleTurn = sse((await talk(env, payload({ context: { riddle: { id: "OQ-1", hints_allowed: 2 } } }))).payload);
-    expect(riddleTurn.find((e) => e.event === "error")!.data.code).toBe("invalid_output");
+    expect(riddleTurn.find((e) => e.event === "error")!.data.code).toBe("riddle_authored");
     expect(finalTurn(riddleTurn)).toMatchObject({ fallback: true, lines: [{ text: RIDDLES["OQ-1"]!.hints[1] }] });
     expect(riddleTurn.some((e) => e.event === "line_delta" && /bell/i.test(e.data.text_so_far))).toBe(false);
-    const prompt = userBlocks(mind.streams[0]!)[0]!;
-    expect(prompt).toContain('<hints allowed="2">');
-    expect(prompt).not.toMatch(/old bell|chapel bell/i);
-    expect(userBlocks(mind.streams[1]!).at(-1)).toBe(correctiveNote("riddle"));
+    expect(mind.streams).toHaveLength(0);
 
     const ordinary = sse((await talk(env, payload())).payload);
     expect(finalTurn(ordinary)).toMatchObject({ fallback: false, lines: leaky.lines });
+    expect(mind.streams).toHaveLength(1);
   });
 
   it("ignores answer lists sent by the client", async () => {
-    const env = await setup(new FakeMind([{ output: good([RIDDLES["OQ-1"]!.hints[0]]) }]));
+    const mind = new FakeMind([{ output: good(["Lamps and tea, that's the answer."]) }]);
+    const env = await setup(mind);
     const body = payload({ context: { riddle: { id: "OQ-1", hints_allowed: 1, accepted: ["lamps", "tea"] } } });
-    expect(finalTurn(sse((await talk(env, body)).payload)).fallback).toBe(false);
+    expect(finalTurn(sse((await talk(env, body)).payload))).toMatchObject({ lines: [{ text: RIDDLES["OQ-1"]!.hints[0] }] });
+    expect(mind.streams).toHaveLength(0);
   });
 
   it("regenerates a line that echoes one of the resident's recent lines", async () => {

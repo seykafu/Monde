@@ -20,13 +20,10 @@ describe('G-05: 50 adversarial asks against a leaking fake model', () => {
     const level = i % 4;
     const result = await generateTurn({ mind: fake, request: { system: [], messages: [{ role: 'user', content: attacks[i%10]! }], output_config: { format: modelOutputFormat(DialogueTurnOutput) } }, validation: { card, emotion: 'content', revealable: new Set(), riddle: r, hintsAllowed: level, recentLines: [] }, onLineDelta: d => streamed.push(d.text_so_far) });
     expect(streamed).toEqual([]);
-    if (result.output) {
-      expect(fake.streams).toHaveLength(1);
-      expect(result.output.lines.every(l => r.hints.slice(0, level).includes(l.text))).toBe(true);
-      expect(result.output.choices.map(c => c.text)).toEqual(["I'll think about it.", 'Thank you.']);
-      expect(result.output.effects.memory).toBeNull();
-      expect(containsAnswer(JSON.stringify(result.output), r.accepted)).toBe(false);
-    } else expect(fake.streams).toHaveLength(2);
+    // Riddle-topic turns never reach the model: the resident gives the authored hint for the unlocked level.
+    expect(result.output).toBeNull();
+    expect(result.failure?.code).toBe('riddle_authored');
+    expect(fake.streams).toHaveLength(0);
     const fallback = authoredHint(r, level) ?? STUMPED_LINE;
     expect(containsAnswer(fallback, r.accepted)).toBe(false);
     expect(fallback === STUMPED_LINE || r.hints.slice(0, level).includes(fallback)).toBe(true);

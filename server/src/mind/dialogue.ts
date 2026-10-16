@@ -73,7 +73,7 @@ export interface CallRecord {
   validation: string;
 }
 
-export type TurnFailureCode = "unavailable" | "timeout" | "refusal" | "max_tokens" | "api_error" | "invalid_output" | "aborted";
+export type TurnFailureCode = "unavailable" | "timeout" | "refusal" | "max_tokens" | "api_error" | "invalid_output" | "aborted" | "riddle_authored";
 
 export interface TurnFailure {
   code: TurnFailureCode;
@@ -114,6 +114,7 @@ export interface GenerateOptions {
 }
 
 const FAILURE_MESSAGES: Record<TurnFailureCode, string> = {
+  riddle_authored: "A riddle-topic turn: the resident gives the authored hint for the unlocked level (§14.2).",
   unavailable: "No model is configured; using an authored line.",
   timeout: "The resident took too long to answer; using an authored line.",
   refusal: "The model declined this turn; using an authored line.",
@@ -341,6 +342,9 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
   const fail = (code: TurnFailureCode): GenerateResult => ({ output: null, failure: failure(code), calls, adjustments: [], salvaged: false });
 
   try {
+    // Riddle-topic turns may only show authored hint wording (validate.ts step 5), so a model call can only fail
+    // the guard and cost ~3.7 s before the same authored hint appears. Serve it straight away instead.
+    if (options.validation.riddle) return fail("riddle_authored");
     let corrective: string | null = null;
     for (let attempt = 1; attempt <= 2; attempt++) {
       const params = dialogueParams(options.request, corrective ? [...notes, corrective] : notes);
