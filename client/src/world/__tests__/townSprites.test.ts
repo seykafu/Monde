@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { scatter, type ScatterMap, type ScatterRule } from '../scatter';
-import { SPRITE_META, TOWN_MANIFEST, isLived, propBlock, resolveState, type TownLook } from '../townSprites';
+import { SPRITE_META, TOWN_MANIFEST, propBlock, resolveState, type TownLook } from '../townSprites';
 import type { TownTerrain } from '../townTerrain';
 
 // ── Scatter ─────────────────────────────────────────────────────────────────
@@ -94,11 +94,12 @@ describe('town sprites', () => {
     expect(resolveState({ sprite: 'oak', state: 'faded' }, look())).toBe('restored');
   });
 
-  it('lights homes people live in', () => {
-    expect(isLived({ id: 'okafor_house', sprite: 'okafor_house' }, 'restored')).toBe(true);
-    expect(isLived({ id: 'vacant_house_39', sprite: 'townhouse_a' }, 'restored')).toBe(false);
-    expect(isLived({ id: 'lamplighter_cottage', sprite: 'lamplighter_cottage' }, 'faded')).toBe(false);
-    expect(isLived({ id: 'glasshouse', sprite: 'glasshouse' }, 'restored')).toBe(false);
+  it('restores a vacant home a household has moved into, and keeps a plain vacant home faded', () => {
+    const homes = ['old_quarter.vacant_house_46'];
+    expect(resolveState({ id: 'vacant_house_46', sprite: 'townhouse_d', state: 'auto', homes }, look())).toBe('faded');
+    expect(resolveState({ id: 'vacant_house_46', sprite: 'townhouse_d', state: 'auto', homes }, look('home_occupied:old_quarter.vacant_house_46'))).toBe('restored');
+    expect(resolveState({ sprite: 'townhouse_a', state: 'auto', homes: ['wharf.vacant'] }, look())).toBe('faded');
+    expect(resolveState({ sprite: 'townhouse_a', state: 'auto', homes: ['wharf.home_02'] }, look())).toBe('restored');
   });
 
   it('blocks a prop\'s trunk or base, centred on its tile and running back from it', () => {

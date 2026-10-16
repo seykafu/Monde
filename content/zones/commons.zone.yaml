@@ -63,6 +63,8 @@ props:
   - { sprite: lamp_post, at: [28, 25] }
   - { sprite: lamp_post, at: [32, 25] }
   - { sprite: flowerbed, at: [30, 24] }
+  # The bandstand's foundation stone, a lantern on its face (CM-5).
+  - { sprite: foundation_stone, at: [29, 21], offset: [0, -12] }
   # The community garden: six overgrown beds (community_garden Project), its fence and gate, the well.
   - { sprite: veg_bed, at: [34, 11], offset: [24, 0] }
   - { sprite: veg_bed, at: [38, 11], offset: [24, 0] }
@@ -84,6 +86,8 @@ props:
   # The glasshouse terrace and the woodland edge along the north.
   - { sprite: planter, at: [16, 7] }
   - { sprite: planter, at: [22, 7] }
+  # The pane that wears a lantern (CM-3), one of the whole ones.
+  - { sprite: lantern_pane, at: [20, 7], offset: [19, -16], lift: 36 }
   - { sprite: oak, at: [1, 1] }
   - { sprite: pine, at: [7, 2] }
   - { sprite: pine, at: [9, 0] }
@@ -156,6 +160,12 @@ props:
   - { sprite: notice_board, at: [33, 34] }
   - { sprite: oak, at: [9, 34] }
   - { sprite: pine, at: [42, 35] }
+  # Monde's Marks (§14.8): the gate post, the sundial's plinth, the tin buried at the gnomon's shadow-tip toward
+  # the Old Elm (mid-afternoon, CM-2), the lantern pane's frame.
+  - { sprite: mark_plaque, at: [28, 36], offset: [0, 2], lift: 25, mark: CM-1 }
+  - { sprite: mark_plaque, at: [18, 30], offset: [0, 2], lift: 13, mark: CM-2 }
+  - { sprite: mark_plaque, at: [20, 29], mark: CM-3 }
+  - { sprite: mark_plaque, at: [20, 7], offset: [19, -15], lift: 29, mark: CM-4 }
 scatter:
   - { sprites: [tall_grass, tall_grass, tall_grass, bush_round, bush_flowering, rock], on: [grass], density: 0.07, seed: 41, keepout: { kinds: [gravel, plaza, soil], radius: 0, doors: 2 } }
   - { sprites: [tall_grass, tall_grass, tall_grass, bush_flowering, bush_round], on: [meadow], density: 0.24, seed: 42, keepout: { kinds: [gravel], radius: 0, doors: 1 } }

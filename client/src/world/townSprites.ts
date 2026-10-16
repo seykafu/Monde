@@ -6,6 +6,8 @@
 // its bottom-centre on the middle of its footprint's FRONT edge, a prop on the middle of its base tile.
 
 import manifestJson from '../../public/assets/town/manifest.json';
+import type { LetterStyle } from '../render/town/lettering';
+import { occupiedFlag } from '../town/occupancy';
 
 export type SpriteState = 'restored' | 'faded';
 
@@ -60,52 +62,63 @@ export interface SpriteMeta {
   project?: string;
   /** Story flags that also mean it is restored (the projects' own flags, §13.6). */
   restoredBy?: readonly string[];
+  /** Buildings: a house. Scenery houses must say who lives there (zone `home:`; town/occupancy.ts). */
+  dwelling?: boolean;
+  /** Buildings: where a datestone goes over the door, px from the sprite's top-left; `plain` carves the year straight into the stone. */
+  lintel?: { x: number; y: number; plain?: boolean };
+  /** Buildings: the sign panel a zone's `sign:` is lettered on (its centre, px), and in what. */
+  sign?: { x: number; y: number; style: LetterStyle };
+  /** Buildings: where a zone's `number:` plate goes (its centre, px). */
+  plate?: readonly [number, number];
+  /** Props: the panel a zone's `text:` is lettered on (its centre, px), and in what. */
+  letter?: { x: number; y: number; style: LetterStyle };
 }
 
 // Chimney tops and door columns were read off the art (scratch contact sheets with the footprint grid drawn
 // over each building); `block` sizes match each prop's trunk, base or legs, not its canopy.
 export const SPRITE_META: Readonly<Record<string, SpriteMeta>> = {
   // ── buildings ──
-  augusta_house: { chimneys: [[80, 2]], door: 0 },
+  augusta_house: { chimneys: [[80, 2]], door: 0, dwelling: true },
   bakery: { chimneys: [[132, 22]], door: 2 },
   bandstand: { door: 1, unlit: true, project: 'bandstand', restoredBy: ['bandstand_rebuilt'] },
-  bertrand_house: { chimneys: [[85, 2]], door: 0 },
+  bertrand_house: { chimneys: [[85, 2]], door: 0, dwelling: true },
   boathouse: { door: 1, unlit: true },
-  bunkhouse: { chimneys: [[163, 1]], door: 2 },
+  bunkhouse: { chimneys: [[163, 1]], door: 2, dwelling: true },
   cafe_liss: { chimneys: [[45, 2]], door: 1 },
   cannery: { chimneys: [[280, 8]], door: 2, project: 'cannery_coop', restoredBy: ['cannery_coop'] },
-  clocktower: { door: 0, unlit: true },
-  constabulary: { chimneys: [[147, 10]], door: 1 },
+  clocktower: { door: 0, unlit: true, lintel: { x: 40, y: 271 } },
+  constabulary: { chimneys: [[147, 10]], door: 1, lintel: { x: 76, y: 101, plain: true } },
   fish_market: { door: 2, unlit: true },
-  founders_house: { chimneys: [[80, 8]], door: 1, unlit: true },
+  founders_house: { chimneys: [[80, 8]], door: 1, unlit: true, lintel: { x: 79, y: 146 } },
   garden_shed: { door: 1, unlit: true },
   general_store: { chimneys: [[52, 3], [184, 2]], door: 1 },
   glasshouse: { door: 2, unlit: true, project: 'glasshouse', restoredBy: ['glasshouse_repaired'] },
   gull_and_anchor: { chimneys: [[36, 1], [167, 1]], door: 2 },
-  harbormaster_house: { chimneys: [[22, 36], [144, 36]], door: 1 },
+  harbormaster_house: { chimneys: [[22, 36], [144, 36]], door: 1, dwelling: true },
   // GDD-GAP: §11.5 has the cottage "in rough shape" and its roof fixed by a personal upgrade, with no flag
   // named; `project_cottage_roof_done` (the declared project_<id>_done pattern) restores its art.
-  lamplighter_cottage: { chimneys: [[146, 5]], door: 2, project: 'cottage_roof' },
-  lantern_office: { chimneys: [[116, 4]], door: 2 },
-  library: { chimneys: [[41, 6], [210, 6]], door: 2 },
+  lamplighter_cottage: { chimneys: [[146, 5]], door: 2, project: 'cottage_roof', dwelling: true },
+  lantern_office: { chimneys: [[116, 4]], door: 2, lintel: { x: 110, y: 116 } },
+  library: { chimneys: [[41, 6], [210, 6]], door: 2, lintel: { x: 125, y: 126 } },
   lighthouse: { door: 1, unlit: true, project: 'lighthouse' },
   market_hall: { door: 2, unlit: true, project: 'market_hall' },
-  nell_cottage: { chimneys: [[35, 2]], door: 1 },
-  okafor_house: { chimneys: [[23, 2]], door: 0 },
-  pell_house: { chimneys: [[23, 2]], door: 0 },
-  st_brigids: { door: 1, unlit: true },
-  storefront_a: { chimneys: [[23, 2]], door: 1 },
-  storefront_b: { chimneys: [[24, 2]], door: 2 },
-  storefront_c: { chimneys: [[84, 2]], door: 2 },
-  teo_cottage: { chimneys: [[37, 2]], door: 2 },
+  nell_cottage: { chimneys: [[35, 2]], door: 1, dwelling: true },
+  okafor_house: { chimneys: [[23, 2]], door: 0, dwelling: true, lintel: { x: 37, y: 120 } },
+  pell_house: { chimneys: [[23, 2]], door: 0, dwelling: true, lintel: { x: 30, y: 115 } },
+  st_brigids: { door: 1, unlit: true, lintel: { x: 85, y: 95 } },
+  storefront_a: { chimneys: [[23, 2]], door: 1, sign: { x: 64, y: 99, style: 'ghost' }, plate: [97, 121] },
+  storefront_b: { chimneys: [[24, 2]], door: 2, sign: { x: 65, y: 99, style: 'ghost' }, plate: [90, 125] },
+  storefront_c: { chimneys: [[84, 2]], door: 2, sign: { x: 62, y: 101, style: 'ghost' }, plate: [96, 124] },
+  teo_cottage: { chimneys: [[37, 2]], door: 2, dwelling: true },
   ticket_booth: { door: 0, unlit: true },
-  town_hall: { door: 3 },
-  townhouse_a: { chimneys: [[20, 1]], door: 1 },
-  townhouse_b: { chimneys: [[18, 1]], door: 1 },
-  townhouse_c: { chimneys: [[23, 3]], door: 0 },
-  townhouse_d: { chimneys: [[81, 2]], door: 1 },
-  vane_office: { door: 1 },
-  wharf_cottage: { chimneys: [[24, 2]], door: 0 },
+  town_hall: { door: 3, lintel: { x: 126, y: 130 } },
+  townhouse_a: { chimneys: [[20, 1]], door: 1, dwelling: true },
+  townhouse_b: { chimneys: [[18, 1]], door: 1, dwelling: true },
+  townhouse_c: { chimneys: [[23, 3]], door: 0, dwelling: true },
+  townhouse_d: { chimneys: [[81, 2]], door: 1, dwelling: true },
+  // Vane drives in Tue/Thu/Sat 10:00–17:00 (§9.5): nobody there after dark.
+  vane_office: { door: 1, unlit: true },
+  wharf_cottage: { chimneys: [[24, 2]], door: 0, dwelling: true },
   // ── trees and plants ──
   oak: { block: [1, 1], fade: true, sway: 1.2 },
   birch: { block: [1, 1], fade: true, sway: 1.6 },
@@ -158,6 +171,18 @@ export const SPRITE_META: Readonly<Record<string, SpriteMeta>> = {
   old_bell: { block: [1, 1] },
   public_scale: { block: [1, 1] },
   gate_pillar: { block: [1, 1] },
+  // ── riddle details (town fixes): the Marks, and what the Spring riddles name. Wall-hung things lie flat (no
+  // ground shadow); lettered panels are set in code (render/town/lettering.ts) ──
+  mark_plaque: { block: [0, 0], flat: true },
+  watch_sign: { block: [0, 0], flat: true },
+  herring_vane: { block: [0, 0], flat: true },
+  datestone: { block: [0, 0], flat: true, letter: { x: 14, y: 9, style: 'carved' } },
+  lantern_pane: { block: [0, 0], flat: true },
+  clock_window: { block: [0, 0], flat: true },
+  welcome_sign: { block: [2, 1], letter: { x: 50, y: 30, style: 'painted' } },
+  brass_stone: { block: [1, 1] },
+  foundation_stone: { block: [0, 0] },
+  gannet: { block: [0, 0], water: true, letter: { x: 182, y: 100, style: 'hull' } },
   // ── animals (placed as props; the town's life layer animates its own) ──
   duck: { block: [0, 0], water: true, shore: true },
   gull: { block: [0, 0], shore: true },
@@ -193,15 +218,16 @@ export interface Restorable {
   sprite: string;
   state: SpriteState | 'auto';
   project?: string;
+  /** Buildings: the homes inside, `zone.home` (town/occupancy.ts buildingHomes). */
+  homes?: readonly string[];
 }
 
 /**
  * The art to show. Fixed states are kept (a faded request on art with no faded drawing shows restored).
  * `auto`: restored once its Project is done (`project_<project>_done`, the meta's own flags, or
- * `project_<place id>_done` for a single home or shop); otherwise faded where the town is still faded on
- * Day 1 (a sprite with a Project, a vacant home, an empty shop), restored everywhere else.
- * GDD-GAP: nothing tracks which vacant home is occupied yet (§6.4 counts homes, not doors), so a vacant
- * home stays faded until its own `project_<id>_done` flag is set.
+ * `project_<place id>_done` for a single home or shop) or a household has moved in (town/occupancy.ts:
+ * a vacant home is restored before anyone lives in it, §6.4); otherwise faded where the town is still faded on
+ * Day 1 (a sprite with a Project, a vacant home, a plain vacant home, an empty shop), restored everywhere else.
  */
 export function resolveState(r: Restorable, look: TownLook, manifest: TownManifest = TOWN_MANIFEST): SpriteState {
   const states = manifest[r.sprite]?.states ?? ['restored'];
@@ -212,15 +238,11 @@ export function resolveState(r: Restorable, look: TownLook, manifest: TownManife
   const flags = [
     ...(project ? [`project_${project}_done`] : []),
     ...(meta.restoredBy ?? []),
-    ...(r.id ? [`project_${r.id}_done`] : [])
+    ...(r.id ? [`project_${r.id}_done`] : []),
+    ...(r.homes ?? []).map(occupiedFlag)
   ];
   if (flags.some(f => look.flag(f))) return 'restored';
   if (project) return 'faded';
+  if ((r.homes ?? []).some(h => h.endsWith('.vacant'))) return 'faded';
   return r.id && VACANT.test(r.id) ? 'faded' : 'restored';
-}
-
-/** Someone is home after dark: lit windows, a light at the door, smoke from the chimney (§16.4, occupied homes only). */
-export function isLived(r: Pick<Restorable, 'id' | 'sprite'>, state: SpriteState): boolean {
-  if (state === 'faded' || metaOf(r.sprite).unlit) return false;
-  return !(r.id && VACANT.test(r.id));
 }

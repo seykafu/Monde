@@ -9812,11 +9812,16 @@ terrain: |                 # one character a tile (default legend below; `legend
   ,,,,'''...pppp
 elevation: |               # optional digits 0–3 (Ravage's rules: elevation.ts clamps any rise in front)
 buildings:                 # place-linked sprites; the footprint (manifest `foot`) is solid
-  - { id: bakery, sprite: bakery, at: [10, 3], door: [12, 7], state: auto }
+  - { id: bakery, sprite: bakery, at: [10, 3], door: [12, 7], state: auto, home: bakery_flat }
+  - { id: library, sprite: library, at: [22, 6], door: [24, 10], home: margo_flat, datestone: 1850 }
+  - { sprite: townhouse_b, at: [4, 17], home: home_01 }      # scenery houses say who lives there
+  - { id: storefront_9, sprite: storefront_b, at: [17, 23], door: [19, 26], number: 9, sign: "A. MONDE · MAPS & PRINTS" }
 props:                     # single placements and lines
   - { sprite: lamp_post, at: [6, 7] }
   - { sprite: cat_sleeping, at: [23, 14], offset: [-6, 2], lift: 13 }
   - { sprite: hedge, line: [[1, 24], [18, 24]] }
+  - { sprite: mark_plaque, at: [5, 10], offset: [4, 2], lift: 2, mark: OQ-2 }   # a Monde's Mark (§14.1)
+  - { sprite: welcome_sign, at: [26, 21], offset: [24, 0], text: "WELCOME TO MONDE|FOUNDED 1838" }
 scatter:                   # seeded set dressing
   - { sprites: [tall_grass, bush_round], on: [grass], density: 0.07, seed: 11,
       near: { kinds: [river], radius: 1 }, keepout: { kinds: [cobble], radius: 1, doors: 2 } }
@@ -9844,19 +9849,41 @@ spawn: [5, 22]
   empty storefronts and sprites with an unfinished Project (fountain, market hall and stalls, glasshouse,
   bandstand, cannery and cranes, lighthouse, garden beds, the cottage roof), and turns restored when
   `project_<project>_done`, the project's own flag (`bandstand_rebuilt`, `glasshouse_repaired`,
-  `cannery_coop`) or `project_<place id>_done` is set; the board swaps the art in place.
+  `cannery_coop`) or `project_<place id>_done` is set, or a household moves into it (below); the board swaps
+  the art in place. `home:` says who lives there (a home id or a list, for flats: `[pub_rooms, roz_flat]`;
+  `home_NN` for a census household; `vacant` for a plain vacant home); a building whose id is a resident's home
+  or a `vacant_house_NN` is its own home, and a scenery house (a `dwelling` sprite) must say. `datestone:` (a
+  year carved over the door, on the sprite's lintel), `sign:` (lettered on its sign panel, `|` breaks a line)
+  and `number:` (a door number plate) are set in code in a pixel font (`render/town/lettering.ts`) over art
+  drawn blank, so they read exactly.
 - **Props.** A prop blocks its trunk, base or legs (`block` per sprite in `world/townSprites.ts`, or
   `solid:`); floating props (boats, buoys, lilies, ducks) go on water. `offset` moves a prop (and its
-  depth); `lift` only draws it higher. Lamp posts are lights.
+  depth); `lift` only draws it higher. Lamp posts are lights. `text:` letters a prop's panel in code (the
+  welcome sign, the *Gannet*'s bow). `mark: OQ-1` makes a prop one of Monde's Marks (§14.1): the compiled zone
+  lists them as `zone.marks` (`{ id, zone, at, stand }`, `stand` being the walkable tile the player reads it
+  from) for the riddle system, and the board can show or hide each plaque (`TownBoard.setMarkVisible`). Marks
+  inside a building (MR-4's oven keystone, MR-5's hand press, WF-4's *Clémence*) are plaques at its door until
+  interiors exist. **Hedges, low stone walls and picket fences** (`hedge`, `stone_wall`, `fence`) are drawn in
+  code as autotiled runs (`render/town/lineArt.ts`): each cell asks which neighbours continue the run and
+  draws its share of one shape, a raised top and a front face wherever the run's south side is open, so a
+  run reads as one hedge in every direction, corners and tees included (a sprite repeated down a column reads
+  as stacked blocks); each cell is its own billboard, so people sort in front of and behind it.
 - **Scatter** is deterministic per seed and rule, only on free ground away from doors, edges and the
   spawn, and walk-through unless `solid: true`.
 - **Validation.** Unknown sprites, overlapping footprints, doors not on walkable ground or not at the
   front edge, props in buildings or on the wrong side of the waterline, and any door or edge the spawn
-  cannot reach are load errors.
+  cannot reach are load errors; so are a scenery house with no `home:`, a home held by two buildings, a
+  Mark placed twice, a Mark with no reachable ground at or beside it, a Mark drawn behind a building or a
+  tree nearer the camera, lettering in characters the pixel font lacks, and a datestone, sign or number on
+  a sprite with no lintel, sign panel or plate for it.
 - **On the board.** Buildings and props are billboards sorted with the people by their ground line, and
   fade to 35% while the player is behind them; contact shadows, sun shadows from the clock (props lean,
   buildings shear along the ground) and lamp shadows at night; lamp pools and heads, lit windows found in
-  the art, and door pools for lived-in homes only. Water moves in its layer under the ground (rivers carry
+  the art, and door pools and chimney smoke for lived-in homes only (who lives where, below); a workplace
+  keeps a light on while it trades (not a faded one, an empty shop or one nobody is in after dark). Once the
+  lighthouse is relit (`project_lighthouse_done`), at night a slow beam turns from its lantern room across
+  the sea and the Wharf, foreshortened as it swings north and south, and the brass-faced stone on the
+  breakwater flashes as it passes (WF-5); with reduced motion the lantern glows steadily instead. Water moves in its layer under the ground (rivers carry
   their crests downstream, the sea swells, foam laps the shore), tinted with the board by the day's grade
   and the night. Small life is pooled and capped: chimney smoke from lived-in homes, birds and gulls,
   butterflies over flowers in sun, ducks on the pond, leaves in a wind, the restored fountain running,
@@ -9864,6 +9891,31 @@ spawn: [5, 22]
   only smoke, ducks, the fountain and glints. The ground bakes into chunk textures (8×6 tiles) round the
   camera first and the rest in idle time, once per zone per session; sprites and water tiles are culled to
   the camera.
+
+**Who lives where (town fixes).** Every house on a board has an occupancy source (`client/src/town/occupancy.ts`):
+a named resident's home (their card's `home`; a flat inside a building, like `margo_flat` over the library),
+the Fellow's cottage (from `cottage_keys_given`, S01c), a **census household** (one of Appendix A.1.2's 123,
+off-screen in the sim, `home_NN` per A.1.3), or **vacant** (`vacant_house_NN`, or a plain vacant home).
+Vacant homes show their faded art, dark; occupied ones their restored art, with smoke and lit windows at
+night. Vane has no bed in town until `vane_resident` (Day 48), so the Harbormaster's House stands dark until
+then; Bastien is a cat. Moving in and out is per door, in the town engine's own flags (`TownState.flags`,
+saved with the town): `home_occupied:<zone>.<home>` and `home_vacated:<zone>.<home>`. G-02 books arrivals
+with `settleArrivalsAt(state, [{ home, size }])` (§6.4's `settleArrivals` plus the doors, which it picks
+from `freeHomes`: restored vacant homes nobody lives in) and departures with `settleDeparturesFrom`; the
+board reads the flags through its look and swaps the house's art, lights and smoke in place (a new door
+pool appears on the next visit). The Day-1 boards keep A.1.3's numbers and each district's mood (§2.3):
+
+| Board | Residents' homes | Census households | Vacant (A.1.3) | Lived in / dark houses at night |
+|---|---|---|---|---|
+| Old Quarter | 6 (Pell, the Okafors, Bertrand, Augusta, Margo's and Sable's flats) + the Fellow's | 8 (`home_01`–`08`; Well Row along the green, and one each on Heron Lane, Bell Row and Lamplighter Lane) | 9 (39–47) | 14 / 9 + the cottage until S01c: mostly lived in |
+| Market Row | 3 (Odile's flat, the pub rooms, Roz's flat) | 9 (Dunmore's flat, over the café, Lower Row's seven houses) | 0 | 12 / 0, but nine empty storefronts dark: half shut |
+| Wharf | 3 (Nell, Old Moss in the boathouse, the Harbormaster's House from Day 48) | 5 (the Calloways' bunkhouse, `home_01`–`04` among the cottages) | 8 (48–55) | 7 / 8 + the Harbormaster's House: thinning |
+| Commons | 1 (Teo) | 0 | 0 | 1 / 0 |
+
+A board shows part of its district: every vacant home of the district stands on it (the §9.5 registry
+lists them), and never more households than A.1.3 gives it. GDD-GAP: which vacant home the `homes` Project
+restores, and in what order arrivals fill them, is the player's and G-02's choice; `freeHomes` offers them
+in board order. Millbrook (mostly empty: 38 of its 83 homes vacant) is built the same way.
 
 **The Spring districts (town lift part 2).** The four boards share one layout of the town, so edges and the
 river line up across them:
@@ -9882,13 +9934,15 @@ river line up across them:
   the old bell by its gate, the Founder's House, Town Hall, clocktower, library, the Lantern, Bertrand's
   shop, the Constabulary), Fountain Square south of it with houses on Heron Lane and the empty terrace on Bell
   Row either side, the Briar road south past the green and well, and Lamplighter Lane, its cottage last on the
-  left. *Market Row:* Café Liss, the Gull & Anchor, the old ironmonger's, Dunmore's and Fournier & Fille on
+  left; Well Row mirrors it west of the road, along the top of the green. *Market Row:* Café Liss, the Gull &
+  Anchor, the old ironmonger's, Dunmore's and Fournier & Fille on
   the north side, the Market Hall on the Cross with the public scale by its steps, five empty shops east of
   it; the market's stalls on the flags south of the street, Lower Row behind them (three more empty shops),
   the back alley behind the north side, Cross Green, the carters' yard and the allotments by the river.
   *Wharf:* the fishermen's terraces on Net Lane and Quay Street, the cannery, bunkhouse and Vane's trailer,
   the fish market and its net racks, the crane yard, the stone quay, the harbour steps, the ferry slip with
-  the ticket booth and Pell's bunting, and the breakwater out to Point Lumière. *Commons:* the broken
+  the ticket booth, the welcome sign, Pell's bunting and the *Gannet* at her berth, and the breakwater out to
+  Point Lumière. *Commons:* the broken
   glasshouse, Teo's cottage and the community garden in the north, the bandstand on its round, the sundial
   lawn with the Old Elm to its north-east, the picnic lawn, the pond and footbridge, and the railing with
   its gate on Market Row.
@@ -9897,7 +9951,39 @@ river line up across them:
   (MR-1), the ferry slip's bollards (WF-1), the net racks marching inland from the quay so their seaward end
   is the south (WF-2), the boathouse (WF-3), the lighthouse at the breakwater's end (WF-4/5), the Commons
   gate posts (CM-1), the sundial and the Old Elm north-east of it (CM-2), the glasshouse (CM-3), the
-  footbridge (CM-4) and the bandstand (CM-5).
+  footbridge (CM-4) and the bandstand (CM-5). The town fixes added what the riddles name that wasn't there:
+  the datestones over the Old Quarter's doors, exactly OQ-3's list (Founder's House 1838, St Brigid's 1839,
+  Town Hall 1841, clocktower 1842, library 1850, Pell's 1862, the Okafors' 1871, constabulary 1888, the Lantern
+  1903); Bertrand's gilded watch over his door and his window of clocks that all disagree (OQ-4); the copper herring on the Market Hall's roof (MR-5); door
+  numbers 1–9 on the empty storefronts and No. 9's ghost sign, *A. MONDE · MAPS & PRINTS* (MR-4); the welcome
+  sign at the slip head, WELCOME TO MONDE · FOUNDED 1838 (OQ-3's first hint); the brass-faced stone on the
+  breakwater's arm (WF-5); the frosted pane with its lantern on the glasshouse (CM-3); the bandstand's
+  foundation stone (CM-5); and Old Moss's *Gannet* (T-05). GDD-GAPs: OQ-3 says every house wears its year
+  but gives only these nine, so no other house has a datestone; the open shops have no door numbers; the
+  *Gannet* lies at the slip at all hours (her crossings aren't drawn).
+- **Monde's Marks on the board** (brass plaques with the lantern stamp, `mark_plaque`; `zone.marks`):
+
+| Mark | Board, tile | Where |
+|---|---|---|
+| OQ-1 | old_quarter (39, 28) | the knocker's backplate on the Lamplighter's Cottage door |
+| OQ-2 | old_quarter (5, 10) | under the lip of the old bell's plinth, by St Brigid's gate |
+| OQ-3 | old_quarter (21, 19) | under the bronze heron's raised foot, read from (21, 20) |
+| OQ-4 | old_quarter (24, 10) | beside the library's 1850 datestone, over its door |
+| OQ-5 | old_quarter (33, 10) | in the gilded watch over Bertrand's door |
+| MR-1 | market_row (35, 4) | the Market Hall's north door, behind it on the back lane |
+| MR-2 | market_row (32, 10) | under the public scale's low pan, read from (32, 11) |
+| MR-3 | market_row (15, 10) | the Gull & Anchor's hanging sign |
+| MR-4 | market_row (27, 10) | Fournier & Fille's door (the oven keystone inside) |
+| MR-5 | market_row (19, 26) | No. 9's door, Lower Row (the hand press inside) |
+| WF-1 | wharf (31, 28) | the mooring bollard at the slip, read from (31, 29) |
+| WF-2 | wharf (22, 27) | the bottom harbour step, the weedy one |
+| WF-3 | wharf (18, 16) | the third hook from the sea: the northmost net rack, read from (18, 17) |
+| WF-4 | wharf (7, 21) | the boathouse doors (the *Clémence* inside) |
+| WF-5 | wharf (44, 36) | the lantern room's brass rail, high on the lighthouse, read from its door |
+| CM-1 | commons (28, 36) | the west gate post, read from (28, 37) |
+| CM-2 | commons (18, 30) | the sundial's plinth, read from (18, 31) |
+| CM-3 | commons (20, 29) | the tin buried at the gnomon's shadow-tip toward the Old Elm, mid-afternoon |
+| CM-4 | commons (20, 7) | the lantern pane's frame on the glasshouse front |
 
 ### 16.5 Sprites
 

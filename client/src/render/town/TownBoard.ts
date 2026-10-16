@@ -1,6 +1,11 @@
 import Phaser from 'phaser';
 import type { ZoneDef, TownBuilding, TownProp, Point } from '../../world/zoneFormat';
-import { TOWN_MANIFEST, isLived, metaOf, resolveState, spriteFile, type Restorable, type SpriteState, type TownLook } from '../../world/townSprites';
+import { TOWN_MANIFEST, metaOf, resolveState, spriteFile, type Restorable, type SpriteState, type TownLook } from '../../world/townSprites';
+import { buildingHomes, isLit } from '../../town/occupancy';
+import { homeDirectory } from '../../world/homes';
+import { LINE_SPRITES, lineMasks, paintLine, type LineKind } from './lineArt';
+import { letter, type LetterStyle } from './lettering';
+import { BEAM_HALF_ANGLE, beamHeading, beamHit, beamOnScreen, headingTo } from './beam';
 import { TERRAIN_INFO } from '../../world/townTerrain';
 import { KIND_ID, TH, TW, groundMap } from './autotile';
 import { bakeChunk, bakeContext, type BakeContext } from './terrainBake';
@@ -28,7 +33,12 @@ import type { ObliqueProjection } from '../ObliqueProjection';
 //              not a toppled one), redrawn when the sun has moved a few degrees; lamps throw shadows at night
 //   night      lamp posts are lights (a pool on the ground, a halo at the head, a steady flicker); lived-in
 //              buildings get their windows lit (found in the art, windows.ts) and a pool at the door
-//   state      faded or restored art per townSprites.resolveState, swapped in place when the town changes
+//   state      faded or restored art per townSprites.resolveState, swapped in place when the town changes;
+//              who is home per town/occupancy.ts (lights and smoke only where someone lives)
+//   lines      hedges, low walls and fences drawn as autotiled runs (lineArt.ts), a billboard per cell
+//   lettering  datestones, signs, door numbers and boats' names set in a pixel font over the art (lettering.ts)
+//   marks      Monde's Marks (§14.1) are props with `mark:`; setMarkVisible() shows or hides each plaque
+//   beam       a relit lighthouse sweeps a slow beam over the sea at night (beam.ts); a steady glow if reduced
 //
 // Everything is created in the constructor (ZoneScene snapshots the world's objects for its UI camera
 // straight after), and only re-textured, moved or shown afterwards.
@@ -63,6 +73,37 @@ const FOAM_DEPTH = DEPTH.TERRAIN - 0.001;
 /** Lights that must shine through the night layer (window panes, lamp heads). */
 const OVER_NIGHT = DEPTH.DARKNESS + 0.3;
 const RIPPLE_FPS = 12;
+/** The lighthouse's lantern room, px from its sprite's top-left (read off the art). */
+const LANTERN: readonly [number, number] = [61, 62];
+/** How far the beam reaches across the board, world px (art tuning: the harbour and the quay). */
+const BEAM_LENGTH = 1100;
+const BEAM_TEX_W = 512;
+const BEAM_TEX_H = 192;
+
+/** A long soft wedge of light, brightest at its root: the beam's texture (made once). */
+function ensureBeamTexture(scene: Phaser.Scene): string {
+  const key = 'town:beam';
+  if (scene.textures.exists(key)) return key;
+  const tex = scene.textures.createCanvas(key, BEAM_TEX_W, BEAM_TEX_H)!;
+  const c = tex.getContext();
+  const img = c.createImageData(BEAM_TEX_W, BEAM_TEX_H);
+  for (let x = 0; x < BEAM_TEX_W; x++) {
+    const t = x / BEAM_TEX_W;
+    const half = 5 + t * (BEAM_TEX_H / 2 - 7);
+    const along = Math.pow(1 - t, 1.15) * (t < 0.03 ? t / 0.03 : 1);
+    for (let y = 0; y < BEAM_TEX_H; y++) {
+      const d = Math.abs(y - BEAM_TEX_H / 2) / half;
+      if (d >= 1) continue;
+      // A bright core in a soft cone.
+      const a = along * (0.6 * Math.pow(1 - d, 0.9) + 0.4 * Math.pow(Math.max(0, 1 - d * 2.2), 2));
+      const i = (y * BEAM_TEX_W + x) * 4;
+      img.data[i] = 255; img.data[i + 1] = 236; img.data[i + 2] = 176; img.data[i + 3] = Math.round(255 * a);
+    }
+  }
+  c.putImageData(img, 0, 0);
+  tex.refresh();
+  return key;
+}
 
 export interface Rect { x0: number; y0: number; x1: number; y1: number }
 
@@ -102,7 +143,18 @@ export interface Billboard {
   door?: Point;
   /** Chimney tops, world px (lived-in buildings smoke from them). */
   chimneys: [number, number][];
+  /** Buildings: the homes inside, `zone.home` (town/occupancy.ts). */
+  homes: string[];
+  /** Lettering, datestones and the like riding on this billboard (they follow its fade and visibility). */
+  extras: Phaser.GameObjects.Image[];
+  /** The Monde's Mark this plaque is. */
+  mark?: string;
+  /** Hidden by the riddle system (a Mark not yet revealed). */
+  hidden: boolean;
 }
+
+/** A cell of a hedge, wall or fence run. */
+interface LineCell { img: Phaser.GameObjects.Image; rect: Rect }
 
 interface Chunk { tx0: number; ty0: number; tx1: number; ty1: number; images: Phaser.GameObjects.Image[]; foam: Phaser.GameObjects.Image[]; done: boolean; rect: Rect }
 interface ChunkMeta { x: number; y: number; w: number; h: number; water: boolean; foam: boolean }
@@ -146,6 +198,10 @@ export class TownBoard {
   private readonly waterImages: { img: Phaser.GameObjects.Image; rect: Rect }[] = [];
   private readonly lampHeads: { img: Phaser.GameObjects.Image; phase: number; base: number }[] = [];
   private readonly lamps: { bill: Billboard; head: Phaser.GameObjects.Image }[] = [];
+  private readonly lineCells: LineCell[] = [];
+  /** The lighthouse's beam, its lantern glow and the stones that answer it (WF-5). */
+  private beam: { bill: Billboard; ray: Phaser.GameObjects.Image; glow: Phaser.GameObjects.Image; x: number; y: number;
+    stones: { flash: Phaser.GameObjects.Image; heading: number }[] } | null = null;
   private readonly ctx: BakeContext;
   private readonly zoneKey: string;
   private time = 0;
@@ -171,7 +227,13 @@ export class TownBoard {
     this.buildWater();
     const town = zone.town!;
     for (const building of town.buildings) this.addBuilding(building);
-    for (const prop of town.props) this.addProp(prop);
+    const lines: { prop: TownProp; kind: LineKind }[] = [];
+    for (const prop of town.props) {
+      const kind = LINE_SPRITES[prop.sprite];
+      if (kind) lines.push({ prop, kind }); else this.addProp(prop);
+    }
+    this.addLines(lines);
+    this.buildBeam();
     this.refresh(opts.look, true);
     this.hideCoveredLamps();
   }
@@ -346,17 +408,92 @@ export class TownBoard {
   private addBuilding(b: TownBuilding): void {
     const x = (b.at[0] + b.foot[0] / 2) * TW;
     const baseY = this.groundY(b.at[0], b.at[1] + b.foot[1] - 1) + TH;
-    this.addBillboard({ sprite: b.sprite, kind: 'building', x, baseY, flip: b.flip, restorable: { ...(b.id ? { id: b.id } : {}), sprite: b.sprite, state: b.state, ...(b.project ? { project: b.project } : {}) }, door: b.door, fade: true });
+    const homes = buildingHomes(this.opts.zone.id, b, homeDirectory);
+    // Scenery has no door in the zone file; its drawn door (the meta's column) still gets a light when lived in.
+    const meta = metaOf(b.sprite);
+    const col = meta.door ?? Math.floor(b.foot[0] / 2);
+    const door: Point = b.door ?? [b.at[0] + (b.flip ? b.foot[0] - 1 - col : col), b.at[1] + b.foot[1]];
+    const bill = this.addBillboard({ sprite: b.sprite, kind: 'building', x, baseY, flip: b.flip,
+      restorable: { ...(b.id ? { id: b.id } : {}), sprite: b.sprite, state: b.state, ...(b.project ? { project: b.project } : {}), homes }, door, fade: true, homes });
+    if (b.datestone !== undefined && meta.lintel) {
+      if (!meta.lintel.plain) {
+        this.extraAt(bill, townTexture('datestone'), meta.lintel.x, meta.lintel.y, 1e-7);
+        const panel = metaOf('datestone').letter!, art = TOWN_MANIFEST.datestone!;
+        this.letterAt(bill, String(b.datestone), panel.style, meta.lintel.x - art.w / 2 + panel.x, meta.lintel.y - art.h / 2 + panel.y, 2e-7);
+      } else this.letterAt(bill, String(b.datestone), 'carved', meta.lintel.x, meta.lintel.y, 2e-7);
+    }
+    if (b.sign !== undefined && meta.sign) this.letterAt(bill, b.sign, meta.sign.style, meta.sign.x, meta.sign.y, 2e-7);
+    if (b.number !== undefined && meta.plate) this.letterAt(bill, String(b.number), 'plate', meta.plate[0], meta.plate[1], 2e-7);
   }
 
   private addProp(p: TownProp): void {
     const meta = metaOf(p.sprite);
     const x = (p.at[0] + 0.5) * TW + p.dx;
     const baseY = this.groundY(p.at[0], p.at[1]) + TH / 2 + p.dy;
-    this.addBillboard({ sprite: p.sprite, kind: 'prop', x, baseY, lift: p.lift, flip: p.flip, restorable: { sprite: p.sprite, state: p.state, ...(p.project ? { project: p.project } : {}) }, fade: !!meta.fade });
+    const bill = this.addBillboard({ sprite: p.sprite, kind: 'prop', x, baseY, lift: p.lift, flip: p.flip, restorable: { sprite: p.sprite, state: p.state, ...(p.project ? { project: p.project } : {}) }, fade: !!meta.fade });
+    if (p.mark) bill.mark = p.mark;
+    if (p.text !== undefined && meta.letter) {
+      this.letterAt(bill, p.text, meta.letter.style, meta.letter.x, meta.letter.y, 2e-7);
+    }
   }
 
-  private addBillboard(o: { sprite: string; kind: 'building' | 'prop'; x: number; baseY: number; lift?: number; flip: boolean; restorable: Restorable; door?: Point; fade: boolean }): void {
+  /** A sprite riding on a billboard, centred on (sx, sy) in the billboard's own art px (flips with it). */
+  private extraAt(bill: Billboard, key: string, sx: number, sy: number, depth: number): Phaser.GameObjects.Image {
+    const art = TOWN_MANIFEST[bill.sprite]!;
+    const left = bill.img.x - art.w / 2, top = bill.img.y - art.h;
+    const x = left + (bill.flip ? art.w - sx : sx);
+    const img = this.scene.add.image(Math.round(x), Math.round(top + sy), crisp(this.scene, key)).setDepth(bill.img.depth + depth);
+    bill.extras.push(img);
+    return img;
+  }
+
+  /** Words set in the pixel font on a billboard's panel (lettering.ts), crisp and exact. */
+  private letterAt(bill: Billboard, text: string, style: LetterStyle, sx: number, sy: number, depth: number): void {
+    const key = `townletter:${style}:${text}`;
+    if (!this.scene.textures.exists(key)) {
+      const l = letter(text, style);
+      const tex = this.scene.textures.createCanvas(key, l.w, l.h);
+      if (!tex) return;
+      tex.getContext().putImageData(new ImageData(l.rgba as Uint8ClampedArray<ArrayBuffer>, l.w, l.h), 0, 0);
+      tex.refresh();
+    }
+    // Text never mirrors: a flipped sign keeps its words readable.
+    const art = TOWN_MANIFEST[bill.sprite]!;
+    const img = this.scene.add.image(0, 0, crisp(this.scene, key)).setDepth(bill.img.depth + depth);
+    const left = bill.img.x - art.w / 2, top = bill.img.y - art.h;
+    const w = img.width, h = img.height, x = bill.flip ? art.w - sx : sx;
+    img.setPosition(Math.round(left + x - w / 2) + w / 2, Math.round(top + sy - h / 2) + h / 2);
+    bill.extras.push(img);
+  }
+
+  /** Hedges, low walls and fences: autotiled runs, one billboard per cell (lineArt.ts). */
+  private addLines(lines: readonly { prop: TownProp; kind: LineKind }[]): void {
+    const groups = new Map<string, { prop: TownProp; kind: LineKind }[]>();
+    for (const l of lines) {
+      const key = `${l.kind}:${l.prop.dx}:${l.prop.dy}`;
+      groups.set(key, [...(groups.get(key) ?? []), l]);
+    }
+    for (const group of groups.values()) {
+      const masks = lineMasks(group.map(l => l.prop.at));
+      group.forEach(({ prop, kind }, i) => {
+        const [cx, cy] = prop.at;
+        const key = `townline:${this.opts.zone.id}:${kind}:${masks[i]}:${cx},${cy}:${prop.dx},${prop.dy}`;
+        const piece = paintLine(kind, masks[i]!, cx, cy, this.opts.seed);
+        if (!this.scene.textures.exists(key)) {
+          const tex = this.scene.textures.createCanvas(key, piece.w, piece.h);
+          if (!tex) return;
+          tex.getContext().putImageData(new ImageData(piece.rgba as Uint8ClampedArray<ArrayBuffer>, piece.w, piece.h), 0, 0);
+          tex.refresh();
+        }
+        const gx = cx * TW + prop.dx + piece.ox, gy = this.groundY(cx, cy) + prop.dy + piece.oy;
+        const img = this.scene.add.image(gx, gy, crisp(this.scene, key)).setOrigin(0, 0)
+          .setDepth(actorDepth(this.groundY(cx, cy) + prop.dy + piece.foot) - 1e-6);
+        this.lineCells.push({ img, rect: { x0: gx, x1: gx + piece.w, y0: gy, y1: gy + piece.h } });
+      });
+    }
+  }
+
+  private addBillboard(o: { sprite: string; kind: 'building' | 'prop'; x: number; baseY: number; lift?: number; flip: boolean; restorable: Restorable; door?: Point; fade: boolean; homes?: string[] }): Billboard {
     const scene = this.scene, meta = metaOf(o.sprite), art = TOWN_MANIFEST[o.sprite]!;
     const lift = (meta.overhead ?? 0) + (o.lift ?? 0);
     const img = scene.add.image(o.x, o.baseY - lift, crisp(scene, townTexture(o.sprite))).setOrigin(0.5, 1).setFlipX(o.flip);
@@ -379,10 +516,21 @@ export class TownBoard {
       img, sprite: o.sprite, kind: o.kind, x: o.x, baseY: o.baseY, bounds, fade: o.fade, alpha: 1,
       restorable: o.restorable, state: 'restored', lived: false, flip: o.flip, shadow, shear, lampShadow: null,
       windows: null, contact, sway: meta.sway ?? 0, phase: (o.x * 0.013 + o.baseY * 0.007) % (Math.PI * 2),
-      ...(o.door ? { door: o.door } : {}), chimneys: []
+      ...(o.door ? { door: o.door } : {}), chimneys: [], homes: o.homes ?? [], extras: [], hidden: false
     };
     this.billboards.push(bill);
     if (meta.light) this.addLamp(bill, meta.light);
+    return bill;
+  }
+
+  /** The riddle system shows a Mark's plaque once it is revealed (§14.1), and hides those still to find. */
+  setMarkVisible(id: string, visible: boolean): void {
+    for (const bill of this.billboards) if (bill.mark === id) bill.hidden = !visible;
+  }
+
+  /** The Marks on this board and their plaques' world positions. */
+  marks(): { id: string; x: number; y: number; visible: boolean }[] {
+    return this.billboards.filter(b => b.mark).map(b => ({ id: b.mark!, x: b.img.x, y: b.img.y - b.img.height / 2, visible: !b.hidden }));
   }
 
   private addLamp(bill: Billboard, light: { dx: number; dy: number; radius: number }): void {
@@ -416,19 +564,25 @@ export class TownBoard {
   /** Faded or restored art for each sprite, from what the town knows now. Cheap when nothing changed. */
   refresh(look: TownLook, force = false): void {
     const states = this.billboards.map(b => resolveState(b.restorable, look));
-    const key = states.join(',');
+    // Who is home (town/occupancy.ts): lights and smoke follow the people, not the paint.
+    const lived = this.billboards.map((b, i) => b.kind === 'building' && isLit({ ...(b.restorable.id ? { id: b.restorable.id } : {}), homes: b.homes,
+      faded: states[i] === 'faded', unlit: !!metaOf(b.sprite).unlit }, homeDirectory, look));
+    const key = states.map((st, i) => `${st}${lived[i] ? '+' : ''}`).join(',');
     if (!force && key === this.lookKey) return;
     this.lookKey = key;
     this.billboards.forEach((bill, i) => {
       const state = states[i]!;
       const changed = force || state !== bill.state;
+      const relit = changed || lived[i] !== bill.lived;
       bill.state = state;
-      bill.lived = bill.kind === 'building' && isLived(bill.restorable, state);
-      if (!changed) return;
-      const tex = crisp(this.scene, townTexture(spriteFile(bill.sprite, state)));
-      bill.img.setTexture(tex);
-      if (bill.shadow && !bill.shear) bill.shadow.setTexture(tex);
-      bill.lampShadow?.img.setTexture(tex);
+      bill.lived = lived[i]!;
+      if (changed) {
+        const tex = crisp(this.scene, townTexture(spriteFile(bill.sprite, state)));
+        bill.img.setTexture(tex);
+        if (bill.shadow && !bill.shear) bill.shadow.setTexture(tex);
+        bill.lampShadow?.img.setTexture(tex);
+      }
+      if (!relit) return;
       this.lightWindows(bill);
       // Chimney tops in world px (only lived-in buildings smoke).
       const art = TOWN_MANIFEST[bill.sprite]!;
@@ -634,12 +788,14 @@ export class TownBoard {
 
     const night = this.lampLevel > 0.005, sunOn = this.sunAlpha > 0.004;
     const body: Rect = { x0: player.x - 12, x1: player.x + 12, y0: player.y - 52, y1: player.y };
+    for (const cell of this.lineCells) cell.img.setVisible(overlaps(cell.rect, view));
     for (const bill of this.billboards) {
-      const on = overlaps(bill.bounds, view) || (!!bill.shadow && sunOn && Math.abs(bill.x - (view.x0 + view.x1) / 2) < (view.x1 - view.x0) / 2 + 320 && bill.baseY > view.y0 && bill.baseY - 400 < view.y1);
+      const on = !bill.hidden && (overlaps(bill.bounds, view) || (!!bill.shadow && sunOn && Math.abs(bill.x - (view.x0 + view.x1) / 2) < (view.x1 - view.x0) / 2 + 320 && bill.baseY > view.y0 && bill.baseY - 400 < view.y1));
       bill.img.setVisible(on);
       bill.shadow?.setVisible(on && sunOn);
       bill.contact?.setVisible(on);
       bill.lampShadow?.img.setVisible(on && night);
+      for (const e of bill.extras) e.setVisible(on).setAlpha(bill.alpha);
       if (!on) { bill.windows?.setVisible(false); continue; }
       if (bill.fade) {
         const behind = player.y < bill.baseY - 2 && overlaps(body, { x0: bill.bounds.x0 + 6, x1: bill.bounds.x1 - 6, y0: bill.bounds.y0 + 6, y1: bill.baseY });
@@ -659,6 +815,49 @@ export class TownBoard {
     if (night) for (const l of this.lampHeads) {
       const n = Math.sin(this.time * 7.3 + l.phase) * 0.5 + Math.sin(this.time * 12.1 + l.phase * 2) * 0.3;
       l.img.setAlpha(l.base * (0.93 + 0.05 * n));
+    }
+    this.sweepBeam();
+  }
+
+  // ── The lighthouse beam ───────────────────────────────────────────────────
+
+  /** Point Lumière's lantern, its beam and the stones on the breakwater that flash as it passes (WF-5). */
+  private buildBeam(): void {
+    const bill = this.billboards.find(b => b.sprite === 'lighthouse');
+    if (!bill) return;
+    const art = TOWN_MANIFEST.lighthouse!;
+    // The lantern room's middle, read off the art (px from its top-left).
+    const x = bill.x - art.w / 2 + (bill.flip ? art.w - LANTERN[0] : LANTERN[0]), y = bill.baseY - art.h + LANTERN[1];
+    const ray = this.scene.add.image(x, y, ensureBeamTexture(this.scene)).setOrigin(0, 0.5)
+      .setBlendMode(Phaser.BlendModes.ADD).setDepth(OVER_NIGHT - 0.02).setVisible(false);
+    const glow = addTorchGlow(this.scene, x, y, { depth: OVER_NIGHT - 0.015, scaleX: 1.6, scaleY: 1.6 });
+    this.scene.tweens.killTweensOf(glow);
+    glow.setVisible(false);
+    // A stone answers when the beam's heading is within its half-width of the stone's own heading.
+    const stones = this.billboards.filter(b => b.sprite === 'brass_stone').map(stone => {
+      const sart = TOWN_MANIFEST.brass_stone!;
+      const flash = addTorchGlow(this.scene, stone.x, stone.baseY - sart.h * 0.45, { depth: OVER_NIGHT - 0.01, scaleX: 0.5, scaleY: 0.5 });
+      this.scene.tweens.killTweensOf(flash);
+      return { flash: flash.setVisible(false), heading: headingTo(stone.x - x, stone.baseY - sart.h * 0.45 - y) };
+    });
+    this.beam = { bill, ray, glow, x, y, stones };
+  }
+
+  /** At night, once the lighthouse is relit: the beam turns (a steady glow under reduced motion). */
+  private sweepBeam(): void {
+    const b = this.beam;
+    if (!b) return;
+    const lit = b.bill.state === 'restored' && this.lampLevel > 0.02;
+    b.glow.setVisible(lit).setAlpha(this.lampLevel * (this.opts.reduced ? 1 : 0.85));
+    const turning = lit && !this.opts.reduced;
+    b.ray.setVisible(turning);
+    if (!turning) { for (const s of b.stones) s.flash.setVisible(false); return; }
+    const heading = beamHeading(this.time);
+    const { rotation, length } = beamOnScreen(heading);
+    b.ray.setRotation(rotation).setScale(length * BEAM_LENGTH / BEAM_TEX_W, 1).setAlpha(this.lampLevel * 0.75);
+    for (const s of b.stones) {
+      const hit = beamHit(heading, s.heading, BEAM_HALF_ANGLE * 0.6);
+      s.flash.setVisible(hit > 0).setAlpha(hit * this.lampLevel);
     }
   }
 

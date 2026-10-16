@@ -4,8 +4,11 @@
 # Constabulary and Augusta's. Fountain Square opens south of the street, its dry fountain and bronze heron
 # in the middle, lived-in houses on Heron Lane to the west and the empty terrace on Bell Row to the east. The
 # road to Briar Woods runs south from the square past the green; Lamplighter Lane, the narrowest street, turns
-# east off it, and the Lamplighter's Cottage is the last on the left (S01c). The High Street runs east to
-# Market Row's bridge and west to the Millbrook road. Zone format v2 (world/zoneFormat.ts).
+# east off it, and the Lamplighter's Cottage is the last on the left (S01c); Well Row mirrors it west of the road,
+# along the top of the green. The High Street runs east to Market Row's bridge and west to the Millbrook road.
+# Who lives where (town/occupancy.ts, A.1.3: the Old Quarter is mostly lived in, 29 households and 9 vacant
+# homes): the named residents' homes, eight census households (home_01..08) and the nine vacant houses (39-47).
+# Zone format v2 (world/zoneFormat.ts).
 format: 2
 id: old_quarter
 name: Old Quarter
@@ -34,13 +37,13 @@ terrain: |
   ,............bpppppppppppppppb..................
   ,............bpppppppppppppppb..................
   ,,,,,,,,,,,,,bpppppppppppppppb,,,,,,,,,,,,,,,,,,
-  ,,mm,,mm,,,,,bbbbbbbbbbbbbbbbb,,,,,,,,,,,,,,,,,,
-  ,,mm,,mm,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,bbbbbbbbbbbbbbbbb,,,,,,,,,,,,,,,,,,
   ,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
-  ,,,,,,,,,,:,,,,,,,,,rrr.....................:::,
-  ,,,,,,:::::::::,,,,,rrr.....................:::,
+  ,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,,,,,,,,,,,,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
+  ,...................rrr.....................:::,
+  ,...................rrr.....................:::,
   ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
   ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
   ,,,,,,,,,,:,,,,,,,,,rrr,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -48,31 +51,42 @@ terrain: |
   ''''''''''''''''''''rrr'''''''''''''''''''''''''
   ''''''''''''''''''''rrr'''''''''''''''''''''''''
 buildings:
-  # The civic row on the High Street's north side, west to east (OQ-3's datestones: chapel 1839, Founder's 1838, hall 1841, tower 1842, library 1850, Lantern 1903, constabulary 1888).
-  - { id: st_brigids, sprite: st_brigids, at: [2, 6], door: [3, 10] }
-  - { id: founders_house, sprite: founders_house, at: [8, 6], door: [9, 10] }
-  - { id: town_hall, sprite: town_hall, at: [12, 6], door: [15, 10] }
-  - { id: clocktower, sprite: clocktower, at: [19, 7], door: [19, 10] }
-  - { id: library, sprite: library, at: [22, 6], door: [24, 10] }
-  - { id: lantern_office, sprite: lantern_office, at: [29, 6], door: [31, 10] }
+  # The civic row on the High Street's north side, west to east, each with its datestone over the door (OQ-3).
+  # Margo's flat is over the library, Sable's over the Lantern (§9.5).
+  - { id: st_brigids, sprite: st_brigids, at: [2, 6], door: [3, 10], datestone: 1839 }
+  - { id: founders_house, sprite: founders_house, at: [8, 6], door: [9, 10], datestone: 1838 }
+  - { id: town_hall, sprite: town_hall, at: [12, 6], door: [15, 10], datestone: 1841 }
+  - { id: clocktower, sprite: clocktower, at: [19, 7], door: [19, 10], datestone: 1842 }
+  - { id: library, sprite: library, at: [22, 6], door: [24, 10], home: margo_flat, datestone: 1850 }
+  - { id: lantern_office, sprite: lantern_office, at: [29, 6], door: [31, 10], home: sable_flat, datestone: 1903 }
   - { id: bertrand_house, sprite: bertrand_house, at: [33, 7], door: [33, 10] }
-  - { id: constabulary, sprite: constabulary, at: [40, 6], door: [41, 10] }
+  - { id: constabulary, sprite: constabulary, at: [40, 6], door: [41, 10], datestone: 1888 }
   - { id: augusta_house, sprite: augusta_house, at: [45, 7], door: [45, 10] }
   # Heron Lane, west of the square: lived-in houses.
-  - { id: pell_house, sprite: pell_house, at: [2, 17], door: [2, 20] }
-  - { id: okafor_house, sprite: okafor_house, at: [6, 17], door: [6, 20] }
-  - { id: vacant_house_39, sprite: townhouse_c, at: [9, 17], door: [9, 20] }
+  - { id: pell_house, sprite: pell_house, at: [1, 17], door: [1, 20], datestone: 1862 }
+  - { sprite: townhouse_b, at: [4, 17], home: home_01 }
+  - { id: okafor_house, sprite: okafor_house, at: [7, 17], door: [7, 20], datestone: 1871 }
+  - { id: vacant_house_39, sprite: townhouse_c, at: [10, 17], door: [10, 20] }
   # Bell Row, east of the square: the empty terrace.
   - { id: vacant_house_40, sprite: townhouse_a, at: [31, 17], door: [32, 20] }
   - { id: vacant_house_41, sprite: townhouse_b, at: [34, 17], door: [35, 20] }
   - { id: vacant_house_42, sprite: townhouse_d, at: [37, 17], door: [38, 20] }
   - { id: vacant_house_43, sprite: townhouse_c, at: [40, 17], door: [40, 20] }
   - { id: vacant_house_44, sprite: townhouse_a, at: [43, 17], door: [44, 20] }
-  # Lamplighter Lane: three empty houses, then the Lamplighter's Cottage, last on the left (S01c).
+  - { sprite: townhouse_d, at: [46, 17], home: home_02 }
+  # Lamplighter Lane: three empty houses, the Quills' neighbours, then the Lamplighter's Cottage, last on the left
+  # (S01c). vacant_house_47 is "two doors from the Fellow's" (S05), the first one Kasimir makes dry.
   - { id: vacant_house_45, sprite: townhouse_b, at: [25, 25], door: [26, 28] }
   - { id: vacant_house_46, sprite: townhouse_d, at: [28, 25], door: [29, 28] }
   - { id: vacant_house_47, sprite: townhouse_a, at: [31, 25], door: [32, 28] }
+  - { sprite: townhouse_c, at: [34, 25], home: home_03 }
   - { id: lamplighter_cottage, sprite: lamplighter_cottage, at: [37, 25], door: [39, 28] }
+  # Well Row, along the top of the green west of the Briar road: five lived-in houses.
+  - { sprite: townhouse_a, at: [1, 25], home: home_04 }
+  - { sprite: townhouse_d, at: [4, 25], home: home_05 }
+  - { sprite: townhouse_c, at: [7, 25], home: home_06 }
+  - { sprite: townhouse_b, at: [12, 25], home: home_07 }
+  - { sprite: townhouse_a, at: [15, 25], home: home_08 }
 props:
   # Fountain Square: the dry fountain and its bronze heron, benches round it, beds, a lamp at each corner.
   - { sprite: fountain, at: [21, 19] }
@@ -123,13 +137,23 @@ props:
   - { sprite: gate_pillar, at: [2, 10] }
   - { sprite: gate_pillar, at: [4, 10] }
   - { sprite: old_bell, at: [5, 10], offset: [4, 0] }
+  # Bertrand's gilded watch over his door (OQ-4), "as wide as a cartwheel", and his shop window of clocks.
+  - { sprite: watch_sign, at: [33, 10], offset: [-2, -16], lift: 67 }
+  # His window "holds a hundred faces, and no two of them agree" (OQ-4).
+  - { sprite: clock_window, at: [34, 10], offset: [-8, -16], lift: 38 }
+  # Monde's Marks (§14.4): the knocker's backplate, under the bell plinth's lip, under the heron's raised foot,
+  # behind the library datestone's lantern, inside the gilded watch.
+  - { sprite: mark_plaque, at: [39, 28], offset: [-24, -16], lift: 25, mark: OQ-1 }
+  - { sprite: mark_plaque, at: [5, 10], offset: [4, 2], lift: 2, mark: OQ-2 }
+  - { sprite: mark_plaque, at: [21, 19], offset: [0, 2], lift: 85, mark: OQ-3 }
+  - { sprite: mark_plaque, at: [24, 10], offset: [32, -16], lift: 77, mark: OQ-4 }
+  - { sprite: mark_plaque, at: [33, 10], offset: [3, -15], lift: 68, mark: OQ-5 }
   - { sprite: planter, at: [2, 14] }
   - { sprite: flower_pots, at: [26, 14] }
   # St Brigid's churchyard: yews, a hedge round it.
   - { sprite: pine, at: [1, 4] }
   - { sprite: pine, at: [6, 3] }
   - { sprite: pine, at: [0, 8] }
-  - { sprite: hedge, line: [[0, 1], [6, 1]] }
   - { sprite: hedge, line: [[7, 2], [7, 9]] }
   # The gardens behind the civic row.
   - { sprite: oak, at: [10, 2] }
@@ -141,21 +165,18 @@ props:
   - { sprite: oak, at: [34, 2] }
   - { sprite: pine, at: [43, 2] }
   - { sprite: birch, at: [46, 3] }
-  - { sprite: hedge, line: [[8, 1], [36, 1]] }
-  # Heron Lane and the back gardens: veg beds, a washing-day garden, the well on the green.
-  - { sprite: lamp_post, at: [5, 21] }
-  - { sprite: flower_pots, at: [4, 20] }
-  - { sprite: planter, at: [8, 20] }
-  - { sprite: fence, line: [[1, 25], [12, 25]] }
-  - { sprite: veg_bed, at: [2, 24], offset: [24, 0], state: restored }
-  - { sprite: veg_bed, at: [6, 24], offset: [24, 0], state: restored }
+  - { sprite: hedge, line: [[0, 1], [36, 1]] }
+  # Heron Lane and the gardens across it, behind Well Row.
+  - { sprite: lamp_post, at: [6, 21] }
+  - { sprite: flower_pots, at: [3, 20] }
+  - { sprite: planter, at: [9, 20] }
   - { sprite: bush_round, at: [9, 23] }
   - { sprite: flower_pots, at: [11, 24] }
-  - { sprite: bush_flowering, at: [11, 23] }
+  - { sprite: bush_flowering, at: [10, 22] }
   # Bell Row: lamps, an old handcart, weeds by the doors.
   - { sprite: lamp_post, at: [33, 21] }
   - { sprite: lamp_post, at: [42, 21] }
-  - { sprite: handcart, at: [46, 20] }
+  - { sprite: handcart, at: [45, 21] }
   - { sprite: barrel, at: [39, 20] }
   - { sprite: hedge, line: [[30, 23], [47, 23]] }
   # Lamplighter Lane: the oldest lamps in town, front gardens, the cottage's gate.
@@ -164,20 +185,18 @@ props:
   - { sprite: lamp_post, at: [36, 30] }
   - { sprite: lamp_post, at: [43, 27] }
   - { sprite: flower_pots, at: [41, 28], offset: [8, -6] }
-  - { sprite: bush_flowering, at: [35, 26] }
-  - { sprite: bush_round, at: [34, 25] }
   - { sprite: apple_tree, at: [44, 25] }
   - { sprite: fence, line: [[23, 31], [43, 31]] }
-  - { sprite: hedge, line: [[24, 24], [35, 24]] }
-  # The green west of the Briar road: the well, the old orchard, benches.
-  - { sprite: well, at: [10, 28], offset: [0, -8] }
-  - { sprite: bench, at: [7, 28] }
-  - { sprite: bench, at: [13, 28] }
-  - { sprite: apple_tree, at: [5, 27] }
-  - { sprite: apple_tree, at: [15, 27] }
-  - { sprite: apple_tree, at: [5, 31] }
-  - { sprite: apple_tree, at: [15, 31] }
-  - { sprite: oak, at: [1, 29] }
+  - { sprite: hedge, line: [[24, 24], [30, 24]] }
+  # Well Row's lamps, and the green below it: the well at the end of its path, the old orchard, benches.
+  - { sprite: lamp_post, at: [3, 30] }
+  - { sprite: lamp_post, at: [14, 30] }
+  - { sprite: well, at: [10, 33], offset: [0, -8] }
+  - { sprite: bench, at: [8, 32] }
+  - { sprite: bench, at: [12, 32] }
+  - { sprite: apple_tree, at: [5, 32] }
+  - { sprite: apple_tree, at: [15, 32] }
+  - { sprite: oak, at: [1, 32] }
   - { sprite: willow, at: [18, 30] }
   - { sprite: lamp_post, at: [19, 25] }
   - { sprite: pine, at: [46, 32] }

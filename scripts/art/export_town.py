@@ -62,6 +62,11 @@ SIZE: dict[str, tuple[str, int]] = {
     "rowboat": ("w", 100), "fishing_boat": ("w", 170), "bollard": ("h", 30), "net_rack": ("h", 80), "lobster_pots": ("h", 44),
     "fish_crates": ("h", 38), "buoy": ("w", 30), "anchor": ("h", 50),
     "old_bell": ("h", 52), "public_scale": ("h", 78), "gate_pillar": ("h", 72),
+    # riddle details: a Mark is "no bigger than a playing card" (S01c) but must read at play scale; the watch is
+    # "as wide as a cartwheel" (OQ-4), about 0.7 of a person
+    "mark_plaque": ("w", 14), "watch_sign": ("w", 50), "herring_vane": ("h", 42), "welcome_sign": ("w", 104),
+    "brass_stone": ("w", 40), "datestone": ("w", 28), "gannet": ("w", 250), "foundation_stone": ("w", 36),
+    "lantern_pane": ("h", 24), "clock_window": ("w", 24),
     # life
     "duck": ("h", 22), "gull": ("h", 22), "cat_sleeping": ("w", 28),
 }

@@ -123,6 +123,15 @@
   "w": 24,
   "width": 0.5
  },
+ "brass_stone": {
+  "h": 42,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 40,
+  "width": 0.83
+ },
  "bunkhouse": {
   "foot": [
    4,
@@ -206,6 +215,15 @@
   "w": 28,
   "width": 0.58
  },
+ "clock_window": {
+  "h": 25,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 24,
+  "width": 0.5
+ },
  "clocktower": {
   "foot": [
    2,
@@ -242,6 +260,15 @@
  },
  "crates": {
   "h": 40,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 28,
+  "width": 0.58
+ },
+ "datestone": {
+  "h": 15,
   "kind": "prop",
   "states": [
    "restored"
@@ -325,6 +352,15 @@
   "w": 190,
   "width": 3.96
  },
+ "foundation_stone": {
+  "h": 38,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 36,
+  "width": 0.75
+ },
  "founders_house": {
   "foot": [
    3,
@@ -346,6 +382,15 @@
   ],
   "w": 140,
   "width": 2.92
+ },
+ "gannet": {
+  "h": 116,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 250,
+  "width": 5.21
  },
  "garden_shed": {
   "foot": [
@@ -444,6 +489,15 @@
   "w": 48,
   "width": 1.0
  },
+ "herring_vane": {
+  "h": 42,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 45,
+  "width": 0.94
+ },
  "lamp_post": {
   "h": 112,
   "kind": "prop",
@@ -477,6 +531,15 @@
    "restored"
   ],
   "w": 163
+ },
+ "lantern_pane": {
+  "h": 24,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 12,
+  "width": 0.25
  },
  "library": {
   "foot": [
@@ -520,6 +583,15 @@
   ],
   "w": 41,
   "width": 0.85
+ },
+ "mark_plaque": {
+  "h": 8,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 14,
+  "width": 0.29
  },
  "market_hall": {
   "foot": [
@@ -893,6 +965,24 @@
   ],
   "w": 96,
   "width": 2.0
+ },
+ "watch_sign": {
+  "h": 64,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 50,
+  "width": 1.04
+ },
+ "welcome_sign": {
+  "h": 73,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 104,
+  "width": 2.17
  },
  "well": {
   "h": 92,

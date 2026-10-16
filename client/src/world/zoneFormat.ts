@@ -4,6 +4,8 @@ import type { MapDef, TerrainKind, ObstacleKind } from '../combat/types';
 import { DEFAULT_LEGEND, TERRAIN_INFO, isFlow, isTownTerrain, type Flow, type LegendEntry, type TownTerrain } from './townTerrain';
 import { TOWN_MANIFEST, metaOf, propBlock, type SpriteState, type TownManifest } from './townSprites';
 import { scatter, type ScatterRule } from './scatter';
+import { canLetter } from '../render/town/lettering';
+import { DIORAMA_ELEV_STEP as ELEV, DIORAMA_TILE_H as TH, DIORAMA_TILE_W as TW } from '../render/dioramaConfig';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Zone files (content/zones/*.zone.yaml), GDD §16.4. Two formats compile to the same ZoneDef.
@@ -31,9 +33,18 @@ import { scatter, type ScatterRule } from './scatter';
 //       # in front of the footprint's front edge, inside its columns. With an id the building IS that place
 //       # (rect = footprint), so it is not listed again under places:. Without one it is scenery.
 //       # state: restored | faded | auto (default; world/townSprites.ts resolveState); project: <id> optional
+//     - { sprite: townhouse_b, at: [4, 17], home: home_03 }
+//       # home: who lives there (town/occupancy.ts): a home id or a list of them (flats: [pub_rooms, roz_flat]),
+//       # `home_NN` for a census household (A.1.3), `vacant` for a plain vacant home. A building whose id is a
+//       # resident's home or a vacant_house_NN is its own home. Scenery houses (a `dwelling` sprite) must say.
+//       # datestone: 1850 (a carved year over the door), sign: "A. MONDE|MAPS & PRINTS" (lettered on the
+//       # sprite's sign panel, `|` breaks a line), number: 9 (a door number plate): lettered in code, exact
 //   props:                   # sprites of kind prop
 //     - { sprite: lamp_post, at: [15, 8] }        # solid?, flip?, state?, offset?: [dx, dy] px (moves it), lift?: px (draws it higher)
 //     - { sprite: hedge, line: [[1, 1], [10, 1]] }               # one per tile along a straight line
+//       # hedge, stone_wall and fence are drawn as autotiled runs (render/town/lineArt.ts): cells that touch join
+//     - { sprite: mark_plaque, at: [5, 10], mark: OQ-2 }         # a Monde's Mark (§14.1): zone.marks lists them
+//     - { sprite: welcome_sign, at: [26, 21], text: "WELCOME TO|MONDE|FOUNDED 1838" }   # lettered in code
 //   scatter:                 # seeded set dressing (world/scatter.ts)
 //     - { sprites: [tall_grass, bush_round], on: [grass], density: 0.05, seed: 3,
 //         near: { kinds: [pond], radius: 2 }, keepout: { kinds: [cobble], radius: 1, doors: 2 } }
@@ -44,6 +55,8 @@ import { scatter, type ScatterRule } from './scatter';
 // Collision is the ground (water and solid legend entries), building footprints and solid props (a prop's
 // `block` in townSprites.ts, or `solid:`). Every door and edge cell must be walkable and reachable from the
 // spawn; footprints and solid props may not overlap; sprites must exist; floating props go on water.
+// A Mark must have ground to stand on beside it (its own tile or one next to it, reachable from the spawn)
+// and must not be drawn behind a building or a tree.
 // Lamp posts are lights. Integer tile coordinates name cells; continuous positions use centres at +0.5.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -75,6 +88,25 @@ export interface TownBuilding {
   state: SpriteState | 'auto';
   project?: string;
   flip: boolean;
+  /** The homes inside (`home:`); empty: the building's own id decides (town/occupancy.ts buildingHomes). */
+  homes: string[];
+  /** A carved year over the door (§14.4 OQ-3's datestones). */
+  datestone?: number;
+  /** Lettered on the sprite's sign panel (`|` breaks a line). */
+  sign?: string;
+  /** A door number plate. */
+  number?: number;
+}
+
+/** A Monde's Mark on a board (§14.1): where its plaque is and where the player stands to read it. */
+export interface MarkSpot {
+  /** The riddle id: `OQ-1` … */
+  id: string;
+  zone: string;
+  /** The plaque's tile. */
+  at: Point;
+  /** A walkable tile at or beside it, reachable from the spawn (the plaque's own if it can be stood on). */
+  stand: Point;
 }
 
 /** A prop on a v2 board (single placements, lines and scatter, in that order). */
@@ -93,6 +125,10 @@ export interface TownProp {
   state: SpriteState | 'auto';
   project?: string;
   from: 'prop' | 'line' | 'scatter';
+  /** The Monde's Mark this plaque is (§14.1). */
+  mark?: string;
+  /** Lettered on the sprite's panel in code (`|` breaks a line): a welcome line, a boat's name. */
+  text?: string;
 }
 
 export interface TownLayout {
@@ -111,7 +147,12 @@ export interface ZoneDef extends MapDef {
   format: 1 | 2;
   /** v2: the town's buildings and props. */
   town?: TownLayout;
+  /** The Monde's Marks on this board (props with `mark:`), in file order. Empty on a v1 greybox. */
+  marks: readonly MarkSpot[];
 }
+
+/** The Marks on a board, typed (the riddle system reads these). */
+export const zoneMarks = (zone: Pick<ZoneDef, 'marks'>): readonly MarkSpot[] => zone.marks;
 
 const terrains = ['grass', 'stone', 'dirt', 'wood', 'water', 'carpet', 'snow', 'mud', 'marble', 'sand', 'forest', 'wall', 'door', 'rubble', 'cobblestone', 'cracked_earth', 'ice', 'lava', 'moss_stone'] satisfies TerrainKind[];
 const obstacles = ['none', 'hay', 'fence', 'wagon', 'barricade', 'pillar', 'throne', 'tree', 'rock', 'torch'] satisfies ObstacleKind[];
@@ -224,7 +265,7 @@ function compileGreybox(raw: Record<string, unknown>): ZoneDef {
   const spawn = f.point(raw.spawn);
   check(walkable(spawn), 'Spawn on solid tile');
   const edges = parseEdges(raw, f, walkable);
-  return { ...map, tiles, places, props, edges, spawn, walkability, format: 1 };
+  return { ...map, tiles, places, props, edges, spawn, walkability, format: 1, marks: [] };
 }
 
 // ── v2: the town ────────────────────────────────────────────────────────────
@@ -263,6 +304,7 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
   // What stands on each tile: a building's name or a solid prop's, for clear overlap messages.
   const solidBy: (string | undefined)[] = new Array(width * height).fill(undefined);
   const standing: boolean[] = new Array(width * height).fill(false);
+  const homeIds = new Set<string>();
 
   // Buildings.
   const buildings: TownBuilding[] = list(raw.buildings ?? []).map((v, n) => {
@@ -292,12 +334,33 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
       check(door[1] === origin[1] + foot[1] && door[0] >= origin[0] && door[0] < origin[0] + foot[0], `Door must be on the front edge: ${name}`);
     }
     check(!pid || door, `A building place needs a door: ${name}`);
-    return { ...(pid ? { id: pid } : {}), sprite, at: origin, foot, ...(door ? { door } : {}), state, ...(b.project !== undefined ? { project: string(b.project) } : {}), flip: bool(b.flip, 'flip') ?? false };
+    // Who lives there (town/occupancy.ts). Scenery houses must say: a census household or a vacant home.
+    const homes = b.home === undefined ? [] : (Array.isArray(b.home) ? b.home : [b.home]).map(h => {
+      check(typeof h === 'string' && /^[a-z][a-z0-9_]*$/.test(h), `${name}: home is a home id or a list of them`);
+      return h;
+    });
+    check(!homes.includes('vacant') || homes.length === 1, `${name}: a vacant home has nobody else in it`);
+    check(pid || homes.length || !metaOf(sprite).dwelling, `Scenery house needs a home (home_NN or vacant): ${name}`);
+    for (const h of homes) if (h !== 'vacant') {
+      check(!homeIds.has(h), `Two buildings hold home ${h}`);
+      homeIds.add(h);
+    }
+    check(b.datestone === undefined || (Number.isInteger(b.datestone) && Number(b.datestone) > 999 && Number(b.datestone) < 10000), `${name}: datestone is a year`);
+    check(b.datestone === undefined || metaOf(sprite).lintel, `${name}: ${sprite} has no lintel for a datestone`);
+    check(b.sign === undefined || metaOf(sprite).sign, `${name}: ${sprite} has no sign panel`);
+    check(b.number === undefined || (Number.isInteger(b.number) && Number(b.number) > 0 && metaOf(sprite).plate), `${name}: number is a door number on a sprite with a plate`);
+    return {
+      ...(pid ? { id: pid } : {}), sprite, at: origin, foot, ...(door ? { door } : {}), state, ...(b.project !== undefined ? { project: string(b.project) } : {}),
+      flip: bool(b.flip, 'flip') ?? false, homes,
+      ...(b.datestone !== undefined ? { datestone: Number(b.datestone) } : {}),
+      ...(b.sign !== undefined ? { sign: lettering(b.sign, name) } : {}),
+      ...(b.number !== undefined ? { number: Number(b.number) } : {})
+    };
   });
 
   // Props: single placements and lines.
   const props: TownProp[] = [];
-  const place = (sprite: string, p: Point, opts: { solid?: boolean; flip?: boolean; state?: unknown; project?: unknown; dx?: number; dy?: number; lift?: number }, from: TownProp['from']) => {
+  const place = (sprite: string, p: Point, opts: { solid?: boolean; flip?: boolean; state?: unknown; project?: unknown; dx?: number; dy?: number; lift?: number; mark?: string; text?: string }, from: TownProp['from']) => {
     const art = manifest[sprite];
     check(art, `Unknown sprite: ${sprite}`);
     check(art.kind === 'prop', `Not a prop sprite: ${sprite}`);
@@ -316,13 +379,29 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
     }
     for (const q of block) solidBy[at(q[0], q[1])] = `prop ${name}`;
     standing[at(p[0], p[1])] = true;
-    props.push({ sprite, at: p, dx: opts.dx ?? 0, dy: opts.dy ?? 0, lift: opts.lift ?? 0, solid: block.length > 0, flip: opts.flip ?? false, state: spriteState(opts.state, name), ...(opts.project !== undefined ? { project: string(opts.project) } : {}), from });
+    props.push({
+      sprite, at: p, dx: opts.dx ?? 0, dy: opts.dy ?? 0, lift: opts.lift ?? 0, solid: block.length > 0, flip: opts.flip ?? false,
+      state: spriteState(opts.state, name), ...(opts.project !== undefined ? { project: string(opts.project) } : {}), from,
+      ...(opts.mark ? { mark: opts.mark } : {}), ...(opts.text !== undefined ? { text: opts.text } : {})
+    });
   };
+  const markIds = new Set<string>();
   for (const v of list(raw.props ?? [])) {
     const p = object(v), sprite = string(p.sprite);
     const offset = p.offset === undefined ? [0, 0] : numbers(p.offset, 2);
     check(p.lift === undefined || (Number.isInteger(p.lift) && Number(p.lift) >= 0), 'lift is a whole number of px');
-    const opts = { solid: bool(p.solid, 'solid'), flip: bool(p.flip, 'flip'), state: p.state, project: p.project, lift: p.lift as number | undefined };
+    const where = `${sprite} at ${String(p.at ?? p.line)}`;
+    let mark: string | undefined;
+    if (p.mark !== undefined) {
+      mark = string(p.mark);
+      check(/^(OQ|MR|WF|MB|CM|SH|LN)-\d$/.test(mark), `${where}: mark is a riddle id like OQ-1`);
+      check(!markIds.has(mark), `Mark placed twice: ${mark}`);
+      check(p.line === undefined, `${where}: a Mark is one plaque, not a line`);
+      markIds.add(mark);
+    }
+    check(p.text === undefined || metaOf(sprite).letter, `${where}: ${sprite} has no panel to letter`);
+    const text = p.text === undefined ? undefined : lettering(p.text, where);
+    const opts = { solid: bool(p.solid, 'solid'), flip: bool(p.flip, 'flip'), state: p.state, project: p.project, lift: p.lift as number | undefined, mark, text };
     if (p.line !== undefined) {
       check(p.at === undefined, 'A prop has at or line, not both');
       const [a, b] = list(p.line).map(q => f.point(q));
@@ -395,8 +474,44 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
   for (const p of places) check(reached[at(p.door[0], p.door[1])], `Place unreachable from the spawn: ${p.id}`);
   for (const e of edges) for (let n = e.from; n <= e.to; n++) { const c = edgeCell(f, e.side, n); check(reached[at(c[0], c[1])], `Edge unreachable from the spawn: ${e.side} ${n}`); }
 
+  // The Marks: ground to stand on beside each (its own tile first, then in front, the sides, behind), and art
+  // no building, tree or other prop nearer the camera hides (props by the middle half of their art).
+  const groundY = (x: number, y: number) => y * TH - tiles[at(x, Math.min(y, height - 1))]!.elev * ELEV;
+  const drawn = (sprite: string, cx: number, baseY: number, lift = 0) => {
+    const art = manifest[sprite]!;
+    return { x0: cx - art.w / 2, x1: cx + art.w / 2, y0: baseY - lift - art.h, y1: baseY - lift, baseY };
+  };
+  const covers = (r: ReturnType<typeof drawn>, x: number, y: number, inset: number) =>
+    x > r.x0 + inset && x < r.x1 - inset && y > r.y0 + Math.min(inset, 8) && y < r.y1;
+  const marks: MarkSpot[] = props.filter(p => p.mark).map(p => {
+    const stand = ([[0, 0], [0, 1], [1, 0], [-1, 0], [0, -1]] as const).map(([dx, dy]): Point => [p.at[0] + dx, p.at[1] + dy])
+      .find(q => walkable(q) && reached[at(q[0], q[1])]);
+    check(stand, `Mark ${p.mark} has no ground to stand on beside it`);
+    const plaque = drawn(p.sprite, (p.at[0] + 0.5) * TW + p.dx, groundY(p.at[0], p.at[1]) + TH / 2 + p.dy, p.lift);
+    const mx = (plaque.x0 + plaque.x1) / 2, my = (plaque.y0 + plaque.y1) / 2;
+    for (const b of buildings) {
+      const r = drawn(b.sprite, (b.at[0] + b.foot[0] / 2) * TW, groundY(b.at[0], b.at[1] + b.foot[1] - 1) + TH);
+      check(!(r.baseY > plaque.baseY && covers(r, mx, my, 4)), `Mark ${p.mark} is hidden behind ${b.id ?? b.sprite}`);
+    }
+    for (const o of props) {
+      const meta = metaOf(o.sprite);
+      // Trees, boats, carts, anything standing in front; not what lies flat, hangs overhead or is the plaque's host.
+      if (o === p || o.mark || meta.flat || meta.under || meta.overhead || o.from === 'scatter') continue;
+      const r = drawn(o.sprite, (o.at[0] + 0.5) * TW + o.dx, groundY(o.at[0], o.at[1]) + TH / 2 + o.dy, o.lift);
+      check(!(r.baseY > plaque.baseY && covers(r, mx, my, (r.x1 - r.x0) / 4)), `Mark ${p.mark} is hidden behind ${o.sprite} at ${o.at.join(',')}`);
+    }
+    return { id: p.mark!, zone: id, at: p.at, stand };
+  });
+
   const map: MapDef = { id, name: string(raw.name), width, height, tiles, startPositions: { player: [], enemy: [] } };
-  return { ...map, tiles, places, props: [], edges, spawn, walkability, format: 2, town: { buildings, props } };
+  return { ...map, tiles, places, props: [], edges, spawn, walkability, format: 2, town: { buildings, props }, marks };
+}
+
+/** Text to letter in code: the pixel font's characters, `|` between lines. */
+function lettering(v: unknown, where: string): string {
+  const text = string(v);
+  check(text.split('|').every(line => line.length > 0 && canLetter(line)), `${where}: text uses letters the pixel font lacks: ${text}`);
+  return text;
 }
 
 /** Cross-file links are checked after all raw files have compiled. */

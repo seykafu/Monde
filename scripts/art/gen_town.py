@@ -203,6 +203,42 @@ TOWN: dict[str, dict] = {
                          "pans hanging from chains, the left pan stuck lower than the right, rust patches", 1.0),
     "gate_pillar": prop("a square stone gate pillar with a round stone ball on top, a little moss, an iron hinge pin "
                         "on one side", 0.6),
+    # ---- Riddle details (town fixes): the Marks themselves and the objects the Spring riddles name. Anything
+    # that must be read (a year, a welcome line, a boat's name) is drawn BLANK here and lettered in code
+    # (render/town/lettering.ts), so it is exact.
+    "mark_plaque": prop("a tiny rectangular brass plaque with rounded corners and a small rivet in each corner, a "
+                        "lantern stamped in relief in its centre, polished so it gleams, seen straight from the front",
+                        0.35),
+    "watch_sign": prop("a giant gilded pocket-watch shop sign hanging from a black wrought-iron wall bracket: a round "
+                       "gold watch case with its winding crown and ring at the top, a cream dial with hour ticks and "
+                       "two black hands (no numerals), hung by a short chain from the end of the bracket arm, which "
+                       "comes in from the left; seen straight from the front", 1.0),
+    "herring_vane": prop("a copper weathervane in the shape of a herring, green verdigris patches, the fish seen in "
+                         "full side profile on top of a thin black iron spindle, with a small ball and four plain "
+                         "compass arms (no letters) below it", 0.9),
+    "welcome_sign": prop("a large painted wooden town welcome sign standing on two stout wooden posts: one wide "
+                         "cream signboard with a carved and painted blue border, a little carved lantern on a crest "
+                         "at the top, small flower boxes at the foot of each post. The signboard's face is "
+                         "completely BLANK and empty (no letters, no numbers, no pictures)", 2.0),
+    "brass_stone": prop("a single square-cut granite breakwater block, weathered grey with barnacles and a little "
+                        "seaweed at its foot; its front face is set with a polished square brass plate that catches "
+                        "the light (the plate is plain)", 0.9),
+    "datestone": prop("a small carved sandstone datestone tablet of the kind set into a wall over a front door: "
+                      "rectangular, a moulded frame, a tiny lantern carved at the top centre of the frame, a smooth "
+                      "BLANK recessed panel (no numbers, no letters); seen straight from the front", 0.7),
+    "gannet": prop("a small old harbour passenger ferry seen exactly from the side with its bow to the right: a "
+                   "navy-blue hull with a white band, a small white wheelhouse, a covered passenger deck with round "
+                   "portholes, a short black funnel, rope fenders hung over the side, a little mast. The hull is "
+                   "plain: no name, no numbers", 5.0),
+    "foundation_stone": prop("a square carved foundation stone block set at ground level, pale weathered stone with "
+                             "moss in its joints, a lantern carved in relief on its face (no letters or numbers)", 0.8),
+    "clock_window": prop("a small shop window seen straight from the front: a white-painted wooden sash frame with a "
+                         "few panes, the window packed with many little clock and pocket-watch faces of different "
+                         "sizes, every one showing a different time (no numerals), warm light behind them", 0.5),
+    "lantern_pane": prop("a single glasshouse window pane with a round-arched top, about one and a half times as tall "
+                         "as it is wide, in a white-painted iron frame; the glass is frosted milky white with a "
+                         "little lantern etched clear into the frost in its middle; seen straight from the front",
+                         0.4),
     # ---- Life
     "duck": prop("a single white farmyard duck, standing", 0.4),
     "gull": prop("a single seagull standing", 0.4),

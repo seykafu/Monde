@@ -3,7 +3,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { compileZone } from '../zoneFormat';
+import { compileZone, zoneMarks } from '../zoneFormat';
 import { TOWN_MANIFEST } from '../townSprites';
 
 // 12 × 8: a lane along row 4, a pond in the corner, a river running south down column 10.
@@ -134,6 +134,51 @@ describe('zone format v2', () => {
   });
 });
 
+describe('homes, Marks and lettering', () => {
+  it('says who lives in each house: a census household, a plain vacant home or flats inside a place', () => {
+    const z = compileZone(swap('buildings:\n', 'buildings:\n  - { sprite: townhouse_b, at: [5, 0], home: home_01 }\n  - { sprite: townhouse_c, at: [7, 0], home: vacant }\n')
+      .replace('door: [2, 4] }', 'door: [2, 4], home: [flat_a, flat_b] }'));
+    expect(z.town!.buildings.map(b => b.homes)).toEqual([[ 'home_01'], ['vacant'], ['flat_a', 'flat_b']]);
+    expect(() => compileZone(swap('buildings:\n', 'buildings:\n  - { sprite: townhouse_b, at: [4, 1] }\n'))).toThrow(/Scenery house needs a home/);
+    expect(() => compileZone(swap('buildings:\n', 'buildings:\n  - { sprite: townhouse_b, at: [4, 1], home: home_01 }\n  - { sprite: townhouse_c, at: [6, 1], home: home_01 }\n'))).toThrow(/Two buildings hold home home_01/);
+    expect(() => compileZone(swap('buildings:\n', 'buildings:\n  - { sprite: townhouse_b, at: [4, 1], home: [vacant, home_02] }\n'))).toThrow(/vacant home has nobody else/);
+    // A shed is not a house: scenery without a home is fine.
+    expect(compileZone(swap('buildings:\n', 'buildings:\n  - { sprite: garden_shed, at: [5, 0] }\n')).town!.buildings[0]!.homes).toEqual([]);
+  });
+
+  it('carves datestones, letters signs and numbers doors only where the art has a place for them', () => {
+    const z = compileZone(base.replace('sprite: townhouse_a, at: [1, 1]', 'sprite: pell_house, at: [1, 1]').replace('door: [2, 4] }', 'door: [1, 4], datestone: 1862 }'));
+    expect(z.town!.buildings[0]).toMatchObject({ datestone: 1862 });
+    expect(() => compileZone(swap('door: [2, 4] }', 'door: [2, 4], datestone: 1862 }'))).toThrow(/no lintel/);
+    expect(() => compileZone(base.replace('sprite: townhouse_a, at: [1, 1]', 'sprite: pell_house, at: [1, 1]').replace('door: [2, 4] }', 'door: [1, 4], datestone: 62 }'))).toThrow(/datestone is a year/);
+    const shop = compileZone(base.replace('sprite: townhouse_a, at: [1, 1]', 'sprite: storefront_b, at: [1, 1]').replace('door: [2, 4] }', 'door: [3, 4], number: 9, sign: "A. MONDE · MAPS & PRINTS" }'));
+    expect(shop.town!.buildings[0]).toMatchObject({ number: 9, sign: 'A. MONDE · MAPS & PRINTS' });
+    expect(() => compileZone(swap('door: [2, 4] }', 'door: [2, 4], number: 9 }'))).toThrow(/door number/);
+    const sign = compileZone(swap('  - { sprite: lamp_post, at: [4, 3] }', '  - { sprite: welcome_sign, at: [4, 2], text: "WELCOME TO MONDE|FOUNDED 1838" }'));
+    expect(sign.town!.props.find(p => p.sprite === 'welcome_sign')!.text).toBe('WELCOME TO MONDE|FOUNDED 1838');
+    expect(() => compileZone(swap('  - { sprite: lamp_post, at: [4, 3] }', '  - { sprite: welcome_sign, at: [4, 2], text: "Welcome" }'))).toThrow(/pixel font lacks/);
+    expect(() => compileZone(swap('  - { sprite: lamp_post, at: [4, 3] }', '  - { sprite: bench, at: [4, 3], text: HI }'))).toThrow(/no panel to letter/);
+  });
+
+  it('lists the Marks with ground to stand on beside each, and refuses one hidden or out of reach', () => {
+    const z = compileZone(swap('props:\n', 'props:\n  - { sprite: mark_plaque, at: [2, 4], offset: [0, -16], lift: 40, mark: OQ-1 }\n  - { sprite: lamp_post, at: [7, 3] }\n  - { sprite: mark_plaque, at: [7, 3], lift: 30, mark: OQ-2 }\n'));
+    expect(zoneMarks(z)).toEqual([
+      { id: 'OQ-1', zone: 'test', at: [2, 4], stand: [2, 4] },
+      { id: 'OQ-2', zone: 'test', at: [7, 3], stand: [7, 4] }
+    ]);
+    expect(z.walkability[4]![2]).toBe(true); // a plaque on a door doesn't block it
+    expect(() => compileZone(swap('props:\n', 'props:\n  - { sprite: mark_plaque, at: [2, 4], mark: OQ-1 }\n  - { sprite: mark_plaque, at: [5, 4], mark: OQ-1 }\n'))).toThrow(/Mark placed twice: OQ-1/);
+    expect(() => compileZone(swap('props:\n', 'props:\n  - { sprite: mark_plaque, at: [5, 4], mark: XX-9 }\n'))).toThrow(/riddle id/);
+    // Behind the house: its art covers the plaque.
+    expect(() => compileZone(swap('props:\n', 'props:\n  - { sprite: mark_plaque, at: [2, 0], offset: [0, 18], mark: OQ-1 }\n'))).toThrow(/hidden behind shop/);
+    // In front of it, a handcart.
+    expect(() => compileZone(swap('props:\n', 'props:\n  - { sprite: mark_plaque, at: [5, 4], mark: OQ-1 }\n  - { sprite: handcart, at: [5, 5] }\n'))).toThrow(/hidden behind handcart/);
+    // On the river between two hedges: nothing to stand on beside it.
+    expect(() => compileZone(swap('props:\n', 'props:\n  - { sprite: hedge, at: [9, 1] }\n  - { sprite: hedge, at: [11, 1] }\n  - { sprite: duck, at: [10, 1], mark: OQ-1 }\n'))).toThrow(/no ground to stand on/);
+    expect(compileZone(base).marks).toEqual([]);
+  });
+});
+
 describe('the shipped town', () => {
   const dir = resolve(import.meta.dirname, '../../../..', 'content/zones');
   const shipped = readdirSync(dir).filter(f => f.endsWith('.zone.yaml')).map(f => compileZone(readFileSync(resolve(dir, f), 'utf8')));
@@ -144,6 +189,29 @@ describe('the shipped town', () => {
       for (const p of z.town!.props) expect(TOWN_MANIFEST[p.sprite]?.kind, p.sprite).toBe('prop');
       expect(z.town!.props.length, `${z.id} is dressed`).toBeGreaterThan(40);
     }
+  });
+  it('puts every Spring Mark on the board its chain belongs to (§14.4–14.8), once', () => {
+    const spring = ['OQ', 'MR', 'WF', 'CM'].flatMap(c => [1, 2, 3, 4, 5].map(n => `${c}-${n}`)).filter(id => id !== 'CM-5');
+    const home = { OQ: 'old_quarter', MR: 'market_row', WF: 'wharf', CM: 'commons' } as Record<string, string>;
+    const placed = shipped.flatMap(z => z.marks);
+    expect(placed.map(m => m.id).sort()).toEqual([...spring].sort());
+    for (const m of placed) expect(m.zone, m.id).toBe(home[m.id.slice(0, 2)]);
+    for (const m of placed) expect(Math.hypot(m.stand[0] - m.at[0], m.stand[1] - m.at[1]), m.id).toBeLessThanOrEqual(1);
+  });
+  it('shows what the Spring riddles name: datestones, the watch, the herring, the welcome sign, No. 9, the Gannet', () => {
+    const byId = Object.fromEntries(shipped.map(z => [z.id, z]));
+    // OQ-3: "art must match", and no datestone reads 1846.
+    const dates = Object.fromEntries(byId.old_quarter!.town!.buildings.filter(b => b.datestone).map(b => [b.id, b.datestone]));
+    expect(dates).toEqual({ founders_house: 1838, st_brigids: 1839, town_hall: 1841, clocktower: 1842, library: 1850, pell_house: 1862, okafor_house: 1871, constabulary: 1888, lantern_office: 1903 });
+    const props = (z: string) => byId[z]!.town!.props.map(p => p.sprite);
+    expect(props('old_quarter')).toEqual(expect.arrayContaining(['watch_sign', 'old_bell', 'fountain']));
+    expect(props('market_row')).toEqual(expect.arrayContaining(['herring_vane', 'public_scale']));
+    expect(props('wharf')).toEqual(expect.arrayContaining(['welcome_sign', 'gannet', 'brass_stone', 'net_rack', 'bollard']));
+    expect(props('commons')).toEqual(expect.arrayContaining(['lantern_pane', 'foundation_stone', 'sundial', 'gate_pillar', 'old_elm', 'footbridge']));
+    expect(byId.wharf!.town!.props.find(p => p.sprite === 'welcome_sign')!.text).toMatch(/1838/);
+    expect(byId.wharf!.town!.props.find(p => p.sprite === 'gannet')!.text).toBe('GANNET');
+    const no9 = byId.market_row!.town!.buildings.find(b => b.id === 'storefront_9')!;
+    expect(no9).toMatchObject({ number: 9, sign: 'A. MONDE · MAPS & PRINTS' });
   });
   it('has a lamp to see by in every district', () => {
     for (const z of shipped) expect(z.town!.props.filter(p => p.sprite === 'lamp_post').length, z.id).toBeGreaterThanOrEqual(4);
