@@ -82,7 +82,35 @@ const LAPSED: Record<number, Act[]> = {
   22: [gain('tollmen', { safety: -2 }, 'Tollmen at the Saturday stalls')]
 };
 
-export const MIGRATION_SCENARIOS = { strong: STRONG, passive: PASSIVE, lapsed: LAPSED } as const;
+/**
+ * G-11 (the Straw Poll soak, finale/__tests__/springSoak.ts): a builder who puts every coin and hour into the Projects
+ * and the homes (two more houses than the strong player) and does the community work, but skips the Marks and the
+ * fight, so the clock restarts on Day 14 with the borrowed chime (S07 B).
+ */
+const BUILDER: Record<number, Act[]> = {
+  4: STRONG_WEEK[4]!, 6: STRONG_WEEK[6]!, 9: [restoreNext], 10: [restoreNext], 11: [restoreNext],
+  12: STRONG[12]!, 13: STRONG[13]!, 14: [restoreNext, ...PASSIVE[14]!], 17: [restoreNext],
+  19: STRONG[19]!, 20: [restoreNext], 23: [restoreNext]
+};
+/**
+ * G-11: a social player who spends the days talking (finale/__tests__/springSoak.ts has their Regard). In the town's
+ * numbers: the two Marks people point them to, the fountain the town pitches in for, the borrowed chime, and the
+ * sociable community work (socialRoutine).
+ */
+const SOCIAL: Record<number, Act[]> = {
+  2: [gain('riddle', { charm: 1 }, 'OQ-1')], 5: [gain('riddle', { charm: 1 }, 'OQ-2')],
+  6: STRONG_WEEK[6]!, 14: PASSIVE[14]!
+};
+/** §8 for the social player: the Mail Round every day, tutoring from Day 12, and hosting Roz's quiz on Thursdays. */
+const socialRoutine = (day: number): Act[] => [
+  ...(day >= 2 ? [cw('spirit', 0.3, 'Mail Round')] : []),
+  ...(day >= 12 ? [cw('spirit', 0.4, 'Tutor at school')] : []),
+  ...(day >= 14 && weekdayOf(day) === 'Thu' ? [cw('spirit', 0.8, 'Pub quiz host')] : [])
+];
+/** Who does community work every day, and which. */
+const ROUTINES: Readonly<Record<string, (day: number) => Act[]>> = { strong: routine, builder: routine, social: socialRoutine };
+
+export const MIGRATION_SCENARIOS = { strong: STRONG, passive: PASSIVE, lapsed: LAPSED, social: SOCIAL, builder: BUILDER } as const;
 export type MigrationScenario = keyof typeof MIGRATION_SCENARIOS;
 
 export interface MigrationSoakDay {
@@ -197,7 +225,7 @@ export function runMigrationSoak(name: MigrationScenario, lastDay = 25, opts: So
       notices: given, leaving, departed, census: s.census, freeHomes: s.homes.restored_free, generated: livingArrivals(s.people).length
     });
     s = setTollmenLevelMax(s, tollmenBaseline(day));
-    for (const act of [...(script[day] ?? []), ...(name === 'strong' ? routine(day) : [])]) s = act(s);
+    for (const act of [...(script[day] ?? []), ...(ROUTINES[name]?.(day) ?? [])]) s = act(s);
   }
   const archetypes: Record<string, number> = {};
   for (const h of all) archetypes[h.archetype] = (archetypes[h.archetype] ?? 0) + 1;

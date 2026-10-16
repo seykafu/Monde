@@ -18,9 +18,9 @@ const compiled = compileScenes(fs.readdirSync(path.join(root, "content/scenes"))
   .map((file) => ({ file, source: read(`content/scenes/${file}`) })), registry);
 const spring = compiled.scenes.filter((s) => s.header && /^s(0\d|10)/.test(s.id));
 const expected = ["s01a_ferry", "s01b_walk", "s01c_cottage", "s02_marks", "s03_tolls", "s04_water_again", "s05_first_arrival",
-  "s06_good_coat", "s07b_chime_loan", "s08_option", "s09_pell_confession", "s10a_bloom_open", "s10b_bloom_close"];
+  "s06_good_coat", "s07b_chime_loan", "s08_option", "s09_pell_confession", "s10a_bloom_open", "s10b_bloom_close", "s10c_straw_poll"];
 
-it("compiles all 37 scripts with zero diagnostics", () => { expect(compiled.scenes).toHaveLength(37); expect(compiled.diagnostics).toEqual([]); });
+it("compiles all 38 scripts with zero diagnostics", () => { expect(compiled.scenes).toHaveLength(38); expect(compiled.diagnostics).toEqual([]); });
 
 describe.each(["first", "last"] as const)("Days 1–25, %s choices", (choice) => {
   it("fires all ten beats in calendar order with live handoffs and persistent flags", async () => {
@@ -40,6 +40,8 @@ describe.each(["first", "last"] as const)("Days 1–25, %s choices", (choice) =>
         memory: (cue, ctx) => { expect(ctx.game.day).toBeGreaterThan(0); expect(cue.importance).toBeGreaterThan(0); memories.push(cue.text); },
         ai_open: async (cue) => { ai.push("ai_open"); return [{ kind: "say", speaker: cue.resident, text: "An answer from the fake resident." }]; },
         ai_line: async (cue) => { ai.push("ai_line"); return [{ kind: "say", speaker: cue.speaker.id, text: "A live slot from the fake resident." }]; },
+        // G-11: the Straw Poll at the fair's close (S10c) publishes `vote.*` as the game's StoryScene does.
+        campaign: (cue) => { expect(cue.key).toBe("spring_straw_poll"); game.values!.vote = { winner: "fellow", share: 47, vane: 21, moss: 32, margin: 12 }; },
       },
     };
     const director = new StoryDirector(spring, flags, host);
@@ -67,7 +69,7 @@ describe.each(["first", "last"] as const)("Days 1–25, %s choices", (choice) =>
       }
     }
     expect(played).toEqual(expected);
-    for (const flag of ["s01a_done", "s01b_done", "s01c_done", "s02_done", "s03_done", "s04_done", "s05_done", "s06_done", "s07_done", "s08_done", "s09_done", "s10a_done", "s10b_done", "option_known", "pell_confessed", "bloom_fair_closed"]) expect(flags.has(flag), flag).toBe(true);
+    for (const flag of ["s01a_done", "s01b_done", "s01c_done", "s02_done", "s03_done", "s04_done", "s05_done", "s06_done", "s07_done", "s08_done", "s09_done", "s10a_done", "s10b_done", "s10c_done", "spring_poll_taken", "option_known", "pell_confessed", "bloom_fair_closed"]) expect(flags.has(flag), flag).toBe(true);
     expect(flags.has("vanes_coin")).toBe(choice === "first");
     expect(flags.has("option_kept_secret")).toBe(choice === "first");
     expect(flags.has("option_public")).toBe(choice === "last");

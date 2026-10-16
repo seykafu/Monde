@@ -1,0 +1,104 @@
+# The Spring Straw Poll's quotes (MVP G-11; S10c "The Straw Poll", and the Day 26 Lantern). When the poll is counted,
+# a few carded residents say which jar they put their bean in. Online, each line is the resident's own ({ai_line}, with
+# a brief naming their lean); in Quiet Mode, or when the model says nothing usable, the line comes from here.
+#
+# Keys: a resident id, then one line per lean band (client/src/finale/quotes.ts; shared/src/election/strawPoll.ts):
+#   fellow_strong  the Fellow's jar, without a second thought   fellow  the Fellow's jar, after some thought
+#   torn           between two jars, still deciding              vane    Mr. Vane's jar   moss  Old Moss's jar
+# `generic` serves anyone without lines of their own (three per band, picked by the world seed). Lines never assume
+# what the player did this Spring: the same line has to fit a builder, a talker and someone who did neither.
+# Voice bible §12.1: one to three sentences, contractions, the speaker's own nouns; no theme statements.
+residents:
+  odile:
+    fellow_strong: "Your jar. I didn't stop to think about it. Now eat something, you look like a Tuesday loaf."
+    fellow: "Your jar, after a minute. You turn up. That counts for more than talk."
+    torn: "I held the bean over two jars. Then I put it in my apron. It's still there."
+    vane: "His jar. Forty jobs is forty wages, and wages buy bread. Don't look at me like that."
+    moss: "Moss. The man brings my flour on the Gannet every Friday. That's a platform."
+  rosalind:
+    fellow_strong: "Between us, pet, I didn't even look at the other jars."
+    fellow: "I couldn't say, but the bean in your jar had my thumbprint on it."
+    torn: "Between us, I put mine in sideways. Sable says that doesn't count. Sable's very strict."
+    vane: "I couldn't say, but a man who pays his tab in advance gets a bean from me. Don't tell June."
+    moss: "Old Moss, pet. Forty years on the same stool in my pub and never once started a fight."
+  nell:
+    fellow_strong: "Yours. Look, I don't hand out beans for nothing."
+    fellow: "Yours, just. Don't let it go to your head. It's one bean."
+    torn: "Look. I stood at that trestle longer than I stand at the fish auction, and I still don't know."
+    vane: "Vane's. He's the only one talking about money, and the cannery won't reopen on talk."
+    moss: "Moss. He's Wharf. Whatever else he is, he's Wharf."
+  margo:
+    fellow_strong: "The Fellow's. I'd file it under obvious, if I filed beans."
+    fellow: "Yours. I wrote down why on the back of a catalogue card. You can't read it."
+    torn: "I abstained by accident. The bean is in my cardigan pocket with a pencil stub."
+    vane: "Mr. Vane's. Don't. I've read the town accounts, and somebody has to pay for the lamps."
+    moss: "Old Moss. A protest vote, entered in pencil. I'll rub it out by autumn."
+  kasimir:
+    fellow_strong: "Yours. True."
+    fellow: "Yours. Level enough."
+    torn: "Measured twice. Didn't cut."
+    vane: "His. Work's work."
+    moss: "Moss. Boat's sound."
+  june:
+    fellow_strong: "Your jar, friend. I'd have put the whole fiddle case in if Sable had let me."
+    fellow: "Sure, your jar. Anyway, it's beans. Ask me again when it's ballots."
+    torn: "I hummed at the trestle until Sable told me to choose. I chose the next song."
+    vane: "His jar. He tipped the band. I know, I know. Anyway."
+    moss: "Old Moss! More ferry! It's catchy. You can't argue with catchy."
+  teo:
+    fellow_strong: "Yours. Sorry, was that meant to be secret? It's yours."
+    fellow: "Yours, I think. I dropped it, but it rolled the right way."
+    torn: "Oh, bother. I put it in the tulip pot by mistake. Does the tulip pot count?"
+    vane: "His. The tulips were very good. I'm not proud of it. Sorry."
+    moss: "Old Moss. He brings my seed orders over on the Gannet and he's never lost one. Not one."
+  bertrand:
+    fellow_strong: "Yours. At eighty-four one knows a sound movement when one sees it. It will do."
+    fellow: "Yours, on balance. A clock is judged by the week, not the minute."
+    torn: "I am still deciding. I have been deciding since the council of nineteen seventy."
+    vane: "His. Don't tell Pell. She'd look at me over her glasses."
+    moss: "Mossimo. I've known him since he was a boy with a bucket. It will do."
+  hollis:
+    fellow_strong: "Your jar. Twenty oh-one. Took me two seconds."
+    fellow: "Your jar. Twenty oh-four. I took the long way round the trestle."
+    torn: "Twenty-ten. Still standing there. The bean's in my waistcoat."
+    vane: "His jar. He says the line comes back. I'll believe it on the timetable."
+    moss: "Moss. Wrong about most things, but punctual. Twenty oh-six."
+  augusta:
+    fellow_strong: "Your jar. Noted. Don't make me regret the notebook entry."
+    fellow: "Yours. On the evidence so far. I'll keep looking."
+    torn: "Undecided. Write that down. No, I'll write it down."
+    vane: "His jar. Somebody has to pay the constable. The Fund can't."
+    moss: "Moss. A man who has never once needed arresting. Low bar. He clears it."
+  priya:
+    fellow_strong: "Yours. Pulse steady, decision quick. Now sit down, you've been on your feet since noon."
+    fellow: "Yours. Mild confidence. I'd call it stable."
+    torn: "I left it on the trestle. Clinically, that's undecided."
+    vane: "His. A clinic needs money and he keeps saying the word. Don't make that face."
+    moss: "Moss. He came to every one of Dad's dressings on his day off. That's my vote."
+  felix:
+    fellow_strong: "Goodness, yours. Nine pupils tried to vote too, and Sable confiscated all nine beans."
+    fellow: "Yours. With a gold star, provisionally."
+    torn: "I've marked both jars 'see me'."
+    vane: "His, I'm afraid. He's promised the school a roof. I'll believe it when it's raining and I'm dry."
+    moss: "Old Moss. He took the class round the bay last spring and brought all nine back."
+generic:
+  fellow_strong:
+    - "Your jar. Didn't need to think."
+    - "Yours. Ask me again in autumn, same answer."
+    - "Yours. I'd have put two in if Sable weren't watching."
+  fellow:
+    - "Yours, I think. Early days."
+    - "Yours. You've been about. People notice."
+    - "Your jar. Don't make a speech about it."
+  torn:
+    - "I stood at that trestle a long time."
+    - "The bean's still in my pocket. Ask me next week."
+    - "Couldn't choose. I had a bun instead."
+  vane:
+    - "Mr. Vane's. Jobs are jobs."
+    - "His. He talks about wages, and nobody else does."
+    - "Vane's. Don't look at me like that."
+  moss:
+    - "Old Moss. More ferry. Can't argue with more ferry."
+    - "Moss. He's been here longer than any of you."
+    - "Moss's jar. A protest, mostly."

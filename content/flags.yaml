@@ -171,6 +171,7 @@ flags:
   - s06_done
   - s10a_done
   - s10b_done
+  - s10c_done
   - s13_done
   - s14_done
   - s15_done
@@ -197,6 +198,7 @@ flags:
   - sc_tutorial_lost
   - sc_tutorial_won
   - school_saved
+  - spring_poll_taken
   - script
   - station_hill_open
   - station_open

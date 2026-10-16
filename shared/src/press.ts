@@ -8,6 +8,16 @@ export const Press = PressCopy.extend({
   event_ids: z.array(z.string()), letters: z.array(z.object({ from: z.string(), text: z.string() })),
   movement_residents: z.array(z.string()).optional(),
   movements: z.array(z.string()), notices: z.array(z.string()),
+  /**
+   * G-11: the Bloom Fair's Straw Poll on the front page (the Day 26 edition, §6.6 "polls"): whole percentages for the
+   * Fellow, Mr. Vane and Old Moss, the beans counted, the ± margin in points, and a few residents in their own words.
+   */
+  poll: z.object({
+    ballots: z.number().int().nonnegative(), margin: z.number().int().nonnegative(),
+    percent: z.object({ fellow: z.number(), vane: z.number(), moss: z.number() }),
+    leader: z.enum(['fellow', 'vane', 'moss', 'tie']),
+    quotes: z.array(z.object({ from: z.string(), text: z.string() })),
+  }).optional(),
 });
 export type Press = z.infer<typeof Press>;
 export const PressEventData = z.object({ id:z.string(),day:z.number().int(),minute:z.number(),type:z.string(),summary:z.string(),importance:z.number(),who:z.array(z.string()) });

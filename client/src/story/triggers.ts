@@ -30,9 +30,9 @@ export const minutes = (time: string): number => {
   return hour! * 60 + minute!;
 };
 
-/** Appointments summoned by §13.3; the host supplies confirmation and travel. */
+/** Appointments summoned by §13.3 (and G-11's Straw Poll at the fair's close); the host supplies confirmation and travel. */
 export function isSummoned(scene: CompiledScene): boolean {
-  return ["s10a_bloom_open", "s10b_bloom_close", "s11_station"].includes(scene.id);
+  return ["s10a_bloom_open", "s10b_bloom_close", "s10c_straw_poll", "s11_station"].includes(scene.id);
 }
 
 export function sceneDone(scene: CompiledScene, flags: FlagStore, completed: ReadonlySet<string>): boolean {

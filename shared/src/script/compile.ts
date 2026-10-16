@@ -29,7 +29,7 @@ export const INTERPOLATIONS: readonly RegExp[] = [
   /^romance_pair_\d\.(a|b)$/,
   /^d\.(player|vane|moss)$/,
   /^run\.(player|vane|moss|total)$/,
-  /^vote\.(winner|share|margin)$/,
+  /^vote\.(winner|share|margin|vane|moss)$/,
   /^tally\.[a-z_]+$/,
 ];
 

@@ -47,10 +47,10 @@ async function playOut(session: StorySession): Promise<StoryLine[]> {
 }
 
 describe('StorySession', () => {
-  it('ships the ten Spring beats', () => {
+  it('ships the ten Spring beats, and the Straw Poll that closes them (G-11)', () => {
     const ids = SPRING_SCENES.filter(s => s.header).map(s => s.id);
     expect(ids).toEqual(['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's05_first_arrival', 's05b_empty_boat',
-      's06_good_coat', 's07a_chime_runs', 's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close']);
+      's06_good_coat', 's07a_chime_runs', 's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']);
   });
 
   it('plays S01a on the ferry slip at 09:50 on Day 1 with every cue landing somewhere', async () => {

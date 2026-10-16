@@ -7,6 +7,29 @@ import type { Clock } from '../sim/clock';
 import { frontPage, printTime } from '../press/model';
 import { FAMILY_BODY, FAMILY_DISPLAY, GAME_WIDTH, GAME_HEIGHT } from '../util/constants';
 import { openPeople } from './PeopleScene';
+import { reportDue } from '../finale/state';
+
+const POLL_NAME = { fellow: 'The Fellow', vane: 'Mr. Vane', moss: 'Old Moss' } as const;
+/** The Straw Poll in print: three ruled bars, the beans and the margin, and one resident in their own words. */
+function drawPollBox(scene: Phaser.Scene, g: Phaser.GameObjects.Graphics, poll: NonNullable<Press['poll']>, x: number, y: number): void {
+  const ink = '#30291f';
+  const t = (tx: number, ty: number, s: string, size: number, o: { italic?: boolean; bold?: boolean; width?: number } = {}) => scene.add.text(tx, ty, s, {
+    fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: ink, fontStyle: [o.italic ? 'italic' : '', o.bold ? 'bold' : ''].join(' ').trim() || 'normal',
+    ...(o.width ? { wordWrap: { width: o.width } } : {})
+  });
+  g.lineBetween(x - 16, 280, x - 16, 480);
+  t(x, y, 'THE STRAW POLL', 20, { bold: true });
+  (['fellow', 'vane', 'moss'] as const).forEach((c, i) => {
+    const yy = y + 34 + i * 30;
+    t(x, yy, POLL_NAME[c], 16, { bold: poll.leader === c });
+    g.strokeRect(x + 110, yy + 3, 170, 14);
+    g.fillStyle(0x30291f, poll.leader === c ? 0.85 : 0.45).fillRect(x + 110, yy + 3, (170 * poll.percent[c]) / 100, 14);
+    t(x + 290, yy, `${poll.percent[c]}%`, 16, { bold: poll.leader === c });
+  });
+  t(x, y + 128, `${poll.ballots} beans at the Bloom Fair · ±${poll.margin} points`, 13, { italic: true });
+  const q = poll.quotes[0];
+  if (q) t(x, y + 150, `“${q.text}” (${q.from})`, 14, { italic: true, width: 355 }).setMaxLines(3);
+}
 export const PAPER_PENDING = 'monde.press.pending';
 interface Open { host: string; clock: Clock; paper: Press; seed: number; archive?: boolean }
 export function openPaper(host: Phaser.Scene, data: Omit<Open, 'host'>): void {
@@ -30,7 +53,10 @@ export class DawnReportScene extends Phaser.Scene {
     text(58,119,`LOW WATER ${m.tides.lows.map(printTime).join(' / ')}     HIGH WATER ${m.tides.highs.map(printTime).join(' / ')}`,16);
     const g = this.add.graphics().lineStyle(2,0x30291f); g.lineBetween(55,150,1225,150);
     text(58,164,paper.headline,29).setMaxLines(2); text(58,232,paper.dek,17);
-    paper.stories.forEach((s,i) => { const x = 58 + i * 390; if (i) g.lineBetween(x-16,280,x-16,480); text(x,280,s.title,22,355).setMaxLines(2); text(x,336,s.text,17,355).setMaxLines(6); });
+    // G-11: the Straw Poll takes the third column on the morning after the Bloom Fair.
+    const poll = paper.poll;
+    paper.stories.slice(0, poll ? 2 : 3).forEach((s,i) => { const x = 58 + i * 390; if (i) g.lineBetween(x-16,280,x-16,480); text(x,280,s.title,22,355).setMaxLines(2); text(x,336,s.text,17,355).setMaxLines(6); });
+    if (poll) drawPollBox(this, g, poll, 838, 280);
     // Small engraved lantern: ink hatch marks and simple cut lines, never a fabricated news photograph.
     g.strokeRect(1150,28,35,48).lineBetween(1150,28,1167,15).lineBetween(1167,15,1185,28);
     for (let x=1155;x<1185;x+=6) g.lineBetween(x,35,x,70);
@@ -57,7 +83,8 @@ export class DawnReportScene extends Phaser.Scene {
     }
     text(450,682,'Tap or Enter · Keep in Journal → Today → Papers',15);
     let closed = false;
-    const close = () => { if (closed) return; closed = true; this.scene.stop(); if (!this.opened.archive) openPeople(host,clock,'Today'); };
+    // The morning Spring ends, the End-of-Spring report follows the paper (finale/attach.ts) instead of the People page.
+    const close = () => { if (closed) return; closed = true; this.scene.stop(); if (!this.opened.archive && !reportDue(this.registry, clock.day)) openPeople(host,clock,'Today'); };
     this.input.on('pointerup',close); this.input.keyboard?.on('keydown-ENTER',close);
     this.events.once('shutdown',() => { clock.resume('paper'); host.input.enabled = true; if (host.input.keyboard) { host.input.keyboard.enabled = true; host.input.keyboard.resetKeys(); } });
   }

@@ -28,7 +28,8 @@ const KNOWN_BROKEN = new Set<string>([]);
 describe("content/scenes", () => {
   it("has the scenes extracted from GDD §13.3–§13.5", () => {
     expect(files.length).toBeGreaterThanOrEqual(37);
-    expect(files.filter((f) => MVP.test(f))).toHaveLength(15);
+    // S01–S10 (15 files) and G-11's S10c Straw Poll.
+    expect(files.filter((f) => MVP.test(f))).toHaveLength(16);
   });
 
   for (const { file, source } of sources) {

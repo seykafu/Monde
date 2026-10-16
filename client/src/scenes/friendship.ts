@@ -7,6 +7,8 @@ import { leavingFavors, localLastChances } from "../friendship/favors";
 import { adoptDawnArrivals, nightArrivals, paperMovements } from "./migration";
 import { generatedCards } from "../world/roster";
 import { projectPaper } from "../projects/runtime";
+import { ensureStrawPoll, withStrawPoll } from "../finale/take";
+import { REPORT_DAY } from "../finale/state";
 import YAML from "yaml";
 import headlineText from "../../../content/lines/headlines.yaml?raw";
 import { fallbackPress, type Press, type PressEvent, type HeadlineTemplate } from "@monde/shared";
@@ -185,7 +187,12 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     const events: PressEvent[] = [...getFriendship(registry).news_log, ...getEventLog(registry).outbox.flatMap(e => e.kind === 'town_event' ? [{ id: e.id, day: e.day, minute: e.minute, type: e.type, summary: e.summary, importance: e.importance, who: e.participants }] : [])];
     const templates = YAML.parse(headlineText) as { headlines: HeadlineTemplate[] };
     // G-03: yesterday's Project opening leads a template edition; today's openings and the calls for hands are notices.
-    const edition = projectPaper(registry, day, paper ?? fallbackPress(day,events,templates.headlines,opts.town()?.fund === undefined ? {} : { coins: opts.town()!.fund! }), templates.headlines);
+    let edition = projectPaper(registry, day, paper ?? fallbackPress(day,events,templates.headlines,opts.town()?.fund === undefined ? {} : { coins: opts.town()!.fund! }), templates.headlines);
+    // G-11: the morning after the Bloom Fair the Lantern prints the Straw Poll (counted now if the player missed the trestle).
+    if (day === REPORT_DAY) {
+      const finale = ensureStrawPoll(registry, id => regardFor(registry, id), opts.weatherSeed());
+      if (finale) edition = withStrawPoll(edition, finale, day, id => townNames()[id] ?? id);
+    }
     const town = getTown(registry);
     edition.notices = [...new Set([...edition.notices, ...(isMarketDay(day) ? ['Saturday market on Market Row.'] : []), ...(isFerryDay(day,town?.flags) ? ['The ferry sails today from the Wharf.'] : []), 'Meals and gifts at the general store.'])];
     if (!paper) edition.letters = getFriendship(registry).letters.filter(l => l.to === 'lantern' && l.day === day).slice(0,2).map(l => ({ from:l.from,text:l.text }));
