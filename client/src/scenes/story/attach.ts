@@ -34,6 +34,7 @@ import { STORY_SCENE, FELLOWSHIP_SCENE, type StoryOpen } from '../StoryScene';
 import { TOWN_KEY, TOWN_LEDGER_SCENE, getTown } from '../TownLedgerScene';
 import { appendEvent, getEventLog } from '../events';
 import { regardFor } from '../friendship';
+import { projectCue } from '../../projects/runtime';
 import type { ResidentLayer } from '../zone/residents';
 
 const SESSION_KEY = 'monde.story.session';
@@ -138,6 +139,7 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
       scene.scene.restart({ zone: zoneId, arrive: door });
     },
     zoneName: id => zones[id]?.name ?? id,
+    projectCue: (id, sceneId) => projectCue(registry, { day: clock.day, minute: clock.minute }, id, sceneId),
     aiLine: (residentId, brief) => liveLine(getMind(), {
       residentId, brief,
       context: talkContext({ day: clock.day, minute: clock.minute, state: residents.stateOf(residentId), zone, weather: opts.weather() })

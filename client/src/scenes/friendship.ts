@@ -4,6 +4,7 @@ import { expireFavor } from "@monde/shared";
 import { computeAppeal } from "../town/appeal";
 import { getTown } from "./TownLedgerScene";
 import { leavingFavors, localLastChances } from "../friendship/favors";
+import { projectPaper } from "../projects/runtime";
 import YAML from "yaml";
 import headlineText from "../../../content/lines/headlines.yaml?raw";
 import { fallbackPress, type Press, type PressEvent, type HeadlineTemplate } from "@monde/shared";
@@ -179,7 +180,8 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     if (getFriendship(registry).papers.some(p => p.day === day)) return;
     const events: PressEvent[] = [...getFriendship(registry).news_log, ...getEventLog(registry).outbox.flatMap(e => e.kind === 'town_event' ? [{ id: e.id, day: e.day, minute: e.minute, type: e.type, summary: e.summary, importance: e.importance, who: e.participants }] : [])];
     const templates = YAML.parse(headlineText) as { headlines: HeadlineTemplate[] };
-    const edition = paper ?? fallbackPress(day,events,templates.headlines,opts.town()?.fund === undefined ? {} : { coins: opts.town()!.fund! });
+    // G-03: yesterday's Project opening leads a template edition; today's openings and the calls for hands are notices.
+    const edition = projectPaper(registry, day, paper ?? fallbackPress(day,events,templates.headlines,opts.town()?.fund === undefined ? {} : { coins: opts.town()!.fund! }), templates.headlines);
     const town = getTown(registry);
     edition.notices = [...new Set([...edition.notices, ...(isMarketDay(day) ? ['Saturday market on Market Row.'] : []), ...(isFerryDay(day,town?.flags) ? ['The ferry sails today from the Wharf.'] : []), 'Meals and gifts at the general store.'])];
     if (!paper) edition.letters = getFriendship(registry).letters.filter(l => l.to === 'lantern' && l.day === day).slice(0,2).map(l => ({ from:l.from,text:l.text }));

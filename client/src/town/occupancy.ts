@@ -163,6 +163,20 @@ export const settleDeparturesFrom = (state: TownState, residentIds: readonly str
   vacateHomes(settleDepartures(state, residentIds, homes.length), homes);
 
 /**
+ * The `homes` Project (§6.3, §6.4) restored a vacant house: one fewer to restore, one more free home for arrivals, and
+ * its `project_<house>_done` flag (the board swaps its art; freeHomes() offers its door). Once per house.
+ */
+export function restoreHome(state: TownState, key: HomeKey): TownState {
+  const flag = `project_${key.slice(key.indexOf('.') + 1)}_done`;
+  if ((state.flags as Record<string, boolean>)[flag]) return state;
+  const restored = setFlags(state, [flag], []);
+  return {
+    ...restored,
+    homes: { ...state.homes, vacant_restorable: Math.max(0, state.homes.vacant_restorable - 1), restored_free: state.homes.restored_free + 1 }
+  };
+}
+
+/**
  * Free restored homes, the doors an arrival can take: vacant stock that has been restored and nobody lives in,
  * and lived-in homes that have emptied. In the order given (a board's, or the town's).
  */

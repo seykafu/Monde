@@ -42,6 +42,15 @@ export const displayName = (name: string): string => /"([^"]+)"/.exec(name)?.[1]
 /** The day's live plans from the mind by resident (the dawn package's model plans), or null for templates only. */
 export type LivePlans = (day: number) => Readonly<Record<string, PlanOutput>> | null;
 
+/**
+ * Changes to the day's plans from a game system, after templates and live plans (G-03: a Project's volunteers at its
+ * site, sim/volunteers.ts). `key(day)` must be cheap (it's read every frame) and change only when `apply` would.
+ */
+export interface PlanAdjuster {
+  key(day: number): string;
+  apply(plans: readonly DayPlan[], day: number): readonly DayPlan[];
+}
+
 export class ResidentSim {
   readonly events = new TypedEmitter<TownEvents>();
   readonly executor: RoutineExecutor;
@@ -53,6 +62,8 @@ export class ResidentSim {
   private last: ResidentState[] = [];
   private lastKey = '';
   private liveRef: Readonly<Record<string, PlanOutput>> | null = null;
+  private adjuster: PlanAdjuster | null = null;
+  private adjustKey = '';
 
   /** `extra` synthetic residents (jittered copies of the cards) join the canon ones (dev `?npcs=`). */
   constructor(private readonly cards: readonly SimCard[], world: ExecutorWorld, private readonly extra = 0, private readonly livePlans?: LivePlans) {
@@ -68,14 +79,24 @@ export class ResidentSim {
 
   profile(id: string): ResidentProfile | undefined { return this.byId.get(id); }
 
+  /** Install (or clear) the plan adjuster; the day's plans are rebuilt on the next read. */
+  setAdjuster(adjuster: PlanAdjuster | null): void {
+    if (adjuster === this.adjuster) return;
+    this.adjuster = adjuster;
+    this.day = NaN;
+  }
+
   /** The day's plans (rebuilt when the day changes, or when the day's live plans arrive). */
   plansFor(day: number): readonly DayPlan[] {
     const live = this.livePlans?.(day) ?? null;
-    if (day !== this.day || live !== this.liveRef) {
+    const adjustKey = this.adjuster?.key(day) ?? '';
+    if (day !== this.day || live !== this.liveRef || adjustKey !== this.adjustKey) {
       this.day = day;
       this.liveRef = live;
+      this.adjustKey = adjustKey;
       const templates = dayPlansFor(this.cards, day);
-      const base = live ? withLivePlans(templates, live).plans : templates;
+      const planned = live ? withLivePlans(templates, live).plans : templates;
+      const base = this.adjuster ? [...this.adjuster.apply(planned, day)] : planned;
       this.plans = this.extra > 0 ? syntheticPlans(base, base.length + this.extra, true) : base;
       this.planById = new Map(this.plans.map(p => [p.resident, p]));
       this.lastKey = '';

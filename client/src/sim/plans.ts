@@ -27,6 +27,11 @@ export interface DayPlanBlock {
   note: string;
   startMin: number;
   endMin: number;
+  /**
+   * Where on the place's board to stand, as a tile rectangle [x, y, w, h] (a Project's work area, projects/site.ts):
+   * the executor stands them on its open cells, outdoors, instead of at the place's door or anywhere in it.
+   */
+  area?: readonly [number, number, number, number];
 }
 
 export interface DayPlan {

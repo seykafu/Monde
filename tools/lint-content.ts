@@ -16,6 +16,8 @@ import {
   SPRING_SCENE_ID, aiOpenCues, exchangePaths, fillScripted, parseScriptedLibrary, scriptedKey, type ScriptedLibrary
 } from "../client/src/mind/scripted.ts";
 import { lexicalHits } from "../server/src/mind/filters.ts";
+import { fillLine, parseProjects, type ProjectsContent } from "../client/src/projects/schema.ts";
+import { puzzles as PUZZLES } from "../client/src/puzzles/catalog.ts";
 
 const root = path.resolve(import.meta.dirname, "..");
 const errors: string[] = [];
@@ -191,11 +193,77 @@ if (scripted) {
   }
 }
 
+// ---- Projects (content/projects.yaml, GDD §6.3, MVP G-03): the client's own parser (it throws naming the Project and
+// field), then every id it names against the rest of content/: items, places, residents, puzzles, flags and scenes;
+// the authored lines through the server's lexical filters and each speaker's `never_says`; memories within §9.6's
+// 200 characters. Every {project: id} cue in a scene names a Project (or is a later Act's, listed as a warning).
+let projectsContent: ProjectsContent | null = null;
+try {
+  projectsContent = parseProjects(YAML.parse(read("content/projects.yaml")));
+} catch (e) {
+  err((e as Error).message);
+}
+const itemIds = new Set((itemResult.success ? itemResult.data : []).map(i => i.id));
+const sceneIds = new Set(compiled.scenes.map(sc => sc.id));
+const sceneText = new Map(compiled.scenes.map(sc => [sc.id, JSON.stringify(sc)]));
+let projectLines = 0;
+if (projectsContent) {
+  const known = new Set(projectsContent.projects.map(p => p.id));
+  const resident = (id: string, where: string) => { if (!cards.has(id)) err(`projects.yaml ${where}: no persona card for '${id}'`); };
+  const words = (where: string, text: string, speaker?: string) => {
+    projectLines++;
+    const filled = fillLine(text, { place: "Fountain Square", project: "the fountain", house: "No. 39", lead: "Kasimir", coins: 20, cost: 150, fund: 120, short: 30 });
+    if (/\{[a-z_]+\}/.test(filled)) err(`projects.yaml ${where}: unknown placeholder in "${text}"`);
+    for (const hit of lexicalHits(filled)) err(`projects.yaml ${where} "${text}": ${hit.group} "${hit.term}"`);
+    for (const banned of (speaker ? cards.get(speaker)?.voice.never_says : undefined) ?? [])
+      if (filled.toLowerCase().includes(banned.toLowerCase())) err(`projects.yaml ${where}: ${speaker} never says "${banned}"`);
+  };
+  for (const item of Object.keys(projectsContent.shopStock)) if (!itemIds.has(item)) err(`projects.yaml shop_stock: unknown item '${item}'`);
+  for (const [key, lines] of Object.entries({ yes: projectsContent.asks.yes, no: projectsContent.asks.no, donate_yes: projectsContent.asks.donateYes, donate_no: projectsContent.asks.donateNo }))
+    for (const [who, text] of Object.entries(lines)) { if (who !== "default") resident(who, `asks.${key}`); words(`asks.${key}.${who}`, text, who === "default" ? undefined : who); }
+  for (const [key, text] of Object.entries(projectsContent.pell)) words(`pell.${key}`, text, "pell");
+  words("asks.busy", projectsContent.asks.busy); words("asks.donated", projectsContent.asks.donated);
+  for (const p of projectsContent.projects) {
+    const at = (field: string) => `${p.id} ${field}`;
+    for (const m of p.materials) if (!itemIds.has(m.item)) err(`projects.yaml ${at("materials")}: unknown item '${m.item}'`);
+    for (const place of [p.site.place, p.site.work.place]) if (place !== "house" && !places.has(place)) err(`projects.yaml ${at("site")}: '${place}' is not in the place registry`);
+    if (p.site.place !== "house" && p.site.place.split(".")[0] !== p.zone) err(`projects.yaml ${at("zone")}: the site is in ${p.site.place.split(".")[0]}, not ${p.zone}`);
+    for (const id of p.leads) resident(id, at("leads"));
+    for (const d of p.donors) { resident(d.resident, at("donors")); words(at(`donors ${d.resident}`), d.line, d.resident); }
+    for (const st of p.standing) { resident(st.resident, at("standing")); if (!sceneIds.has(st.scene)) err(`projects.yaml ${at("standing")}: no scene '${st.scene}'`); }
+    if (p.puzzle && !PUZZLES[p.puzzle]) err(`projects.yaml ${at("puzzle")}: ${p.puzzle} isn't one of the built puzzles (client/src/puzzles)`);
+    if (p.bonusPuzzle && !PUZZLES[p.bonusPuzzle]) warn(`projects.yaml ${at("bonus_puzzle")}: ${p.bonusPuzzle} isn't built (outside the MVP's puzzles)`);
+    for (const f of [...(p.opens.flag ? [p.opens.flag] : []), ...p.complete.flags]) if (!flagOk(f)) err(`projects.yaml ${at("flags")}: undeclared flag '${f}'`);
+    if (p.opens.cue) {
+      if (!sceneIds.has(p.opens.cue)) err(`projects.yaml ${at("opens.cue")}: no scene '${p.opens.cue}'`);
+      else if (!sceneText.get(p.opens.cue)!.includes(`"cmd":"project","id":"${p.id}"`)) err(`projects.yaml ${at("opens.cue")}: ${p.opens.cue} has no {project: ${p.id}} cue`);
+    }
+    if (p.ceremony.scene && !sceneIds.has(p.ceremony.scene)) err(`projects.yaml ${at("ceremony.scene")}: no scene '${p.ceremony.scene}'`);
+    if (!p.ceremony.scene && !p.complete.flags.length && !p.complete.homes) err(`projects.yaml ${at("complete")}: an opening needs a flag (the board's art) or a home`);
+    words(at("ceremony.summary"), p.ceremony.summary);
+    if (fillLine(p.ceremony.summary, { house: "No. 39" }).length > 200) err(`projects.yaml ${at("ceremony.summary")}: over 200 characters (a town event's summary)`);
+    p.ceremony.lines.forEach((l, i) => { if (l.speaker !== "narrator") resident(l.speaker, at(`ceremony.lines[${i}]`)); if (l.expr && !STANDARD_EXPRESSIONS.includes(l.expr as never)) err(`projects.yaml ${at(`ceremony.lines[${i}]`)}: unknown expression '${l.expr}'`); words(at(`ceremony.lines[${i}]`), l.text, l.speaker === "narrator" ? undefined : l.speaker); });
+    for (const m of p.ceremony.memories) {
+      resident(m.resident, at("ceremony.memories"));
+      if (fillLine(m.text, { house: "No. 39" }).length > 200) err(`projects.yaml ${at(`memory ${m.resident}`)}: over §9.6's 200 characters`);
+      if (m.importance > 10) err(`projects.yaml ${at(`memory ${m.resident}`)}: importance is 1-10`);
+      words(at(`memory ${m.resident}`), m.text);
+    }
+    if (p.signoff.line) words(at("signoff.line"), p.signoff.line, "pell");
+  }
+  for (const [id, text] of sceneText) for (const m of text.matchAll(/"cmd":"project","id":"([a-z0-9_]+)"/g)) {
+    if (known.has(m[1]!)) continue;
+    if (SPRING_SCENE_ID.test(id)) err(`${id}: {project: ${m[1]}} names no Project in content/projects.yaml`);
+    else warn(`${id}: {project: ${m[1]}} is a later Act's Project, not in content/projects.yaml yet`);
+  }
+}
+
 for (const w of warnings) console.warn(`warn  ${w}`);
 for (const e of errors) console.error(`error ${e}`);
 const looks = [...cards.values()].filter((c) => c.look).length;
 console.log(`content: ${cards.size} cards (${looks} with a look), ${places.size} places, ${declared.size} declared flags, `
   + `${library?.lines.length ?? 0} lines with ${replyCount} replies, `
-  + `${scripted?.exchanges.length ?? 0} scripted exchanges (${scriptedTurns} nodes, ${scriptedPaths} paths; ${laterCues} later {ai_open} cues still to write) `
+  + `${scripted?.exchanges.length ?? 0} scripted exchanges (${scriptedTurns} nodes, ${scriptedPaths} paths; ${laterCues} later {ai_open} cues still to write), `
+  + `${projectsContent?.projects.length ?? 0} Projects (${projectLines} lines) `
   + `· ${errors.length} errors, ${warnings.length} warnings`);
 process.exit(errors.length ? 1 : 0);

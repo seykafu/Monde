@@ -58,7 +58,8 @@ Calendar-only system events (e.g. Day 21's newspaper disclosure) are outside thi
 the town engine's Pillars/Appeal/census, the `monde.fellow` application, Regard from the friendship mirror) and maps
 every cue: Regard and memories become `scripted_regard` / `scripted_memory` ClientEvents (M-06, `mind/events.ts`;
 sent to monde-mind online, saved meanwhile) with their scene id and cue key, a {scuffle} becomes a `town_event`,
-Pillars go through the town engine, coins/items/Projects/riddles are ledger placeholders, checkpoints go to the save
+Pillars go through the town engine, {project} opens a Project in the Projects engine (G-03, `projects/runtime.ts`; S04's
+cue carries Pell's signature), coins/items/riddles are ledger placeholders, checkpoints go to the save
 system. The story flags reach the server as `flags` snapshots (`scenes/events.ts`). `{charcreate}` opens the
 Fellowship form whenever the application isn't signed yet: a New Game reaches it on the ferry slip (§11.1).
 `hint.ts` (pure) picks the HUD's Next hint: the scene the player can still catch today, its place and window.

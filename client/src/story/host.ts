@@ -65,7 +65,8 @@ export function pronounWords(pronouns: string): PronounWords {
  *   `scripted_regard` ClientEvent (M-06), and in the game the context reads the friendship mirror instead
  *   (WorldNow.regard: the server's snapshot plus what's still queued). The ledger's values stand in for residents the
  *   game doesn't mirror (the S05 `arrival`) and when no world supplies Regard (tests).
- * - coins / items / projects / riddles: typed placeholders until the inventory, Project and Marks systems land.
+ * - coins / items / riddles: typed placeholders until the inventory and Marks systems land. projects: the ids the
+ *   story's {project} cues opened (the Projects themselves live in projects/runtime.ts, G-03).
  * - applied: `scene|cue key` of every durable effect already applied (idempotent restarts).
  */
 export interface StoryLedger {
@@ -221,6 +222,8 @@ export interface StoryWorld {
   zoneName(zone: string): string;
   /** One live line for {ai_line}; [] means use the authored fallback. */
   aiLine(residentId: string, brief: string): Promise<readonly StoryLine[]>;
+  /** {project: id} for the Projects engine (G-03); false for a Project it doesn't know. */
+  projectCue?(id: string, sceneId: string): boolean;
 }
 
 export interface HandlerDeps {
@@ -290,11 +293,14 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
       const items = deps.ledger().items;
       items[cue.item] = Math.max(0, (items[cue.item] ?? 0) + cue.delta);
     }),
+    // {project: id} (§13.1 "Unlocks a Project"): the Projects engine opens it (G-03, projects/runtime.ts projectCue), and
+    // S04's carries Pell's signature ("Pell signed the chit at seven"). The ledger keeps the id too. Unlocking isn't
+    // §9.6's `project_open` (that's the opening ceremony's town event), so nothing is sent here.
     project: (cue, ctx) => once(ctx, () => {
       const projects = deps.ledger().projects;
       if (!projects.includes(cue.id)) projects.push(cue.id);
-      // GDD-GAP: unlocking isn't §9.6's `project_open` (a Project opening): no town event until Projects exist (§6.3).
-      note(`{project: ${cue.id}} unlocked in the ledger only (no Project system yet)`);
+      const known = deps.world()?.projectCue?.(cue.id, ctx.scene) ?? false;
+      if (!known) note(`{project: ${cue.id}} is not one of content/projects.yaml's Projects; kept in the ledger only`);
     }),
     // A `scripted_memory` ClientEvent (M-06): the server writes it with the player and the resident as `who` (valence
     // is unauthored: the server's GDD-GAP keeps it neutral). The S05 `arrival` alias waits in the log until the arrival

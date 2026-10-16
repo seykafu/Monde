@@ -76,14 +76,13 @@ export function completePuzzle(r: RegistryLike, clock: Pick<Clock,'day'|'minute'
     case 'PZ-15': flag(r,'clock_running'); flag(r,'pinion_fitted'); pillar(r,id,'charm',5); regard(r,clock,id,'bertrand',15); break;
     case 'PZ-18': flag(r,'project_footbridge_done'); pillar(r,id,'charm',1); regard(r,clock,id,'kasimir',5); break;
   }
-  syncPuzzleProjects(r); deliverPuzzleItems(r); return true;
+  deliverPuzzleItems(r); return true;
 }
-/** Project system consumes these durable steps; solving a board never completes funding/materials/hours. */
+/** The Projects (client/src/projects) read these durable steps; solving a board never completes funds, materials or hours. */
 export const PROJECT_PUZZLES: Readonly<Record<string,string>> = {fountain:'PZ-01',bakery_ovens:'PZ-02',market_hall:'PZ-04',lighthouse:'PZ-05',streetlights:'PZ-13'};
 export const puzzleStepDone = (r: RegistryLike, project: string) => !!puzzleSave(r).entries[PROJECT_PUZZLES[project] ?? '']?.solved;
 /** Weekly puzzle effects and the first Saturday's market Regard. Call after the town's dawn pass. */
 export function puzzleDawn(r: RegistryLike, clock: Pick<Clock,'day'|'minute'|'time'>): void {
-  syncPuzzleProjects(r);
   const save=puzzleSave(r), flags=puzzleFlags(r);
   for (const [id,name] of [['PZ-02','prosperity'],['PZ-15','spirit']] as const) {
     const solved=save.solvedDays[id]; if (!solved || id==='PZ-02' && flags.has('bakery_closed')) continue;
@@ -97,18 +96,9 @@ export function puzzleDawn(r: RegistryLike, clock: Pick<Clock,'day'|'minute'|'ti
   r.set(PUZZLES_KEY,save); deliverPuzzleItems(r);
 }
 
-/** The completion flags belong to Projects. Apply only after both funding completion and the puzzle step. */
-export function syncPuzzleProjects(r: RegistryLike): void {
-  const save=puzzleSave(r), flags=puzzleFlags(r);
-  const bumps: Record<string, Partial<Record<Pillar,number>>> = {
-    fountain:{charm:6,spirit:2},bakery_ovens:{prosperity:3},market_hall:{prosperity:6,spirit:3},
-    lighthouse:{safety:4,charm:4},streetlights:{safety:6,charm:2}
-  };
-  for(const [project,id] of Object.entries(PROJECT_PUZZLES)) {
-    const key=`project:${project}`;
-    if(!save.entries[id]?.solved || !flags.has(`project_${project}_done`) || save.rewarded.includes(key))continue;
-    for(const [name,n] of Object.entries(bumps[project]!))pillar(r,key,name as Pillar,n!);
-    save.rewarded.push(key);
-  }
-  r.set(PUZZLES_KEY,save);
-}
+/**
+ * The completion Pillars belong to the Projects (G-03: client/src/projects applies content/projects.yaml's `complete`
+ * when a Project opens, and only once its funds, materials, hours and this puzzle step are all in). Saves from before
+ * G-03 recorded any bump they gave here as `project:<id>` in `rewarded`; the Projects runtime reads that receipt.
+ */
+export const legacyProjectReward = (r: RegistryLike, project: string): boolean => puzzleSave(r).rewarded.includes(`project:${project}`);

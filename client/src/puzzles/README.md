@@ -55,17 +55,18 @@ existing `scripted_regard` event queue (without also adding to the friendship mi
   Spirit +4 remains a distinct scene effect.
 - PZ-18: `project_footbridge_done`, Charm +1, Kasimir +5.
 - PZ-04: all five vendors +3 on the first Saturday after the market Project is complete.
-- `puzzleStepDone(registry, project)` exposes the durable puzzle step. `syncPuzzleProjects` only
-  awards the specified completion Pillars when **both** the board is solved and the existing
-  `project_<id>_done` flag is set. Solving a board does not bypass Project funds/materials/hours.
+- `puzzleStepDone(registry, project)` exposes the durable puzzle step. Completion Pillars belong to
+  the Projects (G-03, `client/src/projects`): they apply `content/projects.yaml`'s `complete` once
+  the funds, materials, hours **and** this puzzle step are in. Solving a board does not bypass them.
+  A save from before G-03 that already took a bump here keeps its `project:<id>` receipt
+  (`legacyProjectReward`), and the Projects never apply it twice.
   Lighthouse completion also attempts the discovered WF-4 through the existing riddle adapter,
   whose existing Project gate makes WF-5 available.
 
-The repository's story host still records Project unlocks without implementing funding/materials/
-volunteer-hours. This change supplies their puzzle steps and completion-flag consumer; it does not
-implement the whole Project system. World/render files owned by the other agent were not changed:
-physical fountain gathering, bakery customer throughput, lighthouse beams, footbridge collision,
-and map-pin rendering remain consumers of these flags/data, rather than new renderer changes here.
+The Projects themselves (funds, materials, volunteer-hours, the opening) are G-03's
+(`client/src/projects`): a Project's `puzzle` step reads these boards, and its opening sets the
+`project_<id>_done` flag and applies the completion Pillars. Bakery customer throughput, footbridge
+collision and map-pin rendering remain consumers of these flags/data.
 
 ## GDD gaps and constraints
 

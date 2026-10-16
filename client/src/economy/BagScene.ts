@@ -5,6 +5,7 @@ import { FAMILY_BODY, GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from '../util/cons
 import { items, itemById } from './content';
 import { BAG_KEY, COINS_KEY, bagOf, coinsOf, consume } from './runtime';
 import { addItem, removeItem, moveItem } from './inventory';
+import { recordSale, stockLeft } from '../projects/runtime';
 interface BagOpen { host: string; clock: Clock; gift?: (slot: number, item: Item) => void; share?: (slot: number, item: Item) => void; shop?: boolean }
 export function openBag(host: Phaser.Scene, clock: Clock, options: Pick<BagOpen, 'gift' | 'share' | 'shop'> = {}): void {
   if (!host.scene.get('Bag')) host.scene.add('Bag', BagScene, false);
@@ -51,7 +52,9 @@ export class BagScene extends Phaser.Scene {
       const stock = this.dataIn.shop ? items[i] : undefined;
       const detail = stock ?? (s && itemById(s.item));
       if (detail) bg.on('pointerover', () => tip.setText(`${detail.description} · ${detail.tags.join(', ')}${detail.stamina ? ` · +${detail.stamina} Stamina` : ''}`).setVisible(true)).on('pointerout', () => tip.setVisible(false));
-      this.text(x + 4, y + 3, stock ? `${stock.name}\n${stock.price} coins` : s ? `${itemById(s.item)?.name ?? s.item}\n×${s.count}` : '—', undefined, 150);
+      // G-03: Dunmore's keeps only a little of some Project materials (content/projects.yaml shop_stock).
+      const left = stock ? stockLeft(this.registry, stock.id) : null;
+      this.text(x + 4, y + 3, stock ? `${stock.name}\n${stock.price} coins${left === null ? '' : left ? ` · ${left} left` : ' · sold out'}` : s ? `${itemById(s.item)?.name ?? s.item}\n×${s.count}` : '—', undefined, 150);
     });
     const stack = bag.slots[this.selected], item = this.dataIn.shop ? items[this.selected] : stack && itemById(stack.item);
     if (item) {
@@ -72,9 +75,11 @@ export class BagScene extends Phaser.Scene {
   private buy(): void {
     const item = items[this.selected]; if (!item) return;
     const coins = coinsOf(this.registry), bag = addItem(bagOf(this.registry), item);
-    if (coins >= item.price && bag) { this.registry.set(COINS_KEY, { balance: coins - item.price }); this.registry.set(BAG_KEY, bag); }
+    const soldOut = stockLeft(this.registry, item.id) === 0;
+    if (coins >= item.price && bag && !soldOut) { this.registry.set(COINS_KEY, { balance: coins - item.price }); this.registry.set(BAG_KEY, bag); recordSale(this.registry, item.id); }
     this.draw();
-    this.text(650, 580, !bag ? 'Your bag is full.' : coins < item.price ? 'A few more coins first.' : 'Tucked into your bag.');
+    // GDD-GAP: a sold-out Project material comes back on the next ferry day (Tue/Fri).
+    this.text(650, 580, soldOut ? 'Sold out. Nell says more on the next ferry.' : !bag ? 'Your bag is full.' : coins < item.price ? 'A few more coins first.' : 'Tucked into your bag.');
   }
   private use(): void {
     if (this.dataIn.shop) { this.buy(); return; }

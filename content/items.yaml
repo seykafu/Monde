@@ -196,5 +196,70 @@
     "stack": 1,
     "stamina": 0,
     "price": 20
+  },
+  {
+    "id": "pipe_fitting",
+    "name": "Brass pipe fitting",
+    "description": "A brass elbow with its thread still sharp. Dunmore's keeps two in a drawer marked SUNDRY.",
+    "tags": [
+      "material",
+      "metal",
+      "plumbing"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 15
+  },
+  {
+    "id": "firebrick",
+    "name": "Yellow firebrick",
+    "description": "Heavy, pale and sooty at one end. Bakes for a hundred years if the mortar's right.",
+    "tags": [
+      "material",
+      "brick",
+      "ovens"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 6
+  },
+  {
+    "id": "lamp_glass",
+    "name": "Lamp glass",
+    "description": "A gas-lamp chimney in brown paper. The label says FRAGILE twice, once in Pell's hand.",
+    "tags": [
+      "material",
+      "glass",
+      "lamps"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 10
+  },
+  {
+    "id": "lens_oil",
+    "name": "Tin of lens oil",
+    "description": "Colza oil for a lighthouse lamp, sealed with wax. It smells of mustard flowers and engine rooms.",
+    "tags": [
+      "material",
+      "oil",
+      "lighthouse"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 20
+  },
+  {
+    "id": "brass",
+    "name": "Brass fittings",
+    "description": "Screws, a hinge and a bezel ring in a twist of newspaper. Polish them and they'll outlast you.",
+    "tags": [
+      "material",
+      "metal",
+      "brass"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 15
   }
 ]

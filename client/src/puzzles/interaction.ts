@@ -4,7 +4,7 @@ import type { Clock } from '../sim/clock';
 import { submitMark, marks } from '../scenes/riddles';
 import { puzzles } from './catalog';
 import { openPuzzle } from './scenes/PuzzleScene';
-import { deliverPuzzleItems, puzzleDawn, puzzleFlags, puzzleSave, syncPuzzleProjects } from './runtime';
+import { deliverPuzzleItems, puzzleDawn, puzzleFlags, puzzleSave } from './runtime';
 const sites: Record<string,{id:string;day:number;requires?:string}> = {
   'old_quarter.fountain_square':{id:'PZ-01',day:5},
   'market_row.bakery':{id:'PZ-02',day:4},
@@ -60,7 +60,6 @@ export function attachPuzzles(scene: Phaser.Scene, clock: Clock): void {
     if(syncing)return;
     syncing=true;
     try {
-      syncPuzzleProjects(scene.registry);
       if(puzzleFlags(scene.registry).has('project_lighthouse_done') && puzzleSave(scene.registry).entries['PZ-05']?.solved
         && marks(scene.registry).entries['WF-4']?.status==='found')submitMark(scene.registry,clock,'WF-4','lighthouse');
     } finally { syncing=false; }

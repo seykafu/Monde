@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { baseSkills, emptyEventLog, migrateSave, SaveGame, startingSkills, type ClientEvent } from '@monde/shared';
+import { baseSkills, emptyEventLog, emptyProjects, migrateSave, SaveGame, startingSkills, type ClientEvent } from '@monde/shared';
 import { lookFromChoices, randomChoices } from '../../fellow/options';
 import { Clock } from '../../sim/clock';
 import { dailyWeather } from '../../sim/weather';
@@ -76,11 +76,24 @@ describe('save format and restore', () => {
     const restored = restore(file);
     expect(restored.clock.time).toEqual(source.clock.time);
     const defaults = collect(source, 'manual', 'Home');
-    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, puzzles: defaults.puzzles, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy });
+    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, puzzles: defaults.puzzles, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy, projects: defaults.projects });
     restored.town.pillars.charm++;
     expect(restored.town.pillars.charm).not.toEqual(source.town.pillars.charm);
     expect(runDawnsThrough(restored.town, 5).state.day).toBe(5);
   });
+  it('keeps the Projects (G-03) in v3, and reads a save from before them as none begun', () => {
+    const projects = { ...emptyProjects(), projects: { fountain: {
+      def: 'fountain', target: null, unlocked: 5, funded: 5, signed_by: 'scene' as const, materials: { pipe_fitting: 3 }, vh: 4.5, player_vh: 3, volunteer_vh: 1.5,
+      donors: [], material_donors: ['bertrand'], ceremony: null, opened: null, attendees: []
+    } }, volunteers: [{ project: 'fountain', resident: 'tib', day: 6, source: 'scene' as const, credited: false }],
+    standing: [{ project: 'fountain', resident: 'tib', from: 6 }], sold: { pipe_fitting: 2 } };
+    const saved = collect({ ...state(), projects }, 'autosave', 'Dawn', '2026-10-14T12:00:00.000Z');
+    expect(saved.schema_version).toBe(3);
+    expect(restore(JSON.parse(JSON.stringify(saved))).projects).toEqual(projects);
+    const { projects: _p, ...old } = saved;
+    expect(migrateSave(old).projects).toEqual(emptyProjects());
+  });
+
   it('preserves pass-out rather than silently advancing a day', () => {
     const source = state(); source.clock.setTime(4, 1559); source.clock.advanceMinutes(1);
     expect(restore(collect(source, 'manual', 'Night')).clock.time).toEqual(source.clock.time);

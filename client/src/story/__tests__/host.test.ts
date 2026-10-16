@@ -170,6 +170,18 @@ describe('cue → effect', () => {
     expect(h.outcomes.riddle).toEqual({ solved: false });
   });
 
+  it('hands {project} to the Projects engine (G-03) once per cue, with the scene that cued it', async () => {
+    const h = harness();
+    const projectCue = vi.fn((id: string) => id === 'fountain');
+    h.world.projectCue = projectCue;
+    await h.run({ cmd: 'project', id: 'fountain' }, 's04:43', 's04_water_again');
+    await h.run({ cmd: 'project', id: 'fountain' }, 's04:43', 's04_water_again'); // a restarted scene
+    await h.run({ cmd: 'project', id: 'station' }, 's11:70', 's11_station');
+    expect(projectCue.mock.calls).toEqual([['fountain', 's04_water_again'], ['station', 's11_station']]);
+    expect(h.ledger.projects).toEqual(['fountain', 'station']);
+    expect(h.warn).toHaveBeenCalledWith(expect.stringContaining('{project: station} is not one of'));
+  });
+
   it('queues scripted memories as scripted_memory with the scene, cue and place', async () => {
     const h = harness();
     await h.run({ cmd: 'memory', resident: 'moss', text: 'Brought the Fellow in.', importance: 4 }, 's01a_ferry:90');

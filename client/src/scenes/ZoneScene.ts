@@ -1,4 +1,5 @@
 import { attachPuzzles, puzzleInteraction } from '../puzzles/interaction';
+import { attachProjects, attachProjectsClock, type ProjectsAttachment } from '../projects/attach';
 import { favorInteraction } from "../friendship/favors";
 import { openPaper, PAPER_PENDING } from "./DawnReportScene";
 import type { Press } from "@monde/shared";
@@ -266,6 +267,11 @@ export class ZoneScene extends Phaser.Scene {
   private pillarStrip!: PillarStrip;
   /** Scripted scenes (G-10): zone, place and minute triggers; StoryScene plays them over this scene. */
   private story!: StoryAttachment;
+  /** G-03: the Projects at their sites (E), the asks beside residents (H), volunteers at work, openings. */
+  private projects!: ProjectsAttachment;
+  /** H beside a resident: ask about the Projects. */
+  private askAction: { label: string; run(): void } | null = null;
+  private projectCache = { at: 0, key: '', project: null as { label: string; run(): void } | null, ask: null as { label: string; run(): void } | null };
   private hintCard!: HintCard;
   private toast!: Phaser.GameObjects.Text;
   private hintAt = 0;
@@ -399,6 +405,11 @@ export class ZoneScene extends Phaser.Scene {
       this.scene.restart({ zone: 'old_quarter', arrive: cottage?.door });
     });
     camera.ignore(this.economy.objects);
+    this.projects = attachProjects(this, { zone: this.zone, clock: this.clock, residents: this.residents, projection: this.projection,
+      position: () => this.position, weather: () => this.now, toast: text => this.showToast(text),
+      refreshBoard: () => this.town?.refresh(this.townLook()), busy: () => this.transitioning });
+    this.askAction = null;
+    this.projectCache = { at: 0, key: '', project: null, ask: null };
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E') as Record<string, Phaser.Input.Keyboard.Key>;
     // On the key's own down event, so even a tap shorter than a frame counts (keys are destroyed on restart).
     this.interact = undefined;
@@ -421,6 +432,8 @@ export class ZoneScene extends Phaser.Scene {
     }
     // The town's numbers live beside the clock, with Day-1 values, and its dawn pass runs on the clock's dawn (G-01).
     attachTown(this.registry, clock);
+    // The Projects' dawn (G-03): after the town's, before the Dawn Report, so the paper has last night's hours in.
+    attachProjectsClock(this.registry, clock);
     // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
     this.events.on('update', () => {
       const paper = this.registry.get(PAPER_PENDING) as Press | undefined;
@@ -443,6 +456,7 @@ export class ZoneScene extends Phaser.Scene {
       if (event.code === 'KeyL' || event.key === 'l' || event.key === 'L') openTownLedger(this, this.clock);
       else if (event.code === 'KeyJ' || event.key === 'j' || event.key === 'J') openPeople(this, this.clock);
       else if (event.code === 'KeyP' || event.key === 'p' || event.key === 'P') this.pillarStrip.toggle();
+      else if ((event.code === 'KeyH' || event.key === 'h' || event.key === 'H') && !this.clock.paused) this.askAction?.run();
     };
     this.input.keyboard?.on('keydown', onKey);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.input.keyboard?.off('keydown', onKey));
@@ -745,7 +759,7 @@ export class ZoneScene extends Phaser.Scene {
   /** A few times a second: the hint for now, hidden under scenes, dialogue and menus; a toast as a window closes. */
   private refreshHint(): void {
     const covered = HINT_HIDDEN_UNDER.some(key => this.scene.isActive(key));
-    const hint = this.story.hint();
+    const hint = this.story.hint() ?? this.projects.hint();
     // Standing there with the window open: the scene is about to start, nothing to point at.
     const arrived = !!hint && hint.open && this.story.place() === hint.place;
     this.showHint(hint, !covered && !this.transitioning && !arrived);
@@ -846,6 +860,7 @@ export class ZoneScene extends Phaser.Scene {
     this.applyLight();
     this.driftFog(dt);
     this.residents.update(dt, this.position);
+    this.projects.update(dt);
     if (this.town) {
       this.town.update(dt, { x: this.figure.x, y: this.figure.y }, this.windVec.strength);
       this.life?.update(dt, { wind: this.windVec, ...this.lightKind });
@@ -873,9 +888,19 @@ export class ZoneScene extends Phaser.Scene {
     const mark = talk ? undefined : markInteraction(this, this.clock, this.zone, this.position, { weather: this.now.kind, wind: this.daily.wind });
     const place = talk || mark ? undefined : nearbyPlace(this.zone, this.position);
     const economy = place ? (favorInteraction(this.registry, this.clock, `${this.zone.id}.${place.id}`) ?? this.economy.interaction(`${this.zone.id}.${place.id}`)) : null;
-    const puzzle = place ? puzzleInteraction(this, this.clock, `${this.zone.id}.${place.id}`, economy) : null;
-    this.prompt.setText(talk ? `E: Talk to ${talk.name}` : mark ? 'E: Read the plaque' : place ? `E: ${puzzle?.label ?? economy?.label ?? placeName(place.id)}` : '').setVisible(!!talk || !!mark || !!place);
-    this.interact = talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? puzzle?.run ?? economy?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined);
+    // G-03: a Project's next thing at its site (with the place's own job as a choice), and H's asks beside a resident.
+    // Recomputed a few times a second (they read the Projects, the Bag and the flags).
+    const cacheKey = `${place?.id ?? ''}|${talk?.id ?? ''}|${economy?.label ?? ''}`;
+    if (time - this.projectCache.at > 200 || cacheKey !== this.projectCache.key) {
+      this.projectCache = { at: time, key: cacheKey,
+        project: place ? this.projects.interaction(`${this.zone.id}.${place.id}`, economy) : null,
+        ask: talk ? this.projects.ask(talk.id) : null };
+    }
+    const project = place ? this.projectCache.project : null;
+    this.askAction = talk ? this.projectCache.ask : null;
+    const puzzle = place ? puzzleInteraction(this, this.clock, `${this.zone.id}.${place.id}`, project) : null;
+    this.prompt.setText(talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : place ? `E: ${puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!talk || !!mark || !!place);
+    this.interact = talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? puzzle?.run ?? project?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined);
     if (result.edge) {
       this.transitioning = true;
       const edge = result.edge;

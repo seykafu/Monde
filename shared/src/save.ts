@@ -52,6 +52,51 @@ export const SavedEventLog = z.object({
 export type SavedEventLog = z.infer<typeof SavedEventLog>;
 export const emptyEventLog = (): SavedEventLog => ({ outbox: [], rejected: [], flags_revision: 0, flags: null });
 
+/**
+ * G-03 Projects (GDD §6.3; client/src/projects). One entry per Project begun (a `homes` restoration is one per house:
+ * `homes:<zone>.<vacant_house_NN>`); the definitions live in content/projects.yaml. Optional on read (defaults to
+ * nothing begun), so it needs no version bump.
+ */
+const ProjectProgress = z.object({
+  /** The content/projects.yaml id this follows (`homes` for every restored house). */
+  def: z.string().min(1),
+  /** `homes` only: the house being restored (`old_quarter.vacant_house_39`). */
+  target: z.string().nullable(),
+  /** The day it opened (§6.3 step 1). */
+  unlocked: day,
+  /** The day the Fund paid for it (step 2), and who signed: Pell in person, or the scene that opened it. */
+  funded: day.nullable(), signed_by: z.enum(['pell', 'scene', 'none']).nullable(),
+  /** Materials handed over so far, by item id (step 3). */
+  materials: z.record(z.string(), count),
+  /** Volunteer-hours in (step 4): the player's and the residents', and their sum. */
+  vh: n.nonnegative(), player_vh: n.nonnegative(), volunteer_vh: n.nonnegative(),
+  /** Residents who gave coins (once per Project, §6.3) or materials when asked. */
+  donors: z.array(z.string()), material_donors: z.array(z.string()),
+  /** When the opening ceremony is set for (step 6), once everything is in. */
+  ceremony: z.object({ day, minute: n }).nullable(),
+  /** The day it opened to the town, and who was there. */
+  opened: day.nullable(), attendees: z.array(z.string())
+});
+export const SavedProjects = z.object({
+  projects: z.record(z.string(), ProjectProgress),
+  /** Residents who agreed to help: one entry per day they're at the site (2 VH a day each, credited at the next dawn). */
+  volunteers: z.array(z.object({ project: z.string(), resident: z.string(), day, source: z.enum(['ask', 'scene']), credited: z.boolean() })),
+  /** Residents who signed on for every day until the hours are in (S04's Tib: "Two a day. If you turn up."). */
+  standing: z.array(z.object({ project: z.string(), resident: z.string(), from: day })),
+  /** The last day a resident said no to helping (asked again tomorrow). */
+  declined: z.record(z.string(), day),
+  /** Items sold from Dunmore's limited Project stock (content/projects.yaml `shop_stock`), and its restocks. */
+  sold: z.record(z.string(), count), restocked: z.record(z.string(), count),
+  /** The last day the player worked beside each resident (+1 Regard per co-volunteer, §8). */
+  coworked: z.record(z.string(), day),
+  /** Openings not yet on the Dawn Report's front page. */
+  openings: z.array(z.object({ project: z.string(), day, place: z.string(), attendees: z.array(z.string()) })),
+  /** Pillar receipts: completion effects applied (`<project id>`), so a reload never applies them twice. */
+  applied: z.array(z.string())
+});
+export type SavedProjects = z.infer<typeof SavedProjects>;
+export const emptyProjects = (): SavedProjects => ({ projects: {}, volunteers: [], standing: [], declined: {}, sold: {}, restocked: {}, coworked: {}, openings: [], applied: [] });
+
 export const SAVE_SCHEMA_VERSION = 3;
 export const SaveGame = z.object({
   schema_version: z.literal(SAVE_SCHEMA_VERSION), saved_at: z.string().datetime(), label: z.string(),
@@ -87,7 +132,9 @@ export const SaveGame = z.object({
     solvedDays: z.record(z.string(), day), weekly: z.record(z.string(), day)
   }).default(() => ({ entries: {}, rewarded: [], pendingItems: [], solvedDays: {}, weekly: {} })),
   riddles: SavedRiddles.default(emptyRiddles),
-  friendship: SavedFriendship.default(emptyFriendship)
+  friendship: SavedFriendship.default(emptyFriendship),
+  /** G-03 Projects: optional on read (a save from before them has none begun), so no version bump. */
+  projects: SavedProjects.default(emptyProjects)
 });
 export type SaveGame = z.infer<typeof SaveGame>;
 

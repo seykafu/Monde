@@ -1,0 +1,324 @@
+# Projects (GDD §6.3, MVP G-03): the Spring Projects, transcribed from the §6.3 table and its six-step flow.
+#
+#   unlock   `opens`: a day, a flag, and/or the {project: <id>} cue in a scene (`cue`: only that cue opens it).
+#   fund     `fund` coins from the Town Fund once Pell signs (`signoff.by: pell`, in person); `scene` means the scene
+#            that opened it carries her signature (S04: "Pell signed the chit at seven"); `none` costs nothing.
+#   gather   `materials`, by item id (content/items.yaml): bought at Dunmore's, or given by `donors` when asked.
+#   hands    `vh` volunteer-hours: the player's (10 Stamina an hour, §6.3) and residents' (2 a day each, at `shift`).
+#   puzzle   the §15 board that gates it, solved at the site (client/src/puzzles), or none.
+#   open     the `ceremony` at the `site` (lines with their speakers; `reveal` is when the town changes), then
+#            `complete`: Pillars (source `project`), flags (`project_<id>_done` swaps the board's art, §16.4.1),
+#            homes and the other §6.3 "On completion" effects.
+#
+# `site.work` is where volunteers stand while they work (a place, and a tile rectangle on its board: x, y, w, h).
+# `shift` and ceremony `at` are game times. Lines follow the §12.1 voice bible.
+#
+# GDD-GAP: §6.3 names no shift hours, ceremony times, shop stock or material donors. Volunteers work 10:00-13:00;
+# an opening is set for 90 minutes after the last thing is in (from 10:00, until 18:00, else the next morning) or for
+# the ceremony's own `at`; Dunmore's keeps two pipe fittings (S04, "Dunmore's has two") and gets two more on each ferry
+# day; the donors below are authored stand-ins for "receive donations from residents".
+
+shop_stock:
+  pipe_fitting: { count: 2, restock: 2 }
+
+shift: ["10:00", "13:00"]
+
+pell:
+  short: "The Fund's {fund} and this is {cost}. We're {short} short, dear. Raise it and bring it back. Now."
+  signed: "Signed. Carried. (She blots it.) Take it to {lead} before I change my mind."
+  wait: "It'll keep, dear. The Fund isn't going anywhere. That's rather the trouble."
+
+asks:
+  # Volunteering (§6.3 step 4, §9.9): "Could you lend a hand at …?" The engine decides; these are the answers.
+  yes:
+    default: "Tomorrow, then. Ten o'clock at {place}."
+    ada: "After the morning post. Ten, near enough."
+    augusta: "Ten hundred hours, at {place}. Noted."
+    bertrand: "My knees and I will be there at ten, my dear. One of us will sit down."
+    delphine: "That's kind of you to ask. Ten o'clock. I'll bring my own needle."
+    felix: "Ten. Goodness, I'll bring a pupil or two. Show me what needs doing."
+    hollis: "Ten hundred sharp. Not ten past."
+    june: "Sure. I'll hum. It helps the hammering, friend."
+    kasimir: "Ten. Bring a level."
+    margo: "Ten o'clock. I'll bring gloves. The returns can wait an hour."
+    moss: "Ten. Rope."
+    nell: "Look. Ten o'clock, I'll be there, and I'm not making tea."
+    odile: "Ten o'clock. I'll bring the buns. You'll carry them."
+    pell: "Me? Heavens. Ten o'clock, then. Someone has to hold the ladder."
+    priya: "Ten. I'll bring the kit. Someone always hammers a thumb."
+    rosalind: "Between us, pet, I've been waiting to be asked. Ten."
+    sable: "Ten. On the record. I'll bring a camera and a hammer and use one of them."
+    teo: "Yes. Sorry, yes. Ten. I'll bring a trowel. Two trowels."
+    tib: "Obviously. I'll count the hours. Oh, and the nails."
+  no:
+    default: "Not this week. Ask me again another day."
+    augusta: "I've one constable, and she's me. Not this week."
+    bertrand: "My dear, my knees have already declined on my behalf."
+    ines: "I'll see that it's minuted. I can't promise more than that."
+    june: "Mm, maybe. Not this week."
+    kasimir: "Busy. Next week."
+    margo: "The returns are three days overdue and so am I. Another week."
+    moss: "Tide's wrong. Bilge."
+    nell: "Look, the boats don't stop for planks. Not this week."
+    odile: "Hm. I have bread. Ask me when I don't."
+    pell: "Not this week, dear. The Fund envelopes won't sort themselves."
+    rook: "Don't."
+    rosalind: "Not this week, pet. The cellar's flooding again."
+    sable: "Not this week. The page closes Thursday."
+    teo: "Sorry, the seedlings, they need, I can't. Not this week."
+    tib: "Can't, school. Obviously."
+    vane: "May I be frank? My calendar isn't my own this month."
+  busy: "I'm already at {place} tomorrow. One thing at a time."
+  # Coins for a short Fund (§6.3: Regard 40 or more, up to 5% of savings, once per Project).
+  donate_yes:
+    default: "Here. {coins} coins for {project}. Don't make a speech about it."
+    bertrand: "{coins} coins, my dear, from the tin behind the regulator clock. It was saving itself for this."
+    odile: "{coins}. In the tin. Don't thank me."
+    rosalind: "{coins} from the slate, pet. The regulars won't notice. They can't count."
+  donate_no:
+    default: "Coins? Ask me when we know each other a bit better."
+  donated: "I gave to that one already. Ask somebody else."
+
+projects:
+  - id: fountain
+    name: the fountain
+    zone: old_quarter
+    opens: { day: 5, cue: s04_water_again }
+    signoff: { by: scene }
+    fund: 200
+    materials:
+      - { item: pipe_fitting, count: 4 }
+    vh: 6
+    puzzle: PZ-01
+    leads: [kasimir, bertrand]
+    site:
+      place: old_quarter.fountain_square
+      work: { place: old_quarter.fountain_square, area: [17, 17, 10, 6] }
+    donors:
+      - { resident: bertrand, item: pipe_fitting, count: 1, line: "Aurélien left spares, my dear. This one has been in my drawer since the fourteenth of March, 1951, waiting to be useful." }
+      - { resident: moss, item: pipe_fitting, count: 1, line: "Off the old bilge pump. She won't miss it. Take it." }
+    standing:
+      # S04: "I heard fountain! How many hours? Obviously I'm hours." "Two a day. If you turn up."
+      - { scene: s04_water_again, resident: tib }
+    complete:
+      pillars: { charm: 6, spirit: 2 }
+      flags: [project_fountain_done]
+    ceremony:
+      summary: "The fountain in Fountain Square ran again, opened by Kasimir and Bertrand with the Fellow."
+      lines:
+        - { speaker: narrator, text: "Fountain Square is fuller than a Saturday. Somebody has strung bunting from the corner lamp to the heron's beak." }
+        - { speaker: bertrand, expr: warm, text: "Aurélien laid these valves like a movement, my dear. They have waited very politely." }
+        - { speaker: kasimir, expr: neutral, text: "Hatch shut. Fittings tight. (He puts the chalk behind his ear.) Go on, then." }
+        - { speaker: narrator, reveal: true, text: "A cough in the pipes, a long gurgle, and water climbs the heron's leg and spills over the first lip, then the second." }
+        - { speaker: tib, expr: surprised, text: "It's going! Mr. Achterberg, it's going! That's the word, isn't it? Going!" }
+        - { speaker: kasimir, expr: warm, text: "Out of true by nothing." }
+      memories:
+        - { resident: kasimir, importance: 7, text: "Opened the fountain with the Fellow. Water over all three lips. Tib shouted. I let him." }
+        - { resident: bertrand, importance: 7, text: "The heron has its water back and Aurélien's valves held. The Fellow had chalk on their sleeve. I wound my watch twice." }
+
+  - id: bakery_ovens
+    name: the bakery ovens
+    zone: market_row
+    opens: { day: 4 }
+    signoff: { by: pell, line: "The bakery ovens. A hundred and fifty from the Fund. (She reads the sum twice.) Odile will say she never asked." }
+    fund: 150
+    materials:
+      - { item: firebrick, count: 10 }
+    vh: 4
+    puzzle: PZ-02
+    leads: [odile]
+    site:
+      place: market_row.bakery
+      work: { place: market_row.market_street, area: [24, 10, 6, 2] }
+    complete:
+      pillars: { prosperity: 3 }
+      flags: [project_bakery_ovens_done]
+      # §6.3 "Odile won't close": the repaired bakery never takes the `bakery_closed` path (puzzles/README.md).
+      effects: [bakery_stays_open]
+    ceremony:
+      summary: "Odile's ovens at Fournier & Fille were relit on new firebrick, and the first tray went to whoever was standing there."
+      lines:
+        - { speaker: narrator, text: "The bakery's back door is propped open, and the whole of Market Row can smell why." }
+        - { speaker: odile, expr: neutral, text: "Ten firebrick. Mortared true. Hm." }
+        - { speaker: odile, expr: thinking, text: "The old lady sulks in a cold oven. (She lays a hand on the starter crock.) Not today." }
+        - { speaker: narrator, reveal: true, text: "The flues draw on the first match. A long breath of heat rolls out over the step." }
+        - { speaker: odile, expr: warm, text: "First tray isn't for sale. Take one, petit. Don't thank me." }
+      memories:
+        - { resident: odile, importance: 7, text: "The Fellow fixed my ovens. The flues draw on one match. The first tray went to whoever stood there, and I didn't keep count." }
+
+  - id: streetlights
+    name: the streetlights
+    zone: old_quarter
+    opens: { day: 8 }
+    signoff: { by: pell, line: "Four hundred for the lamps. (She reads it twice, then a third time.) Heavens. Yes." }
+    fund: 400
+    materials:
+      - { item: lamp_glass, count: 12 }
+    vh: 8
+    puzzle: PZ-13
+    leads: [augusta]
+    site:
+      place: old_quarter.town_hall
+      work: { place: old_quarter.town_hall, area: [11, 11, 10, 2] }
+    complete:
+      pillars: { safety: 6, charm: 2 }
+      # A town flag too: ElderAppeal +3 (§6.2) and 10 coins a day of upkeep (§6.3, town/fund.ts).
+      flags: [project_streetlights_done]
+      # §6.3 "night Tollmen −1": recorded for the Tollmen level (G-08) to read; GDD-GAP until it exists.
+      effects: [night_tollmen_minus_1]
+    ceremony:
+      at: "20:00"
+      summary: "Every lamp from the Town Hall to Bell Row was lit at once, with Captain Reyes taking the count."
+      lines:
+        - { speaker: narrator, text: "Dusk on the High Street. Augusta stands under the first lamp with her notebook open." }
+        - { speaker: augusta, expr: neutral, text: "Twelve new glasses. Breakers one, two, three and five. Town Hall to Bell Row. Noted." }
+        - { speaker: pell, expr: warm, text: "I've counted these lamps every evening for twenty-six years, Fellow. Let me count them lit." }
+        - { speaker: narrator, reveal: true, text: "The lamps come on in a ripple down the street, each a beat after the last." }
+        - { speaker: augusta, expr: warm, text: "All lit. I'll write that one down twice." }
+      memories:
+        - { resident: augusta, importance: 7, text: "Streetlights lit, Town Hall to Bell Row, with the Fellow at the breakers. Twelve new glasses. Noted, twice." }
+        - { resident: pell, importance: 7, text: "I counted the lamps tonight and every one was lit. The Fellow stood beside me and didn't say a word, which was kind." }
+
+  - id: community_garden
+    name: the Commons garden
+    zone: commons
+    # §6.3: "(PZ-06 opens it)": Who Fed the Ducks? opens the Commons' garden.
+    opens: { day: 8, flag: pz06_solved }
+    signoff: { by: pell, line: "A hundred for Teo's beds. He'll never ask for more than seeds, so we'd best give him the seeds." }
+    fund: 100
+    materials:
+      - { item: seeds, count: 10 }
+    vh: 10
+    leads: [teo]
+    site:
+      place: commons.community_garden
+      work: { place: commons.community_garden, area: [34, 10, 10, 5] }
+    complete:
+      pillars: { spirit: 3, charm: 2 }
+      flags: [project_community_garden_done]
+    ceremony:
+      summary: "The garden beds on the Commons opened with ten packets sown, rows north to south, and Teo labelling every one."
+      lines:
+        - { speaker: narrator, text: "The beds on the Commons are dug, edged and labelled in a hand that slopes downhill." }
+        - { speaker: teo, expr: thinking, text: "Sorry, that's, the labels are in Latin. English underneath. Mostly. Allium. Onions." }
+        - { speaker: teo, expr: neutral, text: "Ten packets in. Rows north to south, so the sun gets all of them. (He firms the soil with two fingers.)" }
+        - { speaker: narrator, reveal: true, text: "Someone opens the little gate, and the first watering can goes round." }
+        - { speaker: teo, expr: warm, text: "They'll be up in a week. You can, I mean, anyone can pick the radishes. That's the point." }
+      memories:
+        - { resident: teo, importance: 7, text: "The garden beds are open. Ten packets sown, rows north to south. People walked on the paths and not the beds, mostly." }
+
+  - id: market_hall
+    name: the Market Hall
+    zone: market_row
+    opens: { day: 12 }
+    signoff: { by: pell, line: "Six hundred. For the Hall. (She takes her glasses off.) Arthur sold nails in that hall. Yes." }
+    fund: 600
+    materials:
+      - { item: timber, count: 20 }
+      - { item: paint, count: 6 }
+    vh: 16
+    puzzle: PZ-04
+    # §6.3 "+PZ-17 bonus": The First Market (Charm +3) is outside the MVP's puzzle list (MVP_PLAN "Out of scope").
+    bonus_puzzle: PZ-17
+    leads: [odile, nell]
+    site:
+      place: market_row.market_hall
+      work: { place: market_row.market_street, area: [30, 10, 8, 2] }
+    complete:
+      pillars: { prosperity: 6, spirit: 3 }
+      flags: [project_market_hall_done]
+      # §6.3 "weekly market": Saturdays move into the Hall (PZ-04's vendors meet there the first Saturday after).
+      effects: [weekly_market]
+    ceremony:
+      summary: "The Market Hall opened its doors again, with painted stalls and a roof that keeps the herring dry."
+      lines:
+        - { speaker: narrator, text: "The Market Hall's doors stand open, and the stalls inside are painted a colour Kasimir calls \"blue, mostly.\"" }
+        - { speaker: nell, expr: neutral, text: "Look. Twenty planks, six tins of paint and a roof that doesn't drip on the herring. Who signed for that?" }
+        - { speaker: odile, expr: neutral, text: "Pell. And the Fellow carried it. Hm." }
+        - { speaker: narrator, reveal: true, text: "Somebody props the big doors back with a crate, and Saturday comes in off Market Row." }
+        - { speaker: nell, expr: warm, text: "Fine. Saturday, then. First stall's mine, and I'm not paying for the corner." }
+      memories:
+        - { resident: nell, importance: 7, text: "The Market Hall's open. Dry roof, painted stalls, and the Fellow carried half the planks. I'm taking the corner stall." }
+        - { resident: odile, importance: 7, text: "The Market Hall has its doors open. I'll have the stall by the window. Bread won't sell itself, but it will try." }
+
+  - id: homes
+    name: a home
+    zone: various
+    # Repeatable (§6.4): each restores one vacant house, chosen at its door. One at a time (GDD-GAP).
+    repeatable: true
+    opens: { day: 10 }
+    signoff: { by: pell, line: "A hundred and fifty for {house}. A house with a light in it is worth more than the coins, Fellow. Don't tell the council." }
+    fund: 150
+    materials:
+      - { item: timber, count: 4 }
+      - { item: glass, count: 2 }
+    vh: 6
+    leads: [kasimir]
+    # The site is the house: its door, and the pavement in front of it.
+    site: { place: house, work: { place: house, area: door } }
+    complete:
+      homes: 1
+    ceremony:
+      summary: "{house} was restored by Kasimir and the Fellow, ready for whoever comes off the next boat."
+      lines:
+        - { speaker: narrator, text: "{house} has a new door, glass in every window and a front step that doesn't move." }
+        - { speaker: kasimir, expr: neutral, text: "Roof's tight. Sills true. (He knocks on the frame twice and listens.)" }
+        - { speaker: narrator, reveal: true, text: "Kasimir hangs the key on a nail inside the door and leaves it there for whoever comes next." }
+        - { speaker: kasimir, expr: warm, text: "Somebody's home. When they turn up." }
+      memories:
+        - { resident: kasimir, importance: 6, text: "Restored {house} with the Fellow. Roof tight, sills true. Key's on the nail for whoever comes." }
+
+  - id: lighthouse
+    name: the lighthouse
+    zone: wharf
+    # MVP stretch (MVP_PLAN cut list: first to go).
+    stretch: true
+    opens: { day: 16 }
+    signoff: { by: pell, line: "Eight hundred. That's the most I've signed in years. (She signs before she can read it twice.) Now. The light." }
+    fund: 800
+    materials:
+      - { item: lens_oil, count: 4 }
+      - { item: brass, count: 6 }
+    vh: 12
+    puzzle: PZ-05
+    leads: [nell, moss]
+    site:
+      place: wharf.lighthouse
+      work: { place: wharf.breakwater, area: [41, 36, 7, 2] }
+    complete:
+      pillars: { safety: 4, charm: 4 }
+      # The beam turns at night (§16.4.1); WF-4/WF-5 read it (puzzles/interaction.ts).
+      flags: [project_lighthouse_done]
+    ceremony:
+      at: "20:00"
+      summary: "Point Lumière was lit again, with Old Moss timing the beam at eleven seconds a turn."
+      lines:
+        - { speaker: narrator, text: "Evening on the breakwater. The lantern room has its brass back, and the lens is clean enough to frighten a gull." }
+        - { speaker: moss, expr: neutral, text: "Oil. Wick. Lens. (He taps the brass rail.) She'll sulk the first night. They always do." }
+        - { speaker: nell, expr: neutral, text: "Look, if it doesn't turn, I'm telling the whole Wharf it was your idea." }
+        - { speaker: narrator, reveal: true, text: "The lamp catches, the lens begins to turn, and a long arm of light swings out over the water." }
+        - { speaker: moss, expr: warm, text: "Point Lumière. Eleven seconds a turn. I'm only saying." }
+      memories:
+        - { resident: moss, importance: 7, text: "Point Lumière is lit again. The Fellow trimmed the wick. Eleven seconds a turn. More ferry, maybe, now." }
+        - { resident: nell, importance: 7, text: "The lighthouse is turning. Moss said eleven seconds four times. The boats will come in on it." }
+
+  - id: clocktower
+    name: the clocktower
+    zone: old_quarter
+    # §6.3: "after OQ-5", the lantern pinion found on the OQ chain (§14.4), then PZ-15. S07a is its opening, and
+    # PZ-15's own reward is the row's Charm +5 (puzzles/runtime.ts), so completion adds nothing on top.
+    opens: { flag: pinion_found }
+    signoff: { by: none }
+    fund: 0
+    materials: []
+    vh: 0
+    puzzle: PZ-15
+    leads: [bertrand]
+    site:
+      place: old_quarter.clocktower
+      work: { place: old_quarter.clocktower, area: [17, 11, 5, 2] }
+    complete:
+      flags: [project_clocktower_done]
+    ceremony:
+      scene: s07a_chime_runs
+      summary: "The clocktower is going again, after Bertrand and the Fellow fitted the lantern pinion."

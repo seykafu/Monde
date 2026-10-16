@@ -133,6 +133,13 @@ flags:
   - pz01_solved
   - pz03_deferred
   - pz03_solved
+  # G-06's other boards set their own solved flags (puzzles/runtime.ts completePuzzle); G-03's garden opens on PZ-06's.
+  - pz02_solved
+  - pz04_solved
+  - pz05_solved
+  - pz06_solved
+  - pz13_solved
+  - pz18_solved
   - pz15_pending
   - quarry_jars_left
   - quarry_jars_returned

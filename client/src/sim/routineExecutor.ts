@@ -47,6 +47,13 @@ export const OFFBOARD_LOCAL_MINUTES = 8;
 const FAILED_ROUTE_MINUTES = 5;
 /** Verbs that wander about an open place instead of standing at one spot. */
 const STROLL_VERBS: ReadonlySet<string> = new Set(['walk', 'wander', 'exercise']);
+/**
+ * Verbs that work about a site: a few minutes' walk to another spot now and then, a long while at each (fetching,
+ * carrying, measuring), so a Project's volunteers are seen working (GDD §6.3). Art tuning, not a game rule.
+ */
+const WORK_VERBS: ReadonlySet<string> = new Set(['volunteer']);
+const WORK_DWELL: readonly [number, number] = [12, 18];
+const STROLL_DWELL: readonly [number, number] = [3, 7];
 
 /**
  * GDD-GAP: §2.3 names the districts but not how they join. §16.4.1 now lays out the four Spring boards; until
@@ -165,6 +172,7 @@ export class RoutineExecutor {
   /** Place ids no built zone could place (dev warnings). */
   readonly warnings = new Set<string>();
   private readonly places = new Map<string, PlaceInfo>();
+  private readonly areas = new Map<string, PlaceInfo>();
   private readonly timelines = new WeakMap<DayPlan, Timeline>();
   private readonly roads = new Map<string, Loc>();
 
@@ -198,6 +206,23 @@ export class RoutineExecutor {
     if (host) return { id, kind: 'interior', zone: zoneId, local: host.id, door: host.door, spots: [] };
     this.warnings.add(id);
     return { id, kind: 'unresolved', zone: null, local: null, door: null, spots: [], offZone: zoneId, road: this.roadTo(zoneId) };
+  }
+
+  /**
+   * A place with a work area (a block's `area`): the place as resolve() has it, but stood on outdoors at the open
+   * cells inside the rectangle. A place off the board, or an area with no open cells, is the place itself.
+   */
+  resolveArea(id: string, area: readonly [number, number, number, number]): PlaceInfo {
+    const key = `${id}@${area.join(',')}`;
+    let info = this.areas.get(key);
+    if (!info) {
+      const base = this.resolve(id);
+      const zone = base.zone ? this.world.zones[base.zone] : undefined;
+      const spots = zone ? spotsIn(zone, area, base.door ?? [-1, -1]) : [];
+      info = zone && spots.length ? { ...base, kind: 'open', spots } : base;
+      this.areas.set(key, info);
+    }
+    return info;
   }
 
   /** The building an interior is in: the §9.5 table, else an obvious name match (`bakery_flat` → `bakery`). */
@@ -236,14 +261,14 @@ export class RoutineExecutor {
     return road;
   }
 
-  private anchor(plan: DayPlan, placeId: string): Anchor {
-    const info = this.resolve(placeId);
+  private anchor(plan: DayPlan, placeId: string, area?: readonly [number, number, number, number]): Anchor {
+    const info = area ? this.resolveArea(placeId, area) : this.resolve(placeId);
     if (!info.zone) return { info, zone: null, tile: null, visible: false, key: `off:${info.offZone}:${placeId}` };
     const tile = info.kind === 'open' && info.spots.length > 0
       ? info.spots[hashString(`${plan.resident}@${placeId}`) % info.spots.length]!
       : info.door!;
     const visible = info.kind === 'open' || plan.outdoors === true;
-    return { info, zone: info.zone, tile, visible, key: `${info.zone}:${tile[0]},${tile[1]}` };
+    return { info, zone: info.zone, tile, visible, key: `${info.zone}:${tile[0]},${tile[1]}${area ? `@${area.join(',')}` : ''}` };
   }
 
   // ── Timelines ─────────────────────────────────────────────────────────────
@@ -262,7 +287,7 @@ export class RoutineExecutor {
     let free = -Infinity;
     plan.blocks.forEach((b, index) => {
       if (!(b.endMin > b.startMin)) return; // a zero-length block is a no-op
-      const next = this.anchor(plan, b.place);
+      const next = this.anchor(plan, b.place, b.area);
       const pieces = this.journey(here, next, failures);
       const minutes = pieces.reduce((sum, p) => sum + p.minutes, 0);
       const depart = Math.max(free, b.startMin - minutes);
@@ -329,7 +354,8 @@ export class RoutineExecutor {
       if (e > s) out.push({ ...base, t0: s, t1: e, at: cell ? centre(cell) : null, points: null, cum: null });
     };
     const spots = at.info.spots;
-    if (at.info.kind !== 'open' || !STROLL_VERBS.has(activity) || spots.length < 2 || !Number.isFinite(t0) || !Number.isFinite(t1) || !at.tile || !at.zone) {
+    const working = WORK_VERBS.has(activity);
+    if (at.info.kind !== 'open' || !(STROLL_VERBS.has(activity) || working) || spots.length < 2 || !Number.isFinite(t0) || !Number.isFinite(t1) || !at.tile || !at.zone) {
       still(t0, t1, at.tile);
       return;
     }
@@ -337,7 +363,8 @@ export class RoutineExecutor {
     const rng = new Rng(hashString(`${plan.resident}|${place}|${Math.round(t0)}`));
     let t = t0, cell = home;
     for (let tries = 0; tries < 48; tries++) {
-      const dwell = 3 + rng.next() * 7;
+      const [dwellMin, dwellSpan] = working ? WORK_DWELL : STROLL_DWELL;
+      const dwell = dwellMin + rng.next() * dwellSpan;
       const next = spots[rng.intRange(0, spots.length)]!;
       if (samePoint(next, cell)) continue;
       const go = nav.path(cell, next), back = nav.path(next, home);

@@ -25,6 +25,8 @@ import { runDawnsThrough, type DawnReport } from '../town/townEngine';
 import { DIALOGUE_SCENE } from './DialogueScene';
 import { friendshipLines } from './friendship';
 import { HINT_KEY, type StoryHint } from '../story/hint';
+import { drawProjectsPage, projectsSummary } from '../projects/ledgerPage';
+import { PROJECTS_KEY } from '../projects/runtime';
 
 export const TOWN_LEDGER_SCENE = 'TownLedger';
 /** The TownState in the game registry. */
@@ -66,11 +68,11 @@ export const attachTown = (registry: Phaser.Data.DataManager, clock: Clock): voi
   });
 };
 
-/** Open the Ledger over `host` (no-op if it, or the dialogue panel, is already up). */
-export const openTownLedger = (host: Phaser.Scene, clock: Clock): void => {
+/** Open the Ledger over `host` (no-op if it, or the dialogue panel, is already up), on its Town or Projects page. */
+export const openTownLedger = (host: Phaser.Scene, clock: Clock, page: LedgerPage = 'town'): void => {
   // 'People' is PeopleScene's key (it imports this file, so the key is spelled out here).
   if (host.scene.isActive(TOWN_LEDGER_SCENE) || host.scene.isActive(DIALOGUE_SCENE) || host.scene.isActive('People')) return;
-  host.scene.launch(TOWN_LEDGER_SCENE, { host: host.scene.key, clock } satisfies LedgerOpen);
+  host.scene.launch(TOWN_LEDGER_SCENE, { host: host.scene.key, clock, page } satisfies LedgerOpen);
 };
 
 // ── Pillar look ─────────────────────────────────────────────────────────────
@@ -195,10 +197,14 @@ export class PillarStrip {
 
 // ── The Ledger ──────────────────────────────────────────────────────────────
 
+/** The Ledger's two pages: the town's numbers, and the Projects (G-03). Tab (or a click on its tab) turns over. */
+export type LedgerPage = 'town' | 'projects';
+
 export interface LedgerOpen {
   /** The scene underneath: its input is paused while the Ledger is open. */
   host: string;
   clock: Clock;
+  page?: LedgerPage;
 }
 
 // Layout (design pixels, 1280×720).
@@ -230,12 +236,15 @@ export class TownLedgerScene extends Phaser.Scene {
   private openedAt = 0;
   private closed = false;
   private seenKeys = new WeakSet<KeyboardEvent>();
+  private page: LedgerPage = 'town';
+  private tabs!: Phaser.GameObjects.Container;
 
   constructor() { super(TOWN_LEDGER_SCENE); }
 
   init(data: LedgerOpen): void {
     this.open = data;
     this.closed = false;
+    this.page = data.page ?? 'town';
   }
 
   create(): void {
@@ -246,12 +255,17 @@ export class TownLedgerScene extends Phaser.Scene {
 
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x10140f, 0.55).setOrigin(0).setInteractive(); // swallows clicks
     this.drawPaper();
+    this.tabs = this.add.container(0, 0);
     this.content = this.add.container(0, 0);
     this.refresh();
 
     const onChange = () => this.refresh();
     this.registry.events.on(`changedata-${TOWN_KEY}`, onChange);
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.registry.events.off(`changedata-${TOWN_KEY}`, onChange));
+    this.registry.events.on(`changedata-${PROJECTS_KEY}`, onChange);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.registry.events.off(`changedata-${TOWN_KEY}`, onChange);
+      this.registry.events.off(`changedata-${PROJECTS_KEY}`, onChange);
+    });
     this.input.keyboard!.on('keydown', (e: KeyboardEvent) => this.onKey(e));
 
     this.cameras.main.setAlpha(0);
@@ -263,6 +277,7 @@ export class TownLedgerScene extends Phaser.Scene {
     if (this.closed || e.repeat || this.seenKeys.has(e)) return;
     this.seenKeys.add(e);
     if (e.key === 'Escape') { this.close(); return; }
+    if (e.key === 'Tab' || e.code === 'Tab') { e.preventDefault?.(); this.turn(this.page === 'town' ? 'projects' : 'town'); return; }
     // The L that opened the Ledger mustn't close it again.
     if ((e.key === 'l' || e.key === 'L' || e.code === 'KeyL') && performance.now() - this.openedAt > 150) { this.close(); return; }
     if (DEV_KEYS && (e.key === ']' || e.code === 'BracketRight')) {
@@ -291,8 +306,6 @@ export class TownLedgerScene extends Phaser.Scene {
       fontFamily: FAMILY_DISPLAY, fontSize: '40px', color: INK_CSS, resolution: RENDER_SCALE
     }).setOrigin(0.5, 0);
     g.fillStyle(INK, 1).fillRect(PX + 40, PY + 76, PW - 80, 2.5).fillRect(PX + 40, PY + 81, PW - 80, 1);
-    // Column rule.
-    g.fillStyle(INK, 0.25).fillRect(RX - 30, PY + 120, 1, PH - 170);
   }
 
   private text(x: number, y: number, s: string, size: number, opts: { color?: string; family?: string; italic?: boolean; bold?: boolean; align?: 'left' | 'right' | 'center'; wrap?: number } = {}): Phaser.GameObjects.Text {
@@ -303,6 +316,30 @@ export class TownLedgerScene extends Phaser.Scene {
     }).setOrigin(opts.align === 'right' ? 1 : opts.align === 'center' ? 0.5 : 0, 0);
     this.content.add(t);
     return t;
+  }
+
+  private turn(page: LedgerPage): void {
+    if (page === this.page) return;
+    this.page = page;
+    this.refresh();
+  }
+
+  /** The two tabs under the masthead: Town and Projects. */
+  private drawTabs(): void {
+    this.tabs.removeAll(true);
+    const g = this.add.graphics();
+    this.tabs.add(g);
+    (['town', 'projects'] as const).forEach((page, i) => {
+      const on = page === this.page;
+      const x = PX + PW - 44 - 252 + i * 132, y = PY + 38, w = 120, h = 26;
+      g.fillStyle(on ? INK : PAPER_EDGE, on ? 1 : 0.9).fillRoundedRect(x, y, w, h, 6);
+      g.lineStyle(1, BRASS, 0.8).strokeRoundedRect(x, y, w, h, 6);
+      const t = this.add.text(x + w / 2, y + h / 2, page === 'town' ? 'Town' : 'Projects', {
+        fontFamily: FAMILY_UI, fontSize: '14px', color: on ? '#f2e8d0' : INK_CSS, fontStyle: 'bold', resolution: RENDER_SCALE
+      }).setOrigin(0.5);
+      const hit = this.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true }).on('pointerup', () => this.turn(page));
+      this.tabs.add([t, hit]);
+    });
   }
 
   private header(x: number, y: number, s: string): void {
@@ -322,7 +359,21 @@ export class TownLedgerScene extends Phaser.Scene {
     this.text(PX + PW / 2, PY + 90, `Day ${town.day} · ${formatDate(gameTime(town.day, clock.minute))} · ${formatClock(clock.minute)}`, 16, { italic: true, color: MUTED, align: 'center' });
     const hint = this.registry.get(HINT_KEY) as StoryHint | null | undefined;
     if (hint) this.text(PX + PW / 2, PY + 106, `Next: ${hint.text}.`, 13, { color: BRASS_CSS, align: 'center' });
+    this.drawTabs();
 
+    if (this.page === 'projects') {
+      // G-03: every Spring Project, on the whole sheet.
+      this.header(LX, PY + 122, `Projects · fund, gather, volunteer, solve, open · Town Fund ${coins(town.fund)} coins`);
+      const families = { ui: FAMILY_UI, heading: FAMILY_HEADING, body: FAMILY_BODY } as const;
+      drawProjectsPage({
+        g, text: (x, y, s, size, o = {}) => this.text(x, y, s, size, { ...o, family: o.family ? families[o.family] : undefined })
+      }, this.registry, { day: town.day, minute: clock.minute }, { x: LX, y: PY + 142, w: PW - 88, h: PH - 186 });
+      this.text(PX + PW - 44, PY + PH - 38, 'Tab: Town page  ·  L or Esc to close', 14, { family: FAMILY_UI, color: MUTED, align: 'right' });
+      return;
+    }
+
+    // Column rule.
+    g.fillStyle(INK, 0.25).fillRect(RX - 30, PY + 120, 1, PH - 170);
     this.drawPillars(g, town);
     this.drawRightColumn(g, town);
 
@@ -334,7 +385,8 @@ export class TownLedgerScene extends Phaser.Scene {
     const morning = [...riddleNews, report && report.day === town.day ? `${dawnLine(report)}.` : null, ...ties.slice(0, 2), ties.length > 2 ? `And ${ties.length - 2} more.` : null]
       .filter((s): s is string => !!s).join(' ');
     if (morning) this.text(PX + 44, PY + PH - 22, morning, 14, { italic: true, color: MUTED, wrap: 620 }).setOrigin(0, 1);
-    this.text(PX + PW - 44, PY + PH - 38, `L or Esc to close${DEV_KEYS ? '  ·  dev ]: +1 hour' : ''}`, 14, { family: FAMILY_UI, color: MUTED, align: 'right' });
+    this.text(PX + PW - 44, PY + PH - 38, `Tab: Projects  ·  L or Esc to close${DEV_KEYS ? '  ·  dev ]: +1 hour' : ''}`, 14, { family: FAMILY_UI, color: MUTED, align: 'right' });
+    this.text(PX + PW - 44, PY + PH - 56, projectsSummary(this.registry, { day: town.day, minute: clock.minute }), 13, { family: FAMILY_UI, color: BRASS_CSS, align: 'right' });
   }
 
   private drawPillars(g: Phaser.GameObjects.Graphics, town: TownState): void {

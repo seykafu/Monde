@@ -126,8 +126,8 @@ export const scriptedRegard = (s: Stamp, cue: CueIdentity, r: { resident: string
  *
  * What the client knows of the town, against §9.6's table (scuffle 7, project_open 6, sweeping 2):
  *   a story {scuffle} (story/host.ts scuffleEvent)      → `scuffle`, the player and the §7.9 enemies taking part;
- *   GDD-GAP: `project_open` is a Project opening, and no Project system (§6.3) exists on the client yet: a story
- *            {project} cue only unlocks one (ledger placeholder), so nothing is sent;
+ *   a Project's opening ceremony (G-03, projects/runtime.ts openProject) → `project_open`, the player and everyone
+ *            gathered at the site taking part (a story {project} cue only unlocks one, so it sends nothing);
  *   GDD-GAP: `sweeping` is community work (§8), which has no client system yet;
  *   GDD-GAP: {pillar} cues, the night's drift, the dawn's arrivals, departures and Leaving Notices and the Option
  *            Clause change the town but have no type in §9.6's table ("refers to an event table but only supplies

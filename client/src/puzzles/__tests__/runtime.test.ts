@@ -11,7 +11,7 @@ import { pendingRegard } from '../../mind/events';
 import { puzzles } from '../catalog';
 import { codes, words } from '../PZ-03';
 import { solution } from '../PZ-01';
-import { completePuzzle, emptyPuzzles, puzzleSave, storePuzzle, puzzleStepDone, syncPuzzleProjects, puzzleDawn, deliverPuzzleItems, PUZZLES_KEY } from '../runtime';
+import { completePuzzle, emptyPuzzles, puzzleSave, storePuzzle, puzzleStepDone, legacyProjectReward, puzzleDawn, deliverPuzzleItems, PUZZLES_KEY } from '../runtime';
 function registry() {
   const data = new Map<string, unknown>();
   const r={get:(k:string)=>data.get(k),set:(k:string,v:unknown)=>data.set(k,v),remove:(k:string)=>data.delete(k)};
@@ -35,12 +35,14 @@ describe('puzzle effects and saves',()=>{
     // Pending events are added to the mirror by regardFor; never write the same bonus into both.
     expect((r.get('monde.friendship') as ReturnType<typeof emptyFriendship>).regard.bertrand).toBeUndefined();
   });
-  it('defers project Pillars until the Project is complete and never grants them twice',()=>{
+  it('records the Project step and leaves completion Pillars to the Projects (G-03)',()=>{
     const r=registry();solve(r,'PZ-01',solution);expect(puzzleStepDone(r,'fountain')).toBe(true);
     expect((r.get('monde.town') as TownState).pillars.charm).toBe(25);
-    r.set('monde.story.flags',{project_fountain_done:true});syncPuzzleProjects(r);syncPuzzleProjects(r);
-    expect((r.get('monde.town') as TownState).pillars).toMatchObject({charm:31,spirit:24});
-    expect(puzzleSave(r).rewarded.filter(v=>v==='project:fountain')).toHaveLength(1);
+    r.set('monde.story.flags',{project_fountain_done:true});puzzleDawn(r,new Clock({day:7,minute:360}));
+    expect((r.get('monde.town') as TownState).pillars).toMatchObject({charm:25,spirit:22});
+    expect(legacyProjectReward(r,'fountain')).toBe(false);
+    r.set(PUZZLES_KEY,{...puzzleSave(r),rewarded:[...puzzleSave(r).rewarded,'project:fountain']});
+    expect(legacyProjectReward(r,'fountain')).toBe(true);
   });
   it('retains the map reward when the bag is full and delivers it once when there is room',()=>{
     const r=registry();r.set('monde.inventory',{slots:Array.from({length:24},()=>({item:'bun',count:20}))});

@@ -23,6 +23,8 @@ export interface GameState {
   puzzles?: SaveGame['puzzles'];
   riddles?: SaveGame['riddles'];
   friendship?: SaveGame['friendship'];
+  /** G-03 Projects (projects/runtime.ts); absent means none begun. */
+  projects?: SaveGame['projects'];
 }
 export function collect(state: GameState, kind: SaveGame['kind'], label: string, savedAt = new Date().toISOString()): SaveGame {
   return SaveGame.parse({ schema_version: SAVE_SCHEMA_VERSION, saved_at: savedAt, kind, label,
@@ -31,6 +33,6 @@ export function collect(state: GameState, kind: SaveGame['kind'], label: string,
     mind: { world_id: null, branch_id: null, snapshot_id: null }, clock: state.clock.time,
     town: serialize(state.town), player: state.player, weather: state.weather,
     story_flags: state.story_flags, quiet: state.quiet, client_events: state.client_events,
-    fellow: state.fellow, inventory: state.inventory, coins: state.coins, economy: state.economy, skills: state.skills, friendship: state.friendship, riddles: state.riddles, puzzles: state.puzzles
+    fellow: state.fellow, inventory: state.inventory, coins: state.coins, economy: state.economy, skills: state.skills, friendship: state.friendship, riddles: state.riddles, puzzles: state.puzzles, projects: state.projects
   });
 }
