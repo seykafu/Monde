@@ -3,6 +3,8 @@ WORKDIR /app
 COPY package*.json tsconfig.base.json ./
 COPY shared/ ./shared/
 COPY server/ ./server/
+# shared/ bundles data straight from content/ (e.g. riddles.json), so the build needs it too.
+COPY content/ ./content/
 COPY client/package.json ./client/package.json
 COPY desktop/package.json ./desktop/package.json
 RUN npm ci --workspace @monde/server --include-workspace-root=true
