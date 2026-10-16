@@ -30,6 +30,14 @@ describe('Scuffle transaction and saves', () => {
     expect((r.get('monde.friendship') as ReturnType<typeof emptyFriendship>).news_log).toHaveLength(1);
     expect(scufflesOf(r).results['test:market']?.outcome).toBe('win');
   });
+  it('fights the bakery tutorial in Fournier & Fille’s room (§7.9 “Bakery interior”, W-03), and records it on Market Row', () => {
+    const e = prepare(registry(), 'sc_bakery_tutorial', { day: 5, minute: 640 }, { key: 's03:room', story: true });
+    expect(e.battle.arena.id).toMatch(/^bakery_interior:scuffle:/);
+    expect(e.battle.arena.interior?.room.wall).toBe('plaster');
+    expect(e).toMatchObject({ zone: 'market_row', place: 'market_row.bakery' });
+    // A street encounter stays on the street.
+    expect(prepare(registry(), 'sc_market_saturday', { day: 15, minute: 700 }, { key: 'street' }).battle.arena.id).toMatch(/^market_row:scuffle:/);
+  });
   it('does not double S03’s authored Safety reward; used buns leave the Bag, dropped snacks return', () => {
     const r = registry(), bag = emptyInventory(); bag.slots[0] = { item: 'bun', count: 3 }; r.set('monde.inventory', bag);
     const e = prepare(r, 'sc_bakery_tutorial', { day: 3, minute: 600 }, { key: 's03:71', story: true });

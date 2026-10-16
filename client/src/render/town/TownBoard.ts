@@ -151,6 +151,8 @@ export interface Billboard {
   mark?: string;
   /** Hidden by the riddle system (a Mark not yet revealed). */
   hidden: boolean;
+  /** Drawn this many px above where it stands (a lantern hung on a room's back wall). */
+  lift: number;
 }
 
 /** A cell of a hedge, wall or fence run. */
@@ -218,7 +220,7 @@ export class TownBoard {
     this.zoneKey = `${zone.id}:${opts.seed}`;
     const tile = (x: number, y: number) => zone.tiles[y * zone.width + x]!;
     this.ctx = bakeContext(groundMap(zone.width, zone.height, (x, y) => tile(x, y).kind!, (x, y) => projection.elevationAt(x, y)),
-      { seed: opts.seed, elevStep: DIORAMA_ELEV_STEP, slab: DIORAMA_SLAB_DEPTH });
+      { seed: opts.seed, elevStep: DIORAMA_ELEV_STEP, slab: DIORAMA_SLAB_DEPTH, ...(zone.interior ? { room: zone.interior.room } : {}) });
     // The board's own shadow on the world.
     const b = projection.bounds();
     scene.add.image(b.x + b.w / 2, b.y + b.h + 6, ensureDotTexture(scene)).setTint(0x000000).setAlpha(0.7)
@@ -516,7 +518,7 @@ export class TownBoard {
       img, sprite: o.sprite, kind: o.kind, x: o.x, baseY: o.baseY, bounds, fade: o.fade, alpha: 1,
       restorable: o.restorable, state: 'restored', lived: false, flip: o.flip, shadow, shear, lampShadow: null,
       windows: null, contact, sway: meta.sway ?? 0, phase: (o.x * 0.013 + o.baseY * 0.007) % (Math.PI * 2),
-      ...(o.door ? { door: o.door } : {}), chimneys: [], homes: o.homes ?? [], extras: [], hidden: false
+      ...(o.door ? { door: o.door } : {}), chimneys: [], homes: o.homes ?? [], extras: [], hidden: false, lift: o.lift ?? 0
     };
     this.billboards.push(bill);
     if (meta.light) this.addLamp(bill, meta.light);
@@ -536,7 +538,8 @@ export class TownBoard {
   private addLamp(bill: Billboard, light: { dx: number; dy: number; radius: number }): void {
     const scene = this.scene;
     const pool = addTorchGlow(scene, bill.x, bill.baseY - 2, { depth: DEPTH.LIGHT, scaleX: 2.3, scaleY: 2.3 * (TH / TW) });
-    const head = addTorchGlow(scene, bill.x + light.dx, bill.baseY + light.dy, { depth: OVER_NIGHT, scaleX: 0.75, scaleY: 0.75 });
+    // A hung lantern's flame is up on the wall with it; its pool still falls on the floor below.
+    const head = addTorchGlow(scene, bill.x + light.dx, bill.baseY - bill.lift + light.dy, { depth: OVER_NIGHT, scaleX: 0.75, scaleY: 0.75 });
     // Gas lamps burn steady: a slow flicker of our own instead of the torch's dance.
     scene.tweens.killTweensOf(pool);
     scene.tweens.killTweensOf(head);

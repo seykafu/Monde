@@ -10,7 +10,9 @@ import type { TerrainKind } from '../combat/types';
 
 export const TOWN_TERRAINS = [
   'grass', 'meadow', 'cobble', 'brick', 'plaza', 'gravel', 'road', 'sand', 'shingle', 'wet_sand', 'soil',
-  'boards', 'steps', 'weedy', 'river', 'sea', 'pond', 'shallows'
+  'boards', 'steps', 'weedy', 'river', 'sea', 'pond', 'shallows',
+  // Indoors (interiors, zone `kind: interior`): floorboards, tiles, stone flags, a rug, and the room's walls.
+  'floor', 'tile', 'flags', 'rug', 'wall'
 ] as const;
 export type TownTerrain = (typeof TOWN_TERRAINS)[number];
 
@@ -45,7 +47,13 @@ export const DEFAULT_LEGEND: Readonly<Record<string, LegendEntry>> = {
   '>': { terrain: 'river', flow: 'east' },
   '<': { terrain: 'river', flow: 'west' },
   '^': { terrain: 'river', flow: 'north' },
-  v: { terrain: 'river', flow: 'south' }
+  v: { terrain: 'river', flow: 'south' },
+  // Indoors: F floorboards · T tiles · Q stone flags · R rug · # wall (the back wall's face, the cut side and front walls)
+  F: { terrain: 'floor' },
+  T: { terrain: 'tile' },
+  Q: { terrain: 'flags' },
+  R: { terrain: 'rug' },
+  '#': { terrain: 'wall' }
 };
 
 export interface TerrainInfo {
@@ -82,8 +90,16 @@ export const TERRAIN_INFO: Readonly<Record<TownTerrain, TerrainInfo>> = {
   soil: { water: false, walkable: true, layer: 11, soft: false, built: true, legacy: 'mud' },
   boards: { water: false, walkable: true, layer: 12, soft: false, built: true, legacy: 'wood' },
   steps: { water: false, walkable: true, layer: 12, soft: false, built: true, legacy: 'stone' },
-  weedy: { water: false, walkable: true, layer: 12, soft: false, built: true, legacy: 'moss_stone' }
+  weedy: { water: false, walkable: true, layer: 12, soft: false, built: true, legacy: 'moss_stone' },
+  floor: { water: false, walkable: true, layer: 12, soft: false, built: true, legacy: 'wood' },
+  tile: { water: false, walkable: true, layer: 12, soft: false, built: true, legacy: 'marble' },
+  flags: { water: false, walkable: true, layer: 12, soft: false, built: true, legacy: 'stone' },
+  rug: { water: false, walkable: true, layer: 13, soft: false, built: true, legacy: 'carpet' },
+  wall: { water: false, walkable: false, layer: 14, soft: false, built: true, legacy: 'wall' }
 };
+
+/** The indoor kinds (interiors only): floors, the rug and the walls. */
+export const INDOOR_TERRAINS: ReadonlySet<TownTerrain> = new Set(['floor', 'tile', 'flags', 'rug', 'wall']);
 
 export const isTownTerrain = (v: unknown): v is TownTerrain => typeof v === 'string' && (TOWN_TERRAINS as readonly string[]).includes(v);
 export const isFlow = (v: unknown): v is Flow => typeof v === 'string' && (FLOWS as readonly string[]).includes(v);

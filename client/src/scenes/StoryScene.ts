@@ -1,6 +1,7 @@
 import type { Outcome as ScuffleOutcome } from '../combat/scuffle/engine';
 import { openScuffle } from '../scuffles/ScuffleScene';
 import { openPuzzle } from '../puzzles/scenes/PuzzleScene';
+import { openStrawPoll } from '../finale/attach';
 // Scripted scenes as a VN (GDD §13.1 cues, §13.3 scenes, §18 Dialogue; MVP G-10).
 //
 // Launched over ZoneScene by scenes/story/attach.ts when the director has an eligible scene. The zone keeps
@@ -563,6 +564,13 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   async scuffle(id: string, key: string): Promise<ScuffleOutcome> {
     this.panelLayer.setVisible(false); this.portrait?.root.setVisible(false); this.listen(false);
     try { return await openScuffle(this, this.open.clock, id, { key, story: true }); }
+    finally { if (!this.closed) { this.panelLayer.setVisible(true); this.portrait?.root.setVisible(true); this.listen(true); } }
+  }
+
+  /** G-11 S10c: the Straw Poll's card over the scene (finale/attach.ts); resolves with `vote.*` once it's read. */
+  async strawPoll(): Promise<Readonly<Record<string, string | number | boolean>> | null> {
+    this.panelLayer.setVisible(false); this.portrait?.root.setVisible(false); this.listen(false);
+    try { return await openStrawPoll(this, this.session); }
     finally { if (!this.closed) { this.panelLayer.setVisible(true); this.portrait?.root.setVisible(true); this.listen(true); } }
   }
 

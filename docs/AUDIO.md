@@ -28,7 +28,7 @@ two).
 | 3 | `morning.mp3` | The Dawn Report, the first hour of each day | Fresh, quiet, kettle-on |
 | 4 | `old_quarter.mp3` | Old Quarter by day | Cobbles, clocks, gentle bustle |
 | 5 | `market_row.mp3` | Market Row by day, the café, the bakery | Warm, busy, a bit cheeky |
-| 6 | `cottage.mp3` | The player's cottage, letters, quiet personal scenes | Home, safe, small |
+| 6 | `cottage.mp3` | The player's cottage (inside it, at every hour), letters, quiet personal scenes | Home, safe, small |
 | 7 | `wharf.mp3` | The Wharf by day | Salt air, rope, slow swell |
 | 8 | `commons.mp3` | The Commons, the garden, the Glasshouse | Green, open, birdsong |
 | 9 | `night.mp3` | Any district after dark | Lamplight, hush |
@@ -37,6 +37,11 @@ two).
 | 12 | `vane_theme.mp3` | Silas Vane's scenes | Smooth, slightly too polished |
 | 13 | `scuffle.mp3` | Scuffles | Comic, bouncy fight |
 | 14 | `bloom_fair.mp3` | The Bloom Fair (Day 25) | Festival joy |
+
+**Indoors** (`client/src/audio/musicDirector.ts` `ambientMusic`, GDD §16.4.2): a room with its own track plays it at
+every hour (the cottage); every other room plays its district's music as the street does (morning, by day, night), a
+little softer (0.8), and a hushed one (the library, Town Hall, the Lantern, the clock shop, No. 9) softer again (0.55).
+The Gull & Anchor keeps Market Row's fiddle going all evening.
 
 ### How to generate
 

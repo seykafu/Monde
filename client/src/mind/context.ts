@@ -2,7 +2,7 @@
 // The client owns the clock, positions and weather; the routine executor knows where a resident is and why.
 import { describeWeather, type WeatherNow } from '../sim/weather';
 import type { ResidentState } from '../sim/routineExecutor';
-import type { ZoneDef } from '../world/zoneFormat';
+import { districtOf, type ZoneDef } from '../world/zoneFormat';
 import type { TalkContext } from './types';
 
 const PLACE_ID = /^[a-z_]+\.[a-z0-9_]+$/;
@@ -11,8 +11,10 @@ const PLACE_ID = /^[a-z_]+\.[a-z0-9_]+$/;
  * The `zone.place` the resident is standing in: their block's place when they're at it, else (walking between
  * places) whichever of this board's places is nearest.
  */
-export function talkPlace(state: Pick<ResidentState, 'place' | 'traveling' | 'position'> | null, zone: Pick<ZoneDef, 'id' | 'places'>): string {
-  if (state && !state.traveling && PLACE_ID.test(state.place) && state.place.startsWith(`${zone.id}.`)) return state.place;
+export function talkPlace(state: Pick<ResidentState, 'place' | 'traveling' | 'position'> | null, zone: Pick<ZoneDef, 'id' | 'places' | 'district'>): string {
+  // A room's places are its district's (W-03).
+  const district = districtOf(zone);
+  if (state && !state.traveling && PLACE_ID.test(state.place) && state.place.startsWith(`${district}.`)) return state.place;
   const at = state?.position;
   let best = zone.places[0], bestD = Infinity;
   if (at) {
@@ -23,8 +25,8 @@ export function talkPlace(state: Pick<ResidentState, 'place' | 'traveling' | 'po
       if (d < bestD) { best = p; bestD = d; }
     }
   }
-  if (best) return `${zone.id}.${best.id}`;
-  return state && PLACE_ID.test(state.place) ? state.place : `${zone.id}.street`;
+  if (best) return `${district}.${best.id}`;
+  return state && PLACE_ID.test(state.place) ? state.place : `${district}.street`;
 }
 
 /** The resident's plan block in the server's words: "work at market_row.bakery", "walking to old_quarter.library". */
@@ -38,7 +40,7 @@ export function talkActivity(state: Pick<ResidentState, 'activity' | 'place' | '
 export const weatherPhrase = (now: WeatherNow): string => describeWeather(now).toLowerCase();
 
 export function talkContext(args: {
-  day: number; minute: number; state: ResidentState | null; zone: Pick<ZoneDef, 'id' | 'places'>; weather: WeatherNow;
+  day: number; minute: number; state: ResidentState | null; zone: Pick<ZoneDef, 'id' | 'places' | 'district'>; weather: WeatherNow;
 }): TalkContext {
   return {
     day: Math.max(1, Math.floor(args.day)),

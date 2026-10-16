@@ -190,12 +190,18 @@ describe('the shipped town', () => {
       expect(z.town!.props.length, `${z.id} is dressed`).toBeGreaterThan(40);
     }
   });
-  it('puts every Spring Mark on the board its chain belongs to (§14.4–14.8), once', () => {
+  it('puts every Spring Mark on the board its chain belongs to (§14.4–14.8), or in a room of it (W-03), once', () => {
     const spring = ['OQ', 'MR', 'WF', 'CM'].flatMap(c => [1, 2, 3, 4, 5].map(n => `${c}-${n}`)).filter(id => id !== 'CM-5');
     const home = { OQ: 'old_quarter', MR: 'market_row', WF: 'wharf', CM: 'commons' } as Record<string, string>;
-    const placed = shipped.flatMap(z => z.marks);
+    const roomDir = resolve(dir, 'interiors');
+    const rooms = readdirSync(roomDir).filter(f => f.endsWith('.zone.yaml')).map(f => compileZone(readFileSync(resolve(roomDir, f), 'utf8')));
+    const district = Object.fromEntries([...shipped, ...rooms].map(z => [z.id, z.district ?? z.id]));
+    const placed = [...shipped, ...rooms].flatMap(z => z.marks);
     expect(placed.map(m => m.id).sort()).toEqual([...spring].sort());
-    for (const m of placed) expect(m.zone, m.id).toBe(home[m.id.slice(0, 2)]);
+    for (const m of placed) expect(district[m.zone], m.id).toBe(home[m.id.slice(0, 2)]);
+    // The three inside a building (§14.5, §14.6) are in its room now, not at its door.
+    const roomOfMark = Object.fromEntries(placed.map(m => [m.id, m.zone]));
+    expect([roomOfMark['MR-4'], roomOfMark['MR-5'], roomOfMark['WF-4']]).toEqual(['bakery_interior', 'storefront_9_interior', 'boathouse_interior']);
     for (const m of placed) expect(Math.hypot(m.stand[0] - m.at[0], m.stand[1] - m.at[1]), m.id).toBeLessThanOrEqual(1);
   });
   it('shows what the Spring riddles name: datestones, the watch, the herring, the welcome sign, No. 9, the Gannet', () => {

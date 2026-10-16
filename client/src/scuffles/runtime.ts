@@ -12,7 +12,9 @@ import { applyPillarDelta, type TownState } from '../town/pillars';
 import { scriptedRegard, townEvent } from '../mind/events';
 import { appendEvent } from '../scenes/events';
 import { personaCards } from '../world/residents';
-import { zones } from '../world/zones';
+import { interiors, zones } from '../world/zones';
+import { roomOf } from '../world/interiors';
+import { districtOf, type ZoneDef } from '../world/zoneFormat';
 import type { Clock } from '../sim/clock';
 import type { TilePos } from '../combat/types';
 
@@ -49,12 +51,15 @@ export interface Encounter { battle: Scuffle; key: string; zone: string; place: 
 export function prepare(r: RegistryLike, id: ScuffleId, clock: Pick<Clock, 'day' | 'minute'>, opts: {
   key: string; story?: boolean; zone?: string; centre?: TilePos; offers?: AllyOffer[]; regard?: (id: string) => number
 }): Encounter {
-  const def = SCUFFLES[id], zone = zones[opts.zone ?? def.zone]!;
+  const def = SCUFFLES[id];
+  // A Scuffle set in a place with a room (sc_bakery_tutorial: "Bakery interior", §7.9) is fought in the room (W-03).
+  const room = opts.zone ? undefined : roomOf(interiors, `${def.zone}.${def.place}`);
+  const zone = room ?? zones[opts.zone ?? def.zone]!;
   const anchor = opts.centre ?? { x: zone.spawn[0], y: zone.spawn[1] };
   const place = zone.places.find(p => p.id === def.place) ?? [...zone.places].sort((a, b) => Math.abs(a.door[0] - anchor.x) + Math.abs(a.door[1] - anchor.y) - Math.abs(b.door[0] - anchor.x) - Math.abs(b.door[1] - anchor.y))[0];
   const centre = opts.centre ?? { x: place?.door[0] ?? zone.spawn[0], y: place?.door[1] ?? zone.spawn[1] };
-  // GDD-GAP: the town has no interior bakery map yet; use its actual doorstep, retaining the zone's walls/props.
-  const arena = cutArena(zone, centre), fellow = getFellow(r), bag = Inventory.parse(r.get('monde.inventory') ?? {});
+  // In a room, the middle of its floor (its walls and furniture are the arena's); outdoors, the place's doorstep.
+  const arena = cutArena(zone, room ? roomCentre(room) : centre), fellow = getFellow(r), bag = Inventory.parse(r.get('monde.inventory') ?? {});
   const supplies = bag.slots.flatMap(s => s && SUPPLIES.includes(s.item as Supply) ? Array.from({ length: Math.min(5, s.count) }, () => s.item as Supply) : []).slice(0, 5);
   // GDD-GAP: Saturday crews alternate the twins with Bru/Nettie, so Nettie's second win is reachable in Spring.
   const enemies = id === 'sc_market_saturday' && clock.day % 2 === 1 ? ['bru', 'nettie', 'weasel'] : def.enemies;
@@ -69,9 +74,14 @@ export function prepare(r: RegistryLike, id: ScuffleId, clock: Pick<Clock, 'day'
   for (const u of battle.units) if (quitGang.includes(u.id)) { u.departed = true; u.state.alive = false; }
   battle.initiative.reseed(battle.units);
   if (!battle.living().some(u => u.faction === 'enemy')) battle.outcome = 'talk_down';
-  return { battle, key: opts.key, zone: zone.id,
-    place: `${zone.id}.${place?.id ?? 'fountain_square'}`, story: opts.story ?? false, day: clock.day, minute: clock.minute };
+  return { battle, key: opts.key, zone: districtOf(zone),
+    place: `${districtOf(zone)}.${place?.id ?? 'fountain_square'}`, story: opts.story ?? false, day: clock.day, minute: clock.minute };
 }
+/** The middle of a room's floor (between its back wall and its door), where its Scuffle board is cut. */
+const roomCentre = (room: ZoneDef): TilePos => {
+  const band = room.walkability.findIndex(row => row.some(Boolean));
+  return { x: Math.floor(room.width / 2), y: Math.floor((Math.max(0, band) + room.height - 1) / 2) };
+};
 /** One transaction per encounter key; story replay returns the stored result before launching. */
 export function settle(r: RegistryLike, encounter: Encounter, outcome: Outcome, witnesses: readonly string[] = []): { minutes: number; clinic: boolean } {
   const saved = scufflesOf(r); if (saved.results[encounter.key]) return { minutes: 0, clinic: false };

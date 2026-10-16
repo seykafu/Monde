@@ -4,7 +4,7 @@ import { clearFellow, getFellow, setFellow } from '../fellow/state';
 import { DEFAULT_PLAYER_NAME, getMind } from '../mind/api';
 import { loadQuietState, saveQuietState } from '../mind/prefs';
 import { emptyQuietState } from '../mind/quietMode';
-import { zones } from '../world/zones';
+import { boards } from '../world/zones';
 import { dailyWeather } from '../sim/weather';
 import type { Clock } from '../sim/clock';
 import type { TownState } from '../town/pillars';
@@ -47,14 +47,15 @@ export async function requestCheckpoint(key: string): Promise<void> {
   }
 }
 export function resetGame(scene: Phaser.Scene): void {
-  for (const key of ['monde.press.pending', 'monde.press.seed', 'monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.puzzles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies', 'monde.projects', 'monde.scuffles', 'monde.scuffle.recovery', 'monde.scuffle.offers']) scene.registry.remove(key);
+  for (const key of ['monde.press.pending', 'monde.press.seed', 'monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.puzzles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies', 'monde.projects', 'monde.scuffles', 'monde.scuffle.recovery', 'monde.scuffle.offers', 'monde.finale']) scene.registry.remove(key);
   clearFellow(scene.registry);
   saveQuietState(quietStorage, emptyQuietState());
   capture = undefined; dawnSave = undefined;
 }
 export async function loadGame(scene: Phaser.Scene, save: SaveGame): Promise<void> {
   const state = restore(save);
-  const zone = zones[state.player.zone];
+  // The districts and the rooms (W-03): a save made indoors restores the player in the room.
+  const zone = boards[state.player.zone];
   if (!zone || state.player.x < 0 || state.player.y < 0 || state.player.x >= zone.width || state.player.y >= zone.height) {
     throw new Error('This save refers to an unavailable location');
   }
@@ -66,6 +67,7 @@ export async function loadGame(scene: Phaser.Scene, save: SaveGame): Promise<voi
   scene.registry.set('monde.riddles', state.riddles);
   scene.registry.set('monde.scuffles', state.scuffles);
   if (state.projects) scene.registry.set('monde.projects', state.projects);
+  if (state.finale) scene.registry.set('monde.finale', state.finale);
   scene.registry.set('monde.clock', state.clock);
   scene.registry.set('monde.town', state.town);
   scene.registry.set('monde.save.weather', state.weather);
@@ -109,7 +111,8 @@ export function attachSaves(scene: Phaser.Scene, clock: Clock, player: () => Sav
     riddles: scene.registry.get('monde.riddles') as SaveGame['riddles'] | undefined,
     friendship: scene.registry.get('monde.friendship') as SaveGame['friendship'] | undefined,
     scuffles: scene.registry.get('monde.scuffles') as SaveGame['scuffles'] | undefined,
-    projects: scene.registry.get('monde.projects') as SaveGame['projects'] | undefined
+    projects: scene.registry.get('monde.projects') as SaveGame['projects'] | undefined,
+    finale: scene.registry.get('monde.finale') as SaveGame['finale'] | undefined
   }, 'manual', '');
   capture = take;
   const tick = (_time: number, delta: number) => { elapsed += delta / 1000; player(); };

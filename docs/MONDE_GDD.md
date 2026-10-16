@@ -1542,6 +1542,43 @@ bittersweet moment in S23).
 **Polls:** each Saturday from Day 70, the Lantern samples 30 seeded eligible voters and prints shares
 with an honest margin of error (about ±18%). Polls are noisy on purpose.
 
+#### The Spring Straw Poll (MVP G-11)
+
+The MVP ends on Day 25 with a straw poll that runs this model on the Day-25 town: "if Monde voted tomorrow, and the
+Fellow stood". At the Bloom Fair's close (S10c) Sable sets three of Odile's jam jars on a trestle (THE FELLOW, MR. VANE,
+OLD MOSS) and every grown-up in the crowd drops one bean. The rulings that fill the gaps for Spring
+(`shared/src/election`):
+
+- **Who is asked.** The fair's crowd by S10a's band (31 / 73 / 190, §13.3a) times the share of the town that is 18+
+  (187 of 210, A.1.4): 28, 65 or 169 ballots, drawn as a seeded sample of the eligible voters. Each ballot is a §10.3
+  vote (scores plus jitter, no turnout: they were asked). The paper prints the shares with an honest margin of error,
+  1/√n (±19, ±12 or ±8 points). The same model is also counted over the whole electorate with turnout, for testing.
+- **Eligibility.** §10.3's rule scaled to the poll day: 18+ and 10+ days in Monde by Day 25 (so arrivals up to Day 15).
+- **The electorate.** The carded residents (the core cast less Vane, who lives off the map until Day 48, and Tib, who is
+  eleven; plus Ada, Bru, Nettie and Old Moss, who are inside the 192), the generated arrivals, and stand-ins for the rest
+  of the 192 built from A.1.5's archetype × age-band quotas with A.2's values (the card jitter: ±0.10, floor 0.05, cap
+  0.60, renormalised), homes by A.1.3's shares (fishers on the Wharf, mill hands in Millbrook), and two carded friends
+  in their zone plus two neighbours. Stand-ins can't be met, so their reputation reads their carded friends only.
+  Old Moss votes for himself.
+- **Opinions the MVP doesn't simulate.** Without mirrored stances (§9.4), `port`, `vreg` and `moss_reg` start from priors:
+  Port Vane wanted for Prosperity and feared for the Commons and the Wharf, `100·(P − 0.25) − 60·(C + Sp − 0.45)`, +15
+  for the out-of-work mill hands, +30 for Tollmen, +40 for Vane's staff, −30 for fishers, −15 for everyone once
+  `option_public`; Vane a polite stranger (+5 ± 12; mill hands +15, the out-of-work +10, fishers −15, Tollmen +45,
+  retired organizers −10); Moss the fishers' own (+25). A card's own relationship, or the dawn's tie, replaces a prior.
+- **Witnessed deeds.** A Project opened in your zone +8 Regard-points of reputation, a Scuffle won +6 (lost −3), half
+  that for one elsewhere, a week's community work +0.5 a task (§8: being seen working); capped at 25.
+- **Terms §10.3 leaves open.** A lean is Player − Vane. Each candidate's score gets its own seeded ε (one ε shared by all
+  three scores could never change a vote). `social_vane` stays 0 until Vane campaigns: the signed social term already
+  carries friends who lean his way. Postal votes break a tie only when the Fellow is in it. Promise, debate, evidence
+  and Vane's campaign are 0 in Spring.
+- **Quotes.** Three met residents (never Pell, who abstains, or Sable, who counts) say which jar: one for the Fellow,
+  one for someone else, one torn (top two within 0.04), live `{ai_line}`s with written lines in
+  `content/lines/straw_poll.yaml` for Quiet Mode.
+
+The MVP's H5 soak (five play styles × eight worlds, `client/src/finale/__tests__/h5.test.ts`) puts the Fellow's share
+at about 10% for a passive player, 50% for one who lapses, 65% for a talker, 75% for a builder and 85% for the strong
+player: a spread of about 26 points.
+
 ### 10.4 Campaigning (Days 70–99)
 
 | Action | Cost | Effect |
@@ -4182,7 +4219,7 @@ Day 1 is a **Tuesday**. Weekdays repeat on a fixed seven-day cycle, so **D8, D15
 | 22 | Tue | Spring | — | — | Y | 2 | FO | |
 | 23 | Wed | Spring | — | Pub quiz: **the Bastien census joke** | — | 2 | — | Tib enters Bastien on the team sheet as "resident 212". Roz rules him "a person for quiz purposes only". Sable prints a mock correction. |
 | 24 | Thu | Spring | — | Fair set-up on the Commons | — | 2 | FO | |
-| 25 | Fri | Spring | **S10a Bloom Fair (opening) · S10b Bloom Fair (closing)** | **Bloom Fair** | Y | 1 (fair truce) | Gift: a crate of tulips | Spring ends. Rook calls a one-day truce. Vane's tulips arrive "with Mr. Vane's compliments". |
+| 25 | Fri | Spring | **S10a Bloom Fair (opening) · S10b Bloom Fair (closing) · S10c The Straw Poll** | **Bloom Fair** | Y | 1 (fair truce) | Gift: a crate of tulips | Spring ends. Rook calls a one-day truce. Vane's tulips arrive "with Mr. Vane's compliments". Sable's jam-jar Straw Poll after the last song (MVP G-11); the D26 Dawn Report prints it. |
 | 26 | Sat | Summer | — | Market day | — | 2 | FO | Summer (Bloom) begins. [cond `sable_week_granted`] Pell's week is up; her Favor "Tell the truth about the lamps" opens. |
 | 27 | Sun | Summer | — | Service | — | 2 | — | |
 | 28 | Mon | Summer | — | **Storm** (night): Wharf floods, streetlights tested | — | 2 | — | Lit streetlights hold; unlit streets and the Cannery roof take damage. |
@@ -4288,7 +4325,7 @@ All scenes use the §13.1 format and the same reading conventions as §13.4: eac
 - **Memories** are written in the resident's own voice, first person, so the nightly reflection can use them verbatim.
 - **Speakers.** `ARRIVAL` and the slot/regard/memory alias `arrival` stand for the first generated arrival (S05). Tokens `{arrival.name}`, `{arrival.trade}`, `{arrival.reason}` are filled from that resident's card and are valid in Quiet Mode.
 - **Expression variables.** `appeal` (the blended score from §6.2), `ferry_day` (true on a sailing day) and `player.why` (`fresh_start`, `to_help`, `running`, `curious`, from the Fellowship form) are read-only. They are new to the expression list and are repeated in §13.3a.
-- **Summoned scenes.** Festival and appointment scenes (S10a/b, S11) are summoned when their window opens: the engine fades the player to the place with a one-line confirmation. If the player is asleep or in a Scuffle, the window waits for the next valid moment.
+- **Summoned scenes.** Festival and appointment scenes (S10a/b/c, S11) are summoned when their window opens: the engine fades the player to the place with a one-line confirmation. If the player is asleep or in a Scuffle, the window waits for the next valid moment.
 - **Quiet Mode.** Every `{ai_line}` carries an authored `{fallback}`. `{ai_open}` handoffs degrade to a canned, branching exchange per cue, written in `content/lines/scripted.yaml` and found by scene id and resident: the resident's lines with portraits, then 2–3 replies for the Fellow at each of the cue's `turns`, ending in a close that hands back to the script (`npm run lint:content` requires one for every Spring cue). A cue with none falls back to ordinary Quiet Mode small talk. Their `topic` strings are written to be readable as that fallback brief.
 
 ---
@@ -5857,6 +5894,75 @@ N: Bastien sleeps on the flatbed, under a bench somebody lifted over him.
 
 ---
 
+#### S10c · The Straw Poll
+```yaml
+id: s10c_straw_poll
+day: 25
+time: "17:30-26:00"
+place: commons.bandstand
+trigger: "!flag.s10c_done && flag.s10b_done && day == 25"       # summoned: straight after S10b, or later that night
+backdrop: bg_commons_fair_dusk
+music: fair_dusk
+cast: [sable, tib, pell]
+sets: [s10c_done, spring_poll_taken]
+```
+```script
+{fade}
+N: The oil lamps along the sundial path are burning down. By the flatbed, Sable Moreau has set up a trestle with three of Odile's jam jars on it and a card in her own type: IF MONDE VOTED TOMORROW.
+N: The jars are labelled in pencil. THE FELLOW. MR. VANE. OLD MOSS (HE SAYS HE WOULD).
+SABLE [neutral]: (taps a jar with her pencil) Straw poll, for the morning's Lantern. One dried bean each, grown-ups only, no lobbying at the trestle.
+TIB [neutral]: I counted the beans before. Obviously I'm not allowed one.
+SABLE [neutral]: You're eleven. You can hold the lamp.
+PELL [neutral]: (from the crate, not quite looking) I'm abstaining, Sable. Minute it.
+SABLE [ink_smudge]: Minuted. (to you) You're on a jar. Nobody asked you first. That's what makes it a straw poll.
+>> CHOICE
+- "Count them. I'd like to know." → goto count
+- "Should I be worried?" → goto worried
+- "I'm not standing for anything." → goto not_standing
+
+:: worried
+SABLE [neutral]: Worried's for galley proofs. This is beans. (tips the first jar out onto the trestle)
+{goto: count}
+
+:: not_standing
+SABLE [neutral]: Noted. Not printed. You're on a jar either way. (tips the first jar out onto the trestle)
+{goto: count}
+
+:: count
+{campaign: spring_straw_poll}
+[[if vote.winner == "fellow" && vote.share >= 55]]
+TIB [surprised]: That's more than half! Obviously that's more than half.
+SABLE [neutral]: {vote.share} per cent. Margin of error, plus or minus {vote.margin}. Spell your name for the caption.
+PELL [warm]: (quietly, to the lamps) Well. Heavens.
+[[elif vote.winner == "fellow"]]
+SABLE [thinking]: {vote.share} per cent, and ahead. The margin's plus or minus {vote.margin}, so it goes in as a lead, in small type.
+TIB [neutral]: A lead's a lead. Margo says so about library fines.
+[[elif vote.winner == "vane"]]
+SABLE [neutral]: Mr. Vane. {vote.vane} per cent, for a man who doesn't live here. It goes in straight.
+PELL [worried]: (folds the ribbon very small) Forty jobs and forty tulips. It's a good many tulips.
+TIB [neutral]: You've got all summer. Obviously.
+[[elif vote.winner == "moss"]]
+TIB [laugh]: Old Moss! On more ferry!
+SABLE [neutral]: {vote.moss} per cent for a man who hasn't said he's standing. I'll need a bigger headline.
+PELL [warm]: Mossimo will be unbearable. (she doesn't sound as if she minds)
+[[else]]
+SABLE [neutral]: Dead level. I'll count them again. (she counts them again) Still level.
+TIB [neutral]: Flip a bean.
+[[end]]
+SABLE [neutral]: (sweeps the beans into her apron) Morning edition, six o'clock. Don't read it in the bath.
+{memory: sable, "Ran a straw poll at the Bloom Fair with three of Odile's jam jars. Put the Fellow on a jar without asking. Front page tomorrow.", importance: 7}
+{memory: tib, "Held the lamp for Sable's straw poll at Bloom Fair. Counted every bean. Not allowed one, obviously.", importance: 5}
+{memory: pell, "Abstained from Sable's straw poll at the fair and watched the beans go in. Minuted.", importance: 6}
+{set: s10c_done}
+{set: spring_poll_taken}
+```
+
+*(S10c is the MVP's Spring finale, MVP_PLAN G-11. `{campaign: spring_straw_poll}` counts the Straw Poll (§10.3, "The Spring Straw
+Poll"), shows its card and publishes `vote.winner`, `vote.share`, `vote.vane`, `vote.moss` and `vote.margin` for the
+branches. The morning after, the Dawn Report prints the jars, and the End-of-Spring report closes the run.)*
+
+---
+
 #### S11 · The Station
 ```yaml
 id: s11_station
@@ -6264,6 +6370,7 @@ N: Nettie, on her ledge, watches you all the way to the wall. Bru raises the wre
 | `option_public`*, `option_public`* | The town knows. Two names for one fact. | S09 (route 3); engine on D19 meeting or D21 print | §10.3 (Pell endorsement), §13.4 (S15), Pell/Sable/Vane cards |
 | `sable_week_granted`, `pell_promise_broken` | System: Sable agreed to the week (Favor `fv_sable_week`) / the promise lapsed and the Lantern printed on D21. | System | Pell Regard, D21 calendar rule |
 | `bloom_fair_open`, `bloom_fair_closed` | Fair scenes done. | S10a, S10b | Dawn Report |
+| `s10c_done`, `spring_poll_taken` | Sable counted the Straw Poll at the fair's close (MVP G-11). | S10c | D26 Dawn Report, End-of-Spring report |
 | `fair_band_low`, `fair_band_mid`, `fair_band_high` | Spirit band at noon on D25 (< 35, 35–59, 60+). | S10a | S10b, epilogue inserts |
 | `vane_tulips_displayed`, `vane_tulips_refused`, `vane_tulips_pond` | What was done with Vane's gift tulips. | S10a | Vane AI card; Teo AI card |
 | `june_hope` | High-Spirit fair; June looked up and saw the crowd. Does **not** set `june_staying`. | S10b | June AI card (Day 50) |
@@ -9886,7 +9993,8 @@ spawn: [5, 22]
 - **Ground.** `,` grass · `'` meadow (wildflowers) · `.` cobble · `b` brick paving · `p` plaza flagstones ·
   `:` gravel path · `r` cart road (packed earth, wheel ruts along it) · `s` sand · `h` shingle · `w` wet sand ·
   `m` garden soil (planked borders) · `=` boards (wharf, pier, bridge deck) · `_` stone steps · `g` weedy
-  stone · `~` sea · `o` pond · `-` shallows · `> < ^ v` river, the arrow pointing downstream. Water is not
+  stone · `~` sea · `o` pond · `-` shallows · `> < ^ v` river, the arrow pointing downstream. Indoors (§16.4.2):
+  `F` floorboards · `T` tiles · `Q` stone flags · `R` rug · `#` wall. Water is not
   walkable. Each kind has a stacking layer and a soft or hard edge: soft kinds (grass, meadow, sand, gravel,
   road, shallows) spill a ragged few pixels over a lower neighbour with a dark lip, a lit rim and a shadow
   on the ground below; two spilling sides round their corner; laid kinds (cobbles, boards, soil) keep a
@@ -9913,8 +10021,8 @@ spawn: [5, 22]
   welcome sign, the *Gannet*'s bow). `mark: OQ-1` makes a prop one of Monde's Marks (§14.1): the compiled zone
   lists them as `zone.marks` (`{ id, zone, at, stand }`, `stand` being the walkable tile the player reads it
   from) for the riddle system, and the board can show or hide each plaque (`TownBoard.setMarkVisible`). Marks
-  inside a building (MR-4's oven keystone, MR-5's hand press, WF-4's *Clémence*) are plaques at its door until
-  interiors exist. **Hedges, low stone walls and picket fences** (`hedge`, `stone_wall`, `fence`) are drawn in
+  inside a building (MR-4's oven keystone, MR-5's hand press, WF-4's *Clémence*) are in its room (§16.4.2).
+  **Hedges, low stone walls and picket fences** (`hedge`, `stone_wall`, `fence`) are drawn in
   code as autotiled runs (`render/town/lineArt.ts`): each cell asks which neighbours continue the run and
   draws its share of one shape, a raised top and a front face wherever the run's south side is open, so a
   run reads as one hedge in every direction, corners and tees included (a sprite repeated down a column reads
@@ -10037,17 +10145,91 @@ river line up across them:
 | MR-1 | market_row (35, 4) | the Market Hall's north door, behind it on the back lane |
 | MR-2 | market_row (32, 10) | under the public scale's low pan, read from (32, 11) |
 | MR-3 | market_row (15, 10) | the Gull & Anchor's hanging sign |
-| MR-4 | market_row (27, 10) | Fournier & Fille's door (the oven keystone inside) |
-| MR-5 | market_row (19, 26) | No. 9's door, Lower Row (the hand press inside) |
+| MR-4 | bakery_interior (7, 3) | the 1840 oven's keystone, inside Fournier & Fille |
+| MR-5 | storefront_9_interior (4, 5) | the old iron hand press inside No. 9, Lower Row |
 | WF-1 | wharf (31, 28) | the mooring bollard at the slip, read from (31, 29) |
 | WF-2 | wharf (22, 27) | the bottom harbour step, the weedy one |
 | WF-3 | wharf (18, 16) | the third hook from the sea: the northmost net rack, read from (18, 17) |
-| WF-4 | wharf (7, 21) | the boathouse doors (the *Clémence* inside) |
+| WF-4 | boathouse_interior (7, 6) | along the *Clémence*'s keel, inside the boathouse |
 | WF-5 | wharf (44, 36) | the lantern room's brass rail, high on the lighthouse, read from its door |
 | CM-1 | commons (28, 36) | the west gate post, read from (28, 37) |
 | CM-2 | commons (18, 30) | the sundial's plinth, read from (18, 31) |
 | CM-3 | commons (20, 29) | the tin buried at the gnomon's shadow-tip toward the Old Elm, mid-afternoon |
 | CM-4 | commons (20, 7) | the lantern pane's frame on the glasshouse front |
+
+#### 16.4.2 Interiors (W-03)
+
+*Added 2026-10-16.* Twelve buildings of the Spring boards have a room you walk into: the Lamplighter's Cottage, Town
+Hall (the registry hall, and Pell's office behind its partition), the Monde Free Library, the Lantern, Achterberg
+Horlogerie, Fournier & Fille, Café Liss, the Gull & Anchor, Dunmore's General Store, the Covered Market Hall, No. 9
+Market Row and the boathouse. A room is a zone file too (`content/zones/interiors/<building>.zone.yaml`: format v2 with
+`kind: interior`; `client/src/world/zoneFormat.ts` documents it):
+
+```yaml
+format: 2
+kind: interior
+id: bakery_interior
+name: Fournier & Fille
+district: market_row       # the room's places are the district's: inside is market_row.bakery
+building: bakery           # the building on market_row whose door leads in, and back out to
+size: [14, 10]
+terrain: |                 # F floorboards · T tiles · Q stone flags · R rug · # wall (any outdoor kind too)
+  ##############           # the top rows of # are the back wall's face
+  ...
+  ######Q#######           # the doorway: the one floor cell in the front wall
+door: [6, 9]
+room: { wall: plaster, rug: blue, windows: [5, 12] }   # wall: plaster | paper | brick | panel | stone | timber
+upstairs: [bakery_flat]    # rooms over this one (§9.5): residents there are out of sight
+props:                     # furniture, as the town's props; a lantern or a shelf is lifted onto the back wall
+  - { sprite: bread_oven, at: [7, 3], offset: [24, -10] }
+  - { sprite: mark_plaque, at: [7, 3], offset: [24, -8], lift: 70, mark: MR-4 }
+places:                    # the district's places in the room; `door` is where E acts on each
+  - { id: bakery, rect: [1, 3, 12, 6], door: [8, 4] }
+spots:                     # where residents stand: a post of their own (who:), else a free one
+  - { at: [4, 4], who: [odile] }
+  - { at: [3, 6] }
+# music: cottage (the room's own track) · quiet: true (the district's, softly)
+```
+
+- **A cutaway** in the street's ¾ diorama projection, 10×8 to 20×14 tiles (§16.4): the top rows of `#` are the back
+  wall's face, seen square on (a cornice beam, the wall, a dado and wainscot where the style has one, a skirting, the
+  windows); every other `#` is a wall cut through, drawn as its top: the side walls, a partition, the front wall's stub
+  either side of the doorway's stone threshold. Floors, walls and rugs are drawn in code in the town's palette
+  (`render/town/roomArt.ts`), the colours sampled from the §16.3 interior backdrops; the furniture is sprite art (the
+  interior set in `scripts/art/gen_town.py`: ovens, counters, bars, shelves, desks, presses, clocks, the bed, the stove,
+  lamps, plants), front-facing ¾ and sized against the 55 px resident. The camera draws a room 1.5× closer
+  than the street (whole device pixels for the art), centred in the dark when it is smaller than the screen.
+- **Doors.** Walking up into a building's door from its doorstep, or E there ("Go into …"), fades into its room (the
+  street's 0.4 s fade) and arrives just inside the doorway; walking out through the doorway fades back to the same
+  doorstep. The building's place is inside: its scenes trigger in the room (S02 in the library, S03 in the bakery, S08
+  in the Lantern), and Projects, puzzles, favors, community work, the Next hint and Pell's sign-off (at the Town Hall
+  counter or in her office) act at the place's `door` in the room; the doorstep outside counts as the street. Sleep is
+  E at the cottage's bed, and you wake there. A save made in a room restores the player in it. A locked door is a
+  doorstep as before (its place's business, and its scene, happen at it): the cottage until Pell hands over its keys in
+  S01c (`cottage_keys_given`; S01c plays at its door, as written), and, GDD-GAP, No. 9 until MR-4 has been read
+  (§14.5's knock, Tib's window and Pell's key are not beats yet).
+- **Light.** No sun shadows and no weather fall indoors. The windows show the sky outside: blue by day, greyer under
+  cloud, rain or fog, warm at dawn and dusk, deep blue at night; by day they lay a patch of light on the floor under
+  them, and the doorway another. Lamps, lanterns, fires, the stove and the oven glow a little all day and fully from
+  dusk; a room at night is lamplit and warm, 0.72 as dark as the street. Art tuning, not rules.
+- **Music** (`audio/musicDirector.ts`). A room with its own track plays it at every hour (the cottage: `cottage`);
+  others play their district's as outdoors (morning, by day, night), a little softer (0.8), a hushed room softer
+  again (0.55: the library, Town Hall, the Lantern, the clock shop, No. 9). The Gull & Anchor plays Market Row's
+  fiddle all evening.
+- **Residents** (`world/indoorResidents.ts`). The routine executor still walks a resident to the building's door and in;
+  the room shows everyone whose routine has them inside: at their post (Odile behind the counter, Bastien by the oven
+  and under the library window, Margo at her desk, Pell at her desk or the Town Hall counter, Roz behind the bar, June
+  behind Café Liss's counter and by the pub fire, Nell at the store's till and her market stall, Bertrand at his
+  counter, Sable at her desk, Moss in the boathouse), else at a free spot of the room's; they walk in from the doorway
+  as they arrive and out to it as they leave, to the minute. The flats upstairs (§9.5) and anyone asleep, Bastien
+  aside, are out of sight. Two residents near each other inside may talk, as outdoors.
+- **Scuffles** set in a room are fought on it: the bakery tutorial (`sc_bakery_tutorial`, §7.9) is cut from Fournier &
+  Fille's room. There are no street encounters indoors.
+- **Door-only buildings.** GDD-GAP: §16.4 plans about 30 interiors; every other building of the Spring boards stays
+  door-only for now, for a reason given in `DOOR_ONLY` (`client/src/world/interiors.ts`): the clocktower's stair, the
+  locked Founder's House, the chapel, the residents' homes, vacant houses and empty storefronts, the shuttered cannery,
+  the ticket kiosk, the lighthouse's lantern room, Vane's trailer, the bandstand, glasshouse and Teo's cottage. A test
+  checks every indoor place (§9.5) of the boards is in a room or on that list.
 
 ### 16.5 Sprites
 

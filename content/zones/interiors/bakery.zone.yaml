@@ -1,0 +1,52 @@
+# Fournier & Fille (GDD §2.3 Market Row; §7.9 "Bakery interior"): Odile's shop floor, the 1840 bread oven at the back with
+# MR-4 on its keystone (§14.5), the counter across the front of the shop and the stairs up to the Fourniers' flat.
+# E at the oven: the bakery_ovens Project and PZ-02 (the Old Lady's Flues); sc_bakery_tutorial is fought in here.
+format: 2
+kind: interior
+id: bakery_interior
+name: Fournier & Fille
+district: market_row
+building: bakery
+size: [14, 10]
+terrain: |
+  ##############
+  ##############
+  ##############
+  #QQQQQQQQQQQQ#
+  #QQQQQQQQQQQQ#
+  #QQQQQQQQQQQQ#
+  #QQQQQQQQQQQQ#
+  #QQQQRRRRQQQQ#
+  #QQQQRRRRQQQQ#
+  ######Q#######
+door: [6, 9]
+room: { wall: plaster, rug: blue, windows: [5, 12] }
+upstairs: [bakery_flat]
+props:
+  - { sprite: staircase, at: [1, 3], offset: [24, -10] }
+  - { sprite: bread_rack, at: [3, 3], offset: [0, -10] }
+  - { sprite: bread_rack, at: [4, 3], offset: [0, -10] }
+  - { sprite: wall_lamp, at: [6, 3], offset: [-6, -16], lift: 56 }
+  - { sprite: bread_oven, at: [7, 3], offset: [24, -10] }
+  # MR-4 (§14.5): on the oven's keystone, the inner face of the arch.
+  - { sprite: mark_plaque, at: [7, 3], offset: [24, -8], lift: 70, mark: MR-4 }
+  - { sprite: flour_sacks, at: [10, 3], offset: [0, -6] }
+  - { sprite: kneading_table, at: [11, 3], offset: [24, -6] }
+  - { sprite: bakery_counter, at: [3, 5], offset: [0, 10] }
+  - { sprite: bakery_counter, at: [6, 5], offset: [0, 10] }
+  - { sprite: barrel, at: [1, 8], offset: [6, 0] }
+  - { sprite: flower_pots, at: [12, 8], offset: [0, 0] }
+places:
+  # E in front of the oven (behind the counter): the ovens Project, PZ-02.
+  - { id: bakery, rect: [1, 3, 12, 6], door: [8, 4] }
+spots:
+  - { at: [4, 4], who: [odile] }
+  - { at: [10, 4], who: [bastien] }
+  - { at: [3, 6] }
+  - { at: [5, 6] }
+  - { at: [7, 6] }
+  - { at: [10, 6] }
+  - { at: [9, 7] }
+  - { at: [11, 8] }
+  - { at: [2, 8] }
+  - { at: [4, 8] }

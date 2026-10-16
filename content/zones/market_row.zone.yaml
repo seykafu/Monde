@@ -103,8 +103,6 @@ props:
   - { sprite: mark_plaque, at: [35, 4], lift: 4, mark: MR-1 }
   - { sprite: mark_plaque, at: [32, 10], offset: [-28, 2], lift: 6, mark: MR-2 }
   - { sprite: mark_plaque, at: [15, 10], offset: [0, -16], lift: 46, mark: MR-3 }
-  - { sprite: mark_plaque, at: [27, 10], offset: [4, -16], lift: 38, mark: MR-4 }
-  - { sprite: mark_plaque, at: [19, 26], offset: [-23, -16], lift: 37, mark: MR-5 }
   - { sprite: lamp_post, at: [37, 10] }
   - { sprite: flower_pots, at: [40, 10] }
   - { sprite: lamp_post, at: [47, 10] }

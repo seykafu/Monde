@@ -7,6 +7,7 @@ import { PlayerProfile, Skills, baseSkills } from './player';
 import { SavedFriendship, emptyFriendship } from './friendshipData';
 import { ClientEvent } from './events';
 import { TownPeople } from './arrivals/people';
+import { QUOTE_BANDS, StrawPollRecord } from './election/strawPoll';
 
 const n = z.number().finite();
 const count = n.int().nonnegative();
@@ -102,6 +103,20 @@ export const SavedProjects = z.object({
 export type SavedProjects = z.infer<typeof SavedProjects>;
 export const emptyProjects = (): SavedProjects => ({ projects: {}, volunteers: [], standing: [], declined: {}, sold: {}, restocked: {}, coworked: {}, openings: [], applied: [] });
 
+/**
+ * G-11 the Spring finale (client/src/finale): the Bloom Fair's Straw Poll and the quotes printed with it, the day the
+ * End-of-Spring report was shown, and whether the player chose to keep wandering. Optional on read (a save from before
+ * the fair has none of it), so it needs no version bump.
+ */
+export const SavedFinale = z.object({
+  poll: StrawPollRecord.nullable(),
+  quotes: z.array(z.object({ id: z.string(), band: z.enum(QUOTE_BANDS), text: z.string(), live: z.boolean() })),
+  reportDay: day.nullable(),
+  freePlay: z.boolean()
+});
+export type SavedFinale = z.infer<typeof SavedFinale>;
+export const emptyFinale = (): SavedFinale => ({ poll: null, quotes: [], reportDay: null, freePlay: false });
+
 export const SAVE_SCHEMA_VERSION = 3;
 export const SaveGame = z.object({
   schema_version: z.literal(SAVE_SCHEMA_VERSION), saved_at: z.string().datetime(), label: z.string(),
@@ -140,7 +155,9 @@ export const SaveGame = z.object({
   riddles: SavedRiddles.default(emptyRiddles),
   friendship: SavedFriendship.default(emptyFriendship),
   /** G-03 Projects: optional on read (a save from before them has none begun), so no version bump. */
-  projects: SavedProjects.default(emptyProjects)
+  projects: SavedProjects.default(emptyProjects),
+  /** G-11 the Spring finale: optional on read. */
+  finale: SavedFinale.default(emptyFinale)
 });
 export type SaveGame = z.infer<typeof SaveGame>;
 

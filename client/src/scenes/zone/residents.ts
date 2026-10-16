@@ -32,6 +32,7 @@ import { ResidentSim, type ResidentProfile } from '../../sim/residentSim';
 import { hashString } from '../../sim/plans';
 import type { ResidentState } from '../../sim/routineExecutor';
 import { fits, ZoneGraph, type Vec } from '../../world/nav';
+import { IndoorView } from '../../world/indoorResidents';
 import type { Position } from '../../world/player';
 import type { ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
@@ -216,11 +217,14 @@ export class ResidentLayer {
   private readonly emoteThrottle = new PairEmoteThrottle();
   private emoteClock = 0;
   private emoteCheck = 0;
+  /** In a room (W-03): who the routines have inside its building, at their spots (world/indoorResidents.ts). */
+  private readonly indoor: IndoorView | null;
 
   /** Create every actor up front (hidden), so they all belong to the world camera. */
   constructor(private readonly scene: Phaser.Scene, private readonly zone: ZoneDef, private readonly projection: ObliqueProjection,
     private readonly clock: Clock, private readonly dev: boolean) {
     this.sim = sharedResidentSim(scene);
+    this.indoor = zone.interior ? new IndoorView(zone, this.sim.executor, (id, day, minute) => this.sim.sample(id, day, minute)) : null;
     this.chatter = new Chatter(scene, clock);
     this.greetings = new Greetings(scene, clock);
     this.greetings.weather = () => this.chatter.weather();
@@ -478,7 +482,9 @@ export class ResidentLayer {
     if (this.sim.profiles.length !== this.actors.length) this.syncActors();
     const minute = this.clock.minute;
     const states = this.sim.tick(day, minute);
-    this.roster = this.sim.boardRoster(this.zone.id, day, minute, LOOKAHEAD_MIN);
+    this.roster = this.indoor
+      ? this.indoor.roster(m => (m === minute ? states : this.sim.executor.statesAt(this.sim.plansFor(day), m)), minute, LOOKAHEAD_MIN)
+      : this.sim.boardRoster(this.zone.id, day, minute, LOOKAHEAD_MIN);
     const warnings = this.sim.executor.warnings;
     if (warnings.size > this.warned) {
       this.warned = warnings.size;
@@ -495,7 +501,7 @@ export class ResidentLayer {
     if (staged) {
       // Dev (chatterDev.ts): stood here, routine held, standing still on this board.
       a.delay += dMin;
-      const s = this.sim.sample(a.profile.id, day, minute - a.delay);
+      const s = this.sampleAt(a.profile.id, day, minute - a.delay);
       a.state = s && { ...s, zone: this.zone.id, position: { ...staged }, tile: [Math.floor(staged.x), Math.floor(staged.y)], visible: true,
         moving: false, facing: null, traveling: null, path: null };
       a.base = a.state ? staged : null;
@@ -510,7 +516,7 @@ export class ResidentLayer {
       // Behind schedule: hurry (up to 4× pace), faster the further behind.
       const catchUp = a.delay > 0 ? Math.min(a.delay, dMin * Math.min(3, Math.max(0.6, a.delay / 6))) : 0;
       const delay = a.delay - catchUp;
-      const next = this.sim.sample(a.profile.id, day, minute - delay);
+      const next = this.sampleAt(a.profile.id, day, minute - delay);
       let blocked = false;
       if (next?.moving && next.visible && next.zone === this.zone.id && next.position && a.base && !a.passing && dMin > 0) {
         const ahead = this.withOffset(next.position, next, a, player);
@@ -529,9 +535,14 @@ export class ResidentLayer {
       if (a.passing && a.pos && Math.hypot(a.pos.x - player.x, a.pos.y - player.y) > BLOCK_RADIUS + 0.4) a.passing = false;
     }
     if (a.delay < 1e-6) a.delay = 0;
-    const s = this.sim.sample(a.profile.id, day, minute - a.delay);
+    const s = this.sampleAt(a.profile.id, day, minute - a.delay);
     a.state = s;
     a.base = s && s.zone === this.zone.id && s.position ? s.position : null;
+  }
+
+  /** A resident's routine state at a minute, as this board shows it (in a room: inside its building, at their spot). */
+  private sampleAt(id: string, day: number, minute: number): ResidentState | null {
+    return this.indoor ? this.indoor.stateAt(id, day, minute) : this.sim.sample(id, day, minute);
   }
 
   /** Where a body at `p` would stand with its lateral offsets, or `p` itself if that's against a wall. */

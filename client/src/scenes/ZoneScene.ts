@@ -29,8 +29,13 @@ import { DEPTH, actorDepth } from '../render/depth';
 import { CharacterSprite, PLAYER_LOOK_KEY, playerLook, preloadCharacterSheets } from '../render/characterSprite';
 import { ensureFellow } from '../fellow/state';
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from '../util/constants';
-import { zones } from '../world/zones';
-import type { Point, ZoneDef } from '../world/zoneFormat';
+import { boards, doorLinks, interiors, zones } from '../world/zones';
+import { districtOf, type Point, type ZoneDef } from '../world/zoneFormat';
+import { doorAt, placeArrival, walkingIn } from '../world/interiors';
+import { InteriorRoom } from '../render/town/InteriorRoom';
+import { ROOM_VOID } from '../render/town/roomArt';
+import { doorLocked, indoorLight } from './zone/indoors';
+import { playSfx } from '../audio/Sfx';
 import { movePlayer, resolveEdge, nearbyPlace, placeName, standable, type Position } from '../world/player';
 import { Clock, DAY_START, SOLAR_NOON, formatClock, formatDate, formatGameTime, parseClock } from '../sim/clock';
 import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, type DailyWeather, type WeatherKind, type WeatherNow } from '../sim/weather';
@@ -40,13 +45,14 @@ import { attachDialogue } from './DialogueScene';
 import { PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
 import { MindStatusDot } from '../ui/mindStatus';
 import { getMusic, musicHeld } from '../audio/Music';
-import { ambientTrack } from '../audio/musicDirector';
+import { ambientMusic } from '../audio/musicDirector';
 import { applyServerRegard, attachDawnSync } from './friendship';
 import { attachEventSync } from './events';
 import { openPeople } from './PeopleScene';
 import { attachStory, type StoryAttachment } from './story/attach';
 import { attachMigration } from './migration';
 import { attachArrivals } from './zone/arrivals';
+import { attachFinale } from '../finale/attach';
 import { closingToast, type StoryHint } from '../story/hint';
 import { DIALOGUE_SCENE } from './DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE } from './StoryScene';
@@ -92,6 +98,11 @@ const DUSK_GRADE = 0xffb47e;
 /** The night layer's colour at full dark: a cool blue multiply, readable rather than black. */
 const NIGHT_TINT = 0x4a5893;
 const WINDOW_LIGHT = 0xffc46b;
+/**
+ * Rooms are drawn closer (W-03): the camera zooms 1.5× indoors, so a 10×8 to 20×14 room fills the screen as a district's
+ * street does. 1.5 keeps the town art on whole device pixels (3 per art pixel at RENDER_SCALE 2). Art tuning.
+ */
+const INDOOR_ZOOM = 1.5;
 const DEG = Math.PI / 180;
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -288,14 +299,21 @@ export class ZoneScene extends Phaser.Scene {
   /** Place names on a v2 board fade in near their door (the greybox showed them all, always). */
   private placeLabels: { text: Phaser.GameObjects.Text; x: number; y: number }[] = [];
   private lookAt = 0;
+  /** Interiors (W-03): the room's windows and daylight (render/town/InteriorRoom). */
+  private room?: InteriorRoom;
+  /** When a locked door last said so (scene ms). */
+  private lockedAt = -Infinity;
   constructor() { super('Zone'); }
 
   /** Drawn character sheets listed in assets/sprites/manifest.json, and the town's sprites. */
   preload(): void { preloadCharacterSheets(this); preloadTownSprites(this); }
 
   create(data: { zone?: string; arrive?: Point; savedPlayer?: SaveGame['player'] } = {}): void {
-    this.zone = zones[data.zone ?? 'old_quarter']!;
+    this.zone = boards[data.zone ?? 'old_quarter'] ?? zones.old_quarter!;
     this.transitioning = false;
+    // Choose the music at once (a room plays softer than the street; the title plays full again).
+    this.musicCheckedAt = -Infinity;
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => getMusic(this).setLevel(1));
     this.resetLight();
     this.clock = this.sharedClock();
     const savedWeather = this.registry.get('monde.save.weather') as SaveGame['weather'] | undefined;
@@ -332,9 +350,11 @@ export class ZoneScene extends Phaser.Scene {
       this.town = new TownBoard(this, { zone: this.zone, projection: this.projection, seed: 42, look: this.townLook(), focus: start, reduced });
       this.lampGlows = [...this.town.lampGlows];
       this.lamps = this.town.lights.map(({ x, y, radius }) => ({ x, y, radius }));
-      this.life = new TownLife(this, this.town, { reduced, seaside: this.zone.tiles.some(t => t.kind === 'sea') });
-      // Place names fade in as you near the door, readable over the night.
-      this.placeLabels = this.zone.places.map(place => {
+      // Indoors: the room's windows and daylight; no birds, butterflies or smoke.
+      if (this.zone.interior) this.room = new InteriorRoom(this, this.zone);
+      else this.life = new TownLife(this, this.town, { reduced, seaside: this.zone.tiles.some(t => t.kind === 'sea') });
+      // Place names fade in as you near the door, readable over the night (a room's own name is its title).
+      this.placeLabels = this.zone.places.filter(place => place.id !== this.zone.interior?.building).map(place => {
         const p = this.projection.tileToWorld({ x: place.door[0], y: place.door[1] });
         const text = this.add.text(p.x, p.y - 30, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#343d34cc', padding: { x: 4, y: 1 }, resolution: RENDER_SCALE })
           .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setAlpha(0);
@@ -387,15 +407,22 @@ export class ZoneScene extends Phaser.Scene {
       weather: () => this.now, entry: data, busy: () => this.transitioning });
     const world = this.children.list.slice();
     const camera = this.cameras.main;
-    camera.setOrigin(0, 0).setZoom(RENDER_SCALE);
+    const zoom = this.zone.interior ? INDOOR_ZOOM : 1;
+    camera.setOrigin(0, 0).setZoom(RENDER_SCALE * zoom);
     const bounds = this.projection.bounds();
-    camera.setBounds(bounds.x, bounds.y, bounds.w, bounds.h);
+    if (this.zone.interior) {
+      // A room smaller than the screen sits in the middle of it, in the dark (bounds grown round it).
+      const w = Math.max(bounds.w, GAME_WIDTH / zoom), h = Math.max(bounds.h, GAME_HEIGHT / zoom);
+      camera.setBounds(bounds.x - (w - bounds.w) / 2, bounds.y - (h - bounds.h) / 2, w, h).setBackgroundColor(ROOM_VOID);
+    } else camera.setBounds(bounds.x, bounds.y, bounds.w, bounds.h);
     this.followPlayer();
     const perspective = attachPostPipeline(camera, this.game, PERSPECTIVE_PIPELINE, PerspectivePipeline);
     if (perspective) perspective.k = DIORAMA_PERSPECTIVE_K;
     attachPostPipeline(camera, this.game, BLOOM_PIPELINE, BloomPipeline);
     const ui = this.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT);
     ui.ignore(world);
+    // Drawn closer indoors: the world's words (name tags, speech bubbles, place names) render sharp at the zoom.
+    if (zoom !== 1) for (const o of world) if (o instanceof Phaser.GameObjects.Text) o.setResolution(RENDER_SCALE * zoom);
     const title = this.add.text(24, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce', backgroundColor: '#28372d' });
     const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  I: bag  ·  L: ledger  ·  J: journal', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
     const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
@@ -406,9 +433,10 @@ export class ZoneScene extends Phaser.Scene {
       .setOrigin(0.5, 1).setAlpha(0);
     camera.ignore([title, controls, devHelp, this.prompt, this.toast, ...this.buildHud(), ...this.residents.buildUi()]);
     this.economy = attachEconomy(this, this.clock, text => this.showToast(text), () => {
-      const cottage = zones.old_quarter?.places.find(p => p.id === 'lamplighter_cottage');
-      if (cottage) this.registry.set('monde.save.wakePlayer', { zone: 'old_quarter', x: cottage.door[0] + 0.5, y: cottage.door[1] + 0.5, facing: 0 });
-      this.scene.restart({ zone: 'old_quarter', arrive: cottage?.door });
+      // Home: inside the cottage, by the bed (W-03), else at its door.
+      const home = placeArrival(zones, interiors, 'old_quarter.lamplighter_cottage') ?? { zone: 'old_quarter', arrive: zones.old_quarter!.spawn };
+      this.registry.set('monde.save.wakePlayer', { zone: home.zone, x: home.arrive[0] + 0.5, y: home.arrive[1] + 0.5, facing: 0 });
+      this.scene.restart({ zone: home.zone, arrive: home.arrive });
     });
     camera.ignore(this.economy.objects);
     this.projects = attachProjects(this, { zone: this.zone, clock: this.clock, residents: this.residents, projection: this.projection,
@@ -417,6 +445,8 @@ export class ZoneScene extends Phaser.Scene {
     // G-02: newcomers off the ferry, leavers to the slip, and the Gannet's timetable on the Wharf.
     attachArrivals(this, { zone: this.zone, clock: this.clock, residents: this.residents, board: this.town,
       refreshBoard: () => this.town?.refresh(this.townLook()), toast: text => this.showToast(text) });
+    // G-11: the Bloom Fair on the Commons, the Straw Poll's card, the End-of-Spring report.
+    attachFinale(this, { zone: this.zone, clock: this.clock, residents: this.residents, projection: this.projection, busy: () => this.transitioning });
     this.askAction = null;
     this.projectCache = { at: 0, key: '', project: null, ask: null };
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E') as Record<string, Phaser.Input.Keyboard.Key>;
@@ -486,7 +516,7 @@ export class ZoneScene extends Phaser.Scene {
   }
 
   private resetLight(): void {
-    this.town = undefined; this.life = undefined; this.placeLabels = []; this.lookAt = 0;
+    this.town = undefined; this.life = undefined; this.room = undefined; this.placeLabels = []; this.lookAt = 0;
     this.lamps = []; this.sunCasts = []; this.lampCasts = []; this.lampGlows = []; this.windowGlows = []; this.fog = [];
     this.lampLevel = 0; this.lightKey = NaN; this.shadowDirty = true; this.aimedFor = undefined; this.hudIcon = '';
   }
@@ -622,25 +652,31 @@ export class ZoneScene extends Phaser.Scene {
     const override = this.registry.get(WEATHER_OVERRIDE_KEY) as WeatherKind | 'auto' | undefined;
     this.now = override && override !== 'auto' ? { kind: override, intensity: 1 } : weatherAt(this.daily, minute);
     const { kind, intensity } = this.now;
-    const dark = darkness(day, minute);
+    const outdoorDark = darkness(day, minute);
     sunShadow(sunPosition(day, minute), 1 + (SUN_SHADE[kind] - 1) * intensity, this.sun);
+    // Indoors (W-03): no sun shadows, lamps lit a little all day, a lamplit night (scenes/zone/indoors.ts).
+    const indoor = this.zone.interior ? indoorLight(outdoorDark, this.now) : null;
+    if (indoor) this.sun.alpha = 0;
+    const dark = indoor ? indoor.dark : outdoorDark;
     for (const { cast, src } of this.sunCasts) {
       castFrom(cast, src, this.sun);
       cast.setAlpha(this.sun.alpha).setVisible(this.sun.alpha > 0.004);
     }
     // Lamps come on as the light goes.
-    this.lampLevel = clamp01((dark - 0.12) / 0.3);
-    const on = this.lampLevel > 0.005, grey = Math.round(this.lampLevel * 255) * 0x010101;
+    this.lampLevel = indoor ? indoor.lampLevel : clamp01((dark - 0.12) / 0.3);
+    const on = this.lampLevel > 0.005, grey = Math.round(this.lampLevel * (indoor ? indoor.glow : 1) * 255) * 0x010101;
     for (const glow of this.lampGlows) glow.setVisible(on).setTint(grey);
     for (const glow of this.windowGlows) glow.setVisible(on).setTint(grey);
     this.windowPanes.setVisible(on).setAlpha(this.lampLevel);
     for (const { cast, alpha } of this.lampCasts) cast.setVisible(on).setAlpha(alpha * this.lampLevel);
-    this.town?.applyLight({ sun: this.sun, lampLevel: this.lampLevel, dark });
+    this.town?.applyLight({ sun: this.sun, lampLevel: indoor ? indoor.shadowLevel : this.lampLevel, dark });
     this.lightKind = { dark, sunny: (kind === 'sun' || kind === 'wind') && intensity > 0.3, wet: kind === 'rain' || kind === 'snow' || kind === 'fog' };
     this.nightLayer.setVisible(dark > 0.004).setAlpha(dark);
-    const weather = mixColor(0xffffff, WEATHER_GRADE[kind], intensity * (1 - 0.5 * dark));
-    const warm = mixColor(0xffffff, minute < SOLAR_NOON ? DAWN_GRADE : DUSK_GRADE, 0.6 * twilightGlow(day, minute));
-    const grade = mulColor(weather, warm);
+    if (indoor) this.nightLayer.setTint(indoor.nightTint);
+    this.room?.applyLight({ dark: outdoorDark, twilight: twilightGlow(day, minute), grey: indoor?.grey ?? 0 });
+    const weather = mixColor(0xffffff, WEATHER_GRADE[kind], intensity * (1 - 0.5 * dark) * (indoor ? 0.45 : 1));
+    const warm = mixColor(0xffffff, minute < SOLAR_NOON ? DAWN_GRADE : DUSK_GRADE, (indoor ? 0.35 : 0.6) * twilightGlow(day, minute));
+    const grade = indoor ? mulColor(mulColor(weather, warm), indoor.grade) : mulColor(weather, warm);
     this.gradeLayer.setTint(grade).setVisible(grade !== 0xffffff);
     this.applyWeather(force);
     this.updateHud(dark, override !== undefined && override !== 'auto');
@@ -678,7 +714,8 @@ export class ZoneScene extends Phaser.Scene {
 
   private applyWeather(prefill: boolean): void {
     if (this.aimedFor !== this.daily) { this.aimedFor = this.daily; this.aimWeather(this.daily); }
-    const { kind, intensity } = this.now;
+    // Indoors nothing falls (the windows show the sky: render/town/InteriorRoom).
+    const { kind, intensity } = this.zone.interior ? { kind: 'sun' as WeatherKind, intensity: 0 } : this.now;
     const rate = (emitter: Emitter, level: number, perSecond: number, perSecondAtFull: number, prefillMs: number) => {
       if (level <= 0.01) { if (emitter.emitting) emitter.stop(); return; }
       emitter.frequency = 1000 / (perSecond + (perSecondAtFull - perSecond) * level);
@@ -862,7 +899,7 @@ export class ZoneScene extends Phaser.Scene {
     // Explicit follow uses the patch's top-left zoom pivot and bounds clamp.
     const camera = this.cameras.main;
     // On the town's pixel art, scroll in whole device pixels so no art pixel ever shimmers between widths.
-    const snap = this.town ? (v: number) => Math.round(v * RENDER_SCALE) / RENDER_SCALE : (v: number) => v;
+    const snap = this.town ? (v: number) => Math.round(v * camera.zoom) / camera.zoom : (v: number) => v;
     camera.setScroll(snap(camera.clampX(this.figure.x - camera.displayWidth / 2)), snap(camera.clampY(this.figure.y - camera.displayHeight / 2)));
   }
   /** When the town last chose its music (ms of scene time); checked about once a second. */
@@ -874,7 +911,9 @@ export class ZoneScene extends Phaser.Scene {
     this.musicCheckedAt = time;
     if (musicHeld(this)) return;
     const { day, minute } = this.clock;
-    getMusic(this).play(ambientTrack({ zone: this.zone.id, day, minute, darkness: darkness(day, minute) }));
+    const music = ambientMusic({ zone: districtOf(this.zone), day, minute, darkness: darkness(day, minute), ...(this.zone.interior ? { room: this.zone.interior } : {}) });
+    getMusic(this).setLevel(music.level);
+    getMusic(this).play(music.track);
   }
 
   update(time: number, delta: number): void {
@@ -912,27 +951,52 @@ export class ZoneScene extends Phaser.Scene {
     // Residents take precedence over doors.
     const talk = this.residents.talkTarget(this.position);
     const mark = talk ? undefined : markInteraction(this, this.clock, this.zone, this.position, { weather: this.now.kind, wind: this.daily.wind });
-    const place = talk || mark ? undefined : nearbyPlace(this.zone, this.position);
-    const economy = place ? (favorInteraction(this.registry, this.clock, `${this.zone.id}.${place.id}`) ?? this.economy.interaction(`${this.zone.id}.${place.id}`)) : null;
+    // A door with a room behind it (W-03): E (or walking up into it) goes in; the place's own business is inside. A locked
+    // one is a doorstep as before (scenes/zone/indoors.ts), saying why when you try it.
+    const link = talk || mark ? undefined : doorAt(doorLinks, this.zone, this.position);
+    const locked = link ? doorLocked(this.registry, link) : null;
+    const door = locked ? undefined : link;
+    const place = talk || mark || door ? undefined : nearbyPlace(this.zone, this.position);
+    const here = districtOf(this.zone);
+    const economy = place ? (favorInteraction(this.registry, this.clock, `${here}.${place.id}`) ?? this.economy.interaction(`${here}.${place.id}`)) : null;
     // G-03: a Project's next thing at its site (with the place's own job as a choice), and H's asks beside a resident.
     // Recomputed a few times a second (they read the Projects, the Bag and the flags).
     const cacheKey = `${place?.id ?? ''}|${talk?.id ?? ''}|${economy?.label ?? ''}`;
     if (time - this.projectCache.at > 200 || cacheKey !== this.projectCache.key) {
       this.projectCache = { at: time, key: cacheKey,
-        project: place ? this.projects.interaction(`${this.zone.id}.${place.id}`, economy) : null,
+        project: place ? this.projects.interaction(`${here}.${place.id}`, economy) : null,
         ask: talk ? this.projects.ask(talk.id) : null };
     }
     const project = place ? this.projectCache.project : null;
     this.askAction = talk ? this.projectCache.ask : null;
-    const puzzle = place ? puzzleInteraction(this, this.clock, `${this.zone.id}.${place.id}`, project) : null;
+    const puzzle = place ? puzzleInteraction(this, this.clock, `${here}.${place.id}`, project) : null;
     const scuffle = !talk && !mark ? scuffleInteraction(this, this.clock, this.zone, this.position) : null;
-    this.prompt.setText(scuffle ? `E: ${scuffle.label}` : talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : place ? `E: ${puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!scuffle || !!talk || !!mark || !!place);
-    this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? puzzle?.run ?? project?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined));
+    const goIn = door ? (): void => this.goInside(door) : undefined;
+    this.prompt.setText(scuffle ? `E: ${scuffle.label}` : talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : door ? `E: Go into ${placeName(door.building)}` : place ? `E: ${puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!scuffle || !!talk || !!mark || !!door || !!place);
+    this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? goIn ?? (place ? puzzle?.run ?? project?.run ?? (locked ? () => this.showToast(locked) : () => console.log(`${here}.${place.id}`)) : undefined));
+    const entering = !scuffle && !talk ? walkingIn(doorLinks, this.zone, this.position, input) : undefined;
+    if (entering && !result.edge) { this.goInside(entering); return; }
     if (result.edge) {
       this.transitioning = true;
       const edge = result.edge;
+      // Out of a room through its doorway: the door shuts behind you.
+      if (this.zone.interior) playSfx('door_close');
       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ zone: edge.zone, arrive: edge.arrive }));
       this.cameras.main.fadeOut(400);
     }
+  }
+
+  /** Through a building's door into its room (W-03): the same 0.4 s fade as an edge (§16.4), unless it's locked. */
+  private goInside(link: (typeof doorLinks)[number]): void {
+    if (this.transitioning) return;
+    const locked = doorLocked(this.registry, link);
+    if (locked) {
+      if (this.time.now - this.lockedAt > 4000) { this.lockedAt = this.time.now; this.showToast(locked); }
+      return;
+    }
+    this.transitioning = true;
+    playSfx('door_open');
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ zone: link.interior, arrive: link.inside }));
+    this.cameras.main.fadeOut(400);
   }
 }

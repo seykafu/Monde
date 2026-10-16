@@ -35,7 +35,7 @@ STYLE = (
     "use pictograms only). The ENTIRE background is one flat, solid, pure magenta (#FF00FF): no gradient, no "
     "glow, no vignette.")
 FADED = (
-    "The attached image is a building from our game. Draw EXACTLY the same building from exactly the same angle, "
+    "The attached image is a building or object from our game. Draw EXACTLY the same thing from exactly the same angle, "
     "same size, shape, outline, roof, windows and doors, in the same pixel-art style, on the same flat pure "
     "magenta (#FF00FF) background, but in its neglected Day-1 state: {state} Keep it cozy-sad rather than grim. "
     "No text.")
@@ -55,6 +55,8 @@ SHUTTERED = "shutters closed, peeling paint, a few slates missing, an empty wind
 SHOP = ("a narrow two-storey shopfront on a market street, {colour} paint, a big shop window with a {awning} striped "
         "awning, a hanging pictogram sign (no letters), a glazed door, a flat above with one window, slate roof")
 SHOP_SHUT = "the awning rolled up and torn, the shop window boarded with planks, the sign gone, paint peeling."
+INDOOR = ("indoor furniture for a cozy room, seen at the same 3/4 top-down angle STRAIGHT FROM THE FRONT (its front face "
+          "square to the viewer, its top visible receding behind it, no side faces): ")
 
 TOWN: dict[str, dict] = {
     # ---- Old Quarter
@@ -239,6 +241,97 @@ TOWN: dict[str, dict] = {
                          "as it is wide, in a white-painted iron frame; the glass is frosted milky white with a "
                          "little lantern etched clear into the frost in its middle; seen straight from the front",
                          0.4),
+    # ---- Interiors (MVP W-03): furniture and fixtures for the walk-in rooms. The rooms' floors and walls are drawn
+    # in code (render/town/interiorArt.ts); these stand on them like the town's props, front-facing 3/4.
+    # The cottage
+    "bed": prop(INDOOR + "a single wooden bed with a carved headboard, a patchwork quilt in blues and creams, one plump "
+                "white pillow, seen from its foot end so the quilt runs back to the headboard", 1.4),
+    "stove": prop(INDOOR + "a small black cast-iron kitchen range on little legs, a brass rail, a copper kettle on the hob, "
+                  "a stovepipe rising from its back, a warm orange glow behind the little firebox door", 1.2),
+    "kitchen_table": prop(INDOOR + "a small square scrubbed-pine kitchen table with two plain wooden chairs, a brown teapot, "
+                          "two cups and a jam jar of wildflowers on it", 1.6),
+    "chest": prop(INDOOR + "a wooden storage chest with iron bands and a hasp, the lid closed", 1.0),
+    "armchair": prop(INDOOR + "a cosy wing-backed armchair in faded green fabric with a knitted blanket over one arm", 1.1),
+    "dresser": prop(INDOOR + "a tall painted Welsh dresser: plates standing on its open shelves above, two cupboard doors "
+                    "and drawers below, a jug and a bowl on the counter", 1.6),
+    "wall_shelf": prop(INDOOR + "a short wooden wall shelf on two iron brackets holding three jars, a few books and a small "
+                       "trailing plant (only the shelf and what is on it, no wall)", 1.3),
+    "potted_plant": prop(INDOOR + "a tall leafy house plant with big glossy leaves in a terracotta pot", 0.8),
+    "oil_lamp": prop(INDOOR + "a brass oil lamp with a glass chimney and a warm glowing flame, standing on a small round "
+                     "wooden side table", 0.8),
+    "wall_lamp": prop(INDOOR + "a small brass wall lantern on a curled bracket with a glowing candle behind its glass (only "
+                      "the lantern and bracket, no wall)", 0.4),
+    "workbench": prop(INDOOR + "a sturdy wooden workbench with a vice at one end, hand tools hung on a rack along its back, "
+                      "a few brass gears and a coil of wire on its top", 2.0),
+    # Fournier & Fille
+    "bread_oven": prop(INDOOR + "a big old brick bread oven built into a wall: a round-arched oven mouth with a pale stone "
+                       "keystone at the top of the arch, a fire glowing deep inside, loaves on the hearth, a stack of "
+                       "split logs below, a wooden peel leaning beside it, a brick chimney breast rising above", 2.6),
+    "bakery_counter": prop(INDOOR + "a long wooden bakery shop counter with a glass-fronted display of croissants, tarts and "
+                           "round loaves, a little brass bell and a stack of paper bags on top", 3.0),
+    "bread_rack": prop(INDOOR + "a tall wooden shelf rack crowded with round crusty loaves, with baguettes standing in a "
+                       "basket on the bottom shelf", 1.5),
+    "flour_sacks": prop(INDOOR + "three plump burlap flour sacks slumped together, one with a wheat-sheaf pictogram", 1.0),
+    "kneading_table": prop(INDOOR + "a sturdy wooden baker's work table dusted with flour, a round of dough, a wooden "
+                           "rolling pin and a big mixing bowl on top, baskets underneath", 2.0),
+    # Café Liss
+    "espresso_counter": prop(INDOOR + "a cafe counter in pale wood with a gleaming brass espresso machine, stacked white "
+                             "cups, a cake stand with a glass dome over a lemon cake", 3.0),
+    "cafe_table": prop(INDOOR + "a small round marble-topped cafe table on a black iron stand with two bentwood chairs, a "
+                       "cup and saucer on it", 1.4),
+    # The Gull & Anchor
+    "bar_counter": prop(INDOOR + "a long dark-wood pub bar counter with three brass beer pumps, a few pint glasses and a brass "
+                        "foot rail along the bottom", 4.0),
+    "bar_stool": prop(INDOOR + "a single round wooden bar stool", 0.5),
+    "pub_table": prop(INDOOR + "a heavy round dark-wood pub table with two wooden stools and two pewter tankards on it", 1.6),
+    "beer_barrels": prop(INDOOR + "three wooden beer barrels lying on their sides on a low wooden rack, brass taps in their "
+                         "ends", 1.6),
+    "fireplace": prop(INDOOR + "a stone fireplace with a cheerful log fire, a heavy wooden mantel with a ship in a bottle and "
+                      "two candlesticks on it, a brass fender", 2.2),
+    # Dunmore's General Store
+    "store_shelves": prop(INDOOR + "a tall wooden shop shelving unit packed with glass jars, tins, packets, bottles and rolls "
+                          "of string (no labels or text)", 2.0),
+    "store_counter": prop(INDOOR + "a wooden shop counter with a brass cash register (no numbers), a kitchen weighing scale, "
+                          "a big glass jar of sweets and a stack of brown paper bags", 3.0),
+    "produce_crates": prop(INDOOR + "a low wooden stand holding open crates of apples, potatoes, carrots and cabbages", 1.5),
+    # The Monde Free Library
+    "bookshelf": prop(INDOOR + "a tall dark-wood bookcase full of colourful books, a few lying flat, a small brass plant pot "
+                      "on top", 2.0),
+    "reading_table": prop(INDOOR + "a long polished library reading table with two green-shaded brass lamps, open books and "
+                          "four wooden chairs tucked in", 2.6),
+    "card_catalogue": prop(INDOOR + "a wooden library card catalogue cabinet with many little drawers, each with a brass "
+                           "handle and a blank label holder", 1.2),
+    "librarian_desk": prop(INDOOR + "a curved wooden library desk with a rubber stamp and ink pad, two stacks of books, a "
+                           "small brass bell and a reading lamp", 2.4),
+    # The Lantern
+    "printing_press": prop(INDOOR + "an old black cast-iron hand-operated printing press (an Albion press) with a long curved "
+                           "pulling bar, a flat bed and a brass eagle finial on top", 1.9,
+                           "the same press dusty and forgotten: grey with dust, cobwebs between its frame and the bar, a "
+                           "torn dust sheet half slipped off it."),
+    "type_cases": prop(INDOOR + "a printer's wooden type cabinet: sloping trays of tiny metal type on top and many shallow "
+                       "drawers below", 2.0),
+    # Town Hall
+    "office_desk": prop(INDOOR + "a big polished mahogany desk with a green leather top, an inkwell, a black rotary telephone, "
+                        "a stack of papers and a small brass desk lamp", 2.4),
+    "pigeonholes": prop(INDOOR + "a tall wooden pigeonhole cabinet, every pigeonhole full of rolled documents, folded papers "
+                        "and ledgers", 2.0),
+    "registry_counter": prop(INDOOR + "a long panelled wooden public counter with a brass service bell and a big open ledger "
+                             "on top", 3.0),
+    # Achterberg Horlogerie
+    "clock_wall": prop(INDOOR + "a tall wooden display panel hung with a dozen clocks of every shape: round, square, a "
+                       "cuckoo clock, a sunburst, little pendulums, every one showing a different time (no numerals)", 2.4),
+    "grandfather_clock": prop(INDOOR + "a tall longcase grandfather clock in dark wood with a brass pendulum behind a glass "
+                              "door (no numerals)", 0.6),
+    "watch_counter": prop(INDOOR + "a glass-topped watchmaker's shop counter, pocket watches laid on blue velvet inside it, "
+                          "a jeweller's loupe and tiny tools on top", 2.4),
+    # The boathouse
+    "pilot_gig": prop(INDOOR + "a long slim wooden six-oared rowing gig lying UPSIDE DOWN on two wooden trestles, seen from "
+                      "the side, its keel along the top, varnished planks, no name or letters", 5.0),
+    "oars_rack": prop(INDOOR + "a wooden rack of long oars standing upright, a red-and-white lifebuoy hanging from it", 1.2),
+    # The flats over the shops (§9.5 bakery_flat, margo_flat, pub_rooms...): the stairs up, against a back wall
+    "staircase": prop(INDOOR + "a narrow wooden staircase with a turned banister, climbing from left to right up along a "
+                      "back wall to a small landing and a closed door at the top (only the stairs, banister, landing and "
+                      "door, no wall)", 2.0),
     # ---- Life
     "duck": prop("a single white farmyard duck, standing", 0.4),
     "gull": prop("a single seagull standing", 0.4),

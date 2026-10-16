@@ -41,7 +41,7 @@ import type { Clock } from '../sim/clock';
 import { hashString } from '../sim/plans';
 import type { ResidentState } from '../sim/routineExecutor';
 import type { WeatherNow } from '../sim/weather';
-import type { ZoneDef } from '../world/zoneFormat';
+import { districtOf, type ZoneDef } from '../world/zoneFormat';
 import { personaCards } from '../world/residents';
 import { displayName } from '../sim/residentSim';
 import { Rng } from '../util/rng';
@@ -609,7 +609,7 @@ export class DialogueScene extends Phaser.Scene {
     // event log or flag store, so Quiet Mode speaks at an even mood, with no town event and no flags set. Regard is
     // the client's mirror (scenes/friendship.ts): the last the server reported, or the Background's start.
     const { kind: _kind, ...context } = quietContext({
-      kind: 'talk', day: clock.day, minute: clock.minute, weather: weather.kind, zone: zone.id, valence: 0, regard: regardFor(this.registry, this.card.id),
+      kind: 'talk', day: clock.day, minute: clock.minute, weather: weather.kind, zone: districtOf(zone), valence: 0, regard: regardFor(this.registry, this.card.id),
       event: null, speaker: { id: this.card.id, name: this.card.name }, player: getMind().playerName, residents: FIRST_NAMES
     });
     const rng = new Rng(hashString(`${this.conversationId}:${turnIndex}`));

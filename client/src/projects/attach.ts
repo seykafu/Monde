@@ -34,7 +34,7 @@ import type { StoryHint } from '../story/hint';
 import { homeDirectory } from '../world/homes';
 import { homeKey, homeKind, isOccupied } from '../town/occupancy';
 import { nearbyPlace, placeName, type Position } from '../world/player';
-import type { ZoneDef } from '../world/zoneFormat';
+import { districtOf, type ZoneDef } from '../world/zoneFormat';
 import { zones } from '../world/zones';
 import { FAMILY_BODY, FAMILY_UI, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { regardFor } from '../scenes/friendship';
@@ -143,6 +143,16 @@ interface Worker { hammer: Phaser.GameObjects.Image; phase: number; nextDust: nu
 export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions): ProjectsAttachment {
   const { zone, clock, residents, projection } = opts;
   const registry = scene.registry;
+  // In a room (W-03) the Projects are its district's: E at the site's place inside, the opening in the room. The
+  // chalk planks and the volunteers at work stay on the street, where their work areas are.
+  const district = districtOf(zone), indoor = !!zone.interior;
+  /** A site as this board has it: indoors its work area is the room's place (where the crowd gathers for an opening). */
+  const onBoard = (site: Site): Site => {
+    if (!indoor) return site;
+    const local = site.place.slice(site.place.indexOf('.') + 1);
+    const rect = (zone.places.find(p => p.id === local) ?? zone.places[0])?.rect;
+    return rect ? { ...site, work: { ...site.work, area: rect } } : site;
+  };
   attachProjectsClock(registry, clock);
   installShifts(residents.sim, registry);
   const now = () => ({ day: clock.day, minute: clock.minute });
@@ -160,7 +170,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
   const here = (): { id: string; def: ProjectDef; progress: E.Progress; site: Site }[] =>
     E.begun(PROJECTS, projectsOf(registry)).flatMap(b => {
       const site = siteFor(b.def, b.progress);
-      return site && site.zone === zone.id ? [{ ...b, site }] : [];
+      return site && site.zone === district ? [{ ...b, site }] : [];
     });
 
   // ── Beats ─────────────────────────────────────────────────────────────────
@@ -249,7 +259,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
   const decorations: Phaser.GameObjects.GameObject[] = [];
   const presentAt = (site: Site): string[] => residents.sim.profiles.map(p => p.id).filter(id => {
     const s = residents.stateOf(id);
-    return !!s?.position && s.zone === zone.id && !s.traveling && inArea(site.work.area, s.position, 3);
+    return !!s?.position && s.zone === zone.id && !s.traveling && inArea(onBoard(site).work.area, s.position, 3);
   });
 
   const bunting = (site: Site): void => {
@@ -313,12 +323,12 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
       if (opened) return;
       opened = openProject(registry, now(), id, present);
       opts.refreshBoard();
-      confetti(site);
+      confetti(onBoard(site));
       sfxCineChime();
       scene.time.delayedCall(250, () => playSfx('applause_warm'));
       scene.time.delayedCall(900, () => playSfx('cheer_small'));
     };
-    bunting(site);
+    bunting(onBoard(site));
     playSfx('murmur');
     const lead = def.leads[0]!;
     const steps: BeatStep[] = [];
@@ -454,7 +464,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
     const def = E.defOf(PROJECTS, E.HOMES);
     const local = place.slice(place.indexOf('.') + 1);
     if (!def || !/^vacant_house_\d+$/.test(local) || clock.day < (def.opens.day ?? 1)) return null;
-    const key = homeKey(zone.id, local);
+    const key = homeKey(district, local);
     const flags = flagsOf(registry);
     if (homeKind(key, homeDirectory) !== 'vacant' || isOccupied(key, homeDirectory, { flag: f => flags.has(f) }) || flags.has(`project_${local}_done`)) return null;
     if (projectsOf(registry).projects[E.homesId(key)]) return null;
@@ -473,7 +483,8 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
     for (const h of here()) if (h.site.place === place && h.progress.opened === null) options.push(...siteActions(h.id, h.def, h.progress, h.site));
     const homes = homesAt(place);
     if (homes) options.push(homes);
-    if (place === 'old_quarter.town_hall' && pellIn()) for (const id of awaitingSign()) {
+    // At the Town Hall's counter or in Pell's office itself (W-03: both are inside the Town Hall).
+    if ((place === 'old_quarter.town_hall' || place === 'old_quarter.mayor_office') && pellIn()) for (const id of awaitingSign()) {
       const def = E.defOf(PROJECTS, id)!;
       options.push({ label: `Pell's office: ask her to sign for ${projectName(def, projectsOf(registry).projects[id])} (${def.fund} coins)`, run: () => signoffBeat(id) });
     }
@@ -520,7 +531,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
       const [zoneId = ''] = site.place.split('.');
       const pn = sitePlaceName(site.place), zn = zones[zoneId]?.name ?? zoneId;
       const open = t.minute >= c.minute;
-      const where = zoneId === zone.id ? pn : `${pn}, ${zn}`;
+      const where = zoneId === district ? pn : `${pn}, ${zn}`;
       const when = open ? `before ${hhmm(c.minute + E.CEREMONY_WINDOW)}` : `${hhmm(c.minute)}–${hhmm(c.minute + E.CEREMONY_WINDOW)}`;
       const named = projectName(def, progress);
       const reason = `${capitalize(named)} ${isPlural(named) ? 'open' : 'opens'}.`;
@@ -550,6 +561,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
   };
 
   const syncArt = (): void => {
+    if (indoor) return;
     const state = projectsOf(registry);
     if (state === lastState) return;
     lastState = state;
@@ -583,7 +595,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
   /** Who's working at a site on this board now, and where (the executor's position). */
   const atWork = (): { id: string; x: number; y: number; site: Site }[] => {
     const { shifts } = shiftsFor(registry, clock.day);
-    if (!shifts.length) return [];
+    if (!shifts.length || indoor) return [];
     const sites = here().filter(h => h.progress.opened === null);
     const out: { id: string; x: number; y: number; site: Site }[] = [];
     for (const s of shifts) {
@@ -660,7 +672,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
       const door = nearbyPlace(zone, pos);
       for (const h of here()) {
         if (!E.ceremonyOpen(h.progress, t)) continue;
-        const atSite = inArea(h.site.work.area, pos, 2) || (door && `${zone.id}.${door.id}` === h.site.place);
+        const atSite = inArea(onBoard(h.site).work.area, pos, 2) || (door && `${district}.${door.id}` === h.site.place);
         if (atSite) { startCeremony(h.id); return; }
       }
     }

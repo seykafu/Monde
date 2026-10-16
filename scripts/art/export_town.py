@@ -69,6 +69,20 @@ SIZE: dict[str, tuple[str, int]] = {
     "lantern_pane": ("h", 24), "clock_window": ("w", 24),
     # life
     "duck": ("h", 22), "gull": ("h", 22), "cat_sleeping": ("w", 28),
+    # interiors (W-03): furniture against the 55 px resident (a counter is waist-high, about 0.6 of a person; a tall
+    # bookcase or dresser about 1.8; a bed or a table about a tile and a half wide)
+    "bed": ("w", 64), "stove": ("h", 84), "kitchen_table": ("w", 82), "chest": ("w", 44), "armchair": ("h", 52),
+    "dresser": ("h", 100), "wall_shelf": ("w", 58), "potted_plant": ("h", 58), "oil_lamp": ("h", 50), "wall_lamp": ("h", 32),
+    "workbench": ("w", 96), "staircase": ("w", 104),
+    "bread_oven": ("w", 100), "bakery_counter": ("w", 144), "bread_rack": ("h", 100), "flour_sacks": ("w", 50),
+    "kneading_table": ("w", 96), "espresso_counter": ("w", 128), "cafe_table": ("w", 66),
+    "bar_counter": ("w", 190), "bar_stool": ("h", 30), "pub_table": ("w", 74), "beer_barrels": ("w", 76), "fireplace": ("w", 104),
+    "store_shelves": ("h", 120), "store_counter": ("w", 144), "produce_crates": ("w", 70),
+    "bookshelf": ("h", 120), "reading_table": ("w", 124), "card_catalogue": ("w", 54), "librarian_desk": ("w", 116),
+    "printing_press": ("w", 88), "type_cases": ("w", 96),
+    "office_desk": ("w", 116), "pigeonholes": ("h", 110), "registry_counter": ("w", 144),
+    "clock_wall": ("h", 112), "grandfather_clock": ("h", 104), "watch_counter": ("w", 116),
+    "pilot_gig": ("w", 236), "oars_rack": ("h", 100),
 }
 
 

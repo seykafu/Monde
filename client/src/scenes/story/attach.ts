@@ -29,8 +29,10 @@ import { placeName, type Position } from '../../world/player';
 import { personaCards } from '../../world/residents';
 import { findCard, resolveAlias } from '../../world/roster';
 import { firstArrival } from '@monde/shared';
-import type { Point, ZoneDef } from '../../world/zoneFormat';
-import { zones } from '../../world/zones';
+import { districtOf, type Point, type ZoneDef } from '../../world/zoneFormat';
+import { doorLinks, interiors, zones } from '../../world/zones';
+import { placeArrival } from '../../world/interiors';
+import { doorLocked } from '../zone/indoors';
 import { DIALOGUE_SCENE } from '../DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE, type StoryOpen } from '../StoryScene';
 import { TOWN_KEY, TOWN_LEDGER_SCENE, getTown } from '../TownLedgerScene';
@@ -98,6 +100,12 @@ const fellowProfile = (registry: Phaser.Data.DataManager): FellowProfile | null 
 export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): StoryAttachment {
   const { zone, clock, residents } = opts;
   const registry = scene.registry;
+  // A room's places, triggers and hints are its district's (W-03): inside the bakery is market_row. A building with a
+  // room is entered for its scenes: its doorstep outside is the street.
+  const district = districtOf(zone);
+  // A locked door (the cottage before S01c's keys) is still a doorstep: its scene plays there.
+  const links = doorLinks.filter(l => l.district === zone.id);
+  const placeHere = (p: Position) => placeAt(zone, p, new Set(links.filter(l => !doorLocked(registry, l)).map(l => l.building)));
   const held = heldFor(scene, clock);
   const session = held.session;
 
@@ -119,7 +127,7 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
   const world: StoryWorld = {
     readRiddle: id => { findMark(registry, clock, id); return marks(registry).entries[id]?.status === 'solved'; },
     now: () => ({
-      day: clock.day, minute: clock.minute, zone: zone.id, place: placeAt(zone, opts.position()), town: getTown(registry), profile: fellowProfile(registry),
+      day: clock.day, minute: clock.minute, zone: district, place: placeHere(opts.position()), town: getTown(registry), profile: fellowProfile(registry),
       regard: Object.fromEntries(personaCards.map(c => [c.id, regardFor(registry, c.id)])),
       ...storyArrival(registry, clock.day)
     }),
@@ -136,10 +144,10 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     },
     checkpoint: key => requestCheckpoint(key),
     travel: place => {
-      const [zoneId = '', placeId = ''] = place.split('.');
-      const door = zones[zoneId]?.places.find(p => p.id === placeId)?.door;
-      if (!door) { console.warn(`[story] can't travel to ${place}`); return; }
-      scene.scene.restart({ zone: zoneId, arrive: door });
+      // Into the place's room when it has one (W-03), else to its door.
+      const to = placeArrival(zones, interiors, place);
+      if (!to) { console.warn(`[story] can't travel to ${place}`); return; }
+      scene.scene.restart({ zone: to.zone, arrive: to.arrive });
     },
     zoneName: id => zones[id]?.name ?? id,
     projectCue: (id, sceneId) => projectCue(registry, { day: clock.day, minute: clock.minute }, id, sceneId),
@@ -183,22 +191,22 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
   if (DEV) installDevTools(session, check);
   check(); // zone entry
 
-  let lastPlace = placeAt(zone, opts.position());
+  let lastPlace = placeHere(opts.position());
   let hintKey = '';
   let hint: StoryHint | null = null;
   return {
     update(position) {
-      const place = placeAt(zone, position);
+      const place = placeHere(position);
       if (place === lastPlace) return;
       lastPlace = place;
       check(); // place entry
     },
     hint() {
       const done = session.director.serialize().completed;
-      const key = `${clock.day}:${clock.minute}:${zone.id}:${session.active ?? ''}:${session.flags.serialize().join(',')}:${done.length}`;
+      const key = `${clock.day}:${clock.minute}:${district}:${session.active ?? ''}:${session.flags.serialize().join(',')}:${done.length}`;
       if (key === hintKey) return hint;
       hintKey = key;
-      const context = { ...session.context(), zone: zone.id, place: lastPlace };
+      const context = { ...session.context(), zone: district, place: lastPlace };
       hint = storyHint(session.scenes, context, session.flags, HINT_PLACES, new Set(done), session.active);
       registry.set(HINT_KEY, hint);
       return hint;

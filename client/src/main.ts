@@ -12,6 +12,8 @@ import { getMind } from "./mind/api";
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from "./util/constants";
 import { installRenderScale } from "./util/renderScale";
 import { TownBoard } from "./render/town/TownBoard";
+import { applySpringPreset, springPresetFromQuery } from "./finale/devPreset";
+import { parseClock } from "./sim/clock";
 
 installRenderScale();
 const game = new Phaser.Game({
@@ -32,6 +34,12 @@ const game = new Phaser.Game({
       ? [ZoneScene, TitleScene, FellowshipScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
       : [TitleScene, FellowshipScene, ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
 });
+
+// Dev (`?spring=strong|social|builder|lapsed|passive`, a dev build or `?dev`): start on Day 25 with that Spring behind
+// it (finale/devPreset.ts), for the Bloom Fair, the Straw Poll and the End-of-Spring report.
+const springQuery = new URLSearchParams(window.location.search);
+const springStyle = import.meta.env.DEV || springQuery.has("dev") ? springPresetFromQuery(springQuery) : null;
+if (springStyle) applySpringPreset(game.registry, springStyle, Number(springQuery.get("day")) || 25, parseClock(springQuery.get("time") ?? "") ?? 9 * 60);
 
 // Join (or create) this device's world on monde-mind; without an invite code the game plays in Quiet Mode.
 const mind = getMind();

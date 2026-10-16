@@ -13,7 +13,7 @@ vi.mock('../storage', async importOriginal => {
 vi.mock('../../mind/api', () => ({ getMind: () => ({
   playerName: 'Fellow', createSnapshot: async () => ({ world_id: null, branch_id: null, snapshot_id: null }), restoreSnapshot: async () => false
 }) }));
-function host(day = 1) {
+function host(day = 1, player = { zone: 'old_quarter', x: 5.5, y: 5.5, facing: 0 }) {
   const data = new Map<string, unknown>();
   const events = new EventEmitter();
   const keyboard = new EventEmitter();
@@ -22,7 +22,7 @@ function host(day = 1) {
   clock.onDawn(t => data.set('monde.town', runDawnsThrough(data.get('monde.town') as ReturnType<typeof createTownState>, t.day).state));
   const scene = { registry: { get: (k: string) => data.get(k), set: (k: string, v: unknown) => data.set(k, v), remove: (k: string) => data.delete(k) },
     events, input: { keyboard }, scene: { isActive: () => false, pause: vi.fn(), launch: vi.fn(), stop: vi.fn(() => events.emit('shutdown')), start: vi.fn() } };
-  attachSaves(scene as unknown as Phaser.Scene, clock, () => ({ zone: 'old_quarter', x: 5.5, y: 5.5, facing: 0 }), 42);
+  attachSaves(scene as unknown as Phaser.Scene, clock, () => ({ ...player }), 42);
   return { scene: scene as unknown as Phaser.Scene, data, clock, events };
 }
 beforeEach(async () => {
@@ -65,6 +65,16 @@ it('captures before asynchronous work and restores without retaining the outgoin
   resetGame(h.scene);
 });
 
+it('restores a save made inside a room (W-03) in the room, and refuses a position outside it', async () => {
+  const h = host(1, { zone: 'bakery_interior', x: 6.5, y: 7.5, facing: -1.5 });
+  await saveGame('manual:2', 'manual', 'In the bakery');
+  const file = (await saveStorage.read('manual:2'))!;
+  expect(file.player).toEqual({ zone: 'bakery_interior', x: 6.5, y: 7.5, facing: -1.5 });
+  await loadGame(h.scene, file);
+  expect(h.scene.scene.start).toHaveBeenCalledWith('Zone', { zone: 'bakery_interior', savedPlayer: file.player });
+  await expect(loadGame(h.scene, { ...file, player: { ...file.player, x: 30.5 } })).rejects.toThrow(/unavailable location/);
+  resetGame(h.scene);
+});
 
 it('New Game clears the entire economy, including daily gift and work limits', () => {
   const h = host();

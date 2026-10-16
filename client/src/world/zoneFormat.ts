@@ -6,6 +6,7 @@ import { TOWN_MANIFEST, metaOf, propBlock, type SpriteState, type TownManifest }
 import { scatter, type ScatterRule } from './scatter';
 import { canLetter } from '../render/town/lettering';
 import { DIORAMA_ELEV_STEP as ELEV, DIORAMA_TILE_H as TH, DIORAMA_TILE_W as TW } from '../render/dioramaConfig';
+import { RUG_COLOURS, WALL_STYLES, type RoomLook, type RugColour, type WallStyle } from '../render/town/roomArt';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Zone files (content/zones/*.zone.yaml), GDD §16.4. Two formats compile to the same ZoneDef.
@@ -56,6 +57,40 @@ import { DIORAMA_ELEV_STEP as ELEV, DIORAMA_TILE_H as TH, DIORAMA_TILE_W as TW }
 //       # `at` (default 1.5; 1 to 3), off doors and reachable from the spawn; at least two of them.
 //   edges:                   # as v1
 //   spawn: [x, y]
+//
+// Interiors (MVP W-03; GDD §16.4 "interiors of 10×8 to 20×14"): `kind: interior` makes the board a room behind a
+// building's door, in the same diorama projection, as a cutaway box. Its places are the district's (`district.place`):
+//
+//   format: 2
+//   kind: interior
+//   id: bakery_interior
+//   name: Fournier & Fille
+//   district: market_row      # whose places these are: the room's `bakery` is market_row.bakery
+//   building: bakery          # the building on the district's board whose door leads in (and back out to)
+//   size: [14, 10]
+//   terrain: |                # indoors: F floorboards  T tiles  Q stone flags  R rug  # wall (with any outdoor kind)
+//     ##############          #   the top rows of # are the back wall's face (seen square on); every other # is a
+//     ##############          #   wall cut through (side walls, the front wall, partitions), drawn as its top
+//     ##############
+//     #FFFFFFFFFFFF#
+//     #FFFFRRRRFFFF#
+//     ######F#######          #   the doorway: the one floor cell in the front (bottom) row
+//   door: [6, 9]              # the doorway; walk out through it to the building's door outside
+//   room: { wall: brick, rug: red, windows: [3, 10] }   # wall: plaster | paper | brick | panel | stone | timber;
+//                             # rug: red | blue | green | gold; windows: back-wall columns with a window
+//   props:                    # furniture, as town props (lift hangs a lamp or a shelf on the back wall)
+//   places:                   # the district's places in this room: { id, rect, door } (door: where E acts on it)
+//     - { id: bakery, rect: [1, 3, 12, 6], door: [9, 4] }
+//   upstairs: [bakery_flat]   # rooms over this one (§9.5): residents there are out of sight
+//   spots:                    # where residents stand inside: a post of their own (who:), else the first free spot
+//     - { at: [6, 4], who: [odile] }
+//     - { at: [3, 6] }
+//   music: cottage            # optional: the room's own track (audio/musicDirector.ts); `quiet: true` plays the
+//                             # district's track softly
+//   spawn: [6, 8]             # optional: where you arrive (default: just inside the doorway)
+//
+// An interior has no buildings or edges of its own; its way out is the doorway (an edge south to the district, linked to
+// the building's door by world/interiors.ts). Every place, spot and Mark must be reachable from the doorway.
 //
 // Collision is the ground (water and solid legend entries), building footprints and solid props (a prop's
 // `block` in townSprites.ts, or `solid:`). Every door and edge cell must be walkable and reachable from the
@@ -171,7 +206,40 @@ export interface ZoneDef extends MapDef {
   marks: readonly MarkSpot[];
   /** Gathering spots (`social:`), in file order. Empty on a v1 greybox. */
   social: readonly SocialSpot[];
+  /** Interiors (`kind: interior`): the room behind a building's door. */
+  interior?: InteriorDef;
+  /** Whose places these are: the building's district indoors; absent outdoors (the zone's own id). */
+  district?: string;
 }
+
+/** Where a resident stands inside a room (`spots:`): a post of their own, or anyone's. */
+export interface IndoorSpot {
+  at: Point;
+  /** Only these residents (their post: Odile behind the counter). Empty: anyone. */
+  who: readonly string[];
+  /** Only while their plan has them at this place (a local id of the room's places). */
+  place?: string;
+}
+
+/** An interior's link to its building and how it looks (zone `kind: interior`). */
+export interface InteriorDef {
+  /** The district whose places the room's are (`market_row`). */
+  district: string;
+  /** The building's place id on the district's board (`bakery`): its door leads in. */
+  building: string;
+  /** The doorway: the floor cell in the front wall. */
+  door: Point;
+  room: RoomLook;
+  /** Rooms over this one (§9.5 flats): residents there are out of sight. Local ids. */
+  upstairs: readonly string[];
+  spots: readonly IndoorSpot[];
+  /** The room's own music (a track key), if any; `quiet` plays the district's softly. */
+  music?: string;
+  quiet: boolean;
+}
+
+/** The district a board's places belong to (`zone.place`): an interior's building's, else the board's own. */
+export const districtOf = (zone: Pick<ZoneDef, 'id' | 'district'>): string => zone.district ?? zone.id;
 
 /** The Marks on a board, typed (the riddle system reads these). */
 export const zoneMarks = (zone: Pick<ZoneDef, 'marks'>): readonly MarkSpot[] => zone.marks;
@@ -302,6 +370,10 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
   const f = frame(raw);
   const { width, height } = f;
   const id = string(raw.id);
+  check(raw.kind === undefined || raw.kind === 'interior', `${id}: kind is interior (or left out for an outdoor board)`);
+  const indoor = raw.kind === 'interior';
+  check(!indoor || raw.buildings === undefined, `${id}: a room has no buildings in it`);
+  check(!indoor || raw.edges === undefined, `${id}: a room's way out is its door, not edges`);
   const at = (x: number, y: number) => y * width + x;
 
   // Ground.
@@ -449,9 +521,15 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
   };
   const walkable = ([x, y]: Point) => f.inside([x, y]) && walkableAt(x, y);
   places.forEach(p => check(walkable(p.door), `Door on solid tile: ${p.id}`));
-  const spawn = f.point(raw.spawn);
+  // An interior: its doorway in the front wall, and the way out through it (linked to the building's door later).
+  const doorway = indoor ? f.point(raw.door) : undefined;
+  if (doorway) {
+    check(doorway[1] === height - 1, `${id}: the doorway is in the front wall (the bottom row)`);
+    check(walkable(doorway), `${id}: the doorway is on solid ground`);
+  }
+  const spawn = doorway && raw.spawn === undefined ? [doorway[0], doorway[1] - 1] as Point : f.point(raw.spawn);
   check(walkable(spawn), 'Spawn on solid tile');
-  const edges = parseEdges(raw, f, walkable);
+  const edges = doorway ? [{ side: 'south' as const, from: doorway[0], to: doorway[0], zone: string(raw.district), arrive: [0, 0] as Point }] : parseEdges(raw, f, walkable);
 
   // Scatter, on what's still free.
   const reserved = new Set<string>([spawn.join(','), ...places.map(p => p.door.join(','))]);
@@ -497,7 +575,7 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
   for (const e of edges) for (let n = e.from; n <= e.to; n++) { const c = edgeCell(f, e.side, n); check(reached[at(c[0], c[1])], `Edge unreachable from the spawn: ${e.side} ${n}`); }
 
   // Gathering spots: an open place's, near it, with ground to stand on.
-  const social = parseSocial(raw, f, id, places, buildings, (x, y) => walkable([x, y]) && reached[at(x, y)] === 1);
+  const social = parseSocial(raw, f, id, indoor ? string(raw.district) : id, places, buildings, (x, y) => walkable([x, y]) && reached[at(x, y)] === 1);
 
   // The Marks: ground to stand on beside each (its own tile first, then in front, the sides, behind), and art
   // no building, tree or other prop nearer the camera hides (props by the middle half of their art).
@@ -528,14 +606,44 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
     return { id: p.mark!, zone: id, at: p.at, stand };
   });
 
+  const interior = doorway ? parseInterior(raw, id, doorway, places, (x, y) => walkable([x, y]) && reached[at(x, y)] === 1, f) : undefined;
   const map: MapDef = { id, name: string(raw.name), width, height, tiles, startPositions: { player: [], enemy: [] } };
-  return { ...map, tiles, places, props: [], edges, spawn, walkability, format: 2, town: { buildings, props }, marks, social };
+  return { ...map, tiles, places, props: [], edges, spawn, walkability, format: 2, town: { buildings, props }, marks, social,
+    ...(interior ? { interior, district: interior.district } : {}) };
+}
+
+/** The room behind a building's door (`kind: interior`): its building, look, flats upstairs and residents' spots. */
+function parseInterior(raw: Record<string, unknown>, id: string, door: Point, places: readonly Place[], standable: (x: number, y: number) => boolean, f: Frame): InteriorDef {
+  const district = string(raw.district), building = string(raw.building);
+  const ident = /^[a-z][a-z0-9_]*$/;
+  check(ident.test(district) && ident.test(building), `${id}: district and building are ids`);
+  const r = raw.room === undefined ? {} : object(raw.room);
+  const wall = (r.wall ?? 'plaster') as WallStyle, rug = (r.rug ?? 'red') as RugColour;
+  check(WALL_STYLES.includes(wall), `${id}: room.wall is one of ${WALL_STYLES.join(', ')}`);
+  check(RUG_COLOURS.includes(rug), `${id}: room.rug is one of ${RUG_COLOURS.join(', ')}`);
+  const windows = list(r.windows ?? []).map(x => { check(Number.isInteger(x) && Number(x) > 0 && Number(x) < f.width - 1, `${id}: a window is a back-wall column`); return Number(x); });
+  const local = new Set(places.map(p => p.id));
+  const upstairs = list(raw.upstairs ?? []).map(u => { const s = string(u); check(ident.test(s) && !local.has(s), `${id}: upstairs ${s} is a room id not on this floor`); return s; });
+  const spots = list(raw.spots ?? []).map(v => {
+    const o = object(v), at = f.point(o.at);
+    check(standable(at[0], at[1]), `${id}: spot ${at.join(',')} isn't floor reachable from the door`);
+    const who = o.who === undefined ? [] : list(o.who).map(string);
+    const place = o.place === undefined ? undefined : string(o.place);
+    check(place === undefined || local.has(place), `${id}: spot ${at.join(',')} names a place not in the room: ${place}`);
+    return { at, who, ...(place ? { place } : {}) };
+  });
+  const seen = new Set<string>();
+  for (const s of spots) { const k = s.at.join(','); check(!seen.has(k), `${id}: two spots at ${k}`); seen.add(k); }
+  check(!spots.some(s => s.at[0] === door[0] && s.at[1] === door[1]), `${id}: a spot in the doorway`);
+  check(raw.quiet === undefined || typeof raw.quiet === 'boolean', `${id}: quiet is true or false`);
+  return { district, building, door, room: { wall, rug, windows }, upstairs, spots,
+    ...(raw.music !== undefined ? { music: string(raw.music) } : {}), quiet: raw.quiet === true };
 }
 
 /** How far outside its place's rect a gathering spot may stand (a frontage: the café terrace, the quay's edge). */
 const SOCIAL_REACH = 4;
 
-function parseSocial(raw: Record<string, unknown>, f: Frame, zone: string, places: readonly Place[], buildings: readonly TownBuilding[],
+function parseSocial(raw: Record<string, unknown>, f: Frame, zone: string, district: string, places: readonly Place[], buildings: readonly TownBuilding[],
   standable: (x: number, y: number) => boolean): SocialSpot[] {
   const ids = new Set<string>();
   const doors = new Set(places.map(p => p.door.join(',')));
@@ -563,7 +671,7 @@ function parseSocial(raw: Record<string, unknown>, f: Frame, zone: string, place
       stand.push([x, y]);
     }
     check(stand.length >= 2, `${where}: needs at least two cells to stand on within ${radius} tiles`);
-    return { id: `${zone}.${sid}`, place: `${zone}.${placeId}`, at: spot, stand };
+    return { id: `${zone}.${sid}`, place: `${district}.${placeId}`, at: spot, stand };
   });
 }
 
@@ -578,6 +686,7 @@ function lettering(v: unknown, where: string): string {
 export function validateZoneLinks(zones: Record<string, ZoneDef>): void {
   const opposite = { north: 'south', south: 'north', east: 'west', west: 'east' };
   for (const zone of Object.values(zones)) for (const edge of zone.edges) {
+    if (zone.interior) continue; // a room's way out is linked to its building's door (world/interiors.ts linkInteriors)
     const target = zones[edge.zone];
     check(target, `Missing target zone: ${edge.zone}`);
     check(target.walkability[edge.arrive[1]]?.[edge.arrive[0]], 'Arrival must be walkable and in bounds');

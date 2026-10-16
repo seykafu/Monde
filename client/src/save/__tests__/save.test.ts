@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { baseSkills, emptyEventLog, emptyProjects, migrateSave, SaveGame, startingSkills, type ClientEvent } from '@monde/shared';
+import { baseSkills, emptyEventLog, emptyFinale, emptyProjects, migrateSave, SaveGame, startingSkills, type ClientEvent } from '@monde/shared';
 import { lookFromChoices, randomChoices } from '../../fellow/options';
 import { Clock } from '../../sim/clock';
 import { dailyWeather } from '../../sim/weather';
@@ -76,7 +76,7 @@ describe('save format and restore', () => {
     const restored = restore(file);
     expect(restored.clock.time).toEqual(source.clock.time);
     const defaults = collect(source, 'manual', 'Home');
-    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, puzzles: defaults.puzzles, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy, projects: defaults.projects, scuffles: defaults.scuffles });
+    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, puzzles: defaults.puzzles, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy, projects: defaults.projects, scuffles: defaults.scuffles, finale: defaults.finale });
     restored.town.pillars.charm++;
     expect(restored.town.pillars.charm).not.toEqual(source.town.pillars.charm);
     expect(runDawnsThrough(restored.town, 5).state.day).toBe(5);
@@ -92,6 +92,14 @@ describe('save format and restore', () => {
     expect(restore(JSON.parse(JSON.stringify(saved))).projects).toEqual(projects);
     const { projects: _p, ...old } = saved;
     expect(migrateSave(old).projects).toEqual(emptyProjects());
+  });
+
+  it('keeps the Spring finale (G-11), and reads a save from before the fair as none of it', () => {
+    const finale = { ...emptyFinale(), reportDay: 26, freePlay: true, quotes: [{ id: 'odile', band: 'fellow' as const, text: 'Your jar.', live: false }] };
+    const saved = collect({ ...state(), finale }, 'checkpoint', 'end of spring', '2026-10-14T12:00:00.000Z');
+    expect(restore(JSON.parse(JSON.stringify(saved))).finale).toEqual(finale);
+    const { finale: _f, ...old } = saved;
+    expect(migrateSave(old).finale).toEqual(emptyFinale());
   });
 
   it('preserves pass-out rather than silently advancing a day', () => {

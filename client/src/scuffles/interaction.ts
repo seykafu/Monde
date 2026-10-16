@@ -1,4 +1,5 @@
-import { zones } from '../world/zones';
+import { interiors, zones } from '../world/zones';
+import { placeArrival } from '../world/interiors';
 import type Phaser from 'phaser';
 import { weekdayOf, type Clock } from '../sim/clock';
 import type { ZoneDef } from '../world/zoneFormat';
@@ -19,7 +20,8 @@ export function attachScuffles(scene: Phaser.Scene, clock: Clock): void {
   if (devPending) { const id = devPending; devPending = null; if (isScuffleId(id)) scene.time.delayedCall(0, () => { void openScuffle(scene, clock, id, { key: `dev:${id}:${clock.day}:${clock.minute}` }); }); }
 }
 export function scuffleInteraction(scene: Phaser.Scene, clock: Clock, zone: ZoneDef, position: TilePos): { label: string; run(): void } | null {
-  if (clock.paused) return null;
+  // Bins, market toughs and night patrols are street encounters (indoors: the bakery's tutorial comes from its scene).
+  if (clock.paused || zone.interior) return null;
   const level = pressure(scene.registry, zone.id, clock), night = clock.minute >= 1200;
   const alley = zone.places.find(p => p.id === 'back_alley');
   // GDD-GAP: absent bin props/interiors, the bins sit at the back-alley door, or OQ's cottage lane. One seeded encounter/day.
@@ -43,8 +45,9 @@ export function recoverScuffle(scene: Phaser.Scene, clock: Clock): boolean {
   const pending = { clinic: !!(scene.registry.get('monde.town') as { flags?: { clinic_open?: boolean } } | undefined)?.flags?.clinic_open };
   scene.registry.set(SCUFFLES_KEY, { ...saved, recovery: false });
   const places = Object.values(zones).flatMap(z => z.places.map(p => ({ z, p })));
-  // GDD-GAP: the clinic interior is not on an MVP zone yet; home is the safe fallback even after clinic_open.
-  const destination = (pending.clinic ? places.find(({ p }) => p.id === 'clinic') : undefined) ?? places.find(({ p }) => p.id === 'lamplighter_cottage');
+  // GDD-GAP: the clinic interior is not on an MVP zone yet; home (inside the cottage, W-03) is the safe fallback even after clinic_open.
+  const clinic = pending.clinic ? places.find(({ p }) => p.id === 'clinic') : undefined;
+  const destination = clinic ? { zone: clinic.z.id, arrive: clinic.p.door } : placeArrival(zones, interiors, 'old_quarter.lamplighter_cottage');
   if (!destination) return false;
-  scene.scene.restart({ zone: destination.z.id, arrive: destination.p.door }); return true;
+  scene.scene.restart({ zone: destination.zone, arrive: destination.arrive }); return true;
 }

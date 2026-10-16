@@ -1,0 +1,46 @@
+# The Lantern (GDD §2.3 Old Quarter): Sable's print shop: the hand press, the type cases, her desk, the stairs up to her
+# flat (§9.5 sable_flat). S08 (the Option) plays in here.
+format: 2
+kind: interior
+id: lantern_office_interior
+name: The Lantern
+district: old_quarter
+building: lantern_office
+size: [13, 10]
+terrain: |
+  #############
+  #############
+  #############
+  #FFFFFFFFFFF#
+  #FFFFFFFFFFF#
+  #FFFFFFFFFFF#
+  #FFFFFFFFFFF#
+  #FFFFFRRRRRF#
+  #FFFFFRRRRRF#
+  ######F######
+door: [6, 9]
+room: { wall: panel, rug: blue, windows: [5, 8] }
+upstairs: [sable_flat]
+quiet: true
+props:
+  - { sprite: type_cases, at: [1, 3], offset: [24, -10] }
+  - { sprite: wall_shelf, at: [3, 3], offset: [0, -16], lift: 50 }
+  - { sprite: wall_lamp, at: [4, 3], offset: [0, -16], lift: 56 }
+  - { sprite: wall_lamp, at: [9, 3], offset: [0, -16], lift: 56 }
+  - { sprite: crates, at: [7, 3], offset: [0, -6] }
+  - { sprite: staircase, at: [10, 3], offset: [24, -10] }
+  - { sprite: printing_press, at: [3, 5], offset: [24, 0] }
+  - { sprite: office_desk, at: [8, 6], offset: [0, 12] }
+  - { sprite: oil_lamp, at: [5, 7], offset: [0, 2] }
+  - { sprite: crates, at: [1, 8], offset: [6, 0] }
+  - { sprite: potted_plant, at: [11, 8], offset: [0, 2] }
+places:
+  # E at Sable's desk.
+  - { id: lantern_office, rect: [1, 3, 11, 6], door: [8, 7] }
+spots:
+  - { at: [8, 5], who: [sable] }
+  - { at: [2, 6] }
+  - { at: [5, 5] }
+  - { at: [6, 6] }
+  - { at: [3, 7] }
+  - { at: [10, 7] }

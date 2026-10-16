@@ -242,7 +242,6 @@ props:
   - { sprite: mark_plaque, at: [31, 28], offset: [14, 2], lift: 6, mark: WF-1 }
   - { sprite: mark_plaque, at: [22, 27], offset: [0, 8], mark: WF-2 }
   - { sprite: mark_plaque, at: [18, 16], offset: [24, 2], lift: 65, mark: WF-3 }
-  - { sprite: mark_plaque, at: [7, 21], offset: [0, -16], lift: 50, mark: WF-4 }
   - { sprite: mark_plaque, at: [44, 36], offset: [14, -16], lift: 270, mark: WF-5 }
   - { sprite: rock, at: [50, 23] }
 scatter:

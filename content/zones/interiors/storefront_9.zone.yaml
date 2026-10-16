@@ -1,0 +1,38 @@
+# No. 9 Market Row, "A. MONDE · MAPS & PRINTS" (GDD §14.5 MR-4, MR-5): Aurélien's old print shop, empty and dusty, his
+# iron hand press under a slipping sheet with MR-5 on it. Locked until MR-4 sends you here (scenes/zone/indoors.ts).
+format: 2
+kind: interior
+id: storefront_9_interior
+name: No. 9 · Maps & Prints
+district: market_row
+building: storefront_9
+size: [11, 9]
+terrain: |
+  ###########
+  ###########
+  ###########
+  #FFFFFFFFF#
+  #FFFFFFFFF#
+  #FFFFFFFFF#
+  #FFFFFFFFF#
+  #FFFFFFFFF#
+  #####F#####
+door: [5, 8]
+room: { wall: plaster, windows: [3, 7] }
+quiet: true
+props:
+  - { sprite: type_cases, at: [1, 3], offset: [24, -10] }
+  - { sprite: wall_shelf, at: [5, 3], offset: [0, -16], lift: 50 }
+  - { sprite: crates, at: [8, 3], offset: [0, -6] }
+  - { sprite: printing_press, at: [4, 5], offset: [24, 0], state: faded }
+  # MR-5 (§14.5): on the old iron hand press.
+  - { sprite: mark_plaque, at: [4, 5], offset: [24, 2], lift: 34, mark: MR-5 }
+  - { sprite: crates, at: [9, 6] }
+  # A hurricane lamp someone left on a crate (Tib, by the look of the matches).
+  - { sprite: oil_lamp, at: [8, 6], offset: [0, 0] }
+  - { sprite: barrel, at: [1, 7], offset: [6, 0] }
+places:
+  # E in front of the press.
+  - { id: storefront_9, rect: [1, 3, 9, 5], door: [5, 6] }
+spots:
+  - { at: [7, 6] }

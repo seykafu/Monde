@@ -37,7 +37,7 @@ export function nearbyPlace(zone: ZoneDef, p: Position): Place | undefined {
     .filter(p => p.distance <= 1).sort((a, b) => a.distance - b.distance)[0]?.place;
 }
 export function placeName(id: string): string {
-  const names: Record<string, string> = { bakery: 'Fournier & Fille', general_store: "Dunmore’s General Store", gull_and_anchor: 'The Gull & Anchor', cafe_liss: 'Café Liss', library: 'Monde Free Library', lantern_office: 'The Lantern', st_brigids: 'St. Brigid’s', bertrand_house: 'Achterberg Horlogerie', market_hall: 'Covered Market Hall' };
+  const names: Record<string, string> = { bakery: 'Fournier & Fille', general_store: "Dunmore’s General Store", gull_and_anchor: 'The Gull & Anchor', cafe_liss: 'Café Liss', library: 'Monde Free Library', lantern_office: 'The Lantern', st_brigids: 'St. Brigid’s', bertrand_house: 'Achterberg Horlogerie', market_hall: 'Covered Market Hall', mayor_office: 'the Mayor’s Office', storefront_9: 'No. 9 Market Row', lamplighter_cottage: 'the Lamplighter’s Cottage' };
   return names[id] ?? id.split('_').map(s => s[0]!.toUpperCase() + s.slice(1)).join(' ');
 }
 

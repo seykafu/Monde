@@ -13,4 +13,4 @@ export function chooseAutosaveSlot(entries: readonly SaveEntry[]): string {
 export const sortForMenu = (entries: readonly SaveEntry[]): SaveEntry[] => [...entries].sort((a, b) =>
   b.save.saved_at.localeCompare(a.save.saved_at) || a.slot.localeCompare(b.slot));
 export const formatSummary = ({ summary: s }: SaveGame): string =>
-  `${s.player_name} · Day ${s.day} (${s.weekday}) · ${Math.floor(s.time / 60) % 24}:${String(Math.floor(s.time % 60)).padStart(2, '0')} · ${s.zone.replaceAll('_', ' ')} · ${Math.floor(s.playtime / 60)}m`;
+  `${s.player_name} · Day ${s.day} (${s.weekday}) · ${Math.floor(s.time / 60) % 24}:${String(Math.floor(s.time % 60)).padStart(2, '0')} · ${s.zone.replace(/_interior$/, '').replaceAll('_', ' ')} · ${Math.floor(s.playtime / 60)}m`;

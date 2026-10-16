@@ -17,6 +17,15 @@
   "w": 109,
   "width": 2.27
  },
+ "armchair": {
+  "h": 52,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 48,
+  "width": 1.0
+ },
  "augusta_house": {
   "foot": [
    2,
@@ -41,6 +50,15 @@
   ],
   "w": 170
  },
+ "bakery_counter": {
+  "h": 65,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 144,
+  "width": 3.0
+ },
  "bandstand": {
   "foot": [
    2,
@@ -54,6 +72,24 @@
   ],
   "w": 116
  },
+ "bar_counter": {
+  "h": 88,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 190,
+  "width": 3.96
+ },
+ "bar_stool": {
+  "h": 30,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 20,
+  "width": 0.42
+ },
  "barrel": {
   "h": 34,
   "kind": "prop",
@@ -62,6 +98,24 @@
   ],
   "w": 26,
   "width": 0.54
+ },
+ "bed": {
+  "h": 75,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 64,
+  "width": 1.33
+ },
+ "beer_barrels": {
+  "h": 42,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 76,
+  "width": 1.58
  },
  "bench": {
   "h": 45,
@@ -123,8 +177,35 @@
   "w": 24,
   "width": 0.5
  },
+ "bookshelf": {
+  "h": 120,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 76,
+  "width": 1.58
+ },
  "brass_stone": {
   "h": 42,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 40,
+  "width": 0.83
+ },
+ "bread_oven": {
+  "h": 122,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 100,
+  "width": 2.08
+ },
+ "bread_rack": {
+  "h": 100,
   "kind": "prop",
   "states": [
    "restored"
@@ -193,6 +274,15 @@
   ],
   "w": 167
  },
+ "cafe_table": {
+  "h": 46,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 66,
+  "width": 1.38
+ },
  "cannery": {
   "foot": [
    6,
@@ -206,6 +296,15 @@
   ],
   "w": 306
  },
+ "card_catalogue": {
+  "h": 66,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 54,
+  "width": 1.12
+ },
  "cat_sleeping": {
   "h": 23,
   "kind": "prop",
@@ -214,6 +313,24 @@
   ],
   "w": 28,
   "width": 0.58
+ },
+ "chest": {
+  "h": 38,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 44,
+  "width": 0.92
+ },
+ "clock_wall": {
+  "h": 112,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 93,
+  "width": 1.94
  },
  "clock_window": {
   "h": 25,
@@ -276,6 +393,15 @@
   "w": 28,
   "width": 0.58
  },
+ "dresser": {
+  "h": 100,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 52,
+  "width": 1.08
+ },
  "duck": {
   "h": 22,
   "kind": "prop",
@@ -285,6 +411,15 @@
   "w": 12,
   "width": 0.25
  },
+ "espresso_counter": {
+  "h": 95,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 128,
+  "width": 2.67
+ },
  "fence": {
   "h": 27,
   "kind": "prop",
@@ -293,6 +428,15 @@
   ],
   "w": 48,
   "width": 1.0
+ },
+ "fireplace": {
+  "h": 100,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 104,
+  "width": 2.17
  },
  "fish_crates": {
   "h": 38,
@@ -324,6 +468,15 @@
   ],
   "w": 170,
   "width": 3.54
+ },
+ "flour_sacks": {
+  "h": 46,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 50,
+  "width": 1.04
  },
  "flower_pots": {
   "h": 34,
@@ -438,6 +591,15 @@
   ],
   "w": 242
  },
+ "grandfather_clock": {
+  "h": 104,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 24,
+  "width": 0.5
+ },
  "gull": {
   "h": 22,
   "kind": "prop",
@@ -498,6 +660,24 @@
   "w": 45,
   "width": 0.94
  },
+ "kitchen_table": {
+  "h": 53,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 82,
+  "width": 1.71
+ },
+ "kneading_table": {
+  "h": 69,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 96,
+  "width": 2.0
+ },
  "lamp_post": {
   "h": 112,
   "kind": "prop",
@@ -540,6 +720,15 @@
   ],
   "w": 12,
   "width": 0.25
+ },
+ "librarian_desk": {
+  "h": 64,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 116,
+  "width": 2.42
  },
  "library": {
   "foot": [
@@ -655,6 +844,33 @@
   "w": 155,
   "width": 3.23
  },
+ "oars_rack": {
+  "h": 100,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 86,
+  "width": 1.79
+ },
+ "office_desk": {
+  "h": 73,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 116,
+  "width": 2.42
+ },
+ "oil_lamp": {
+  "h": 50,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 32,
+  "width": 0.67
+ },
  "okafor_house": {
   "foot": [
    2,
@@ -706,6 +922,24 @@
   "w": 76,
   "width": 1.58
  },
+ "pigeonholes": {
+  "h": 110,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 78,
+  "width": 1.62
+ },
+ "pilot_gig": {
+  "h": 51,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 236,
+  "width": 4.92
+ },
  "pine": {
   "h": 195,
   "kind": "prop",
@@ -733,6 +967,43 @@
   "w": 18,
   "width": 0.38
  },
+ "potted_plant": {
+  "h": 58,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 43,
+  "width": 0.9
+ },
+ "printing_press": {
+  "h": 98,
+  "kind": "prop",
+  "states": [
+   "restored",
+   "faded"
+  ],
+  "w": 88,
+  "width": 1.83
+ },
+ "produce_crates": {
+  "h": 58,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 70,
+  "width": 1.46
+ },
+ "pub_table": {
+  "h": 64,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 74,
+  "width": 1.54
+ },
  "public_scale": {
   "h": 78,
   "kind": "prop",
@@ -742,6 +1013,15 @@
   "w": 83,
   "width": 1.73
  },
+ "reading_table": {
+  "h": 71,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 124,
+  "width": 2.58
+ },
  "reeds": {
   "h": 46,
   "kind": "prop",
@@ -750,6 +1030,15 @@
   ],
   "w": 36,
   "width": 0.75
+ },
+ "registry_counter": {
+  "h": 46,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 144,
+  "width": 3.0
  },
  "rock": {
   "h": 38,
@@ -790,6 +1079,15 @@
   ],
   "w": 169
  },
+ "staircase": {
+  "h": 119,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 104,
+  "width": 2.17
+ },
  "stone_wall": {
   "h": 18,
   "kind": "prop",
@@ -798,6 +1096,24 @@
   ],
   "w": 48,
   "width": 1.0
+ },
+ "store_counter": {
+  "h": 84,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 144,
+  "width": 3.0
+ },
+ "store_shelves": {
+  "h": 120,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 71,
+  "width": 1.48
  },
  "storefront_a": {
   "foot": [
@@ -837,6 +1153,15 @@
    "faded"
   ],
   "w": 123
+ },
+ "stove": {
+  "h": 84,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 48,
+  "width": 1.0
  },
  "sundial": {
   "h": 55,
@@ -944,6 +1269,15 @@
   ],
   "w": 99
  },
+ "type_cases": {
+  "h": 79,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 96,
+  "width": 2.0
+ },
  "vane_office": {
   "foot": [
    3,
@@ -965,6 +1299,33 @@
   ],
   "w": 96,
   "width": 2.0
+ },
+ "wall_lamp": {
+  "h": 32,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 15,
+  "width": 0.31
+ },
+ "wall_shelf": {
+  "h": 30,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 58,
+  "width": 1.21
+ },
+ "watch_counter": {
+  "h": 70,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 116,
+  "width": 2.42
  },
  "watch_sign": {
   "h": 64,
@@ -1014,5 +1375,14 @@
   ],
   "w": 178,
   "width": 3.71
+ },
+ "workbench": {
+  "h": 82,
+  "kind": "prop",
+  "states": [
+   "restored"
+  ],
+  "w": 96,
+  "width": 2.0
  }
 }

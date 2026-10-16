@@ -16,7 +16,7 @@ import { computeAppeal } from '../town/appeal';
 import { isFerryDay } from '../town/migration';
 import { TOWN_FLAGS, applyPillarDelta, createTownState, setTownFlag, type TownState } from '../town/pillars';
 import { nearbyPlace, placeName, type Position } from '../world/player';
-import type { ZoneDef } from '../world/zoneFormat';
+import { districtOf, type ZoneDef } from '../world/zoneFormat';
 import type { StorySave } from './director';
 import type { CueContext, HostCue, StoryHandlers, StoryLine } from './runtime';
 import type { StoryContext } from './triggers';
@@ -143,13 +143,17 @@ export function buildStoryContext(world: WorldNow, ledger: StoryLedger, outcomes
  * The place the player is at: a doorstep within a tile (world/player nearbyPlace, as the E prompt uses), else
  * the smallest place whose rect holds the player's tile (open ground: the ferry slip, Fountain Square).
  */
-export function placeAt(zone: Pick<ZoneDef, 'id' | 'places'>, p: Position): string {
-  const door = nearbyPlace(zone as ZoneDef, p);
-  if (door) return `${zone.id}.${door.id}`;
+export function placeAt(zone: Pick<ZoneDef, 'id' | 'places' | 'district'>, p: Position, indoors: ReadonlySet<string> = new Set()): string {
+  // A room's places are its district's (W-03): inside Fournier & Fille is market_row.bakery. A building with a room
+  // (`indoors`, its place ids on this board) is reached by going in: its doorstep outside is the street.
+  const district = districtOf(zone);
+  const places = indoors.size ? zone.places.filter(q => !indoors.has(q.id)) : zone.places;
+  const door = nearbyPlace({ ...zone, places } as ZoneDef, p);
+  if (door) return `${district}.${door.id}`;
   const tx = Math.floor(p.x), ty = Math.floor(p.y);
-  const inside = zone.places.filter(({ rect: [x, y, w, h] }) => tx >= x && tx < x + w && ty >= y && ty < y + h)
+  const inside = places.filter(({ rect: [x, y, w, h] }) => tx >= x && tx < x + w && ty >= y && ty < y + h)
     .sort((a, b) => a.rect[2] * a.rect[3] - b.rect[2] * b.rect[3]);
-  return inside[0] ? `${zone.id}.${inside[0].id}` : '';
+  return inside[0] ? `${district}.${inside[0].id}` : '';
 }
 
 /**
@@ -205,6 +209,11 @@ export interface StoryPresenter {
   charcreate(): Promise<boolean>;
   /** {ai_open}: a live exchange in the dialogue panel; resolves when it closes. */
   aiOpen(cue: Cue<'ai_open'>, place: string): Promise<readonly StoryLine[]>;
+  /**
+   * G-11 `{campaign: spring_straw_poll}`: count the Bloom Fair's Straw Poll, show its card, and resolve with what the
+   * script reads back as `vote.*` (finale/poll.ts VoteOutcome); null when there's no town to poll.
+   */
+  strawPoll?(): Promise<Readonly<Record<string, string | number | boolean>> | null>;
 }
 
 /** The game around the story (scenes/story/attach.ts). */
@@ -236,10 +245,13 @@ export interface HandlerDeps {
   ledger(): StoryLedger;
   world(): StoryWorld | null;
   presenter(): StoryPresenter | null;
-  setOutcome(name: 'puzzle' | 'riddle' | 'scuffle', value: Record<string, boolean>): void;
+  setOutcome(name: 'puzzle' | 'riddle' | 'scuffle' | 'vote', value: Readonly<Record<string, string | number | boolean>>): void;
   /** The `zone.place` a scene is set in (memories are written there). */
   scenePlace(sceneId: string): string;
 }
+
+/** S10c's cue: the Bloom Fair's Straw Poll (MVP G-11). */
+export const SPRING_STRAW_POLL = 'spring_straw_poll';
 
 /** GDD-GAP: §13.1 doesn't time a bare {wait}; one second reads as a beat. */
 export const DEFAULT_WAIT_SECONDS = 1;
@@ -360,6 +372,13 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
     ai_open: async (cue, ctx) => {
       const p = stage('ai_open');
       return p ? p.aiOpen(cue, deps.scenePlace(ctx.scene) || ctx.game.place) : [];
+    },
+    // G-11: the Spring Straw Poll at the Bloom Fair (S10c). The campaign's own events (§10.4, Days 70+) aren't in Spring.
+    campaign: async cue => {
+      if (cue.key !== SPRING_STRAW_POLL) { note(`{campaign: ${cue.key}} belongs to the campaign (Days 70+); not in Spring`); return; }
+      const vote = await stage('campaign')?.strawPoll?.();
+      if (vote) deps.setOutcome('vote', vote);
+      else note('{campaign: spring_straw_poll}: no poll was taken; the script reads no vote');
     }
   };
 }

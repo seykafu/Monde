@@ -73,9 +73,16 @@ export class MusicManager {
   private updateVolume(): void {
     if (!this.context || !this.output) return;
     const s = getAudioSettings();
-    this.output.gain.setTargetAtTime(s.mute ? 0 : s.master * s.music * (this.ducked ? 0.4 : 1), this.context.currentTime, 0.08);
+    this.output.gain.setTargetAtTime(s.mute ? 0 : s.master * s.music * (this.ducked ? 0.4 : 1) * this.level, this.context.currentTime, 0.08);
   }
   duck(on: boolean): void { this.ducked = on; this.updateVolume(); }
+  /** The place's own loudness (indoors a room plays the town's music softer: audio/musicDirector.ts ambientMusic). */
+  private level = 1;
+  setLevel(level: number): void {
+    if (level === this.level) return;
+    this.level = level;
+    this.updateVolume();
+  }
   private fadeSeconds = 1.5;
   play(cue: string, options: { fadeMs?: number } = {}): void {
     const track = resolveMusicCue(cue);

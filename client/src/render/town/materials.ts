@@ -73,7 +73,15 @@ export const PAL = {
   stepTop: [0xd6cab4, 0xccc0a8, 0xdcd0bc] as const,
   stepRiser: 0x8e8272,
   weedy: [0x8c8a78, 0x7e7e6c, 0x969480] as const,
-  moss: [0x5e7a3a, 0x6e8c44, 0x52703a] as const
+  moss: [0x5e7a3a, 0x6e8c44, 0x52703a] as const,
+  // Indoors (sampled from art_sources/backdrops' interiors: the bakery, the café, the library, the Lantern).
+  floor: [0xc48a52, 0xb87e48, 0xcc955c, 0xb27744, 0xc08650] as const,
+  floorGap: 0x6a4224,
+  tileLight: 0xf0e4c8,
+  tileDark: 0x7f8c96,
+  tileGrout: 0xb8ac94,
+  flags: [0xd2b48e, 0xc8a882, 0xdabe98, 0xc49c78, 0xcfae86, 0xbf8f6c] as const,
+  flagJoint: 0x8a6e54
 };
 
 type Gen = (x: number, y: number) => number;
@@ -243,6 +251,51 @@ const GENERATORS: Partial<Record<TownTerrain, Gen>> = {
     let c: number = PAL.stepTop[Math.floor(hash01(col % 16, Math.floor(y / 12) % 24, 131) * PAL.stepTop.length)]!;
     if (ly === 0) c = shade(c, 1.07);
     if (sx % 24 === 0) c = shade(c, 0.85);
+    return c;
+  },
+  // ── Indoors (interiors): polished floorboards, checker tiles, worn stone flags. The rug and the walls are drawn
+  // per room in terrainBake.ts (their colours are the room's).
+  floor(x, y) {
+    const row = Math.floor(y / 6), ly = y - row * 6;
+    if (ly === 5) return PAL.floorGap;
+    const len = [64, 96, 128][Math.floor(hash01(row, 2, 151) * 3)]!;
+    const off = Math.floor(hash01(row, 3, 152) * len);
+    const col = Math.floor((x + off) / len), lx = (x + off) - col * len;
+    if (lx === 0) return PAL.floorGap;
+    let c: number = PAL.floor[Math.floor(hash01(col % (MAT_W / len), row, 153) * PAL.floor.length)]!;
+    if (ly === 0) c = shade(c, 1.08);
+    else if (ly === 4) c = shade(c, 0.9);
+    // A long grain and the odd knot; a polish that catches the light now and then.
+    if (ly > 0 && ly < 4 && pnoise(x, y, 32, 2, 154) > 0.74) c = shade(c, 0.92);
+    if (hash01(x >> 1, row, 155) < 0.004) c = PAL.floorGap;
+    if (ly === 1 && pnoise(x, y, 40, 6, 156) > 0.7 && bayer(x, y) < 0.5) c = shade(c, 1.1);
+    return c;
+  },
+  tile(x, y) {
+    const tx = Math.floor(x / 24), ty = Math.floor(y / 18), lx = x - tx * 24, ly = y - ty * 18;
+    if (lx === 23 || ly === 17) return PAL.tileGrout;
+    let c: number = (tx + ty) & 1 ? PAL.tileDark : PAL.tileLight;
+    if (lx === 0 || ly === 0) c = shade(c, 1.06);
+    else if (lx === 22 || ly === 16) c = shade(c, 0.93);
+    // A glaze: a soft diagonal sheen across each tile.
+    if (Math.abs(lx - ly * 1.3 - 4) < 1.2 && bayer(x, y) < 0.6) c = shade(c, 1.08);
+    if (hash01(x, y, 161) < 0.02) c = shade(c, 0.95);
+    return c;
+  },
+  flags(x, y) {
+    // Worn stone flags laid in courses: slabs of uneven length (each divides the period), joints staggered course to
+    // course, warm stone and the odd terracotta slab, edges a little rounded by feet.
+    const row = Math.floor(y / 18), ly = y - row * 18;
+    const len = [32, 48, 64][Math.floor(hash01(row, 4, 171) * 3)]!;
+    const off = Math.floor(hash01(row, 5, 172) * len);
+    const col = Math.floor((x + off) / len), lx = (x + off) - col * len;
+    if (ly === 17 || lx === 0) return PAL.flagJoint;
+    let c: number = PAL.flags[Math.floor(hash01(col % (MAT_W / len), row, 173) * PAL.flags.length)]!;
+    if (ly === 0 || lx === 1) c = shade(c, 1.07);
+    else if (ly === 16 || lx === len - 1) c = shade(c, 0.9);
+    const n = pnoise(x, y, 8, 6, 174);
+    if (n > 0.7 && bayer(x, y) < 0.45) c = shade(c, 0.95);
+    if (hash01(x, y, 175) < 0.025) c = shade(c, 0.92);
     return c;
   },
   weedy(x, y) {

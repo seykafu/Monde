@@ -1,0 +1,66 @@
+# The Gull & Anchor (GDD §2.3 Market Row): Roz's bar, the barrels behind it, the fire, the tables where Monde "tells the
+# truth by its third cup" (MR-2), and the stairs up to the rented rooms and Roz's flat (§9.5 pub_rooms, roz_flat).
+format: 2
+kind: interior
+id: gull_and_anchor_interior
+name: The Gull & Anchor
+district: market_row
+building: gull_and_anchor
+size: [16, 11]
+terrain: |
+  ################
+  ################
+  ################
+  #FFFFFFFFFFFFFF#
+  #FFFFFFFFFFFFFF#
+  #FFFFFFFFFFFFFF#
+  #FFFFFFFFFFFFFF#
+  #FFFFFFFRRRRRFF#
+  #FFFFFFFRRRRRFF#
+  #FFFFFFFFFFFFFF#
+  #######F########
+door: [7, 10]
+room: { wall: panel, rug: red, windows: [6, 9] }
+upstairs: [pub_rooms, roz_flat]
+# A pub's evening: the market's fiddle and claps at every hour, never the night's hush.
+music: market_row
+props:
+  - { sprite: beer_barrels, at: [2, 3], offset: [24, -6] }
+  - { sprite: wall_shelf, at: [4, 3], offset: [0, -16], lift: 50 }
+  - { sprite: bar_counter, at: [4, 5], offset: [24, 4] }
+  - { sprite: bar_stool, at: [3, 6] }
+  - { sprite: bar_stool, at: [4, 6] }
+  - { sprite: bar_stool, at: [5, 6] }
+  - { sprite: bar_stool, at: [6, 6] }
+  - { sprite: wall_lamp, at: [8, 3], offset: [0, -16], lift: 54 }
+  - { sprite: armchair, at: [10, 4], offset: [0, -4] }
+  - { sprite: fireplace, at: [11, 3], offset: [24, -10] }
+  - { sprite: staircase, at: [13, 3], offset: [24, -10] }
+  - { sprite: pub_table, at: [9, 5] }
+  - { sprite: pub_table, at: [12, 5] }
+  - { sprite: pub_table, at: [8, 8] }
+  - { sprite: pub_table, at: [11, 8] }
+  - { sprite: pub_table, at: [3, 8] }
+  - { sprite: barrel, at: [1, 9], offset: [6, 0] }
+  - { sprite: potted_plant, at: [14, 9], offset: [0, 2] }
+places:
+  # E at the end of the bar.
+  - { id: gull_and_anchor, rect: [1, 3, 14, 7], door: [7, 6] }
+spots:
+  - { at: [5, 3], who: [rosalind] }
+  - { at: [13, 4], who: [june] }
+  - { at: [3, 6] }
+  - { at: [4, 6] }
+  - { at: [5, 6] }
+  - { at: [6, 6] }
+  - { at: [8, 5] }
+  - { at: [10, 5] }
+  - { at: [11, 5] }
+  - { at: [13, 5] }
+  - { at: [7, 8] }
+  - { at: [9, 8] }
+  - { at: [10, 8] }
+  - { at: [12, 8] }
+  - { at: [2, 8] }
+  - { at: [4, 8] }
+  - { at: [13, 7] }

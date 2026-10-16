@@ -18,6 +18,7 @@ import type { TownTerrain } from '../../world/townTerrain';
 import { FAMILY, IS_WATER, KIND_ID, KIND_OF, LAYER, SOFT, TH, TW, edgeNoise, hash01, roadRuts, spillMask, vnoise, winnerAt, type GroundMap, type Ruts } from './autotile';
 import { MAT_H, MAT_W, PAL, bayer, materials, mix, shade } from './materials';
 import { TERRAIN_INFO } from '../../world/townTerrain';
+import { ROOM_VOID, capPixel, facePixel, rugPixel, wallMap, type RoomLook, type WallMap } from './roomArt';
 
 export interface BakeOptions {
   seed: number;
@@ -25,6 +26,8 @@ export interface BakeOptions {
   elevStep: number;
   /** The slab under the board's front row, world px. */
   slab: number;
+  /** Interiors: the room's walls, rug and windows (roomArt.ts). */
+  room?: RoomLook;
 }
 
 export interface BakedChunk {
@@ -48,16 +51,21 @@ export interface BakeContext {
   mask: Uint8Array;
   ruts: (Ruts | null)[];
   mats: (Uint32Array | null)[];
+  /** Interiors: which tiles are the back wall's face and which are cut walls. */
+  walls: WallMap | null;
 }
 
 export const bakeContext = (map: GroundMap, opts: BakeOptions): BakeContext =>
-  ({ map, opts, mask: spillMask(map), ruts: roadRuts(map), mats: materials(new Set(map.kinds)) });
+  ({ map, opts, mask: spillMask(map), ruts: roadRuts(map), mats: materials(new Set(map.kinds)), walls: map.kinds.includes(KIND_ID.wall) ? wallMap(map) : null });
 const id = (k: TownTerrain) => KIND_ID[k];
 const K = {
   grass: id('grass'), meadow: id('meadow'), cobble: id('cobble'), brick: id('brick'), plaza: id('plaza'), road: id('road'),
   soil: id('soil'), boards: id('boards'), steps: id('steps'), weedy: id('weedy'), sand: id('sand'), wet: id('wet_sand'),
-  shingle: id('shingle'), sea: id('sea'), river: id('river'), pond: id('pond'), shallows: id('shallows'), gravel: id('gravel')
+  shingle: id('shingle'), sea: id('sea'), river: id('river'), pond: id('pond'), shallows: id('shallows'), gravel: id('gravel'),
+  wall: id('wall'), rug: id('rug'), floor: id('floor'), tile: id('tile'), flags: id('flags')
 };
+/** The look a room with no `room:` gets (a wall or rug on an outdoor board, say). */
+const PLAIN_ROOM: RoomLook = { wall: 'plaster', rug: 'red', windows: [] };
 const PAVED = new Set([K.cobble, K.brick, K.plaza]);
 /** Beaches slope into the water: no bank face above them, just surf. */
 const BEACH = new Set([K.sand, K.wet, K.shingle, K.shallows]);
@@ -143,7 +151,8 @@ function faceColour(face: Face, r: number, fh: number, gx: number): number {
 
 /** Bake the tiles [tx0, tx1) × [ty0, ty1). */
 export function bakeChunk(ctx: BakeContext, tx0: number, ty0: number, tx1: number, ty1: number): BakedChunk {
-  const { map, opts, mask, ruts, mats } = ctx;
+  const { map, opts, mask, ruts, mats, walls } = ctx;
+  const room = opts.room ?? PLAIN_ROOM;
   const seed = opts.seed;
   const step = opts.elevStep;
   const elev = (x: number, y: number) => (x < 0 || y < 0 || x >= map.width || y >= map.height ? 0 : map.elevs[y * map.width + x]!);
@@ -283,6 +292,13 @@ export function bakeChunk(ctx: BakeContext, tx0: number, ty0: number, tx1: numbe
             }
             continue;
           }
+          // Indoors: the walls (the back wall's face, cut walls) and the rug are the room's own (roomArt.ts).
+          if (own === K.wall && walls) {
+            const fr = walls.floorRow[tx]!;
+            put(land, o, walls.cls[ty * map.width + tx] === 1 ? facePixel(room, gx, fr * TH - 1 - gy, fr * TH, tx, seed) : capPixel(map, walls, room, tx, ty, u, v, seed));
+            continue;
+          }
+          if (k === K.rug) { put(land, o, shade(rugPixel(map, room, tx, ty, u, v), drift(gx, gy))); continue; }
           const mat = mats[k]!;
           let c = mat[(gy % MAT_H) * MAT_W + (gx % MAT_W)]!;
           c = shade(c, drift(gx, gy));
@@ -331,12 +347,14 @@ export function bakeChunk(ctx: BakeContext, tx0: number, ty0: number, tx1: numbe
       if (fh > 0) {
         const face = IS_WATER[own] ? 'stone' : faceOf(own);
         const lipped = own === K.grass || own === K.meadow;
+        // Indoors the slab is the dark the room sits in, and the doorway's a stone threshold.
+        const indoor = own === K.wall ? 'void' : own === K.floor || own === K.tile || own === K.flags || own === K.rug ? 'step' : null;
         for (let rr = 0; rr < fh; rr++) {
           const sy = sy0 + TH + rr;
           if (sy < 0 || sy >= H) continue;
           for (let u = 0; u < TW; u++) {
             const gx = tx * TW + u;
-            let c = faceColour(face, rr, fh, gx);
+            let c = indoor === 'void' ? ROOM_VOID : indoor === 'step' ? (rr < 6 ? (rr === 0 ? 0xe8dcc4 : 0xc8bca4) : ROOM_VOID) : faceColour(face, rr, fh, gx);
             // Turf hangs a ragged pixel or two over the edge.
             if (lipped && rr < 3 && rr < 1 + Math.floor((edgeNoise(gx, ty, seed) + 1) * 1.2)) c = rr === 0 ? PAL.grass[0] : PAL.grassEdge;
             put(land, (sy * W + sx0 + u) * 4, c);
