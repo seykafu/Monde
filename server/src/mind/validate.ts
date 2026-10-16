@@ -14,6 +14,15 @@
  *   6. secrets     reveal_secret must be one of the revealable ids, else null                 (adjusts)
  *   7. echo        word-trigram overlap with the resident's last 20 lines must be ≤ 0.35      (fail: "echo")
  *
+ * Then two soft checks (MVP Q-01). They regenerate once with a note, like any failure, but a turn that still trips
+ * one is accepted rather than swapped for an authored line (dialogue.ts): the slip is in voice, a fallback isn't.
+ *   8. borrowed    no line may use another resident's signature phrase (voice.ts)            (soft: "borrowed")
+ *      tic_repeat  nor one of the resident's own a second time in this conversation          (soft: "tic_repeat")
+ *   9. samples     no line may echo one of the resident's own card samples: trigram overlap
+ *                  above 0.35, or a run of six or more words lifted from one                  (soft: "sample_echo")
+ *
+ * Step 2 also turns *asterisk* stage business into the house style's (parentheses) (adjusts).
+ *
  * Canon checks (§9.13 step 3) are rules built from canon_locks and arrive with their content; nothing here
  * pretends to do them. Favor feasibility is M-09: favors are stored as "proposed".
  */
@@ -24,8 +33,11 @@ import { containsAnswer } from "./promptBuilder.js";
 import { checkedExpression } from "./expressions.js";
 import { lexicalHits, type FilterGroup } from "./filters.js";
 import type { RiddleRecord } from "./riddles.js";
+import { borrowedHits, type Signature } from "./voice.js";
 
-export type ValidationCategory = "schema" | `lexical:${FilterGroup}` | "riddle" | "echo";
+export type ValidationCategory = "schema" | `lexical:${FilterGroup}` | "riddle" | "echo" | SoftCategory;
+/** Checks that regenerate once and then accept (dialogue.ts), never fall back. */
+export type SoftCategory = "borrowed" | "tic_repeat" | "sample_echo";
 
 export interface ValidationContext {
   /** The name fills `{name}` in padded replies; kind keeps an animal's own expressions. */
@@ -39,13 +51,25 @@ export interface ValidationContext {
   hintsAllowed?: number;
   /** The resident's most recent lines, newest first (the echo window). */
   recentLines: readonly string[];
+  /** Other residents' signature phrases this resident must not borrow (voice.ts borrowedFor). */
+  borrowed?: readonly Signature[];
+  /** The resident's own signature phrases (voice.ts ownSignatures): each at most once per conversation. */
+  own?: readonly Signature[];
+  /** What the resident has said so far in this conversation, oldest first. */
+  conversationLines?: readonly string[];
+  /** The resident's own card samples: tone, never script (step 9). */
+  samples?: readonly string[];
   /** Heart skill perk widens the Regard clamp to ±7 (§9.10.2). Skills aren't built yet: false. */
   heartPerk?: boolean;
 }
 
 export type ValidationResult =
   | { ok: true; output: DialogueTurnOutput; adjustments: string[] }
-  | { ok: false; category: ValidationCategory; detail: string };
+  | {
+    ok: false; category: ValidationCategory; detail: string;
+    /** Set when only a soft check failed: the otherwise valid turn, to keep if the regeneration fails too. */
+    soft?: { output: DialogueTurnOutput; adjustments: string[] };
+  };
 
 /** §9.10 "Echo check": above this overlap with a recent line, regenerate. */
 export const ECHO_THRESHOLD = 0.35;
@@ -53,6 +77,13 @@ export const ECHO_THRESHOLD = 0.35;
 export const ECHO_WINDOW = 20;
 /** GDD-GAP: §9.10.2 calls the topic "a short tag" with no length; 60 characters keeps already_discussed short. */
 export const TOPIC_CHARS = 60;
+/**
+ * GDD-GAP: §9.10 sets only the 0.35 overlap for echoes. A card sample is quoted verbatim mostly as one long phrase
+ * inside a longer line ("you look like a coat on a hook"), which a share of trigrams misses, so a run of this many
+ * words lifted from one sample counts too. Five catches ordinary prices and counts ("rye's two coins, white's
+ * three"), which residents may repeat; six is a quotation.
+ */
+export const SAMPLE_RUN_WORDS = 6;
 
 const CHOICE_IDS = ["a", "b", "c"] as const;
 const PROPOSABLE_FAVORS: ReadonlySet<string> = new Set(MVP_FAVOR_TEMPLATES.filter((t) => t !== "last_chance"));
@@ -85,6 +116,37 @@ export function echoOverlap(line: string, previous: readonly string[]): number {
   return worst;
 }
 
+/**
+ * The longest run of consecutive words in `line` that also appears in `other`, in words (counted by trigrams, so
+ * runs under three words are 0).
+ */
+export function sharedRun(line: string, other: string): number {
+  const words = normalizeWords(line);
+  const grams = wordTrigrams(other);
+  let best = 0;
+  let streak = 0;
+  for (let i = 0; i + 2 < words.length; i++) {
+    streak = grams.has(`${words[i]} ${words[i + 1]} ${words[i + 2]}`) ? streak + 1 : 0;
+    best = Math.max(best, streak);
+  }
+  return best === 0 ? 0 : best + 2;
+}
+
+/** The first of `samples` a line echoes (step 9), with why, or null. */
+export function sampleEcho(line: string, samples: readonly string[]): string | null {
+  for (const sample of samples) {
+    const overlap = echoOverlap(line, [sample]);
+    const run = sharedRun(line, sample);
+    if (overlap > ECHO_THRESHOLD || run >= SAMPLE_RUN_WORDS) return `${overlap.toFixed(2)}/${run} words: ${sample}`;
+  }
+  return null;
+}
+
+/** *Stage business in asterisks* becomes the house style's (stage business in parentheses). */
+export function parenthesizeStageBusiness(text: string): string {
+  return text.replace(/\*([^*\n]+)\*/g, (_match, inner: string) => `(${inner.trim()})`);
+}
+
 /** Text the player will see (and that a riddle answer could leak through). */
 function visibleTexts(out: DialogueTurnOutput): string[] {
   return [...out.lines.map((l) => l.text), ...out.choices.map((c) => c.text), ...(out.effects.favor ? [out.effects.favor.text] : [])];
@@ -106,7 +168,11 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
     return fail("schema", issue ? `${issue.path.join(".") || "(root)"}: ${issue.message}` : "invalid");
   }
   const adjustments: string[] = [];
-  const lines = parsed.data.lines.map((l) => ({ ...l, text: l.text.trim() })).filter((l) => l.text !== "");
+  const lines = parsed.data.lines.map((l) => ({ ...l, text: l.text.trim() })).filter((l) => l.text !== "").map((l) => {
+    const text = parenthesizeStageBusiness(l.text);
+    if (text !== l.text) adjustments.push("asterisk stage business→parentheses");
+    return { ...l, text };
+  });
   if (lines.length === 0) return fail("schema", "no lines");
 
   // 2. Clamps. Choices first, so a reply dropped as a repeat or a second goodbye can be replaced by a fourth.
@@ -175,6 +241,24 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
     if (overlap > ECHO_THRESHOLD) return fail("echo", `${overlap.toFixed(2)}: ${line.text}`);
   }
 
+  // 8-9. Soft voice checks: another resident's catchphrase, a card sample quoted back.
+  const soft = (category: SoftCategory, detail: string): ValidationResult =>
+    ({ ok: false, category, detail, soft: { output: out, adjustments } });
+  for (const line of out.lines) {
+    const borrowed = borrowedHits(line.text, ctx.borrowed ?? [])[0];
+    if (borrowed) return soft("borrowed", `"${borrowed.phrase}" (${borrowed.owner})`);
+  }
+  const said = [...(ctx.conversationLines ?? [])];
+  for (const line of out.lines) {
+    const again = borrowedHits(line.text, ctx.own ?? []).find((s) => said.some((earlier) => borrowedHits(earlier, [s]).length > 0));
+    if (again) return soft("tic_repeat", `"${again.phrase}"`);
+    said.push(line.text);
+  }
+  for (const line of out.lines) {
+    const echo = sampleEcho(line.text, ctx.samples ?? []);
+    if (echo) return soft("sample_echo", echo);
+  }
+
   return { ok: true, output: out, adjustments };
 }
 
@@ -182,7 +266,18 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
  * The one-line instruction appended (as an extra user-message text block, never a prefill) when a turn is
  * regenerated. Blocks 1-3 stay untouched so the retry still reads the cache.
  */
-export function correctiveNote(category: ValidationCategory): string {
+export function correctiveNote(category: ValidationCategory, detail = ""): string {
+  if (category === "borrowed") {
+    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "that phrase";
+    return `${what} is another resident's catchphrase, not yours. Say it again in your own voice, with your own words.`;
+  }
+  if (category === "tic_repeat") {
+    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "that phrase";
+    return `You've already said ${what} in this conversation. It's a habit for once a conversation: say something else.`;
+  }
+  if (category === "sample_echo") {
+    return "That repeats one of your card's samples nearly word for word. The samples only show your tone: say something new, in your own words.";
+  }
   if (category === "schema") {
     return "Your last reply didn't match the schema. Reply again with JSON only: one to three lines and two or three choices.";
   }

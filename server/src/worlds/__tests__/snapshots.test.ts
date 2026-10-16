@@ -105,7 +105,8 @@ it("branches the complete saved mind, isolates later changes and can run the nex
   expect(night.statusCode).toBe(200);
   expect(night.json().already).toBeUndefined();
   await e.runner.idle();
-});
+  // A whole night for every resident on PGlite: ~2.5 s alone, past the 5 s default when the full suite runs in parallel.
+}, 20_000);
 
 it("requires the owning world's token, validates bodies and scopes snapshot ids", async () => {
   const e = await setup();

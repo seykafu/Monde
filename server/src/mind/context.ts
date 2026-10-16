@@ -19,6 +19,7 @@ import { playerView, type PlayerProfile } from "./player.js";
 import { contentWords, retrieveMemories, topicCards, type MemoryCandidate } from "./retrieval.js";
 import { riddleRecord, riddleTopic, type RiddleRecord } from "./riddles.js";
 import { ECHO_WINDOW, type ValidationContext } from "./validate.js";
+import { borrowedFor, ownSignatures, type RosterVoice } from "./voice.js";
 
 /** The scene the client reports with each turn. The client owns the clock, position and weather. */
 export interface TalkScene {
@@ -39,6 +40,8 @@ export interface ResidentPrefix {
   flags: string[];
   /** Display names by resident id (stable: from the cards). */
   names: Record<string, string>;
+  /** Every resident's tics, sorted by id (stable: from the cards), for voice ownership (voice.ts). */
+  voices: RosterVoice[];
 }
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
@@ -54,10 +57,18 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
   const [worldRows, edges, everyone] = await Promise.all([
     db.select({ flags: worlds.storyFlags }).from(worlds).where(eq(worlds.id, worldId)),
     db.select().from(relationships).where(and(eq(relationships.worldId, worldId), eq(relationships.fromId, residentId))),
-    db.select({ id: residents.id, name: sql<string>`${residents.card}->>'name'` }).from(residents).where(eq(residents.worldId, worldId)),
+    db.select({
+      id: residents.id, name: sql<string>`${residents.card}->>'name'`, kind: sql<string>`${residents.card}->>'kind'`,
+      tics: sql<unknown>`${residents.card}->'voice'->'tics'`,
+    }).from(residents).where(eq(residents.worldId, worldId)),
   ]);
   const names: Record<string, string> = {};
-  for (const r of [...everyone].sort((a, b) => (a.id < b.id ? -1 : 1))) names[r.id] = r.name;
+  const voices: RosterVoice[] = [];
+  for (const r of [...everyone].sort((a, b) => (a.id < b.id ? -1 : 1))) {
+    names[r.id] = r.name;
+    const tics = Array.isArray(r.tics) ? r.tics.filter((t): t is string => typeof t === "string") : [];
+    voices.push({ id: r.id, kind: r.kind as RosterVoice["kind"], tics });
+  }
   return {
     card: row.card,
     state: row.state,
@@ -67,11 +78,12 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
     })),
     flags: worldRows[0]?.flags ?? [],
     names,
+    voices,
   };
 }
 
 export function canonContext(prefix: ResidentPrefix, day: number): CanonContext {
-  return { flags: prefix.flags, day, names: prefix.names };
+  return { flags: prefix.flags, day, names: prefix.names, voices: prefix.voices };
 }
 
 /** Blocks 1-3 exactly as a dialogue turn on `day` sends them. */
@@ -214,6 +226,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         relationships: prefix.relationships,
         flags: prefix.flags,
         names: prefix.names,
+        voices: prefix.voices,
         scene: { day: scene.day, weekday: weekdayOf(scene.day), minute: scene.minute, place: scene.place, weather: scene.weather },
         doing: scene.current_activity ?? null,
         player,
@@ -234,6 +247,10 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         riddle,
         hintsAllowed: riddleState?.allowed ?? 0,
         recentLines,
+        borrowed: borrowedFor(prefix.card, prefix.voices),
+        own: ownSignatures(prefix.card, prefix.voices),
+        conversationLines: conversation.filter((t) => t.speaker === "resident").map((t) => t.text),
+        samples: prefix.card.voice.mode === "narrated_action" ? [] : prefix.card.voice.samples,
         heartPerk: false,
       },
     },

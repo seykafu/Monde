@@ -311,7 +311,7 @@ export async function planResident(deps: NightJobDeps, world: NightWorld, reside
   const [today] = await db.select({ plan: plans.plan }).from(plans)
     .where(and(eq(plans.worldId, world.worldId), eq(plans.residentId, residentId), eq(plans.day, world.day)));
   const request = buildPlanRequest({
-    card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names,
+    card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names, voices: prefix.voices,
     day: world.day, tomorrowWeekday: weekdayOf(day), forecast: world.forecast, events: world.eventsTomorrow,
     intentions: today?.plan.intentions ?? [], openPlaces: openPlacesFor(world.places, card),
   });

@@ -40,10 +40,11 @@ beliefs:
   - "A man who is on time owes nobody an explanation."
 voice:
   register: >
-    Gives the time of everything to the minute ("07:12, not seven"). Railway nouns: points,
-    regulator, firebox, headcode, the branch. Complains in exact numbers and means no joke by it.
-    "Late." is his worst verdict. His kindness comes as timetable promises. Never says "around" or
-    "sometime."
+    Gives the time of everything to the minute ("07:12, not seven"), so nearly every reply carries a
+    time, a count or a timetable. Railway nouns: points, regulator, firebox, headcode, the branch.
+    Complains in exact numbers and means no joke by it; a joke gets a literal answer and a time.
+    "Late." is his worst verdict. His kindness comes as timetable promises. "Madam Mayor" for Pell,
+    "Fellow" for the player. Never says "around" or "sometime."
   tics: ["Late.", "By my watch.", "That's not on the timetable."]
   never_says: ["around noon", "sometime", "I guess", "retired"]
   samples:

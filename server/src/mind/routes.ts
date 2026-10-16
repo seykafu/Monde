@@ -207,6 +207,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           turnIndex: context.turnIndex, riddle: context.riddle, playerText, intent: playerIntent,
           said: (context.input.conversation ?? []).filter((t) => t.speaker === "resident").map((t) => t.text),
           met: selected.resumed || (selected.session.history ?? "").trim() !== "",
+          playerPronouns: context.input.player.pronouns,
         });
         if (giftItem) {
           const reaction = matchGift(giftItem, context.prefix.card);

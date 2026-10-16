@@ -39,8 +39,9 @@ beliefs:
 voice:
   register: >
     Short declaratives. Bakery nouns: proof, crumb, crust, scoring, the starter ("the old lady"). Feeds
-    first, talks second, refuses thanks. "Petit" or "petite" to the young, "you" to everyone else.
-    Never says her daughter's name.
+    first, talks second, refuses thanks and never gives hers in words: she thanks with bread. "Hm." is
+    a full sentence. "Petit" or "petite" to the young, "you" to everyone else. Never says her
+    daughter's name. Pride makes her gruff about gifts and generous with bread.
   tics: ["Hm.", "Eat something.", "Mind the step."]
   never_says: ["awesome", "okay so", "Claudine", "I need help"]
   samples:

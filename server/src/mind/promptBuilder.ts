@@ -26,6 +26,8 @@ import {
   type FavorTemplate, type Memory, type PersonaCard, type ResidentState, type Verb,
 } from "@monde/shared";
 import { promptExpressions } from "./expressions.js";
+import { addressFor } from "./naming.js";
+import { borrowedFor, borrowedLine, type RosterVoice } from "./voice.js";
 
 // ---------------------------------------------------------------------------------------------------------------
 // API settings (GDD §9.17 "API call settings"; AGENTS.md "Claude API rules")
@@ -109,7 +111,7 @@ type Templates = Readonly<Record<TemplateName, string>>;
  * Bump when the code-side serialization below changes in a way the template files don't show (list formats,
  * field order), so the logged prompt version still changes.
  */
-const SERIALIZER_VERSION = "m05.2";
+const SERIALIZER_VERSION = "q01.1";
 
 /**
  * Where the templates live. Source runs read them next to this file. The bundled server (tsup → server/dist)
@@ -244,6 +246,11 @@ export interface CanonContext {
   day: number;
   /** Optional display names by resident id, e.g. { margo: "Marguerite \"Margo\" Liang" }. Must be stable. */
   names?: Readonly<Record<string, string>>;
+  /**
+   * The world's roster of resident voices, for the never-borrow list of other residents' catchphrases (voice.ts).
+   * Must be stable: context.ts loads it sorted, and only hand-written cards own phrases.
+   */
+  voices?: readonly RosterVoice[];
 }
 
 const flagSet = (flags: Iterable<string>): ReadonlySet<string> =>
@@ -292,7 +299,7 @@ export function personaBlock(card: PersonaCard, ctx: CanonContext): string {
   const voice = card.voice;
   const voiceExtra = voice.mode === "narrated_action"
     ? `Action verbs: ${voice.action_verbs.join(", ")}.\nYou never speak. Each line is one short narrated action.`
-    : `Samples (style anchors; never repeat them word for word):\n${bullets(voice.samples.map(prose), "")}`;
+    : `Samples, to show your tone only (never repeat one or lift its phrases; say new things):\n${bullets(voice.samples.map(prose), "")}`;
   const big5 = card.personality.big5;
   const values = card.values;
   return fillTemplate(loadTemplates().persona, {
@@ -320,6 +327,7 @@ export function personaBlock(card: PersonaCard, ctx: CanonContext): string {
     register: prose(voice.register),
     tics: quoted(voice.tics),
     never_says: quoted(voice.never_says),
+    borrowed: borrowedLine(borrowedFor(card, ctx.voices ?? [])),
     voice_extra: voiceExtra,
     expressions: promptExpressions(card).join(", "),
     canon: bullets(activeCanonLocks(card, ctx), "(none right now)"),
@@ -506,6 +514,8 @@ export interface DialogueInput {
   /** World story flags (names, no `flag.` prefix). */
   flags: Iterable<string>;
   names?: Readonly<Record<string, string>>;
+  /** The world's voice roster (CanonContext.voices), so blocks 1-3 match across dialogue, plan and reflection. */
+  voices?: readonly RosterVoice[];
   scene: SceneView;
   /** The resident's current plan block, e.g. "work at market_row.bakery". */
   doing?: string | null;
@@ -530,6 +540,11 @@ export interface DialogueInput {
   focus?: TurnFocus;
   /** A random word from the whim list (§9.17) for variety. */
   whimSeed?: string | null;
+  /**
+   * They have talked before, for how the resident addresses the Fellow (naming.ts). Defaults to: there is a history
+   * with the Fellow, or this conversation was resumed.
+   */
+  met?: boolean;
 }
 
 /** What `<player_said>` holds when the Fellow walks up rather than speaks. */
@@ -582,9 +597,11 @@ export function dialogueMessages(input: DialogueInput, user: string): Anthropic.
 export function buildDialogueRequest(input: DialogueInput): MindRequest {
   const { card, state, scene, player } = input;
   const flags = [...input.flags];
-  const ctx: CanonContext = { flags, day: scene.day, names: input.names };
+  const ctx: CanonContext = { flags, day: scene.day, names: input.names, voices: input.voices };
   const secrets = revealableSecrets(card, { regard: state.regard, flags, day: scene.day });
   const playerName = speech(player.name);
+  const met = input.met ?? ((input.sessionHistory ?? "").trim() !== "" || input.resumedAfter !== undefined);
+  const address = addressFor({ residentId: card.id, playerName, pronouns: player.pronouns, regard: state.regard, met });
   const focus = input.focus ?? (input.playerSaid === WALK_UP ? "open" : "reply");
   // Topic cards invite a change of subject, so they're offered only when there's nothing to answer (§9.10).
   const offerTopics = focus === "open" || focus === "lull";
@@ -610,6 +627,7 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     player_pronouns: speech(player.pronouns),
     regard_tier: regardTier(state.regard),
     player_background: clause(player.background),
+    address: address.line,
     shared_past: player.sharedPast ? `Shared past you may recall: ${prose(player.sharedPast)}` : "",
     memories: bullets(input.memories.slice(0, DIALOGUE_MEMORIES).map(memoryLine), "(nothing comes to mind)"),
     topics,
@@ -640,6 +658,8 @@ export interface PlanInput {
   relationships: readonly RelationshipView[];
   flags: Iterable<string>;
   names?: Readonly<Record<string, string>>;
+  /** The world's voice roster (CanonContext.voices), so blocks 1-3 match across dialogue, plan and reflection. */
+  voices?: readonly RosterVoice[];
   /** Today (the evening the plan is made): blocks 1-3 match today's dialogue cache. Tomorrow is day + 1. */
   day: number;
   tomorrowWeekday: string;
@@ -661,7 +681,7 @@ function planVerbs(card: PersonaCard): readonly Verb[] {
 
 export function buildPlanRequest(input: PlanInput): MindRequest {
   const { card, state } = input;
-  const ctx: CanonContext = { flags: [...input.flags], day: input.day, names: input.names };
+  const ctx: CanonContext = { flags: [...input.flags], day: input.day, names: input.names, voices: input.voices };
   const weekend = isWeekend(input.tomorrowWeekday);
   const routine = (weekend ? card.routine.weekend : card.routine.weekday).map((block) =>
     `${block.at} ${block.do} at ${block.where}${block.with?.length ? ` with ${block.with.join(", ")}` : ""}`);
@@ -705,6 +725,8 @@ export interface ReflectInput {
   relationships: readonly RelationshipView[];
   flags: Iterable<string>;
   names?: Readonly<Record<string, string>>;
+  /** The world's voice roster (CanonContext.voices), so blocks 1-3 match across dialogue, plan and reflection. */
+  voices?: readonly RosterVoice[];
   day: number;
   /** Today's memories, best first; the top 12 are used. */
   memoriesToday: readonly Memory[];
@@ -718,7 +740,7 @@ export interface ReflectInput {
 
 export function buildReflectRequest(input: ReflectInput): MindRequest {
   const { card, state, town } = input;
-  const ctx: CanonContext = { flags: [...input.flags], day: input.day, names: input.names };
+  const ctx: CanonContext = { flags: [...input.flags], day: input.day, names: input.names, voices: input.voices };
   const templates = input.favorTemplates ?? MVP_FAVOR_TEMPLATES.filter((t) => t !== "last_chance");
   const p = town.pillars;
   const townText = [

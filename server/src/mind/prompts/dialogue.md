@@ -6,13 +6,14 @@ promptBuilder.ts); the context follows, compact. Topic cards appear only when th
 Every slot value is escaped so text cannot open or close a tag. A slot alone on its line is dropped when
 empty (shared_past, topics, hints, whim). Slots: player_said, focus, day, weekday, season, time, place,
 weather, emotion, intensity, energy, stress, doing, player_name, player_pronouns, regard_tier,
-player_background, shared_past, memories, topics, already_discussed, open_favors, revealable_secrets, hints,
+player_background, address, shared_past, memories, topics, already_discussed, open_favors, revealable_secrets, hints,
 whim, resident_name, reply_note.
+`address` is what this resident calls the Fellow at this Regard and met state (naming.ts, GDD §12.1).
 -->
 <player_said> {{player_said}} </player_said>
 {{focus}}
 <scene> Day {{day}} ({{weekday}}, {{season}}), {{time}}, {{place}}. Weather: {{weather}}. You: {{emotion}} ({{intensity}}), energy {{energy}}, stress {{stress}}. Doing: {{doing}}. </scene>
-<player> Name: {{player_name}} ({{player_pronouns}}). Your regard: {{regard_tier}}. Background: {{player_background}}. </player>
+<player> Name: {{player_name}} ({{player_pronouns}}). Your regard: {{regard_tier}}. Background: {{player_background}}. {{address}} </player>
 {{shared_past}}
 <memories>
 {{memories}}

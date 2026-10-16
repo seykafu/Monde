@@ -11,6 +11,10 @@
  * lines have their own; riddle hints and narrated lines take replies derived from the line
  * (shared/src/replies.ts). The client adds Leave.
  *
+ * `{player}` in a line is how this resident addresses the Fellow (naming.ts: "Fellow", "petite", the name…), so
+ * an authored line follows the same naming rules as a generated one. A riddle-topic turn is the resident's
+ * authored lead-in (riddleLeads.ts) and then the authored hint, on one line.
+ *
  * Only the opener greets. Mid-conversation the fallback answers the moment the Fellow made (fallbackMoment): a
  * question gets an honest stall that asks for it again and offers to repeat it, a feeling gets a little care, a
  * goodbye gets seen off, anything else a short acknowledgement; and its replies carry the conversation on (ask
@@ -18,12 +22,14 @@
  * opens with "we haven't met".
  */
 import {
-  REPLY_CHARS, callName, derivedReplies, fillReply, moodBand, normalizeChoices, regardTier, replyHash, type DialogueTurnOutput,
+  LIMITS, REPLY_CHARS, callName, derivedReplies, fillReply, moodBand, normalizeChoices, regardTier, replyHash, type DialogueTurnOutput,
   type Intent, type MoodBand, type PersonaCard, type RegardTier, type Reply, type ReplyCue, type ResidentState,
 } from "@monde/shared";
 import { containsAnswer, turnFocus } from "./promptBuilder.js";
 import type { RiddleRecord } from "./riddles.js";
 import { expressionFor } from "./expressions.js";
+import { addressFor } from "./naming.js";
+import { riddleLeadIn } from "./riddleLeads.js";
 
 /** The authored beat the client plays when nothing has streamed by 2.5 s (§9.10 flow step 4). */
 export const THINKING_BEAT = "Hm.";
@@ -31,7 +37,7 @@ export const THINKING_BEAT = "Hm.";
 type MoodGroup = "low" | "even" | "high";
 const MOOD_GROUP: Record<MoodBand, MoodGroup> = { glum: "low", low: "low", even: "even", bright: "high", glowing: "high" };
 
-/** `{player}` is the player's name. */
+/** `{player}` is what the resident calls the Fellow (naming.ts). */
 export const FALLBACK_LINES: Readonly<Record<RegardTier, Readonly<Record<MoodGroup, string>>>> = {
   Wary: {
     low: "Oh. It's you. I haven't the energy for this.",
@@ -76,7 +82,10 @@ export const MET_LINES: Readonly<Record<MoodGroup, string>> = {
  */
 export type FallbackMoment = "open" | "resume" | "question" | "feeling" | "thanks" | "bye" | "intro" | "statement";
 
-/** Lines for each mid-conversation moment, house style (§12.1), in no resident's particular voice. `{player}` is the player's name. */
+/**
+ * Lines for each mid-conversation moment, house style (§12.1), in no resident's particular voice. `{player}` is what
+ * the resident calls the Fellow (naming.ts), except in `intro`, where it's the name the Fellow just gave.
+ */
 export const MOMENT_LINES: Readonly<Record<Exclude<FallbackMoment, "open">, readonly string[]>> = {
   resume: ["Back again. Where were we?", "There you are. Where were we?"],
   question: [
@@ -194,6 +203,8 @@ export interface FallbackInput {
   said?: readonly string[];
   /** They've talked before (a history with the Fellow, or a resumed session). */
   met?: boolean;
+  /** The Fellow's pronouns ("she/her"), for how the resident addresses them (naming.ts). */
+  playerPronouns?: string;
 }
 
 const firstName = (card: PersonaCard): string => card.name.replace(/"[^"]*"/g, " ").trim().split(/\s+/)[0] ?? card.id;
@@ -208,15 +219,47 @@ export function authoredHint(record: RiddleRecord, allowed: number): string | nu
   return null;
 }
 
+/** What this resident calls the Fellow right now (naming.ts). */
+export function addressTerm(input: FallbackInput): string {
+  return addressFor({
+    residentId: input.card.id, playerName: input.playerName, pronouns: input.playerPronouns ?? "they/them",
+    regard: input.state.regard, met: input.met ?? false,
+  }).term;
+}
+
+/** Fill `{player}` with `term`, capitalized where it opens a sentence ("My dear. Good."). */
+export function fillAddress(line: string, term: string): string {
+  return line.replace(/\{player\}/g, (_match, offset: number) => {
+    const before = line.slice(0, offset);
+    return before.trim() === "" || /[.!?]\s+$/.test(before) ? term.charAt(0).toUpperCase() + term.slice(1) : term;
+  });
+}
+
 /** The first line of `pool` (from a stable start) that the resident hasn't said in this conversation. */
-function freshLine(pool: readonly string[], input: FallbackInput): string {
+function freshLine(pool: readonly string[], input: FallbackInput, term: string): string {
   const said = new Set((input.said ?? []).map((line) => line.trim()));
   const start = replyHash(`${input.playerText ?? ""}|${input.turnIndex}`) % pool.length;
   for (let i = 0; i < pool.length; i++) {
-    const line = pool[(start + i) % pool.length]!.replaceAll("{player}", input.playerName);
+    const line = fillAddress(pool[(start + i) % pool.length]!, term);
     if (!said.has(line)) return line;
   }
-  return pool[start]!.replaceAll("{player}", input.playerName);
+  return fillAddress(pool[start]!, term);
+}
+
+/**
+ * A riddle-topic turn: the resident's authored lead-in, then the best safe hint (§14.2), on one line. Asked again
+ * after that hint was given in this conversation, the lead-in says so. Nothing safe to hint: stumped.
+ */
+function riddleLine(input: FallbackInput, riddle: NonNullable<FallbackInput["riddle"]>): string {
+  const hint = authoredHint(riddle.record, riddle.allowed);
+  if (!hint) return STUMPED_LINE;
+  const said = input.said ?? [];
+  const lead = riddleLeadIn({
+    residentId: input.card.id, riddleId: riddle.record.id, turnIndex: input.turnIndex,
+    again: said.some((line) => line.includes(hint)), said,
+  });
+  const line = `${lead} ${hint}`;
+  return line.length <= LIMITS.dialogue.lineChars ? line : hint;
 }
 
 export function fallbackLine(input: FallbackInput): string {
@@ -225,11 +268,13 @@ export function fallbackLine(input: FallbackInput): string {
   if (input.card.voice.mode === "narrated_action") {
     return (moment === "open" ? ANIMAL_LINES[group] : ANIMAL_FILLER).replaceAll("{name}", firstName(input.card));
   }
-  if (input.riddle) return authoredHint(input.riddle.record, input.riddle.allowed) ?? STUMPED_LINE;
-  if (moment !== "open") return freshLine(MOMENT_LINES[moment], input);
+  if (input.riddle) return riddleLine(input, input.riddle);
+  // The intro moment echoes the name the Fellow just gave; everything else uses the resident's own address.
+  const term = moment === "intro" ? input.playerName : addressTerm(input);
+  if (moment !== "open") return freshLine(MOMENT_LINES[moment], input, term);
   const tier = regardTier(input.state.regard);
   const line = input.met && tier === "Stranger" ? MET_LINES[group] : FALLBACK_LINES[tier][group];
-  return line.replaceAll("{player}", input.playerName);
+  return fillAddress(line, term);
 }
 
 const CHOICE_IDS = ["a", "b", "c"] as const;

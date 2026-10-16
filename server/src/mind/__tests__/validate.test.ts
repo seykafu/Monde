@@ -10,6 +10,7 @@ import {
 } from "../fallback.js";
 import { REPLY_POOLS, WEATHER_REPLIES, ZONE_REPLIES, derivedReplies, fillReply, type Reply } from "@monde/shared";
 import { RIDDLES } from "../riddles.js";
+import { riddleLeadIn } from "../riddleLeads.js";
 
 let cards: PersonaCard[];
 const card = (id: string) => cards.find((c) => c.id === id)!;
@@ -212,12 +213,14 @@ describe("fallback turns", () => {
     regard, mood: { valence, energy: 50, stress: 0, emotion: "wistful" as const, intensity: 10 },
   });
 
-  it("picks the line by Regard tier and mood band, and fills the player's name", () => {
+  it("picks the line by Regard tier and mood band, and fills in what the resident calls the Fellow", () => {
     const pell = card("pell");
     const base = { card: pell, playerName: "Ada", turnIndex: 0 };
     expect(fallbackTurn({ ...base, state: state(-10, 0) }).lines[0]!.text).toBe(FALLBACK_LINES.Wary.even);
     expect(fallbackTurn({ ...base, state: state(0, -90) }).lines[0]!.text).toBe(FALLBACK_LINES.Stranger.low);
-    expect(fallbackTurn({ ...base, state: state(25, 0) }).lines[0]!.text).toBe("Hello again, Ada. How are you getting on?");
+    // Pell says "Fellow" until Friend (§12.1); a resident without a naming rule uses the name from Neighbor.
+    expect(fallbackTurn({ ...base, state: state(25, 0) }).lines[0]!.text).toBe("Hello again, Fellow. How are you getting on?");
+    expect(fallbackTurn({ ...base, card: card("margo"), state: state(25, 0) }).lines[0]!.text).toBe("Hello again, Ada. How are you getting on?");
     expect(fallbackTurn({ ...base, state: state(80, 90) }).lines[0]!.text).toBe(FALLBACK_LINES.Confidant.high);
     // Walking back up to a conversation that's still open: picking up, not a greeting.
     expect(MOMENT_LINES.resume).toContain(fallbackTurn({ ...base, turnIndex: 1, state: state(0, 0) }).lines[0]!.text);
@@ -265,7 +268,9 @@ describe("fallback turns", () => {
     expect(authoredHint(RIDDLES["OQ-1"]!, 3)).toBe(RIDDLES["OQ-1"]!.hints[2]);
     expect(authoredHint(oq2, 0)).toBeNull();
     const base = { card: card("margo"), playerName: "Ada", turnIndex: 0, state: state(0, 0) };
-    expect(fallbackTurn({ ...base, riddle: { record: oq2, allowed: 1 } }).lines[0]!.text).toBe(oq2.hints[0]);
+    // The authored hint, after Margo's own authored lead-in (riddleLeads.ts) on the same line.
+    const lead = riddleLeadIn({ residentId: "margo", riddleId: "OQ-2", turnIndex: 0, again: false });
+    expect(fallbackTurn({ ...base, riddle: { record: oq2, allowed: 1 } }).lines[0]!.text).toBe(`${lead} ${oq2.hints[0]}`);
     expect(fallbackTurn({ ...base, riddle: { record: oq2, allowed: 0 } }).lines[0]!.text).toBe(STUMPED_LINE);
   });
 

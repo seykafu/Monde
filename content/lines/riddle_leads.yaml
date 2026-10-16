@@ -1,0 +1,179 @@
+# Riddle lead-ins (GDD §14.2 AI hint guard; MVP Q-01). On a riddle-topic turn the resident never paraphrases:
+# the engine serves the authored hint for the unlocked level (server/src/mind/fallback.ts). This is the short
+# line, in the resident's own voice, that comes before it on the same line: "<lead-in> <hint>".
+#   give   the first time the hint comes up in a conversation; reads as a refusal to give the answer
+#   again  when that hint was already given in this conversation (the Fellow is pushing)
+# Picked deterministically (resident, riddle, exchange), never one already said in the conversation.
+# Rules (tests check them): no riddle content at all (no accepted answer of any riddle, no inscription or hint
+# words), no other resident's catchphrase, the voice bible's house style (§12.1), and lead-in + longest hint fits
+# one 220-character line. Stage business is physical only. `default` covers residents without their own
+# (generated arrivals).
+leads:
+  default:
+    give:
+      - "(Stops work a moment.) I don't know the answer. I know this much:"
+      - "All I can give you is this:"
+    again:
+      - "Same as before. That's all I've got:"
+      - "(Goes back to work.) I've nothing more than last time:"
+  ada:
+    give:
+      - "(Stamps a stub without looking.) I sell tickets, not answers. One line, no charge:"
+      - "(Runs the pencil down the manifest.) One hint, and it's free:"
+    again:
+      - "Same as last time, Fellow. Price hasn't gone up:"
+      - "(Taps the hatch.) Asked, and answered. Here it is again:"
+  augusta:
+    give:
+      - "(Writes while she talks.) I can't confirm an answer. I can tell you this:"
+      - "(Turns a page in her notebook.) Not my department. What I've got is this:"
+    again:
+      - "(Doesn't stop writing.) You've had that one already. Word for word:"
+      - "Same as before. I don't change a statement:"
+  bertrand:
+    give:
+      - "(Winds a pocket watch.) My dear, Aurélien would never forgive me an answer. A nudge, then:"
+      - "(Sets down a mainspring.) I shan't spoil it, young person. But I'll say this much:"
+    again:
+      - "(Holds up one finger.) Patience. The same nudge, and not a tooth more:"
+      - "Where was I. Yes. Exactly what I said before:"
+  bru:
+    give:
+      - "(Turns a bit of alder in his hands.) Don't know the answer. I know this bit:"
+      - "(Thinks, then nods.) Only got the one thing:"
+    again:
+      - "(Sets the knife down.) Same as before. It's what's here:"
+      - "Same thing. That's all of it:"
+  delphine:
+    give:
+      - "(Smooths a seam flat.) I'm afraid I don't know the answer. I can offer you this:"
+      - "(Threads a needle without looking.) I shouldn't like to guess. There is this, however:"
+    again:
+      - "(Folds the cloth on the bias.) As I said before, and I'm afraid it isn't more:"
+      - "(Sets the thimble down.) Only what I told you:"
+  felix:
+    give:
+      - "(Wipes chalk from his fingers.) I won't do your sums for you. Here's where to start:"
+      - "(Taps the slate.) Show your working, not mine. This is all you get from me:"
+    again:
+      - "(Folds his hands on the desk.) We'll go over it once more, from the top:"
+      - "Goodness, the same question. The same clue, then:"
+  hollis:
+    give:
+      - "(Checks the watch on its chain.) I don't deal in riddles. I deal in facts, and the fact is this:"
+      - "(Snaps the watch shut.) No answers on this platform. What's written down is this:"
+    again:
+      - "(Taps the watch.) Asked two minutes ago, answered two minutes ago. Same again:"
+      - "(Doesn't look up from the rails.) It hasn't changed since you last asked:"
+  ines:
+    give:
+      - "(Squares a folder on her knee.) To be clear, I've no answer to give. Only this:"
+      - "(Uncaps a pen.) I'm not in a position to say. What I can share is this:"
+    again:
+      - "As discussed, the same note. I'd hate to be imprecise:"
+      - "(Rereads her note.) Nothing's changed since you asked:"
+  june:
+    give:
+      - "(Hums a bar, then stops.) Mm, I'm no good at these, friend. Only this:"
+      - "(Taps out a rest on the counter.) Sure, I'll give you a bit. Just a bit:"
+    again:
+      - "Mm, the same again, friend. It's all I've got:"
+      - "(Plucks one string.) Same tune as before:"
+  kasimir:
+    give:
+      - "(Picks up his rule.) Don't know. Know this much:"
+      - "(Runs a thumb along the grain.) No answer. One measurement:"
+    again:
+      - "Same as before. Measure twice:"
+      - "(Sets the plane down.) Said it. Saying it again:"
+  margo:
+    give:
+      - "(Taps the plate.) All I'll give you is this:"
+      - "(Sets the pencil square to the folio.) No answers. One note, and you'll want to copy it:"
+    again:
+      - "(Doesn't look up.) Same note as before. It hasn't changed since you asked:"
+      - "No. Technically, I've already told you everything I'll tell you:"
+  moss:
+    give:
+      - "(Coils a rope.) Riddles. Not my trade. Only this:"
+      - "(Squints at the water.) Don't know. This, though:"
+    again:
+      - "(Coils the same rope again.) Same again:"
+      - "Same as before. I'm only saying:"
+  nell:
+    give:
+      - "Look. I don't do riddles, I do crates and lorries. Fine. This:"
+      - "(Thumps a crate.) Who signed you up for riddles? Here, then:"
+    again:
+      - "(Arms folded.) You heard me the first time:"
+      - "Look. Same not-answer as before:"
+  nettie:
+    give:
+      - "(Flicks a pebble off the ledge.) Riddles are Tib's thing. Fine, Fellow. This:"
+      - "Easy. I'll tell you one thing and you stop asking:"
+    again:
+      - "Blast, you again. Same thing as before:"
+      - "(Flicks another pebble.) Same as I said. Pay attention:"
+  odile:
+    give:
+      - "(Dusts flour off her hands.) Hm. I'm no good at riddles. Here's what I've got:"
+      - "(Turns a loaf on the rack.) Don't ask me for the answer. This much, then:"
+    again:
+      - "(Doesn't stop kneading.) I said it once. I'll say it twice, no more:"
+      - "Hm. Same as before:"
+  pell:
+    give:
+      - "(Takes off her glasses and folds them.) I'm no use with puzzles. All I can offer is this:"
+      - "(Squares the ledger.) Heavens, don't ask me for answers. I can tell you this much:"
+    again:
+      - "(Caps her pen.) I've told you all I know, and I'll tell it once more:"
+      - "Now. Same as I said before, and that's the end of it:"
+  priya:
+    give:
+      - "(Rolls a bandage while she talks.) I patch people, not puzzles. Here's what I've got:"
+      - "(Snaps a glove off.) No answers. A pointer, though, and you'll do the rest:"
+    again:
+      - "Right. Second dose, same as the first:"
+      - "(Rolls the bandage tighter.) Same as before. It won't change if you ask harder:"
+  rook:
+    give:
+      - "(Pulls a loose thread from his cuff.) Riddles. Rot. One thing, then:"
+      - "Say what you came to say. Fine. This is what I've got:"
+    again:
+      - "Don't. Same as before:"
+      - "(Shrugs.) You heard it. Again:"
+  rosalind:
+    give:
+      - "(Wipes a glass that's already dry.) Between us, pet, this is all I've heard:"
+      - "(Sets a glass down slowly.) I couldn't say, but there's this:"
+    again:
+      - "(Polishes the same glass.) Same as I told you, pet:"
+      - "(Leans on the counter.) Only what I said before:"
+  sable:
+    give:
+      - "(Wipes ink off her thumb.) I print facts, not answers. Here's a fact:"
+      - "(Taps a pencil on the galley.) You want the answer. You get this:"
+    again:
+      - "Same quote as before. No second edition:"
+      - "(Doesn't look up from the forme.) I've already given you that one:"
+  teo:
+    give:
+      - "(Keeps his hands in the soil.) Oh, bother. I'm no good at these. Only this, sorry:"
+      - "(Turns a pot toward the window.) Sorry, it's, well. I don't know it. I know this:"
+    again:
+      - "(Waters the same fern twice.) Sorry. Same as, same as before:"
+      - "Sorry. It's still only this:"
+  tib:
+    give:
+      - "I'm not supposed to say, but. Okay. Just this:"
+      - "(Counts on his fingers.) Obviously I'm not telling. But here's a bit:"
+    again:
+      - "Same as before. I said. This:"
+      - "(Kicks the cobbles.) I already told you. This:"
+  vane:
+    give:
+      - "(Adjusts his pocket square.) Riddles aren't my business. I can tell you this much:"
+      - "Let's be sensible. You don't need an answer from me. You need this:"
+    again:
+      - "(Straightens a cufflink.) The same as before. I'd hate to oversell it:"
+      - "May I be frank? It's what I said last time:"

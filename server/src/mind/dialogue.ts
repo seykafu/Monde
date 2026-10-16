@@ -4,6 +4,10 @@
  *   build (promptBuilder) → stream (MindClient) → check stop_reason → validate (validate.ts)
  *     → on a validation failure, regenerate ONCE with a corrective note → else the authored fallback.
  *
+ * Soft failures (another resident's catchphrase, a card sample quoted back; validate.ts steps 8-9) regenerate once
+ * too, but are never worth an authored line: a second soft failure is accepted, and if the regeneration fails
+ * outright the first attempt's otherwise valid turn is kept.
+ *
  * Deadlines (§9.10 step 4): if nothing visible has streamed by 2.5 s the caller gets `onThinking` (the client
  * plays "Hm."); if the model has produced no text by 6 s the call is abandoned. Inside that window a call that
  * has produced nothing is not left to hang: at 2.5 s the same request is sent again alongside it (a hedge; the
@@ -21,6 +25,7 @@ import { DialogueTurnOutput, LIMITS, fitText, modelOutputFormat } from "@monde/s
 import { apiParams, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
 import { completeWords, lexicalHits } from "./filters.js";
+import { borrowedHits } from "./voice.js";
 import { LineTextExtractor } from "./partialJson.js";
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
 import { correctiveNote, validateTurn, type ValidationContext } from "./validate.js";
@@ -66,9 +71,10 @@ export interface CallRecord {
   /** The API's stop_reason, or "none" when no message came back (timeout, error, no key). */
   stopReason: string;
   /**
-   * "ok", a validation category ("schema", "lexical:brand", "riddle", "echo"), "salvaged" / "salvaged:<code>"
-   * (a cut-short reply whose whole lines were kept), "hedge_lost" / "retried:<code>" (an extra call of the same
-   * attempt that didn't supply the turn), or what stopped the call.
+   * "ok", a validation category ("schema", "lexical:brand", "riddle", "echo", "borrowed", "sample_echo"),
+   * "kept:<soft category>" (accepted despite a soft check), "salvaged" / "salvaged:<code>" (a cut-short reply whose
+   * whole lines were kept), "hedge_lost" / "retried:<code>" (an extra call of the same attempt that didn't supply
+   * the turn), or what stopped the call.
    */
   validation: string;
 }
@@ -310,9 +316,13 @@ async function callOnce(
   }
 }
 
-/** Is this (whole-word) partial line safe to show before validation? Same lexical and riddle rules. */
+/**
+ * Is this (whole-word) partial line safe to show before validation? Same lexical and riddle rules, and no other
+ * resident's catchphrase (the turn will be regenerated, so the Fellow never sees June say Odile's line).
+ */
 function streamSafe(text: string, validation: ValidationContext): boolean {
   if (lexicalHits(text).length > 0) return false;
+  if (borrowedHits(text, validation.borrowed ?? []).length > 0) return false;
   return !validation.riddle; // Riddle-topic output is held until the complete turn has passed the guard.
 }
 
@@ -325,8 +335,11 @@ function salvage(raw: string, validation: ValidationContext): { output: Dialogue
   if (!rebuilt) return null;
   const rawOutput = JSON.stringify(rebuilt.turn);
   const validated = validateTurn(rawOutput, validation);
-  if (!validated.ok) return null;
-  return { output: validated.output, rawOutput, adjustments: [`salvaged ${JSON.stringify(rebuilt.kept)}`, ...validated.adjustments] };
+  const kept = validated.ok ? validated : validated.soft
+    ? { output: validated.soft.output, adjustments: [...validated.soft.adjustments, `kept despite ${validated.category}: ${validated.detail}`] }
+    : null;
+  if (!kept) return null;
+  return { output: kept.output, rawOutput, adjustments: [`salvaged ${JSON.stringify(rebuilt.kept)}`, ...kept.adjustments] };
 }
 
 export async function generateTurn(options: GenerateOptions): Promise<GenerateResult> {
@@ -339,7 +352,11 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
   const thinkingTimer = setTimeout(() => {
     if (!visible && !finished) options.onThinking?.();
   }, timings.thinkingMs);
-  const fail = (code: TurnFailureCode): GenerateResult => ({ output: null, failure: failure(code), calls, adjustments: [], salvaged: false });
+  // A first attempt that failed only a soft check: kept if the regeneration can't do better (validate.ts 8-9).
+  let spare: { output: DialogueTurnOutput; rawOutput: string; adjustments: string[] } | null = null;
+  const fail = (code: TurnFailureCode): GenerateResult => (spare
+    ? { ...spare, failure: null, calls, salvaged: false }
+    : { output: null, failure: failure(code), calls, adjustments: [], salvaged: false });
 
   try {
     // Riddle-topic turns may only show authored hint wording (validate.ts step 5), so a model call can only fail
@@ -416,8 +433,19 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
         record(tokens, stopReason, "ok");
         return { output: validated.output, rawOutput: textOf(message), failure: null, calls, adjustments: validated.adjustments, salvaged: false };
       }
+      if (validated.soft) {
+        const kept = {
+          output: validated.soft.output, rawOutput: textOf(message),
+          adjustments: [...validated.soft.adjustments, `kept despite ${validated.category}: ${validated.detail}`],
+        };
+        if (attempt === 2) {
+          record(tokens, stopReason, `kept:${validated.category}`);
+          return { ...kept, failure: null, calls, salvaged: false };
+        }
+        spare = kept;
+      }
       record(tokens, stopReason, validated.category);
-      corrective = correctiveNote(validated.category);
+      corrective = correctiveNote(validated.category, validated.detail);
     }
     return fail("invalid_output");
   } finally {

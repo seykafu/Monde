@@ -444,7 +444,7 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
 
   const itemIds = new Set((await loadItems()).map(i => i.id));
   const request = buildReflectRequest({
-    card: prefix.card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names,
+    card: prefix.card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names, voices: prefix.voices,
     day: world.day, memoriesToday: selectReflectionMemories(today, prefix, world.day), town: world.town,
     favorTemplates: PROPOSABLE_FAVORS,
   });

@@ -14,6 +14,7 @@ import { WRAP_UP_NOTE } from "../dialogue.js";
 import { DIALOGUE_MAX_TOKENS } from "../promptBuilder.js";
 import { FALLBACK_LINES, FALLBACK_REPLIES, MOMENT_LINES } from "../fallback.js";
 import { RIDDLES } from "../riddles.js";
+import { loadRiddleLeads } from "../riddleLeads.js";
 import { correctiveNote } from "../validate.js";
 import { FakeMind, allBodies } from "./fakeMind.js";
 
@@ -349,7 +350,12 @@ describe("POST /v1/worlds/:w/talk", () => {
 
     const riddleTurn = sse((await talk(env, payload({ context: { riddle: { id: "OQ-1", hints_allowed: 2 } } }))).payload);
     expect(riddleTurn.find((e) => e.event === "error")!.data.code).toBe("riddle_authored");
-    expect(finalTurn(riddleTurn)).toMatchObject({ fallback: true, lines: [{ text: RIDDLES["OQ-1"]!.hints[1] }] });
+    // Pell's authored lead-in, then the authored hint for the unlocked level, on one line.
+    const riddleLine = finalTurn(riddleTurn).lines;
+    expect(finalTurn(riddleTurn)).toMatchObject({ fallback: true });
+    expect(riddleLine).toHaveLength(1);
+    expect(riddleLine[0].text.endsWith(` ${RIDDLES["OQ-1"]!.hints[1]}`)).toBe(true);
+    expect(loadRiddleLeads().leads.pell!.give.some((lead) => riddleLine[0].text.startsWith(lead))).toBe(true);
     expect(riddleTurn.some((e) => e.event === "line_delta" && /bell/i.test(e.data.text_so_far))).toBe(false);
     expect(mind.streams).toHaveLength(0);
 
@@ -362,7 +368,9 @@ describe("POST /v1/worlds/:w/talk", () => {
     const mind = new FakeMind([{ output: good(["Lamps and tea, that's the answer."]) }]);
     const env = await setup(mind);
     const body = payload({ context: { riddle: { id: "OQ-1", hints_allowed: 1, accepted: ["lamps", "tea"] } } });
-    expect(finalTurn(sse((await talk(env, body)).payload))).toMatchObject({ lines: [{ text: RIDDLES["OQ-1"]!.hints[0] }] });
+    const lines = finalTurn(sse((await talk(env, body)).payload)).lines;
+    expect(lines).toHaveLength(1);
+    expect(lines[0].text.endsWith(` ${RIDDLES["OQ-1"]!.hints[0]}`)).toBe(true);
     expect(mind.streams).toHaveLength(0);
   });
 
@@ -375,6 +383,31 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect(finalTurn(events)).toMatchObject({ fallback: false, lines: [{ text: "Tea, then. Sit." }] });
     expect(userBlocks(mind.streams[2]!).at(-1)).toBe(correctiveNote("echo"));
     expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["ok", "echo", "ok"]);
+  });
+
+  it("owns the voice: the persona lists other residents' catchphrases, the turn says what to call the Fellow", async () => {
+    const mind = new FakeMind([{ output: good() }]);
+    const env = await setup(mind);
+    await talk(env, payload());
+    const system = mind.streams[0]!.system as Anthropic.TextBlockParam[];
+    const persona = system[1]!.text;
+    expect(persona).toContain('Your tics, yours alone (each at most once per conversation): "Now.", "Heavens."');
+    expect(persona).toContain('Odile "Eat something.", "Mind the step."');
+    expect(persona).not.toContain('Pell "Now."');
+    // Before the Fellowship form the Fellow is just "Fellow" (they/them).
+    expect(userBlocks(mind.streams[0]!)[0]).toContain('Call them "Fellow" ("dear" now and then). </player>');
+  });
+
+  it("regenerates a line that borrows another resident's catchphrase, and keeps a second slip rather than fall back", async () => {
+    const borrowing = good(["(Counts a lamp.) Mind the step, Fellow. Eighty-one lit tonight."]);
+    const mind = new FakeMind([{ output: borrowing, chunk: 4 }, { output: borrowing }]);
+    const env = await setup(mind);
+    const events = sse((await talk(env, payload())).payload);
+    expect(finalTurn(events)).toMatchObject({ fallback: false, lines: borrowing.lines });
+    expect(events.some((e) => e.event === "error")).toBe(false);
+    expect(userBlocks(mind.streams[1]!).at(-1)).toBe(correctiveNote("borrowed", '"Mind the step." (odile)'));
+    expect(events.some((e) => e.event === "line_delta" && /mind the step/i.test(e.data.text_so_far))).toBe(false);
+    expect((await logs(env.worldId)).map((l) => [l.validation, l.fallback])).toEqual([["borrowed", false], ["kept:borrowed", false]]);
   });
 
   it("forces wrap_up on the sixth exchange and carries exact earlier turns", async () => {

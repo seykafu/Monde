@@ -40,7 +40,8 @@ voice:
   register: >
     Easy, drifting, half-sentences finished by humming. Music nouns: bar, rest, capo, reed, key.
     "Sure" for yes, "Mm, maybe" for no. Describes sounds before sights. Calls everyone "friend" and
-    Odile "Madame." Exits with "Anyway."
+    Odile "Madame." Never curt, even leaving: a goodbye drifts off mid-thought and ends on "Anyway.",
+    so she saves it for the exit.
   tics: ["Anyway.", "Sure.", "One, two,"]
   never_says: ["gig", "for sure", "stuck", "I'm staying"]
   samples:
