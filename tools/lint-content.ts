@@ -1,3 +1,4 @@
+import { SPRING_RIDDLES, normalizeRiddleAnswer } from '@monde/shared';
 /**
  * Content linter (GDD §20.4): persona cards (with their `look`), place registry, declared flags, the Quiet Mode line library
  * (Appendix B) with its authored replies, and the scripted {ai_open} exchanges (content/lines/scripted.yaml).
@@ -7,7 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
 import {
-  PersonaCard, STANDARD_EXPRESSIONS, cardLookProblems, compileScenes, evaluate, fillReply, registryFromContent,
+  ItemCatalog, COMMUNITY_TASKS, PersonaCard, STANDARD_EXPRESSIONS, cardLookProblems, compileScenes, evaluate, fillReply, registryFromContent,
   type PersonaCard as Card
 } from "@monde/shared";
 import { firstName, parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
@@ -32,6 +33,11 @@ for (const [zone, ids] of Object.entries(placesDoc)) for (const id of ids) {
 }
 const placeOk = (p: string) => places.has(p) || /^[a-z_]+\.home_\d{2,3}$/.test(p);
 
+// ---- items and work destinations
+const itemResult = ItemCatalog.safeParse(YAML.parse(fs.readFileSync(path.join(root, 'content/items.yaml'), 'utf8')));
+if (!itemResult.success) for (const issue of itemResult.error.issues) err(`items: ${issue.path.join('.')}: ${issue.message}`);
+for (const task of COMMUNITY_TASKS) if (!places.has(task.place)) err(`work ${task.id}: unknown place ${task.place}`);
+
 // ---- flags
 const flagsDoc = YAML.parse(fs.readFileSync(path.join(root, "content/flags.yaml"), "utf8")) as { flags: string[] };
 const declared = new Set(flagsDoc.flags);
@@ -49,6 +55,16 @@ function flagsIn(expr: string, where: string): string[] {
     err(`${where}: expression does not parse: ${expr} (${(e as Error).message})`);
   }
   return [...new Set(seen)];
+}
+
+// ---- authored Spring riddles (Tib's explicit null ladders are documented GDD gaps)
+const riddleIds = new Set(SPRING_RIDDLES.map(r => r.id));
+if (riddleIds.size !== SPRING_RIDDLES.length) err('riddles: duplicate ids');
+for (const r of SPRING_RIDDLES) {
+  if (!r.accepted.length || r.accepted.some(a => !normalizeRiddleAnswer(a))) err(`${r.id}: empty normalized answer`);
+  if (r.hints.length !== 3 || r.hints.some(h => !h) && !r.gaps.some(g => g.includes('no hint ladder'))) err(`${r.id}: incomplete hint ladder`);
+  if (r.previous && !riddleIds.has(r.previous)) err(`${r.id}: unknown preceding Mark`);
+  for (const f of [...r.prerequisites, ...r.rewards.flags]) if (!declared.has(f) && f !== 'project_lighthouse_done') err(`${r.id}: unknown flag ${f}`);
 }
 
 // ---- residents

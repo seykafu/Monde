@@ -1,0 +1,200 @@
+# GDD-GAP: stacks of 20 (tools 1), retail prices and tea +10 are provisional. Meals follow §11.3.
+[
+  {
+    "id": "bun",
+    "name": "Odile’s warm bun",
+    "description": "Odile’s warm bun. A little something from Monde.",
+    "tags": [
+      "bread",
+      "rye flour",
+      "first loaf",
+      "meal"
+    ],
+    "stack": 20,
+    "stamina": 15,
+    "price": 6
+  },
+  {
+    "id": "lunch",
+    "name": "Café Liss lunch",
+    "description": "Café Liss lunch. A little something from Monde.",
+    "tags": [
+      "meal",
+      "vegetables"
+    ],
+    "stack": 20,
+    "stamina": 25,
+    "price": 12
+  },
+  {
+    "id": "supper",
+    "name": "Gull & Anchor supper",
+    "description": "Gull & Anchor supper. A little something from Monde.",
+    "tags": [
+      "meal",
+      "fish"
+    ],
+    "stack": 20,
+    "stamina": 30,
+    "price": 15
+  },
+  {
+    "id": "tea",
+    "name": "Tin of harbour tea",
+    "description": "Tin of harbour tea. A little something from Monde.",
+    "tags": [
+      "tea",
+      "drink"
+    ],
+    "stack": 20,
+    "stamina": 10,
+    "price": 5
+  },
+  {
+    "id": "flowers",
+    "name": "Lane-end posy",
+    "description": "Lane-end posy. A little something from Monde.",
+    "tags": [
+      "flowers",
+      "wildflowers"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 4
+  },
+  {
+    "id": "bread",
+    "name": "Brown-paper loaf",
+    "description": "Brown-paper loaf. A little something from Monde.",
+    "tags": [
+      "bread",
+      "rye flour",
+      "first loaf"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 5
+  },
+  {
+    "id": "book",
+    "name": "Salt-worn storybook",
+    "description": "Salt-worn storybook. A little something from Monde.",
+    "tags": [
+      "books",
+      "old books",
+      "history"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 10
+  },
+  {
+    "id": "shell",
+    "name": "Moon-white shell",
+    "description": "Moon-white shell. A little something from Monde.",
+    "tags": [
+      "shells",
+      "sea"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 3
+  },
+  {
+    "id": "honey",
+    "name": "Jar of summer honey",
+    "description": "Jar of summer honey. A little something from Monde.",
+    "tags": [
+      "honey",
+      "sweet"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 8
+  },
+  {
+    "id": "rubbings",
+    "name": "Founder’s rubbing paper",
+    "description": "Founder’s rubbing paper. A little something from Monde.",
+    "tags": [
+      "pencil rubbings",
+      "plaque numbers"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 5
+  },
+  {
+    "id": "timber",
+    "name": "Straight-grain timber",
+    "description": "Straight-grain timber. A little something from Monde.",
+    "tags": [
+      "material",
+      "wood"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 8
+  },
+  {
+    "id": "nails",
+    "name": "Paper twist of nails",
+    "description": "Paper twist of nails. A little something from Monde.",
+    "tags": [
+      "material",
+      "metal"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 4
+  },
+  {
+    "id": "paint",
+    "name": "Tin of porch paint",
+    "description": "Tin of porch paint. A little something from Monde.",
+    "tags": [
+      "material",
+      "paint"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 10
+  },
+  {
+    "id": "glass",
+    "name": "Clear window glass",
+    "description": "Clear window glass. A little something from Monde.",
+    "tags": [
+      "material",
+      "glass"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 12
+  },
+  {
+    "id": "seeds",
+    "name": "Folded packet of seeds",
+    "description": "Folded packet of seeds. A little something from Monde.",
+    "tags": [
+      "material",
+      "seeds",
+      "repotting"
+    ],
+    "stack": 20,
+    "stamina": 0,
+    "price": 4
+  },
+  {
+    "id": "tools",
+    "name": "Well-kept hand tools",
+    "description": "Well-kept hand tools. A little something from Monde.",
+    "tags": [
+      "material",
+      "tools"
+    ],
+    "stack": 1,
+    "stamina": 0,
+    "price": 20
+  }
+]

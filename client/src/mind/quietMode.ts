@@ -479,6 +479,7 @@ const ASKS_NEWS = /\b(?:news|what'?s new|anything new|happening|going on|heard a
  * that asks for the news (a `news…` id or the words) gets a `ctx` line, and anything else more talk.
  */
 export function kindFor(input: TalkInput, turnIndex: number): LineKind {
+  if (input.kind === 'gift') return 'react';
   if (turnIndex >= MAX_EXCHANGES) return 'bye';
   if (input.kind === 'open') return 'greet';
   if (input.kind === 'choice') {
@@ -561,11 +562,14 @@ export interface QuietTurn {
  */
 export function quietTurn(q: QuietTurnInput): QuietTurn {
   const kind = kindFor(q.input, q.turnIndex);
-  const ctx: QuietContext = { ...q.context, kind };
+  const ctx: QuietContext = { ...q.context, kind, ...(q.input.kind === 'gift' ? { event: `gift_${q.input.reaction}` } : {}) };
   const wrapUp = kind === 'bye';
   const seed = replyHash(`${q.conversationId}:${q.turnIndex}`);
   let text: string, expr: PortraitExpression, replies: TalkChoice[], pick: LinePick | null = null;
-  if (q.narrated) {
+  if (q.input.kind === 'meal') {
+    text = q.narrated ? '(Makes room beside the bowl.)' : "Pull up a chair. There's room.";
+    expr = 'warm'; replies = asChoices(derivedReplies({ text, kind: 'talk' }, seed), ctx);
+  } else if (q.narrated) {
     const group = MOOD_GROUP[ctx.mood];
     const template = kind === 'bye' ? ANIMAL_BYE : kind === 'greet' ? ANIMAL_LINES[group] : ANIMAL_FILLER;
     text = template.replaceAll('{name}', ctx.speaker.firstName);

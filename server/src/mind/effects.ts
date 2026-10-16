@@ -92,6 +92,8 @@ export interface PersistTurnArgs {
   place: string;
   /** What the player said (choice or free text); null when they walked up. */
   playerInput: string | null;
+  gift?: boolean;
+  heartLevel?: number;
   output: DialogueTurnOutput;
   rawOutput?: string;
   promptUser?: string;
@@ -122,9 +124,12 @@ export async function persistTurn(db: WorldDatabase, args: PersistTurnArgs): Pro
         state: residents.state, talkDay: residents.talkDay, talkGain: residents.talkGain, lastTalkDay: residents.lastTalkDay,
       }).from(residents).where(where).for("update");
       if (!row) throw new Error(`resident ${residentId} vanished mid-turn`);
-      const talk = applyTalkTurn(
+      const talk = args.gift ? {
+        regard: row.state.regard, ledger: { day: row.talkDay, gains: row.talkGain, lastTalkDay: row.lastTalkDay }, change: null,
+      } : applyTalkTurn(
         row.state.regard, { day: row.talkDay, gains: row.talkGain, lastTalkDay: row.lastTalkDay }, args.day,
-        args.fallback ? 0 : effects.regard_delta,
+        // GDD-GAP: integral Regard rounds the +15% Heart L3 bonus to nearest whole point; cap still applies.
+        args.fallback ? 0 : Math.round(effects.regard_delta * (effects.regard_delta > 0 && (args.heartLevel ?? 1) >= 3 ? 1.15 : 1)),
       );
       applied = talk.change;
       const state = args.fallback

@@ -8641,6 +8641,15 @@ stumped if pushed. On **riddle-topic turns only**, a post-filter rejects any gen
 accepted answer for that unsolved riddle and falls back to the authored hint text. (Many answers are
 ordinary words, like the library or the school, that residents must stay free to say on other turns.)
 
+**G-05 implementation note (2026-10-15).** The post-filter currently permits only safe authored
+hint wording at or below the unlocked level, and holds all riddle-topic streaming until validation.
+Unverifiable paraphrases regenerate once, then use a safe authored hint (or a stumped line). This is a
+conservative restriction of the paraphrasing rule above: it also prevents encoded and indirect answers.
+Typed-answer fuzzy matching currently uses reviewed one-edit nonword variants rather than accepting
+all distance-one strings: an unrestricted matcher mistakes real words such as "stale" for "scale".
+`GDD-GAP:` a complete word dictionary and Tib's three authored hint lines per riddle are not supplied;
+Tib's absent ladder slots remain unavailable, never invented by the model.
+
 ### 14.3 Rewards
 
 | Event | Reward |

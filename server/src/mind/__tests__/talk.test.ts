@@ -284,7 +284,7 @@ describe("POST /v1/worlds/:w/talk", () => {
   });
 
   it("ignores answer lists sent by the client", async () => {
-    const env = await setup(new FakeMind([{ output: good() }]));
+    const env = await setup(new FakeMind([{ output: good([RIDDLES["OQ-1"]!.hints[0]]) }]));
     const body = payload({ context: { riddle: { id: "OQ-1", hints_allowed: 1, accepted: ["lamps", "tea"] } } });
     expect(finalTurn(sse((await talk(env, body)).payload)).fallback).toBe(false);
   });
@@ -539,4 +539,23 @@ it('does not wait for a compaction model call before finishing the new reply', a
     expect(finalTurn(sse(response.payload))).toMatchObject({ turn_index: 0, resumed: false });
     await startedCall;
   } finally { release(); }
+});
+
+
+describe('G-09 gift reaction turn', () => {
+  it('recomputes the gift reaction, keeps it outside talk gains, and never lets the model award extra Regard', async () => {
+    const mind = new FakeMind([{ output: good() }, { output: good(['Thank you. I shall put it on the shelf.'], { regard_delta: 5 }) }]);
+    const env = await setup(mind);
+    const opening = payload({ resident_id: 'odile' });
+    await talk(env, opening);
+    await setResidentState(env.worldId, s => ({ ...s, regard: 0 }), 'odile');
+    await database.db.update(residents).set({ talkGain: 6 }).where(and(eq(residents.worldId, env.worldId), eq(residents.id, 'odile')));
+    const response = await talk(env, payload({ resident_id: 'odile', conversation_id: opening.conversation_id, input: { kind: 'gift', item: 'bread', reaction: 'dislike', text: 'Here you are.', event_id: 'gift-talk' } }));
+    expect(response.statusCode).toBe(200);
+    expect(finalTurn(sse(response.body)).regard).toBeNull();
+    expect((await residentState(env.worldId, 'odile')).regard).toBe(8);
+    const [row] = await database.db.select().from(residents).where(and(eq(residents.worldId, env.worldId), eq(residents.id, 'odile')));
+    expect(row!.talkGain).toBe(6);
+    expect(userBlocks(mind.streams[1]!).join(' ')).toContain('engine-decided reaction is love');
+  });
 });

@@ -1,4 +1,4 @@
-import { MAX_SESSION_EXCHANGES } from "@monde/shared";
+import { containsAnswer, MAX_SESSION_EXCHANGES } from "@monde/shared";
 /**
  * The prompt builder (GDD §9.10.1, §9.17; MVP task M-04).
  *
@@ -412,22 +412,7 @@ export interface RiddleTopic {
   accepted?: readonly string[];
 }
 
-const ARTICLES = new Set(["a", "an", "the"]);
-
-/** Answer normalization (§14.1): lowercase, accents folded, punctuation and articles stripped. */
-export function normalizeAnswerText(text: string): string {
-  return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/['’]/g, "")
-    .replace(/[^a-z0-9]+/g, " ").split(" ").filter((word) => word && !ARTICLES.has(word)).join(" ");
-}
-
-/** True if `text` contains any accepted answer as a whole-word phrase (after normalization). */
-export function containsAnswer(text: string, accepted: readonly string[]): boolean {
-  const haystack = ` ${normalizeAnswerText(text)} `;
-  return accepted.some((answer) => {
-    const needle = normalizeAnswerText(answer);
-    return needle !== "" && haystack.includes(` ${needle} `);
-  });
-}
+export { containsAnswer, normalizeAnswerText } from '@monde/shared';
 
 function hintsBlock(riddle: RiddleTopic): string {
   const allowed = Math.max(0, Math.min(riddle.hints.length, Math.floor(riddle.allowed)));

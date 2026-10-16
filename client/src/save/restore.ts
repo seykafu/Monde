@@ -9,7 +9,7 @@ export function restore(raw: unknown): GameState {
   // setTime normally normalizes 26:00 to the next day. Preserve a save at pass-out exactly.
   if (save.clock.minute === 1560) { clock.autoRollover = false; clock.advanceMinutes(1200); clock.autoRollover = true; }
   else clock.setTime(save.clock.day, save.clock.minute);
-  return { clock, town: restoreTown(save.town), player: save.player, weather: save.weather,
+  return { inventory: save.inventory, coins: save.coins, economy: save.economy, clock, town: restoreTown(save.town), player: save.player, weather: save.weather,
     story_flags: save.story_flags, quiet: save.quiet, client_events: save.client_events,
-    player_name: save.summary.player_name, playtime: save.summary.playtime, fellow: save.fellow, skills: save.skills };
+    player_name: save.summary.player_name, playtime: save.summary.playtime, fellow: save.fellow, skills: save.skills, riddles: save.riddles, friendship: save.friendship };
 }

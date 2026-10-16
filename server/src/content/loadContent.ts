@@ -36,3 +36,9 @@ export async function loadContent(directory = process.env.MONDE_CONTENT_DIR ?? d
   // Never let world initialization mutate the cached template.
   return structuredClone(await pending);
 }
+
+/** The same authored catalog the client bundles. */
+export async function loadItems(directory = process.env.MONDE_CONTENT_DIR ?? defaultDirectory) {
+  const { ItemCatalog } = await import('@monde/shared');
+  return ItemCatalog.parse(parse(await readFile(join(directory, 'items.yaml'), 'utf8')));
+}

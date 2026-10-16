@@ -31,8 +31,12 @@ Dawn also returns `regard: Record<residentId, number>`; replace the local mirror
 - Remove acknowledged accepted/duplicate IDs from the queue. Inspect rejected records; don't silently
   discard unknown residents, invalid payloads or unsupported placeholders. An obsolete flags snapshot may be
   superseded by the latest revision. Split longer logs across /events requests before calling night.
-- Gift and community_work have typed contracts but return explicit "not implemented" rejections with no
-  receipts or effects. They are reserved for later systems, not accepted no-ops.
+- Gift and community_work are implemented (G-09). Gifts use catalog tags and card preferences, with a
+  resident/day receipt as well as the event-id receipt, and apply Regard outside the talk ledger.
+  Community work validates the task, opening day, time and place, then writes a town event and witnessed memories.
+- Invalid economy events produce explicit rejections with no
+  receipts or effects. Shared-meal events validate the meal tag, grant +2 Regard outside the talk ledger,
+  and deduplicate by event id; they do not consume the daily gift allowance.
 
 ## Engine behavior and design gaps
 

@@ -26,6 +26,7 @@ export const ClientEvent = z.discriminatedUnion("kind", [
   z.object({ ...stamp, kind: z.literal("flags"), revision: z.number().int().min(1).max(2_147_483_647),
     flags: z.array(z.string().regex(/^[a-z][a-z0-9_]*$/).max(200)).max(1000) }),
   z.object({ ...stamp, kind: z.literal("gift"), resident: key, item: key }),
+  z.object({ ...stamp, kind: z.literal("meal"), resident: key, item: key }),
   z.object({ ...stamp, kind: z.literal("community_work"), task: key, place: PlaceId, participants: z.array(key).max(500) }),
 ]);
 export type ClientEvent = z.infer<typeof ClientEvent>;

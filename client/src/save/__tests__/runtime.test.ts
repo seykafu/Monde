@@ -64,3 +64,13 @@ it('captures before asynchronous work and restores without retaining the outgoin
   expect(h.scene.scene.start).toHaveBeenCalledWith('Zone', { zone: file.player.zone, savedPlayer: file.player });
   resetGame(h.scene);
 });
+
+
+it('New Game clears the entire economy, including daily gift and work limits', () => {
+  const h = host();
+  const keys = ['monde.inventory', 'monde.coins', 'monde.economy', 'monde.save.wakePlayer'];
+  for (const key of keys) h.data.set(key, { old: true });
+  h.events.emit('shutdown');
+  resetGame(h.scene);
+  for (const key of keys) expect(h.data.has(key)).toBe(false);
+});

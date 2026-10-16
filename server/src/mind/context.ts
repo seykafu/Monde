@@ -226,6 +226,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         emotion: prefix.state.mood.emotion,
         revealable,
         riddle,
+        hintsAllowed: riddleState?.allowed ?? 0,
         recentLines,
         heartPerk: false,
       },

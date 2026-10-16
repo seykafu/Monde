@@ -1,0 +1,957 @@
+[
+  {
+    "id": "OQ-1",
+    "title": "The Retired Voice",
+    "chain": "OQ",
+    "district": "old_quarter",
+    "inscription": "Iron tongue, bronze skirt.\nThey rang me for every wedding and every grave,\nthen gave my tower to a younger voice.\nNow I keep the chapel gate and say nothing at all.\nCome and listen to me not ringing.",
+    "accepted": [
+      "bell",
+      "old bell",
+      "chapel bell",
+      "church bell",
+      "st brigids bell",
+      "brigids bell"
+    ],
+    "hints": [
+      "Something that used to make a noise and doesn't anymore.",
+      "It has a tongue and a skirt but no face, and it lives by a gate.",
+      "Look at St. Brigid's chapel gate."
+    ],
+    "startDay": 1,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the backplate of the player's own door knocker, Lamplighter's Cottage.",
+    "answerLocation": "the old bell on its plinth by St. Brigid's gate (retired in 1850, when the tower got a bigger one)."
+  },
+  {
+    "id": "OQ-2",
+    "title": "The Patient Fisher",
+    "chain": "OQ",
+    "district": "old_quarter",
+    "inscription": "I fish all day in a pool that has forgotten water,\nand I have never caught a thing.\nThe bell and I were poured from the same pot.\nI keep one foot dry, out of habit.\nLook under it.",
+    "accepted": [
+      "heron",
+      "bronze heron",
+      "fountain",
+      "fountain heron",
+      "bird"
+    ],
+    "hints": [
+      "The pool that has forgotten water is easy to find in a town this dry.",
+      "A bronze bird that stands on one leg.",
+      "Fountain Square: look under the heron's lifted foot."
+    ],
+    "startDay": 1,
+    "previous": "OQ-1",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "under the bell plinth's lip.",
+    "answerLocation": "the bronze heron in the dry fountain, Fountain Square."
+  },
+  {
+    "id": "OQ-3",
+    "title": "The Builder's Sum",
+    "chain": "OQ",
+    "district": "old_quarter",
+    "inscription": "Every house in this quarter wears its birth year over the door.\nFind the one that wears this sum:\nthe year Monde was founded,\nand every hand my tower holds,\nand every face it shows.",
+    "accepted": [
+      "1850",
+      "library",
+      "the library"
+    ],
+    "hints": [
+      "Monde's founding year is on the welcome sign at the ferry slip.",
+      "Walk around the clocktower. Count its faces, and remember each face has two hands.",
+      "1838 + 8 + 4."
+    ],
+    "startDay": 1,
+    "previous": "OQ-2",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "under the heron's raised foot.",
+    "answerLocation": "1850, over the door of the Monde Free Library. The clocktower has four faces with two hands each: 1838 + 8 + 4 = 1850."
+  },
+  {
+    "id": "OQ-4",
+    "title": "The Shop With a Hundred Faces",
+    "chain": "OQ",
+    "district": "old_quarter",
+    "inscription": "Search where my apprentice's line still keeps its hours.\nHis window holds a hundred faces, and no two of them agree.\nOver his door hangs a gilded watch as wide as a cartwheel.\nPut your crowbar away and ask him the time.",
+    "accepted": [
+      "shop",
+      "clock shop",
+      "watch shop",
+      "bertrand",
+      "achterberg",
+      "horlogerie",
+      "watch sign"
+    ],
+    "hints": [
+      "Read the first letter of each line.",
+      "A window full of clocks that all disagree.",
+      "Bertrand's shop, the one with the giant watch over the door. Ask him the time."
+    ],
+    "startDay": 1,
+    "previous": "OQ-3",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "examine the giant gilded watch sign, or ask Bertrand \"what time is it?\" (a dialogue option unlocked by this Mark). He opens the sign's case: the Mark is inside.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "behind the library datestone's lantern.",
+    "answerLocation": "Achterberg Horlogerie, Bertrand's closed clock shop. The first letters of the lines spell SHOP."
+  },
+  {
+    "id": "OQ-5",
+    "title": "The Heart Stair",
+    "chain": "OQ",
+    "district": "old_quarter",
+    "inscription": "My heart is at the top of the stair, and it is missing a piece.\nFrom noon to midnight I strike, and strike again.\nCount every stroke I give after noon, up to and including midnight's,\nand stop upon that step.\nThe stone there is loose for you alone.",
+    "accepted": [
+      "78",
+      "seventy eight",
+      "step 78"
+    ],
+    "hints": [
+      "The clock strikes once at one o'clock, twice at two…",
+      "Add up the strokes from one o'clock to twelve.",
+      "1 + 2 + … + 12 = 78. Count the stairs."
+    ],
+    "startDay": 1,
+    "previous": "OQ-4",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "inside the clocktower (96 steps), the stair shows a step counter while climbing. Examine step 78 to lift the loose stone.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 3,
+      "coins": 0,
+      "regard": 0,
+      "flags": [
+        "pinion_found"
+      ],
+      "items": [
+        "lantern_pinion"
+      ]
+    },
+    "fragment": "I. Of the Hours. The clock in the square belongs to no one, so that no one may say the town's time is theirs to keep. Whoever winds it winds it for everybody.",
+    "gaps": [],
+    "mark": "inside the gilded watch sign.",
+    "answerLocation": "step 78 of the clocktower stair. One stroke at 1 p.m., two at 2, and so on up to twelve at midnight: 1 + 2 + … + 12 = 78."
+  },
+  {
+    "id": "MR-1",
+    "title": "Two Arms",
+    "chain": "MR",
+    "district": "market_row",
+    "inscription": "Two arms, and I hug nobody.\nTwo pans, and I cook nothing.\nThe baker fears me, the cheat hates me,\nand the honest walk past me without a thought.\nFind my oldest iron self on the Row,\nand look beneath the pan that sank.",
+    "accepted": [
+      "scale",
+      "scales",
+      "balance",
+      "public scale",
+      "weighing scale"
+    ],
+    "hints": [
+      "It weighs things for a living.",
+      "An old iron balance stands on the Row. One of its pans is stuck down.",
+      "The public scale by the Market Hall steps. Look under the low pan."
+    ],
+    "startDay": 3,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the north door hinge plate of the Covered Market Hall.",
+    "answerLocation": "the public scale, an iron beam balance on a post by the Market Hall steps, rusted with one pan stuck low."
+  },
+  {
+    "id": "MR-2",
+    "title": "Over the Truthful Door",
+    "chain": "MR",
+    "district": "market_row",
+    "inscription": "One of us cries over the water all day and never learns the words.\nOne of us holds a ship still and has never once been aboard.\nWe hang together, creaking,\nover the door where Monde tells the truth by its third cup.\nTurn us over.",
+    "accepted": [
+      "gull and anchor",
+      "gull & anchor",
+      "pub sign",
+      "the pub",
+      "sign",
+      "gull",
+      "anchor"
+    ],
+    "hints": [
+      "A bird and a piece of a ship.",
+      "A sign that hangs over a door where people drink.",
+      "The Gull & Anchor's sign. Turn it over."
+    ],
+    "startDay": 3,
+    "previous": "MR-1",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "Roz lets you unhook the sign (Regard ≥ 10), or borrow Kasimir's ladder. The Mark is on the back.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "under the scale's low pan.",
+    "answerLocation": "the hanging sign of The Gull & Anchor."
+  },
+  {
+    "id": "MR-3",
+    "title": "The Baker's Shift",
+    "chain": "MR",
+    "district": "market_row",
+    "inscription": "Shift every letter back by a baker's dozen.\nGUR BIRA XRLFGBAR",
+    "accepted": [
+      "the oven keystone",
+      "oven keystone",
+      "keystone",
+      "the oven",
+      "oven"
+    ],
+    "hints": [
+      "A baker's dozen is thirteen.",
+      "Move each letter thirteen places along the alphabet: G becomes T.",
+      "It spells THE OVEN KEYSTONE. Ask Odile."
+    ],
+    "startDay": 3,
+    "previous": "MR-2",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "Odile lets you behind the counter at Regard ≥ 10, or any time before 06:00 while she bakes, provided you carry a sack of flour. The Mark is on the keystone's inner face.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the back of the pub sign.",
+    "answerLocation": "THE OVEN KEYSTONE: shift each letter 13 places (ROT13). The keystone of the original 1840 bread oven arch, inside Fournier & Fille."
+  },
+  {
+    "id": "MR-4",
+    "title": "The Mapmaker's Door",
+    "chain": "MR",
+    "district": "market_row",
+    "inscription": "Add the letters in our town's name\nto the faces on my tower,\nand knock at that door on the Row.\nI printed maps there once.\nKnock twice.",
+    "accepted": [
+      "9",
+      "nine",
+      "number 9",
+      "no 9",
+      "no. 9"
+    ],
+    "hints": [
+      "Count the letters in \"Monde.\"",
+      "You already know how many faces the tower has. If not, walk around it.",
+      "5 + 4. Market Row, door number nine."
+    ],
+    "startDay": 3,
+    "previous": "MR-3",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "knock twice and Tib appears (\"I know a window\"), or ask Pell for the key (town property). The Mark is on the old iron hand press inside.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the oven keystone's inner face.",
+    "answerLocation": "No. 9 Market Row: M-O-N-D-E is five letters, plus the tower's four faces. Now an empty storefront; its ghost sign reads A. MONDE · MAPS & PRINTS."
+  },
+  {
+    "id": "MR-5",
+    "title": "The Herring Who Never Swam",
+    "chain": "MR",
+    "district": "market_row",
+    "inscription": "I turn my nose into every wind and quarrel with none.\nI have swum above the Hall since its first market and never once got wet.\nMy belly holds what I was given to keep.\nCome up when I am looking at the sea, and not before.",
+    "accepted": [
+      "weathervane",
+      "weather vane",
+      "vane",
+      "herring",
+      "copper herring",
+      "wind vane"
+    ],
+    "hints": [
+      "It swims in the wind, not the water.",
+      "A weathervane points into the wind, so it \"looks at the sea\" when the wind blows from the sea.",
+      "The herring on the Market Hall roof. Climb up on a west-wind day."
+    ],
+    "startDay": 3,
+    "previous": "MR-4",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "climb (with Kasimir's ladder) on a day with a **west wind**, when the herring's nose points at the sea. The Dawn Report prints the wind. On other days the belly hatch is jammed against the spindle. Open the hatch.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 3,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": "II. Of Trade. The Row shall keep a public scale, true and inspected, and any honest hand may sell there on market day without paying any person for the right.",
+    "gaps": [],
+    "mark": "on the hand press inside No. 9.",
+    "answerLocation": "the copper herring weathervane on the Market Hall roof."
+  },
+  {
+    "id": "WF-1",
+    "title": "The Visitor",
+    "chain": "WF",
+    "district": "wharf",
+    "inscription": "I call twice a day and leave twice a day, and I never knock.\nWhen I have gone out, the harbor stair has one more step\nthan it has when I am home.\nRead that step.",
+    "accepted": [
+      "tide",
+      "the tide",
+      "low tide",
+      "harbor steps",
+      "harbour steps",
+      "steps"
+    ],
+    "hints": [
+      "It visits twice a day and you can see where it's been.",
+      "Check the tide table in the Lantern.",
+      "The harbor steps at low tide. The bottom step."
+    ],
+    "startDay": 8,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "the Dawn Report prints the daily **tide table**, with two low waters a day, shifting about 50 minutes later each day. At low tide, scrub the weed off the bottom step to reveal the Mark.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the ferry slip's mooring bollard.",
+    "answerLocation": "low tide: the bottom step of the harbor steps is uncovered only at low water."
+  },
+  {
+    "id": "WF-2",
+    "title": "Full of Holes",
+    "chain": "WF",
+    "district": "wharf",
+    "inscription": "I am made of holes, and I still bring supper home.\nI am mended more often than I am thanked.\nFind where I hang to dry,\nand count three hooks from the sea.",
+    "accepted": [
+      "net",
+      "nets",
+      "fishing net",
+      "net rack",
+      "drying rack"
+    ],
+    "hints": [
+      "You can't hold water in it, but you can hold fish.",
+      "Nets dry on racks at the fish market.",
+      "Third hook from the water's end."
+    ],
+    "startDay": 8,
+    "previous": "WF-1",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the bottom harbor step.",
+    "answerLocation": "the net racks at the fish market, on the third hook counting from the seaward end."
+  },
+  {
+    "id": "WF-3",
+    "title": "The Maker's Daughter",
+    "chain": "WF",
+    "district": "wharf",
+    "inscription": "Six oars, one helm, and my maker's daughter's name upon my bow.\nI carried the pilot out to every ship that did not know our rocks.\nNow they keep me in the dark, upside down, like a beetle on its back.\nLook along my spine.",
+    "accepted": [
+      "gig",
+      "pilot gig",
+      "boat",
+      "rowing boat",
+      "clemence",
+      "boathouse"
+    ],
+    "hints": [
+      "A boat that guided ships past the rocks.",
+      "It's stored upside down in the dark. Its \"spine\" is its keel.",
+      "The boathouse. The gig named *Clémence*."
+    ],
+    "startDay": 8,
+    "previous": "WF-2",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "Nell has the boathouse key (Regard ≥ 20), or Old Moss lets you in on ferry days. The Mark is along the keel.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the third hook of the net rack.",
+    "answerLocation": "the pilot gig Clémence, upside down on trestles in the boathouse. (Clémence was Aurélien's daughter.)"
+  },
+  {
+    "id": "WF-4",
+    "title": "One Eye",
+    "chain": "WF",
+    "district": "wharf",
+    "inscription": "I am a tower with one eye.\nI wink at strangers all night and never at a friend.\nI have been asleep a long while.\nWake me, and I will show you where to look.",
+    "accepted": [
+      "lighthouse",
+      "point lumiere",
+      "the light",
+      "beacon"
+    ],
+    "hints": [
+      "It has one eye and works nights.",
+      "It's been dark for eleven years.",
+      "The lighthouse on the breakwater. Relight it."
+    ],
+    "startDay": 8,
+    "previous": "WF-3",
+    "prerequisites": [
+      "project_lighthouse_done"
+    ],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "needs the **`lighthouse` Project** complete, including PZ-05 (the Lens). WF-5 is found in the lantern room once the light is relit.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the *Clémence*'s keel.",
+    "answerLocation": "Point Lumière lighthouse. The light faces the sea, toward strangers, and never the town."
+  },
+  {
+    "id": "WF-5",
+    "title": "The Stone That Answers",
+    "chain": "WF",
+    "district": "wharf",
+    "inscription": "My eye sweeps the whole bay every night.\nOnly one stone on my long arm throws my light back at me.\nGo out along the arm after dark,\nwatch for the stone that answers,\nand lift it.",
+    "accepted": [
+      "breakwater",
+      "the stone",
+      "brass stone",
+      "shining stone",
+      "glint",
+      "mirror"
+    ],
+    "hints": [
+      "The \"long arm\" is the breakwater.",
+      "Go at night when it isn't foggy. One stone flashes as the beam passes.",
+      "Walk the breakwater after dark and lift the flashing stone."
+    ],
+    "startDay": 8,
+    "previous": "WF-4",
+    "prerequisites": [
+      "project_lighthouse_done"
+    ],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 3,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": "III. Of the Sea. The shore from the river's mouth to the end of the breakwater, the steps, the slip and the water's edge, is held by the town and by no one else. The light on the point shall be kept for strangers.",
+    "gaps": [],
+    "mark": "on the lantern room's brass rail, after relighting.",
+    "answerLocation": "the brass-faced stone on the breakwater (the \"long arm\") that flashes when the beam passes. It's visible at night in clear weather, not in fog or heavy rain."
+  },
+  {
+    "id": "CM-1",
+    "title": "One Finger",
+    "chain": "CM",
+    "district": "commons",
+    "inscription": "I have one finger and no hands, and still I tell the hour.\nOn cloudy days I say nothing at all,\nwhich is more than most can manage.",
+    "accepted": [
+      "sundial",
+      "sun dial",
+      "dial"
+    ],
+    "hints": [
+      "It tells time without hands.",
+      "It needs the sun to work.",
+      "The sundial lawn."
+    ],
+    "startDay": 6,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the Commons gate post.",
+    "answerLocation": "the sundial on the sundial lawn."
+  },
+  {
+    "id": "CM-2",
+    "title": "The Reaching Shadow",
+    "chain": "CM",
+    "district": "commons",
+    "inscription": "On a bright afternoon my shadow reaches for the oldest tree on the green.\nFollow it to its very tip,\nand dig one hand deep.",
+    "accepted": [
+      "elm",
+      "old elm",
+      "the tree",
+      "shadow"
+    ],
+    "hints": [
+      "Shadows move as the sun crosses the sky.",
+      "In mid-afternoon the shadow points toward the Old Elm.",
+      "On a sunny day around 3 p.m., dig at the shadow's tip."
+    ],
+    "startDay": 6,
+    "previous": "CM-1",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "a trowel (from Teo or Dunmore's) and the right hour. A buried tin holds the next Mark.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the sundial's plinth.",
+    "answerLocation": "the dig spot at the tip of the gnomon's shadow when it points at the Old Elm: on sunny days, between 15:00 and 16:00 (the shadow is engine-driven by the sun's angle)."
+  },
+  {
+    "id": "CM-3",
+    "title": "The Rent-Free House",
+    "chain": "CM",
+    "district": "commons",
+    "inscription": "I am a house where nobody sleeps.\nYou can see through my walls, and my roof drinks the sun.\nMy tenants are green and have never paid rent.\nOne of my windows wears a lantern. Find it.",
+    "accepted": [
+      "glasshouse",
+      "greenhouse",
+      "glass house",
+      "hothouse"
+    ],
+    "hints": [
+      "Walls you can see through.",
+      "Plants live there.",
+      "The Glasshouse. Find the pane with a frosted lantern."
+    ],
+    "startDay": 6,
+    "previous": "CM-2",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "inside the buried tin.",
+    "answerLocation": "the Glasshouse, on the pane with a frosted lantern (one of the 229 still whole)."
+  },
+  {
+    "id": "CM-4",
+    "title": "The Back Nobody Thanks",
+    "chain": "CM",
+    "district": "commons",
+    "inscription": "Everyone walks on my back, and nobody says thank you.\nThe ducks go under me and never pay a toll.\nLook at me from the water's side.",
+    "accepted": [
+      "footbridge",
+      "bridge",
+      "foot bridge"
+    ],
+    "hints": [
+      "You walk over it.",
+      "Ducks swim under it.",
+      "The footbridge. Look at its side from the pond."
+    ],
+    "startDay": 6,
+    "previous": "CM-3",
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": "wade in with wellies (Dunmore's, 25 coins), or after the `community_garden` Project, take the little punt.",
+    "rewards": {
+      "namedXp": 20,
+      "foundXp": 40,
+      "charm": 1,
+      "spirit": 0,
+      "coins": 0,
+      "regard": 0,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [],
+    "mark": "on the lantern pane's frame.",
+    "answerLocation": "the footbridge over the duck pond. The Mark is on the outer beam, visible only from the water."
+  },
+  {
+    "id": "T-01",
+    "title": "T-01",
+    "chain": "T",
+    "district": "tib",
+    "inscription": "I've got a hundred teeth and I never bite. I make Odile's hair behave and nobody ever thanks me.",
+    "accepted": [
+      "comb"
+    ],
+    "hints": [
+      null,
+      null,
+      null
+    ],
+    "startDay": 1,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 10,
+      "foundXp": 10,
+      "charm": 0,
+      "spirit": 0,
+      "coins": 5,
+      "regard": 3,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [
+      "GDD-GAP: §14.12 authors no hint ladder for Tib; null means unavailable, never model-generated.",
+      "GDD-GAP: §14.12 gives no exact Spring duel schedule."
+    ],
+    "mark": "Tib’s riddle duel",
+    "answerLocation": "comb"
+  },
+  {
+    "id": "T-02",
+    "title": "T-02",
+    "chain": "T",
+    "district": "tib",
+    "inscription": "I'm full of holes but the baker can't work without me. Shake me and it snows indoors.",
+    "accepted": [
+      "sieve",
+      "sifter",
+      "flour sieve"
+    ],
+    "hints": [
+      null,
+      null,
+      null
+    ],
+    "startDay": 1,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 10,
+      "foundXp": 10,
+      "charm": 0,
+      "spirit": 0,
+      "coins": 5,
+      "regard": 3,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [
+      "GDD-GAP: §14.12 authors no hint ladder for Tib; null means unavailable, never model-generated.",
+      "GDD-GAP: §14.12 gives no exact Spring duel schedule."
+    ],
+    "mark": "Tib’s riddle duel",
+    "answerLocation": "sieve"
+  },
+  {
+    "id": "T-03",
+    "title": "T-03",
+    "chain": "T",
+    "district": "tib",
+    "inscription": "I'm longest at breakfast and supper and tiny at lunch. I go everywhere you go and I've never said a word.",
+    "accepted": [
+      "shadow"
+    ],
+    "hints": [
+      null,
+      null,
+      null
+    ],
+    "startDay": 1,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 10,
+      "foundXp": 10,
+      "charm": 0,
+      "spirit": 0,
+      "coins": 5,
+      "regard": 3,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [
+      "GDD-GAP: §14.12 authors no hint ladder for Tib; null means unavailable, never model-generated.",
+      "GDD-GAP: §14.12 gives no exact Spring duel schedule."
+    ],
+    "mark": "Tib’s riddle duel",
+    "answerLocation": "shadow"
+  },
+  {
+    "id": "T-04",
+    "title": "T-04",
+    "chain": "T",
+    "district": "tib",
+    "inscription": "I've got a spout but I'm not a whale, a lid but I'm not a box, and I scream when I'm happy.",
+    "accepted": [
+      "kettle",
+      "teakettle"
+    ],
+    "hints": [
+      null,
+      null,
+      null
+    ],
+    "startDay": 1,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 10,
+      "foundXp": 10,
+      "charm": 0,
+      "spirit": 0,
+      "coins": 5,
+      "regard": 3,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [
+      "GDD-GAP: §14.12 authors no hint ladder for Tib; null means unavailable, never model-generated.",
+      "GDD-GAP: §14.12 gives no exact Spring duel schedule."
+    ],
+    "mark": "Tib’s riddle duel",
+    "answerLocation": "kettle"
+  },
+  {
+    "id": "T-05",
+    "title": "T-05",
+    "chain": "T",
+    "district": "tib",
+    "inscription": "Old Moss has a boat. The boat's named after a bird that dives into the sea like it's mad at it. What's the bird?",
+    "accepted": [
+      "gannet",
+      "the gannet"
+    ],
+    "hints": [
+      null,
+      null,
+      null
+    ],
+    "startDay": 1,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 10,
+      "foundXp": 10,
+      "charm": 0,
+      "spirit": 0,
+      "coins": 5,
+      "regard": 3,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [
+      "GDD-GAP: §14.12 authors no hint ladder for Tib; null means unavailable, never model-generated.",
+      "GDD-GAP: §14.12 gives no exact Spring duel schedule."
+    ],
+    "mark": "Tib’s riddle duel",
+    "answerLocation": "gannet"
+  },
+  {
+    "id": "T-06",
+    "title": "T-06",
+    "chain": "T",
+    "district": "tib",
+    "inscription": "I've got eight legs and I hold up music. Well. I used to.",
+    "accepted": [
+      "bandstand",
+      "band stand"
+    ],
+    "hints": [
+      null,
+      null,
+      null
+    ],
+    "startDay": 1,
+    "previous": null,
+    "prerequisites": [],
+    "normalization": "fold-articles-punctuation-number-words",
+    "worldConditions": null,
+    "rewards": {
+      "namedXp": 10,
+      "foundXp": 10,
+      "charm": 0,
+      "spirit": 0,
+      "coins": 5,
+      "regard": 3,
+      "flags": [],
+      "items": []
+    },
+    "fragment": null,
+    "gaps": [
+      "GDD-GAP: §14.12 authors no hint ladder for Tib; null means unavailable, never model-generated.",
+      "GDD-GAP: §14.12 gives no exact Spring duel schedule."
+    ],
+    "mark": "Tib’s riddle duel",
+    "answerLocation": "bandstand"
+  }
+]

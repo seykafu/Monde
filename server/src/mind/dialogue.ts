@@ -12,7 +12,7 @@
  */
 import type Anthropic from "@anthropic-ai/sdk";
 import { DialogueTurnOutput, LIMITS, modelOutputFormat } from "@monde/shared";
-import { apiParams, containsAnswer, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
+import { apiParams, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
 import { completeWords, lexicalHits } from "./filters.js";
 import { LineTextExtractor } from "./partialJson.js";
@@ -206,7 +206,7 @@ async function callOnce(
 /** Is this (whole-word) partial line safe to show before validation? Same lexical and riddle rules. */
 function streamSafe(text: string, validation: ValidationContext): boolean {
   if (lexicalHits(text).length > 0) return false;
-  return !validation.riddle || !containsAnswer(text, validation.riddle.accepted);
+  return !validation.riddle; // Riddle-topic output is held until the complete turn has passed the guard.
 }
 
 export async function generateTurn(options: GenerateOptions): Promise<GenerateResult> {

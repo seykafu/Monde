@@ -18,3 +18,5 @@ export * from "./look";
 export * from "./player";
 export * from "./events";
 export * from "./conversation.js";
+export * from './economy';
+export * from './riddles';

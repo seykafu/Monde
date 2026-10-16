@@ -1,3 +1,12 @@
+import { openPeople } from './PeopleScene';
+import { SPRING_RIDDLES } from '@monde/shared';
+import { getFellow, setFellow } from '../fellow/state';
+import { gainXp } from '@monde/shared';
+import { containsAnswer } from '@monde/shared';
+import { openBag } from '../economy/BagScene';
+import { giveGift, shareMeal } from '../economy/runtime';
+import { findMark, marks, refreshHints } from './riddles';
+import { requestHint, riddle } from '../riddles/engine';
 import { quietStorage } from '../save/session';
 // The VN dialogue panel (GDD §9.10 flow, §18 Dialogue; MVP M-05 client, M-11 Quiet Mode).
 //
@@ -204,6 +213,7 @@ class PanelButton {
 
 export class DialogueScene extends Phaser.Scene {
   private open!: DialogueOpen;
+  private shownReplies: TalkChoice[] = [];
   private card!: PersonaCard;
   private look!: PortraitLook;
   private context!: TalkContext;
@@ -262,6 +272,7 @@ export class DialogueScene extends Phaser.Scene {
   /** The name plate's hearts (§9.11.1), and a turn's Regard feedback waiting for the reply to be read (§9.11.2). */
   private hearts: HeartRowView | null = null;
   private feedback: HeartFeedback | null = null;
+  private giftFeedback: HeartFeedback | null = null;
 
   constructor() { super(DIALOGUE_SCENE); }
 
@@ -307,6 +318,7 @@ export class DialogueScene extends Phaser.Scene {
     this.backlog = null;
     this.hearts = null;
     this.feedback = null;
+    this.giftFeedback = null;
   }
 
   create(): void {
@@ -440,6 +452,7 @@ export class DialogueScene extends Phaser.Scene {
   // ── Turns ─────────────────────────────────────────────────────────────────
 
   private async send(input: TalkInput, echo: string | null): Promise<void> {
+    if (input.kind === 'gift' || input.kind === 'meal') this.context = { ...this.context, riddle: null };
     const seq = ++this.requestSeq;
     this.generating = true;
     this.turn = null;
@@ -461,7 +474,7 @@ export class DialogueScene extends Phaser.Scene {
     try {
       result = mind.enabled
         ? await mind.talk(
-          { resident_id: this.card.id, conversation_id: this.conversationId, input, context: this.context },
+          { resident_id: this.card.id, conversation_id: this.conversationId, input, context: { ...this.context, heart_level: getFellow(this.registry)?.skills.heart.level ?? 1 } },
           {
             signal: abort.signal, fallback,
             onLineDelta: d => { if (seq === this.requestSeq && this.reader.delta(d) === 'reset') this.restartQuietly(); },
@@ -475,6 +488,11 @@ export class DialogueScene extends Phaser.Scene {
       result = { turn: fallback(), source: 'quiet', reason: 'error' };
     }
     if (this.closed || seq !== this.requestSeq || !result) return;
+    if (input.kind === 'say' || input.kind === 'choice') {
+      const fellow = getFellow(this.registry);
+      // GDD-GAP: each completed reply earns 5 Heart XP, including Quiet Mode.
+      if (fellow) setFellow(this.registry, { ...fellow, skills: gainXp(fellow.skills, 'heart', 5) });
+    }
     this.onTurn(result.turn, result.source, result.reason);
   }
 
@@ -503,7 +521,8 @@ export class DialogueScene extends Phaser.Scene {
     this.exchange = turn.turn_index + 1;
     // §9.11.2: the server's applied Regard (Quiet Mode turns carry none); shown once the reply has been read.
     recordDialogueTurn(this.registry, this.card.id, this.open.clock.day, turn, source === 'server' && !turn.fallback);
-    this.feedback = source === 'server' ? heartFeedback(turn.regard) : null;
+    this.feedback = this.giftFeedback ?? (source === 'server' ? heartFeedback(turn.regard) : null);
+    this.giftFeedback = null;
     if (this.reader.finish(this.turn) === 'reset') this.restartQuietly();
     if (DEV_MARK) {
       const what = source === 'quiet' ? `quiet${this.quietLine ? ` · ${this.quietLine}` : ''}${reason ? ` (${reason})` : ''}` : turn.fallback ? 'server fallback' : 'live';
@@ -521,7 +540,7 @@ export class DialogueScene extends Phaser.Scene {
   private tidy(turn: TalkTurn): TalkTurn {
     const leave = turn.choices.find(c => isBareLeave(c)) ?? LEAVE;
     if (turn.wrap_up || (this.open.turns !== undefined && turn.turn_index >= this.open.turns)) return { ...turn, wrap_up: true, choices: [leave] };
-    const replies = normalizeChoices(turn.choices, { cue: { text: turn.lines.at(-1)?.text ?? '' }, name: callName(this.card.name) });
+    const replies = normalizeChoices(turn.choices, { cue: { text: turn.lines.at(-1)?.text ?? '' }, name: callName(this.card.name), four: (getFellow(this.registry)?.skills.heart.level ?? 1) >= 5 });
     return { ...turn, choices: [...replies, leave] };
   }
 
@@ -529,7 +548,12 @@ export class DialogueScene extends Phaser.Scene {
     const { clock, weather, zone } = this.open;
     // An {ai_open} cue with a written exchange: play it while the conversation is still on its branches (it opened
     // here); once a live turn has come in between, there's nothing to continue and ordinary Quiet Mode takes over.
-    const canned = this.open.scripted && scriptedTurn(this.open.scripted, this.scriptedNodes[turnIndex - 1] ?? null, input, {
+    if (this.context.riddle) {
+      const topic = this.context.riddle, record = riddle(topic.id);
+      const text = record?.hints.slice(0, topic.hints_allowed).filter((h): h is string => !!h && !containsAnswer(h, record!.accepted)).at(-1) ?? "I'm stumped. Give it a little time.";
+      return { conversation_id: this.conversationId, resident_id: this.card.id, turn_index: turnIndex, lines: [{ text, expr: 'thinking' }], choices: [{ id: 'a', text: 'Thank you.', intent: 'kind' }], wrap_up: false, fallback: true };
+    }
+    const canned = input.kind !== 'gift' && input.kind !== 'meal' && this.open.scripted && scriptedTurn(this.open.scripted, this.scriptedNodes[turnIndex - 1] ?? null, input, {
       conversationId: this.conversationId, residentId: this.card.id, turnIndex, vars: { name: firstName(this.card.name), player: getMind().playerName }
     });
     if (canned) {
@@ -680,13 +704,19 @@ export class DialogueScene extends Phaser.Scene {
     this.choicesShown = true;
     this.hideButtons();
     const replies = turn.choices.filter(c => !isBareLeave(c));
+    const selected = marks(this.registry).selected;
+    if (selected && marks(this.registry).entries[selected]?.status === 'found' && ['margo', 'bertrand', 'tib'].includes(this.card.id)) {
+      replies.push({ id: 'mark', text: `About ${selected}…`, intent: 'about_riddle' });
+    }
+    if (this.card.id === 'tib' && SPRING_RIDDLES.some(r => r.chain === 'T' && marks(this.registry).entries[r.id]?.status !== 'solved')) replies.push({ id: 'tib_duel', text: 'A riddle duel?', intent: 'about_riddle' });
+    this.shownReplies = replies;
     const rows = replies.map((c, i) => new PanelButton(this, CHOICE_X, 0, CHOICE_W, `${i + 1}   ${c.text}`, () => this.choose(c)));
     const row: PanelButton[] = [];
     let say: PanelButton | null = null;
     if (!turn.wrap_up) {
       say = new PanelButton(this, CHOICE_X, 0, 214, 'Say something…', () => this.openSay(), { center: true, size: 17 });
-      // Gift (§18): there's no inventory yet, so it only says so.
-      const gift = new PanelButton(this, CHOICE_X + 222, 0, 100, 'Gift', () => this.toast("You've nothing to give yet."), { center: true, muted: true, size: 17 });
+      // Gift values are engine-owned; the next live turn supplies only the reaction line.
+      const gift = new PanelButton(this, CHOICE_X + 222, 0, 100, 'Gift', () => this.openGift(), { center: true, size: 17 });
       row.push(say, gift);
       this.extraButtons.push(gift);
     }
@@ -697,13 +727,27 @@ export class DialogueScene extends Phaser.Scene {
     let y = PANEL_Y - 30 - Math.max(...row.map(b => b.h));
     for (const b of row) b.moveTo(y);
     for (let i = rows.length - 1; i >= 0; i--) { y -= rows[i]!.h + CHOICE_GAP; rows[i]!.moveTo(y); }
-    this.buttons = [...rows, ...(say ? [say] : []), leave];
+    this.buttons = [...rows, ...(say ? [say] : []), ...this.extraButtons, leave];
     this.focus = 0;
     this.buttons.forEach((b, i) => b.setFocus(i === 0));
   }
 
+  private openGift(): void {
+    openBag(this, this.open.clock, { share: (slot, item) => {
+      const shared = shareMeal(this.registry, this.open.clock, this.card, slot, item);
+      if (!shared) return;
+      this.giftFeedback = heartFeedback(shared.regard);
+      void this.send({ kind: 'meal', item: item.id, event_id: shared.eventId, text: `Shall we share ${item.name}?` }, `Shall we share ${item.name}?`);
+    }, gift: (slot, item) => {
+      const given = giveGift(this.registry, this.open.clock, this.card, slot, item);
+      if (!given) { this.toast('One gift each day is plenty.'); return; }
+      this.giftFeedback = heartFeedback(given.regard);
+      void this.send({ kind: 'gift', item: item.id, reaction: given.reaction, event_id: given.eventId, text: `I brought you ${item.name}.` }, `I brought you ${item.name}.`);
+    } });
+  }
+
   private hideButtons(): void {
-    for (const b of [...this.buttons, ...this.extraButtons]) b.destroy();
+    for (const b of new Set([...this.buttons, ...this.extraButtons])) b.destroy();
     this.buttons = [];
     this.extraButtons = [];
   }
@@ -722,7 +766,25 @@ export class DialogueScene extends Phaser.Scene {
 
   private choose(choice: TalkChoice): void {
     if (this.closed || this.generating) return;
+    if (choice.id === 'tib_duel') {
+      const next = SPRING_RIDDLES.find(r => r.chain === 'T' && marks(this.registry).entries[r.id]?.status !== 'solved');
+      if (next) {
+        findMark(this.registry, this.open.clock, next.id);
+        const host = this.scene.get(this.open.host), clock = this.open.clock;
+        this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => host.time.delayedCall(0, () => openPeople(host, clock, 'Marks')));
+        this.close();
+      }
+      return;
+    }
     if (choice.intent === 'leave') { this.leave(isBareLeave(choice) ? null : choice.text); return; }
+    if (choice.intent === 'about_riddle') {
+      refreshHints(this.registry, this.open.clock);
+      const state = marks(this.registry), id = state.selected;
+      if (id && state.entries[id]?.status === 'found') {
+        requestHint(state, id, { kind: 'resident', id: this.card.id, regard: regardFor(this.registry, this.card.id) });
+        this.context = { ...this.context, riddle: { id, hints_allowed: state.entries[id]!.hints } };
+      }
+    } else this.context = { ...this.context, riddle: null };
     void this.send({ kind: 'choice', choice_id: choice.id, text: choice.text, intent: choice.intent }, choice.text);
   }
 
@@ -881,8 +943,8 @@ export class DialogueScene extends Phaser.Scene {
       return;
     }
     if (this.choicesShown) {
-      if (/^[1-3]$/.test(key)) {
-        const replies = this.turn!.choices.filter(c => !isBareLeave(c));
+      if (/^[1-6]$/.test(key)) {
+        const replies = this.shownReplies;
         const pick = replies[Number(key) - 1];
         if (pick) { playSfx('click'); this.choose(pick); }
         return;

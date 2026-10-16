@@ -51,7 +51,7 @@ async function dialogue(env: Env, residentId = "odile") {
 }
 
 describe("M-06 client ingestion", () => {
-  it("writes each implemented kind, rejects typed placeholders, and applies scripted Regard outside the talk cap", async () => {
+  it("writes gifts and rejects work at the wrong place, and applies scripted Regard outside the talk cap", async () => {
     const env = await setup();
     const [odile] = await database.db.select().from(residents).where(and(eq(residents.worldId, env.worldId), eq(residents.id, "odile")));
     await database.db.update(residents).set({ state: { ...odile!.state, regard: 0 }, talkDay: 1, talkGain: 6 }).where(and(eq(residents.worldId, env.worldId), eq(residents.id, "odile")));
@@ -60,9 +60,9 @@ describe("M-06 client ingestion", () => {
       { ...base, id: "c", kind: "community_work", task: "sweep", place: "market_row.bakery", participants: ["player"] }]);
     expect(response.statusCode).toBe(200);
     const result = EventIngestionResult.parse(response.json());
-    expect(result.accepted).toEqual(["t", "m", "r", "f"]);
-    expect(result.rejected.map(r => r.id)).toEqual(["g", "c"]);
-    expect(result.regard.odile).toBe(20);
+    expect(result.accepted).toEqual(["t", "m", "r", "f", "g"]);
+    expect(result.rejected.map(r => r.id)).toEqual(["c"]);
+    expect(result.regard.odile).toBe(28);
     expect((await storedMemories(env)).some(m => m.kind === "scripted" && m.text === cue().text)).toBe(true);
     expect((await storedMemories(env)).some(m => m.residentId === "rook" && m.kind === "did" && m.importance === 7)).toBe(true);
     // No stored plan: weekday routine puts Odile in her bakery at 10:00.
@@ -201,4 +201,45 @@ describe("M-06 client ingestion", () => {
     expect((await post(branch, [cue("m"), regard("r"), flags("f")])).json().duplicates).toEqual(["m", "r", "f"]);
     expect((await loadResidentPrefix(database.db, branch.worldId, "rook"))!.flags).toEqual(["rook_turned"]);
   });
+});
+
+
+describe('G-09 economy ingestion', () => {
+  it('gifts ignore the talk cap, derive reactions from the card, double birthdays, dedupe across ids and persist memory', async () => {
+    const env = await setup();
+    const where = and(eq(residents.worldId, env.worldId), eq(residents.id, 'odile'));
+    const [row] = await database.db.select().from(residents).where(where);
+    await database.db.update(residents).set({ card: { ...row!.card, birthday: 1 }, state: { ...row!.state, regard: 0 }, talkDay: 1, talkGain: 6 }).where(where);
+    const gift = { ...base, kind: 'gift', id: 'gift1', resident: 'odile', item: 'bread' };
+    expect((await post(env, [gift])).json().regard.odile).toBe(16);
+    expect((await post(env, [gift, { ...gift, id: 'gift2' }])).json().regard.odile).toBe(16);
+    expect((await post(env, [{ ...gift, id: 'gift3', day: 2 }])).json().regard.odile).toBe(24);
+    expect((await storedMemories(env)).filter(m => m.sourceEvent === 'gift1')).toHaveLength(1);
+    const [after] = await database.db.select().from(residents).where(where);
+    expect(after!.talkGain).toBe(6);
+  });
+  it('all six jobs become witnessed town events once; unknown jobs are rejected', async () => {
+    const { COMMUNITY_TASKS } = await import('@monde/shared');
+    const env = await setup();
+    const batch = COMMUNITY_TASKS.map(t => ({ kind: 'community_work', id: t.id, day: t.opens, minute: 600, task: t.id, place: t.place, participants: ['player', 'odile'] }));
+    const result = (await post(env, batch)).json();
+    expect(result.accepted).toHaveLength(6); expect(result.rejected).toEqual([]);
+    expect((await post(env, batch)).json().duplicates).toHaveLength(6);
+    expect(await database.db.select().from(events).where(eq(events.worldId, env.worldId))).toHaveLength(6);
+    expect((await storedMemories(env)).filter(m => m.residentId === 'odile' && m.kind === 'did')).toHaveLength(6);
+    expect((await post(env, [{ ...batch[0], id: 'unknown', task: 'imaginary' }])).json().rejected).toHaveLength(1);
+  });
+});
+
+
+it('shared meals earn +2 outside talk gains, dedupe, and reject inedible items', async () => {
+  const env = await setup();
+  const where = and(eq(residents.worldId, env.worldId), eq(residents.id, 'odile'));
+  const [row] = await database.db.select().from(residents).where(where);
+  await database.db.update(residents).set({ state: { ...row!.state, regard: 0 }, talkDay: 1, talkGain: 6 }).where(where);
+  const meal = { ...base, kind: 'meal', id: 'meal1', resident: 'odile', item: 'bun' };
+  expect((await post(env, [meal, meal])).json().regard.odile).toBe(2);
+  const rejected = (await post(env, [{ ...meal, id: 'meal2', item: 'tools' }])).json();
+  expect(rejected.rejected).toHaveLength(1); expect(rejected.regard.odile).toBe(2);
+  expect((await post(env, [{ ...base, kind: 'gift', id: 'still-can-gift', resident: 'odile', item: 'bread' }])).json().regard.odile).toBe(10);
 });

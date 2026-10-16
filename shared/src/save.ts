@@ -1,4 +1,6 @@
+import { Inventory, Wallet, Economy, emptyEconomy } from './economy';
 import { z } from 'zod';
+import { SavedRiddles, emptyRiddles } from './riddles';
 import { CharacterLookData } from './look';
 import { PlayerProfile, Skills, baseSkills } from './player';
 import { SavedFriendship, emptyFriendship } from './friendshipData';
@@ -70,13 +72,15 @@ export const SaveGame = z.object({
   /** v3 (M-06): the ClientEvent log, sent to POST /events when online and with the night pass (§9.14). */
   client_events: SavedEventLog,
   fellow: SavedFellow,
-  inventory: empty, coins: empty,
+  inventory: Inventory.default(() => Inventory.parse({})), coins: Wallet.default(() => Wallet.parse({})),
+  economy: Economy.default(emptyEconomy),
   /** §11.2 skills, from the Background's start (§11.1). */
   skills: Skills,
   /**
    * G-13 friendship (friendshipData.ts). Optional on read: a save from before it starts with nothing known, so it
    * needs no version bump or migration step.
    */
+  riddles: SavedRiddles.default(emptyRiddles),
   friendship: SavedFriendship.default(emptyFriendship)
 });
 export type SaveGame = z.infer<typeof SaveGame>;

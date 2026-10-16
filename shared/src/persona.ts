@@ -112,6 +112,7 @@ export const PersonaCard = z.object({
   values: Values,
   beliefs: z.array(z.string()).max(12),
   voice: z.union([HumanVoice, AnimalVoice]),
+  birthday: z.number().int().min(1).max(100).optional(),
   likes: z.array(z.string()),
   dislikes: z.array(z.string()),
   fears: z.array(z.string()),

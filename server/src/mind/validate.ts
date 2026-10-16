@@ -36,6 +36,7 @@ export interface ValidationContext {
   revealable: ReadonlySet<string>;
   /** Set only on riddle-topic turns. */
   riddle: RiddleRecord | null;
+  hintsAllowed?: number;
   /** The resident's most recent lines, newest first (the echo window). */
   recentLines: readonly string[];
   /** Heart skill perk widens the Regard clamp to ±7 (§9.10.2). Skills aren't built yet: false. */
@@ -149,10 +150,17 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
 
   // 5. Riddle post-filter, riddle-topic turns only (§14.2: many answers are ordinary words residents need).
   if (ctx.riddle) {
-    for (const text of visibleTexts(out)) {
+    const safeHints = ctx.riddle.hints.slice(0, ctx.hintsAllowed ?? 3).filter(h => h && !containsAnswer(h, ctx.riddle!.accepted));
+    // Arbitrary paraphrases cannot be proven free of semantic leaks or higher-level hints.
+    // GDD-GAP: fail closed to authored wording rather than trusting a model to paraphrase.
+    if (out.lines.some(l => !safeHints.includes(l.text))) return fail("riddle", ctx.riddle.id);
+    for (const text of [...visibleTexts(out), out.effects.memory?.text ?? "", out.effects.topic]) {
       if (containsAnswer(text, ctx.riddle.accepted)) return fail("riddle", ctx.riddle.id);
     }
   }
+
+  // Riddle replies/effects are engine-owned too: arbitrary text can encode an answer without naming it.
+  if (ctx.riddle) out = { ...out, choices: [{ id: 'a', text: "I'll think about it.", intent: 'curious' }, { id: 'b', text: 'Thank you.', intent: 'kind' }], effects: { regard_delta: 0, mood: { valence: 0, stress: 0 }, memory: null, favor: null, reveal_secret: null, topic: '' } };
 
   // 6. Secrets: only engine-approved ids.
   if (out.effects.reveal_secret !== null && !ctx.revealable.has(out.effects.reveal_secret)) {

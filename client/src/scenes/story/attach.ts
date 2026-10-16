@@ -1,3 +1,4 @@
+import { findMark, marks } from '../riddles';
 // The story in the world (MVP G-10): ZoneScene calls attachStory() in create() and update(position) every frame.
 //
 // - One StorySession per game, kept in the registry beside the clock (a new clock means a new or loaded game).
@@ -113,6 +114,7 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
   }
 
   const world: StoryWorld = {
+    readRiddle: id => { findMark(registry, clock, id); return marks(registry).entries[id]?.status === 'solved'; },
     now: () => ({
       day: clock.day, minute: clock.minute, zone: zone.id, place: placeAt(zone, opts.position()), town: getTown(registry), profile: fellowProfile(registry),
       regard: Object.fromEntries(personaCards.map(c => [c.id, regardFor(registry, c.id)]))

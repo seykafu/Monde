@@ -159,7 +159,8 @@ describe("validation pipeline", () => {
     expect(run(leaky, ctx({ riddle: RIDDLES["OQ-1"]! }))).toMatchObject({ ok: false, category: "riddle", detail: "OQ-1" });
     const leakyChoice = turn({ choices: [{ id: "a", text: "Is it the heron?", intent: "about_riddle" }, { id: "b", text: "Hm.", intent: "kind" }] });
     expect(run(leakyChoice, ctx({ riddle: RIDDLES["OQ-2"]! }))).toMatchObject({ ok: false, category: "riddle" });
-    expect(run(turn(), ctx({ riddle: RIDDLES["OQ-1"]! }))).toMatchObject({ ok: true });
+    expect(run(turn(), ctx({ riddle: RIDDLES["OQ-1"]! }))).toMatchObject({ ok: false, category: "riddle" });
+    expect(run(turn({ lines: [{ text: RIDDLES["OQ-1"]!.hints[0], expr: "thinking" }] }), ctx({ riddle: RIDDLES["OQ-1"]!, hintsAllowed: 1 }))).toMatchObject({ ok: true });
   });
 
   it("6. keeps a revealable secret id and nulls any other", () => {

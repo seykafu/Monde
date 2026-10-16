@@ -1,3 +1,5 @@
+import { markInteraction } from './markInteraction';
+import { attachEconomy, attachEconomyClock, type EconomyAttachment } from '../economy/attach';
 import type { SaveGame } from '@monde/shared';
 import { attachSaves } from '../save/runtime';
 import Phaser from 'phaser';
@@ -282,9 +284,13 @@ export class ZoneScene extends Phaser.Scene {
     this.daily = savedWeather?.daily.day === this.clock.day ? savedWeather.daily : dailyWeather(this.saveWeatherSeed(), this.clock.day);
     const [x, y] = data.arrive ?? this.zone.spawn;
     this.position = data.savedPlayer ? standable(this.zone, { x: data.savedPlayer.x, y: data.savedPlayer.y }) : { x: x + 0.5, y: y + 0.5 };
+    this.registry.remove('monde.save.wakePlayer');
     let facing = data.savedPlayer?.facing ?? 0;
     let lastPosition = { ...this.position };
+    attachEconomyClock(this, this.clock);
     attachSaves(this, this.clock, () => {
+      const waking = this.registry.get('monde.save.wakePlayer') as SaveGame['player'] | undefined;
+      if (waking) return waking;
       const dx = this.position.x - lastPosition.x, dy = this.position.y - lastPosition.y;
       if (dx || dy) facing = Math.atan2(dy, dx);
       lastPosition = { ...this.position };
@@ -371,7 +377,7 @@ export class ZoneScene extends Phaser.Scene {
     const ui = this.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT);
     ui.ignore(world);
     const title = this.add.text(24, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce', backgroundColor: '#28372d' });
-    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  L: town ledger  ·  J: people  ·  East / west road: change district', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
+    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  I: bag  ·  L: ledger  ·  J: journal', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
     const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
     this.prompt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 50, '', { fontFamily: FAMILY_BODY, fontSize: '22px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 12, y: 6 } }).setOrigin(0.5);
@@ -379,6 +385,12 @@ export class ZoneScene extends Phaser.Scene {
     this.toast = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 84, '', { fontFamily: FAMILY_BODY, fontSize: '17px', fontStyle: 'italic', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 14, y: 7 }, resolution: RENDER_SCALE })
       .setOrigin(0.5, 1).setAlpha(0);
     camera.ignore([title, controls, devHelp, this.prompt, this.toast, ...this.buildHud(), ...this.residents.buildUi()]);
+    this.economy = attachEconomy(this, this.clock, text => this.showToast(text), () => {
+      const cottage = zones.old_quarter?.places.find(p => p.id === 'lamplighter_cottage');
+      if (cottage) this.registry.set('monde.save.wakePlayer', { zone: 'old_quarter', x: cottage.door[0] + 0.5, y: cottage.door[1] + 0.5, facing: 0 });
+      this.scene.restart({ zone: 'old_quarter', arrive: cottage?.door });
+    });
+    camera.ignore(this.economy.objects);
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E') as Record<string, Phaser.Input.Keyboard.Key>;
     // On the key's own down event, so even a tap shorter than a frame counts (keys are destroyed on restart).
     this.interact = undefined;
@@ -389,6 +401,8 @@ export class ZoneScene extends Phaser.Scene {
     this.installClockHooks();
     camera.fadeIn(400); // GDD §16.4.
   }
+
+  private economy!: EconomyAttachment;
 
   private sharedClock(): Clock {
     let clock = this.registry.get(CLOCK_KEY) as Clock | undefined;
@@ -826,7 +840,7 @@ export class ZoneScene extends Phaser.Scene {
       }
     }
     if (time - this.hintAt > 250) { this.hintAt = time; this.refreshHint(); }
-    if (this.transitioning || !this.keys) return;
+    if (this.transitioning || !this.keys || this.clock.paused) return;
     const down = (...names: string[]) => names.some(name => this.keys[name]!.isDown) ? 1 : 0;
     const input = { x: down('D', 'RIGHT') - down('A', 'LEFT'), y: down('S', 'DOWN') - down('W', 'UP') };
     const from = this.position;
@@ -840,9 +854,11 @@ export class ZoneScene extends Phaser.Scene {
     this.story.update(this.position);
     // Residents take precedence over doors.
     const talk = this.residents.talkTarget(this.position);
-    const place = talk ? undefined : nearbyPlace(this.zone, this.position);
-    this.prompt.setText(talk ? `E: Talk to ${talk.name}` : place ? `E: ${placeName(place.id)}` : '').setVisible(!!talk || !!place);
-    this.interact = talk ? () => this.residents.requestTalk(talk.id) : place ? () => console.log(`${this.zone.id}.${place.id}`) : undefined;
+    const mark = talk ? undefined : markInteraction(this, this.clock, this.zone, this.position, { weather: this.now.kind, wind: this.daily.wind });
+    const place = talk || mark ? undefined : nearbyPlace(this.zone, this.position);
+    const economy = place ? this.economy.interaction(`${this.zone.id}.${place.id}`) : null;
+    this.prompt.setText(talk ? `E: Talk to ${talk.name}` : mark ? 'E: Read the plaque' : place ? `E: ${economy?.label ?? placeName(place.id)}` : '').setVisible(!!talk || !!mark || !!place);
+    this.interact = talk ? () => this.residents.requestTalk(talk.id) : mark ?? (place ? economy?.run ?? (() => console.log(`${this.zone.id}.${place.id}`)) : undefined);
     if (result.edge) {
       this.transitioning = true;
       const edge = result.edge;

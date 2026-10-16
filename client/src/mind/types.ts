@@ -28,11 +28,14 @@ export interface TalkTurn {
 
 export type TalkInput =
   | { kind: 'open' }
+  | { kind: 'meal'; item: string; event_id: string; text: string }
+  | { kind: 'gift'; item: string; reaction: import('@monde/shared').GiftReaction; event_id: string; text: string }
   | { kind: 'choice'; choice_id: string; text: string; intent: Intent }
   | { kind: 'say'; text: string };
 
 /** What the client reports with every turn: it owns the clock, positions and weather. */
 export interface TalkContext {
+  heart_level?: number;
   day: number;
   /** Minutes since midnight of `day`, 360..1560. */
   minute: number;

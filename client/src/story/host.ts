@@ -203,6 +203,7 @@ export interface StoryPresenter {
 
 /** The game around the story (scenes/story/attach.ts). */
 export interface StoryWorld {
+  readRiddle?(id: string): boolean;
   now(): WorldNow;
   setTown(state: TownState): void;
   /** The event log's queued ClientEvents (mind/events.ts; sent to monde-mind online, saved meanwhile). */
@@ -323,8 +324,8 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
     },
     riddle: (cue, ctx) => {
       once(ctx, () => { const r = deps.ledger().riddles; if (!r.includes(cue.id)) r.push(cue.id); });
-      deps.setOutcome('riddle', { solved: false });
-      note(`{riddle: ${cue.id}} noted in the ledger only (no Marks log yet)`);
+      const solved = deps.world()?.readRiddle?.(cue.id) ?? false;
+      deps.setOutcome('riddle', { solved });
     },
 
     // Handoffs.

@@ -1,3 +1,4 @@
+import { marks } from './riddles';
 // The Town Ledger (GDD §6.6, §18 Journal → Town Ledger; MVP G-01), the HUD Pillar strip, and the town's
 // registry wiring.
 //
@@ -329,7 +330,8 @@ export class TownLedgerScene extends Phaser.Scene {
     // This morning's line: the town's dawn, then the friendship news (G-13: milestones and romance, at most two).
     const report = this.registry.get(DAWN_REPORT_KEY) as DawnReport | undefined;
     const ties = friendshipLines(this.registry, town.day);
-    const morning = [report && report.day === town.day ? `${dawnLine(report)}.` : null, ...ties.slice(0, 2), ties.length > 2 ? `And ${ties.length - 2} more.` : null]
+    const riddleNews = marks(this.registry).headlines.filter(h => h.day === town.day - 1).map(h => h.text);
+    const morning = [...riddleNews, report && report.day === town.day ? `${dawnLine(report)}.` : null, ...ties.slice(0, 2), ties.length > 2 ? `And ${ties.length - 2} more.` : null]
       .filter((s): s is string => !!s).join(' ');
     if (morning) this.text(PX + 44, PY + PH - 22, morning, 14, { italic: true, color: MUTED, wrap: 620 }).setOrigin(0, 1);
     this.text(PX + PW - 44, PY + PH - 38, `L or Esc to close${DEV_KEYS ? '  ·  dev ]: +1 hour' : ''}`, 14, { family: FAMILY_UI, color: MUTED, align: 'right' });

@@ -1,3 +1,6 @@
+import { loadItems } from '../content/loadContent.js';
+import { ingestClientEvents } from './eventIngestion.js';
+import { matchGift } from '@monde/shared';
 import { closeSession, historyFor, selectSession } from "./sessions.js";
 import { compactSession } from "./compaction.js";
 import { WorldSemaphores } from "./semaphore.js";
@@ -56,10 +59,13 @@ export const TalkBody = z.object({
   conversation_id: z.uuid(),
   input: z.discriminatedUnion("kind", [
     z.object({ kind: z.literal("open") }),
+    z.object({ kind: z.literal('meal'), item: z.string().min(1).max(200), event_id: z.string().min(1).max(200), text: PLAYER_TEXT }),
+    z.object({ kind: z.literal('gift'), item: z.string().min(1).max(200), reaction: z.enum(['love', 'like', 'neutral', 'dislike']), event_id: z.string().min(1).max(200), text: PLAYER_TEXT }),
     z.object({ kind: z.literal("choice"), choice_id: z.string().min(1).max(8), text: PLAYER_TEXT, intent: Intent }),
     z.object({ kind: z.literal("say"), text: PLAYER_TEXT }),
   ]),
   context: z.object({
+    heart_level: z.number().int().min(1).max(10).optional(),
     day: z.number().int().min(1),
     minute: z.number().int().min(360).max(1560),
     place: PlaceId,
@@ -140,6 +146,13 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       const selected = await selectSession(db!, { worldId, residentId: body.resident_id, requestedId: body.conversation_id, open: body.input.kind === 'open', scene: body.context });
       if ('error' in selected) return reply.code(selected.error === 'unknown_resident' ? 404 : 409).send({ error: selected.error });
       body.conversation_id = selected.session.id;
+      const giftId = body.input.kind === 'gift' || body.input.kind === 'meal' ? body.input.item : null;
+      const giftItem = giftId ? (await loadItems()).find(i => i.id === giftId) : undefined;
+      if (body.input.kind === 'gift' || body.input.kind === 'meal') {
+        if (!giftItem) return reply.code(400).send({ error: 'unknown gift item' });
+        const receipt = await ingestClientEvents(db!, worldId, [{ kind: body.input.kind, id: body.input.event_id, day: body.context.day, minute: body.context.minute, resident: body.resident_id, item: giftItem.id }]);
+        if (receipt.rejected.length) return reply.code(400).send({ error: receipt.rejected[0]!.reason });
+      }
       const playerText = body.input.kind === "open" ? null : body.input.text;
       const loaded = await loadDialogueContext(db!, {
         worldId, residentId: body.resident_id, conversationId: body.conversation_id, scene: body.context,
@@ -151,13 +164,16 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           : reply.code(409).send({ error: "conversation belongs to another resident" });
       }
       const ctx = loaded.context;
+      // GDD-GAP: the ±7 Heart judgment range unlocks with the L3 Regard perk.
+      ctx.validation.heartPerk = (body.context.heart_level ?? 1) >= 3;
+      if (giftItem) ctx.input.playerSaid = body.input.kind === 'meal' ? `The player shares ${giftItem.name} with you. React in character; the engine already applied the meal's Regard.` : `The player gives you ${giftItem.name}. Your engine-decided reaction is ${matchGift(giftItem, ctx.prefix.card)}. React in character; do not award Regard for this gift (already applied outside conversation).`;
       ctx.input.sessionHistory = selected.session.history;
       ctx.input.sessionSystem = selected.session.system;
       if (selected.resumed) ctx.input.resumedAfter = selected.afterMinutes;
       const previous = selected.resumed ? await db!.select().from(dialogueTurns).where(and(eq(dialogueTurns.worldId, worldId), eq(dialogueTurns.conversationId, body.conversation_id))).orderBy(asc(dialogueTurns.turnIndex)) : [];
       const backlog = previous.flatMap(t => [...(t.playerInput ? [{ who: 'player', text: t.playerInput }] : []), ...t.output.lines.map(l => ({ who: 'resident', text: l.text }))]);
       if (body.context.riddle && !ctx.riddle) {
-        request.log.warn({ riddle: body.context.riddle.id }, "unknown riddle id; no hint guard on this turn");
+        return reply.code(400).send({ error: "unknown riddle id" });
       }
 
       reply.hijack();
@@ -182,6 +198,11 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           card: context.prefix.card, state: context.prefix.state, playerName: context.playerName,
           turnIndex: context.turnIndex, riddle: context.riddle,
         });
+        if (giftItem) {
+          const reaction = matchGift(giftItem, context.prefix.card);
+          const lines = { love: 'Oh, this is going on my best shelf. Thank you.', like: 'Thank you. I shall find a good place for this.', neutral: 'Thank you for thinking of me.', dislike: 'Kind of you to bring it. It is not quite my thing.' };
+          turn.lines = [{ text: body.input.kind === 'meal' ? "Pull up a chair. There's room." : lines[reaction], expr: reaction === 'dislike' ? 'worried' : 'warm' }];
+        }
         return applyLimit(turn);
       };
       const sendTurn = (output: DialogueTurnOutput, fallback: boolean, regard: TurnRegard | null) => send("turn", {
@@ -226,7 +247,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           regard = await persistTurn(db!, {
             worldId, residentId: body.resident_id, conversationId: body.conversation_id, turnIndex: ctx.turnIndex,
             day: body.context.day, minute: body.context.minute, place: body.context.place, playerInput: playerText,
-            output, rawOutput, promptUser, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
+            output, rawOutput, promptUser, gift: body.input.kind === 'gift' || body.input.kind === 'meal', heartLevel: body.context.heart_level, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
           });
         } catch (error) {
           request.log.error({ err: error, calls }, "persisting the dialogue turn failed");

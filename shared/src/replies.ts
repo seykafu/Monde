@@ -386,25 +386,25 @@ export const replyId = (reply: Pick<Reply, "next">, n: number): string => `${rep
  */
 export function normalizeChoices(
   choices: readonly ChoiceLike[],
-  opts: { cue?: ReplyCue | null; name?: string | null; seed?: number } = {},
+  opts: { cue?: ReplyCue | null; name?: string | null; seed?: number; four?: boolean } = {},
 ): NormalizedChoice[] {
   const out: NormalizedChoice[] = [];
   const seen = new Set<string>();
   const add = (choice: ChoiceLike, id: string): void => {
     const text = choice.text.replace(/\s+/g, " ").trim();
     const key = sameText(text);
-    if (!text || !key || isBareLeave({ text }) || seen.has(key) || out.length >= MAX_REPLIES) return;
+    if (!text || !key || isBareLeave({ text }) || seen.has(key) || out.length >= (opts.four ? 4 : MAX_REPLIES)) return;
     if (choice.intent === "leave" && out.some((c) => c.intent === "leave")) return;
     seen.add(key);
     out.push({ id, text, intent: choice.intent });
   };
   choices.forEach((choice, i) => add(choice, choice.id?.trim() || `p${i + 1}`));
-  if (out.length < MIN_REPLIES) {
+  if (out.length < (opts.four ? 4 : MIN_REPLIES)) {
     const cue = opts.cue ?? { text: "" };
     const pads = [...derivedReplies(cue, opts.seed ?? 0), ...derivedReplies({ text: "" }, opts.seed ?? 0)];
     let n = 1;
     for (const pad of pads) {
-      if (out.length >= MIN_REPLIES) break;
+      if (out.length >= (opts.four ? 4 : MIN_REPLIES)) break;
       add({ text: fillReply(pad.text, { name: opts.name }), intent: pad.intent }, replyId(pad, n++));
     }
   }

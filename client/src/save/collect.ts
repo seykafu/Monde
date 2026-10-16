@@ -3,6 +3,9 @@ import type { Clock } from '../sim/clock';
 import { serialize } from '../town/townEngine';
 import type { TownState } from '../town/pillars';
 export interface GameState {
+  inventory?: SaveGame['inventory'];
+  coins?: SaveGame['coins'];
+  economy?: SaveGame['economy'];
   clock: Clock;
   town: TownState;
   player: SaveGame['player'];
@@ -17,6 +20,7 @@ export interface GameState {
   fellow: SaveGame['fellow'];
   skills: SaveGame['skills'];
   /** G-13 friendship (scenes/friendship.ts); absent means nothing known yet. */
+  riddles?: SaveGame['riddles'];
   friendship?: SaveGame['friendship'];
 }
 export function collect(state: GameState, kind: SaveGame['kind'], label: string, savedAt = new Date().toISOString()): SaveGame {
@@ -26,6 +30,6 @@ export function collect(state: GameState, kind: SaveGame['kind'], label: string,
     mind: { world_id: null, branch_id: null, snapshot_id: null }, clock: state.clock.time,
     town: serialize(state.town), player: state.player, weather: state.weather,
     story_flags: state.story_flags, quiet: state.quiet, client_events: state.client_events,
-    fellow: state.fellow, inventory: {}, coins: {}, skills: state.skills, friendship: state.friendship
+    fellow: state.fellow, inventory: state.inventory, coins: state.coins, economy: state.economy, skills: state.skills, friendship: state.friendship, riddles: state.riddles
   });
 }

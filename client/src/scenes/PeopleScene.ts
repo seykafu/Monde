@@ -1,3 +1,5 @@
+import { MarkPages } from './MarkPages';
+import { marks } from './riddles';
 // The People page (GDD §9.11.3 "What the player sees", §18 Journal → People; MVP G-13 client).
 //
 // A page of the Journal (§16.6: a cloth-bound notebook), opened over ZoneScene with J and closed with J or Esc. The
@@ -25,13 +27,14 @@ export interface PeopleOpen {
   /** The scene underneath: its input is paused while the page is open. */
   host: string;
   clock: Clock;
+  tab?: 'People' | 'Marks' | 'Today';
 }
 
 /** Open the People page over `host` (no-op if it, the Ledger or the dialogue panel is already up). */
-export const openPeople = (host: Phaser.Scene, clock: Clock): void => {
+export const openPeople = (host: Phaser.Scene, clock: Clock, tab?: PeopleOpen['tab']): void => {
   // 'TownLedger' is TOWN_LEDGER_SCENE (TownLedgerScene imports this file, so the key is spelled out here).
   if ([PEOPLE_SCENE, 'TownLedger', DIALOGUE_SCENE].some(key => host.scene.isActive(key))) return;
-  host.scene.launch(PEOPLE_SCENE, { host: host.scene.key, clock } satisfies PeopleOpen);
+  host.scene.launch(PEOPLE_SCENE, { host: host.scene.key, clock, tab } satisfies PeopleOpen);
 };
 
 const CARDS: ReadonlyMap<string, { card: PersonaCard; index: number }> = new Map(personaCards.map((card, index) => [card.id, { card, index }]));
@@ -60,13 +63,14 @@ export const tieText = (t: Pick<KnownTie, 'label' | 'romance' | 'other'>, name: 
 /** GDD-GAP: persona cards have no birthday field yet (§9.11.3 life events); the page shows one if a card gains it. */
 const birthdayOf = (card: PersonaCard): string | null => {
   const b = (card as PersonaCard & { birthday?: unknown }).birthday;
-  return typeof b === 'string' && b.trim() ? b.trim() : null;
+  return typeof b === 'number' ? `Day ${b}` : null;
 };
 
 let lastPicked: string | null = null;
 
 export class PeopleScene extends Phaser.Scene {
   private open!: PeopleOpen;
+  private markPages!: MarkPages;
   private content!: Phaser.GameObjects.Container;
   private portraits: Portrait[] = [];
   private hearts: HeartRowView[] = [];
@@ -92,8 +96,10 @@ export class PeopleScene extends Phaser.Scene {
     this.openedAt = performance.now();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.teardown());
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, 0x10140f, 0.55).setOrigin(0).setInteractive(); // swallows clicks
+    if (this.open.tab) marks(this.registry).tab = this.open.tab;
     this.drawBook();
     this.content = this.add.container(0, 0);
+    this.markPages = new MarkPages(this, this.open.clock, this.content, () => this.refresh());
     this.ids = metResidents(getFriendship(this.registry)).filter(id => CARDS.has(id));
     const keep = lastPicked ? this.ids.indexOf(lastPicked) : -1;
     this.picked = keep >= 0 ? keep : 0;
@@ -113,6 +119,7 @@ export class PeopleScene extends Phaser.Scene {
   private onKey(e: KeyboardEvent): void {
     if (this.closed || this.seenKeys.has(e)) return;
     this.seenKeys.add(e);
+    if (marks(this.registry).tab === 'Marks' && this.markPages.key(e)) return;
     if (e.key === 'Escape') { this.close(); return; }
     // The J that opened the page mustn't close it again.
     if ((e.key === 'j' || e.key === 'J' || e.code === 'KeyJ') && !e.repeat && performance.now() - this.openedAt > 150) { this.close(); return; }
@@ -156,8 +163,9 @@ export class PeopleScene extends Phaser.Scene {
     g.lineStyle(1, INK, 0.25).lineBetween(SPINE, BY, SPINE, BY + BH);
     // A ribbon marker hanging from the top of the right page.
     g.fillStyle(0x9c2f3a, 1).fillRect(SPINE + BW / 2 - 70, BY - 12, 12, 64).fillTriangle(SPINE + BW / 2 - 70, BY + 52, SPINE + BW / 2 - 58, BY + 52, SPINE + BW / 2 - 64, BY + 44);
-    this.add.text(LX, BY + 28, 'People', { fontFamily: FAMILY_DISPLAY, fontSize: '38px', color: INK_CSS, resolution: RENDER_SCALE });
-    this.add.text(LX + 2, BY + 74, 'Everyone you have spoken with', { fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE });
+    this.add.text(LX, BY + 28, 'Journal', { fontFamily: FAMILY_DISPLAY, fontSize: '38px', color: INK_CSS, resolution: RENDER_SCALE });
+    (['People', 'Marks', 'Today'] as const).forEach((tab, i) => this.add.text(LX + 120 + i * 100, BY + 74, tab, { fontFamily: FAMILY_UI, fontSize: '17px', color: INK_CSS }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { marks(this.registry).tab = tab; this.refresh(); }));
+    this.add.text(LX + 2, BY + 74, 'Pages', { fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE });
     g.fillStyle(INK, 1).fillRect(LX, BY + 100, LW, 2).fillRect(LX, BY + 104, LW, 1);
     this.add.text(BX + BW - 30, BY + BH - 30, 'W/S or ↑↓ to choose  ·  J or Esc to close', {
       fontFamily: FAMILY_UI, fontSize: '13px', color: MUTED, resolution: RENDER_SCALE
@@ -184,6 +192,8 @@ export class PeopleScene extends Phaser.Scene {
     this.portraits = [];
     this.hearts = [];
     this.content.removeAll(true);
+    const tab = marks(this.registry).tab;
+    if (tab !== 'People') { this.markPages.draw(tab); return; }
     const g = this.add.graphics();
     this.content.add(g);
     if (!this.ids.length) {

@@ -47,7 +47,7 @@ export async function requestCheckpoint(key: string): Promise<void> {
   }
 }
 export function resetGame(scene: Phaser.Scene): void {
-  for (const key of ['monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies']) scene.registry.remove(key);
+  for (const key of ['monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies']) scene.registry.remove(key);
   clearFellow(scene.registry);
   saveQuietState(quietStorage, emptyQuietState());
   capture = undefined; dawnSave = undefined;
@@ -62,6 +62,7 @@ export async function loadGame(scene: Phaser.Scene, save: SaveGame): Promise<voi
   await getMind().restoreSnapshot(save.mind);
   scene.scene.stop('Zone');
   resetGame(scene);
+  scene.registry.set('monde.riddles', state.riddles);
   scene.registry.set('monde.clock', state.clock);
   scene.registry.set('monde.town', state.town);
   scene.registry.set('monde.save.weather', state.weather);
@@ -70,6 +71,9 @@ export async function loadGame(scene: Phaser.Scene, save: SaveGame): Promise<voi
   scene.registry.set('monde.events', state.client_events);
   scene.registry.set('monde.save.playtime', state.playtime);
   scene.registry.set('monde.save.name', state.player_name);
+  scene.registry.set('monde.inventory', state.inventory);
+  scene.registry.set('monde.coins', state.coins);
+  scene.registry.set('monde.economy', { ...state.economy, day: state.clock.day });
   setFellow(scene.registry, { ...state.fellow, skills: state.skills });
   // G-13 friendship (scenes/friendship.ts): what the client knew when the game was saved.
   scene.registry.set('monde.friendship', migrateSave(save).friendship);
@@ -91,12 +95,14 @@ function fellowSection(scene: Phaser.Scene): { fellow: SaveGame['fellow']; skill
 export function attachSaves(scene: Phaser.Scene, clock: Clock, player: () => SaveGame['player'], seed: number, ready: () => boolean = () => true): void {
   let elapsed = (scene.registry.get('monde.save.playtime') as number | undefined) ?? 0;
   const savedWeather = scene.registry.get('monde.save.weather') as SaveGame['weather'] | undefined;
-  const take = () => collect({ clock, town: scene.registry.get('monde.town') as TownState, player: player(),
+  const take = () => collect({ inventory: scene.registry.get('monde.inventory') as SaveGame['inventory'] | undefined,
+    coins: scene.registry.get('monde.coins') as SaveGame['coins'] | undefined, economy: scene.registry.get('monde.economy') as SaveGame['economy'] | undefined, clock, town: scene.registry.get('monde.town') as TownState, player: player(),
     weather: { seed, daily: savedWeather?.daily.day === clock.day ? savedWeather.daily : dailyWeather(seed, clock.day), override: ((scene.registry.get('monde.weatherOverride') === 'auto' ? null : scene.registry.get('monde.weatherOverride')) as SaveGame['weather']['override']) ?? null },
     story_flags: (scene.registry.get('monde.story.flags') as SaveGame['story_flags'] | undefined) ?? {},
     client_events: (scene.registry.get('monde.events') as SaveGame['client_events'] | undefined) ?? emptyEventLog(),
     quiet: loadQuietState(quietStorage), player_name: saveName(scene), playtime: elapsed,
     ...fellowSection(scene),
+    riddles: scene.registry.get('monde.riddles') as SaveGame['riddles'] | undefined,
     friendship: scene.registry.get('monde.friendship') as SaveGame['friendship'] | undefined
   }, 'manual', '');
   capture = take;

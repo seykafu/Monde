@@ -121,7 +121,7 @@ export function authoredHint(record: RiddleRecord, allowed: number): string | nu
   const level = Math.max(0, Math.min(record.hints.length, Math.floor(allowed)));
   for (let i = level - 1; i >= 0; i--) {
     const hint = record.hints[i]!;
-    if (!containsAnswer(hint, record.accepted)) return hint;
+    if (hint && !containsAnswer(hint, record.accepted)) return hint;
   }
   return null;
 }

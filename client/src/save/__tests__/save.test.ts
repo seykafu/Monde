@@ -72,9 +72,11 @@ describe('save format and restore', () => {
   });
   it('collect → restore retains the clock, town, player, memory, weather and offline log', () => {
     const source = state();
-    const restored = restore(collect(source, 'manual', 'Home'));
+    const file = collect(source, 'manual', 'Home');
+    const restored = restore(file);
     expect(restored.clock.time).toEqual(source.clock.time);
-    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null });
+    const defaults = collect(source, 'manual', 'Home');
+    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy });
     restored.town.pillars.charm++;
     expect(restored.town.pillars.charm).not.toEqual(source.town.pillars.charm);
     expect(runDawnsThrough(restored.town, 5).state.day).toBe(5);

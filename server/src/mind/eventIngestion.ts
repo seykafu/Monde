@@ -1,6 +1,7 @@
+import { loadItems } from '../content/loadContent.js';
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray } from "drizzle-orm";
-import { ClientEvent, applyScriptedRegard, type EventIngestionResult, type RegardSnapshot } from "@monde/shared";
+import { ClientEvent, COMMUNITY_TASKS, matchGift, giftRegard, isBirthday, applyScriptedRegard, type EventIngestionResult, type RegardSnapshot } from "@monde/shared";
 import { events, memories, plans, processedClientEvents, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { loadPlaceRegistry } from "./places.js";
@@ -50,9 +51,17 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
       result.rejected.push({ id, reason: parsed.error.issues.map(i => `${i.path.join(".")}: ${i.message}`).join("; ") });
       continue;
     }
-    const e = parsed.data;
+    const original = parsed.data;
+    const task = original.kind === 'community_work' ? COMMUNITY_TASKS.find(t => t.id === original.task) : undefined;
+    // Work uses the existing town-event witnessing pipeline, preserving its original receipt id.
+    const e = original.kind === 'community_work' && task ? {
+      ...original, kind: 'town_event' as const, type: 'community_work' as const,
+      // GDD-GAP: other work uses sweeping’s importance (2) until §9.6 supplies a fuller table.
+      summary: `The Fellow completed ${task.name}.`, importance: 2,
+    } : original;
     const keys = [JSON.stringify(["id", e.id])];
     if (e.kind === "scripted_memory" || e.kind === "scripted_regard") keys.push(JSON.stringify(["cue", e.kind, e.scene_id, e.cue_key]));
+    if (e.kind === 'gift') keys.push(JSON.stringify(['gift', e.resident, e.day]));
     const receipts = await tx.select().from(processedClientEvents).where(and(eq(processedClientEvents.worldId, worldId), inArray(processedClientEvents.key, keys)));
     if (receipts.length) {
       // Remember a new id that aliases an already applied cue, too.
@@ -61,7 +70,10 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
     }
     let reason: string | undefined;
     if (options.nightDay !== undefined && (e.day > options.nightDay || world.day > options.nightDay)) reason = "event is outside this unprocessed night";
-    if (e.kind === "gift" || e.kind === "community_work") reason = "not implemented; retain for a future client";
+    if (original.kind === 'community_work' && (!task || original.place !== task.place || original.day < task.opens || original.minute + task.minutes > 1560)) reason = 'invalid community task, place or time';
+    const item = e.kind === 'gift' || e.kind === 'meal' ? (await loadItems(options.contentDir)).find(i => i.id === e.item) : undefined;
+    if ((e.kind === 'gift' || e.kind === 'meal') && !item) reason = 'unknown item';
+    if (e.kind === 'meal' && (!item?.tags.includes('meal') || !item.stamina)) reason = 'not a meal';
     if ("place" in e && !registry.ids.has(e.place)) reason = "unknown place";
     if ("resident" in e && !byId.has(e.resident)) reason = "unknown resident";
     if ("participants" in e && e.participants.some(id => id !== "player" && !byId.has(id))) reason = "unknown participant";
@@ -92,6 +104,16 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
         }
         result.accepted.push(e.id);
       }
+    } else if ((e.kind === 'gift' || e.kind === 'meal') && item) {
+      const row = byId.get(e.resident)!;
+      const reaction = matchGift(item, row.card);
+      const delta = e.kind === 'meal' ? 2 : giftRegard(reaction, { birthday: isBirthday(e.day, row.card.birthday) });
+      row.state = { ...row.state, regard: applyScriptedRegard(row.state.regard, delta) };
+      await tx.update(residents).set({ state: row.state, updatedAt: new Date() }).where(and(eq(residents.worldId, worldId), eq(residents.id, e.resident)));
+      await tx.insert(memories).values({ worldId, id: randomUUID(), residentId: e.resident, day: e.day, minute: e.minute,
+        kind: 'did', text: e.kind === 'meal' ? `I shared ${item.name} with the Fellow.` : `The Fellow gave me ${item.name}. My reaction: ${reaction}.`, who: ['player', e.resident], wherePlace: row.card.home,
+        importance: 2, valence: Math.sign(delta), sourceEvent: e.id });
+      result.accepted.push(e.id);
     } else if (e.kind === "scripted_memory") {
       await tx.insert(memories).values({ worldId, id: randomUUID(), residentId: e.resident, day: e.day, minute: e.minute,
         kind: "scripted", text: e.text, who: ["player", e.resident], wherePlace: e.place, importance: e.importance, valence: 0 });
