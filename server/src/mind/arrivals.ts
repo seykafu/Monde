@@ -31,7 +31,7 @@ import { initialState, type WorldDatabase } from "../worlds/createWorld.js";
 import { callModel } from "./callModel.js";
 import { weekdayOf } from "./context.js";
 import { aiLogRow } from "./effects.js";
-import { lexicalHits } from "./filters.js";
+import { currencyHit, lexicalHits } from "./filters.js";
 import type { NightJobDeps } from "./nightJob.js";
 import { loadPlaceRegistry } from "./places.js";
 import { MIND_MODEL } from "./promptBuilder.js";
@@ -123,7 +123,8 @@ async function validationContext(db: Database, worldId: string, day: number) {
     places: registry.ids,
     residents: new Map(rows.map(r => [r.id, { name: r.card.name }])),
     reservedFull: gone.filter(e => e.day > day - RECENT_DEPARTURE_DAYS).map(e => e.summary.split(",")[0]!.trim()),
-    banned: (text: string) => lexicalHits(text).map(h => h.group),
+    // V16 also covers money that isn't Monde's (the World Bible: "Money is coins").
+    banned: (text: string) => [...lexicalHits(text).map(h => h.group), ...(currencyHit(text) ? ["money"] : [])],
   };
 }
 

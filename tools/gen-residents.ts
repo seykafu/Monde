@@ -31,7 +31,7 @@ import os from "node:os";
 import path from "node:path";
 import YAML from "yaml";
 import { runCensus, stringifyGeneratedCard, stringifySkeleton, type CensusStore, type CensusWriter } from "@monde/shared";
-import { lexicalHits } from "../server/src/mind/filters.ts";
+import { currencyHit, lexicalHits } from "../server/src/mind/filters.ts";
 import { HAIKU_55_PRICES_PER_MTOK } from "../server/src/mind/pricing.ts";
 import { DAY1_CARDS_DIR, REPO_ROOT, SKELETON_FILE, loadCensusInput } from "./census-inputs.ts";
 
@@ -166,7 +166,8 @@ if (!dryRun && !templateOnly) {
 
 const started = Date.now();
 const result = await runCensus(
-  { ...input, banned: text => lexicalHits(text).map(h => h.group) },
+  // V16 also covers money that isn't Monde's ("four and six", "a penny"): the World Bible's "Money is coins".
+  { ...input, banned: text => [...lexicalHits(text).map(h => h.group), ...(currencyHit(text) ? ["money"] : [])] },
   // Template cards one household at a time: the same ids every run.
   { writer, store, dryRun, regen, limit, concurrency: templateOnly ? 1 : concurrency, templateOnly, prices: HAIKU_55_PRICES_PER_MTOK },
 );
