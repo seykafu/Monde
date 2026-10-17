@@ -23,7 +23,7 @@ import { z } from "zod";
 import {
   ARCHETYPES, ARRIVAL_SYSTEM_PROMPT, ArrivalHousehold, HOME_TOKEN, PersonaCard, RESERVED_FIRST_NAMES, ResidentState,
   arrivalMaxTokens, arrivalUserMessage, bindHome, cardsFromHousehold, drawHousehold, hashParts, modelOutputFormat,
-  templateHousehold, validateHousehold, ArrivalHouseholdOutput, type ArrivalFacts, type HouseholdDraw, type PromptContext,
+  templateHousehold, validateHousehold, whimFor, ArrivalHouseholdOutput, type ArrivalFacts, type HouseholdDraw, type PromptContext,
   type RecentHousehold,
 } from "@monde/shared";
 import { aiLog, arrivals, events, favors, memories, plans, relationships, residents, worlds } from "../db/schema.js";
@@ -159,8 +159,8 @@ export async function writeHousehold(deps: ArrivalDeps, worldId: string, draw: H
   }
   let errors: string[] = [];
   for (let attempt = 1; attempt <= ARRIVAL_ATTEMPTS; attempt++) {
-    // A.3.8: each retry gets a fresh whim seed.
-    const whim = `${draw.id}:${attempt}:${hashParts(deps.seed, draw.id, attempt).toString(36)}`;
+    // A.3.8: each retry gets a fresh whim seed (§9.17's 500-entry list).
+    const whim = whimFor(deps.seed, draw.id, attempt);
     const ctx = await promptContext(deps.db, worldId, request, whim, home);
     if (errors.length) ctx.validatorErrors = errors;
     const call = await callModel(budgetMind(deps.db, deps.mind, worldId, null, "arrival", request.day), arrivalRequest(draw, ctx), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });

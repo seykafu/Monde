@@ -29,6 +29,7 @@
     "lint:content": "tsx tools/lint-content.ts",
     "census:skeleton": "tsx tools/census.ts skeleton",
     "census:report": "tsx tools/census.ts report",
+    "census:write": "tsx tools/gen-residents.ts",
     "scenes": "tsx tools/compile-scenes.ts",
     "smoke:server": "bash tools/smoke-server.sh"
   },

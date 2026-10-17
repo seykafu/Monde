@@ -6,4 +6,7 @@ export * from "./names";
 export * from "./library";
 export * from "./draw";
 export * from "./card";
+export * from "./nativeDraw";
+export * from "./native";
+export * from "./whims";
 export * from "./people";

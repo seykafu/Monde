@@ -5,6 +5,9 @@ const schema = z.object({
   WORLD_DAILY_BUDGET_USD: z.coerce.number().positive().default(0.06), // GDD §9.15
   // GDD-GAP: global UTC-day hard cap default; operator can change it.
   GLOBAL_DAILY_BUDGET_USD: z.coerce.number().nonnegative().default(10),
+  // MVP M-03: the whole Day-1 census run (/admin/census/write) is charged to one census world and stops at this, all
+  // days together. GDD-GAP: the plan's figure; the global daily cap still applies on top.
+  CENSUS_BUDGET_USD: z.coerce.number().nonnegative().default(3),
   PORT: z.coerce.number().int().min(1).max(65535).default(8080),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: z.url().optional(),

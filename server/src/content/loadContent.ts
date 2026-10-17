@@ -15,6 +15,8 @@ export async function loadContent(directory = process.env.MONDE_CONTENT_DIR ?? d
   if (!pending) {
     pending = (async () => {
       const folder = join(root, "residents");
+      // The hand-written cards only. The Day-1 census's generated cards (content/residents/day1/, MVP M-03 step 2) are
+      // a folder down and stay out until step 3 loads them: readdir isn't recursive and the folder isn't a .yaml.
       const files = (await readdir(folder)).filter((name) => name.endsWith(".yaml")).sort();
       if (!files.length) throw new Error(`No resident YAML cards in ${folder}`);
       const ids = new Set<string>();

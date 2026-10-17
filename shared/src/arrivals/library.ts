@@ -11,6 +11,7 @@
 // Day-1 census assigns its share without any reuse (shared/src/census/portraitPlan.ts).
 import { z } from "zod";
 import data from "../../../content/portraits/library.json";
+import type { PortraitTags } from "../census/portraitPlan";
 import { CardHumanLook, HAIR_COLOURS, SKIN_TONES, swatchColour } from "../look";
 import type { Presentation } from "./archetypes";
 import type { SeededRng } from "./rng";
@@ -51,6 +52,11 @@ export const PORTRAIT_LIBRARY: readonly PortraitEntry[] = z.array(PortraitEntry)
 const BY_ID = new Map(PORTRAIT_LIBRARY.map(p => [p.id, p]));
 export const portraitById = (id: string): PortraitEntry | undefined => BY_ID.get(id);
 export const isLibraryPortrait = (id: string): boolean => /^lib_[fma]\d{2}_\d{3}$/.test(id);
+/** A library bust as A.3.5 tags (the same record a procedural look's tags are, census/portraitPlan.ts tagsFromLook). */
+export const tagsOfEntry = (e: PortraitEntry): PortraitTags => ({
+  band: e.band, presentation: e.presentation, skin: e.skin, skin_word: e.skin_word, hair_word: e.hair_word, hair_style: e.look.hair.style,
+  attire: [...e.attire], build: e.build, caption: e.caption,
+});
 /** The master an identity belongs to (itself for a master). */
 export const masterOf = (entry: Pick<PortraitEntry, "id" | "variant_of">): string => entry.variant_of ?? entry.id;
 

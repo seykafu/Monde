@@ -7,14 +7,17 @@ import YAML from "yaml";
 import {
   ARCHETYPE_QUOTAS, BAND_TABLE, CENSUS_ZONES, CORE_HOMED, FIRST_NAMES, FAMILY_NAMES, FAMOUS_NAMES, HOUSEHOLDS, JOB_ROWS, MINORS_BY_ZONE,
   PORTRAIT_LIBRARY, PUPIL_AGES, PersonaCard, RESERVED_FAMILY_NAMES, RESERVED_FIRST_NAMES, STATUS_TABLE, TYPES_BY_ZONE, bandAllowance, bandOf,
-  bedsNeeded, buildSkeleton, cardLookProblems, censusMismatches, censusTables, foldName, formatCensusReport, homeZone, isNamedPin, isVacantHome,
+  bedsNeeded, buildSkeleton, cardLookProblems, censusMismatches, censusProgressReset, censusTables, foldName, formatCensusReport, homeZone, isNamedPin, isVacantHome,
   masterOf, parseHomes, parsePins, tagsFromLook, type CensusCard, type Day1Skeleton, type SkeletonMember,
 } from "../index";
 
 const root = resolve(import.meta.dirname, "../../..");
 const read = (p: string) => readFileSync(resolve(root, p), "utf8");
-const sk = YAML.parse(read("content/census/day1.yaml")) as Day1Skeleton;
 const pins = parsePins(YAML.parse(read("content/census/pins.yaml")));
+// The skeleton as the seed built it: M-03 step 2 records its progress in the same file (statuses, generation records,
+// the written members' ids and names), which these tests leave to censusGenerate.test.ts.
+const file = YAML.parse(read("content/census/day1.yaml")) as Day1Skeleton;
+const sk = censusProgressReset(file, new Set(pins.households.map(h => h.id)));
 const homes = parseHomes(YAML.parse(read("content/places/homes.yaml")));
 const cardFiles = readdirSync(resolve(root, "content/residents")).filter(f => f.endsWith(".yaml")).sort();
 const fullCards = cardFiles.map(f => PersonaCard.parse(YAML.parse(read(`content/residents/${f}`))));

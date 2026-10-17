@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { z } from "zod";
 import data from "../../../content/portraits/library.json";
 import {
-  AGE_BANDS, BAND_AGES, PORTRAIT_LIBRARY, PortraitEntry, ROUTINE_PLACES, bandOf, cardLookProblems, templateHousehold, validateHousehold,
+  tagsOfEntry, AGE_BANDS, BAND_AGES, PORTRAIT_LIBRARY, PortraitEntry, ROUTINE_PLACES, bandOf, cardLookProblems, templateHousehold, validateHousehold,
   type CardHumanLook, type HouseholdDraw,
 } from "../index";
 
@@ -93,7 +93,7 @@ describe("the portrait library rows (A-05)", () => {
         members: [{
           slot: "m1", role: r.band === "child" || r.band === "teen" ? "child" : "adult", age_min: BAND_AGES[r.band][0],
           age_max: BAND_AGES[r.band][1], age: r.age, band: r.band, presentation: r.presentation, pronoun_default: pronoun[r.presentation],
-          portrait: r.id,
+          portrait: r.id, tags: tagsOfEntry(r),
         }],
       };
       const v = validateHousehold(templateHousehold(draw, vctx, 3), draw, vctx);

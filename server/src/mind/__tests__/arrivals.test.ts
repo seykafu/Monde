@@ -4,7 +4,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { and, eq } from "drizzle-orm";
 import {
-  ARRIVAL_SYSTEM_PROMPT, HOME_TOKEN, PersonaCard, templateHousehold, type ArrivalHouseholdOutput, type HouseholdDraw, type MemberDraw,
+  ARRIVAL_SYSTEM_PROMPT, HOME_TOKEN, PersonaCard, WHIMS, portraitById, tagsOfEntry, templateHousehold, type ArrivalHouseholdOutput, type HouseholdDraw,
+  type MemberDraw,
 } from "@monde/shared";
 import { createTestDatabase } from "../../db/testDatabase.js";
 import { aiLog, arrivals, events, memories, relationships, residents } from "../../db/schema.js";
@@ -35,13 +36,14 @@ function drawFromPrompt(text: string): HouseholdDraw {
   const members: MemberDraw[] = [...text.matchAll(/- slot (m\d) · role ([a-z_]+) · age range (\d+)-(\d+) · pronoun default (\S+)\n {2}portrait (lib_[a-z0-9_]+):/g)].map(m => ({
     slot: m[1]!, role: m[2] as MemberDraw["role"], age_min: Number(m[3]), age_max: Number(m[4]), age: Number(m[3]), band: "adult",
     presentation: m[6]!.slice(4, 5) as MemberDraw["presentation"], pronoun_default: m[5] as MemberDraw["pronoun_default"], portrait: m[6]!,
+    tags: tagsOfEntry(portraitById(m[6]!)!),
   }));
   return { id: "prompt", archetype: archetype as HouseholdDraw["archetype"], day: 8, slot: 0, youth: false, members, beds: 2, prob: 1 };
 }
 
 /** A well-written answer in the model's own words; `broken` answers fail V03 (a cast member's name). */
 function answer(text: string, broken = false): ArrivalHouseholdOutput {
-  const out = templateHousehold(drawFromPrompt(text), { residents: new Map() }, /WHIM: (\S+)/.exec(text)![1]!);
+  const out = templateHousehold(drawFromPrompt(text), { residents: new Map() }, /WHIM: (.+)/.exec(text)![1]!);
   for (const m of out.members) {
     m.backstory = `${m.name.split(" ")[0]} kept a ferry café in Marrow Quay for nine years and swore the tide there was the slowest on the coast. Came for the light.`;
     m.voice.samples = ["Can't say I mind the wind.", "That's the third gull today. They've a system.", "Right. I'll put the kettle on."];
@@ -86,6 +88,8 @@ describe("the arrival buffer (§9.2, A.3.6–A.3.8)", () => {
       expect(body.output_config).toMatchObject({ effort: "low", format: { type: "json_schema" } });
       expect((body.system as Anthropic.TextBlockParam[])[0]).toMatchObject({ text: ARRIVAL_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } });
       expect(body.messages.every(m => m.role === "user")).toBe(true); // no assistant prefill
+      // §9.17's whim seed, from the 500-entry list.
+      expect(WHIMS).toContain(/WHIM: (.+)/.exec(String(body.messages.at(-1)!.content))![1]);
     }
     const logged = await database.db.select().from(aiLog).where(and(eq(aiLog.worldId, world.id), eq(aiLog.kind, "arrival")));
     expect(logged).toHaveLength(ARRIVAL_BUFFER_SIZE);

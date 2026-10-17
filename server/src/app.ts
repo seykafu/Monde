@@ -1,5 +1,6 @@
 import { configureBudget } from "./mind/budget.js";
 import { registerAdminRoutes } from "./mind/admin.js";
+import { registerCensusRoutes } from "./mind/census.js";
 import { registerTelemetryRoutes } from './telemetry/routes.js';
 import { registerChatRoutes } from './mind/chatRoutes.js';
 import { randomUUID } from "node:crypto";
@@ -94,6 +95,7 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   if (db) configureBudget(db, config);
   registerAdminRoutes(app, config, db);
   const mind = options.mind ?? createMindClient(config);
+  registerCensusRoutes(app, config, db, mind);
   registerWorldRoutes(app, config, db);
   registerTelemetryRoutes(app, config, db);
   registerChatRoutes(app, db, mind);

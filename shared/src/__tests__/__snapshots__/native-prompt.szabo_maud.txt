@@ -1,0 +1,92 @@
+DAY 1 · Spring · Tuesday
+PILLARS: prosperity 18, safety 30, spirit 22, charm 25
+TOWN: census 210; shops open 6; school pupils 9; projects done: none; in progress: none
+MODE: native
+
+ARCHETYPE single_parent · Single parent
+default values: prosperity 0.35, safety 0.30, spirit 0.20, charm 0.15
+dream templates:
+single_parent.d1 → Hours that fit around the school run → Ask a shop owner for fixed morning hours (Regard ≥ 25) › Swap school-run days with a neighbor (Regard ≥ 20) › Write the timetable on the kitchen wall
+single_parent.d2 → One whole afternoon with nothing in it → Meet a sitter they'd trust › Take the child to the duck pond and leave the chores › Sit down for an hour
+single_parent.d3 → A bedroom the child likes → Buy paint at Dunmore's › Borrow brushes from Kasimir › Finish before the child's birthday
+likes to draw from: tea that stays hot long enough to finish; neighbors who knock before advising; a back door that locks
+dislikes to draw from: being pitied; visitors at bedtime; being asked who watches the children
+voice note: Efficient and dry, with one eye on a small person. Clipped sentences and the odd long breath.
+typical work: café shift worker; pub kitchen hand; Town Hall cleaner
+
+HOUSEHOLD (3 people; single parent + children)
+- slot m1 · role adult · age 36 · pronoun default he/him
+  portrait (painted from these tags): A man with close-cropped black hair and an olive jumper.
+  tags: band adult, presentation m, skin 4 (golden brown), hair black cropped, attire jumper, build average
+  work: a full-time carer at home, unpaid
+  in Monde: born here
+  name: a first name from Henrik, Idris, Gideon, Matthias, Gerrit, Stig; surname Szabo (use one, or invent if none fits)
+- slot m2 · role child · age 9 · pronoun default she/her
+  portrait lib_f12_075: A girl with long copper hair held back by a hairband, a bottle-green school jumper, a cream knitted scarf and a satchel strap across her chest. A sticking plaster on her chin and a bookish, sceptical look.
+  tags: band child, presentation f, skin 1 (pale), hair copper long, attire school_jumper, scarf, satchel, build slight
+  work: a pupil at Millbrook School (millbrook.school), in Felix Amari's class
+  in Monde: born here
+  name: Maud Szabo (canon: write it exactly)
+  routine: the engine writes this child's day; give five entries a day at millbrook.home_07 and spend the words on the prose
+- slot m3 · role child · age 17 · pronoun default they/them
+  portrait lib_a15_045: A lanky teenager with a sandy-blond mop, a face full of freckles and a too-big olive-green canvas work apron over a brick-red shirt. Eager, a little sheepish.
+  tags: band teen, presentation a, skin 2 (fair and freckled), hair sandy blond tufty, attire apron, tool_belt, boots, build slight
+  work: a teenager: lessons by post at the library desk and Felix's Thursday-evening class
+  in Monde: born here
+  name: a first name from Jo, Sol, Sasha, Oakley, Rue, Shay; surname Szabo (use one, or invent if none fits)
+HOME: millbrook.home_07, No. 15 Terrace Row, ground floor (2 beds)
+
+PLACES
+workplace options: m1 null (no job); m2 null (no job); m3 null (no job)
+places for routines: millbrook.terrace_row (Terrace Row, the brick terraces); millbrook.laundry_green (the laundry green); millbrook.weir (the weir and the path along the Liss); millbrook.school (Millbrook School, one room); millbrook.mill_yard (the mill yard); millbrook.mill (Lissworth Mill, closed); millbrook.clinic (the shut clinic); millbrook.kasimir_workshop (Kasimir's carpentry workshop); old_quarter.fountain_square (the square with the heron fountain); old_quarter.library (the free library, Margo's); old_quarter.st_brigids (the chapel); market_row.market_street (Market Row's street; the Saturday market); market_row.cafe_liss (Café Liss); market_row.gull_and_anchor (the pub, The Gull & Anchor); market_row.general_store (Dunmore's General Store); market_row.bakery (Fournier & Fille, the bakery); commons.duck_pond (the duck pond on the Commons); commons.picnic_lawn (the picnic lawn on the Commons); wharf.breakwater (the breakwater); wharf.harbor_steps (the harbour steps); millbrook.home_07 (their home)
+people they might know: nettie (Nettie Szabo: Tollman, the lookout (slingshot)); ilona (Ilona Szabo: widowed elder); bru (Bru Haskett: Tollman, the crew's bruiser; carves wooden birds); delphine (Delphine Mercer: Seamstress; former loom hand at Lissworth Mill); felix (Felix Amari: Teacher, Millbrook School); kasimir (Kasimir Wolanski: Carpenter and handyman); priya (Priya Ramaswamy: Nurse; unofficial house-call nurse and carer for her father); rook (Roland "Rook" Mercer: Leader of the Tollmen; former mill doffer)
+REQUIRED TIES (put each in that member's relationships, with this id): m2 → nettie (Nettie Szabo), tag kin: Cousins. Nettie Szabo's card ties to them as "cousin" (affinity 90, trust 85); return it | m2 → ilona (Ilona Szabo), tag kin: Granddaughter and grandmother (Nettie's cousin, Ilona's son's or daughter's child). | m1 → ilona (Ilona Szabo), tag kin: Ilona's son or daughter. | m1 → nettie (Nettie Szabo), tag kin: Nettie's uncle or aunt. | m3 → nettie (Nettie Szabo), tag kin: Cousins. | m3 → ilona (Ilona Szabo), tag kin: Grandchild and grandmother. | m2 → bru (Bru Haskett): Bru Haskett's card ties to them as "friend" (affinity 65, trust 50); return it
+SEED (true of them; build the card around it, and keep the Tollmen out of secrets): m1: Maud's parent: Ilona's son or daughter, Nettie's uncle or aunt. Kin: ilona (Ilona Szabo), nettie (Nettie Szabo). | m2 Maud Szabo: Draws everyone she meets in the margin of her slate; Felix pins the best ones to the wall. Voice: Shy; whispers; 'I drew you.' Kin: nettie (Nettie Szabo), ilona (Ilona Szabo). | m3: Maud's brother or sister. Kin: nettie (Nettie Szabo), ilona (Ilona Szabo).
+AVOID: first names Bertrand, Ada, Bru, Augusta, Ines, Bastien, Delphine, Hollis, Mossimo, Moss, Juniper, June, Marguerite, Margo, Edwina, Felix, Nell, Odile, Sable, Kasimir, Priya, Rosalind, Roz, Nettie, Roland, Rook, Teodor, Teo, Silas, Tobias, Tib, Barnaby, Barney, Hester, Raman, Ilona, Alphonse, Ferdinand, Ignatia, Dolores, Dolly, Dex, Dom, Wendell, Marit, Cormac, Maud, Dunstan, Alma, Imogen, Arthur, Gil, Maren, Daniel, Odette, Teddy, Ivy, Chidi, Pippa, Saffron, Lyle, Ambrose, Fenwick, Cornelius, Hugo, Philomena, Hyacinth, Waldemar, Ilka, Claudine, Dennis, Gustav, Beatrix, Colm, Ruari, Maeve, Finn, Isla, Calder, Nadine, Sunny, Wick, Mateo, Lucía, Lucia, Marisol, Hazel, Posy, Robin; full names none
+WHIM: a kite with no tail
+
+OUTPUT CONTRACT
+{
+  "household": { "same_surname": true, "summary": "<= 25 words: how they are related and why they came" },
+  "members": [
+    {
+      "slot": "m1",                          // echo the slot
+      "name": "First Last",                  // 2-3 words; letters, apostrophes, hyphens
+      "age": 0,                              // integer inside the portrait band and the age range
+      "pronouns": "she/her | he/him | they/them",
+      "occupation": "<= 12 words",
+      "workplace": "<place id from workplace options> | millbrook.home_07 | null",
+      "appearance": "1-2 sentences, <= 40 words, must agree with the portrait tags and name one item they wear",
+      "backstory": "<= 120 words",
+      "personality": {
+        "traits": ["3 to 5 single words"],
+        "big5": { "open": 0, "conscientious": 0, "extravert": 0, "agreeable": 0, "neurotic": 0 }  // integers 0-100, one >= 70 or <= 30
+      },
+      "values": { "prosperity": 0.00, "safety": 0.00, "spirit": 0.00, "charm": 0.00 },           // each 0.05-0.60, sum 1.0
+      "beliefs": ["2 to 4 short first-person beliefs about the town or themselves; at least one is wrong"],
+      "voice": {
+        "register": "<= 40 words on how they talk",
+        "tics": ["1 to 4 short phrases"],
+        "never_says": ["2 to 6 words or phrases"],
+        "samples": ["exactly 3 lines, each <= 25 words"]
+      },
+      "likes": ["3 to 5"], "dislikes": ["3 to 5"], "fears": ["1 to 3"],
+      "dream": {
+        "template": "<one of the archetype's dream ids>",
+        "text": "<= 25 words",
+        "stages": ["exactly 3, each <= 18 words, each starting with a verb"]
+      },
+      "routine": {
+        "weekday": [ { "at": "HH:MM", "do": "work|eat|nap|shop|socialize|sleep|walk|read|garden|fish|clean|cook|visit|attend|tinker|write|pray|wander|sit", "where": "<place id or millbrook.home_07>" } ],
+        "weekend": [ { "at": "HH:MM", "do": "...", "where": "<place id or millbrook.home_07>" } ]
+      },                                     // 5-9 entries a day, the first and last at millbrook.home_07; work only at the workplace
+      "chores": ["2 to 4 short phrases"],
+      "relationships": [
+        { "id": "<resident id or household slot>", "affinity": 0, "trust": 0,
+          "tag": "fond|wary|curious|rival|kin|friend", "note": "<= 15 words" }
+      ],                                     // 1-3; anyone outside the household within -30..30
+      "secrets": [ { "text": "<= 25 words", "reveal": { "regard_min": 60 } } ],   // 0-2; regard_min 40-80
+      "story_role": "none | favor_giver | shopkeeper | volunteer | mentor"
+    }
+  ]
+}

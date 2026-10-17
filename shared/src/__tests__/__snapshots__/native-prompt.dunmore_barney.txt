@@ -1,0 +1,79 @@
+DAY 1 · Spring · Tuesday
+PILLARS: prosperity 18, safety 30, spirit 22, charm 25
+TOWN: census 210; shops open 6; school pupils 9; projects done: none; in progress: none
+MODE: native
+
+ARCHETYPE shop_founder · Small-business founder
+default values: prosperity 0.50, safety 0.20, spirit 0.10, charm 0.20
+dream templates:
+shop_founder.d1 → Open by the end of the month → Stock the shelves › Get a sign painted › Cut the ribbon with the mayor
+shop_founder.d2 → A first employee → Post the job on the Lantern's board › Interview two residents › Hire one
+shop_founder.d3 → The shop everyone mentions → Sell to ten different residents › Win a standing order from the pub or the bakery › Put the shop's name on the window glass
+likes to draw from: a till that rings; hand-lettered signs; first customers
+dislikes to draw from: fees nobody explained; just browsing said twice; empty windows
+voice note: Brisk. A salesperson's warmth with a ledger underneath. Talks in prices and margins.
+typical work: bookseller; haberdasher; chandler; repair-counter keeper
+
+HOUSEHOLD (1 person; adult living alone)
+- slot m1 · role adult · age 51 · pronoun default he/him
+  portrait lib_m53_029: A stocky man with salt-and-pepper hair under a brown flat cap, a nose broken long ago and set a little crooked, and a grey work cardigan with leather elbow patches. A long-suffering, dryly amused look.
+  tags: band adult, presentation m, skin 3 (tan), hair salt-and-pepper short, attire cardigan, flat_cap, work_jacket, build broad
+  work: counter clerk (Dunmore's General Store), at market_row.general_store
+  in Monde: born here
+  name: Barnaby "Barney" Dunmore (canon: write it exactly)
+HOME: market_row.dunmore_flat, the flat over Dunmore's, upstairs (2 beds)
+
+PLACES
+workplace options: m1 market_row.general_store
+places for routines: market_row.market_street (Market Row's street; the Saturday market); market_row.market_hall (the covered Market Hall); market_row.bakery (Fournier & Fille, the bakery); market_row.general_store (Dunmore's General Store); market_row.gull_and_anchor (the pub, The Gull & Anchor); market_row.cafe_liss (Café Liss); market_row.back_alley (the alley behind the shops); old_quarter.fountain_square (the square with the heron fountain); old_quarter.library (the free library, Margo's); old_quarter.st_brigids (the chapel); commons.duck_pond (the duck pond on the Commons); commons.picnic_lawn (the picnic lawn on the Commons); wharf.breakwater (the breakwater); wharf.harbor_steps (the harbour steps); market_row.dunmore_flat (their home)
+people they might know: nell (Nell Dunmore: Fisher; runs Dunmore's General Store with her brother Barney); bru (Bru Haskett: Tollman, the crew's bruiser; carves wooden birds); ines (Ines Delacroix: Executive assistant to Silas Vane); june (Juniper "June" Castellanos: Musician; morning shift at Café Liss); odile (Odile Fournier: Baker; owner of Fournier & Fille); rosalind (Rosalind "Roz" Hale: Publican, The Gull & Anchor)
+REQUIRED TIES (put each in that member's relationships, with this id): m1 → nell (Nell Dunmore), tag kin: Brother and sister. Nell Dunmore's card ties to them as "brother" (affinity 70, trust 80); return it | m1 → bru (Bru Haskett): Bru Haskett's card ties to them as "embarrassed" (affinity 40, trust 35); return it
+SEED (true of them; build the card around it, and keep the Tollmen out of secrets): m1 Barnaby "Barney" Dunmore: Hands the Tollmen 20 coins from the till at the back door every Saturday and books it as 'sundries.' Nell doesn't know. Voice: Apologetic; counts change aloud; 'Mm, well.' Kin: nell (Nell Dunmore).
+AVOID: first names Bertrand, Ada, Bru, Augusta, Ines, Bastien, Delphine, Hollis, Mossimo, Moss, Juniper, June, Marguerite, Margo, Edwina, Felix, Nell, Odile, Sable, Kasimir, Priya, Rosalind, Roz, Nettie, Roland, Rook, Teodor, Teo, Silas, Tobias, Tib, Barnaby, Barney, Hester, Raman, Ilona, Alphonse, Ferdinand, Ignatia, Dolores, Dolly, Dex, Dom, Wendell, Marit, Cormac, Maud, Dunstan, Alma, Imogen, Arthur, Gil, Maren, Daniel, Odette, Teddy, Ivy, Chidi, Pippa, Saffron, Lyle, Ambrose, Fenwick, Cornelius, Hugo, Philomena, Hyacinth, Waldemar, Ilka, Claudine, Dennis, Gustav, Beatrix, Colm, Ruari, Maeve, Finn, Isla, Calder, Nadine, Sunny, Wick, Mateo, Lucía, Lucia, Marisol, Hazel, Posy, Robin; full names none
+WHIM: an abacus
+
+OUTPUT CONTRACT
+{
+  "household": { "same_surname": true, "summary": "<= 25 words: how they are related and why they came" },
+  "members": [
+    {
+      "slot": "m1",                          // echo the slot
+      "name": "First Last",                  // 2-3 words; letters, apostrophes, hyphens
+      "age": 0,                              // integer inside the portrait band and the age range
+      "pronouns": "she/her | he/him | they/them",
+      "occupation": "<= 12 words",
+      "workplace": "<place id from workplace options> | market_row.dunmore_flat | null",
+      "appearance": "1-2 sentences, <= 40 words, must agree with the portrait tags and name one item they wear",
+      "backstory": "<= 120 words",
+      "personality": {
+        "traits": ["3 to 5 single words"],
+        "big5": { "open": 0, "conscientious": 0, "extravert": 0, "agreeable": 0, "neurotic": 0 }  // integers 0-100, one >= 70 or <= 30
+      },
+      "values": { "prosperity": 0.00, "safety": 0.00, "spirit": 0.00, "charm": 0.00 },           // each 0.05-0.60, sum 1.0
+      "beliefs": ["2 to 4 short first-person beliefs about the town or themselves; at least one is wrong"],
+      "voice": {
+        "register": "<= 40 words on how they talk",
+        "tics": ["1 to 4 short phrases"],
+        "never_says": ["2 to 6 words or phrases"],
+        "samples": ["exactly 3 lines, each <= 25 words"]
+      },
+      "likes": ["3 to 5"], "dislikes": ["3 to 5"], "fears": ["1 to 3"],
+      "dream": {
+        "template": "<one of the archetype's dream ids>",
+        "text": "<= 25 words",
+        "stages": ["exactly 3, each <= 18 words, each starting with a verb"]
+      },
+      "routine": {
+        "weekday": [ { "at": "HH:MM", "do": "work|eat|nap|shop|socialize|sleep|walk|read|garden|fish|clean|cook|visit|attend|tinker|write|pray|wander|sit", "where": "<place id or market_row.dunmore_flat>" } ],
+        "weekend": [ { "at": "HH:MM", "do": "...", "where": "<place id or market_row.dunmore_flat>" } ]
+      },                                     // 5-9 entries a day, the first and last at market_row.dunmore_flat; work only at the workplace
+      "chores": ["2 to 4 short phrases"],
+      "relationships": [
+        { "id": "<resident id or household slot>", "affinity": 0, "trust": 0,
+          "tag": "fond|wary|curious|rival|kin|friend", "note": "<= 15 words" }
+      ],                                     // 1-3; anyone outside the household within -30..30
+      "secrets": [ { "text": "<= 25 words", "reveal": { "regard_min": 60 } } ],   // 0-2; regard_min 40-80
+      "story_role": "none | favor_giver | shopkeeper | volunteer | mentor"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { EMPLOYMENT } from "./census/day1Tables";
 import { PlaceId, ResidentId } from "./ids";
 import { CardLook } from "./look";
 import { Verb } from "./verbs";
@@ -131,5 +132,17 @@ export const PersonaCard = z.object({
   will_scuffle: z.boolean().optional(),
   /** §9.11.3: `false` opts the resident out of romance (the ladder never starts for them). Absent means eligible. */
   romance: z.boolean().optional(),
+  // ── Generated residents (MVP M-03: the Day-1 census, content/residents/day1/). Bookkeeping for curation and the
+  // census tables; none of these goes into the persona prompt block (server/src/mind/promptBuilder.ts personaBlock). ──
+  /** A.3.8: written by the model, or the template card after the model failed. */
+  generated_by: z.enum(["model", "template"]).optional(),
+  /** The census household (content/census/day1.yaml) the resident belongs to. */
+  household: z.string().optional(),
+  /** The A.2 archetype the card was written from. */
+  archetype: z.string().optional(),
+  /** A.1.4's status (employed, retired, out of work, carer, unable, pupil, lessons, under five). */
+  employment: z.enum(EMPLOYMENT).optional(),
+  /** Years lived in Monde; equal to `age` for someone born here. */
+  years_in_monde: z.number().int().min(0).max(110).optional(),
 });
 export type PersonaCard = z.infer<typeof PersonaCard>;

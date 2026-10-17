@@ -2,9 +2,12 @@
 //
 // One household per arrival slot, seeded with hash(world_seed, day, slot) (A.3.1), so the same night draws the same
 // people. The Haiku call (A.3.6) or the template card (A.3.8) then writes them.
+import type { PortraitTags } from "../census/portraitPlan";
+import type { CardHumanLook } from "../look";
 import { PILLARS } from "../script/types";
 import { ARCHETYPES, ARCHETYPE_BY_ID, type Archetype, type ArchetypeId, type ArrivalFacts, type Presentation } from "./archetypes";
-import { AGE_BANDS, BAND_AGES, assignPortrait, type AgeBand, type PortraitEntry } from "./library";
+import { AGE_BANDS, BAND_AGES, assignPortrait, tagsOfEntry, type AgeBand, type PortraitEntry } from "./library";
+import type { NativeHouseholdFacts, NativeMemberFacts } from "./nativeDraw";
 import { SeededRng, hashParts } from "./rng";
 
 /** A.3.2: lift(a) = exp(8 · (score(a) − mean(π))). */
@@ -137,7 +140,8 @@ function clampProbabilities(rows: ArchetypeWeight[]): void {
 
 // ── Households ──────────────────────────────────────────────────────────────
 
-export type MemberRole = "adult" | "partner" | "child" | "grandparent" | "adult_child";
+/** A.3.3's roles; the Day-1 census adds A.1.2's siblings, flatmates and elder parents (shared/src/census/day1Tables.ts). */
+export type MemberRole = "adult" | "partner" | "child" | "grandparent" | "adult_child" | "sibling" | "flatmate" | "parent";
 
 export interface MemberDraw {
   /** m1, m2, … (A.3.6 HOUSEHOLD slots). */
@@ -151,7 +155,16 @@ export interface MemberDraw {
   band: AgeBand;
   presentation: Presentation;
   pronoun_default: "she/her" | "he/him" | "they/them";
+  /** A library bust's id, or (a Day-1 resident with a procedural look) the resident's own id once written. */
   portrait: string;
+  /** The bust's A.3.5 tags and caption: what the prompt shows and the validator checks (V04, V06). */
+  tags: PortraitTags;
+  /** A procedural look (the Day-1 census, D1): the card wears it. Library busts carry their own. */
+  look?: CardHumanLook;
+  /** The member's own archetype when it isn't the household's (a Day-1 adult living with an elder parent). */
+  archetype?: ArchetypeId;
+  /** Day-1 census members only (MODE: native). */
+  native?: NativeMemberFacts;
 }
 
 export interface HouseholdDraw {
@@ -167,6 +180,8 @@ export interface HouseholdDraw {
   beds: number;
   /** The weights it was drawn from (for the soak and the dev log). */
   prob: number;
+  /** Day-1 census households only (MODE: native): the skeleton's facts. */
+  native?: NativeHouseholdFacts;
 }
 
 const PRONOUN: Readonly<Record<Presentation, MemberDraw["pronoun_default"]>> = { f: "she/her", m: "he/him", a: "they/them" };
@@ -283,7 +298,7 @@ export function drawHousehold(ctx: DrawContext): HouseholdDraw | null {
     const ageMax = Math.max(band.lo, pl) <= Math.min(band.hi, ph) ? Math.min(band.hi, ph) : Math.min(ph, pl + 10);
     members.push({
       slot: `m${i + 1}`, role: plan.role, age_min: ageMin, age_max: ageMax, age: Math.min(ageMax, Math.max(ageMin, age)), band: portrait.band,
-      presentation: shown, pronoun_default: PRONOUN[shown], portrait: portrait.id,
+      presentation: shown, pronoun_default: PRONOUN[shown], portrait: portrait.id, tags: tagsOfEntry(portrait),
     });
   });
   return {

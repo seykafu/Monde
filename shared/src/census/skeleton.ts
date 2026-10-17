@@ -62,6 +62,25 @@ export interface SkeletonMember {
   note?: string;
 }
 
+/**
+ * Where a household is in M-03: `skeleton` (drawn by the seed) or `pinned` (held by pins.yaml) until its cards are
+ * written (step 2, tools/gen-residents.ts: `drafted`), then `curated` once Kasey has edited them.
+ */
+export type HouseholdStatus = "skeleton" | "pinned" | "drafted" | "curated";
+
+/** The card-writing step's ledger for one household (M-03 step 2). */
+export interface GenerationRecord {
+  prompt: "census-v1";
+  /** Model calls made for it (0 before it is written; a template after six failures still counts them). */
+  attempts: number;
+  source: "model" | "template" | null;
+  /** The household's inputs when its cards were written (generate.ts censusInputHash): a later change is warned about. */
+  input_hash: string | null;
+  cost_usd: number;
+  /** ISO date-time of the write. */
+  written_at?: string;
+}
+
 export interface SkeletonHousehold {
   id: string;
   type: HouseholdType;
@@ -71,10 +90,29 @@ export interface SkeletonHousehold {
   surname: string | null;
   /** Null where a card already says. */
   years_in_monde: number | null;
-  status: "skeleton" | "pinned";
+  status: HouseholdStatus;
   members: SkeletonMember[];
   /** The card-writing step's ledger (M-03 step 2). Null when every member already has a card. */
-  generation: { prompt: "census-v1"; attempts: 0; source: null; input_hash: null; cost_usd: 0 } | null;
+  generation: GenerationRecord | null;
+}
+
+/** A fresh household ledger, as the skeleton writes it. */
+export const blankGeneration = (): GenerationRecord => ({ prompt: "census-v1", attempts: 0, source: null, input_hash: null, cost_usd: 0 });
+
+/**
+ * The skeleton as the seed built it, without M-03 step 2's progress (statuses, generation records, the ids and names
+ * the written cards gave anonymous members): what `buildSkeleton` reproduces from the seed.
+ */
+export function censusProgressReset(sk: Day1Skeleton, pinned: ReadonlySet<string>): Day1Skeleton {
+  return {
+    ...sk,
+    households: sk.households.map(h => ({
+      ...h,
+      status: pinned.has(h.id) ? "pinned" : "skeleton",
+      generation: h.generation ? blankGeneration() : null,
+      members: h.members.map(m => (m.kind === "anonymous" ? { ...m, id: null, name: null } : m)),
+    })),
+  };
 }
 
 export interface SkeletonLink { a: string; b: string; tag: string; note: string; source: "pin" | "mirror" }
@@ -815,7 +853,7 @@ export function buildSkeleton(seed: string, pins: Pins, homes: HomeRegistry, lib
         saturday_job: m.saturday, surname: m.surname ?? null, first_names: m.firstNames, birthday: m.birthday, portrait: m.portrait!,
         ...(m.note ? { note: m.note } : {}),
       })),
-      generation: toWrite ? { prompt: "census-v1", attempts: 0, source: null, input_hash: null, cost_usd: 0 } : null,
+      generation: toWrite ? blankGeneration() : null,
     };
   });
   return {

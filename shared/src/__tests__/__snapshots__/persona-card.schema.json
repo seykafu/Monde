@@ -1,0 +1,895 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 110
+    },
+    "pronouns": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "canon",
+        "resident",
+        "arrival",
+        "animal"
+      ]
+    },
+    "occupation": {
+      "type": "string"
+    },
+    "workplace": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z_]+\\.[a-z0-9_]+$"
+        },
+        {
+          "type": "string",
+          "const": "offmap.city"
+        }
+      ]
+    },
+    "home": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z_]+\\.[a-z0-9_]+$"
+        },
+        {
+          "type": "string",
+          "const": "offmap.city"
+        }
+      ]
+    },
+    "portrait": {
+      "type": "string"
+    },
+    "portrait_expressions": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sprite": {
+      "type": "string"
+    },
+    "appearance": {
+      "type": "string"
+    },
+    "look": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "human"
+            },
+            "skin": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "hair": {
+              "type": "object",
+              "properties": {
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "short",
+                    "cropped",
+                    "bob",
+                    "long",
+                    "ponytail",
+                    "bun",
+                    "curly",
+                    "braids",
+                    "buzz",
+                    "pigtails",
+                    "swept",
+                    "tufty"
+                  ]
+                },
+                "colour": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                }
+              },
+              "required": [
+                "style",
+                "colour"
+              ],
+              "additionalProperties": false
+            },
+            "eyes": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "build": {
+              "type": "string",
+              "enum": [
+                "narrow",
+                "medium",
+                "broad"
+              ]
+            },
+            "height": {
+              "type": "string",
+              "enum": [
+                "short",
+                "tall"
+              ]
+            },
+            "outfit": {
+              "type": "object",
+              "properties": {
+                "cut": {
+                  "type": "string",
+                  "enum": [
+                    "plain",
+                    "jumper",
+                    "smock",
+                    "pinafore",
+                    "apron",
+                    "coat",
+                    "dungarees"
+                  ]
+                },
+                "top": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "bottom": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "bottom_style": {
+                  "type": "string",
+                  "enum": [
+                    "trousers",
+                    "shorts",
+                    "skirt"
+                  ]
+                },
+                "shoes": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "trim": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                }
+              },
+              "required": [
+                "cut",
+                "top",
+                "bottom",
+                "bottom_style",
+                "shoes"
+              ],
+              "additionalProperties": false
+            },
+            "accessory": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "scarf",
+                    "apron",
+                    "glasses"
+                  ]
+                },
+                "colour": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            },
+            "glasses": {
+              "type": "string",
+              "enum": [
+                "none",
+                "round",
+                "halfmoon",
+                "heavy",
+                "on_head"
+              ]
+            },
+            "headwear": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "flat_cap",
+                    "peaked_cap",
+                    "knit_cap"
+                  ]
+                },
+                "colour": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
+            },
+            "face": {
+              "type": "object",
+              "properties": {
+                "moustache": {
+                  "type": "boolean"
+                },
+                "freckles": {
+                  "type": "boolean"
+                },
+                "grey_temples": {
+                  "type": "boolean"
+                },
+                "cowlick": {
+                  "type": "boolean"
+                },
+                "stubble": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "skin",
+            "hair",
+            "eyes",
+            "build",
+            "height",
+            "outfit",
+            "accessory"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "const": "cat"
+            },
+            "fur": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "markings": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "bib": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "eyes": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "collar": {
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "fur",
+            "markings",
+            "bib",
+            "eyes"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "backstory": {
+      "type": "string"
+    },
+    "personality": {
+      "type": "object",
+      "properties": {
+        "traits": {
+          "minItems": 3,
+          "maxItems": 5,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "big5": {
+          "type": "object",
+          "properties": {
+            "open": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "conscientious": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "extravert": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "agreeable": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "neurotic": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "open",
+            "conscientious",
+            "extravert",
+            "agreeable",
+            "neurotic"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "traits",
+        "big5"
+      ],
+      "additionalProperties": false
+    },
+    "values": {
+      "type": "object",
+      "properties": {
+        "prosperity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "safety": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "spirit": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "charm": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "prosperity",
+        "safety",
+        "spirit",
+        "charm"
+      ],
+      "additionalProperties": false
+    },
+    "beliefs": {
+      "maxItems": 12,
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "voice": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "speech"
+            },
+            "register": {
+              "type": "string"
+            },
+            "tics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "exit_only": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "never_says": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "samples": {
+              "minItems": 3,
+              "maxItems": 3,
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "register",
+            "tics",
+            "never_says",
+            "samples"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "narrated_action"
+            },
+            "register": {
+              "type": "string"
+            },
+            "tics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "never_says": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "action_verbs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "mode",
+            "register",
+            "tics",
+            "never_says",
+            "action_verbs"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "birthday": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "likes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dislikes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fears": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dream": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "stages": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "text",
+        "stages"
+      ],
+      "additionalProperties": false
+    },
+    "routine": {
+      "type": "object",
+      "properties": {
+        "weekday": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "type": "string",
+                "pattern": "^\\d{2}:\\d{2}$"
+              },
+              "do": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "eat",
+                      "nap",
+                      "sleep",
+                      "shop",
+                      "socialize",
+                      "walk",
+                      "read",
+                      "garden",
+                      "fish",
+                      "play_music",
+                      "clean",
+                      "cook",
+                      "visit",
+                      "attend",
+                      "exercise",
+                      "tinker",
+                      "write",
+                      "pray",
+                      "wander",
+                      "sit",
+                      "volunteer"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "follow",
+                      "beg"
+                    ]
+                  }
+                ]
+              },
+              "where": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z_]+\\.[a-z0-9_]+$"
+                  },
+                  {
+                    "type": "string",
+                    "const": "offmap.city"
+                  }
+                ]
+              },
+              "with": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                }
+              }
+            },
+            "required": [
+              "at",
+              "do",
+              "where"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "weekend": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "type": "string",
+                "pattern": "^\\d{2}:\\d{2}$"
+              },
+              "do": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "work",
+                      "eat",
+                      "nap",
+                      "sleep",
+                      "shop",
+                      "socialize",
+                      "walk",
+                      "read",
+                      "garden",
+                      "fish",
+                      "play_music",
+                      "clean",
+                      "cook",
+                      "visit",
+                      "attend",
+                      "exercise",
+                      "tinker",
+                      "write",
+                      "pray",
+                      "wander",
+                      "sit",
+                      "volunteer"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "enum": [
+                      "follow",
+                      "beg"
+                    ]
+                  }
+                ]
+              },
+              "where": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[a-z_]+\\.[a-z0-9_]+$"
+                  },
+                  {
+                    "type": "string",
+                    "const": "offmap.city"
+                  }
+                ]
+              },
+              "with": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                }
+              }
+            },
+            "required": [
+              "at",
+              "do",
+              "where"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "weekday",
+        "weekend"
+      ],
+      "additionalProperties": false
+    },
+    "chores": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "affinity": {
+            "type": "integer",
+            "minimum": -100,
+            "maximum": 100
+          },
+          "trust": {
+            "type": "integer",
+            "minimum": -100,
+            "maximum": 100
+          },
+          "tag": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "affinity",
+          "trust",
+          "tag",
+          "note"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "secrets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "reveal": {
+            "type": "object",
+            "properties": {
+              "regard_min": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "flag": {
+                "type": "string"
+              },
+              "day": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "text",
+          "reveal"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "canon_locks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "while": {
+            "type": "string"
+          },
+          "fact": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "while",
+          "fact"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "story_role": {
+      "type": "string"
+    },
+    "will_scuffle": {
+      "type": "boolean"
+    },
+    "romance": {
+      "type": "boolean"
+    },
+    "generated_by": {
+      "type": "string",
+      "enum": [
+        "model",
+        "template"
+      ]
+    },
+    "household": {
+      "type": "string"
+    },
+    "archetype": {
+      "type": "string"
+    },
+    "employment": {
+      "type": "string",
+      "enum": [
+        "employed",
+        "out_of_work",
+        "carer",
+        "retired",
+        "unable",
+        "pupil",
+        "lessons",
+        "under_five"
+      ]
+    },
+    "years_in_monde": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 110
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "age",
+    "pronouns",
+    "kind",
+    "occupation",
+    "workplace",
+    "home",
+    "portrait",
+    "portrait_expressions",
+    "sprite",
+    "appearance",
+    "backstory",
+    "personality",
+    "values",
+    "beliefs",
+    "voice",
+    "likes",
+    "dislikes",
+    "fears",
+    "dream",
+    "routine",
+    "chores",
+    "relationships",
+    "secrets",
+    "canon_locks"
+  ],
+  "additionalProperties": false
+}

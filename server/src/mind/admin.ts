@@ -10,13 +10,16 @@ import { budgetLimits, utcStart } from './budget.js';
 // GDD-GAP: §9.13 has no report rate or reason length. Ten reports/world/UTC day, 500-character reasons; duplicates are idempotent.
 export const REPORT_DAILY_LIMIT = 10;
 const hash = (s: string) => createHash('sha256').update(s).digest();
+/** The admin token check every /admin route uses (a constant-time compare of digests). */
+export const adminTokenMatches = (config: Pick<Config, 'ADMIN_TOKEN'>, token: unknown): boolean =>
+  !!config.ADMIN_TOKEN && typeof token === 'string' && timingSafeEqual(hash(token), hash(config.ADMIN_TOKEN));
 const escape = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 export function registerAdminRoutes(app: FastifyInstance, config: Config, db?: WorldDatabase): void {
   for (const path of ['/admin', '/admin/costs.json']) app.get<{ Querystring: { token?: string } }>(path, async (request, reply) => {
     reply.header('cache-control', 'no-store').header('referrer-policy', 'no-referrer');
     if (!config.ADMIN_TOKEN) return reply.code(404).send({ error: 'not found' });
     const token = request.headers.authorization?.replace(/^Bearer /, '') ?? request.query.token ?? '';
-    if (typeof token !== 'string' || !timingSafeEqual(hash(token), hash(config.ADMIN_TOKEN))) return reply.code(401).send({ error: 'unauthorized' });
+    if (!adminTokenMatches(config, token)) return reply.code(401).send({ error: 'unauthorized' });
     if (!db) return reply.code(503).send({ error: 'database unavailable' });
     const cap = budgetLimits(db);
     const perWorldDay = await db.select({ worldId: budgetCalls.worldId, day: budgetCalls.day, kind: budgetCalls.kind, costUsd: sql<string>`sum(${budgetCalls.costUsd})` }).from(budgetCalls).groupBy(budgetCalls.worldId, budgetCalls.day, budgetCalls.kind);

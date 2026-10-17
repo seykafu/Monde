@@ -1,19 +1,26 @@
 // Writing an arrival's Persona Card (GDD Appendix A.3.6–A.3.8, §9.3): the Haiku prompt and its output contract, the
 // validator, the engine's assembly of PersonaCards, and the template fallback. Pure: no I/O and no model calls (the
 // server makes the call, server/src/mind/arrivals.ts).
+//
+// The Day-1 census (A.1.5: "the same prompt as arrivals (A.3.6) with MODE: native") reuses all of it: its prompt is
+// native.ts, and `profile: "native"` switches the validator and the card assembly to the census's rules (each
+// difference is marked GDD-GAP where it is made).
 import { z } from "zod";
+import type { PortraitTags } from "../census/portraitPlan";
+import { COMMUTER_ROW, OPEN_BOARDS } from "../census/day1Tables";
 import { PORTRAIT_SET, PersonaCard, type Values } from "../persona";
 import { PILLARS, type Pillar } from "../script/types";
 import { Verb } from "../verbs";
 import { ARCHETYPE_BY_ID, type Archetype } from "./archetypes";
 import type { HouseholdDraw, MemberDraw } from "./draw";
-import { BAND_AGES, portraitById } from "./library";
+import { BAND_AGES, portraitById, tagsOfEntry } from "./library";
 import { FAMILY_NAMES, FAMOUS_NAMES, FIRST_NAMES, RESERVED_FAMILY_NAMES, RESERVED_FIRST_NAMES, foldName } from "./names";
 import { SeededRng } from "./rng";
 
 /**
  * A household is written before it has a home (it waits in the arrival buffer, §9.2), so its routines and workplace
- * say `home.own` for home, and bindHome() swaps in the real door when the home is reserved (A.3.1 step 4).
+ * say `home.own` for home, and bindHome() swaps in the real door when the home is reserved (A.3.1 step 4). A Day-1
+ * household already has its home: its prompt, validation and cards take the real id instead.
  */
 export const HOME_TOKEN = "home.own";
 export const STORY_ROLES = ["none", "favor_giver", "shopkeeper", "volunteer", "mentor"] as const;
@@ -34,6 +41,10 @@ export const ROUTINE_PLACES: readonly { id: string; line: string }[] = [
   { id: "wharf.breakwater", line: "the breakwater" },
   { id: "wharf.harbor_steps", line: "the harbour steps" },
 ];
+/** A member's bust tags. Drafts saved before draws carried tags (an old buffered arrival) read them off the library. */
+export const memberTags = (m: Pick<MemberDraw, "portrait"> & { tags?: PortraitTags }): PortraitTags => m.tags ?? tagsOfEntry(portraitById(m.portrait)!);
+/** A member's archetype: their own (a Day-1 household can mix two) or the household's. */
+export const memberArchetype = (m: Pick<MemberDraw, "archetype">, draw: Pick<HouseholdDraw, "archetype">): Archetype => ARCHETYPE_BY_ID.get(m.archetype ?? draw.archetype)!;
 /** A.3.6's outside places (V17's allowlist): where people come from. */
 export const OUTSIDE_PLACES = ["Carrow", "Hessle Cross", "Port Sallow", "Tarn End", "Marrow Quay", "Ashby Lock"] as const;
 
@@ -118,6 +129,9 @@ CRAFT RULES
 - Do not give anyone knowledge of the Tollmen's finances, Vane Consolidated's plans, any loan or option on the Wharf, or any founder's charter. They may have opinions about what the Tollmen visibly do.
 - Names suit the portrait and the household and avoid stereotype. Never use a name on the AVOID list or any famous person's name.`;
 
+/** A.3.6's output contract text (the `{{contract}}` fill) for a household whose home is `home`. */
+export const arrivalContract = (home: string = HOME_TOKEN): string => ARRIVAL_CONTRACT.replaceAll(HOME_TOKEN, home);
+
 /** A.3.6's output contract text (the `{{contract}}` fill), with the engine's additions marked GDD-GAP in code. */
 export const ARRIVAL_CONTRACT = `{
   "household": { "same_surname": true, "summary": "<= 25 words: how they are related and why they came" },
@@ -197,6 +211,30 @@ const vec = (v: Readonly<Record<Pillar, number>>): string => PILLARS.map(k => `$
 /** The workplaces this archetype can name (§9.5 ids), plus home.own. */
 export const workplaceOptions = (a: Archetype): string[] => [...new Set([...a.workplaces.filter(w => w !== "home"), HOME_TOKEN])];
 
+/** A.3.6's first block: the day, the Pillars, the town and the mode. */
+export const townLines = (t: PromptTown, mode: PromptContext["mode"]): string[] => [
+  `DAY ${t.day} · ${t.season} · ${t.weekday}`,
+  `PILLARS: ${pillarLine(t.pillars)}`,
+  `TOWN: census ${t.census}; shops open ${t.shopsOpen}; school pupils ${t.pupils}; projects done: ${t.projectsDone.join(", ") || "none"}; in progress: ${t.projectsActive.join(", ") || "none"}`,
+  `MODE: ${mode}`,
+];
+
+/** A.3.6's ARCHETYPE block; `slots` names the members it is for when a household has more than one. */
+export const archetypeLines = (a: Archetype, slots?: readonly string[]): string[] => [
+  `ARCHETYPE ${a.id} · ${a.label}${slots ? ` (for ${slots.join(", ")})` : ""}`,
+  `default values: ${vec(a.values)}`,
+  "dream templates:",
+  ...a.dreams.map(d => `${d.id} → ${d.text} → ${d.stages.join(" › ")}`),
+  `likes to draw from: ${a.likes.join("; ")}`,
+  `dislikes to draw from: ${a.dislikes.join("; ")}`,
+  `voice note: ${a.voice}`,
+  `typical work: ${a.occupations.join("; ")}`,
+];
+
+/** A.3.6's `tags:` line for one bust. */
+export const tagLine = (p: PortraitTags): string =>
+  `band ${p.band}, presentation ${p.presentation}, skin ${p.skin} (${p.skin_word}), hair ${p.hair_word} ${p.hair_style}, attire ${p.attire.join(", ")}, build ${p.build}`;
+
 /** A.3.6's user message. */
 export function arrivalUserMessage(draw: HouseholdDraw, ctx: PromptContext): string {
   const a = ARCHETYPE_BY_ID.get(draw.archetype)!;
@@ -207,27 +245,17 @@ export function arrivalUserMessage(draw: HouseholdDraw, ctx: PromptContext): str
   const t = ctx.town;
   const home = ctx.home ?? { id: HOME_TOKEN, description: "a restored house in Monde, its door chosen when they land (use home.own)", beds: draw.beds };
   const lines = [
-    `DAY ${t.day} · ${t.season} · ${t.weekday}`,
-    `PILLARS: ${pillarLine(t.pillars)}`,
-    `TOWN: census ${t.census}; shops open ${t.shopsOpen}; school pupils ${t.pupils}; projects done: ${t.projectsDone.join(", ") || "none"}; in progress: ${t.projectsActive.join(", ") || "none"}`,
-    `MODE: ${ctx.mode}`,
+    ...townLines(t, ctx.mode),
     "",
-    `ARCHETYPE ${a.id} · ${a.label}`,
-    `default values: ${vec(a.values)}`,
-    "dream templates:",
-    ...a.dreams.map(d => `${d.id} → ${d.text} → ${d.stages.join(" › ")}`),
-    `likes to draw from: ${a.likes.join("; ")}`,
-    `dislikes to draw from: ${a.dislikes.join("; ")}`,
-    `voice note: ${a.voice}`,
-    `typical work: ${a.occupations.join("; ")}`,
+    ...archetypeLines(a),
     "",
     `HOUSEHOLD (${draw.members.length} ${draw.members.length === 1 ? "person" : "people"})`,
     ...draw.members.flatMap(m => {
-      const p = portraitById(m.portrait)!;
+      const p = memberTags(m);
       return [
         `- slot ${m.slot} · role ${m.role} · age range ${m.age_min}-${m.age_max} · pronoun default ${m.pronoun_default}`,
-        `  portrait ${p.id}: ${p.caption}`,
-        `  tags: band ${p.band}, presentation ${p.presentation}, skin ${p.skin} (${p.skin_word}), hair ${p.hair_word} ${p.look.hair.style}, attire ${p.attire.join(", ")}, build ${p.build}`,
+        `  portrait ${m.portrait}: ${p.caption}`,
+        `  tags: ${tagLine(p)}`,
       ];
     }),
     `HOME: ${home.id}, ${home.description} (${home.beds} beds)`,
@@ -259,7 +287,74 @@ export interface ValidationContext {
   reservedFull?: readonly string[];
   /** The content filters (§9.13 step 2): the groups a text trips. The server passes its lexical filters. */
   banned?: (text: string) => readonly string[];
+  /** The household's home: `home.own` for an arrival in the buffer, the real id for a Day-1 household. */
+  home?: string;
+  /** "native": the Day-1 census's rules (MVP M-03; each difference is marked GDD-GAP below). The draw carries `native`. */
+  profile?: "arrival" | "native";
+  /** V11: the gift catalog's tags (content/items.yaml), so a like can match an item. */
+  giftTags?: readonly string[];
+  /** V19: the backstories of the most recent stored cards, by archetype, newest last (the last 30 are read). */
+  recentBackstories?: ReadonlyMap<string, readonly string[]>;
+  /** Native V14: the ties a member's card must make (kin and the links the existing cards make to them). */
+  requiredLinks?: readonly RequiredLink[];
+  /** Native V03: surnames the engine supplied through kin links (another household of the same family). */
+  kinSurnames?: readonly string[];
+  /** Native V03: the surnames the census gave other households (not yet written, so not in `residents`). */
+  otherSurnames?: readonly string[];
 }
+
+/** A tie the engine requires (native V14): from a member (`slot`) to a resident id, with the tag a kin tie must carry. */
+export interface RequiredLink {
+  slot: string;
+  id: string;
+  name: string;
+  /** "kin" for family; null when any tag will do (the hint says what the other card feels). */
+  tag: (typeof RELATION_TAGS)[number] | null;
+  hint: string;
+}
+
+/** V19: the novelty threshold (A.3.7: under 35% four-word overlap) and how many recent cards are compared. */
+export const NOVELTY_MAX_OVERLAP = 0.35;
+export const NOVELTY_WINDOW = 30;
+/** GDD-GAP: native V14 lets ties outside the household run to ±60 (old neighbours; A.3.7's ±30 is a stranger's). */
+export const NATIVE_TIE_LIMIT = 60;
+/** GDD-GAP: V13n exempts the housebound from the open-board rule; the skeleton has no flag, so 85 and over. */
+export const HOUSEBOUND_AGE = 85;
+const VACANT = /\.vacant_house_\d+$/;
+
+/** The four-word runs of a text (lowercased, punctuation dropped). */
+const fourGrams = (text: string): Set<string> => {
+  const w = text.toLowerCase().replace(/[’']/g, "").split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const out = new Set<string>();
+  for (let i = 0; i + 4 <= w.length; i++) out.add(w.slice(i, i + 4).join(" "));
+  return out;
+};
+/** V19: the share of a text's four-word runs that also appear in any of `others` (0..1). */
+export function fourWordOverlap(text: string, others: readonly string[]): number {
+  const mine = fourGrams(text);
+  if (!mine.size || !others.length) return 0;
+  const seen = new Set<string>();
+  for (const o of others) for (const g of fourGrams(o)) seen.add(g);
+  let hit = 0;
+  for (const g of mine) if (seen.has(g)) hit++;
+  return hit / mine.size;
+}
+
+/**
+ * Where a Day-1 member works, if anywhere (A.1.4 via the skeleton): the job's place (`home.own` is their home), a teen's
+ * Saturday job, or null.
+ */
+export function assignedWorkplace(m: Pick<MemberDraw, "native">, home: string): string | null {
+  const n = m.native;
+  if (!n) return null;
+  if (n.job) return n.job.workplace === HOME_TOKEN ? home : n.job.workplace;
+  return n.saturday_job;
+}
+export const isCommuter = (m: Pick<MemberDraw, "native">): boolean => m.native?.job?.row === COMMUTER_ROW;
+/** Pupils and under-fives get the engine's routine (the school day); the model writes only their prose. */
+export const hasEngineRoutine = (m: Pick<MemberDraw, "native">): boolean => m.native?.minor === "pupil" || m.native?.minor === "under_five";
+const zoneOfPlace = (p: string): string => p.slice(0, p.indexOf("."));
+const normalizeLike = (s: string) => ` ${s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim()} `;
 
 export type Validation = { ok: true; output: ArrivalHouseholdOutput; warnings: string[] } | { ok: false; errors: string[] };
 
@@ -319,7 +414,8 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
   const out = structuredClone(parsed.data);
   const errors: string[] = [];
   const warnings: string[] = [];
-  const a = ARCHETYPE_BY_ID.get(draw.archetype)!;
+  const native = ctx.profile === "native";
+  const home = ctx.home ?? HOME_TOKEN;
   // V01: one card per member, slots echoed in order.
   if (out.members.length !== draw.members.length) errors.push(`V01 members has ${out.members.length} entries; the household is ${draw.members.length}`);
   out.members.forEach((m, i) => { if (m.slot !== draw.members[i]?.slot) errors.push(`V01 members[${i}].slot is "${m.slot}"; expected ${draw.members[i]?.slot}`); });
@@ -330,31 +426,47 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
   const fullTaken = new Set([...[...ctx.residents.values()].map(r => foldName(r.name)), ...(ctx.reservedFull ?? []).map(foldName), ...FAMOUS_NAMES.map(foldName)]);
   const firstCount = new Map<string, number>();
   for (const r of ctx.residents.values()) { const f = foldName(r.name.replace(/"[^"]*"\s*/g, "").split(" ")[0] ?? ""); firstCount.set(f, (firstCount.get(f) ?? 0) + 1); }
-  const familyTaken = new Set([...ctx.residents.values()].map(r => foldName(r.name.split(" ").at(-1) ?? "")));
+  const familyTaken = new Set([...ctx.residents.values()].map(r => foldName(r.name.replace(/"[^"]*"\s*/g, "").split(" ").at(-1) ?? "")));
   const slots = new Set(draw.members.map(m => m.slot));
-  const places = new Set([...ctx.places, HOME_TOKEN]);
-  const workplaces = new Set(workplaceOptions(a));
+  const places = new Set([...ctx.places, home]);
+  // GDD-GAP (native V03): a Day-1 household may repeat its own surnames and the ones its kin links supply (the Szabos).
+  const ownSurnames = new Set(native ? [draw.native?.surname, ...draw.members.map(m => m.native?.surname), ...(ctx.kinSurnames ?? [])].filter((x): x is string => !!x).map(foldName) : []);
+  const otherSurnames = new Set((ctx.otherSurnames ?? []).map(foldName));
   const bigFive: number[][] = [];
 
   out.members.forEach((m, i) => {
     const d = draw.members[i];
     if (!d) return;
     const at = `members[${i}]`;
-    const p = portraitById(d.portrait)!;
-    // V02 name form.
-    const tokens = m.name.trim().split(/\s+/);
-    if (tokens.length < 2 || tokens.length > 3 || m.name.length > 28 || tokens.some(t => !NAME_TOKEN.test(t) || TITLES.test(t)))
-      errors.push(`V02 ${at}.name "${m.name}" must be 2-3 words of letters, apostrophes or hyphens, at most 28 characters, no titles`);
-    // V03 collisions.
-    const full = foldName(m.name), first = foldName(tokens[0] ?? ""), family = foldName(tokens.at(-1) ?? "");
-    if (fullTaken.has(full)) errors.push(`V03 ${at}.name "${m.name}" is already taken or reserved`);
-    if (reserved.has(first)) errors.push(`V03 ${at}.name: the first name "${tokens[0]}" belongs to someone in Monde's story`);
-    if ((firstCount.get(first) ?? 0) >= 2) errors.push(`V03 ${at}.name: two living residents are already called ${tokens[0]}`);
-    if (reservedFamily.has(family) || familyTaken.has(family)) errors.push(`V03 ${at}.name: the surname "${tokens.at(-1)}" belongs to another household`);
-    if (out.members.some((o, j) => j < i && foldName(o.name) === full)) errors.push(`V03 ${at}.name "${m.name}" repeats a household member`);
+    const p = memberTags(d);
+    const a = memberArchetype(d, draw);
+    const pinned = native ? d.native?.pinned : null;
+    if (pinned) {
+      // GDD-GAP (native V02/V03): a named canon person keeps their canon name ("Barnaby \"Barney\" Dunmore", "Rev. Alma
+      // Cobb"): the engine writes it, whatever the model wrote, and the name rules don't apply to it.
+      if (foldName(m.name) !== foldName(pinned.name)) warnings.push(`V03 ${at}.name "${m.name}" replaced by the canon name ${pinned.name}`);
+      m.name = pinned.name;
+    } else {
+      // V02 name form.
+      const tokens = m.name.trim().split(/\s+/);
+      if (tokens.length < 2 || tokens.length > 3 || m.name.length > 28 || tokens.some(t => !NAME_TOKEN.test(t) || TITLES.test(t)))
+        errors.push(`V02 ${at}.name "${m.name}" must be 2-3 words of letters, apostrophes or hyphens, at most 28 characters, no titles`);
+      // V03 collisions.
+      const full = foldName(m.name), first = foldName(tokens[0] ?? ""), family = foldName(tokens.at(-1) ?? "");
+      if (fullTaken.has(full)) errors.push(`V03 ${at}.name "${m.name}" is already taken or reserved`);
+      if (reserved.has(first)) errors.push(`V03 ${at}.name: the first name "${tokens[0]}" belongs to someone in Monde's story`);
+      if ((firstCount.get(first) ?? 0) >= 2) errors.push(`V03 ${at}.name: two living residents are already called ${tokens[0]}`);
+      if (!ownSurnames.has(family) && (reservedFamily.has(family) || familyTaken.has(family) || otherSurnames.has(family))) errors.push(`V03 ${at}.name: the surname "${tokens.at(-1)}" belongs to another household`);
+      if (out.members.some((o, j) => j < i && foldName(o.name) === full)) errors.push(`V03 ${at}.name "${m.name}" repeats a household member`);
+    }
     // V04 age.
     const [bl, bh] = BAND_AGES[p.band];
-    if (!Number.isInteger(m.age) || m.age < Math.max(bl, d.age_min) || m.age > Math.min(bh, d.age_max))
+    if (native) {
+      // GDD-GAP (native V04): the skeleton's ages close A.1.1 (the pupils' exact ages) and V04's gaps, so a Day-1 age is
+      // fixed: the engine keeps its own.
+      if (m.age !== d.age) warnings.push(`V04 ${at}.age ${m.age} replaced by the census age ${d.age}`);
+      m.age = d.age;
+    } else if (!Number.isInteger(m.age) || m.age < Math.max(bl, d.age_min) || m.age > Math.min(bh, d.age_max))
       errors.push(`V04 ${at}.age ${m.age} must be ${Math.max(bl, d.age_min)}-${Math.min(bh, d.age_max)}`);
     // V05 pronouns, and the appearance agreeing with them.
     if (!PRONOUNS.includes(m.pronouns)) errors.push(`V05 ${at}.pronouns "${m.pronouns}"`);
@@ -419,10 +531,18 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
     const n = (list: readonly string[], lo: number, hi: number, field: string) => { if (list.length < lo || list.length > hi) errors.push(`V11 ${at}.${field} must have ${lo}-${hi} entries`); };
     n(m.likes, 3, 5, "likes"); n(m.dislikes, 3, 5, "dislikes"); n(m.fears, 1, 3, "fears"); n(m.chores, 2, 4, "chores");
     const archetypeLikes = a.likes.map(l => l.toLowerCase());
-    const matched = m.likes.filter(l => archetypeLikes.some(x => x.includes(l.toLowerCase()) || l.toLowerCase().includes(x))).length;
-    // GDD-GAP: V11 asks for two likes from the archetype list or the gift catalog; the catalog lives client-side, so the
-    // server checks the archetype list and asks for one.
-    if (matched < 1) errors.push(`V11 ${at}.likes: at least one must come from the archetype's list (${a.likes.join("; ")})`);
+    const gifts = (ctx.giftTags ?? []).map(normalizeLike);
+    const fromList = (l: string) => archetypeLikes.some(x => x.includes(l.toLowerCase()) || l.toLowerCase().includes(x));
+    const fromCatalog = (l: string) => gifts.some(g => normalizeLike(l).includes(g));
+    if (native) {
+      // Native V11 is A.3.7's own: two likes from the archetype's list or the gift catalog (content/items.yaml's tags).
+      if (m.likes.filter(l => fromList(l) || fromCatalog(l)).length < 2)
+        errors.push(`V11 ${at}.likes: at least two must come from the archetype's list (${a.likes.join("; ")}) or name a gift (bread, tea, fish, rope…)`);
+    } else if (m.likes.filter(fromList).length < 1) {
+      // GDD-GAP: V11 asks for two likes from the archetype list or the gift catalog; the catalog lives client-side, so the
+      // server checks the archetype list and asks for one.
+      errors.push(`V11 ${at}.likes: at least one must come from the archetype's list (${a.likes.join("; ")})`);
+    }
     if (m.likes.some(l => m.dislikes.some(x => x.toLowerCase() === l.toLowerCase()))) errors.push(`V11 ${at}: an item is in both likes and dislikes`);
     if (m.beliefs.length < 1 || m.beliefs.length > 4) errors.push(`V11 ${at}.beliefs must have 1-4 entries`);
     // V12 dream.
@@ -434,29 +554,36 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
     // GDD-GAP: V12 wants them ascending, but A.2's own single_parent.d1 runs 25 then 20; a descent is noted, not failed.
     if (regards.some((r, k) => k > 0 && r < regards[k - 1]!)) warnings.push(`V12 ${at}.dream.stages: Regard thresholds descend`);
     // V13 places and routine.
-    if (m.workplace !== null && !workplaces.has(m.workplace)) errors.push(`V13 ${at}.workplace "${m.workplace}" is not in the workplace options`);
-    for (const day of ["weekday", "weekend"] as const) {
-      const list = m.routine[day];
-      if (list.length < 5 || list.length > 9) errors.push(`V13 ${at}.routine.${day} has ${list.length} entries; 5-9`);
-      let prev = -1, wrapped = false;
-      for (const e of list) {
-        if (!places.has(e.where)) errors.push(`V13 ${at}.routine.${day}: "${e.where}" is not a place id`);
-        const t = /^(\d{1,2}):(\d{2})$/.exec(e.at);
-        let min = t ? Number(t[1]) * 60 + Number(t[2]) : NaN;
-        if (Number.isFinite(min) && min < prev && !wrapped && min + 1440 <= 26 * 60) { min += 1440; wrapped = true; }
-        if (!Number.isFinite(min) || min < prev || min > 26 * 60) errors.push(`V13 ${at}.routine.${day}: "${e.at}" is out of order or past 26:00`);
-        else prev = min;
-        if (e.do === "work" && e.where !== (m.workplace ?? "") && e.where !== HOME_TOKEN) errors.push(`V13 ${at}.routine.${day}: work at "${e.where}" is not their workplace`);
+    if (native) validateNativeRoutine(m, d, draw, places, home, at, errors);
+    else {
+      const workplaces = new Set(workplaceOptions(a));
+      if (m.workplace !== null && !workplaces.has(m.workplace)) errors.push(`V13 ${at}.workplace "${m.workplace}" is not in the workplace options`);
+      for (const day of ["weekday", "weekend"] as const) {
+        const list = m.routine[day];
+        if (list.length < 5 || list.length > 9) errors.push(`V13 ${at}.routine.${day} has ${list.length} entries; 5-9`);
+        routineTimes(list, `${at}.routine.${day}`, errors);
+        for (const e of list) {
+          if (!places.has(e.where)) errors.push(`V13 ${at}.routine.${day}: "${e.where}" is not a place id`);
+          if (e.do === "work" && e.where !== (m.workplace ?? "") && e.where !== HOME_TOKEN) errors.push(`V13 ${at}.routine.${day}: work at "${e.where}" is not their workplace`);
+        }
+        if (list.length && (list[0]!.where !== HOME_TOKEN || list.at(-1)!.where !== HOME_TOKEN)) errors.push(`V13 ${at}.routine.${day} must start and end at ${HOME_TOKEN}`);
       }
-      if (list.length && (list[0]!.where !== HOME_TOKEN || list.at(-1)!.where !== HOME_TOKEN)) errors.push(`V13 ${at}.routine.${day} must start and end at ${HOME_TOKEN}`);
     }
     // V14 relationships.
-    if (m.relationships.length < 1 || m.relationships.length > 3) errors.push(`V14 ${at}.relationships must have 1-3 entries`);
+    const required = native ? (ctx.requiredLinks ?? []).filter(l => l.slot === m.slot) : [];
+    // GDD-GAP (native V14): the ties the engine requires don't count toward A.3.7's three.
+    const extra = m.relationships.filter(r => !required.some(q => q.id === r.id)).length;
+    if (m.relationships.length < 1 || extra > 3) errors.push(`V14 ${at}.relationships must have 1-3 entries${required.length ? ` besides the required ${required.map(q => q.id).join(", ")}` : ""}`);
+    for (const q of required) {
+      const tie = m.relationships.find(r => r.id === q.id);
+      if (!tie) errors.push(`V14 ${at}.relationships must include ${q.id} (${q.name}): ${q.hint}`);
+      else if (q.tag && tie.tag !== q.tag) errors.push(`V14 ${at}.relationships "${q.id}" must be tagged ${q.tag}`);
+    }
     for (const r of m.relationships) {
       const inside = slots.has(r.id);
       if (!inside && !ctx.residents.has(r.id)) errors.push(`V14 ${at}.relationships: "${r.id}" is not a resident or a household slot`);
       if (r.id === m.slot) errors.push(`V14 ${at}.relationships: a member can't relate to themself`);
-      const lim = inside ? 100 : 30;
+      const lim = inside ? 100 : native ? NATIVE_TIE_LIMIT : 30;
       if (!Number.isInteger(r.affinity) || !Number.isInteger(r.trust) || Math.abs(r.affinity) > lim || Math.abs(r.trust) > lim)
         errors.push(`V14 ${at}.relationships "${r.id}": affinity and trust must be integers within ±${lim}`);
     }
@@ -469,19 +596,83 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
     }
     // V16 banned content, across every text the card carries.
     if (ctx.banned) {
+      // GDD-GAP: A.2's own dream stages say "community work" and "the Community Garden", which §12.1's style list bans;
+      // a stage copied word for word from the archetype is A.2's text, not the model's, so V16 doesn't scan it.
+      const authored = new Set(a.dreams.flatMap(x => x.stages));
       const texts = [m.name, m.occupation, m.appearance, m.backstory, ...m.beliefs, m.voice.register, ...m.voice.tics, ...m.voice.samples,
-        ...m.likes, ...m.dislikes, ...m.fears, m.dream.text, ...m.dream.stages, ...m.chores, ...m.relationships.map(r => r.note), ...m.secrets.map(s => s.text)];
+        ...m.likes, ...m.dislikes, ...m.fears, m.dream.text, ...m.dream.stages.filter(x => !authored.has(x)), ...m.chores, ...m.relationships.map(r => r.note), ...m.secrets.map(s => s.text)];
       const groups = new Set(texts.flatMap(t => ctx.banned!(t)));
       if (groups.size) errors.push(`V16 ${at}: banned language (${[...groups].join(", ")})`);
     }
     if (CRIME.test(m.backstory)) errors.push(`V16 ${at}.backstory mentions crime, harm or romance`);
+    // V19 novelty: the backstory against the last 30 stored cards of the same archetype.
+    const recent = ctx.recentBackstories?.get(a.id)?.slice(-NOVELTY_WINDOW) ?? [];
+    const overlap = fourWordOverlap(m.backstory, recent);
+    if (overlap >= NOVELTY_MAX_OVERLAP) errors.push(`V19 ${at}.backstory repeats ${Math.round(overlap * 100)}% of its four-word runs from recent ${a.id} cards; write it fresh`);
   });
   // V08: household members differ by 15+ on at least two Big Five traits.
   for (let i = 0; i < bigFive.length; i++) for (let j = i + 1; j < bigFive.length; j++) {
     if (bigFive[i]!.filter((v, k) => Math.abs(v - bigFive[j]![k]!) >= 15).length < 2) errors.push(`V08 members[${i}] and members[${j}] have too-similar Big Five scores`);
   }
   if (ctx.banned && ctx.banned(out.household.summary).length) errors.push("V16 household.summary: banned language");
-  return errors.length ? { ok: false, errors: [...new Set(errors)].slice(0, 20) } : { ok: true, output: out, warnings };
+  if (errors.length) return { ok: false, errors: [...new Set(errors)].slice(0, 20) };
+  // GDD-GAP (native V13): pupils and under-fives live the engine's day (the school day, A.1.1: 08:30-15:30 at
+  // millbrook.school, with the template's variations), whatever the model wrote; workplaces are the census's.
+  if (native) out.members.forEach((m, i) => {
+    const d = draw.members[i]!;
+    const wp = assignedWorkplace(d, home);
+    m.workplace = wp;
+    if (hasEngineRoutine(d)) m.routine = templateRoutine(d, null, SeededRng.of(draw.id, d.slot, "routine"), home);
+  });
+  return { ok: true, output: out, warnings };
+}
+
+/** V13's times: `at` ascending within 00:00–26:00 (one wrap past midnight allowed). */
+function routineTimes(list: readonly { at: string }[], where: string, errors: string[]): void {
+  let prev = -1, wrapped = false;
+  for (const e of list) {
+    const t = /^(\d{1,2}):(\d{2})$/.exec(e.at);
+    let min = t ? Number(t[1]) * 60 + Number(t[2]) : NaN;
+    if (Number.isFinite(min) && min < prev && !wrapped && min + 1440 <= 26 * 60) { min += 1440; wrapped = true; }
+    if (!Number.isFinite(min) || min < prev || min > 26 * 60) errors.push(`V13 ${where}: "${e.at}" is out of order or past 26:00`);
+    else prev = min;
+  }
+}
+
+/**
+ * Native V13 (GDD-GAP, each rule the census's): the workplace is the one A.1.4 assigned (or none); work happens only
+ * there; a commuter's weekdays are at offmap.city (they may start and end there); nobody else goes to offmap.city or a
+ * vacant house. V13n: a Millbrook or Station Hill resident aged 13 or more (not housebound) spends at least one weekday
+ * block and one weekend block on an open board, so the player meets them. Pupils and under-fives are skipped: the
+ * engine writes their day.
+ */
+function validateNativeRoutine(m: ArrivalMember, d: MemberDraw, draw: HouseholdDraw, places: ReadonlySet<string>, home: string, at: string, errors: string[]): void {
+  const assigned = assignedWorkplace(d, home);
+  const commuter = isCommuter(d);
+  const written = m.workplace === HOME_TOKEN ? home : m.workplace;
+  if (assigned === null ? written !== null && written !== home : written !== assigned)
+    errors.push(`V13 ${at}.workplace "${m.workplace}" must be ${assigned ?? "null"}: their work is fixed`);
+  if (hasEngineRoutine(d)) return;
+  for (const day of ["weekday", "weekend"] as const) {
+    const list = m.routine[day].map(e => (e.where === HOME_TOKEN ? { ...e, where: home } : e));
+    m.routine[day] = list;
+    if (list.length < 5 || list.length > 9) errors.push(`V13 ${at}.routine.${day} has ${list.length} entries; 5-9`);
+    routineTimes(list, `${at}.routine.${day}`, errors);
+    const away = commuter && day === "weekday";
+    for (const e of list) {
+      if (!places.has(e.where)) errors.push(`V13 ${at}.routine.${day}: "${e.where}" is not a place id`);
+      else if (VACANT.test(e.where)) errors.push(`V13 ${at}.routine.${day}: "${e.where}" is an empty house`);
+      else if (e.where === "offmap.city" && !away) errors.push(`V13 ${at}.routine.${day}: only a commuter's weekdays go to offmap.city`);
+      if (e.do === "work" && e.where !== assigned) errors.push(`V13 ${at}.routine.${day}: work at "${e.where}"${assigned ? `; their work is at ${assigned}` : ", but they have no job"}`);
+    }
+    const ends = away ? [home, "offmap.city"] : [home];
+    if (list.length && (!ends.includes(list[0]!.where) || !ends.includes(list.at(-1)!.where))) errors.push(`V13 ${at}.routine.${day} must start and end at ${ends.join(" or ")}`);
+    if (away && !list.some(e => e.do === "work" && e.where === "offmap.city")) errors.push(`V13 ${at}.routine.weekday: a commuter works at offmap.city on weekdays`);
+    const zone = draw.native?.zone;
+    const needsBoard = (zone === "millbrook" || zone === "station_hill") && d.age >= 13 && d.age < HOUSEBOUND_AGE && !away;
+    if (needsBoard && !list.some(e => (OPEN_BOARDS as readonly string[]).includes(zoneOfPlace(e.where))))
+      errors.push(`V13n ${at}.routine.${day} needs at least one block on an open board (${OPEN_BOARDS.join(", ")})`);
+  }
 }
 
 // ── Assembly: the engine's keys (A.3.6 "The engine owns these keys") ─────────
@@ -505,33 +696,119 @@ export function bindHome(card: PersonaCard, home: string): PersonaCard {
 
 export interface BuiltResident { card: PersonaCard; dream_template: string }
 
+export interface CardOptions {
+  /** "native": a Day-1 resident (A.1.5): pinned ids, kind `resident`, the real home, the census's portrait and ties. */
+  profile?: "arrival" | "native";
+  /** Who wrote it (A.3.8 flags template cards). Native cards record it on the card. */
+  generatedBy?: "model" | "template";
+}
+
+/** Someone a household tie runs between: a member being written, or a housemate whose card exists. */
+interface TieEnd { slot: string; role: string; pronouns: string; age: number; surname: string }
+
+const surnameOfName = (name: string): string => name.replace(/"[^"]*"\s*/g, "").trim().split(/\s+/).at(-1) ?? "";
+const gendered = (pronouns: string, f: string, m: string, a: string): string => (pronouns.startsWith("she") ? f : pronouns.startsWith("he") ? m : a);
+
+/**
+ * What `to` is to `from` in one household, from A.1.2's roles (the tag the census card carries: FAMILY_TAGS, or
+ * spouse/partner, or flatmate). `word` overrides with a kin word the pins supplied (twins, cousins).
+ * GDD-GAP: a three-generation household's elder is the head's parent; to the head's partner they are "family".
+ */
+export function householdTag(from: TieEnd, to: TieEnd, word?: string): string {
+  if (word) return word;
+  const parentWord = (p: TieEnd) => gendered(p.pronouns, "mother", "father", "parent");
+  const childWord = (c: TieEnd) => gendered(c.pronouns, "daughter", "son", "child");
+  const grandWord = (g: TieEnd) => gendered(g.pronouns, "grandmother", "grandfather", "grandparent");
+  const grandchildWord = (c: TieEnd) => gendered(c.pronouns, "granddaughter", "grandson", "grandchild");
+  const siblingWord = (s: TieEnd) => gendered(s.pronouns, "sister", "brother", "sibling");
+  const couple = new Set(["adult", "partner"]);
+  const [f, t] = [from.role, to.role];
+  if (f === "flatmate" || t === "flatmate") return "flatmate";
+  if (couple.has(f) && couple.has(t)) return from.surname && from.surname === to.surname ? "spouse" : "partner";
+  if (couple.has(f) && t === "child") return childWord(to);
+  if (f === "child" && couple.has(t)) return parentWord(to);
+  if (f === "child" && t === "child") return siblingWord(to);
+  if (f === "child" && t === "grandparent") return grandWord(to);
+  if (f === "grandparent" && t === "child") return grandchildWord(to);
+  if (f === "adult" && t === "grandparent") return parentWord(to);
+  if (f === "grandparent" && t === "adult") return childWord(to);
+  if (f === "partner" && t === "grandparent") return "family";
+  if (f === "grandparent" && t === "partner") return "family";
+  // A.1.2 type O: an elder parent or grandparent (45 years or more between them is a grandparent).
+  if (f === "adult" && (t === "parent" || t === "adult_child")) return t === "parent" ? (to.age - from.age >= 45 ? grandWord(to) : parentWord(to)) : childWord(to);
+  if ((f === "parent" || f === "adult_child") && t === "adult") return f === "parent" ? (from.age - to.age >= 45 ? grandchildWord(to) : childWord(to)) : parentWord(to);
+  if ((f === "sibling" && t === "adult") || (f === "adult" && t === "sibling")) return siblingWord(to);
+  return "kin";
+}
+
+/** GDD-GAP: A.3.6 leaves the household's own tie numbers to the model; when it leaves one out, these are the engine's. */
+const TIE_NUMBERS: readonly [RegExp, number, number][] = [
+  [/^(spouse|partner)$/, 70, 75], [/^(mother|father|parent|daughter|son|child)$/, 75, 70], [/^grand/, 70, 70],
+  [/^(sister|brother|sibling|twin)$/, 65, 60], [/^cousin$/, 55, 55], [/^family$/, 45, 50], [/^flatmate$/, 35, 40],
+];
+const tieNumbers = (tag: string): [number, number] => { const row = TIE_NUMBERS.find(([re]) => re.test(tag)); return row ? [row[1], row[2]] : [60, 60]; };
+
 /** The household's PersonaCards (A.3.1 step 7: ids, portrait, sprite, look, home and the household's own ties). */
-export function cardsFromHousehold(out: ArrivalHouseholdOutput, draw: HouseholdDraw, taken: ReadonlySet<string>, home = HOME_TOKEN): BuiltResident[] {
+export function cardsFromHousehold(out: ArrivalHouseholdOutput, draw: HouseholdDraw, taken: ReadonlySet<string>, home = HOME_TOKEN, options: CardOptions = {}): BuiltResident[] {
+  const native = options.profile === "native";
   const used = new Set(taken);
-  const ids = out.members.map(m => { const id = residentIdFor(m.name, used); used.add(id); return id; });
+  const ids = out.members.map((m, i) => {
+    const pinned = native ? draw.members[i]?.native?.pinned : null;
+    const id = pinned ? pinned.id : residentIdFor(m.name, used);
+    used.add(id);
+    return id;
+  });
   const bySlot = new Map(out.members.map((m, i) => [m.slot, ids[i]!]));
+  // Everyone in the household, written now or already carded (the census's mixed households), for the role ties.
+  const ends = new Map<string, TieEnd & { id: string }>();
+  out.members.forEach((m, i) => {
+    const d = draw.members[i]!;
+    ends.set(m.slot, { id: ids[i]!, slot: m.slot, role: d.role, pronouns: m.pronouns, age: native ? d.age : m.age, surname: surnameOfName(m.name) });
+  });
+  if (native) for (const h of draw.native?.housemates ?? []) ends.set(h.slot, { id: h.id, slot: h.slot, role: h.role, pronouns: h.pronouns, age: h.age, surname: surnameOfName(h.name) });
+  const words = new Map((draw.native?.ties ?? []).flatMap(t => [[`${t.a}|${t.b}`, t.word], [`${t.b}|${t.a}`, t.word]] as const));
+  const idToSlot = new Map([...ends.values()].map(e => [e.id, e.slot]));
   return out.members.map((m, i) => {
     const d = draw.members[i]!;
-    const p = portraitById(d.portrait)!;
+    const lib = portraitById(d.portrait);
     const values: Values = { prosperity: m.values.prosperity, safety: m.values.safety, spirit: m.values.spirit, charm: m.values.charm };
+    const me = ends.get(m.slot)!;
+    const tagFor = (otherSlot: string) => householdTag(me, ends.get(otherSlot)!, words.get(`${m.slot}|${otherSlot}`));
     const relationships = m.relationships.flatMap(r => {
       const id = bySlot.get(r.id) ?? r.id;
-      return id === ids[i] ? [] : [{ id, affinity: r.affinity, trust: r.trust, tag: r.tag, note: r.note }];
+      if (id === ids[i]) return [];
+      // A native card's household ties carry the family word the roles give (FAMILY_TAGS, spouse, partner, flatmate).
+      const slot = native ? idToSlot.get(id) : undefined;
+      return [{ id, affinity: r.affinity, trust: r.trust, tag: slot ? tagFor(slot) : r.tag, note: r.note }];
     });
-    // Household members always know each other (A.3.4 rule 2): add the kin tie the model left out.
-    for (const [slot, id] of bySlot) if (slot !== m.slot && !relationships.some(r => r.id === id)) relationships.push({ id, affinity: 70, trust: 70, tag: "kin", note: "Came over on the same boat." });
+    // Household members always know each other (A.3.4 rule 2): add the tie the model left out.
+    if (native) {
+      for (const e of ends.values()) if (e.slot !== m.slot && !relationships.some(r => r.id === e.id)) {
+        const tag = tagFor(e.slot);
+        const [affinity, trust] = tieNumbers(tag);
+        relationships.push({ id: e.id, affinity, trust, tag, note: tag === "flatmate" ? "Shares the house." : `${cap(tag)}, under the same roof.` });
+      }
+    } else for (const [slot, id] of bySlot) if (slot !== m.slot && !relationships.some(r => r.id === id)) relationships.push({ id, affinity: 70, trust: 70, tag: "kin", note: "Came over on the same boat." });
+    const n = d.native;
     const card: PersonaCard = {
-      id: ids[i]!, name: m.name.trim(), age: m.age, pronouns: m.pronouns, kind: "arrival", occupation: m.occupation,
-      workplace: m.workplace ?? HOME_TOKEN, home: HOME_TOKEN, portrait: p.id, portrait_expressions: [...PORTRAIT_SET], sprite: ids[i]!,
-      appearance: m.appearance, look: structuredClone(p.look), backstory: m.backstory,
+      id: ids[i]!, name: m.name.trim(), age: m.age, pronouns: m.pronouns, kind: native ? "resident" : "arrival", occupation: m.occupation,
+      workplace: native ? assignedWorkplace(d, home) ?? home : m.workplace ?? HOME_TOKEN, home: native ? home : HOME_TOKEN,
+      // A procedural look's bust is drawn from the card's look, under the resident's own id (D1).
+      portrait: lib ? lib.id : ids[i]!, portrait_expressions: [...PORTRAIT_SET], sprite: ids[i]!,
+      appearance: m.appearance, look: structuredClone(d.look ?? lib!.look), backstory: m.backstory,
       personality: { traits: m.personality.traits.map(t => t.trim()), big5: m.personality.big5 }, values,
       beliefs: m.beliefs.slice(0, 12),
       voice: { register: m.voice.register, tics: m.voice.tics, never_says: m.voice.never_says, samples: m.voice.samples },
+      ...(native && n?.birthday ? { birthday: n.birthday } : {}),
       likes: m.likes, dislikes: m.dislikes, fears: m.fears,
       dream: { text: m.dream.text, stages: m.dream.stages },
       routine: { weekday: m.routine.weekday.map(e => ({ at: e.at, do: e.do, where: e.where })), weekend: m.routine.weekend.map(e => ({ at: e.at, do: e.do, where: e.where })) },
       chores: m.chores, relationships, secrets: m.secrets.map(s => ({ text: s.text, reveal: { regard_min: s.reveal.regard_min } })),
       canon_locks: [], story_role: m.story_role,
+      ...(native && n ? {
+        generated_by: options.generatedBy ?? "model", household: draw.id, archetype: memberArchetype(d, draw).id,
+        employment: n.employment, years_in_monde: Math.min(n.years_in_monde, d.age),
+      } : {}),
     };
     return { card: bindHome(PersonaCard.parse(card), home), dream_template: m.dream.template };
   });
@@ -539,13 +816,13 @@ export function cardsFromHousehold(out: ArrivalHouseholdOutput, draw: HouseholdD
 
 // ── The template card (A.3.8) ───────────────────────────────────────────────
 
-/** Six Big Five values 17 apart, one per household member (V08). */
-const GRID = [8, 25, 42, 59, 76, 93] as const;
-const TRAITS = ["steady", "wry", "shy", "warm", "particular", "curious", "stubborn", "patient", "brisk", "dreamy", "practical", "proud", "careful", "cheerful", "restless", "kind"];
-const CHORES = ["sweep the step", "wind the clock", "water the window box", "beat the doormat", "mend a sock", "black the stove", "fold the washing", "fill the coal scuttle"];
-const CHILD_SAMPLES: readonly [string, string, string] = ["Is that the sea? All of it.", "I'm not tired. I'm resting my eyes.", "Can we go to the ducks? Just for a minute."];
-const TEEN_SAMPLES: readonly [string, string, string] = ["It's fine. It's a town. There's a pub. Can't go in it.", "Did you see the lighthouse? It's not even on.", "I'll unpack later. Probably."];
-const NEVER_SAYS = ["no worries", "awesome", "okay so", "literally"];
+/** Six Big Five values 17 apart, one per household member (V08). Exported (with the lists below) for native.ts. */
+export const GRID = [8, 25, 42, 59, 76, 93] as const;
+export const TRAITS = ["steady", "wry", "shy", "warm", "particular", "curious", "stubborn", "patient", "brisk", "dreamy", "practical", "proud", "careful", "cheerful", "restless", "kind"];
+export const CHORES = ["sweep the step", "wind the clock", "water the window box", "beat the doormat", "mend a sock", "black the stove", "fold the washing", "fill the coal scuttle"];
+export const CHILD_SAMPLES: readonly [string, string, string] = ["Is that the sea? All of it.", "I'm not tired. I'm resting my eyes.", "Can we go to the ducks? Just for a minute."];
+export const TEEN_SAMPLES: readonly [string, string, string] = ["It's fine. It's a town. There's a pub. Can't go in it.", "Did you see the lighthouse? It's not even on.", "I'll unpack later. Probably."];
+export const NEVER_SAYS = ["no worries", "awesome", "okay so", "literally"];
 
 /** A household's names from the banks, through V03 (A.3.8). */
 function templateNames(draw: HouseholdDraw, rng: SeededRng, ctx: Pick<ValidationContext, "residents" | "reservedFull">): string[] {
@@ -571,9 +848,9 @@ function templateNames(draw: HouseholdDraw, rng: SeededRng, ctx: Pick<Validation
 
 const t = (at: string, verb: z.infer<typeof Verb>, where: string) => ({ at, do: verb, where });
 
-/** A.3.8: "a routine from the occupation's template". */
-function templateRoutine(m: MemberDraw, workplace: string | null, rng: SeededRng): ArrivalMember["routine"] {
-  const h = HOME_TOKEN;
+/** A.3.8: "a routine from the occupation's template" (exported for the Day-1 template card, native.ts). */
+export function templateRoutine(m: Pick<MemberDraw, "role" | "age">, workplace: string | null, rng: SeededRng, home: string = HOME_TOKEN): ArrivalMember["routine"] {
+  const h = home;
   const out = rng.pick(["old_quarter.fountain_square", "commons.duck_pond", "wharf.breakwater", "commons.picnic_lawn"]);
   const evening = rng.pick(["market_row.gull_and_anchor", "market_row.cafe_liss", h]);
   const weekend = [
@@ -615,7 +892,7 @@ export const agelessCaption = (caption: string): string => caption
   .replace(/\s+in (?:her|his|their) (?:early |mid-|late )?\w+ies(?= with|,)/g, "")
   .replace(/\s{2,}/g, " ");
 
-const pronounSet = (p: (typeof PRONOUNS)[number]) => p === "she/her" ? { they: "she", s: "s" } : p === "he/him" ? { they: "he", s: "s" } : { they: "they", s: "" };
+export const pronounForms = (p: (typeof PRONOUNS)[number]) => p === "she/her" ? { they: "she", s: "s" } : p === "he/him" ? { they: "he", s: "s" } : { they: "they", s: "" };
 
 /**
  * A.3.8's template household: names from the bank (through V03), ages inside the portrait band, the portrait's caption
@@ -633,9 +910,9 @@ export function templateHousehold(draw: HouseholdDraw, ctx: Pick<ValidationConte
   const order = () => [0, 1, 2, 3, 4, 5].sort(() => rng.next() - 0.5);
   const openOrder = order(), extraOrder = order();
   const members = draw.members.map((m, i): ArrivalMember => {
-    const p = portraitById(m.portrait)!;
+    const p = memberTags(m);
     const first = names[i]!.split(" ")[0]!;
-    const { they, s } = pronounSet(m.pronoun_default);
+    const { they, s } = pronounForms(m.pronoun_default);
     const adult = m.role !== "child";
     const workplace = adult && m.role !== "grandparent" && m.role !== "adult_child" && a.workplaces.length ? (() => {
       const w = rng.pick(a.workplaces);

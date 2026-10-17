@@ -8,8 +8,9 @@ import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
 import {
-  ItemCatalog, COMMUNITY_TASKS, HOMES_BY_ZONE, PersonaCard, STANDARD_EXPRESSIONS, cardLookProblems, compileScenes, evaluate, fillReply, isVacantHome,
-  parseHomes, registryFromContent, type HomeRegistry, type PersonaCard as Card
+  ItemCatalog, COMMUNITY_TASKS, HOMED, HOMES_BY_ZONE, PORTRAIT_SET, PersonaCard, STANDARD_EXPRESSIONS, bandOf, cardLookProblems, cardProblems,
+  compileScenes, evaluate, fillReply, isVacantHome, parseHomes, parsePins, portraitById, registryFromContent, type Day1Skeleton, type HomeRegistry,
+  type PersonaCard as Card
 } from "@monde/shared";
 import { firstName, parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
 import {
@@ -103,10 +104,92 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".yaml")).sort()
     if (s.reveal.flag) for (const f of s.reveal.flag.split(/\s*&&\s*/)) if (!flagOk(f.replace(/^flag\./, ""))) err(`${where}: secret reveal uses undeclared flag '${f}'`);
 }
 
-// ---- reciprocal relationships between carded residents (GDD §12.2 rule)
+// ---- the Day-1 census's generated cards (content/residents/day1/, MVP M-03 step 2; tools/gen-residents.ts). The game
+// doesn't load them yet (step 3): every loader reads content/residents/*.yaml only. Here: each card on its own (the
+// schema, places, look, A.3.7's static checks, the lexical filters), then against the skeleton (content/census/day1.yaml).
+const day1Dir = path.join(dir, "day1");
+const day1 = new Map<string, Card>();
+const censusPins = parsePins(YAML.parse(fs.readFileSync(path.join(root, "content/census/pins.yaml"), "utf8")));
+const skeleton = YAML.parse(fs.readFileSync(path.join(root, "content/census/day1.yaml"), "utf8")) as Day1Skeleton;
+const householdOf = new Map(skeleton.households.flatMap(h => h.members.filter(m => m.id).map(m => [m.id!, h] as const)));
+for (const file of fs.existsSync(day1Dir) ? fs.readdirSync(day1Dir).filter((f) => f.endsWith(".yaml")).sort() : []) {
+  const where = `residents/day1/${file}`;
+  const parsed = PersonaCard.safeParse(YAML.parse(fs.readFileSync(path.join(day1Dir, file), "utf8")));
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) err(`${where}: ${issue.path.join(".")}: ${issue.message}`);
+    continue;
+  }
+  const c = parsed.data;
+  if (`${c.id}.yaml` !== file) err(`${where}: id '${c.id}' does not match file name`);
+  if (cards.has(c.id)) err(`${where}: id '${c.id}' is a hand-written card's too`);
+  day1.set(c.id, c);
+  if (c.kind !== "resident") err(`${where}: kind is ${c.kind}; a Day-1 card is a resident`);
+  if (!c.generated_by || !c.household || !c.archetype || !c.employment || c.years_in_monde === undefined) err(`${where}: missing the census fields (generated_by, household, archetype, employment, years_in_monde)`);
+  for (const [label, p] of [["workplace", c.workplace], ["home", c.home]] as const)
+    if (!placeOk(p)) err(`${where}: ${label} '${p}' is not in the place registry`);
+  for (const [day, blocks] of Object.entries(c.routine))
+    for (const b of blocks) if (!placeOk(b.where)) err(`${where}: routine.${day} ${b.at} place '${b.where}' unknown`);
+  for (const problem of cardLookProblems(c)) err(`${where}: ${problem}`);
+  if (!c.look) err(`${where}: no look`);
+  for (const e of PORTRAIT_SET) if (!c.portrait_expressions.includes(e)) err(`${where}: portrait_expressions missing '${e}'`);
+  const mates = new Set(householdOf.get(c.id)?.members.map(m => m.id).filter((x): x is string => !!x) ?? []);
+  for (const problem of cardProblems(c, { canonName: c.id in censusPins.people, household: mates })) err(`${where}: ${problem}`);
+  if (c.voice.mode !== "narrated_action") {
+    const texts = [c.name, c.occupation, c.appearance, c.backstory, ...c.beliefs, c.voice.register, ...c.voice.tics, ...c.voice.samples, ...c.likes, ...c.dislikes,
+      ...c.fears, c.dream.text, ...c.chores, ...c.relationships.map(r => r.note), ...c.secrets.map(x => x.text)];
+    for (const hit of new Set(texts.flatMap(t => lexicalHits(t).map(h => `${h.group} "${h.term}"`)))) err(`${where}: V16 ${hit}`);
+  }
+}
+// Against the skeleton: every written member's card, at the household's home, in the member's band, archetype and
+// portrait (the library id, or their own id for a procedural look, wearing it).
+const libraryWorn = new Map<string, string>();
+/** Key order aside (the schema's parse reorders), the same JSON. */
+const canonical = (v: unknown): string => JSON.stringify(v, (_k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.entries(x).sort(([a], [b]) => a.localeCompare(b))) : x));
+let toWrite = 0, writtenMembers = 0;
+for (const h of skeleton.households) for (const m of h.members) {
+  if (m.kind !== "named" && m.kind !== "anonymous") continue;
+  toWrite++;
+  const c = m.id ? day1.get(m.id) : undefined;
+  const at = `census ${h.id}/${m.slot}`;
+  if (!c) { if (h.status === "drafted" || h.status === "curated") err(`${at}: ${h.status}, but content/residents/day1/ has no card ${m.id ?? "(no id)"}`); continue; }
+  writtenMembers++;
+  if (h.status !== "drafted" && h.status !== "curated") warn(`${at}: ${c.id} has a card, but the household is still ${h.status}`);
+  if (c.household !== h.id) err(`${at}: ${c.id}'s card says household ${c.household}`);
+  if (c.home !== h.home) err(`${at}: ${c.id}'s card says home ${c.home}; the census says ${h.home}`);
+  if (bandOf(c.age) !== m.band) err(`${at}: ${c.id} is ${c.age} (${bandOf(c.age)}); the census says ${m.band}`);
+  if (c.archetype !== m.archetype) err(`${at}: ${c.id}'s card says archetype ${c.archetype}; the census says ${m.archetype}`);
+  if (m.kind === "named" && c.name !== m.name) err(`${at}: ${c.id} is canon as ${m.name}, the card says ${c.name}`);
+  const p = m.portrait;
+  if (p.source === "library") {
+    if (c.portrait !== p.id) err(`${at}: ${c.id} wears portrait ${c.portrait}; the census gave ${p.id}`);
+    else if (canonical(c.look) !== canonical(portraitById(p.id)?.look)) err(`${at}: ${c.id}'s look isn't its library bust's (${p.id})`);
+    const other = libraryWorn.get(p.id);
+    if (other) err(`${at}: ${c.id} and ${other} both wear ${p.id}`);
+    libraryWorn.set(p.id, c.id);
+  } else if (p.source === "procedural") {
+    if (c.portrait !== c.id) err(`${at}: ${c.id} has a procedural look, so its portrait is its own id, not ${c.portrait}`);
+    if (canonical(c.look) !== canonical(p.look)) err(`${at}: ${c.id}'s look isn't the census's procedural look`);
+  }
+}
+for (const c of day1.values()) if (!householdOf.has(c.id)) err(`residents/day1/${c.id}.yaml: no census member has id ${c.id} (household ${c.household})`);
+for (const c of cards.values()) if (libraryWorn.has(c.portrait)) err(`portrait ${c.portrait}: worn by ${c.id} and ${libraryWorn.get(c.portrait)}`);
+// A.1: once every card is written, the town is 210 homed residents (the hand-written with a home here, and the 188).
+if (toWrite && writtenMembers === toWrite) {
+  const homed = [...cards.values(), ...day1.values()].filter(c => c.kind !== "animal" && !c.home.startsWith("offmap."));
+  if (homed.length !== HOMED) err(`census: ${homed.length} homed residents with cards; A.1 says ${HOMED}`);
+}
+// Ties a Day-1 card makes must name someone: a card, or a named person still to write (a warning until they are).
+for (const c of day1.values()) for (const r of c.relationships) {
+  if (cards.has(r.id) || day1.has(r.id)) continue;
+  if (r.id in censusPins.people) warn(`residents/day1/${c.id}.yaml: tie to ${r.id}, whose card isn't written yet`);
+  else err(`residents/day1/${c.id}.yaml: tie to ${r.id}, who has no card`);
+}
+
+// ---- reciprocal relationships (GDD §12.2 rule): among the hand-written cards, and from a hand-written card to a
+// generated one (the census's mirrors). A generated card's ties to others needn't be returned.
 for (const c of cards.values())
   for (const r of c.relationships) {
-    const other = cards.get(r.id);
+    const other = cards.get(r.id) ?? day1.get(r.id);
     if (other && !other.relationships.some((x) => x.id === c.id)) err(`relationship ${c.id} → ${r.id} is not reciprocated`);
   }
 
@@ -146,9 +229,9 @@ for (const [id, home] of homes) {
     if (!b) err(`homes.yaml: ${id} is in building ${name}, which zones/${zone} doesn't have`);
   }
 }
-for (const c of cards.values()) {
+for (const c of [...cards.values(), ...day1.values()]) {
   if (c.kind === "animal" || c.home.startsWith("offmap.")) continue;
-  if (!homes.has(c.home)) err(`residents/${c.id}.yaml: home ${c.home} isn't in homes.yaml`);
+  if (!homes.has(c.home)) err(`residents/${day1.has(c.id) ? "day1/" : ""}${c.id}.yaml: home ${c.home} isn't in homes.yaml`);
 }
 
 // ---- Quiet Mode lines (Appendix B) and their replies: the client's own parser (it throws on a bad entry), then
@@ -302,7 +385,7 @@ if (projectsContent) {
 for (const w of warnings) console.warn(`warn  ${w}`);
 for (const e of errors) console.error(`error ${e}`);
 const looks = [...cards.values()].filter((c) => c.look).length;
-console.log(`content: ${cards.size} cards (${looks} with a look), ${places.size} places, ${homes.size} homes, ${declared.size} declared flags, `
+console.log(`content: ${cards.size} cards (${looks} with a look), ${day1.size} of the census's ${toWrite} Day-1 cards written, ${places.size} places, ${homes.size} homes, ${declared.size} declared flags, `
   + `${library?.lines.length ?? 0} lines with ${replyCount} replies, `
   + `${scripted?.exchanges.length ?? 0} scripted exchanges (${scriptedTurns} nodes, ${scriptedPaths} paths; ${laterCues} later {ai_open} cues still to write), `
   + `${projectsContent?.projects.length ?? 0} Projects (${projectLines} lines) `

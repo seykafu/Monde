@@ -3,6 +3,8 @@
 import { parse } from 'yaml';
 import { PersonaCard } from '@monde/shared';
 
+// One level only: the Day-1 census's generated cards in content/residents/day1/ (MVP M-03 step 2) aren't loaded until
+// step 3 wires them in, so this glob must stay non-recursive (no `**`).
 const files = import.meta.glob('../../../content/residents/*.yaml', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 export const personaCards: readonly PersonaCard[] = Object.keys(files).sort().map(path => {
