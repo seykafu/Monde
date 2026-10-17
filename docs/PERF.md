@@ -69,3 +69,11 @@ Connect to that page's `webSocketDebuggerUrl`, use `Runtime.evaluate` to navigat
 - `heapStart/heapEnd`: Chromium's optional `performance.memory` used/allocated/limit JS heap bytes, or `null`. These can be coarse and exclude native, texture/GPU and other process memory. **They cannot establish the 1.5 GB total-memory target.** Also record process memory using the OS/browser task manager (for Electron, include its child processes), noting the measurement method and peak during the tour.
 
 Save the JSON with laptop model, CPU/GPU, RAM, OS, browser/Electron version, power mode, display refresh rate, resolution, build revision, day/time/weather, process-memory observations, and whether assets were warm. Report each district plus the interior and any invalid runs. No hardware-target pass/fail is inferred automatically.
+
+## Captures
+
+| Date | Machine | Build | Crowd | fps mean / p5 | frame p95 / p99 | long frames | zone loads | JS heap |
+|---|---|---|---|---|---|---|---|---|
+| 2026-10-17 | MacBook Pro, M1 Max, 120 Hz, packaged desktop app | ca6b381 | 60 visible | 120 / 108 | 9.2 / 9.5 ms | 0 | 0.51–0.85 s (four districts, the bakery) | ~88 MB |
+
+The M1 Max runs at its display refresh with headroom; the MVP sign-off still needs a mid-range laptop (Q-04).
