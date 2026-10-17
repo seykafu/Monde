@@ -108,8 +108,9 @@ describe("POST /admin/census/write (M-03 step 2)", () => {
       expect(json.cost_usd).toBeGreaterThan(0);
       const sent = mind.bodies[0]!;
       expect(sent.model).toBe("claude-haiku-5-5");
-      expect(sent.max_tokens).toBe(900 + 750);
-      for (const key of ["temperature", "top_p", "top_k", "thinking"]) expect(sent).not.toHaveProperty(key);
+      expect(sent.max_tokens).toBe(1500 + 1200);
+      for (const key of ["temperature", "top_p", "top_k"]) expect(sent).not.toHaveProperty(key);
+      expect(sent.thinking).toEqual({ type: "disabled" });
       expect(sent.messages.at(-1)!.role).toBe("user");
       // A.3.6's prompt, MONDE ON DAY 1, then the card contract; one cache breakpoint at the end.
       expect(sent.system).toEqual([...NATIVE_SYSTEM_BLOCKS.map(text => ({ type: "text", text })), { type: "text", text: HOUSEHOLD_JSON_BLOCK, cache_control: { type: "ephemeral" } }]);

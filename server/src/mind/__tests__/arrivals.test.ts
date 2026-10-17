@@ -85,7 +85,8 @@ describe("the arrival buffer (§9.2, A.3.6–A.3.8)", () => {
     }
     for (const body of mind.bodies) {
       expect(body.model).toBe("claude-haiku-5-5");
-      for (const key of ["temperature", "top_p", "top_k", "thinking"]) expect(body).not.toHaveProperty(key);
+      for (const key of ["temperature", "top_p", "top_k"]) expect(body).not.toHaveProperty(key);
+      expect(body.thinking).toEqual({ type: "disabled" });
       // The contract is in the cached system prompt; the strict format's grammar is too large for the API.
       expect(body.output_config).toEqual({ effort: "low" });
       expect(JSON.stringify(body.system)).toContain("REPLY FORMAT");

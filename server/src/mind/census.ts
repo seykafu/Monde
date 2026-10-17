@@ -51,6 +51,9 @@ export function censusRequest(draw: HouseholdDraw, ctx: NativePromptContext): An
     // too large for strict structured output). One breakpoint at the end caches all three.
     system: [...NATIVE_SYSTEM_BLOCKS, HOUSEHOLD_JSON_BLOCK].map((text, i, all) => ({ type: "text" as const, text, ...(i === all.length - 1 ? { cache_control: { type: "ephemeral" as const } } : {}) })),
     messages: [{ role: "user", content: nativeUserMessage(draw, ctx) }],
+    // Thinking off: a card is writing to a contract, and thinking spent the token budget (every trial call hit
+    // max_tokens). GDD-GAP: A.3.6 says effort low; the effort setting stays, the thinking goes.
+    thinking: { type: "disabled" },
     output_config: { effort: "low" },
   };
 }

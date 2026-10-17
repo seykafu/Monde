@@ -61,14 +61,14 @@ describe("the native prompt (A.3.6, MODE: native)", () => {
     expect(MONDE_DAY1_BLOCK.length / 4).toBeLessThan(560);
   });
 
-  it("is what the census endpoint accepts, and asks for 900 + 750 × size tokens", () => {
+  it("is what the census endpoint accepts, and asks for 1,500 + 1,200 × size tokens", () => {
     for (const h of censusOrder(censusInput().skeleton, censusInput().homes, censusInput().pins)) {
       const input = censusInput();
       const draw = nativeDrawFor(input, household(input, h.id));
       expect(NativeDrawSchema.safeParse(draw).success, h.id).toBe(true);
       expect(NativePromptContextSchema.safeParse(nativeContextFor(input, household(input, h.id), draw, "w")).success, h.id).toBe(true);
     }
-    expect(nativeMaxTokens(3)).toBe(3150);
+    expect(nativeMaxTokens(3)).toBe(5100);
   });
 
   it("knows six to ten people: the required ties, colleagues, the cast in the zone", () => {

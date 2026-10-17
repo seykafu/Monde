@@ -135,6 +135,8 @@ export function arrivalRequest(draw: HouseholdDraw, ctx: PromptContext) {
     // rejects this schema's compiled grammar as too large, so the strict format failed every call).
     system: [{ type: "text" as const, text: ARRIVAL_SYSTEM_PROMPT }, { type: "text" as const, text: HOUSEHOLD_JSON_BLOCK, cache_control: { type: "ephemeral" as const } }],
     messages: [{ role: "user" as const, content: arrivalUserMessage(draw, ctx) }],
+    // Thinking off, as for the census (census.ts): thinking spent the card's token budget.
+    thinking: { type: "disabled" as const },
     output_config: { effort: "low" as const },
   };
 }

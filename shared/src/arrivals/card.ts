@@ -280,7 +280,9 @@ export function arrivalUserMessage(draw: HouseholdDraw, ctx: PromptContext): str
 }
 
 /** A.3.6: max_tokens = 900 + 750 × household size. */
-export const arrivalMaxTokens = (size: number): number => 900 + 750 * size;
+// GDD-GAP: A.3.6 gives 900 + 750 x size, but a full card runs ~1,000-1,400 tokens of JSON and every census trial call
+// stopped at max_tokens (2026-10-17). With thinking off for these calls (arrivals.ts, census.ts), 1,500 + 1,200 x size.
+export const arrivalMaxTokens = (size: number): number => 1500 + 1200 * size;
 
 // ── Validation (A.3.7) ──────────────────────────────────────────────────────
 
