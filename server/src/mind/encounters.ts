@@ -40,8 +40,8 @@ export const MIN_OVERLAP_MINUTES = 30;
 const APART_VERBS: ReadonlySet<string> = new Set(["sleep", "nap"]);
 /** Up to this many of each side's notable memories of the day go into the prompt as news. */
 export const NEWS_PER_SIDE = 3;
-/** GDD-GAP: news is what made the day: memories of importance 5+ (the Acquainted reflection trigger, §9.8). */
-export const NEWS_IMPORTANCE = 5;
+/** GDD-GAP: stop at importance 1 instead of circulating minimum-importance news forever. */
+export const NEWS_IMPORTANCE = 2;
 
 export const TIER_ORDER: Readonly<Record<Tier, number>> = { core: 0, acquainted: 1, ambient: 2 };
 
@@ -303,7 +303,8 @@ export async function resolveEncounter(
     eq(memories.worldId, ctx.worldId), eq(memories.id, encounterMemoryId(ctx.day, encounter.a, encounter.b, encounter.a)),
   ));
   if (met) return { key, mode: "rule", reason: "rule", applied: { ab: 0, ba: 0 }, adjustments: ["already met today"] };
-  const rule = () => ruleOutcome(a.state.mood.valence, b.state.mood.valence, encounter.mean);
+  const propagated = [...a.news, ...b.news].map(n => n.id);
+  const rule = () => ({ ...ruleOutcome(a.state.mood.valence, b.state.mood.valence, encounter.mean), news: propagated });
   if (encounter.mode === "rule" || !deps.mind.enabled) {
     const applied = await persistEncounter(deps.db, ctx, encounter, rule(), null, null);
     return { key, mode: "rule", reason: "rule", applied, adjustments: [] };
@@ -329,7 +330,7 @@ export async function resolveEncounter(
   const offered = new Set([...a.news, ...b.news].map((n) => n.id));
   const validated = validateEncounter(result.text, { offered, romanceAllowed: ctx.romanceAllowed });
   if (!validated.ok) return fallback("schema", { ...result.call, validation: validated.category }, validated.detail);
-  const applied = await persistEncounter(deps.db, ctx, encounter, validated.outcome, result.call, version, true);
+  const applied = await persistEncounter(deps.db, ctx, encounter, { ...validated.outcome, news: [...new Set([...validated.outcome.news, ...propagated])] }, result.call, version, true);
   if (validated.adjustments.length) deps.log.info({ pair: key, day: ctx.day, adjustments: validated.adjustments }, "encounter adjusted");
   return { key, mode: "model", reason: "ok", applied, adjustments: validated.adjustments };
 }
@@ -341,6 +342,9 @@ type RelationshipRow = typeof relationships.$inferSelect;
  * trust, the feeling, last_seen_day and the encounter count; a memory for each side; the ai_log row. Rows are
  * locked in id order so two encounters can't deadlock.
  */
+/** The news itself, without the "X told me: " a heard memory already carries (one teller per hop, never a chain). */
+const heardText = (text: string): string => text.replace(/^[^:]{1,40} told me: /, "");
+
 export async function persistEncounter(
   db: WorldDatabase, ctx: EncounterContext, encounter: Encounter, outcome: EncounterOutcome,
   call: CallRecord | null, version: string | null, model = false,
@@ -398,8 +402,13 @@ export async function persistEncounter(
       const [source] = await tx.select().from(memories).where(and(eq(memories.worldId, worldId), eq(memories.id, id)));
       if (!source || ![a, b].includes(source.residentId)) continue;
       const recipient = source.residentId === a ? b : a;
-      await tx.insert(memories).values({ ...source, id: `heard_${day}_${recipient}_${id}`, residentId: recipient,
-        day, minute: encounter.minute, kind: "heard", text: `${ctx.names[source.residentId] ?? source.residentId} told me: ${source.text}`, importance: Math.max(1, source.importance - 1),
+      const provenance = source.sourceEvent ?? source.id;
+      const [known] = await tx.select({ id: memories.id }).from(memories).where(and(
+        eq(memories.worldId, worldId), eq(memories.residentId, recipient), eq(memories.sourceEvent, provenance),
+      ));
+      if (known) continue;
+      await tx.insert(memories).values({ ...source, id: `heard_${recipient}_${provenance}`, sourceEvent: provenance, residentId: recipient,
+        day, minute: encounter.minute, kind: "heard", text: `${ctx.names[source.residentId] ?? source.residentId} told me: ${heardText(source.text)}`, importance: Math.max(1, source.importance - 1),
         who: [...new Set([...source.who, source.residentId])], wherePlace: encounter.place,
       }).onConflictDoNothing();
     }

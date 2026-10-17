@@ -1,3 +1,5 @@
+import { createTownState, setTownFlag } from '../town/pillars';
+import { runDawnsThrough } from '../town/townEngine';
 // The Spring soak bot (MVP_PLAN Q-02, first version): a headless player that plays "Spring in Monde" from New Game to
 // the End-of-Spring report on the real game modules, in Quiet Mode (no server: the mind is offline, so the residents
 // speak from the line library and the scripted exchanges, and the dawn is the template paper).
@@ -1317,6 +1319,13 @@ export function auditSpring(): string[] {
   const bot = new SpringBot('strong');
   bot.newGame();
   const out: string[] = [];
+  const setback = runDawnsThrough({ ...createTownState(), census: 199 }, 8).state;
+  const clauseRegistry = { set: () => {}, remove: () => {}, get: (key: string): unknown => key === 'monde.town' ? setback : undefined };
+  for (const building of ['fish_market', 'boathouse']) {
+    if (!doorLocked(clauseRegistry, { district: 'wharf', building })) out.push(`Option Clause: ${building} did not close`);
+    const reopened = { set: () => {}, remove: () => {}, get: (key: string): unknown => key === 'monde.town' ? setTownFlag(setback, 'charter_found') : undefined };
+    if (doorLocked(reopened, { district: 'wharf', building })) out.push(`Option Clause: ${building} did not reopen`);
+  }
   const home = bot.arrival(HOME)!;
   const check = (what: string, place: string, opts: { keys?: boolean } = {}) => {
     if (opts.keys) bot.session.flags.set('cottage_keys_given');

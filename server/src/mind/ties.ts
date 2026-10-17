@@ -7,9 +7,9 @@
  *                      that matter (became Friends / Close friends / Rivals / Enemies, made up);
  *   buildDawnTies      the dawn package's `ties`: every pair's label, romance stage, and last night's milestones.
  */
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import {
-  ResidentState, applyAffinity, driftDelta, neglectDelta, orderedPair, pairKey, pairLabel, romanceEligible,
+  ResidentState, encounterRoll, applyAffinity, driftDelta, neglectDelta, orderedPair, pairKey, pairLabel, romanceEligible,
   romanceStageOf, tieMilestone, type DawnTies, type PairLabel, type PersonaCard, type TieMilestoneView, type TieView,
 } from "@monde/shared";
 import { memories, plans, relationships, residents, tieMilestones, worlds } from "../db/schema.js";
@@ -72,7 +72,9 @@ export async function prepareFriendship(db: WorldDatabase, options: PrepareOptio
     db.select().from(relationships).where(eq(relationships.worldId, worldId)),
     db.select({ residentId: plans.residentId, plan: plans.plan }).from(plans).where(and(eq(plans.worldId, worldId), eq(plans.day, day))),
     db.select().from(memories).where(and(
-      eq(memories.worldId, worldId), eq(memories.day, day), eq(memories.archived, false), gte(memories.importance, NEWS_IMPORTANCE),
+      // §9.11: what a resident knows passes on to whom they meet the next day, so today's news and last night's.
+      eq(memories.worldId, worldId), gte(memories.day, day - 1), lte(memories.day, day), eq(memories.archived, false),
+      gte(memories.importance, NEWS_IMPORTANCE),
     )),
     db.select({ id: memories.id }).from(memories).where(and(eq(memories.worldId, worldId), eq(memories.day, day), eq(memories.kind, "did"))),
   ]);
@@ -96,18 +98,22 @@ export async function prepareFriendship(db: WorldDatabase, options: PrepareOptio
   const drifted = await applyDrift(db, worldId, day, edges.filter((e) =>
     residentIds.has(e.fromId) && residentIds.has(e.toId) && !meeting.has(pairKey(e.fromId, e.toId)) && !met.has(encounterMemoryId(day, e.fromId, e.toId, e.fromId))));
 
-  // News: each side's notable memories of the day, minus what the other already knows (same source event).
+  // Snapshot before tonight: heard news becomes eligible on a later night. Provenance also prevents echoes.
   const newsOf = new Map<string, { id: string; text: string; source: string | null; importance: number }[]>();
   for (const m of newsRows) {
     if (m.kind === "felt") continue;
     const list = newsOf.get(m.residentId) ?? [];
-    list.push({ id: m.sourceEvent ?? m.id, text: m.text, source: m.sourceEvent, importance: m.importance });
+    list.push({ id: m.id, text: m.text, source: m.sourceEvent, importance: m.importance });
     newsOf.set(m.residentId, list);
   }
   const news = (self: string, other: string) => {
-    const known = new Set((newsOf.get(other) ?? []).flatMap((n) => (n.source ? [n.source] : [])));
+    const known = new Set((newsOf.get(other) ?? []).map((n) => n.source ?? n.id));
     return (newsOf.get(self) ?? [])
-      .filter((n) => !n.source || !known.has(n.source))
+      .filter((n) => n.importance >= NEWS_IMPORTANCE && !known.has(n.source ?? n.id))
+      // §9.11: chance per hop. GDD-GAP: affinity_factor is unspecified; neutral strangers use 1,
+      // and mean affinity scales it linearly from 0 to 2. Seed by provenance, never random memory UUIDs.
+      .filter((n) => encounterRoll(`${world?.seed ?? 0}:gossip:${n.source ?? n.id}`, day, self, other)
+        < 0.6 * n.importance / 10 * (1 + (meanOf(byEdge, self, other) ?? 0) / 100))
       .sort((x, y) => y.importance - x.importance || (x.id < y.id ? -1 : 1))
       .slice(0, NEWS_PER_SIDE)
       .map(({ id, text }) => ({ id, text }));

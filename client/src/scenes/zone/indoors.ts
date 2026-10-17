@@ -1,3 +1,5 @@
+import { optionClosesPlace } from '../../town/optionClause';
+import type { TownState } from '../../town/pillars';
 // Indoors (MVP W-03): how a room is lit for the clock, and which doors are locked. Pure except for reading the registry.
 import type { WeatherNow } from '../../sim/weather';
 import type { DoorLink } from '../../world/interiors';
@@ -56,6 +58,8 @@ type Reg = RegistryLike;
  *   key; until those beats exist, the empty shop opens once the MR-4 Mark has been read (its riddle names the door).
  */
 export function doorLocked(registry: Reg, link: Pick<DoorLink, 'district' | 'building'>): string | null {
+  const town = registry.get('monde.town') as TownState | undefined;
+  if (town && optionClosesPlace(town, `${link.district}.${link.building}`)) return 'Closed: Port Vane survey site.';
   if (link.district === 'old_quarter' && link.building === 'lamplighter_cottage' && !flagsOf(registry).has('cottage_keys_given')) {
     return "Locked. Pell has the keys: she said she'd meet you here.";
   }

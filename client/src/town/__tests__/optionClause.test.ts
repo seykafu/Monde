@@ -1,7 +1,9 @@
+import { SavedFriendship } from '@monde/shared';
+import { applyOptionRegard, emptyFriendship } from '../../friendship/state';
 import { describe, expect, it } from 'vitest';
-import { OPTION_DAWNS, optionClauseDawn, optionGauge, type OptionClauseState } from '../optionClause';
+import { OPTION_DAWNS, optionClosesPlace, optionClauseDawn, optionGauge, type OptionClauseState } from '../optionClause';
 import { createTownState, setTownFlag, type TownState } from '../pillars';
-import { runDawn } from '../townEngine';
+import { restore, serialize, runDawn } from '../townEngine';
 
 const fresh: OptionClauseState = { dawnsUnder: 0, exercised: false, exercisedDay: null };
 
@@ -81,4 +83,35 @@ describe('the census gauge (§6.5 UI)', () => {
   it('goes away once the Charter voids the clause', () => {
     expect(optionGauge(setTownFlag(town(190, true), 'charter_found')).visible).toBe(false);
   });
+});
+
+it('G-04: a forced census drop triggers the Wharf setback once, survives save/restore, and the Charter reopens it', () => {
+  let s = { ...createTownState(), census: 199 };
+  for (let day = 2; day <= 7; day++) s = restore(serialize(runDawn(s, { day }).state));
+  const baseline = runDawn({ ...s, census: 200 }, { day: 8 }).state;
+  s = runDawn(s, { day: 8 }).state;
+  expect(s.pillars.prosperity).toBeCloseTo(baseline.pillars.prosperity - 8);
+  expect(s.pillars.spirit).toBeCloseTo(baseline.pillars.spirit - 4);
+  expect(s.flags.option_known).toBe(true);
+  for (const place of ['wharf.fish_market', 'wharf.boathouse']) expect(optionClosesPlace(s, place)).toBe(true);
+  expect(optionClosesPlace(s, 'wharf.ferry_slip')).toBe(false);
+  s = restore(serialize(s));
+  expect(runDawn(s, { day: 9 }).report.optionClause.triggered).toBe(false);
+  const reopened = setTownFlag(s, 'charter_found');
+  expect(reopened.pillars.spirit).toBe(s.pillars.spirit + 6);
+  expect(optionClosesPlace(reopened, 'wharf.fish_market')).toBe(false);
+  expect(setTownFlag(restore(serialize(reopened)), 'charter_found').pillars).toEqual(reopened.pillars);
+  expect(setTownFlag(createTownState(), 'charter_found').pillars).toEqual(createTownState().pillars);
+});
+
+it('drops Nell and every current fisher to Wary toward Pell, preserving player Regard and saved consequences', () => {
+  const cards = [
+    { id: 'nell', occupation: 'Shopkeeper' }, { id: 'fisher_1', occupation: 'Herring fisher' },
+    { id: 'moss', occupation: 'Skipper; former herring fisher' }, { id: 'odile', occupation: 'Baker' },
+  ];
+  const before = { ...emptyFriendship(), regard: { nell: 70 }, resident_regard: { fisher_1: { pell: -20 } } };
+  const after = SavedFriendship.parse(applyOptionRegard(before, cards));
+  expect(after.resident_regard).toEqual({ nell: { pell: -1 }, fisher_1: { pell: -20 } });
+  expect(after.regard).toEqual({ nell: 70 });
+  expect(applyOptionRegard(after, cards)).toBe(after);
 });

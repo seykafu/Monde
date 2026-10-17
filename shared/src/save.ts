@@ -26,7 +26,7 @@ export const SavedTown = z.object({
     source: z.enum(['community_work', 'project', 'riddle', 'story', 'resident_sim', 'scuffle', 'tollmen', 'event', 'drift', 'dev']),
     requested: n, applied: n, capped: z.boolean(), note: z.string().optional() })),
   migration: z.object({ lowStayNights: z.record(z.string(), count), notices: z.record(z.string(), day) }),
-  optionClause: z.object({ dawnsUnder: count, exercised: z.boolean(), exercisedDay: day.nullable() })
+  optionClause: z.object({ reopened: z.boolean().optional(), dawnsUnder: count, exercised: z.boolean(), exercisedDay: day.nullable() })
 });
 export const SavedQuiet = z.object({
   day: count, residents: z.record(z.string(), z.object({

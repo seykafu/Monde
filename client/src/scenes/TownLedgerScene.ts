@@ -1,3 +1,6 @@
+import { livingArrivals } from '@monde/shared';
+import { applyOptionRegard, emptyFriendship, type FriendshipState } from '../friendship/state';
+import { personaCards } from '../world/residents';
 import { marks } from './riddles';
 // The Town Ledger (GDD §6.6, §18 Journal → Town Ledger; MVP G-01), the HUD Pillar strip, and the town's
 // registry wiring.
@@ -59,6 +62,8 @@ export const attachTown = (registry: Phaser.Data.DataManager, clock: Clock): voi
     const { state, reports } = runDawnsThrough(town, t.day);
     const report = reports.at(-1);
     registry.set(TOWN_KEY, state);
+    if (state.optionClause.exercised) registry.set('monde.friendship', applyOptionRegard(
+      (registry.get('monde.friendship') as FriendshipState | undefined) ?? emptyFriendship(), [...personaCards, ...livingArrivals(state.people).map(r => r.card)]));
     if (!report) return;
     registry.set(DAWN_REPORT_KEY, report);
     if (import.meta.env.DEV) {

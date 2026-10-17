@@ -5,8 +5,7 @@
 // - Undo: the Charter's Article III voids it (`charter_found`, S21).
 // - UI: once known, the Town Ledger shows a census gauge with a 200 line and a 7-day counter whenever the
 //   census is under 205.
-// The consequences (the Wharf closes, Prosperity −8, Spirit −4, Regard drops) belong to G-04; this module
-// counts, triggers and describes the gauge.
+// Consequences use the saved exercised state; the Charter reopens the sites immediately.
 import type { TownFlags, TownState } from './pillars';
 
 export const OPTION_CENSUS_LINE = 200;
@@ -17,6 +16,7 @@ export const OPTION_GAUGE_BELOW = 205;
 export interface OptionClauseState {
   /** Consecutive dawns with the census under 200. */
   dawnsUnder: number;
+  reopened?: boolean;
   exercised: boolean;
   exercisedDay: number | null;
 }
@@ -73,3 +73,9 @@ export const optionGauge = (state: Pick<TownState, 'census' | 'flags' | 'optionC
     void: isVoid
   };
 };
+
+/** §6.5: only the fish market and boathouse close; the rest of the Wharf remains accessible. */
+export const wharfClosed = (town: Pick<TownState, 'optionClause' | 'flags'>): boolean =>
+  town.optionClause.exercised && !optionVoid(town.flags);
+export const optionClosesPlace = (town: Pick<TownState, 'optionClause' | 'flags'>, place: string): boolean =>
+  wharfClosed(town) && ['wharf.fish_market', 'wharf.boathouse'].includes(place);

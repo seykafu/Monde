@@ -1,4 +1,3 @@
-import { roomOf } from '../world/interiors';
 // The Projects in the running game (GDD §6.3, MVP G-03): the engine's state in the registry (`monde.projects`, saved as
 // SaveGame.projects) and every action with its side effects on the rest of the game: the Town Fund and the Pillars
 // (`monde.town`), the Bag, coins and Stamina (economy), skills (fellow), the story's flags (so the board swaps art and
@@ -7,6 +6,8 @@ import { roomOf } from '../world/interiors';
 // No Phaser at runtime: the registry is anything with get/set/remove (as puzzles/runtime.ts), so this runs under vitest.
 // Regard comes in from the caller (scenes/friendship.ts regardFor in the game), which keeps the friendship mirror's
 // Phaser-side glue out of this file.
+import { wharfClosed } from '../town/optionClause';
+import { roomOf } from '../world/interiors';
 import { Economy, Inventory, baseSkills, emptyProjects, gainXp, skillPerks, type ClientEvent, type HeadlineTemplate, type Pillar, type Press } from '@monde/shared';
 import { addItem } from '../economy/inventory';
 import { itemById } from '../economy/content';
@@ -57,7 +58,7 @@ export function worldOf(r: RegistryLike, now: Now): E.ProjectWorld {
   // Read, never create: a New Game's Fellow stays unsigned until S01a's {charcreate} (fellow/state.ts ensureFellow).
   const skills = getFellow(r)?.skills ?? baseSkills();
   return {
-    day: now.day, minute: now.minute, flags: flagsOf(r),
+    day: now.day, minute: now.minute, flags: flagsOf(r), wharfPaused: !!townOf(r) && wharfClosed(townOf(r)!),
     puzzleSolved: id => !!solved[id]?.solved,
     homeMaterialMultiplier: skillPerks(skills).homeMaterialMultiplier
   };
@@ -169,6 +170,7 @@ export function signWithPell(r: RegistryLike, now: Now, id: string): { ok: boole
 export function donateOwnCoins(r: RegistryLike, id: string): number {
   const def = E.defOf(PROJECTS, id), town = townOf(r);
   if (!def || !town) return 0;
+  if (E.projectPaused(def, projectsOf(r).projects[id], { wharfPaused: wharfClosed(town) })) return 0;
   const { coins, town: next } = E.donateOwn(def, projectsOf(r), id, coinsOf(r), town);
   if (!coins) return 0;
   r.set(COINS_KEY, { balance: coinsOf(r) - coins });
@@ -180,6 +182,7 @@ export function donateOwnCoins(r: RegistryLike, id: string): number {
 export function askForDonation(r: RegistryLike, id: string, resident: string, regard: number): { verdict: E.DonationVerdict; coins: number; line: string } {
   const def = E.defOf(PROJECTS, id), town = townOf(r);
   if (!def || !town) return { verdict: 'not_needed', coins: 0, line: '' };
+  if (E.projectPaused(def, projectsOf(r).projects[id], { wharfPaused: wharfClosed(town) })) return { verdict: 'not_needed', coins: 0, line: 'The Wharf Projects are paused.' };
   const result = E.askDonation(def, projectsOf(r), id, resident, regard, town);
   const asks = PROJECT_CONTENT.asks;
   const vars = { ...lineVars(def, projectsOf(r).projects[id], town), coins: result.coins };
@@ -193,6 +196,7 @@ export function askForDonation(r: RegistryLike, id: string, resident: string, re
 export function handOverAt(r: RegistryLike, now: Now, id: string): Record<string, number> {
   const def = E.defOf(PROJECTS, id);
   if (!def) return {};
+  if (E.projectPaused(def, projectsOf(r).projects[id], worldOf(r, now))) return {};
   const result = E.handOver(def, projectsOf(r), id, bagOf(r), worldOf(r, now));
   if (!Object.keys(result.moved).length) return {};
   store(r, result.state);
@@ -205,6 +209,7 @@ export function handOverAt(r: RegistryLike, now: Now, id: string): Record<string
 export function askForMaterial(r: RegistryLike, now: Now, id: string, resident: string, regard: number): { verdict: E.MaterialVerdict; item: string | null; count: number; line: string } {
   const def = E.defOf(PROJECTS, id);
   if (!def) return { verdict: 'none', item: null, count: 0, line: '' };
+  if (E.projectPaused(def, projectsOf(r).projects[id], worldOf(r, now))) return { verdict: 'none', item: null, count: 0, line: 'The Wharf Projects are paused.' };
   const result = E.askMaterial(def, projectsOf(r), id, resident, regard, worldOf(r, now));
   if (result.verdict !== 'given' || !result.item) return { verdict: result.verdict, item: result.item, count: 0, line: result.line ?? '' };
   let state = result.state;
@@ -229,7 +234,7 @@ export type WorkOutcome = { ok: true; vh: number; minutes: number; regard: strin
 export function workAt(r: RegistryLike, now: Now, id: string, present: readonly string[] = []): WorkOutcome {
   const def = E.defOf(PROJECTS, id);
   if (!def) return { ok: false, reason: 'opened' };
-  const result = E.work(def, projectsOf(r), id, economyOf(r), { day: now.day, minute: now.minute, tinkerer: isTinkerer(r) });
+  const result = E.work(def, projectsOf(r), id, economyOf(r), { day: now.day, minute: now.minute, tinkerer: isTinkerer(r), wharfPaused: worldOf(r, now).wharfPaused });
   if (!result.ok) return result;
   let state = result.state;
   r.set(ECONOMY_KEY, result.economy);
@@ -250,6 +255,7 @@ export function workAt(r: RegistryLike, now: Now, id: string, present: readonly 
 export function askForHelp(r: RegistryLike, now: Now, id: string, resident: string, regard: number): { verdict: E.VolunteerVerdict; line: string } {
   const def = E.defOf(PROJECTS, id);
   if (!def) return { verdict: 'not_needed', line: '' };
+  if (E.projectPaused(def, projectsOf(r).projects[id], worldOf(r, now))) return { verdict: 'not_needed', line: 'The Wharf Projects are paused.' };
   const card = CARDS.get(resident);
   const result = E.askVolunteer(def, projectsOf(r), id, { resident, regard, ...(card ? { values: card.values, animal: card.kind === 'animal' } : {}) }, { day: now.day, organizer: isOrganizer(r) });
   if (result.state !== projectsOf(r)) store(r, result.state);
@@ -293,7 +299,7 @@ export interface Opening {
  */
 export function openProject(r: RegistryLike, now: Now, id: string, present: readonly string[]): Opening {
   const def = E.defOf(PROJECTS, id), town = townOf(r), p = projectsOf(r).projects[id];
-  if (!def || !town || !p || p.opened !== null) return { opened: false, pillars: {}, flags: [] };
+  if (!def || !town || !p || E.projectPaused(def, p, worldOf(r, now)) || p.opened !== null) return { opened: false, pillars: {}, flags: [] };
   const site = siteFor(def, p);
   let state = projectsOf(r);
   // A pre-G-03 save whose puzzle runtime already gave this Project's Pillars keeps them, once.
@@ -325,21 +331,24 @@ export function recordSale(r: RegistryLike, item: string): void {
 
 // ── Shifts for the residents' plans ─────────────────────────────────────────
 
-let shiftMemo: { state: E.ProjectsState; day: number; shifts: Shift[]; key: string } | null = null;
+let shiftMemo: { state: E.ProjectsState; day: number; paused: boolean; shifts: Shift[]; key: string } | null = null;
 
 /** The day's site shifts as plan blocks (sim/volunteers.ts), memoised on the state object and the day. */
 export function shiftsFor(r: RegistryLike, day: number): { shifts: Shift[]; key: string } {
   const state = projectsOf(r);
-  if (shiftMemo && shiftMemo.state === state && shiftMemo.day === day) return shiftMemo;
+  const paused = !!townOf(r) && wharfClosed(townOf(r)!);
+  if (shiftMemo && shiftMemo.state === state && shiftMemo.day === day && shiftMemo.paused === paused) return shiftMemo;
   const shifts: Shift[] = [];
   for (const s of E.siteShifts(PROJECTS, state, day, PROJECT_CONTENT.shift)) {
-    const def = E.defOf(PROJECTS, s.project), site = def && siteFor(def, state.projects[s.project]);
+    const def = E.defOf(PROJECTS, s.project);
+    if (def && E.projectPaused(def, state.projects[s.project], worldOf(r, { day, minute: 360 }))) continue;
+    const site = def && siteFor(def, state.projects[s.project]);
     if (!def || !site) continue;
     const name = projectName(def, state.projects[s.project]);
     const note = s.action === 'attend' ? `The opening of ${name}` : s.action === 'work' ? `Minding the work on ${name}` : `Lending a hand with ${name}`;
     shifts.push({ resident: s.resident, action: s.action, place: site.work.place, ...(roomOf(interiors, site.work.place) ? {} : { area: site.work.area }), startMin: s.startMin, endMin: s.endMin, note });
   }
-  shiftMemo = { state, day, shifts, key: shiftsKey(shifts) };
+  shiftMemo = { state, day, paused, shifts, key: shiftsKey(shifts) };
   return shiftMemo;
 }
 

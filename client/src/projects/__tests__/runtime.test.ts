@@ -68,3 +68,37 @@ it('room openings put every attendee, including the lead, inside the ceremony ro
     }
   }
 });
+
+it('pauses Wharf Projects and targeted Wharf homes through save/restore, then resumes on the Charter', async () => {
+  const { emptyProjects, SavedProjects, emptyEconomy } = await import('@monde/shared');
+  const { setTownFlag } = await import('../../town/pillars');
+  const { runDawnsThrough, serialize, restore } = await import('../../town/townEngine');
+  const E = await import('../engine');
+  const { worldOf, projectsDawn, openProject } = await import('../runtime');
+  const r = registry();
+  const now = { day: 16, minute: 600 };
+  const town = runDawnsThrough({ ...createTownState(), census: 199 }, 16).state;
+  r.set('monde.town', restore(serialize(town)));
+  const unlocked = E.unlockDue(PROJECTS, emptyProjects(), worldOf(r, now)).state;
+  const p = unlocked.projects.lighthouse!;
+  expect(p).toBeDefined();
+  r.set('monde.projects', SavedProjects.parse({ ...unlocked,
+    projects: { ...unlocked.projects, lighthouse: { ...p, funded: 15, vh: 0, ceremony: { day: 16, minute: 600 } } },
+    volunteers: [{ project: 'lighthouse', resident: 'nell', day: 15, source: 'scene', credited: false }],
+  }));
+  r.set('monde.economy', { ...emptyEconomy(), day: 16, stamina: 100 });
+  expect(workAt(r, now, 'lighthouse')).toEqual({ ok: false, reason: 'paused' });
+  expect(shiftsFor(r, 16).shifts).toEqual([]);
+  expect(openProject(r, now, 'lighthouse', []).opened).toBe(false);
+  projectsDawn(r, now);
+  expect(projectsOf(r).projects.lighthouse!.vh).toBe(0);
+  expect(projectsOf(r).projects.lighthouse!.opened).toBeNull();
+  const home = E.startHomes(PROJECTS.find(d => d.id === 'homes')!, emptyProjects(), 'wharf.vacant_house_50', worldOf(r, now))!;
+  const homeDef = PROJECTS.find(d => d.id === 'homes')!;
+  expect(E.projectPaused(homeDef, home.projects['homes:wharf.vacant_house_50'], worldOf(r, now))).toBe(true);
+  expect(E.signOff(homeDef, home, 'homes:wharf.vacant_house_50', town, now).ok).toBe(false);
+  r.set('monde.town', setTownFlag(town, 'charter_found'));
+  expect(workAt(r, now, 'lighthouse')).toMatchObject({ ok: true, vh: 1 });
+  expect(shiftsFor(r, 16).shifts.length).toBeGreaterThan(0);
+  expect(E.signOff(homeDef, home, 'homes:wharf.vacant_house_50', setTownFlag(town, 'charter_found'), now).ok).toBe(true);
+});

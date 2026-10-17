@@ -11,6 +11,7 @@
 // The numbers are §6.3's: the Fund cost, the materials, VH (the player's 1 per 10 Stamina, residents' 2 per day
 // assigned), and the completion Pillars through the town engine's `project` source. §11.1's perks: Tinkerer VH
 // count 1.5×, Organizer volunteers say yes at 10 less Regard; §11.2 Handiwork 5 cuts a home's materials by 20%.
+import { wharfClosed } from '../town/optionClause';
 import type { Economy, Pillar, SavedProjects } from '@monde/shared';
 import { PASS_OUT } from '../sim/clock';
 import { postToFund } from '../town/fund';
@@ -25,6 +26,7 @@ export const STAGES: readonly Stage[] = ['locked', 'open', 'funded', 'gathering'
 
 /** What the engine reads of the world: the time, the story's and town's flags, the puzzles, the player's perks. */
 export interface ProjectWorld {
+  wharfPaused?: boolean;
   day: number;
   minute: number;
   flags: ReadonlySet<string>;
@@ -32,6 +34,10 @@ export interface ProjectWorld {
   /** §11.2 Handiwork 5: homes take 20% fewer materials (economy skillPerks homeMaterialMultiplier). */
   homeMaterialMultiplier?: number;
 }
+
+/** Homes use their actual target district, not the generic homes definition's district. */
+export const projectPaused = (def: ProjectDef, p: Progress | undefined, world: { wharfPaused?: boolean }): boolean =>
+  !!world.wharfPaused && (p?.target ? p.target.startsWith('wharf.') : def.zone === 'wharf');
 
 // ── Numbers ─────────────────────────────────────────────────────────────────
 
@@ -95,6 +101,7 @@ export const materialsShort = (def: ProjectDef, p: Progress, world: Pick<Project
 export function stageOf(def: ProjectDef, p: Progress | undefined, world: ProjectWorld): Stage {
   if (!p) return 'locked';
   if (p.opened !== null) return 'opened';
+  if (projectPaused(def, p, world)) return 'locked';
   if (p.funded === null) return 'open';
   const matShort = materialsShort(def, p, world).length > 0, vhShort = p.vh < def.vh;
   if (matShort || vhShort) {
@@ -168,7 +175,7 @@ export function projectCue(defs: readonly ProjectDef[], state: ProjectsState, to
   let s = state, t = town, unlocked = false, funded = false;
   let p = s.projects[id];
   if (!p) { p = autoFund(def, fresh(def, world.day), world.day); unlocked = true; }
-  if (p.funded === null && def.signoff.by === 'scene' && def.opens.cue === sceneId && t.fund >= def.fund) {
+  if (!projectPaused(def, p, { wharfPaused: wharfClosed(town) }) && p.funded === null && def.signoff.by === 'scene' && def.opens.cue === sceneId && t.fund >= def.fund) {
     p = { ...p, funded: world.day, signed_by: 'scene' };
     t = postToFund(t, -def.fund);
     funded = true;
@@ -194,7 +201,7 @@ export type SignResult =
 /** §6.3 step 2: Pell signs, and the Fund pays the Project's cost. GDD-GAP: she won't sign a chit the Fund can't cover. */
 export function signOff(def: ProjectDef, state: ProjectsState, id: string, town: TownState, world: Pick<ProjectWorld, 'day'>): SignResult {
   const p = state.projects[id];
-  if (!p || p.funded !== null || p.opened !== null) return { ok: false, reason: 'not_open', short: 0 };
+  if (projectPaused(def, p, { wharfPaused: wharfClosed(town) }) || !p || p.funded !== null || p.opened !== null) return { ok: false, reason: 'not_open', short: 0 };
   if (town.fund < def.fund) return { ok: false, reason: 'short', short: def.fund - town.fund };
   return { ok: true, state: put(state, id, { ...p, funded: world.day, signed_by: 'pell' }), town: postToFund(town, -def.fund) };
 }
@@ -270,7 +277,7 @@ export function askMaterial(def: ProjectDef, state: ProjectsState, id: string, r
   return { verdict: 'given', item: donor.item, count: Math.min(short, donor.count), line: donor.line, state: put(state, id, { ...p, material_donors: [...p.material_donors, resident] }) };
 }
 
-export type WorkRefusal = 'not_funded' | 'hours_in' | 'tired' | 'too_late' | 'opened';
+export type WorkRefusal = 'not_funded' | 'hours_in' | 'tired' | 'too_late' | 'opened' | 'paused';
 
 /** The VH one shift of the player's adds (§6.3, §11.1 Tinkerer), before the cap at what's still needed. */
 export const playerShiftVh = (tinkerer: boolean): number => (tinkerer ? TINKERER_VH : 1);
@@ -279,9 +286,10 @@ export const playerShiftVh = (tinkerer: boolean): number => (tinkerer ? TINKERER
  * §6.3 step 4, the player's share: 10 Stamina and an hour of work for 1 VH (1.5 for a Tinkerer), capped at the hours
  * still needed. `economy.day` must be today's (the Stamina is today's).
  */
-export function work(def: ProjectDef, state: ProjectsState, id: string, economy: Economy, opts: { day: number; minute: number; tinkerer: boolean }):
+export function work(def: ProjectDef, state: ProjectsState, id: string, economy: Economy, opts: { day: number; minute: number; tinkerer: boolean; wharfPaused?: boolean }):
   { ok: true; state: ProjectsState; economy: Economy; vh: number; minutes: number } | { ok: false; reason: WorkRefusal } {
   const p = state.projects[id];
+  if (projectPaused(def, p, opts)) return { ok: false, reason: 'paused' };
   if (!p || p.opened !== null) return { ok: false, reason: 'opened' };
   if (p.funded === null) return { ok: false, reason: 'not_funded' };
   if (p.vh >= def.vh) return { ok: false, reason: 'hours_in' };
@@ -399,7 +407,7 @@ export interface Completion {
  */
 export function completeProject(def: ProjectDef, state: ProjectsState, id: string, town: TownState, opts: { day: number; place: string; attendees: readonly string[] }): Completion {
   const p = state.projects[id];
-  if (!p || p.opened !== null) return { state, town, flags: [], pillars: {} };
+  if (projectPaused(def, p, { wharfPaused: wharfClosed(town) }) || !p || p.opened !== null) return { state, town, flags: [], pillars: {} };
   let t = town;
   const pillars: Partial<Record<Pillar, number>> = {};
   if (!state.applied.includes(id)) {
@@ -453,7 +461,7 @@ export function dawn(defs: readonly ProjectDef[], state: ProjectsState, world: P
     if (v.credited || v.day >= world.day) continue;
     v.credited = true;
     const def = defOf(defs, v.project), p = s.projects[v.project];
-    if (!def || !working(p) || p.vh >= def.vh) continue;
+    if (!def || projectPaused(def, p, world) || !working(p) || p.vh >= def.vh) continue;
     const vh = Math.min(VOLUNTEER_VH_PER_DAY, def.vh - p.vh);
     s = put(s, v.project, { ...p, vh: round(p.vh + vh), volunteer_vh: round(p.volunteer_vh + vh) });
     credited[v.project] = round((credited[v.project] ?? 0) + vh);
@@ -465,7 +473,7 @@ export function dawn(defs: readonly ProjectDef[], state: ProjectsState, world: P
   // 3. Standing volunteers, today, while their Project still needs hands.
   for (const st of s.standing) {
     const def = defOf(defs, st.project), p = s.projects[st.project];
-    if (!def || st.from > world.day || !working(p) || pledgedVh(s, st.project) >= def.vh) continue;
+    if (!def || projectPaused(def, p, world) || st.from > world.day || !working(p) || pledgedVh(s, st.project) >= def.vh) continue;
     if (s.volunteers.some(v => v.resident === st.resident && v.day === world.day)) continue;
     s = { ...s, volunteers: [...s.volunteers, { project: st.project, resident: st.resident, day: world.day, source: 'scene', credited: false }] };
   }
@@ -568,6 +576,7 @@ const plural = (n: number, one: string): string => (n === 1 ? one : one.endsWith
 
 /** The one next thing to do, in the Ledger's words. */
 export function nextStep(def: ProjectDef, p: Progress | undefined, world: ProjectWorld, ctx: StepContext): string {
+  if (projectPaused(def, p, world) && p?.opened === null) return 'Paused: Port Vane survey site. The Charter can reopen the Wharf.';
   const stage = stageOf(def, p, world);
   const lead = ctx.residentName(def.leads[0]!);
   const site = ctx.placeName(def.site.place === 'house' && p?.target ? p.target : def.site.place);
@@ -614,7 +623,7 @@ export function nextStep(def: ProjectDef, p: Progress | undefined, world: Projec
 
 /** A Project waiting on volunteers: for the Dawn Report's notices ("Project calls for volunteers", §6.6). */
 export function volunteerCalls(defs: readonly ProjectDef[], state: ProjectsState, world: ProjectWorld): { id: string; def: ProjectDef; left: number }[] {
-  return begun(defs, state).filter(b => working(b.progress) && b.progress.vh < b.def.vh && stageOf(b.def, b.progress, world) !== 'ready')
+  return begun(defs, state).filter(b => !projectPaused(b.def, b.progress, world) && working(b.progress) && b.progress.vh < b.def.vh && stageOf(b.def, b.progress, world) !== 'ready')
     .map(b => ({ id: b.id, def: b.def, left: Math.max(0, round(b.def.vh - pledgedVh(state, b.id))) }))
     .filter(c => c.left > 0);
 }

@@ -20,7 +20,7 @@ import { fundDay, type FundDay, type UpkeepItem } from './fund';
 import { decideArrivals, nightlyStay, type ArrivalDecision, type ResidentStay } from './migration';
 import { optionClauseDawn, optionGauge, type OptionGauge } from './optionClause';
 import {
-  HISTORY_DAYS, LOG_DAYS, PILLARS, calendarWeek, mapPillars, roundPillar, zeroPillars,
+  applyPillarDeltas, HISTORY_DAYS, LOG_DAYS, PILLARS, calendarWeek, mapPillars, roundPillar, zeroPillars,
   type Pillar, type TownState
 } from './pillars';
 
@@ -110,6 +110,10 @@ export const runDawn = (prev: TownState, ctx: DawnContext): DawnResult => {
   // 4. The Option Clause, on the census at dawn.
   const option = optionClauseDawn(state.optionClause, state.census, day, state.flags);
   state = { ...state, optionClause: option.state };
+  if (option.triggered) {
+    state = applyPillarDeltas(state, { prosperity: -8, spirit: -4 }, 'event', 'Option Clause: Port Vane survey site');
+    state = { ...state, flags: { ...state.flags, option_known: true } };
+  }
 
   // 5. Yesterday's books.
   const books = fundDay(yesterday, state.homes.occupied, state.flags, ctx.extraUpkeep);

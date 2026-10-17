@@ -64,6 +64,9 @@ export const SavedBond = z.object({
 export type SavedBond = z.infer<typeof SavedBond>;
 
 export const SavedFriendship = z.object({
+  /** Directed resident-to-resident Regard, distinct from Regard toward the player. */
+  resident_regard: z.record(z.string(), z.record(z.string(), n.min(-100).max(100))).optional(),
+  option_regard_applied: z.boolean().optional(),
   favor_book: z.array(Favor).default([]),
   papers: z.array(Press).default([]),
   news_log: z.array(PressEventData).default([]),

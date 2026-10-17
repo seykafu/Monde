@@ -316,12 +316,18 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
     y += 76;
     g.fillStyle(INK, 0.25).fillRect(RX, y - 12, RW, 1);
     this.header(RX, y, 'Known ties');
+    const pellRegard = state.resident_regard?.[id]?.pell;
+    if (pellRegard !== undefined) {
+      this.text(RX + 30, y + 26, `Toward Pell: ${regardTier(pellRegard)} · the Wharf sale`, 17);
+      y += 30;
+    }
     const ties = knownTiesOf(state, id, tieMap(this.registry));
     if (!ties.length) {
+      if (pellRegard !== undefined) return;
       this.text(RX, y + 22, 'None you know of yet. Watch who they spend time with.', 16, { italic: true, color: MUTED, wrap: RW });
       return;
     }
-    const max = 7;
+    const max = pellRegard === undefined ? 7 : 6;
     ties.slice(0, max).forEach((t, i) => {
       const ry = y + 26 + i * 30;
       const emote = pairEmote(t);

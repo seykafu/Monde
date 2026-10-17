@@ -445,7 +445,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
     const result = workAt(registry, now(), id, co);
     if (!result.ok) {
       const why: Record<E.WorkRefusal, string> = {
-        not_funded: 'Nothing starts until Pell signs.', hours_in: 'The hours are all in.', tired: 'A meal or a fresh morning would help.',
+        paused: 'The Wharf Projects are paused: Port Vane survey site.', not_funded: 'Nothing starts until Pell signs.', hours_in: 'The hours are all in.', tired: 'A meal or a fresh morning would help.',
         too_late: "Too late for an hour's work tonight.", opened: 'It is already open.'
       };
       opts.toast(why[result.reason]);

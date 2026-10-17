@@ -217,8 +217,14 @@ export const applyPillarDeltas = (state: TownState, deltas: Partial<Pillars>, so
   PILLARS.reduce((s, p) => (deltas[p] ? applyPillarDelta(s, p, deltas[p]!, source, note) : s), state);
 
 /** Set or clear one of the flags the engine reads. */
-export const setTownFlag = (state: TownState, flag: TownFlag, on = true): TownState =>
-  ({ ...state, flags: { ...state.flags, [flag]: on } });
+export const setTownFlag = (state: TownState, flag: TownFlag, on = true): TownState => {
+  let next = { ...state, flags: { ...state.flags, [flag]: on } };
+  if (flag === 'charter_found' && on && state.optionClause.exercised && !state.optionClause.reopened) {
+    next = applyPillarDelta(next, 'spirit', 6, 'event', 'Option Clause: Wharf reopens');
+    next = { ...next, optionClause: { ...next.optionClause, reopened: true } };
+  }
+  return next;
+};
 
 /** The highest Tollmen level in any zone (set by the Tollmen system, G-08). */
 export const setTollmenLevelMax = (state: TownState, level: number): TownState =>

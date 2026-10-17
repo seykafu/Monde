@@ -148,3 +148,15 @@ export function applyDawn(state: FriendshipState, pkg: DawnPackage, opts: { name
   next = learnTies(next, [...printed.map(m => [m.a, m.b] as const), ...romance.map(r => [r.a, r.b] as const)], day, 'read', index);
   return { state: next, lines, printed, romance };
 }
+
+/** §6.5 targets Nell and current fishers' Regard toward Pell, never their Regard toward the Fellow. */
+export function applyOptionRegard(state: FriendshipState, cards: readonly Pick<PersonaCard, 'id' | 'occupation'>[]): FriendshipState {
+  if (state.option_regard_applied) return state;
+  const regard = { ...state.resident_regard };
+  for (const c of cards) {
+    if (c.id !== 'nell' && !/\b(fisher|fisherman|fisherwoman)\b/i.test(c.occupation.replace(/former[^;]*/gi, ''))) continue;
+    // GDD-GAP: §6.5 names the Wary tier, not a score; use its nearest boundary (-1), preserving worse Regard.
+    regard[c.id] = { ...regard[c.id], pell: Math.min(-1, regard[c.id]?.pell ?? 0) };
+  }
+  return { ...state, resident_regard: regard, option_regard_applied: true };
+}
