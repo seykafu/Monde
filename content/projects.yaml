@@ -129,7 +129,7 @@ projects:
     leads: [odile]
     site:
       place: market_row.bakery
-      work: { place: market_row.market_street, area: [24, 10, 6, 2] }
+      work: { place: market_row.bakery, area: [1, 3, 12, 6] }
     complete:
       pillars: { prosperity: 3 }
       flags: [project_bakery_ovens_done]
@@ -159,7 +159,7 @@ projects:
     leads: [augusta]
     site:
       place: old_quarter.town_hall
-      work: { place: old_quarter.town_hall, area: [11, 11, 10, 2] }
+      work: { place: old_quarter.town_hall, area: [1, 3, 9, 7] }
     complete:
       pillars: { safety: 6, charm: 2 }
       # A town flag too: ElderAppeal +3 (§6.2) and 10 coins a day of upkeep (§6.3, town/fund.ts).
@@ -223,7 +223,7 @@ projects:
     leads: [odile, nell]
     site:
       place: market_row.market_hall
-      work: { place: market_row.market_street, area: [30, 10, 8, 2] }
+      work: { place: market_row.market_hall, area: [1, 3, 18, 8] }
     complete:
       pillars: { prosperity: 6, spirit: 3 }
       flags: [project_market_hall_done]

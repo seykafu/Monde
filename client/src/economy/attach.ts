@@ -72,9 +72,24 @@ export function attachEconomy(scene: Phaser.Scene, clock: Clock, toast: (text: s
     if (place === 'old_quarter.lamplighter_cottage') return { label: 'Sleep until morning', run: () => {
       if (clock.paused) return;
       clock.pause('sleep-prompt');
-      const text = scene.add.text(380, 300, 'Turn in for the night?\nEnter: sleep · Esc: stay up', { fontFamily: FAMILY_BODY, fontSize: '26px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 24, y: 20 } });
-      scene.cameras.main.ignore(text);
-      const answer = (e: KeyboardEvent) => { if (e.key !== 'Enter' && e.key !== 'Escape') return; scene.input.keyboard?.off('keydown', answer); text.destroy(); clock.resume('sleep-prompt'); if (e.key === 'Enter') finishDay(); };
+      const style = { fontFamily: FAMILY_BODY, fontSize: '26px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 24, y: 20 } };
+      const text = scene.add.text(380, 300, 'Turn in for the night?', style);
+      let closed = false;
+      const finish = (sleep: boolean) => {
+        if (closed) return;
+        closed = true;
+        scene.input.keyboard?.off('keydown', answer);
+        scene.events.off('shutdown', cleanup);
+        for (const object of [text, yes, no]) object.destroy();
+        clock.resume('sleep-prompt');
+        if (sleep) finishDay();
+      };
+      const cleanup = () => finish(false);
+      const answer = (e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === 'Escape') finish(e.key === 'Enter'); };
+      const yes = scene.add.text(380, 375, 'Enter · Sleep', style).setInteractive({ useHandCursor: true }).on('pointerup', () => finish(true));
+      const no = scene.add.text(640, 375, 'Esc · Stay up', style).setInteractive({ useHandCursor: true }).on('pointerup', () => finish(false));
+      scene.cameras.main.ignore([text, yes, no]);
+      scene.events.once('shutdown', cleanup);
       scene.input.keyboard?.resetKeys(); scene.input.keyboard?.on('keydown', answer);
     } };
     if (place === 'market_row.general_store') return { label: 'Browse meals and gifts', run: () => openBag(scene, clock, { shop: true }) };

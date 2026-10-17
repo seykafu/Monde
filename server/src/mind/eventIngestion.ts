@@ -1,4 +1,4 @@
-import { feasibleFavor } from "./favorFeasibility.js";
+import { feasibleFavor, restoreQuietFavor } from "./favorFeasibility.js";
 import { Favor, canCompleteFavor } from "@monde/shared";
 import { loadItems } from '../content/loadContent.js';
 import { randomUUID } from "node:crypto";
@@ -85,6 +85,7 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
     if (reason) { result.rejected.push({ id: e.id, reason }); continue; }
 
     if (e.kind === 'favor_choice') {
+      await restoreQuietFavor(tx, worldId, e);
       if (e.notice && e.notice.resident === e.resident && e.favor === `last_chance_${e.resident}_${e.notice.deadline}` && e.notice.deadline >= e.day && e.notice.deadline <= e.day + 2) {
         const existing = await tx.select().from(favors).where(eq(favors.worldId,worldId));
         const open = existing.filter(f => ['proposed','accepted'].includes(f.status) && f.expiresDay >= e.day);

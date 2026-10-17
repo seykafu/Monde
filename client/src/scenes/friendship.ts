@@ -1,9 +1,10 @@
+import { optionCalendar } from '../story/optionCalendar';
 import { isMarketDay } from "../town/fund";
 import { isFerryDay } from "../town/migration";
 import { expireFavor } from "@monde/shared";
 import { computeAppeal } from "../town/appeal";
 import { getTown } from "./TownLedgerScene";
-import { leavingFavors, localLastChances } from "../friendship/favors";
+import { leavingFavors, localLastChances, localTemplateFavors } from "../friendship/favors";
 import { adoptDawnArrivals, nightArrivals, paperMovements } from "./migration";
 import { generatedCards } from "../world/roster";
 import { projectPaper } from "../projects/runtime";
@@ -21,7 +22,7 @@ import { fallbackPress, type Press, type PressEvent, type HeadlineTemplate } fro
 //            night is still working), then fold it in: the model plans replace templates (ResidentSim reads them
 //            from here), the ties, milestones, letters and Favors are kept, and this morning's friendship lines go
 //            to `monde.dawnTies` for the Ledger's dawn line and the Dawn Report (M-10);
-//   offline  nothing: templates, and the ties the client last knew (Day 1's from the cards before any).
+//   offline  template routines and Favors, and the ties the client last knew.
 // A game loaded mid-day whose save has no plans for that day asks for the day's package again (no night).
 import type Phaser from 'phaser';
 import type { PlanOutput, RegardSnapshot, TieData, TieMilestoneData, TurnRegard } from '@monde/shared';
@@ -91,7 +92,9 @@ export const seedFor = (id: string): number => seedRegard(getMind().player?.back
  * the event log (M-06), so a story's {regard} shows at once and in Quiet Mode, and never twice once acknowledged.
  */
 export const regardFor = (registry: Registry, id: string): number =>
-  Math.max(-100, Math.min(100, regardOf(getFriendship(registry), id, seedFor(id)) + pendingRegard(getEventLog(registry), id)));
+  Math.max(-100, Math.min(100, regardOf(getFriendship(registry), id, seedFor(id)) + pendingRegard(getEventLog(registry), id)
+    + getEventLog(registry).outbox.reduce((sum, event) => sum + (event.kind === 'favor_done' && event.resident === id
+      ? getFriendship(registry).favor_book.find(f => f.id === event.favor)?.reward.regard ?? 0 : 0), 0)));
 
 /** The server's Regard for the whole town (an events reply, the night's ingestion, the dawn): replace the mirror. */
 export const applyServerRegard = (registry: Registry, regard: RegardSnapshot): FriendshipState =>
@@ -188,6 +191,7 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     const templates = YAML.parse(headlineText) as { headlines: HeadlineTemplate[] };
     // G-03: yesterday's Project opening leads a template edition; today's openings and the calls for hands are notices.
     let edition = projectPaper(registry, day, paper ?? fallbackPress(day,events,templates.headlines,opts.town()?.fund === undefined ? {} : { coins: opts.town()!.fund! }), templates.headlines);
+    edition = optionCalendar(registry, day, edition);
     // G-11: the morning after the Bloom Fair the Lantern prints the Straw Poll (counted now if the player missed the trestle).
     if (day === REPORT_DAY) {
       const finale = ensureStrawPoll(registry, id => regardFor(registry, id), opts.weatherSeed());
@@ -205,7 +209,7 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
   };
   const run = async (day: number, withNight: boolean): Promise<void> => {
     const mind = getMind();
-    if (!mind.enabled) { localLastChances(registry,day); publish(day); return; }
+    if (!mind.enabled) { localLastChances(registry,day); localTemplateFavors(registry,day); publish(day); return; }
     const seq = ++syncSeq;
     // §9.8: the residents' day starts on the night's plans, so time waits for them (a few seconds at most).
     clock.pause('dawn');
@@ -238,7 +242,7 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
       console.warn('[dawn] sync failed; keeping templates', error);
     } finally {
       clearTimeout(safety);
-      if (seq === syncSeq && registry.get(CLOCK_KEY) === clock) publish(day);
+      if (seq === syncSeq && registry.get(CLOCK_KEY) === clock) { if (!getFriendship(registry).papers.some(p => p.day === day)) { localLastChances(registry,day); localTemplateFavors(registry,day); } publish(day); }
       clock.resume('dawn');
     }
   };

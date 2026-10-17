@@ -126,7 +126,7 @@ export class PuzzleScene extends Phaser.Scene {
       this.button(620,605,this.puzzle.id==='PZ-01'?'Open main [C]':this.puzzle.id==='PZ-05'?'Light lamp [C]':'Check [C]',()=>this.check(),185);
     }
     this.button(845,605,this.state.solved?'Lovely. Continue →':'I’ll come back later',()=>this.scene.stop(),290);
-    this.text(104,676,'Tab / arrows: select   ·   Enter / Space: use   ·   Esc: leave with progress saved',14);
+    this.text(104,676,'Tab / arrows: select   ·   Enter / Space: use   ·   Esc: leave with progress saved',14).setColor('#fff0ce');
     this.focus=Math.min(this.focus,this.actions.length-1);this.highlight();
   }
   private board(): void {

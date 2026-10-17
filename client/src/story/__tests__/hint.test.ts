@@ -52,9 +52,9 @@ describe('the Next hint', () => {
     expect(catchableToday(SPRING_SCENES, { ...ctx, asleep: true }, flags(...AFTER_S01A))).toEqual([]);
   });
 
-  it('uses the generic line where the calendar gives no reason (S08 at the Lantern)', () => {
+  it('explains S08 at the Lantern', () => {
     const hint = storyHint(SPRING_SCENES, at({ day: 18, minute: 700, zone: 'old_quarter', place: '' }), flags(...TO_S07), places);
-    expect(hint).toMatchObject({ sceneId: 's08_option', when: '14:00–17:30', reason: 'Someone is expecting you at The Lantern.' });
+    expect(hint).toMatchObject({ sceneId: 's08_option', when: '14:00–17:30', reason: 'Sable has found the Option in the town records.' });
   });
 
   it("puts Bloom Fair's opening before its closing, and needs no route for a summons", () => {
@@ -77,9 +77,9 @@ describe('the closing toast', () => {
     expect(closingToast(null, { day: 1, minute: 675, place: '' }, new Set())).toBeNull();
   });
 
-  it('has a generic line too', () => {
+  it('keeps S08 specific in its closing toast', () => {
     const s08 = storyHint(SPRING_SCENES, at({ day: 18, minute: 1030, zone: 'market_row', place: '' }), flags(...TO_S07), places);
-    expect(closingToast(s08, { day: 18, minute: 1030, place: '' }, new Set())).toBe('Nearly 17:30. The Lantern: someone is still expecting you.');
+    expect(closingToast(s08, { day: 18, minute: 1030, place: '' }, new Set())).toBe('Nearly 17:30. The Lantern: Sable has found the Option in the town records.');
   });
 });
 
@@ -92,3 +92,5 @@ describe('zoneRoute', () => {
     expect(zoneRoute(zones, 'wharf', 'briar_woods')).toBeNull();
   });
 });
+
+it('explains Pell’s S09 invitation', () => { expect(SCENE_REASONS.s09_pell_confession).toBe('Pell is waiting to talk about the Option.'); });

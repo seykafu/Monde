@@ -1,3 +1,4 @@
+import { PROJECT_BEAT } from '../../projects/BeatScene';
 import { Chatter, type ChatterActor } from './chatter';
 import { Greetings } from './greetings';
 import { spotAt } from './chatterRules';
@@ -633,7 +634,7 @@ export class ResidentLayer {
     // The emote bubble sits just over the head; the name tag (when shown) above it.
     // A speech bubble (chatter, greetings) takes the place of the emote and the name tag: it carries the name. Both of a
     // talking pair drop theirs, so the listener's tag doesn't sit under the speaker's bubble.
-    const speaking = this.speaking(a.profile.id) || this.chatter.partner(a.profile.id) !== null;
+    const speaking = this.scene.scene.isActive(PROJECT_BEAT) || this.speaking(a.profile.id) || this.chatter.partner(a.profile.id) !== null;
     const emote = shown && !speaking && (a.talking ? 'talk' : !s.moving ? s.activity : null);
     const key = emote ? ensureEmote(this.scene, emote) : null;
     if (key) {

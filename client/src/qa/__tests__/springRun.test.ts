@@ -2,7 +2,7 @@
 // report on the real game modules in Quiet Mode (qa/springBot.ts), saving at every dawn and reloading the save.
 // Set BOT_OUT=<dir> to write each run's log, issues and report there.
 import { writeFileSync } from 'node:fs';
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 vi.mock('phaser', () => import('./phaserStub'));
 
 // The game's dev logging ([town] dawn, [arrivals]…) would fill the run's output.
@@ -34,10 +34,15 @@ const BEATS = {
 } as const;
 
 describe('the Spring soak bot', () => {
-  it('finds every place the Spring sends the player standable and reachable (one known gap: closed-district homes)', () => {
+  const shares: number[] = [];
+  afterAll(() => {
+    expect(shares).toHaveLength(3);
+    const mean = shares.reduce((sum, value) => sum + value, 0) / shares.length;
+    expect(Math.sqrt(shares.reduce((sum, value) => sum + (value - mean) ** 2, 0) / shares.length)).toBeGreaterThanOrEqual(8);
+  });
+  it('finds every Spring task standable and reachable', () => {
     const audit = auditSpring();
-    // Follow-up (QA report): Favors at the homes of residents who live in Millbrook, Station Hill or off the map.
-    expect(audit.filter(a => !a.includes("live where a Spring player can't go"))).toEqual([]);
+    expect(audit).toEqual([]);
   });
 
   describe.each(['strong', 'lazy', 'social'] as const)('the %s player', script => {
@@ -45,6 +50,9 @@ describe('the Spring soak bot', () => {
     it('plays Days 1–25 to the End-of-Spring report with nothing stuck', async () => {
       res = await playSpring(script, { reloadEveryDawn: script !== 'lazy' });
       write(res);
+      shares.push(100 * res.poll!.shares.fellow);
+      if (script !== 'lazy') expect(res.favors.some(f => f.id.startsWith('quiet_chore_') && f.status === 'completed')).toBe(true);
+      console.log(`${script} poll: ${JSON.stringify(res.report?.poll?.shares)}`);
       expect(res.issues).toEqual([]);
       expect(res.played).toEqual(BEATS[script]);
       for (const flag of ['s10c_done', 'spring_poll_taken', 'option_known', 'pell_confessed', 'bloom_fair_closed']) expect(res.flags, flag).toContain(flag);

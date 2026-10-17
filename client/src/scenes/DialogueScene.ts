@@ -295,7 +295,10 @@ export class DialogueScene extends Phaser.Scene {
 
   constructor() { super(DIALOGUE_SCENE); }
 
+  private usedMarks = new Set<string>();
+
   init(data: DialogueOpen): void {
+    this.usedMarks.clear();
     this.open = data;
     const other = data.chatter ? CARDS.get(data.chatter.secondary) : undefined;
     this.joined = other && data.chatter ? new JoinedChatter(data.chatter, displayName(other.card.name), displayName(CARDS.get(data.residentId)!.card.name), other.card.voice.mode === 'narrated_action') : null;
@@ -761,7 +764,7 @@ export class DialogueScene extends Phaser.Scene {
     const ready = favorBook(this.registry).find(f => f.status === 'accepted' && (f.task.kind === 'introduce' && f.resident_id === this.card.id));
     if (ready) replies.push({ id: `favor_finish:${ready.id}`, text: ready.task.kind === 'delivery' ? 'I have a parcel for you.' : 'Let me introduce you.', intent: 'kind' });
     const selected = marks(this.registry).selected;
-    if (selected && marks(this.registry).entries[selected]?.status === 'found' && ['margo', 'bertrand', 'tib'].includes(this.card.id)) {
+    if (selected && !this.usedMarks.has(selected) && marks(this.registry).entries[selected]?.status === 'found' && ['margo', 'bertrand', 'tib'].includes(this.card.id)) {
       replies.push({ id: 'mark', text: `About ${selected}…`, intent: 'about_riddle' });
     }
     if (this.card.id === 'tib' && SPRING_RIDDLES.some(r => r.chain === 'T' && marks(this.registry).entries[r.id]?.status !== 'solved')) replies.push({ id: 'tib_duel', text: 'A riddle duel?', intent: 'about_riddle' });
@@ -846,6 +849,7 @@ export class DialogueScene extends Phaser.Scene {
       refreshHints(this.registry, this.open.clock);
       const state = marks(this.registry), id = state.selected;
       if (id && state.entries[id]?.status === 'found') {
+        this.usedMarks.add(id);
         requestHint(state, id, { kind: 'resident', id: this.card.id, regard: regardFor(this.registry, this.card.id) });
         this.context = { ...this.context, riddle: { id, hints_allowed: state.entries[id]!.hints } };
       }

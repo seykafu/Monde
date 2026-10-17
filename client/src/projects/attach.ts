@@ -151,7 +151,7 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
   const { zone, clock, residents, projection } = opts;
   const registry = scene.registry;
   // In a room (W-03) the Projects are its district's: E at the site's place inside, the opening in the room. The
-  // chalk planks and the volunteers at work stay on the street, where their work areas are.
+  // work areas for room sites are authored in room coordinates.
   const district = districtOf(zone), indoor = !!zone.interior;
   /** A site as this board has it: indoors its work area is the room's place (where the crowd gathers for an opening). */
   const onBoard = (site: Site): Site => {

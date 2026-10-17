@@ -21,16 +21,23 @@ export type Favor = z.infer<typeof Favor>;
 export interface FavorWorld {
   day: number;
   items: ReadonlySet<string>;
-  residents: ReadonlyMap<string, { home: string; reachable: boolean }>;
+  residents: ReadonlyMap<string, { home: string; workplace?: string; places?: readonly string[]; reachable: boolean }>;
   places: ReadonlySet<string>;
+  reachablePlace: (place: string) => boolean;
   met: (a: string, b: string) => boolean;
   leaving?: ReadonlyMap<string, { deadline: number; factors: Record<'town' | 'friends' | 'purpose' | 'roots', number> }>;
 }
+/** Prefer the home, then a workplace or routine stop that the player can actually reach. */
+export function favorPlace(resident: FavorWorld['residents'] extends ReadonlyMap<string, infer R> ? R : never, world: FavorWorld): string | undefined {
+  return [resident.home, resident.workplace, ...(resident.places ?? [])].find((p): p is string => !!p && world.places.has(p) && world.reachablePlace(p));
+}
+
 /** The model never supplies rewards or task parameters. Unknown targets are rejected, never silently reworded. */
 export function instantiateFavor(request: FavorRequest, id: string, owner: string, world: FavorWorld): Favor | null {
   const resident = world.residents.get(owner);
-  if (!resident?.reachable || !world.places.has(resident.home) || !MVP_FAVOR_TEMPLATES.includes(request.template)) return null;
-  const task: Favor['task'] = { kind: 'handover', place: resident.home, item: null, recipient: owner, minutes: 0, stayFactor: null };
+  const place = resident && favorPlace(resident, world);
+  if (!resident?.reachable || !place || !MVP_FAVOR_TEMPLATES.includes(request.template)) return null;
+  const task: Favor['task'] = { kind: 'handover', place, item: null, recipient: owner, minutes: 0, stayFactor: null };
   let expires = world.day + 5;
   switch (request.template) {
     case 'fetch': case 'find':
@@ -38,24 +45,24 @@ export function instantiateFavor(request: FavorRequest, id: string, owner: strin
       task.kind = request.template === 'find' ? 'find' : 'handover'; task.item = request.target; break;
     case 'deliver': case 'introduce': {
       const target = world.residents.get(request.target);
-      if (request.target === owner || !target?.reachable || !world.places.has(target.home)) return null;
+      if (request.target === owner || !target?.reachable || !favorPlace(target, world)) return null;
       if (request.template === 'introduce' && world.met(owner, request.target)) return null;
       task.kind = request.template === 'deliver' ? 'delivery' : 'introduce';
-      task.recipient = request.target; task.place = target.home;
+      task.recipient = request.target; task.place = favorPlace(target, world)!;
       if (task.kind === 'delivery') { task.item = [...world.items].sort()[0] ?? null; if (!task.item) return null; }
       break;
     }
     case 'help_chore':
-      if (request.target !== owner && request.target !== resident.home) return null;
+      if (request.target !== owner && request.target !== resident.home && request.target !== place) return null;
       task.kind = 'chore'; task.minutes = 30; break;
     case 'last_chance': {
       const notice = world.leaving?.get(owner); if (!notice || notice.deadline < world.day) return null;
       expires = notice.deadline;
       task.stayFactor = (Object.entries(notice.factors).sort((a,b) => a[1] - b[1])[0]![0]) as NonNullable<Favor['task']['stayFactor']>;
-      // GDD-GAP: jobs, roof repairs and roots have no authored Last Chance tasks yet; use a 30-minute home chore.
+      // GDD-GAP: jobs, roof repairs and roots have no authored Last Chance tasks yet; use a 30-minute chore at a reachable place tied to the resident.
       task.kind = 'chore'; task.minutes = 30;
       if (task.stayFactor === 'friends') {
-        const other = [...world.residents].sort(([a],[b]) => a.localeCompare(b)).find(([key, r]) => key !== owner && r.reachable && world.places.has(r.home) && !world.met(owner, key));
+        const other = [...world.residents].sort(([a],[b]) => a.localeCompare(b)).find(([key, r]) => key !== owner && r.reachable && !!favorPlace(r, world) && !world.met(owner, key));
         if (!other) return null; task.kind = 'introduce'; task.recipient = other[0]; task.minutes = 0;
       }
       break;

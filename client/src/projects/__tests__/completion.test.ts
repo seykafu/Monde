@@ -127,7 +127,7 @@ describe('every Spring Project, unlock to opening (MVP G-03)', () => {
     expect(askForHelp(g.r, g.now, 'bakery_ovens', 'odile', 0).verdict).toBe('yes');
     expect(askForHelp(g.r, g.now, 'bakery_ovens', 'june', 25).verdict).toBe('yes');
     expect(shiftsFor(g.r, 5).shifts.map(s => [s.resident, s.action, s.place])).toEqual([
-      ['odile', 'volunteer', 'market_row.market_street'], ['june', 'volunteer', 'market_row.market_street']
+      ['odile', 'volunteer', 'market_row.bakery'], ['june', 'volunteer', 'market_row.bakery']
     ]);
 
     // ── Day 5: S04 "Water Again": {project: fountain}, Pell's chit already signed; Tib signs on. ──

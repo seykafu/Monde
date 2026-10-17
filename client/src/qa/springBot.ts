@@ -1185,8 +1185,8 @@ export class SpringBot {
   }
 
   /**
-   * The Favors a script is asked (Quiet Mode only ever offers Last Chance ones, so these come as the server's would: a
-   * dialogue turn's `favors`, through shared instantiateFavor, into the favor book; DialogueScene.onTurn).
+   * Additional fixture Favors, supplied as a server would: a
+   * dialogue turn's `favors`, through shared instantiateFavor, into the favor book (DialogueScene.onTurn).
    */
   static readonly FAVOR_ASKS: Readonly<Record<Script, readonly { day: number; template: 'help_chore' | 'fetch' | 'find'; resident: string; target: string; text: string }[]>> = {
     strong: [{ day: 9, template: 'help_chore', resident: 'bertrand', target: 'bertrand', text: 'Could you help me with the shutters?' }],
@@ -1201,11 +1201,12 @@ export class SpringBot {
   private offerFavors(): void {
     const r = asRegistry(this.r), day = this.clock.day;
     for (const ask of SpringBot.FAVOR_ASKS[this.script]) {
-      if (ask.day !== day) continue;
-      const id = `bot_${ask.template}_${ask.resident}_${day}`;
+      if (favorBook(r).filter(f => ['proposed', 'accepted'].includes(f.status) && f.expires_day >= day).length >= 6) break;
+      if (day < ask.day || favorBook(r).some(f => f.resident_id === ask.resident && ['proposed', 'accepted'].includes(f.status) && f.expires_day >= day)) continue;
+      const id = `bot_${ask.template}_${ask.resident}_${ask.day}`;
       if (favorBook(r).some(f => f.id === id)) continue;
       const f = instantiateFavor({ template: ask.template, target: ask.target, text: ask.text }, id, ask.resident, {
-        day, items: new Set(items.map(i => i.id)), places: new Set(allCards().map(c => c.home)),
+        day, reachablePlace: place => !!placeArrival(zones, interiors, place), items: new Set(items.map(i => i.id)), places: new Set(allCards().map(c => c.home)),
         residents: new Map(allCards().map(c => [c.id, { home: c.home, reachable: true }])), met: () => false
       });
       if (!f) { this.issue(`a ${ask.template} Favor from ${ask.resident} could not be made`); continue; }
@@ -1333,15 +1334,17 @@ export function auditSpring(): string[] {
   }
   for (const t of COMMUNITY_TASKS) check(`job ${t.id}`, t.place, { keys: true });
   for (const place of Object.keys(PUZZLE_SITES)) check(`puzzle ${PUZZLE_SITES[place]!.id}`, place, { keys: true });
-  // A help_chore or find Favor (and a Last Chance chore) is done at the resident's home (shared favorEngine.ts).
-  const away: string[] = [];
-  for (const c of personaCards) {
-    if (!c.home || c.kind === 'animal') continue;
-    const zone = c.home.split('.')[0]!;
-    if (!zones[zone]) { away.push(`${c.id} (${c.home})`); continue; }
-    check(`${c.id}'s home (a help_chore Favor's place)`, standingPlace(interiors, c.home), { keys: true });
+  const favorWorld = {
+    day: 2, items: new Set(items.map(i => i.id)),
+    places: new Set(personaCards.flatMap(c => [c.home, c.workplace, ...c.routine.weekday.map(b => b.where), ...c.routine.weekend.map(b => b.where)])),
+    residents: new Map(personaCards.map(c => [c.id, { home: c.home, workplace: c.workplace, places: [...c.routine.weekday, ...c.routine.weekend].map(b => b.where), reachable: true }])),
+    reachablePlace: (place: string) => !!placeArrival(zones, interiors, place), met: () => false,
+  };
+  for (const c of personaCards.filter(c => c.kind !== 'animal')) {
+    const f = instantiateFavor({ template: 'help_chore', target: c.id, text: 'Help?' }, `audit_${c.id}`, c.id, favorWorld);
+    if (!f) { out.push(`${c.id} has no reachable Favor location`); continue; }
+    check(`${c.id}'s Favor`, standingPlace(interiors, f.task.place), { keys: true });
   }
-  if (away.length) out.push(`${away.length} carded residents live where a Spring player can't go, so a help_chore/find/Last Chance Favor from them can't be done: ${away.join(', ')}`);
   for (const m of Object.values(boards).flatMap(b => b.marks)) {
     const to = { board: m.zone, tile: m.stand };
     if (bot.walkMinutes(home, to) === null) out.push(`Mark ${m.id}: its plaque on ${m.zone} can't be walked to`);

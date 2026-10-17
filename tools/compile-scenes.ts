@@ -57,7 +57,8 @@ const out = {
   diagnostics: { errors, warnings },
   scenes: Object.fromEntries(scenes.map((s): [string, CompiledScene] => [s.id, s])),
 };
-fs.writeFileSync(outFile, stringify(out) + "\n");
+const output = stringify(out) + "\n";
+if (!fs.existsSync(outFile) || fs.readFileSync(outFile, "utf8") !== output) fs.writeFileSync(outFile, output);
 
 console.log(
   `scenes: ${scenes.length} compiled from ${files.length} files · ${totalLines} lines, ${totalChoices} choices · ` +

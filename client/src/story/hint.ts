@@ -35,6 +35,8 @@ export const SCENE_REASONS: Readonly<Record<string, string>> = {
   s06_good_coat: 'A man in a good coat is coming to the square.', // D10: "Vane's first on-screen visit."
   s07a_chime_runs: 'Bertrand is at the clocktower.', // D14 A: "the clock runs for good."
   s07b_chime_loan: 'Bertrand is at the clocktower.', // D14 B: "Bertrand lends the tower one borrowed chime."
+  s08_option: 'Sable has found the Option in the town records.',
+  s09_pell_confession: 'Pell is waiting to talk about the Option.',
   s10a_bloom_open: 'The Bloom Fair is opening.', // D25: Bloom Fair.
   s10b_bloom_close: 'The Bloom Fair is closing.'
 };

@@ -12,11 +12,11 @@ function panel(id:string) {
   const data=new Map<string,unknown>(), events=new EventEmitter(), keyboard=new EventEmitter();
   const registry={get:(k:string)=>data.get(k),set:(k:string,v:unknown)=>data.set(k,v),remove:(k:string)=>data.delete(k)};
   registry.set('monde.town',createTownState());
-  const nodes: {text:string;x:number;y:number;width:number;height:number}[]=[];
+  const nodes: {text:string;x:number;y:number;width:number;height:number;color?:string}[]=[];
   // A fluent display stub keeps lifecycle tests independent of DOM/canvas and the other agent's zones.
   const display=(x=0,y=0,text='')=>{
     const e=new EventEmitter();
-    const raw={x,y,text,width:text.length*8,height:24,on:e.on.bind(e),emit:e.emit.bind(e)};
+    const raw={x,y,text,width:text.length*8,height:24,color:'',setColor:(color:string)=>{raw.color=color;return obj;},on:e.on.bind(e),emit:e.emit.bind(e)};
     nodes.push(raw);
     const obj: object=new Proxy(raw,{get:(target,key)=> key in target ? Reflect.get(target,key) : (..._args:unknown[])=>obj});
     return obj;
@@ -48,3 +48,5 @@ it('a real solved board returns true; a wrong answer cannot choose success',()=>
   h.press('ArrowRight');h.press('Enter');h.press('c');h.press('Escape');
   expect(h.done).toHaveBeenCalledWith(true);expect(puzzleSave(h.registry).entries['PZ-06']?.solved).toBe(true);
 });
+
+it('prints the control footer in cream against the dark surround', () => { expect(panel('PZ-01').nodes.find(n => n.text.startsWith('Tab / arrows'))?.color).toBe('#fff0ce'); });

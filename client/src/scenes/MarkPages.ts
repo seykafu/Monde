@@ -57,7 +57,7 @@ export class MarkPages {
     if (this.feedback.startsWith('✦')) this.scene.tweens.add({ targets: stamp, alpha: 0.3, duration: 240, yoyo: true, repeat: 1 });
     this.text(674, 85, `${r.id} · ${r.district.replaceAll('_', ' ')}`, 24);
     this.text(674, 128, r.inscription + (r.chain === 'T' ? '' : '\n— A.M.  ✦'), 17);
-    this.text(674, 305, r.hints.slice(0, e.hints).filter(Boolean).map((h,i) => `${i+1}. ${h}`).join('\n') || 'A nudge will appear one game hour after finding this Mark.', 14);
+    this.text(674, 305, r.hints.slice(0, e.hints).filter(Boolean).map((h,i) => `${i+1}. ${h}`).join('\n') || (e.status === 'solved' ? '' : 'A nudge will appear one game hour after finding this Mark.'), 14);
     if (e.status !== 'solved') {
       this.button(132, 630, e.hints === 2 ? 'Use a Notebook page' : 'Ponder at home · 10 Stamina', () => { this.feedback = (e.hints === 2 ? notebookHint(this.scene.registry, r.id) : homeHint(this.scene.registry, r.id)) ? 'A little clearer now.' : 'This hint is not available yet.'; this.redraw(); });
     }

@@ -1,3 +1,4 @@
+import { roomOf } from '../world/interiors';
 // The Projects in the running game (GDD §6.3, MVP G-03): the engine's state in the registry (`monde.projects`, saved as
 // SaveGame.projects) and every action with its side effects on the rest of the game: the Town Fund and the Pillars
 // (`monde.town`), the Bag, coins and Stamina (economy), skills (fellow), the story's flags (so the board swaps art and
@@ -17,7 +18,7 @@ import { isFerryDay } from '../town/migration';
 import type { TownState } from '../town/pillars';
 import { placeName } from '../world/player';
 import { personaCards } from '../world/residents';
-import { zones } from '../world/zones';
+import { zones, interiors } from '../world/zones';
 import { shiftsKey, type Shift } from '../sim/volunteers';
 import { PROJECTS, PROJECT_CONTENT } from './catalog';
 import * as E from './engine';
@@ -336,7 +337,7 @@ export function shiftsFor(r: RegistryLike, day: number): { shifts: Shift[]; key:
     if (!def || !site) continue;
     const name = projectName(def, state.projects[s.project]);
     const note = s.action === 'attend' ? `The opening of ${name}` : s.action === 'work' ? `Minding the work on ${name}` : `Lending a hand with ${name}`;
-    shifts.push({ resident: s.resident, action: s.action, place: site.work.place, area: site.work.area, startMin: s.startMin, endMin: s.endMin, note });
+    shifts.push({ resident: s.resident, action: s.action, place: site.work.place, ...(roomOf(interiors, site.work.place) ? {} : { area: site.work.area }), startMin: s.startMin, endMin: s.endMin, note });
   }
   shiftMemo = { state, day, shifts, key: shiftsKey(shifts) };
   return shiftMemo;

@@ -13,7 +13,7 @@ const importance = z.number().int().min(1).max(10);
 /** GDD-GAP: transport bounds aren't specified; 500 events / 1000 flags bound each request. */
 export const CLIENT_EVENT_BATCH_LIMIT = 500;
 export const ClientEvent = z.discriminatedUnion("kind", [
-  z.object({ ...stamp, kind: z.literal("favor_choice"), resident: key, favor: key, accept: z.boolean(), notice: LeavingFavorNotice.optional() }),
+  z.object({ ...stamp, kind: z.literal("favor_choice"), resident: key, favor: key, accept: z.boolean(), offered_day: z.number().int().positive().optional(), notice: LeavingFavorNotice.optional() }),
   z.object({ ...stamp, kind: z.literal("favor_done"), resident: key, favor: key, proof: FavorProof }),
   z.object({
     ...stamp, kind: z.literal("town_event"),

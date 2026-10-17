@@ -42,6 +42,7 @@ export function bandOf(flags: ReadonlySet<string>, spirit: number): FairBand {
   return fairBand(spirit);
 }
 
+// GDD-GAP: §10.3 records approximate five-style soak results, but gives no per-script share cap or Vane minimum. Keep the authored scoring; audit the actual bot distributions and H5 spread.
 /** The §10.3 count and the fair's jars for this world. */
 export function springPoll(w: SpringWorld): StrawPollRecord {
   const people = springElectorate({
