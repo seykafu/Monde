@@ -5,6 +5,7 @@
  *   npx tsx tools/eval-dialogue.ts --label=after --local --out-dir=<dir>       an in-process server on PGlite
  *   npx tsx tools/eval-dialogue.ts --render=<dir>/dialogue_eval_<label>.json [--scores=<scores.json>]
  *
+ * --repeat=N plays each scenario N times (default 1), with independent worlds and @1…@N ids.
  * Each scenario gets its own world, signs the Fellowship form (Wren, she/her, tinkerer), prewarms the resident the
  * way walking up to them does, then plays a scripted conversation through POST /talk, reading the SSE stream as the
  * client does. Per turn it records: fallback, the server's failure code (error event), salvage, the inferred
@@ -42,19 +43,22 @@ const label = args.get("label") ?? "run";
 const outDir = resolve(args.get("out-dir") ?? join(tmpdir(), "monde-eval"));
 const only = args.get("only")?.split(",").map((s) => s.trim()).filter(Boolean) ?? null;
 const judgeMode = (args.get("judge") ?? "auto") as "auto" | "sonnet" | "none";
+const repeat = Number(args.get("repeat") ?? "1");
+if (!Number.isSafeInteger(repeat) || repeat < 1) throw new Error("--repeat must be a positive safe integer");
 const prewarm = args.get("no-prewarm") !== "true";
 const JUDGE_MODEL = "claude-sonnet-5-5";
 
 // ── Scenarios ────────────────────────────────────────────────────────────────
 
-type Step =
+type Step = (
   | { open: true }
   | { say: string; riddle?: { id: string; hints_allowed: number } }
   /** Pick one of the resident's own offered replies (not the goodbye): 0 = the first, 1 = the second… */
   | { choose: number }
   | { choice: { id: string; text: string; intent: string }; riddle?: { id: string; hints_allowed: number } }
   /** Leave (POST /talk/close) and come back after `minutes` game minutes with a new conversation. */
-  | { leave: number };
+  | { leave: number }
+) & { remembers?: true };
 
 interface Scenario {
   id: string;
@@ -110,6 +114,34 @@ const SCENARIOS: Scenario[] = [
       { open: true }, { say: "Did I tell you what I was hoping to fix?" }] },
   { id: "pell_why", resident: "pell", place: "old_quarter.mayor_office", tests: "a one-word follow-up",
     steps: [{ open: true }, { say: "Do you like being mayor?" }, { say: "Why?" }] },
+  { id: "margo_detail_two_back", resident: "margo", place: "old_quarter.library", tests: "resident's own detail two turns back",
+    steps: [{ open: true }, { say: "Tell me about one unusual book you keep here." },
+      { say: "Is it usually quiet here in the mornings?" },
+      { say: "That book you mentioned earlier—what made it unusual again?", remembers: true }] },
+  { id: "odile_personal_three_back", resident: "odile", place: "market_row.bakery", tests: "personal fact three turns back",
+    steps: [{ open: true }, { say: "My sister can't stand cinnamon. I'm picking up a treat for her later." },
+      { say: "When do you start baking each morning?" }, { say: "Do you enjoy the early starts?" },
+      { say: "What should I bring her that she'd actually enjoy?", remembers: true }] },
+  { id: "hollis_correction", resident: "hollis", place: "station_hill.platform", tests: "repeat-back trigger, correction, then recall; judge correction even if repeat-back was accurate",
+    steps: [{ open: true }, { say: "I repair pocket watches, not station clocks." },
+      { say: "So what was it I repair—station clocks? Say it back to me.", remembers: true },
+      { say: "No, I said pocket watches. The little ones you carry.", remembers: true },
+      { say: "What sort of repair job should you send my way, then?", remembers: true }] },
+  { id: "june_choice_why", resident: "june", place: "market_row.cafe_liss", tests: "follow-up after choosing an offered reply",
+    steps: [{ open: true }, { choose: 0 }, { say: "Why did you say that?", remembers: true }] },
+  { id: "odile_name_pronoun", resident: "odile", place: "market_row.bakery", tests: "name in turn 1, pronoun in turn 3",
+    steps: [{ open: true }, { say: "I'm taking Margo a little thank-you gift." },
+      { say: "It smells lovely in here this morning." }, { say: "What do you think she'd like?", remembers: true }] },
+  { id: "teo_other_one", resident: "teo", place: "commons.glasshouse", tests: "recall the second of two listed things",
+    steps: [{ open: true }, { say: "Name two plants here that a beginner could grow." },
+      { say: "How would I look after the first one?", remembers: true },
+      { say: "And the other one?", remembers: true }] },
+  { id: "odile_short_resume", resident: "odile", place: "market_row.bakery", tests: "resume within five game minutes",
+    steps: [{ open: true }, { say: "I'd like to learn to bake. What should I try first?" }, { leave: 2 },
+      { open: true }, { say: "Where were we?", remembers: true }] },
+  { id: "teo_promise_callback", resident: "teo", place: "commons.glasshouse", tests: "Fellow's promise across conversations",
+    steps: [{ open: true }, { say: "I promise I'll bring you my spare watering can this afternoon." }, { leave: 40 },
+      { open: true }, { say: "I've come to keep my promise. Do you remember what I was bringing?", remembers: true }] },
 ];
 
 // ── Records ──────────────────────────────────────────────────────────────────
@@ -117,6 +149,8 @@ const SCENARIOS: Scenario[] = [
 interface TurnRecord {
   step: number;
   conversation: number;
+  returnedAfterMinutes?: number;
+  remembers?: true;
   /** What the Fellow did: "(walks up)", their words, or the reply they picked. */
   player: string;
   inputKind: string;
@@ -150,6 +184,7 @@ interface RunRecord {
   liveModel: boolean;
   version: { version?: string; prompt_version?: string } | null;
   startedAt: string;
+  repeat?: number;
   scenarios: ScenarioRecord[];
   judge: string;
 }
@@ -310,6 +345,7 @@ async function runScenario(target: Target, scenario: Scenario): Promise<Scenario
   const day = 2;
   let minute = 9 * 60 + 30;
   let conversation = 0;
+  let returnedAfterMinutes: number | undefined;
   let conversationId = randomUUID();
   let last: TurnRecord | null = null;
   const leakAnswers = (scenario.noLeak ?? []).flatMap((id) => SPRING_RIDDLES.find((r) => r.id === id)?.accepted ?? []);
@@ -317,6 +353,7 @@ async function runScenario(target: Target, scenario: Scenario): Promise<Scenario
     if ("leave" in step) {
       await fetch(`${target.base}/v1/worlds/${worldId}/talk/close`, { method: "POST", headers, body: JSON.stringify({ resident_id: scenario.resident, conversation_id: conversationId, day, minute }) });
       minute += step.leave;
+      returnedAfterMinutes = step.leave + 1; // The next open advances the clock by one more minute.
       conversation += 1;
       conversationId = randomUUID();
       continue;
@@ -358,7 +395,7 @@ async function runScenario(target: Target, scenario: Scenario): Promise<Scenario
     const shown = [...turn.lines, ...turn.choices.map((c) => c.text)];
     const leak = leakAnswers.length && shown.some((text) => containsAnswer(text, leakAnswers)) ? "LEAK" : null;
     const { conversationId: _id, ...result } = turn;
-    last = { step: index, conversation, player, inputKind: String(input.kind), leak, ...result,
+    last = { step: index, conversation, returnedAfterMinutes, remembers: step.remembers, player, inputKind: String(input.kind), leak, ...result,
       ...(target.takeRequests ? { prompt: promptOf(target.takeRequests()) } : {}) };
     record.turns.push(last);
     const flags = [last.fallback ? `fallback(${last.error?.code ?? "?"})` : "live", last.salvaged ? "salvaged" : "", last.leak ?? ""].filter(Boolean).join(" ");
@@ -387,7 +424,7 @@ export const JUDGE_RUBRIC = `You are grading NPC dialogue in Monde, a cozy seasi
 
 Score every graded turn:
 - responds (1-5): does the reply respond directly to what the Fellow just said? 5: answers the question asked, or reacts to the news, feeling, joke or insult, or follows on from the reply the Fellow picked, before adding anything of its own. 4: responds, but thinly or only after a detour. 3: partly or only implicitly. 2: mostly about something else. 1: ignores the line (a greeting mid-conversation, an unrelated remark, a non-sequitur). A deliberate in-character refusal (keeping a secret, not giving a riddle answer) counts as responding when it clearly addresses the question.
-- remembers (1-5 or null): only when the Fellow's line refers back to something said earlier (in this conversation or an earlier one shown to you), or earlier context plainly matters to the answer. 5: uses it correctly. 3: vague. 1: ignores it, forgets it or gets it wrong. null when nothing earlier is relevant to this turn.
+- remembers (1-5 or null): only when the Fellow's line refers back to something said earlier (in this conversation or an earlier one shown to you), or earlier context plainly matters to the answer. 5: uses it correctly. 3: vague. 1: ignores it, forgets it or gets it wrong. null when nothing earlier is relevant to this turn. Steps explicitly marked "score remembers" require a numeric score, including when the resident failed to supply the requested setup detail.
 - in_character (1-5): sounds like this resident and fits the world: in-world (no modern technology, no talk of AI, games or assistants), cozy, E10+, short spoken lines, never a customer-service voice. 1: breaks the world or reads like a generic assistant.
 - note: one short sentence giving the main reason for the lowest score.
 
@@ -405,11 +442,11 @@ function transcriptFor(record: ScenarioRecord): { text: string; graded: number[]
   for (const turn of record.turns) {
     if (turn.conversation !== conversation) {
       conversation = turn.conversation;
-      out.push(conversation === 0 ? "## Conversation" : "## A later conversation (the Fellow left and came back 40 minutes later)");
+      out.push(conversation === 0 ? "## Conversation" : `## A later conversation (the Fellow left and came back ${turn.returnedAfterMinutes ?? 40} minutes later)`);
     }
     const grade = turn.inputKind !== "open";
     if (grade) graded.push(turn.step);
-    out.push(`[step ${turn.step}${grade ? ", GRADE THIS TURN" : ""}]`);
+    out.push(`[step ${turn.step}${grade ? ", GRADE THIS TURN" : ""}${turn.remembers ? "; score remembers (1-5, not null)" : ""}]`);
     out.push(`Fellow: ${turn.player}${turn.inputKind === "choice" ? " (picked from the offered replies)" : ""}`);
     for (const line of turn.lines) out.push(`${p.name.split(" ")[0]}: ${line}`);
     out.push(`(offered replies: ${turn.choices.map((c) => `"${c.text}"`).join(" | ")}${turn.wrapUp ? "; the resident wrapped up" : ""})`);
@@ -504,7 +541,7 @@ function render(run: RunRecord, scores: Scores | null): string {
   out.push(`- Target: ${run.target}${run.local ? " (in-process server, PGlite)" : ""}; server ${run.version?.version ?? "?"}, prompt ${run.version?.prompt_version ?? "?"}`);
   out.push(`- Model: ${run.liveModel ? "live (claude-haiku-5-5)" : "**none**: no Anthropic credentials, so every turn is the authored fallback (this run measures the fallback path and the prompt layout only)"}`);
   out.push(`- Judge: ${run.judge}`);
-  out.push(`- Run: ${run.startedAt}; ${run.scenarios.length} scenarios, ${turns.length} turns (${answers.length} answer a player line)`, "");
+  out.push(`- Run: ${run.startedAt}; ${run.scenarios.length} scenario entries (${run.repeat ?? 1} repeat(s) each), ${turns.length} turns (${answers.length} answer a player line)`, "");
 
   out.push("## Summary", "", "| Metric | Value |", "|---|---|");
   out.push(`| Fallback turns | ${turns.filter(({ t }) => t.fallback).length}/${turns.length} (${pct(turns.filter(({ t }) => t.fallback).length, turns.length)}) |`);
@@ -583,14 +620,23 @@ async function main(): Promise<void> {
   const target: Target = local ? await localTarget()
     : { base: (args.get("base") ?? STAGING).replace(/\/+$/, ""), inviteCode: inviteCode(), liveModel: true, close: async () => undefined };
   const version = await fetch(`${target.base}/v1/version`).then((r) => r.json() as Promise<RunRecord["version"]>).catch(() => null);
-  const run: RunRecord = { label, target: local ? "local" : target.base, local, liveModel: target.liveModel, version, startedAt: new Date().toISOString(), scenarios: [], judge: "not run" };
+  const run: RunRecord = { label, target: local ? "local" : target.base, local, liveModel: target.liveModel, version, repeat, startedAt: new Date().toISOString(), scenarios: [], judge: "not run" };
   try {
-    for (const scenario of SCENARIOS) {
-      if (only && !only.includes(scenario.id)) continue;
-      console.log(scenario.id);
-      try { run.scenarios.push(await runScenario(target, scenario)); }
-      catch (error) { run.scenarios.push({ id: scenario.id, resident: scenario.resident, place: scenario.place, tests: scenario.tests, turns: [], error: String(error) }); }
-    }
+    const scenarios = SCENARIOS.filter((s) => !only || only.includes(s.id)).flatMap((s) =>
+      Array.from({ length: repeat }, (_, i) => ({ ...s, id: repeat === 1 ? s.id : `${s.id}@${i + 1}` })));
+    // Local prompt capture is a shared buffer: serialize it to keep per-turn attribution correct.
+    // Remote runs keep at most three conversations active on the single Fly machine.
+    const concurrency = local ? 1 : 3;
+    let next = 0;
+    await Promise.all(Array.from({ length: concurrency }, async () => {
+      while (next < scenarios.length) {
+        const index = next++;
+        const scenario = scenarios[index]!;
+        console.log(scenario.id);
+        try { run.scenarios[index] = await runScenario(target, scenario); }
+        catch (error) { run.scenarios[index] = { id: scenario.id, resident: scenario.resident, place: scenario.place, tests: scenario.tests, turns: [], error: String(error) }; }
+      }
+    }));
   } finally {
     await target.close();
   }
