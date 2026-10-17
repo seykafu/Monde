@@ -1,3 +1,4 @@
+import { safePlayerText } from "./safetyText.js";
 /**
  * Context assembly for a dialogue turn (GDD §9.10.1, §9.6; MVP M-05). Loads what the prompt builder needs from
  * the world's rows: the card, state and relationships (blocks 2-3), retrieved memories, topic cards, open favors,
@@ -172,7 +173,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
   }));
 
   const conversation: ConversationTurn[] = turns.flatMap((t) => [
-    ...(t.playerInput ? [{ speaker: "player" as const, text: t.playerInput }] : []),
+    ...(safePlayerText(t) ? [{ speaker: "player" as const, text: safePlayerText(t)! }] : []),
     ...t.output.lines.map((line) => ({ speaker: "resident" as const, text: line.text })),
   ]);
 

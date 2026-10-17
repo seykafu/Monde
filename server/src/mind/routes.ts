@@ -1,3 +1,5 @@
+import { budgetMind, BudgetError } from "./budget.js";
+import { localPrecheck, precheck, safetyLine } from "./safety.js";
 import { favors } from "../db/schema.js";
 import { Favor } from "@monde/shared";
 import { loadItems } from '../content/loadContent.js';
@@ -236,24 +238,58 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         const promptUser = `${selected.resumed ? `<resumed after_minutes="${selected.afterMinutes}"/>\n` : ''}<player_said> ${speech(playerText ?? WALK_UP)} </player_said>`;
         let output: DialogueTurnOutput;
         let failure: TurnFailure | null = null;
+        let inputApproved = body.input.kind !== 'say';
+        // §9.13: free text is pre-checked before the resident's reply reaches the player. The check runs beside the
+        // dialogue call, and the reply's lines are held until it clears, so a fine line costs no extra wait; a line
+        // that fails it never reaches the player, and the reply is dropped (not recorded) for the in-world one.
+        const generation = new AbortController();
+        const stopGeneration = () => generation.abort();
+        clientGone.signal.addEventListener('abort', stopGeneration, { once: true });
+        const gate = body.input.kind === 'say'
+          ? precheck(db!, mind, worldId, body.resident_id, body.input.text).catch((error: unknown) => {
+            request.log.warn({ err: error }, 'precheck failed; the local rules stand');
+            return 'fine' as const;
+          })
+          : Promise.resolve('fine' as const);
+        let cleared = body.input.kind !== 'say';
+        const held: Parameters<NonNullable<Parameters<typeof generateTurn>[0]['onLineDelta']>>[0][] = [];
+        void gate.then((verdict) => {
+          if (verdict !== 'fine') { generation.abort(); return; }
+          cleared = true;
+          for (const delta of held.splice(0)) send("line_delta", delta);
+        });
         try {
-          const result = await generateTurn({
-            mind,
+          const generating = body.input.kind === 'say' && localPrecheck(body.input.text) !== 'fine' ? null : generateTurn({
+            mind: budgetMind(db!, mind, worldId, body.resident_id, 'dialogue'),
             request: built,
             notes: forced ? [WRAP_UP_NOTE] : [],
             validation: ctx.validation,
             timings: options.timings,
-            signal: clientGone.signal,
-            onLineDelta: (delta) => send("line_delta", delta),
+            signal: generation.signal,
+            onLineDelta: (delta) => { if (cleared) send("line_delta", delta); else held.push(delta); },
             onThinking: () => send("thinking", { text: THINKING_BEAT }),
           });
-          calls = result.calls;
-          rawOutput = result.rawOutput;
-          failure = result.failure;
-          salvaged = result.salvaged;
-          output = result.output ? applyLimit(result.output) : fallbackFor(ctx);
-          if (result.salvaged) request.log.warn({ calls: calls.map((c) => [c.stopReason, c.validation, c.tokens.output]) }, "dialogue reply cut short; whole lines salvaged");
-          if (result.adjustments.length) request.log.info({ adjustments: result.adjustments }, "dialogue output adjusted");
+          const safety = await gate;
+          inputApproved = safety === 'fine';
+          if (safety !== 'fine' || !generating) {
+            await generating?.catch(() => undefined);
+            failure = { code: safety === 'budget' ? 'budget' : 'safety', message: 'The resident answers with a written line.' };
+            output = fallbackFor(ctx);
+            if (safety !== 'budget') {
+              output.lines = [{ text: safetyLine(safety, body.input.kind === 'say' ? body.input.text : ''), expr: 'worried' }];
+              // GDD-GAP: §9.13 calls for a small rude-input Regard cost; use -1.
+              output.effects.regard_delta = safety === 'rude' || safety === 'abusive' ? -1 : 0;
+            }
+          } else {
+            const result = await generating;
+            calls = result.calls;
+            rawOutput = result.rawOutput;
+            failure = result.failure;
+            salvaged = result.salvaged;
+            output = result.output ? applyLimit(result.output) : fallbackFor(ctx);
+            if (result.salvaged) request.log.warn({ calls: calls.map((c) => [c.stopReason, c.validation, c.tokens.output]) }, "dialogue reply cut short; whole lines salvaged");
+            if (result.adjustments.length) request.log.info({ adjustments: result.adjustments }, "dialogue output adjusted");
+          }
         } catch (error) {
           request.log.error({ err: error }, "dialogue generation crashed");
           failure = { code: "api_error", message: "The turn failed; using an authored line." };
@@ -267,7 +303,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           regard = await persistTurn(db!, {
             worldId, residentId: body.resident_id, conversationId: body.conversation_id, turnIndex: ctx.turnIndex,
             day: body.context.day, minute: body.context.minute, place: body.context.place, playerInput: playerText,
-            output, rawOutput, promptUser, gift: body.input.kind === 'gift' || body.input.kind === 'meal', heartLevel: body.context.heart_level, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
+            output, rawOutput, safetyRegard: failure?.code === 'safety' ? output.effects.regard_delta : undefined, promptUser: !inputApproved ? '<player_said> [The resident redirected the conversation.] </player_said>' : promptUser, gift: body.input.kind === 'gift' || body.input.kind === 'meal', heartLevel: body.context.heart_level, fallback, calls, promptVersion: promptVersion(), recordTurn: !clientGone.signal.aborted,
           });
         } catch (error) {
           request.log.error({ err: error, calls }, "persisting the dialogue turn failed");
@@ -321,7 +357,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     const params = prewarmParams(prefix, day, await historyFor(db!, worldId, residentId));
     const started = performance.now();
     try {
-      const message = await mind.createMessage(params, { signal: AbortSignal.timeout(options.prewarmTimeoutMs ?? 5000) });
+      const message = await budgetMind(db!, mind, worldId, residentId, 'prewarm').createMessage(params, { signal: AbortSignal.timeout(options.prewarmTimeoutMs ?? 5000) });
       const tokens = tokensOf(message.usage);
       try {
         await db!.insert(aiLog).values(aiLogRow({
@@ -338,7 +374,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     } catch (error) {
       // The API may reject max_tokens: 0 (or anything else): log it and move on. The real turn will just be cold.
       request.log.warn({ err: error, residentId }, "prewarm failed");
-      return { warmed: false, reason: "error" };
+      return { warmed: false, reason: error instanceof BudgetError ? "budget" : "error" };
     }
   });
 }

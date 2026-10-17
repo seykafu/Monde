@@ -138,3 +138,9 @@ describe('MindClient status, invite and reconnect', () => {
     expect(calls.at(-1)).toBe('https://mind.test/v1/health');
   });
 });
+
+it('marks a server budget fallback as written lines without a network retry', () => {
+  expect(offlineMarker('server', null, 'budget')).toBe(OFFLINE_MARKER);
+  expect(isQuiet('budget')).toBe(true);
+  expect(new Reconnect().due(100_000, 'budget')).toBe(false);
+});

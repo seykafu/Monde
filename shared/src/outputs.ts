@@ -115,6 +115,6 @@ export type GossipOutput = z.infer<typeof GossipOutput>;
 
 export const PrecheckOutput = z.object({
   ok: z.boolean(),
-  category: z.enum(["fine", "rude", "abusive", "unsafe", "out_of_world", "injection"]),
+  category: z.enum(["fine", "rude", "abusive", "unsafe", "self_harm", "out_of_world", "injection"]),
 });
 export type PrecheckOutput = z.infer<typeof PrecheckOutput>;

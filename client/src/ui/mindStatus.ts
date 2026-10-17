@@ -7,7 +7,7 @@ import { getMind } from '../mind/api';
 import { Reconnect, statusDetail, statusLabel, type MindStatus } from '../mind/connection';
 
 const COLOURS: Readonly<Record<MindStatus, number>> = {
-  online: 0x7fd18b, connecting: 0xe4c77f, unreachable: 0xa7a08c, no_invite: 0xa7a08c, offline: 0xa7a08c
+  budget: 0xa7a08c, online: 0x7fd18b, connecting: 0xe4c77f, unreachable: 0xa7a08c, no_invite: 0xa7a08c, offline: 0xa7a08c
 };
 
 export class MindStatusDot {

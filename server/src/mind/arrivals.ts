@@ -1,3 +1,4 @@
+import { budgetMind } from "./budget.js";
 /**
  * Arrivals and departures on the server (GDD §6.4, Appendix A.3; MVP G-02).
  *
@@ -162,7 +163,7 @@ export async function writeHousehold(deps: ArrivalDeps, worldId: string, draw: H
     const whim = `${draw.id}:${attempt}:${hashParts(deps.seed, draw.id, attempt).toString(36)}`;
     const ctx = await promptContext(deps.db, worldId, request, whim, home);
     if (errors.length) ctx.validatorErrors = errors;
-    const call = await callModel(deps.mind, arrivalRequest(draw, ctx), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
+    const call = await callModel(budgetMind(deps.db, deps.mind, worldId, null, "arrival", request.day), arrivalRequest(draw, ctx), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
     let verdict: ReturnType<typeof validateHousehold> | null = null;
     if (call.ok) {
       let raw: unknown = null;

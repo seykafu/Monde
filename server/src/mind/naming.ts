@@ -205,6 +205,19 @@ function misgenderPatterns(fellow: FellowView): RegExp[] {
   return list;
 }
 
+/**
+ * Odile's word for the young, in the Fellow's gender: "petite" for she/her, "petit" otherwise (the unmarked form,
+ * addressFor). Only where it addresses the Fellow (after a comma or opening a sentence, before punctuation), so it's
+ * a certain fix rather than a retry: the model reaches for the sample's "petit" again on a regenerate.
+ */
+export function agreeAddress(text: string, fellow: FellowView): string {
+  const wanted = genderOf(fellow.pronouns) === "she" ? "petite" : "petit";
+  return text.replace(/(?<=(?:^|,|[.!?…)]\s)\s*)(petite?)(?=\s*(?:[.!?…,;]|$))/giu, (word: string) => {
+    if (word.toLowerCase() === wanted) return word;
+    return word[0] === "P" ? wanted[0]!.toUpperCase() + wanted.slice(1) : wanted;
+  });
+}
+
 /** The first wrong-gendered reference to the Fellow in a line, as it appeared ("a man", "lad"), or null. */
 export function misgenderHit(text: string, fellow: FellowView): string | null {
   const folded = text.replace(/[’‘]/g, "'");

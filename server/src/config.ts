@@ -1,6 +1,10 @@
 import { z } from "zod";
 
 const schema = z.object({
+  ADMIN_TOKEN: z.string().min(1).optional(),
+  WORLD_DAILY_BUDGET_USD: z.coerce.number().positive().default(0.06), // GDD §9.15
+  // GDD-GAP: global UTC-day hard cap default; operator can change it.
+  GLOBAL_DAILY_BUDGET_USD: z.coerce.number().nonnegative().default(10),
   PORT: z.coerce.number().int().min(1).max(65535).default(8080),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: z.url().optional(),

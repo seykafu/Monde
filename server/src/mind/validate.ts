@@ -48,7 +48,7 @@ import {
 import { containsAnswer } from "./promptBuilder.js";
 import { checkedExpression } from "./expressions.js";
 import { currencyHit, lexicalHits, type FilterGroup } from "./filters.js";
-import { misgenderHit, pronounRule, type FellowView } from "./naming.js";
+import { agreeAddress, misgenderHit, pronounRule, type FellowView } from "./naming.js";
 import type { RiddleRecord } from "./riddles.js";
 import { borrowedHits, stripTics, type Signature } from "./voice.js";
 
@@ -372,8 +372,10 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
   }
   const adjustments: string[] = [];
   let lines = parsed.data.lines.map((l) => ({ ...l, text: l.text.trim() })).filter((l) => l.text !== "").map((l) => {
-    const text = parenthesizeStageBusiness(l.text);
-    if (text !== l.text) adjustments.push("asterisk stage business→parentheses");
+    const staged = parenthesizeStageBusiness(l.text);
+    if (staged !== l.text) adjustments.push("asterisk stage business→parentheses");
+    const text = ctx.fellow ? agreeAddress(staged, ctx.fellow) : staged;
+    if (text !== staged) adjustments.push(`address agreed with ${ctx.fellow!.pronouns}`);
     return { ...l, text };
   });
   if (lines.length === 0) return fail("schema", "no lines");

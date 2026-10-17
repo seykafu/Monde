@@ -12,7 +12,7 @@
  *   no_invite    no invite code, or the server refused the one given
  *   offline      the player chose Offline (`?offline`, `--offline`)
  */
-export type MindStatus = 'online' | 'connecting' | 'unreachable' | 'no_invite' | 'offline';
+export type MindStatus = 'budget' | 'online' | 'connecting' | 'unreachable' | 'no_invite' | 'offline';
 
 export interface MindSnapshot {
   offline: boolean;
@@ -31,7 +31,7 @@ export function mindStatus(s: MindSnapshot): MindStatus {
 }
 
 /** Residents are speaking written lines (Quiet Mode) in this state. */
-export const isQuiet = (status: MindStatus): boolean => status === 'unreachable' || status === 'no_invite' || status === 'offline';
+export const isQuiet = (status: MindStatus): boolean => status === 'budget' || status === 'unreachable' || status === 'no_invite' || status === 'offline';
 
 /** The HUD's word beside the dot: nothing while online (the green dot says it). */
 export function statusLabel(status: MindStatus): string {
@@ -45,6 +45,7 @@ export function statusLabel(status: MindStatus): string {
 /** A sentence for Settings and the dot's hover: what's going on and what to do. */
 export function statusDetail(status: MindStatus): string {
   switch (status) {
+    case 'budget': return 'Quiet Mode: residents are speaking written lines for today.';
     case 'online': return 'Online: residents are speaking for themselves.';
     case 'connecting': return 'Joining the town…';
     case 'unreachable': return "Offline: can't reach the town's mind, so residents speak written lines. Retrying.";
@@ -63,7 +64,7 @@ export const OFFLINE_MARKER = 'offline · written lines';
  */
 export function offlineMarker(source: 'server' | 'quiet', reason?: string | null, serverError?: string | null): string | null {
   if (source === 'quiet' && reason) return OFFLINE_MARKER;
-  if (source === 'server' && serverError === 'unavailable') return OFFLINE_MARKER;
+  if (source === 'server' && (serverError === 'unavailable' || serverError === 'budget')) return OFFLINE_MARKER;
   return null;
 }
 

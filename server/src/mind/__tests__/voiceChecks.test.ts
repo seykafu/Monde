@@ -157,9 +157,10 @@ describe("the Fellow's pronouns", () => {
 
   it("regenerate once with a note naming the right words, and the slip never streams", async () => {
     const ctx = vctx("odile");
-    const wrong = turn(["(Slides a heel across.) I'd not say no to a handy lad. Eat something, petit."]);
+    // "petit" itself is agreed, not retried (agreeAddress); "lad" has no certain fix.
+    const wrong = turn(["(Slides a heel across.) I'd not say no to a handy lad. Eat something, lad."]);
     const right = turn(["(Slides a heel across.) Clocks, is it. Eat something, petite."]);
-    expect(validateTurn(JSON.stringify(wrong), ctx)).toMatchObject({ ok: false, category: "misgender", detail: '"petit" (she/her)' });
+    expect(validateTurn(JSON.stringify(wrong), ctx)).toMatchObject({ ok: false, category: "misgender", detail: '"lad" (she/her)' });
     const mind = new FakeMind([{ output: wrong, chunk: 6 }, { output: right }]);
     const streamed: string[] = [];
     const request = { system: [], messages: [{ role: "user" as const, content: "<player_said> Hi. </player_said>" }], output_config: { format: modelOutputFormat(DialogueTurnOutput) } };
@@ -167,10 +168,10 @@ describe("the Fellow's pronouns", () => {
     expect(result.output!.lines[0]!.text).toBe(right.lines[0]!.text);
     expect(result.calls.map((c) => c.validation)).toEqual(["misgender", "ok"]);
     const note = (mind.streams[1]!.messages.at(-1)!.content as { text: string }[]).at(-1)!.text;
-    expect(note).toBe(softNote([{ category: "misgender", detail: '"petit" (she/her)' }]));
+    expect(note).toBe(softNote([{ category: "misgender", detail: '"lad" (she/her)' }]));
     expect(note).toContain(pronounRule("she/her"));
     expect(note).toMatch(/Reply again: answer what the Fellow just said first, as before, and change only that\.$/);
-    expect(streamed.some((t) => /\bpetit\b/.test(t))).toBe(false);
+    expect(streamed.some((t) => /something, lad\b/.test(t))).toBe(false);
   });
 });
 
@@ -180,8 +181,8 @@ describe("the Fellow's pronouns", () => {
 
 describe("soft slips: one note for all of them, and the attempt that slipped less", () => {
   const request = { system: [], messages: [{ role: "user" as const, content: "<player_said> (walks up to you) </player_said>" }], output_config: { format: modelOutputFormat(DialogueTurnOutput) } };
-  // The eval's opener: "petit" for Wren (she/her) and a whole sample sentence, in one line.
-  const both = turn(["Eat something, petit, you look like a coat on a hook."]);
+  // The eval's opener: a wrong word for Wren (she/her) and a whole sample sentence, in one line.
+  const both = turn(["Eat something, lad, you look like a coat on a hook."]);
   const sampleOnly = turn(["Eat something, you look like a coat on a hook."]);
   const clean = turn(["(Dusts flour off her hands.) You're early. The first tray's still on the rack."]);
 
@@ -195,7 +196,7 @@ describe("soft slips: one note for all of them, and the attempt that slipped les
     expect(out.output!.lines[0]!.text).toBe(clean.lines[0]!.text);
     const note = (mind.streams[1]!.messages.at(-1)!.content as { text: string }[]).at(-1)!.text;
     expect(note).toBe(softNote(result.soft.slips));
-    expect(note).toContain('"petit" gets the Fellow wrong.');
+    expect(note).toContain('"lad" gets the Fellow wrong.');
     expect(note).toContain("comes from your card's samples");
     expect(note).toMatch(/and change only those words\.$/);
   });
@@ -638,5 +639,17 @@ describe("riddle hints, asked again", () => {
   it("has a trail lead-in for every resident who speaks", () => {
     for (const c of speaking()) expect(library().leads[c.id]?.trail?.length ?? 0, c.id).toBeGreaterThan(0);
     expect(library().leads.default!.trail!.length).toBeGreaterThan(0);
+  });
+});
+
+describe('Odile\'s petit / petite', () => {
+  it('agrees with the Fellow\'s pronouns where it addresses her, and leaves other uses alone', async () => {
+    const { agreeAddress } = await import('../naming.js');
+    const she = { name: 'Wren', pronouns: 'she/her' }, he = { name: 'Wren', pronouns: 'he/him' }, they = { name: 'Wren', pronouns: 'they/them' };
+    expect(agreeAddress("Rye's two coins, petit, and the crumb holds.", she)).toBe("Rye's two coins, petite, and the crumb holds.");
+    expect(agreeAddress('Petit, sit down. Eat something, petit.', she)).toBe('Petite, sit down. Eat something, petite.');
+    expect(agreeAddress('Mind the step, petite.', he)).toBe('Mind the step, petit.');
+    expect(agreeAddress('Mind the step, petite.', they)).toBe('Mind the step, petit.');
+    expect(agreeAddress('A petit four for the fair.', she)).toBe('A petit four for the fair.');
   });
 });

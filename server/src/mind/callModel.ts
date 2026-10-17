@@ -1,3 +1,4 @@
+import { BudgetError } from "./budget.js";
 /**
  * One non-streaming structured-output call for the night jobs (plans and reflections, GDD §9.7, §9.17), with a
  * deadline and the stop_reason check AGENTS.md requires before any content is read. The caller validates the text
@@ -11,7 +12,7 @@ import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
 import { AbortedError } from "./semaphore.js";
 
-export type CallFailure = "unavailable" | "timeout" | "aborted" | "api_error" | "refusal" | "max_tokens" | `stop:${string}`;
+export type CallFailure = "budget" | "unavailable" | "timeout" | "aborted" | "api_error" | "refusal" | "max_tokens" | `stop:${string}`;
 
 export type ModelCall =
   | { ok: true; text: string; call: CallRecord }
@@ -60,6 +61,7 @@ export async function callModel(mind: MindClient, params: Anthropic.MessageCreat
     return { ok: true, text: textOf(message), call: record(tokens, stopReason, "ok") };
   } catch (error) {
     const original = error instanceof MindStreamError ? error.original : error;
+    if (original instanceof BudgetError) return { ok: false, failure: "budget", call: null };
     if (!sent) return { ok: false, failure: "aborted", call: null, error: original };
     const failure: CallFailure = (timeout as AbortSignal | null)?.aborted ? "timeout"
       : options.signal?.aborted || original instanceof AbortedError ? "aborted"

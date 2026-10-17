@@ -64,6 +64,13 @@
       "when": 1792201030586,
       "tag": "0008_q06_telemetry",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792202646443,
+      "tag": "0009_m12_m13_budget_safety",
+      "breakpoints": true
     }
   ]
 }

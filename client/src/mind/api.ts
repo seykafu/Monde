@@ -184,7 +184,9 @@ export class MindClient {
   get playerSynced(): boolean { return this.profileSynced; }
 
   /** Where things stand with the server, for the HUD dot and Settings (mind/connection.ts). */
+  private budgetQuiet = false;
   get status(): MindStatus {
+    if (this.budgetQuiet) return 'budget';
     return mindStatus({
       offline: !!this.opts.offline, hasSession: this.session !== null, hasInvite: this.inviteCode !== null,
       inviteRejected: this.inviteRejected, coolingOff: this.now() < this.offlineUntil
@@ -325,6 +327,7 @@ export class MindClient {
     try {
       const res = await this.authed('/prewarm', { method: 'POST', body: JSON.stringify(day ? { resident_id: residentId, day } : { resident_id: residentId }) }, REQUEST_TIMEOUT_MS);
       if (res && !res.ok) this.log('warn', `prewarm ${residentId}: HTTP ${res.status}`);
+      if (res?.ok) { const data = await res.json() as { reason?: string }; if (data.reason === 'budget') this.budgetQuiet = true; }
       else if (res) await res.body?.cancel().catch(() => undefined);
     } catch (error) {
       this.log('info', `prewarm ${residentId} failed`, error);
@@ -440,12 +443,13 @@ export class MindClient {
         if (!e) { this.log('warn', `talk: ignored event ${event.event}`, event.data); return; }
         if (e.type === 'line_delta') h.onLineDelta?.(e.data);
         else if (e.type === 'thinking') h.onThinking?.(e.data.text);
-        else if (e.type === 'error') { this.log('info', `talk: server fell back (${e.data.code})`, e.data.message); h.onError?.(e.data); }
+        else if (e.type === 'error') { if (e.data.code === 'budget') this.budgetQuiet = true; this.log('info', `talk: server fell back (${e.data.code})`, e.data.message); h.onError?.(e.data); }
         else turn = e.data;
       });
       if (!turn) return quiet('stream ended without a turn');
       // Back in touch: send an application that couldn't go earlier.
       if (!this.profileSynced) void this.syncPlayer();
+      if (!turn.fallback) this.budgetQuiet = false;
       return { turn, source: 'server' };
     } catch (error) {
       if (h.signal?.aborted) return null;
@@ -456,6 +460,13 @@ export class MindClient {
       clearTimeout(total);
       h.signal?.removeEventListener('abort', onAbort);
     }
+  }
+
+  async reportTurn(conversationId: string, turnIndex: number, reason = 'Report line'): Promise<boolean> {
+    try {
+      const response = await this.authed('/reports', { method: 'POST', body: JSON.stringify({ conversation_id: conversationId, turn_index: turnIndex, reason }) }, REQUEST_TIMEOUT_MS);
+      return response?.ok ?? false;
+    } catch { return false; }
   }
 
   // ── Internals ─────────────────────────────────────────────────────────────

@@ -234,3 +234,16 @@ export const surveyAnswers = pgTable('survey_answers', {
   survey: text('survey').notNull(), question: text('question').notNull(), resident: text('resident'),
   value: jsonb('value').$type<string | number>().notNull(), createdAt: createdAt(),
 });
+
+/** Admission reservations are durable across processes and become actual costs on completion. */
+export const budgetCalls = pgTable('budget_calls', {
+  id: uuid('id').primaryKey(), worldId: worldId(), day: integer('day').notNull(),
+  kind: text('kind').notNull(), costUsd: numeric('cost_usd').notNull(),
+  pending: boolean('pending').notNull().default(true), createdAt: createdAt(),
+}, t => [index('budget_calls_day_idx').on(t.createdAt), index('budget_calls_world_idx').on(t.worldId, t.day)]);
+export const reportedTurns = pgTable('reported_turns', {
+  id: uuid('id').primaryKey(), worldId: worldId(), conversationId: text('conversation_id').notNull(),
+  turnIndex: integer('turn_index').notNull(), residentId: text('resident_id').notNull(),
+  lines: jsonb('lines').$type<DialogueTurnOutput['lines']>().notNull(), playerInput: text('player_input'),
+  reason: text('reason').notNull(), createdAt: createdAt(),
+}, t => [index('reported_turns_world_idx').on(t.worldId, t.createdAt)]);

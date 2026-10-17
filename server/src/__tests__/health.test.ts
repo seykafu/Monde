@@ -15,7 +15,7 @@ afterEach(async () => {
 describe("monde-mind", () => {
   it("uses safe defaults without optional services", () => {
     expect(parseConfig({})).toEqual({
-      PORT: 8080, NODE_ENV: "development", MONDE_ENV: "dev", LOG_LEVEL: "info", GIT_SHA: "dev",
+      WORLD_DAILY_BUDGET_USD: 0.06, GLOBAL_DAILY_BUDGET_USD: 10, PORT: 8080, NODE_ENV: "development", MONDE_ENV: "dev", LOG_LEVEL: "info", GIT_SHA: "dev",
     });
     expect(parseConfig({ PORT: "9090", MONDE_ENV: "staging", MONDE_TOKEN_SECRET: "test-secret" }).PORT).toBe(9090);
     expect(() => parseConfig({ PORT: "invalid" })).toThrow();

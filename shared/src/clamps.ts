@@ -28,11 +28,45 @@ export function fitText(text: string, max: number): string {
 }
 const sym = (v: number, m: number): number => Math.round(clamp(v, -m, m));
 
+/** Sentence ends fitText and splitLine cut at. */
+const SENTENCE_ENDS = [". ", "! ", "? ", "… ", ".) ", "!) ", "?) "];
+/** GDD-GAP: a split's first part keeps at least this many characters (shorter reads as a stray fragment). */
+export const SPLIT_MIN_HEAD = 40;
+
+/**
+ * An over-long line cut at its last sentence end within `max` into [head, rest], or null when no sentence ends in
+ * reach. The rest becomes the next line (a model sometimes writes one long line where it meant two).
+ */
+export function splitLine(text: string, max: number): [string, string] | null {
+  if (text.length <= max) return null;
+  const room = text.slice(0, max);
+  const at = Math.max(...SENTENCE_ENDS.map((end) => {
+    const i = room.lastIndexOf(end);
+    return i < 0 ? -1 : i + end.length - 1;
+  }));
+  if (at < SPLIT_MIN_HEAD) return null;
+  const rest = text.slice(at).trim();
+  return rest ? [room.slice(0, at).trimEnd(), rest] : null;
+}
+
+/** A turn's lines within the caps: an over-long line splits into the next line while the turn has room, else fits. */
+export function fitLines<L extends { text: string }>(lines: readonly L[], max: number, maxLines: number): L[] {
+  const out: L[] = [];
+  const queue = lines.slice(0, maxLines).map((l) => ({ ...l }));
+  while (queue.length > 0 && out.length < maxLines) {
+    const line = queue.shift()!;
+    const split = out.length + queue.length + 1 < maxLines ? splitLine(line.text, max) : null;
+    if (split) { out.push({ ...line, text: split[0] }); queue.unshift({ ...line, text: split[1] }); continue; }
+    out.push({ ...line, text: fitText(line.text, max) });
+  }
+  return out;
+}
+
 export function clampDialogue(out: DialogueTurnOutput, opts: { heartPerk?: boolean } = {}): DialogueTurnOutput {
   const L = LIMITS.dialogue;
   return {
     ...out,
-    lines: out.lines.slice(0, L.maxLines).map((l) => ({ ...l, text: fitText(l.text, L.lineChars) })),
+    lines: fitLines(out.lines, L.lineChars, L.maxLines),
     choices: out.choices.slice(0, L.maxChoices).map((c) => ({ ...c, text: fitText(c.text, L.choiceChars) })),
     effects: {
       ...out.effects,

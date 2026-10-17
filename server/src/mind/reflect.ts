@@ -1,3 +1,4 @@
+import { budgetMind } from "./budget.js";
 import { loadItems } from "../content/loadContent.js";
 import { feasibleFavor } from "./favorFeasibility.js";
 /**
@@ -449,7 +450,7 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
     favorTemplates: PROPOSABLE_FAVORS, fellow: world.fellow,
   });
   request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${[...itemIds].join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
-  const result = await callModel(mind, apiParams("reflect", request), {
+  const result = await callModel(budgetMind(db, mind, world.worldId, residentId, "reflect", world.day), apiParams("reflect", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
   });
   if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);

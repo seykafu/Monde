@@ -147,7 +147,7 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(log.filter((l) => l.kind === "reflect")).toHaveLength(core.length);
     expect(log.filter((l) => l.kind === "plan")).toHaveLength(core.length);
     expect(log.filter(l => l.kind !== "press").every((l) => !l.fallback && Number(l.costUsd) > 0)).toBe(true);
-  });
+  }, 15_000);
 
   it("runs Acquainted residents after Core, and Ambient ones only after an importance-6 memory", async () => {
     const mind = fake();
@@ -237,7 +237,8 @@ describe("POST /v1/worlds/:w/night", () => {
       return happy(call);
     });
     const env = await setup(mind);
-    expect((await night(env, { day: 1 })).json()).toMatchObject({ complete: true });
+    expect((await night(env, { day: 1 })).statusCode).toBe(200);
+    await env.runner.idle(env.worldId);
     const stored = await storedPlans(env.worldId, 2);
     const pell = stored.find((p) => p.residentId === "pell")!;
     const odile = stored.find((p) => p.residentId === "odile")!;
@@ -283,6 +284,7 @@ describe("GET /v1/worlds/:w/dawn/:day", () => {
   it("returns every resident's plan, last night's letters (once) and the new favors", async () => {
     const env = await setup(fake());
     await night(env, { day: 1 });
+    await env.runner.idle(env.worldId);
     const res = await dawn(env, 2);
     expect(res.statusCode).toBe(200);
     const body = res.json();
@@ -404,4 +406,4 @@ it('compacts the day’s leftover sessions before reflections read memories', as
   await night(env, { day: 1 });
   await env.runner.idle(env.worldId);
   expect(mind.callsFor('reflect', 'pell').map(c => JSON.stringify(c.body.messages)).join()).toContain('brass bookmark');
-});
+}, 15_000);

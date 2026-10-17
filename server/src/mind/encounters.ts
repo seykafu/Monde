@@ -1,3 +1,4 @@
+import { budgetMind } from "./budget.js";
 /**
  * Resident ↔ resident encounters in the night pass (GDD §9.11.3 "Encounters"; MVP G-13).
  *
@@ -316,7 +317,7 @@ export async function resolveEncounter(
     flags: ctx.flags, names: ctx.names, day: ctx.day, weekday: weekdayOf(ctx.day), minute: encounter.minute,
     place: encounter.place, mode: "summary",
   });
-  const result = await callModel(deps.mind, apiParams("gossip", request), {
+  const result = await callModel(budgetMind(deps.db, deps.mind, ctx.worldId, `${encounter.a}+${encounter.b}`, "gossip", ctx.day), apiParams("gossip", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
   });
   const fallback = async (reason: EncounterResult["reason"], call: CallRecord | null, detail?: unknown): Promise<EncounterResult> => {

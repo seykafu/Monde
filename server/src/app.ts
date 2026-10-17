@@ -1,3 +1,5 @@
+import { configureBudget } from "./mind/budget.js";
+import { registerAdminRoutes } from "./mind/admin.js";
 import { registerTelemetryRoutes } from './telemetry/routes.js';
 import { registerChatRoutes } from './mind/chatRoutes.js';
 import { randomUUID } from "node:crypto";
@@ -89,6 +91,8 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   // Loading the prompt version at request time proves the prompt templates shipped with the build.
   app.get("/v1/version", async () => ({ version: config.GIT_SHA, prompt_version: promptVersion() }));
   const db = testDb ?? database?.db;
+  if (db) configureBudget(db, config);
+  registerAdminRoutes(app, config, db);
   const mind = options.mind ?? createMindClient(config);
   registerWorldRoutes(app, config, db);
   registerTelemetryRoutes(app, config, db);

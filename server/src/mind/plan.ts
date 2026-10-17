@@ -1,3 +1,4 @@
+import { budgetMind } from "./budget.js";
 /**
  * Tomorrow's plan (GDD §9.7 step 2, §9.17 Plan; MVP M-07).
  *
@@ -315,7 +316,7 @@ export async function planResident(deps: NightJobDeps, world: NightWorld, reside
     day: world.day, tomorrowWeekday: weekdayOf(day), forecast: world.forecast, events: world.eventsTomorrow,
     intentions: today?.plan.intentions ?? [], openPlaces: openPlacesFor(world.places, card), fellow: world.fellow,
   });
-  const result = await callModel(mind, apiParams("plan", request), {
+  const result = await callModel(budgetMind(db, mind, world.worldId, residentId, "plan", world.day), apiParams("plan", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
   });
   if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);

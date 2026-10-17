@@ -971,16 +971,18 @@ export class DialogueScene extends Phaser.Scene {
     this.menu = [];
   }
 
-  /** Report line (§18): the review queue is M-13; for now the ids go to the console. */
+  /** §9.13: replace the line immediately, then queue the stored turn for review. */
   private report(): void {
     this.closeMenu();
     const turn = this.turn;
-    if (!turn) { this.toast('Nothing to report yet.'); return; }
-    console.info('[dialogue] report line', {
-      conversation_id: turn.conversation_id, resident_id: turn.resident_id, turn_index: turn.turn_index,
-      line_index: this.reader.line, text: this.reader.stream.lines[this.reader.line] ?? '', fallback: turn.fallback, source: this.source
+    if (!turn || turn.fallback || this.source !== 'server') { this.toast('Nothing to report yet.'); return; }
+    this.turn = { ...turn, fallback: true, lines: [{ text: '(Waves the thought away.) Never mind that. Where were we?', expr: 'neutral' }] };
+    this.reader.reset();
+    this.reader.finish(this.turn);
+    void getMind().reportTurn(turn.conversation_id, turn.turn_index).then(saved => {
+      // The reported line stays replaced either way (§9.13 "swaps in a fallback immediately").
+      if (!this.closed) this.toast(saved ? 'Thanks. That line was sent for review.' : 'Couldn\'t send the report. The line is hidden; try again later.');
     });
-    this.toast('Thanks. That line has been noted.');
   }
 
   private cycleSpeed(): void {

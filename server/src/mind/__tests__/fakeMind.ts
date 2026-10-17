@@ -95,6 +95,7 @@ export class FakeMind implements MindClient {
     this.creates.push(body);
     allBodies.push(body);
     if (this.createBehavior.error) throw this.createBehavior.error;
+    if (params.max_tokens === 64) return message(JSON.stringify({ ok: true, category: "fine" }), "end_turn");
     return message("", "max_tokens", { input_tokens: 4, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 3800 });
   }
 }

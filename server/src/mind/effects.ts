@@ -97,6 +97,7 @@ export interface PersistTurnArgs {
   output: DialogueTurnOutput;
   rawOutput?: string;
   promptUser?: string;
+  safetyRegard?: number;
   fallback: boolean;
   calls: readonly CallRecord[];
   promptVersion: string;
@@ -129,7 +130,7 @@ export async function persistTurn(db: WorldDatabase, args: PersistTurnArgs): Pro
       } : applyTalkTurn(
         row.state.regard, { day: row.talkDay, gains: row.talkGain, lastTalkDay: row.lastTalkDay }, args.day,
         // GDD-GAP: integral Regard rounds the +15% Heart L3 bonus to nearest whole point; cap still applies.
-        args.fallback ? 0 : Math.round(effects.regard_delta * (effects.regard_delta > 0 && (args.heartLevel ?? 1) >= 3 ? 1.15 : 1)),
+        args.fallback ? (args.safetyRegard === -1 ? -1 : 0) : Math.round(effects.regard_delta * (effects.regard_delta > 0 && (args.heartLevel ?? 1) >= 3 ? 1.15 : 1)),
       );
       applied = talk.change;
       const state = args.fallback

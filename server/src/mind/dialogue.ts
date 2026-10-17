@@ -1,3 +1,4 @@
+import { BudgetError } from "./budget.js";
 /**
  * One dialogue turn against the model (GDD §9.10 flow, §9.13 pipeline; MVP M-05).
  *
@@ -22,11 +23,11 @@
  * This module has no I/O of its own beyond the MindClient: the route streams, effects.ts persists.
  */
 import type Anthropic from "@anthropic-ai/sdk";
-import { DialogueTurnOutput, LIMITS, fitText, modelOutputFormat } from "@monde/shared";
+import { DialogueTurnOutput, LIMITS, fitText, modelOutputFormat, splitLine } from "@monde/shared";
 import { apiParams, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
 import { completeWords, currencyHit, lexicalHits } from "./filters.js";
-import { misgenderHit } from "./naming.js";
+import { agreeAddress, misgenderHit } from "./naming.js";
 import { borrowedHits, stripTics } from "./voice.js";
 import { LineTextExtractor } from "./partialJson.js";
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
@@ -82,7 +83,7 @@ export interface CallRecord {
   validation: string;
 }
 
-export type TurnFailureCode = "unavailable" | "timeout" | "refusal" | "max_tokens" | "api_error" | "invalid_output" | "aborted" | "riddle_authored";
+export type TurnFailureCode = "budget" | "safety" | "unavailable" | "timeout" | "refusal" | "max_tokens" | "api_error" | "invalid_output" | "aborted" | "riddle_authored";
 
 export interface TurnFailure {
   code: TurnFailureCode;
@@ -124,6 +125,7 @@ export interface GenerateOptions {
 
 const FAILURE_MESSAGES: Record<TurnFailureCode, string> = {
   riddle_authored: "A riddle-topic turn: the resident gives the authored hint for the unlocked level (§14.2).",
+  budget: "Written lines for today.", safety: "Let’s keep this in town.",
   unavailable: "No model is configured; using an authored line.",
   timeout: "The resident took too long to answer; using an authored line.",
   refusal: "The model declined this turn; using an authored line.",
@@ -178,7 +180,7 @@ interface ExtraCall { tokens: CallTokens; latencyMs: number; firstTokenMs: numbe
 type Attempt =
   | { kind: "message"; message: Anthropic.Message; latencyMs: number; firstTokenMs: number | null; extra: ExtraCall[] }
   | {
-    kind: "failed"; code: "timeout" | "aborted" | "unavailable" | "api_error"; error: unknown; tokens: CallTokens; latencyMs: number;
+    kind: "failed"; code: "timeout" | "aborted" | "budget" | "safety" | "unavailable" | "api_error"; error: unknown; tokens: CallTokens; latencyMs: number;
     firstTokenMs: number | null; extra: ExtraCall[];
   };
 
@@ -261,7 +263,7 @@ async function callOnce(
   const elapsed = () => Math.round(now() - start);
   const sinceStart = (leg: Leg | null) => (leg?.first == null ? null : Math.round(leg.first - start));
   const extras = (main: Leg | null): ExtraCall[] => legs.filter((leg) => leg !== main).map((leg) => {
-    const code = originalError(leg.error) instanceof MindUnavailableError ? "unavailable" : "api_error";
+    const code = originalError(leg.error) instanceof BudgetError ? "budget" : originalError(leg.error) instanceof MindUnavailableError ? "unavailable" : "api_error";
     return {
       tokens: leg.message ? tokensOf(leg.message.usage) : tokensOfError(leg.error),
       latencyMs: Math.round((leg.settled ?? now()) - leg.started),
@@ -273,8 +275,8 @@ async function callOnce(
     kind: "failed", code, error: originalError(leg?.error), tokens: tokensOfError(leg?.error), latencyMs: elapsed(),
     firstTokenMs: sinceStart(leg), extra: extras(leg),
   });
-  const codeOf = (leg: Leg): "unavailable" | "api_error" =>
-    originalError(leg.error) instanceof MindUnavailableError ? "unavailable" : "api_error";
+  const codeOf = (leg: Leg): "budget" | "safety" | "unavailable" | "api_error" =>
+    originalError(leg.error) instanceof BudgetError ? "budget" : originalError(leg.error) instanceof MindUnavailableError ? "unavailable" : "api_error";
 
   const decide = (): Attempt | null => {
     if (stopped) {
@@ -385,8 +387,13 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
           if (suppressed || line.index >= LIMITS.dialogue.maxLines) continue;
           // Hold back a word still being typed: "game" may become "gamekeeper", and "smartph" must not show.
           const capped = line.text.slice(0, LIMITS.dialogue.lineChars);
-          const whole = line.done ? fitText(line.text, LIMITS.dialogue.lineChars) : completeWords(capped);
-          const text = exitTics.length > 0 ? stripTics(whole, exitTics) : whole;
+          // A finished over-long line shows up to its last sentence; the final turn carries the rest as the next line
+          // (clamps.ts fitLines).
+          const whole = line.done
+            ? splitLine(line.text, LIMITS.dialogue.lineChars)?.[0] ?? fitText(line.text, LIMITS.dialogue.lineChars)
+            : completeWords(capped);
+          const agreed = options.validation.fellow ? agreeAddress(whole, options.validation.fellow) : whole;
+          const text = exitTics.length > 0 ? stripTics(agreed, exitTics) : agreed;
           if (!streamSafe(text, options.validation)) { suppressed = true; continue; }
           if (text.trim() === "" || text === shown[line.index]) continue;
           shown[line.index] = text;

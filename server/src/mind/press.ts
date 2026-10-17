@@ -1,3 +1,4 @@
+import { budgetMind } from "./budget.js";
 import { aiLogRow } from "./effects.js";
 import { readFile } from 'node:fs/promises';
 import { parse } from 'yaml';
@@ -43,7 +44,7 @@ export async function runPress(deps: NightJobDeps, world: NightWorld, fund?: num
   const templates = parse(await readFile(new URL(import.meta.url.includes('/src/') ? '../../../content/lines/headlines.yaml' : '../../content/lines/headlines.yaml', import.meta.url), 'utf8')) as { headlines: HeadlineTemplate[] };
   let paper = fallbackPress(world.day + 1, ranked, templates.headlines, fund === undefined ? {} : { coins: fund });
   if (deps.mind.enabled) {
-    const call = await callModel(deps.mind, pressRequest(ranked), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
+    const call = await callModel(budgetMind(deps.db, deps.mind, world.worldId, null, "press", world.day), pressRequest(ranked), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
     const copy = call.ok ? validatePress(call.text, new Set(ranked.map(e => e.id))) : null;
     if (call.call) await deps.db.insert(aiLog).values(aiLogRow({ worldId: world.worldId,residentId: 'sable',kind: 'press',promptVersion: 'press-v1',call: { ...call.call,validation: copy ? 'ok' : call.ok ? 'schema_or_filter' : call.failure },fallback: !copy }));
     if (copy) paper = { ...paper, ...copy, source: 'model' };
