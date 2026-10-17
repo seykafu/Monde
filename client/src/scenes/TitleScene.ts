@@ -104,7 +104,7 @@ class SaveMenuBase extends Phaser.Scene {
       ], () => this.resume());
     } else {
       this.show([
-        { text: 'Continue', run: entries[0] ? () => loadGame(this, entries[0]!.save) : undefined },
+        { text: 'Continue', run: entries[0] ? () => loadGame(this, entries[0]!.save, entries[0]!.slot) : undefined },
         // Q-06: the one-time sharing question comes before the first New Game (and on a first visit to Settings).
         { text: 'New Game', run: () => (telemetryChoice() === null ? this.askSharing(() => this.newGame()) : this.newGame()) },
         { text: 'Load', run: async () => this.loadList(sortForMenu(await saveStorage.list())) },
@@ -222,7 +222,7 @@ class SaveMenuBase extends Phaser.Scene {
     const back = () => this.loadList(entries, page);
     this.message.setText(formatSummary(entry.save));
     this.show([
-      { text: `Load ${entry.save.label}`, run: () => loadGame(this, entry.save) },
+      { text: `Load ${entry.save.label}`, run: () => loadGame(this, entry.save, entry.slot) },
       { text: 'Delete', run: () => this.confirm(`Delete ${entry.save.label}? This cannot be undone.`, async () => {
         await saveStorage.delete(entry.slot); this.loadList(sortForMenu(await saveStorage.list()));
       }, back) },

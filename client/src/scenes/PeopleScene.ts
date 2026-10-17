@@ -1,6 +1,7 @@
 import { accessiblePages } from '../ui/accessiblePages';
 import { textSize, accessibility } from '../accessibility/runtime';
 import { openPaper } from "./DawnReportScene";
+import { printPaper } from "../press/report";
 import { favorBook } from "../friendship/favors";
 import { MarkPages } from './MarkPages';
 import { marks } from './riddles';
@@ -237,7 +238,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
         this.text(RX,420,'Papers',24);
         this.text(RX+160,420,'←',22).setInteractive().on('pointerdown',() => { this.paperPage = Math.max(0,this.paperPage-1); this.refresh(); });
         this.text(RX+210,420,'→',22).setInteractive().on('pointerdown',() => { if ((this.paperPage+1)*5 < getFriendship(this.registry).papers.length) this.paperPage++; this.refresh(); });
-        [...getFriendship(this.registry).papers].reverse().slice(this.paperPage * 5,this.paperPage * 5 + 5).forEach((paper,i) => this.text(RX,457+i*31,`Day ${paper.day} · ${paper.headline.slice(0,35)}`,15).setInteractive().on('pointerdown',() => openPaper(this,{ paper,clock: this.open.clock,seed: (this.registry.get('monde.press.seed') as number | undefined) ?? (this.registry.get('monde.save.weather') as { seed: number } | undefined)?.seed ?? 0,archive: true })));
+        [...getFriendship(this.registry).papers].reverse().slice(this.paperPage * 5,this.paperPage * 5 + 5).forEach((paper,i) => this.text(RX,457+i*31,`Day ${paper.day} · ${printPaper(paper,getFriendship(this.registry).reported).paper.headline.slice(0,35)}`,15).setInteractive().on('pointerdown',() => openPaper(this,{ paper,clock: this.open.clock,seed: (this.registry.get('monde.press.seed') as number | undefined) ?? (this.registry.get('monde.save.weather') as { seed: number } | undefined)?.seed ?? 0,archive: true })));
       }
       return;
     }

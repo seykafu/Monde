@@ -141,7 +141,7 @@ it('lets ordinary town talk through the local rules', () => {
 
 it('leaves hard feelings to the resident: a model-only self_harm verdict passes, an explicit phrase gets the care line', async () => {
   const w = await world(), mind = new FakeMind(); configureBudget(database.db, parseConfig({}));
-  mind.createMessage = async () => message('{"ok":false,"category":"self_harm"}');
+  mind.createMessage = async () => message('{"ok":false,"category":"self_harm"}', 'end_turn');
   expect(await precheck(database.db, mind, w.id, 'priya', 'Thanks. What do you do when you feel like that?')).toBe('fine');
   expect(await precheck(database.db, mind, w.id, 'priya', 'Some days I want to die.')).toBe('self_harm');
   // Priya is the help the line points to; she doesn't send the Fellow to herself.

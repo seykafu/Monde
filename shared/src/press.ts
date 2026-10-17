@@ -3,9 +3,20 @@ export const PressStory = z.object({ event_id: z.string().nullable(), title: z.s
 export const PressCopy = z.object({ headline: z.string(), dek: z.string(), stories: z.array(PressStory).min(2).max(3) });
 export type PressCopy = z.infer<typeof PressCopy>;
 const pillars = z.object({ prosperity:z.number(),safety:z.number(),spirit:z.number(),charm:z.number() });
+/**
+ * A story as printed. `model_index` is its place in the server's model-written edition, stamped by the client when it
+ * prints a model edition (client/src/press/report.ts): those stories are reportable (§9.13). Template, engine and
+ * authored stories (the quiet desk, the Option clause, a Project opening) have none.
+ */
+export const PrintedStory = PressStory.extend({ model_index: z.number().int().min(0).max(2).optional() });
 export const Press = PressCopy.extend({
+  stories: z.array(PrintedStory).min(2).max(3),
+  /** The headline and dek as printed are the model's (stamped like `model_index`; absent when the client replaced them). */
+  model_front: z.boolean().optional(),
   ledger: z.object({ pillars,dayStart:pillars,census:z.number(),appeal:z.number(),fund:z.number() }).optional(), day: z.number().int().positive(), source: z.enum(['model', 'template']),
-  event_ids: z.array(z.string()), letters: z.array(z.object({ from: z.string(), text: z.string() })),
+  event_ids: z.array(z.string()),
+  /** Letters to the Lantern; `id` is the letter's (absent in editions printed before Report reached the paper). */
+  letters: z.array(z.object({ from: z.string(), text: z.string(), id: z.string().optional() })),
   movement_residents: z.array(z.string()).optional(),
   movements: z.array(z.string()), notices: z.array(z.string()),
   /**

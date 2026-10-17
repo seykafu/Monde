@@ -34,7 +34,8 @@ export async function liveLine(
     }, { signal: abort.signal, fallback: empty });
     if (!result || result.source !== 'server' || result.turn.fallback) return [];
     const line = result.turn.lines.find(l => l.text.trim());
-    return line ? [{ kind: 'say', speaker: req.residentId, text: line.text.trim(), expr: line.expr }] : [];
+    return line ? [{ kind: 'say', speaker: req.residentId, text: line.text.trim(), expr: line.expr,
+      report: { conversation_id: result.turn.conversation_id, turn_index: result.turn.turn_index } }] : [];
   } catch {
     return [];
   } finally {

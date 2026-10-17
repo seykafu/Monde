@@ -18,4 +18,15 @@ Safety responses stay in town; self-harm responses point to Priya, friends, and 
 
 Report line immediately replaces the displayed turn, then posts its conversation ID and turn index. The server copies authoritative stored lines and input into `reported_turns`; it does not trust client-supplied text. World-token authorization applies. **GDD-GAP:** ten distinct reports per world per UTC day; repeats within the day are idempotent. Reasons are limited to 500 characters. Reports appear only behind ADMIN_TOKEN and are HTML-escaped. No report-retention interval is specified by §9.13; this change does not delete review evidence automatically.
 
+Migration `0010_report_kinds` (apply it like 0009) gives every report a `kind` (the body contract is `shared/src/reports.ts`); a body without `kind` is a dialogue report, exactly as before:
+
+- `dialogue`: `conversation_id`, `turn_index` (the dialogue panel, and a story scene's live `{ai_line}`).
+- `press`: `day` and `story` (the story's index in the stored edition, or `"front"` for the headline and dek), with the story's `event_id` as a cross-check. Only an edition the model wrote (`source: "model"`) is reportable; template editions are authored lines and engine records. The server stores its own title and text.
+- `letter`: `letter_id`. Only reflection letters (`letter_<resident>_<day>`, the only letters the server writes, all model-written) that were delivered are reportable; the server stores the writer, day and text.
+- `other`: a `ref` and the client's `text`, stored as sent and shown as unverified (nothing uses it yet).
+
+Papers and delivered letters aren't copied into a restored world's snapshot, so press and letter lookups search the world and the worlds it was restored from, nearest first. The ten-a-day limit counts every kind together. `/admin` shows the queue as a table (kind, time, world, item, text, reason) and `/admin/costs.json` lists each report with its kind first and counts by kind.
+
+The client (`client/src/press/report.ts`) puts a small Report on each model-written item of the paper (stamped at print time against the server's copy, so the client's own authored inserts aren't reportable) and on each reflection letter in Letters to the Lantern; letters to the Fellow have no screen yet. A first press arms it, a second hides the item at once behind an authored line in the Lantern's voice (**GDD-GAP:** §9.13 has no confirm step; the paper closes on any other tap). The reported keys go into the save (`friendship.reported`) and are merged into the last save written or loaded (the dawn autosave Continue reopens), so a reload doesn't bring the item back. A failed send keeps it hidden. A story's live `{ai_line}` gets the same Report beside Log (or R twice), which swaps in the cue's authored `{fallback}`. Chatter speech bubbles have no Report: they float over the board and fade on their own.
+
 The regression set covers 45 locally caught red-team inputs. It does not replace §9.16's 300-input live safety evaluation or other release bars.

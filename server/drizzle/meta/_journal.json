@@ -71,6 +71,13 @@
       "when": 1792202646443,
       "tag": "0009_m12_m13_budget_safety",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792225742042,
+      "tag": "0010_report_kinds",
+      "breakpoints": true
     }
   ]
 }

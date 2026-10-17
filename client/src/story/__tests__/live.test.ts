@@ -14,7 +14,8 @@ describe('liveLine ({ai_line})', () => {
   it('takes the first line of a live server turn, with the brief as the activity', async () => {
     const m = mind(true, async () => ({ turn: turn(), source: 'server' }));
     const lines = await liveLine(m, { residentId: 'rosalind', brief: 'x '.repeat(100), context }, { conversationId: 'c' });
-    expect(lines).toEqual([{ kind: 'say', speaker: 'rosalind', text: 'Sixty cups, pet.', expr: 'warm' }]);
+    // §9.13: the stored turn travels with the line so the story panel can report it.
+    expect(lines).toEqual([{ kind: 'say', speaker: 'rosalind', text: 'Sixty cups, pet.', expr: 'warm', report: { conversation_id: 'c', turn_index: 0 } }]);
     const req = m.talk.mock.calls[0]![0];
     expect(req.input).toEqual({ kind: 'open' });
     expect(req.context.current_activity!.length).toBeLessThanOrEqual(120);

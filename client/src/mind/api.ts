@@ -1,5 +1,5 @@
 import { loadAccessibility } from '../accessibility/preferences';
-import { ChatReply, type ChatBody } from '@monde/shared';
+import { ChatReply, type ChatBody, type ReportBody } from '@monde/shared';
 // monde-mind client (GDD §9.10, §9.14, §19.4; MVP M-05). No Phaser; the network and storage are injected so
 // the bootstrap and the stream run under vitest with fakes.
 //
@@ -482,8 +482,17 @@ export class MindClient {
   }
 
   async reportTurn(conversationId: string, turnIndex: number, reason = 'Report line'): Promise<boolean> {
+    return this.postReport({ conversation_id: conversationId, turn_index: turnIndex, reason });
+  }
+
+  /** §9.13 Report on any generated item (shared/src/reports.ts): a paper story or front, a letter. True when recorded. */
+  async report(body: ReportBody): Promise<boolean> {
+    return this.postReport(body);
+  }
+
+  private async postReport(body: object): Promise<boolean> {
     try {
-      const response = await this.authed('/reports', { method: 'POST', body: JSON.stringify({ conversation_id: conversationId, turn_index: turnIndex, reason }) }, REQUEST_TIMEOUT_MS);
+      const response = await this.authed('/reports', { method: 'POST', body: JSON.stringify(body) }, REQUEST_TIMEOUT_MS);
       return response?.ok ?? false;
     } catch { return false; }
   }

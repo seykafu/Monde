@@ -54,5 +54,7 @@ it('persists one edition from yesterday’s real events, includes Lantern letter
     const paper = await readPress(database.db,world.id,2);
     expect(paper).toMatchObject({ source:'model',event_ids:['actual'],notices:['Market today.'],letters:[{ from:'odile',text:'The broom is by the door.' }] });
     expect(paper!.stories[0]!.text).toContain('swept Market Row');
+    // §9.13: a printed letter keeps its id, so the paper can report it.
+    expect(paper!.letters[0]!.id).toBe('editor');
   } finally { await database.client.close(); }
 },30_000);

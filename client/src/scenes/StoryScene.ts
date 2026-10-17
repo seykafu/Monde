@@ -13,8 +13,10 @@ import { openStrawPoll } from '../finale/attach';
 // keys): portraits swap by speaker (dialogue/portrait.ts, art from the manifest or the procedural bust),
 // narration has no portrait and is set in italics, and the player's own lines get the "You" plate with no
 // portrait (§11.1). Choices are 1–4, ↑↓/Tab and Enter, or a click; Enter, Space or a click reads on; L opens
-// the scene's log (dialogue/backlog.ts). Backdrops come from assets/backdrops/manifest.json when it lists the
-// id; otherwise a tinted panel names the place (story/backdrop.ts).
+// the scene's log (dialogue/backlog.ts). A live {ai_line} has a small Report beside Log (or R, twice: §9.13
+// Report line) that swaps in the cue's authored {fallback} at once and sends the stored turn for review.
+// Backdrops come from assets/backdrops/manifest.json when it lists the id; otherwise a tinted panel names the
+// place (story/backdrop.ts).
 //
 // It is also the StoryPresenter (story/host.ts): music, backdrop, fade, wait, camera and sound cues, the
 // summons confirmation, placeholders for puzzles and Scuffles, the Fellowship form and the {ai_open} handoff
@@ -31,7 +33,7 @@ import {
 } from '../dialogue/panel';
 import { Portrait } from '../dialogue/portrait';
 import { PORTRAIT_W, portraitArtId, portraitLook, type PortraitLook } from '../dialogue/portraitModel';
-import { browserStorage } from '../mind/api';
+import { browserStorage, getMind } from '../mind/api';
 import { loadTextSpeed } from '../mind/prefs';
 import { MS_PER_CHAR, type TextSpeed } from '../mind/reader';
 import { scriptedTurn, type ScriptedExchange } from '../mind/scripted';
@@ -169,6 +171,10 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   private log: LogEntry[] = [];
   private backlog: Backlog | null = null;
   private thinkingTween: Phaser.Tweens.Tween | null = null;
+  // Report line (§9.13) for a live {ai_line}: the control, its armed state, and the note it leaves.
+  private reportButton!: Phaser.GameObjects.Text;
+  private reportArmed: Phaser.Time.TimerEvent | null = null;
+  private reportNote!: Phaser.GameObjects.Text;
 
   constructor() { super(STORY_SCENE); }
 
@@ -181,7 +187,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.line = null; this.pages = []; this.page = 0; this.shown = 0; this.typing = false; this.paren = false; this.lastBlip = 0;
     this.speaker = null; this.echoLines = 0; this.reading = false; this.buttons = []; this.focus = 0;
     this.answer = null; this.waitDone = null; this.lineDone = null; this.revealed = false; this.musicStarted = false; this.backdropId = '';
-    this.portrait = null; this.log = []; this.backlog = null; this.thinkingTween = null;
+    this.portrait = null; this.log = []; this.backlog = null; this.thinkingTween = null; this.reportArmed = null;
   }
 
   create(): void {
@@ -217,9 +223,18 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     logButton.on('pointerover', () => logButton.setColor('#fff0ce'));
     logButton.on('pointerout', () => logButton.setColor('#e4c77f'));
     logButton.on('pointerup', () => { playSfx('click'); this.time.delayedCall(0, () => (this.backlog ? this.closeLog() : this.openLog())); });
+    this.reportButton = this.add.text(PANEL_X + PANEL_W - 76, PANEL_Y + 15, 'Report', {
+      fontFamily: FAMILY_BODY, fontSize: '14px', fontStyle: 'italic', color: MUTED, padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
+    }).setOrigin(1, 0).setInteractive({ useHandCursor: true }).setVisible(false);
+    this.reportButton.on('pointerover', () => { if (!this.reportArmed) this.reportButton.setColor('#fff0ce'); });
+    this.reportButton.on('pointerout', () => { if (!this.reportArmed) this.reportButton.setColor(MUTED); });
+    this.reportButton.on('pointerup', () => { playSfx('click'); this.time.delayedCall(0, () => this.pressReport()); });
+    this.reportNote = this.add.text(PANEL_X + PANEL_W / 2, PANEL_Y + PANEL_H - 22, '', {
+      fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE
+    }).setOrigin(0.5).setAlpha(0);
     this.plate.container.setAlpha(0);
     // The portrait sits under the panel's top edge (depth 5); the panel and its text above it.
-    this.panelLayer = this.add.container(0, 0, [panel, this.plate.container, this.you, this.body, this.echo, this.more, this.caption, logButton]).setDepth(10);
+    this.panelLayer = this.add.container(0, 0, [panel, this.plate.container, this.you, this.body, this.echo, this.more, this.caption, logButton, this.reportButton, this.reportNote]).setDepth(10);
 
     const keyboard = this.input.keyboard!;
     keyboard.addCapture('SPACE,TAB,UP,DOWN');
@@ -290,6 +305,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.reveal();
     this.stopThinking();
     this.line = line;
+    this.showReport(!!line.report);
     const text = plainText(line.business ? `(${line.business}) ${line.text}` : line.text);
     if (line.kind === 'say' && line.speaker) {
       this.showSpeaker(line.speaker, line.expr);
@@ -327,6 +343,47 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   private updateMore(): void {
     const show = this.reading && !this.typing && !this.answer;
     this.more.setText(!show ? '' : this.page < this.pages.length - 1 ? 'More ▾' : '▸');
+  }
+
+  // ── Report line (§9.13) ───────────────────────────────────────────────────
+
+  private showReport(on: boolean): void {
+    this.reportArmed?.remove(); this.reportArmed = null;
+    this.relabelReport('Report', MUTED, 'italic');
+    this.reportButton.setVisible(on);
+  }
+
+  private relabelReport(text: string, color: string, style: string): void {
+    this.reportButton.setText(text).setColor(color).setFontStyle(style);
+    (this.reportButton.input?.hitArea as Phaser.Geom.Rectangle | undefined)?.setTo(0, 0, this.reportButton.width, this.reportButton.height);
+  }
+
+  /** First press arms ("Confirm report"); the second swaps in the authored {fallback} and sends the stored turn. */
+  private pressReport(): void {
+    const line = this.line, report = line?.report;
+    if (this.closed || !line || !report || !this.reportButton.visible) return;
+    if (!this.reportArmed) {
+      this.relabelReport('Confirm report', '#e4c77f', 'bold italic');
+      // GDD-GAP: §9.13 has no confirm step; four seconds to press again, as the Lantern's Report.
+      this.reportArmed = this.time.delayedCall(4000, () => { this.reportArmed = null; this.relabelReport('Report', MUTED, 'italic'); });
+      return;
+    }
+    this.showReport(false);
+    // The compiler requires every {ai_line} to have its {fallback}; a neutral beat covers an empty one.
+    const text = report.fallback?.trim() || '(A pause.) Never mind that.';
+    this.line = { kind: line.kind, ...(line.speaker ? { speaker: line.speaker } : {}), text };
+    const last = this.log.at(-1);
+    if (last) this.log[this.log.length - 1] = { ...last, text: plainText(text) };
+    this.pages = paginateBody(this.measure, plainText(text), BODY_MAX_LINES());
+    this.page = 0;
+    this.startPage();
+    this.reading = true;
+    void getMind().reportTurn(report.conversation_id, report.turn_index).then(saved => {
+      if (this.closed) return;
+      this.tweens.killTweensOf(this.reportNote);
+      this.reportNote.setText(saved ? 'Thanks. That line was sent for review.' : 'Couldn\u2019t send the report. The line stays hidden.').setAlpha(1);
+      this.tweens.add({ targets: this.reportNote, alpha: 0, delay: 2200, duration: 400 });
+    });
   }
 
   /** Enter, Space or a click: finish the page, turn it, or read on. */
@@ -469,6 +526,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.hideSpeaker();
     this.showYou(false);
     this.line = null;
+    this.showReport(false);
     this.typing = false;
     this.body.setColor(NARRATION_COLOUR).setFontStyle('italic').setText(text);
   }
@@ -543,6 +601,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.showSpeaker(speaker);
     this.showYou(false);
     this.line = null;
+    this.showReport(false);
     this.typing = false;
     this.body.setColor(BODY_COLOUR).setFontStyle('italic').setText('…');
     this.stopThinking();
@@ -755,6 +814,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
       return;
     }
     if (key === 'l' || key === 'L') { e.preventDefault(); this.openLog(); return; }
+    if ((key === 'r' || key === 'R') && !e.repeat && this.line?.report && this.reportButton.visible) { e.preventDefault(); this.pressReport(); return; }
     if (this.answer) {
       if (/^[1-9]$/.test(key)) { const i = Number(key) - 1; if (i < this.buttons.length) { playSfx('click'); this.pick(i); } return; }
       if (key === 'ArrowDown' || (key === 'Tab' && !e.shiftKey)) { e.preventDefault(); this.moveFocus(1); return; }

@@ -13,11 +13,14 @@ import { restore } from './restore';
 import { createSaveStorage } from './storage';
 import { checkpointSlot, chooseAutosaveSlot } from './slots';
 import { quietStorage } from './session';
+import { mergeReported } from '../press/report';
 
 export const saveStorage = createSaveStorage();
 let capture: (() => ReturnType<typeof collect>) | undefined;
 let queue: Promise<unknown> = Promise.resolve();
 let dawnSave: SaveGame | undefined;
+/** The save this session last wrote or loaded: the one a reload would bring back, so a report amends it (§9.13). */
+let lastSave: { slot: string; saved_at: string } | undefined;
 export async function finishSaving(): Promise<void> { await queue; }
 /** Capture synchronously before networking, serialize writes so simultaneous requests cannot lose a slot. */
 export function saveGame(slot: string | null, kind: SaveGame['kind'], label: string): Promise<void> {
@@ -26,11 +29,30 @@ export function saveGame(slot: string | null, kind: SaveGame['kind'], label: str
   save.kind = kind; save.label = label;
   const work = async () => {
     save.mind = await getMind().createSnapshot(save.clock.day, save.clock.minute, label);
-    await saveStorage.write(slot ?? chooseAutosaveSlot(await saveStorage.list()), save);
+    const target = slot ?? chooseAutosaveSlot(await saveStorage.list());
+    await saveStorage.write(target, save);
+    lastSave = { slot: target, saved_at: save.saved_at };
     if (kind === 'autosave') dawnSave = save;
     if (kind === 'autosave' && save.clock.day === 70 && save.clock.minute === 360) {
       await saveStorage.write(checkpointSlot('campaign_season'), { ...save, kind: 'checkpoint', label: 'Campaign Season' });
     }
+  };
+  const result = queue.then(work);
+  queue = result.catch(() => undefined);
+  return result;
+}
+/**
+ * §9.13: a reported paper item or letter stays withdrawn after a reload too. The dawn autosave (what Continue loads)
+ * is written before the morning's paper is read, so the reported keys are merged into the last save written or loaded
+ * in place (only that field; the slot must still hold the same save). Every later save carries them anyway.
+ */
+export function amendLastSave(reported: readonly string[]): Promise<void> {
+  const work = async () => {
+    const last = lastSave;
+    if (!last || !reported.length) return;
+    const save = await saveStorage.read(last.slot);
+    if (!save || save.saved_at !== last.saved_at || reported.every(k => save.friendship.reported.includes(k))) return;
+    await saveStorage.write(last.slot, { ...save, friendship: { ...save.friendship, reported: mergeReported(save.friendship.reported, reported) } });
   };
   const result = queue.then(work);
   queue = result.catch(() => undefined);
@@ -50,9 +72,10 @@ export function resetGame(scene: Phaser.Scene): void {
   for (const key of ['monde.press.pending', 'monde.press.seed', 'monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.puzzles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies', 'monde.projects', 'monde.scuffles', 'monde.scuffle.recovery', 'monde.scuffle.offers', 'monde.finale']) scene.registry.remove(key);
   clearFellow(scene.registry);
   saveQuietState(quietStorage, emptyQuietState());
-  capture = undefined; dawnSave = undefined;
+  capture = undefined; dawnSave = undefined; lastSave = undefined;
 }
-export async function loadGame(scene: Phaser.Scene, save: SaveGame): Promise<void> {
+/** `slot`: where the save came from (a report can then amend it, amendLastSave). */
+export async function loadGame(scene: Phaser.Scene, save: SaveGame, slot?: string): Promise<void> {
   const state = restore(save);
   // The districts and the rooms (W-03): a save made indoors restores the player in the room.
   const zone = boards[state.player.zone];
@@ -82,6 +105,7 @@ export async function loadGame(scene: Phaser.Scene, save: SaveGame): Promise<voi
   setFellow(scene.registry, { ...state.fellow, skills: state.skills });
   // G-13 friendship (scenes/friendship.ts): what the client knew when the game was saved.
   scene.registry.set('monde.friendship', migrateSave(save).friendship);
+  if (slot) lastSave = { slot, saved_at: save.saved_at };
   saveQuietState(quietStorage, state.quiet);
   scene.scene.start('Zone', { zone: state.player.zone, savedPlayer: state.player });
 }

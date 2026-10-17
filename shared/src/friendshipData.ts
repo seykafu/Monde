@@ -90,9 +90,14 @@ export const SavedFriendship = z.object({
    * events reply, the dawn package), met or not. Absent in older saves: nothing reported yet.
    */
   regard: z.record(z.string(), n.min(-100).max(100)).default({}),
+  /**
+   * §9.13: the generated items the player reported (client/src/press/report.ts keys: `press:<day>:front`,
+   * `press:<day>:story:<model_index>`, `letter:<id>`). They stay withdrawn in print. Absent in older saves: none.
+   */
+  reported: z.array(z.string()).default([]),
 });
 export type SavedFriendship = z.infer<typeof SavedFriendship>;
 
 export const emptyFriendship = (): SavedFriendship => ({
-  favor_book: [], papers: [], news_log: [], residents: {}, ties: null, milestones: [], known_ties: {}, tiers: {}, plans: null, letters: [], favors: [], report: null, regard: {},
+  favor_book: [], papers: [], news_log: [], residents: {}, ties: null, milestones: [], known_ties: {}, tiers: {}, plans: null, letters: [], favors: [], report: null, regard: {}, reported: [],
 });

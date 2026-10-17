@@ -8,6 +8,11 @@ export interface StoryLine {
   speaker?: string;
   expr?: string;
   business?: string;
+  /**
+   * A live {ai_line} (GDD §9.13 Report line): the stored dialogue turn it came from, and the cue's authored
+   * {fallback} that replaces it when the player reports it.
+   */
+  report?: { conversation_id: string; turn_index: number; fallback?: string };
 }
 export type HostCue = Exclude<CompiledCommand, { cmd: "set" | "unset" | "insert" | "goto_scene" }>
   | { cmd: "music"; id: string };
@@ -94,6 +99,9 @@ export class StoryRuntime {
     }
     if (cue.cmd === "ai_line" && !lines?.length) {
       lines = [{ kind: "say", speaker: cue.speaker.id, text: cue.fallback }];
+    } else if (cue.cmd === "ai_line" && lines) {
+      const fallback = cue.fallback;
+      lines = lines.map(l => (l.report ? { ...l, report: { ...l.report, fallback } } : l));
     }
     // ai_open's resident-specific Quiet Mode exchange belongs to the host's line library.
     if (lines) this.lines.push(...lines);

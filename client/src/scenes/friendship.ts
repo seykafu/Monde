@@ -13,6 +13,7 @@ import { REPORT_DAY } from "../finale/state";
 import YAML from "yaml";
 import headlineText from "../../../content/lines/headlines.yaml?raw";
 import { fallbackPress, type Press, type PressEvent, type HeadlineTemplate } from "@monde/shared";
+import { stampGenerated } from "../press/report";
 // Friendship's Phaser side (GDD §9.11; MVP G-13 client): the registry's FriendshipState and the dawn package.
 //
 // The pure rules live in src/friendship (hearts, state, known ties, milestones, emotes) and src/mind/dawn.ts (the
@@ -217,11 +218,13 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     }
     const town = getTown(registry);
     edition.notices = [...new Set([...edition.notices, ...(isMarketDay(day) ? ['Saturday market on Market Row.'] : []), ...(isFerryDay(day,town?.flags) ? ['The ferry sails today from the Wharf.'] : []), 'Meals and gifts at the general store.'])];
-    if (!paper) edition.letters = getFriendship(registry).letters.filter(l => l.to === 'lantern' && l.day === day).slice(0,2).map(l => ({ from:l.from,text:l.text }));
+    if (!paper) edition.letters = getFriendship(registry).letters.filter(l => l.to === 'lantern' && l.day === day).slice(0,2).map(l => ({ from:l.from,text:l.text,id:l.id }));
     // G-02 (§6.6): comings and goings from the town's own roster: this morning's boat in, and anyone leaving on it.
     const moves = paperMovements(registry, day);
     if (moves.lines.length) { edition.movements = moves.lines; edition.movement_residents = moves.residents; }
     if (town) edition.ledger = { pillars:{ ...town.pillars },dayStart:{ ...town.dayStart },census:town.census,appeal:computeAppeal(town).appeal,fund:town.fund };
+    // §9.13: what's still Sable's model copy after the client's own changes is reportable (press/report.ts).
+    edition = stampGenerated(edition, paper);
     updateFriendship(registry,s => ({ ...s, favor_book: s.favor_book.map(f => expireFavor(f,day)), papers: [...s.papers.filter(p => p.day !== day),edition] }));
     registry.set('monde.press.seed',opts.weatherSeed()); registry.set('monde.press.pending',edition); clock.pause('paper');
   };

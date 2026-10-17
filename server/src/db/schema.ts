@@ -241,9 +241,19 @@ export const budgetCalls = pgTable('budget_calls', {
   kind: text('kind').notNull(), costUsd: numeric('cost_usd').notNull(),
   pending: boolean('pending').notNull().default(true), createdAt: createdAt(),
 }, t => [index('budget_calls_day_idx').on(t.createdAt), index('budget_calls_world_idx').on(t.worldId, t.day)]);
+/**
+ * §9.13's review queue: every kind of reported generated text (the table keeps its 0009 name). Each kind fills its own
+ * keys: dialogue (conversation_id, turn_index, lines, player_input), press (day, story_index — null for the
+ * headline and dek — event_id, text), letter (letter_id, day, text), other (ref, text as the client sent it).
+ */
 export const reportedTurns = pgTable('reported_turns', {
-  id: uuid('id').primaryKey(), worldId: worldId(), conversationId: text('conversation_id').notNull(),
-  turnIndex: integer('turn_index').notNull(), residentId: text('resident_id').notNull(),
-  lines: jsonb('lines').$type<DialogueTurnOutput['lines']>().notNull(), playerInput: text('player_input'),
+  id: uuid('id').primaryKey(), worldId: worldId(),
+  kind: text('kind').$type<import('@monde/shared').ReportKind>().notNull().default('dialogue'),
+  conversationId: text('conversation_id'), turnIndex: integer('turn_index'),
+  /** Who wrote it: the speaker, `sable` for the Lantern, the letter's writer; null when unknown (`other`). */
+  residentId: text('resident_id'),
+  lines: jsonb('lines').$type<DialogueTurnOutput['lines']>(), playerInput: text('player_input'),
+  day: integer('day'), storyIndex: integer('story_index'), eventId: text('event_id'), letterId: text('letter_id'),
+  ref: text('ref'), text: text('text'),
   reason: text('reason').notNull(), createdAt: createdAt(),
 }, t => [index('reported_turns_world_idx').on(t.worldId, t.createdAt)]);

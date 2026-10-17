@@ -50,7 +50,7 @@ export async function runPress(deps: NightJobDeps, world: NightWorld, fund?: num
     if (copy) paper = { ...paper, ...copy, source: 'model' };
     else deps.log.warn({ worldId: world.worldId, day: world.day }, 'press used templates');
   }
-  paper.letters = mail.filter(l => !lexicalHits(l.text).length).slice(0,2).map(l => ({ from: l.fromId, text: l.text }));
+  paper.letters = mail.filter(l => !lexicalHits(l.text).length).slice(0,2).map(l => ({ from: l.fromId, text: l.text, id: l.id }));
   paper.notices = [...world.eventsTomorrow];
   const movements = rows.filter(e => e.day === world.day && ['arrival', 'departure', 'returnee'].includes(e.type));
   paper.movements = movements.map(e => e.summary);

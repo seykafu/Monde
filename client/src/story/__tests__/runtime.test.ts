@@ -49,6 +49,13 @@ describe("host dispatch", () => {
     expect(steps).toContainEqual({ kind: "line", line: { kind: "say", speaker: "pell", text: "Hello Alex" } });
   });
 
+  it("hands a live {ai_line} on with its stored turn and the cue's authored fallback, for Report line (§9.13)", async () => {
+    const live = { kind: "say" as const, speaker: "pell", text: "Live line", report: { conversation_id: "c", turn_index: 0 } };
+    const runtime = new StoryRuntime(scene([{ op: "cmd", line: 1, cmd: cues.ai_line }]), flags(), { context, handlers: { ai_line: async () => [live] } });
+    const steps = await drain(runtime);
+    expect(steps).toContainEqual({ kind: "line", line: { ...live, report: { conversation_id: "c", turn_index: 0, fallback: "Hello Alex" } } });
+  });
+
   it("awaits AI, rejects concurrent steps, and uses authored fallback on failure", async () => {
     let release!: () => void;
     const handler = vi.fn(() => new Promise<never>((_resolve, reject) => { release = () => reject(new Error("offline")); }));
