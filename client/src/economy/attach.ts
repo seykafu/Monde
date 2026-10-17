@@ -1,4 +1,6 @@
 import { puzzleSave } from '../puzzles/runtime';
+import { isWorkPuzzle, workBoard, workSolved } from '../puzzles/work';
+import { openWorkPuzzle } from '../puzzles/scenes/WorkPuzzleScene';
 import type Phaser from 'phaser';
 import { COMMUNITY_TASKS, baseSkills, type CommunityTask } from '@monde/shared';
 import type { Clock } from '../sim/clock';
@@ -22,6 +24,7 @@ export function attachEconomyClock(scene: Phaser.Scene, clock: Clock): void {
   });
   scene.events.once('shutdown', () => { minute(); dawn(); });
 }
+let devWork = import.meta.env.DEV && typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('work') : null;
 export interface EconomyAttachment { objects: Phaser.GameObjects.GameObject[]; interaction(place: string): { label: string; run(): void } | null }
 export function attachEconomy(scene: Phaser.Scene, clock: Clock, toast: (text: string) => void, home: () => void): EconomyAttachment {
   const r = scene.registry;
@@ -47,27 +50,51 @@ export function attachEconomy(scene: Phaser.Scene, clock: Clock, toast: (text: s
   const key = (e: KeyboardEvent) => { if (!e.repeat && e.key.toLowerCase() === 'i' && !clock.paused) openBag(scene, clock); };
   scene.input.keyboard?.on('keydown', key);
   scene.events.once('shutdown', () => { off(); scene.events.off('update', update); scene.input.keyboard?.off('keydown', key); });
+  const attempt = (task: CommunityTask) => {
+    const fellow = getFellow(r), town = getTown(r);
+    if (!town) return null;
+    const done = completeWork({ state: economyOf(r), coins: coinsOf(r), town, skills: fellow?.skills ?? baseSkills(), organizer: fellow?.profile?.background === 'organizer', day: clock.day, minute: clock.minute, task, id: uuid() });
+    if (!done) { toast(clock.day < task.opens ? `This job opens on Day ${task.opens}.` : 'A meal or a fresh morning would help.'); return null; }
+    return { done, fellow, town };
+  };
+  const settle = (task: CommunityTask, { done, fellow, town }: NonNullable<ReturnType<typeof attempt>>) => {
+    r.set(ECONOMY_KEY, done.state); r.set(COINS_KEY, { balance: done.coins }); r.set('monde.town', done.town);
+    if (fellow) setFellow(r, { ...fellow, skills: done.skills });
+    // GDD-GAP: Duck Duty is not in the server's six-job catalogue yet; record its authored action as a
+    // scripted memory (importance 2, the existing sweeping importance), rather than queue an invalid task.
+    appendEvent(r, task.id === 'duck_duty' ? { kind:'scripted_memory',id:done.event.id,day:clock.day,minute:Math.floor(clock.minute),
+      resident:'bertrand',scene_id:'puzzles',cue_key:done.event.id,place:task.place,text:'The Fellow fed the ducks peas at the pond.',importance:2 } : done.event);
+    clock.advanceMinutes(done.minutes);
+    const applied = done.town.pillars[task.pillar] - town.pillars[task.pillar];
+    toast(`${task.name}: +${task.pay} coins · +${task.xp} ${task.skill} XP · ${task.pillar} +${Number(applied.toFixed(3))}`);
+  };
   const work = (task: CommunityTask) => {
     if (clock.paused) return;
-    const fellow = getFellow(r), town = getTown(r);
-    if (!town) return;
-    const done = completeWork({ state: economyOf(r), coins: coinsOf(r), town, skills: fellow?.skills ?? baseSkills(), organizer: fellow?.profile?.background === 'organizer', day: clock.day, minute: clock.minute, task, id: uuid() });
-    if (!done) { toast(clock.day < task.opens ? `This job opens on Day ${task.opens}.` : 'A meal or a fresh morning would help.'); return; }
+    const ready = attempt(task);
+    if (!ready) return;
+    if (isWorkPuzzle(task.id)) {
+      // G-07 (§15.21): the job is the board. It pays as below once the saved board is won within par (checked again
+      // here); leaving keeps the board for later and costs nothing. GDD-GAP: beating par gives nothing extra.
+      const kind = task.id;
+      void openWorkPuzzle(scene, clock, kind).then(solved => {
+        if (!solved || !workSolved(r, workBoard(r, kind, clock.day, getFellow(r)?.skills.wits.level ?? 1))) return;
+        const now = attempt(task);
+        if (now) settle(task, now);
+      });
+      return;
+    }
     clock.pause('community-work'); scene.input.keyboard?.resetKeys();
     toast(`${task.name}…`);
     // GDD-GAP: 900 ms presentation beat; the task's authored minutes are charged on completion.
-    scene.time.delayedCall(900, () => {
-      r.set(ECONOMY_KEY, done.state); r.set(COINS_KEY, { balance: done.coins }); r.set('monde.town', done.town);
-      if (fellow) setFellow(r, { ...fellow, skills: done.skills });
-      // GDD-GAP: Duck Duty is not in the server's six-job catalogue yet; record its authored action as a
-      // scripted memory (importance 2, the existing sweeping importance), rather than queue an invalid task.
-      appendEvent(r, task.id === 'duck_duty' ? { kind:'scripted_memory',id:done.event.id,day:clock.day,minute:Math.floor(clock.minute),
-        resident:'bertrand',scene_id:'puzzles',cue_key:done.event.id,place:task.place,text:'The Fellow fed the ducks peas at the pond.',importance:2 } : done.event);
-      clock.advanceMinutes(done.minutes); clock.resume('community-work');
-      const applied = done.town.pillars[task.pillar] - town.pillars[task.pillar];
-      toast(`${task.name}: +${task.pay} coins · +${task.xp} ${task.skill} XP · ${task.pillar} +${Number(applied.toFixed(3))}`);
-    });
+    scene.time.delayedCall(900, () => { settle(task, ready); clock.resume('community-work'); });
   };
+  // Dev (G-07): `?work=mail` or `?work=library` runs that job's place prompt once, as pressing E at its place would (the
+  // same checks, board and pay), as soon as nothing holds the clock (the morning paper, a scene).
+  const devTask = devWork ? COMMUNITY_TASKS.find(t => t.id === devWork) : undefined;
+  if (devTask) {
+    const once = () => { if (clock.paused || !devWork) return; devWork = null; scene.events.off('update', once); work(devTask); };
+    scene.events.on('update', once); scene.events.once('shutdown', () => scene.events.off('update', once));
+  }
   return { objects: [hud, bar], interaction: place => {
     if (place === 'old_quarter.lamplighter_cottage') return { label: 'Sleep until morning', run: () => {
       if (clock.paused) return;

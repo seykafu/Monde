@@ -107,3 +107,47 @@ Validation on this shared working tree (2026-10-15):
   `cd client && node ../node_modules/vite/bin/vite.js build`, and `npm run build -w @monde/server`.
 - No dependencies added; no commits or pushes. No browser visual review was available; panel checks
   exercise input and lifecycle with a headless display adapter.
+
+# G-07 · Procedural community work: Mail Round, Library Returns (§15.21)
+
+Two of §8's jobs are now played as boards: the place prompts at `wharf.ticket_booth` (Ada) and `old_quarter.library`
+(Margo) open them instead of the plain timed beat. The job still pays exactly what G-09 pays (`completeWork`: coins,
+Stamina, game minutes, the capped and diminishing Pillar effect, 10 XP, the `community_work` event), but only once the
+saved board is re-checked as won within par. Leaving (Esc) keeps the board and costs nothing.
+
+| Board | Pure logic | Generator (§15.21) | Win |
+|---|---|---|---|
+| Mail Round | `mailRound.ts`, graphs in `mailMaps.ts` | A district's place graph, built from its board: every door a node, streets join neighbouring doors (relative neighbourhood graph), weighted by the board's own shortest walk in whole steps. k = 4 + ⌊Wits/2⌋ (max 8) addressed doors. Par = exact optimum (Held–Karp) + 15%, rounded up. | Every letter delivered (passing a door counts) within par steps |
+| Library Returns | `libraryReturns.ts` | 6–12 books with distinct Dewey-style call numbers, shuffled. Minimum = n − cycles; par = minimum + 1. | Shelf in call-number order within par swaps |
+
+Both are `core.ts` sessions (`puzzle()`), so undo, reset, the hint ladder (nudge after 3 minutes or Wits 3; ask Ada or
+Margo; at Friend Regard, the first step of an optimal solution) and the save shape match the authored puzzles.
+`work.ts` seeds each day's board from the world seed, the job, the day and how many times the job has been done today,
+so a reload gives the same board. It saves progress in `SaveGame.puzzles.entries` under `work:<job>:<day>:<run>:<wits>`
+(keeping the Wits level the board was drawn at) and keeps only the current board of each job. `scenes/WorkPuzzleScene.ts`
+is the paper shell in PuzzleScene's style: Tab/arrows select, Enter/Space use, U undo, R reset, H hint, Esc leave.
+Every map door and book is also clickable. Text follows the text-size setting, and with reduced motion the walk and the
+swap happen without their 220 ms tween.
+
+Library Returns has a parity property: every swap flips the permutation's parity, so a sorted shelf always took the
+minimum plus an even number of swaps. Par's one spare swap can never be used. Only a perfect re-shelving wins, where
+every swap sends one book home.
+
+**Try it (dev build):** `npm run dev`, then open `http://localhost:5173/?skiptitle=1&day=3&work=mail` (or `work=library`)
+and close the morning paper; the job's prompt runs once, as pressing E at its place would. In ordinary play, walk to
+the ferry ticket booth on the Wharf, or to the library in the Old Quarter, from Day 2 and press E. At the library, the
+prompt offers a choice while The Almanac (PZ-03) is unsolved.
+
+**GDD gaps** (marked `GDD-GAP` in code): Wits/2 rounds down; par rounds up to a whole step; the Commons takes no
+rounds (three doors, too few for k = 4); a round starts at Ada's booth on the Wharf, or where the walk up from it
+enters Market Row or the Old Quarter, and ends at its last door. Empty houses, empty shopfronts and the Fellow's
+cottage take no letters. The book count per Wits level is spread over 6–12, and a shuffle is redrawn until it needs at
+least ⌈n/2⌉ swaps. Finishing under par gives nothing extra. Not built yet: the Mail Round's chats with residents met
+on the route, and Library Returns' rare Founder's Notebook page. Neither the item ids nor the odds are authored.
+
+**Tests:** `__tests__/procedural.test.ts` generates 1,000 instances of each and solves every one within par, in exactly
+the optimal steps or minimum swaps. It checks the Held–Karp optimum against a brute force over every letter order, the
+minimum swaps against a breadth-first search, and that generation is deterministic per seed. It also covers the
+boards' state transitions. `__tests__/work.test.ts` covers seeding, reloads, held Wits, pruning, the re-check and the
+scene's keys, mouse, hints, reduced motion and text size. `economy/__tests__/workPuzzles.test.ts` checks that the flow
+pays only for a won board. The QA bot (`qa/springBot.ts`) plays each board with the solver's moves before it is paid.

@@ -51,6 +51,7 @@ import {
 import { puzzles } from '../puzzles/catalog';
 import { PUZZLE_SITES, attachPuzzles, puzzleAt } from '../puzzles/interaction';
 import { completePuzzle, puzzleSave } from '../puzzles/runtime';
+import { isWorkPuzzle, storeWork, workBoard, workSolution, workSolved } from '../puzzles/work';
 import { solution as PZ01_SOLUTION } from '../puzzles/PZ-01';
 import { codes as PZ03_CODES, words as PZ03_WORDS } from '../puzzles/PZ-03';
 import { constraints as PZ04_CONSTRAINTS } from '../puzzles/PZ-04';
@@ -841,11 +842,31 @@ export class SpringBot {
     const done = completeWork({ state: economyOf(r), coins: coinsOf(r), town, skills: fellow?.skills ?? baseSkills(), organizer: fellow?.profile?.background === 'organizer',
       day: this.clock.day, minute: this.clock.minute, task, id: uuid() });
     if (!done) { this.log(`${task.name}: refused (Stamina ${economyOf(r).stamina}, day ${economyOf(r).day})`); return false; }
+    if (isWorkPuzzle(task.id) && !this.playWorkBoard(task)) return false;
     r.set(ECONOMY_KEY, done.state); r.set(COINS_KEY, { balance: done.coins }); r.set(TOWN_KEY, done.town);
     if (fellow) setFellow(this.r, { ...fellow, skills: done.skills });
     appendEvent(r, done.event);
     this.advance(done.minutes);
     this.log(`${task.name}: +${task.pay} coins`);
+    return true;
+  }
+
+  /**
+   * economy/attach.ts work() for a G-07 board (puzzles/work.ts): today's Mail Round or Library Returns, played with the
+   * solver's moves through the board's own rules (WorkPuzzleScene's moves), saved, and paid only once the saved board is
+   * re-checked as won within par.
+   */
+  private playWorkBoard(task: CommunityTask): boolean {
+    if (!isWorkPuzzle(task.id)) return false;
+    const board = workBoard(this.r, task.id, this.clock.day, getFellow(this.r)?.skills.wits.level ?? 1);
+    let state = { ...board.puzzle.reset(), elapsed: board.state.elapsed, hints: board.state.hints };
+    for (const move of workSolution(board)) state = board.puzzle.move(state, move);
+    if (!board.puzzle.win(state)) { this.issue(`${task.name}: the solver's round didn't win board ${board.key}`); return false; }
+    storeWork(this.r, board, { ...state, solved: true });
+    if (!workSolved(this.r, board)) { this.issue(`${task.name}: the saved board ${board.key} wasn't solved on re-check`); return false; }
+    this.log(board.kind === 'mail'
+      ? `${task.name} board: ${board.round.letters.length} letters in ${board.round.map.name}, ${board.round.optimal} steps (par ${board.round.par})`
+      : `${task.name} board: ${board.shelf.initial.length} books in ${state.cells[0]} swaps (par ${board.shelf.par})`);
     return true;
   }
 
