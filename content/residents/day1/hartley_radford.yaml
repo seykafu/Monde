@@ -4,14 +4,14 @@ name: Hartley Radford
 age: 41
 pronouns: he/him
 kind: resident
-occupation: fishing-boat crew
+occupation: Deckhand and mate on a harbour fishing boat.
 workplace: wharf.harbor_steps
 home: wharf.home_16
 portrait: lib_m47_010
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: hartley_radford
-appearance: A broad man with a short grey-flecked beard, greying temples under a grey flat cap, a pencil
-  behind one ear and a brown canvas work jacket. A measured, patient look.
+appearance: A broad man with a short grey-flecked beard and greying temples under a grey flat cap. He wears a
+  brown canvas work jacket with a pencil tucked behind one ear.
 look:
   kind: human
   skin: 3
@@ -23,58 +23,90 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 14 }
   face: { grey_temples: true, stubble: true }
-backstory: "Hartley came to Monde from Tarn End 15 years ago and works as fishing-boat crew. What he wants
-  most is plain enough: a boat with my name on it."
+backstory: Hartley grew up inland, in a town where the mill was the only employer, and worked the looms until
+  he couldn't stand the noise any longer. At 26 he answered an advert for a deckhand in Monde and has been on
+  the water since. He learned the bay from Old Moss Ferrante, who taught him to read tide and wind before he
+  could read a chart. Two winters ago he lost a whole week's catch to a bad engine and never told the crew it
+  was his fault. He stays because the sea asks little of him except attention, and because Kerry is here.
 personality:
-  traits: [ wry, cheerful, curious ]
-  big5: { open: 8, conscientious: 28, extravert: 25, agreeable: 56, neurotic: 29 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+  traits: [ patient, steady, dry, watchful ]
+  big5: { open: 40, conscientious: 82, extravert: 35, agreeable: 60, neurotic: 30 }
+values: { prosperity: 0.35, safety: 0.45, spirit: 0.08, charm: 0.12 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The bay tells you what it's going to do if you bother to look.
+  - Nobody in Monde would notice if the boats stopped.
+  - Engines are fine, but you can't trust a pulley you didn't fit yourself.
 voice:
-  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
-  tics: [ Fair. ]
-  never_says: [ no worries, awesome ]
+  register: Quiet and weather-first. He speaks in short clauses and lets silences do the work. He rarely
+    volunteers an opinion unless asked twice.
+  tics: [ Fair., Tide's making., Could be worse. ]
+  never_says: [ I reckon, you know what I mean, to be honest ]
   samples:
-    - Fair. Wind's backing.
-    - Could be worse. Could be raining.
-    - Tide's making. I'll be off.
+    - Fair. Wind's backing west, we'll not go far.
+    - Could be worse. Could be raining on the catch.
+    - Tide's making. Give me a minute with the rope.
 birthday: 64
-likes: [ flat calm at dawn, good rope, smoked fish ]
-dislikes: [ tangled gear, loud engines, gulls on the catch ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ flat calm at dawn, good rope, smoked fish, the creak of an old hull, Kerry's terrible coffee ]
+dislikes: [ tangled gear, loud engines, gulls on the catch, fishing in the rain without cause ]
+fears: [ the boathouse flooding, losing another man to the water ]
 dream:
-  text: A boat with my name on it
+  text: I want a boat with my name on it, built on the boathouse slip with my own hands.
   stages:
-    - Find a hull and bring it to the boathouse
-    - Raise 60 coins from catches and community work
-    - Launch on Regatta day
+    - Find a sound hull and bring it to the boathouse.
+    - Raise sixty coins from catches and work for the town.
+    - Launch her on Regatta day.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: wharf.home_16 }
-    - { at: "08:30", do: work, where: wharf.harbor_steps }
+    - { at: "05:30", do: eat, where: wharf.home_16 }
+    - { at: "06:00", do: work, where: wharf.harbor_steps }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: wharf.harbor_steps }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_16 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "13:00", do: work, where: wharf.harbor_steps }
+    - { at: "16:30", do: tinker, where: wharf.boathouse }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:30", do: cook, where: wharf.home_16 }
     - { at: "22:00", do: sleep, where: wharf.home_16 }
   weekend:
-    - { at: "08:00", do: eat, where: wharf.home_16 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: wharf.home_16 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: wharf.home_16 }
-chores: [ water the window box, wind the clock ]
+    - { at: "07:30", do: eat, where: wharf.home_16 }
+    - { at: "08:30", do: tinker, where: wharf.boathouse }
+    - { at: "11:00", do: shop, where: wharf.fish_market }
+    - { at: "13:00", do: sit, where: commons.picnic_lawn }
+    - { at: "17:00", do: wander, where: wharf.breakwater }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: wharf.home_16 }
+chores:
+  [
+    Mends the family's nets on Sunday evenings,
+    Splits and stacks driftwood for the stove,
+    Checks the bilge after every rough day
+  ]
 relationships:
-  - { id: kerry_radford, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: kerry_radford,
+      affinity: 70,
+      trust: 75,
+      tag: spouse,
+      note: Married to Kerry; the one person he always tells the weather to.
+    }
+  - {
+      id: ebba_forsyth,
+      affinity: 20,
+      trust: 25,
+      tag: friend,
+      note: Crewed beside her for years; she bets on the tides and loses.
+    }
+  - {
+      id: idris_pryce,
+      affinity: 10,
+      trust: 18,
+      tag: curious,
+      note: Keeps asking about the old mill; Hartley doesn't answer.
+    }
+secrets:
+  - text: He still keeps the mill's brass pulley from his first job in a drawer at home, and oils it every spring.
+    reveal: { regard_min: 55 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: mentor
+generated_by: model
 household: wf_e01
 archetype: fisher
 employment: employed

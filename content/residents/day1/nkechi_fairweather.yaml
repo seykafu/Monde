@@ -4,13 +4,14 @@ name: Nkechi Fairweather
 age: 68
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired draper, still sorts thread by colour at the kitchen table.
 workplace: millbrook.home_22
 home: millbrook.home_22
 portrait: nkechi_fairweather
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: nkechi_fairweather
-appearance: An older woman with grey curls and a cream coat.
+appearance: A tall woman with grey curls cut close to her head and a cream wool coat buttoned to the throat, a
+  green enamel brooch pinned at the lapel. Her hands are always a little cold.
 look:
   kind: human
   skin: 8
@@ -20,58 +21,91 @@ look:
   height: short
   outfit: { cut: coat, top: 9, bottom: 2, bottom_style: skirt, shoes: 3 }
   accessory: { kind: none }
-backstory: "Nkechi came to Monde from Ashby Lock 39 years ago and is retired now. What she wants most is plain
-  enough: a bench with a view."
+backstory: Nkechi kept the drapery counter at a Carrow department store for twenty years, measuring hems for
+  brides and widows. She met Klara at a Saturday dance when Klara was twenty-four and Nkechi was twenty-nine
+  and already tired of the city. They took the Gannet over with two suitcases and a sewing box. The mill was
+  still loud then, and the town seemed to have room for two more women who wanted a quiet life. Nkechi has
+  never quite forgiven Monde for the cold, and has never once said she misses the shops.
 personality:
-  traits: [ stubborn, curious, restless ]
-  big5: { open: 25, conscientious: 34, extravert: 42, agreeable: 42, neurotic: 51 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ precise, dry, stubborn, loyal ]
+  big5: { open: 45, conscientious: 82, extravert: 38, agreeable: 55, neurotic: 40 }
+values: { prosperity: 0.15, safety: 0.35, spirit: 0.15, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Anything worth doing is worth doing with a proper hem.
+  - The town would be fine if people would just answer their post.
+  - Klara is the only one who ever tells me when I am wrong.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Clipped and exact, with a teacher's patience and a draper's habit of checking the measure twice.
+    Speaks in short declaratives and lets silence do the rest.
+  tics: [ "Well, now.", Measure twice., "That's the thing, isn't it." ]
+  never_says: [ I suppose, whatever you like, not my problem ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Measure twice, then speak. That's how we managed forty years.
+    - No, the hem is fine. It's the thread that's gone wrong.
+    - You'll want the good chair by the stove. Klara will try to take it.
 birthday: 49
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    the morning paper with its ink still smudging,
+    a kettle that sings on the stove,
+    thread sorted by shade,
+    a morning paper,
+    a kettle on the stove
+  ]
+dislikes: [ stairs, drafts from the front door, being managed, late post ]
+fears: [ being the one left in the flat alone, a cold that settles in for good ]
 dream:
-  text: A bench with a view
+  text: A bench on the Commons where she can sit and watch the duck pond with Klara.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Choose a spot beside the duck pond, away from the bindweed.
+    - Raise fifteen coins from the Saturday market or ask Kasimir to build it.
+    - Sit on it with the first neighbour who stops to talk.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_22 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: millbrook.home_22 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_22 }
-    - { at: "19:30", do: read, where: millbrook.home_22 }
+    - { at: "08:15", do: read, where: millbrook.home_22 }
+    - { at: "09:30", do: walk, where: millbrook.terrace_row }
+    - { at: "10:30", do: shop, where: market_row.general_store }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: volunteer, where: old_quarter.library }
+    - { at: "17:30", do: cook, where: millbrook.home_22 }
     - { at: "21:30", do: sleep, where: millbrook.home_22 }
   weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_22 }
+    - { at: "08:30", do: eat, where: millbrook.home_22 }
     - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: millbrook.home_22 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "12:00", do: sit, where: commons.picnic_lawn }
+    - { at: "15:00", do: visit, where: millbrook.laundry_green }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: millbrook.home_22 }
-chores: [ beat the doormat, water the window box ]
+chores: [ sort the thread on Mondays, mend Klara's pinafore hems, wind the wireless each night ]
 relationships:
-  - { id: klara_fairweather, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: klara_fairweather,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: Thirty-nine years of arguing over the stove.
+    }
+  - {
+      id: konrad_maguire,
+      affinity: 12,
+      trust: 15,
+      tag: friend,
+      note: Remembers her measuring his wife's wedding gown.
+    }
+  - {
+      id: hamish_ortega,
+      affinity: -6,
+      trust: 4,
+      tag: rival,
+      note: Disputes every entry in the Loom Street ledger.
+    }
+secrets:
+  - text: She still keeps the wedding-gown pattern from Carrow, and sometimes sews small pieces in the evenings.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_b07
 archetype: retired_couple
 employment: retired

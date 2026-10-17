@@ -4,15 +4,15 @@ name: Iain Corbett
 age: 17
 pronouns: he/him
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Student doing lessons by post and Felix's Thursday class.
 workplace: station_hill.home_03
 home: station_hill.home_03
 portrait: lib_m16_077
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: iain_corbett
-appearance: A lanky lad with mid-brown hair flopping into his eyes, ears that stick out, a navy duffel coat
-  over a grey jumper and a long mustard-and-cream striped scarf wound twice round his neck. A shy, sidelong,
-  trying-to-look-bored look.
+appearance: Mid-brown hair swept into his eyes, ears that stick out, a navy duffel coat over a grey jumper and
+  a striped mustard-and-cream scarf wound twice round his neck. Golden brown skin, slight build, a shy
+  sidelong look.
 look:
   kind: human
   skin: 9
@@ -22,57 +22,80 @@ look:
   height: tall
   outfit: { cut: coat, top: 6, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 4 }
-backstory: Iain was born in Monde and does lessons by post at the library desk. He likes the ducks on the Commons best.
+backstory: Iain is the older Corbett child and has spent two years being sure he would leave Monde the moment
+  he finished school. He reads the timetables for the ferry and the trains that no longer stop, and makes a
+  point of knowing the schedule for leaving. He is clumsy with people and better with maps. He stayed because
+  his mother asked, and because the one time he tried to go to Carrow on his own he came back on the Friday
+  ferry with nothing but a wet scarf.
 personality:
-  traits: [ cheerful, stubborn, restless ]
-  big5: { open: 42, conscientious: 68, extravert: 42, agreeable: 15, neurotic: 65 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ sardonic, observant, shy, restless ]
+  big5: { open: 70, conscientious: 40, extravert: 25, agreeable: 45, neurotic: 75 }
+values: { prosperity: 0.3, safety: 0.25, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The ferry is the only real way out of Monde, and everything else is talk.
+  - Mum thinks the school can be saved, but it's already gone.
+  - Remy is the one who'll stay forever, not me.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: Dry and short, the sort of understatement that can land badly. Pauses, half-finished lines, a sniff
+    of mock boredom.
+  tics: [ Whatever, "fine, fine", sure ]
+  never_says: [ I'm sorry, I love this town ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - Sure. Ferry's at four. Not that anyone's counting.
+    - Fine, fine, I'll come to the class. Don't make it weird.
+    - The Gannet doesn't run on hope, Remy. Nor do I.
 birthday: 81
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes:
+  [
+    timetables and maps,
+    the lookout bench over the bay,
+    a warm scarf,
+    a lunch box packed right,
+    a teacher who remembers names
+  ]
+dislikes: [ being told to be cheerful, the cold on the harbour, school forms that ask what he wants to be ]
+fears: [ being stuck in Monde, letting his mother down ]
 dream:
-  text: A school worth the walk
+  text: Get the teenagers a proper desk at the library so they can study without leaving town.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Find a desk at the library for the teenagers with Margo.
+    - Back the Thursday-evening class with a few names on the list.
+    - Place the oldest with a Saturday master at the Gull & Anchor.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: station_hill.home_03 }
-    - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: station_hill.home_03 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
-    - { at: "18:00", do: eat, where: station_hill.home_03 }
-    - { at: "21:30", do: sleep, where: station_hill.home_03 }
-  weekend:
     - { at: "08:00", do: eat, where: station_hill.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: station_hill.home_03 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: station_hill.home_03 }
-chores: [ water the window box, mend a sock ]
+    - { at: "09:00", do: read, where: old_quarter.library }
+    - { at: "12:30", do: sit, where: station_hill.lookout_bench }
+    - { at: "14:00", do: wander, where: wharf.harbor_steps }
+    - { at: "17:00", do: attend, where: old_quarter.library }
+    - { at: "19:00", do: eat, where: station_hill.home_03 }
+    - { at: "21:00", do: read, where: station_hill.home_03 }
+    - { at: "22:30", do: sleep, where: station_hill.home_03 }
+  weekend:
+    - { at: "09:00", do: eat, where: station_hill.home_03 }
+    - { at: "10:30", do: wander, where: station_hill.platform }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: sit, where: station_hill.lookout_bench }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: station_hill.home_03 }
+chores: [ Fetch the post, Stack firewood, Wash the windows ]
 relationships:
-  - { id: ilse_corbett, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: ottilie_verhoeven, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: remy_corbett, affinity: 70, trust: 70, tag: sibling, note: Same house. }
-secrets: []
+  - {
+      id: hollis,
+      affinity: 18,
+      trust: 15,
+      tag: fond,
+      note: Tells him about the Liss branch and never asks him to stay.
+    }
+  - { id: ilse_corbett, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
+  - { id: ottilie_verhoeven, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
+  - { id: remy_corbett, affinity: 65, trust: 60, tag: sibling, note: "Sibling, under the same roof." }
+secrets:
+  - text: He has a folded ferry ticket to Carrow he bought last winter and has never used.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: sh_l01
 archetype: school_family
 employment: lessons

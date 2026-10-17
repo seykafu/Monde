@@ -4,13 +4,14 @@ name: Ayesha Soto
 age: 36
 pronouns: she/her
 kind: resident
-occupation: works in Hessle Cross
+occupation: Office clerk in Hessle Cross, working weekdays and home weekends.
 workplace: offmap.city
 home: millbrook.home_26
 portrait: ayesha_soto
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: ayesha_soto
-appearance: A woman with black braids, a rose coat and a rust scarf.
+appearance: Black braids are tied back from her face. She wears a rose coat over a rust scarf that she loosens
+  on the ferry.
 look:
   kind: human
   skin: 5
@@ -20,59 +21,71 @@ look:
   height: tall
   outfit: { cut: coat, top: 12, bottom: 14, bottom_style: trousers, shoes: 8 }
   accessory: { kind: scarf, colour: 11 }
-backstory: "Ayesha was born in Monde and works as a commuter to Hessle Cross. What she wants most is plain
-  enough: a school worth the walk."
+backstory: Ayesha was born in Monde and went to the mainland for work when the mill was still open, living in
+  a rented room near the Hessle Cross docks. She met Cordelia on a weekend visit home and they married in the
+  chapel of St Brigid's. The job in Hessle Cross pays better than anything in Monde, and she sends most of it
+  home. She is proud of being useful in the city, and quietly guilty about being away when the boys need her.
+  She took the weekly commute so they could keep the house on Mill Lane. She is not sure the school will
+  survive, and does not say so on the ferry.
 personality:
-  traits: [ shy, patient, warm ]
-  big5: { open: 25, conscientious: 79, extravert: 76, agreeable: 72, neurotic: 16 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ steady, practical, wry, loyal ]
+  big5: { open: 55, conscientious: 75, extravert: 55, agreeable: 60, neurotic: 38 }
+values: { prosperity: 0.35, safety: 0.25, spirit: 0.2, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Money in the bank is the only real safety.
+  - Monde will be fine if the right people stay.
+  - Commuting is a sensible arrangement for now.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: Dry and quick, with short sentences. She uses the ferry timetable as a kind of joke. She is warm but
+    not gushing.
+  tics: [ Ferry's at six., "Sensible, that.", "Right, I'll manage." ]
+  never_says: [ I'm too tired, I don't know, we'll see ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - Ferry's at six. Don't wait up if the wind's up.
+    - Two weeks' pay in the envelope. Tell Cordelia it isn't a loan.
+    - Yes, I'm home Friday. Yes, I'll bring the good bread.
 birthday: 45
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    The ferry crossing at dawn,
+    Fresh bread from Fournier & Fille,
+    Her boys reading aloud,
+    The sound of the Gannet's horn,
+    a lunch box packed right
+  ]
+dislikes: [ Commuting on Mondays, Empty shops on Market Row, Being asked when she'll move home for good ]
+fears: [ Missing something important at home, The mainland job ending ]
 dream:
-  text: A school worth the walk
+  text: Plant a garden behind the house that the whole street can share.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Clear the plot behind the house of bindweed.
+    - Get seed from Dunmore's General Store.
+    - Plant it before the next Saturday market.
 routine:
   weekday:
-    - { at: "06:30", do: eat, where: millbrook.home_26 }
-    - { at: "07:30", do: work, where: offmap.city }
-    - { at: "12:30", do: eat, where: offmap.city }
-    - { at: "13:30", do: work, where: offmap.city }
-    - { at: "19:00", do: eat, where: offmap.city }
-    - { at: "22:00", do: sleep, where: offmap.city }
+    - { at: "05:30", do: eat, where: millbrook.home_26 }
+    - { at: "06:00", do: walk, where: wharf.harbor_steps }
+    - { at: "09:00", do: work, where: offmap.city }
+    - { at: "17:30", do: eat, where: offmap.city }
+    - { at: "22:30", do: sleep, where: offmap.city }
   weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_26 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_26 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_26 }
-chores: [ mend a sock, wind the clock ]
+    - { at: "08:30", do: eat, where: millbrook.home_26 }
+    - { at: "10:00", do: shop, where: market_row.bakery }
+    - { at: "12:00", do: walk, where: millbrook.weir }
+    - { at: "15:00", do: garden, where: millbrook.home_26 }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: millbrook.home_26 }
+chores: [ Bring home bread from the bakery, Take in the washing on Friday, Check the ferry tickets ]
 relationships:
-  - { id: cordelia_soto, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-  - { id: arvid_soto, affinity: 70, trust: 70, tag: son, note: Same house. }
-  - { id: raoul_soto, affinity: 70, trust: 70, tag: son, note: Same house. }
-secrets: []
+  - { id: cordelia_soto, affinity: 18, trust: 22, tag: spouse, note: "Her wife, the steady one at home." }
+  - { id: arvid_soto, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+  - { id: raoul_soto, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+secrets:
+  - text: She has been saving a second envelope of pay in case the school closes and the family has to leave Monde.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_l01
 archetype: school_family
 employment: employed

@@ -4,13 +4,14 @@ name: Cordelia Soto
 age: 36
 pronouns: she/her
 kind: resident
-occupation: full-time carer at home
+occupation: Full-time carer at home, unpaid; keeps the household running and the boys…
 workplace: millbrook.home_26
 home: millbrook.home_26
 portrait: cordelia_soto
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: cordelia_soto
-appearance: A woman with long chestnut hair and a cream jumper.
+appearance: Long chestnut hair falls past her shoulders. She wears a cream jumper with the sleeves pushed up
+  at the wrists.
 look:
   kind: human
   skin: 7
@@ -20,61 +21,94 @@ look:
   height: short
   outfit: { cut: jumper, top: 9, bottom: 12, bottom_style: trousers, shoes: 4 }
   accessory: { kind: none }
-backstory: "Cordelia was born in Monde and looks after the household full-time. What she wants most is plain
-  enough: a school worth the walk."
+backstory: "Cordelia grew up three streets from Mill Lane and left at nineteen to train as a clerk in Carrow.
+  She came back when her mother fell ill and never quite went away again. Her mother died two winters ago, and
+  Cordelia stayed on in the house with the boys while Ayesha took the Hessle Cross post. She runs a tight
+  week: lunch boxes packed the night before, a list on the fridge, the ferry timetable pinned beside it. She
+  believes the school will last if enough people keep turning up to it. That is only partly true, and she has
+  not yet admitted to herself that the roll is the real problem."
 personality:
-  traits: [ stubborn, wry, kind ]
-  big5: { open: 8, conscientious: 49, extravert: 93, agreeable: 86, neurotic: 60 }
+  traits: [ organised, dutiful, practical, anxious ]
+  big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 68, neurotic: 64 }
 values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A child who has a fixed routine will be fine.
+  - If the school closes, the boys will fall behind for good.
+  - People in Monde mean well, even when they don't follow through.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
+  register: Brisk and organising. Speaks in lists of three and asks questions like a form. Ends sentences on the
     schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  tics: [ "Right, then.", Is that Tuesday or Thursday?, And after that? ]
+  never_says: [ don't worry, it'll be fine, just relax ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - Lunch, reading book, and the satchel by the door. Is that everything?
+    - Ferry's on Tuesday, so Ayesha home by Friday tea. Yes?
+    - No, I haven't forgotten the roll. I'm counting the days on the calendar.
 birthday: 13
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    A lunch box packed right,
+    Teachers who remember names,
+    The bench by the school gate,
+    Ordered lists on the back of old envelopes,
+    a teacher who remembers names
+  ]
+dislikes: [ A closed school, Walking home in the dark, Being told the children will adapt ]
+fears: [ The school closing with the boys still in it, Ayesha not coming home on Friday ]
 dream:
-  text: A school worth the walk
+  text: Get the school a roll of twenty, so Arvid and Raoul can stay in their own room.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Visit Felix's classroom and sit in on a lesson.
+    - Help with a Friday lesson so the children see a familiar face.
+    - Sign the enrollment roll in front of the whole class.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_26 }
-    - { at: "09:30", do: walk, where: wharf.breakwater }
-    - { at: "12:00", do: eat, where: millbrook.home_26 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_26 }
-    - { at: "19:30", do: read, where: millbrook.home_26 }
-    - { at: "21:30", do: sleep, where: millbrook.home_26 }
+    - { at: "06:45", do: eat, where: millbrook.home_26 }
+    - { at: "07:30", do: visit, where: millbrook.school }
+    - { at: "09:00", do: clean, where: millbrook.home_26 }
+    - { at: "11:00", do: shop, where: market_row.general_store }
+    - { at: "13:00", do: eat, where: millbrook.home_26 }
+    - { at: "15:15", do: walk, where: millbrook.weir }
+    - { at: "17:00", do: cook, where: millbrook.home_26 }
+    - { at: "20:30", do: write, where: millbrook.home_26 }
+    - { at: "22:00", do: sleep, where: millbrook.home_26 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_26 }
     - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: millbrook.home_26 }
-    - { at: "19:30", do: read, where: millbrook.home_26 }
-    - { at: "22:00", do: sleep, where: millbrook.home_26 }
-chores: [ fill the coal scuttle, wind the clock ]
+    - { at: "12:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "15:00", do: garden, where: millbrook.home_26 }
+    - { at: "18:30", do: eat, where: millbrook.home_26 }
+    - { at: "22:30", do: sleep, where: millbrook.home_26 }
+chores:
+  [
+    Pack lunch boxes the night before,
+    Keep the ferry timetable up to date,
+    Hang the washing on the laundry green
+  ]
 relationships:
-  - { id: ayesha_soto, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-  - { id: arvid_soto, affinity: 70, trust: 70, tag: son, note: Same house. }
-  - { id: raoul_soto, affinity: 70, trust: 70, tag: son, note: Same house. }
-secrets: []
+  - {
+      id: ayesha_soto,
+      affinity: 18,
+      trust: 22,
+      tag: spouse,
+      note: "Her wife, away in Hessle Cross all week."
+    }
+  - {
+      id: greta_grieve,
+      affinity: 8,
+      trust: 10,
+      tag: curious,
+      note: "Commuter neighbour, keeps odd hours too."
+    }
+  - { id: arvid_soto, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+  - { id: raoul_soto, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+secrets:
+  - text: She has been quietly writing to the Carrow education office for a teacher's post, and has heard nothing
+      back.
+    reveal: { regard_min: 60 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: volunteer
+generated_by: model
 household: mb_l01
 archetype: school_family
 employment: carer

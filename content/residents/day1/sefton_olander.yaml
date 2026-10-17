@@ -4,14 +4,14 @@ name: Sefton Olander
 age: 42
 pronouns: he/him
 kind: resident
-occupation: fishing-boat crew
+occupation: Fishing-boat crew on one of Monde's nine boats.
 workplace: wharf.harbor_steps
 home: wharf.home_10
 portrait: lib_m44_090
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: sefton_olander
-appearance: A tall, soft-spoken man with tidy black hair, a neatly trimmed beard, a camel duffel coat and a
-  long, lopsided sky-blue striped scarf that a child clearly knitted. A patient, slightly frazzled look.
+appearance: A tall, soft-spoken man with tidy black hair and a neatly trimmed beard, in a camel duffel coat.
+  He wears a long, lopsided sky-blue striped scarf that a child clearly knitted for him.
 look:
   kind: human
   skin: 4
@@ -22,58 +22,75 @@ look:
   outfit: { cut: coat, top: 15, bottom: 1, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 5 }
   face: { moustache: true, stubble: true }
-backstory: "Sefton came to Monde from Carrow 18 years ago and works as fishing-boat crew. What he wants most
-  is plain enough: a boat with my name on it."
+backstory: Sefton grew up inland in a market town where his father sold feed and never once went near water.
+  At twenty-four he took a ferry out of Carrow on a whim, saw the harbour steps at low tide, and asked for
+  work the same afternoon. He was useless at knots for two seasons and nobody let him forget it. The boats
+  kept him because he never complained about the cold. He lives alone in a ground-floor flat on Shore Lane
+  with more chairs than he needs. The scarf came from Bea Hendry's youngest, Tam, who knitted it at school and
+  insisted he wear it on every crossing.
 personality:
-  traits: [ particular, shy, wry ]
-  big5: { open: 64, conscientious: 75, extravert: 81, agreeable: 57, neurotic: 67 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+  traits: [ patient, dry, loyal, tidy ]
+  big5: { open: 40, conscientious: 78, extravert: 35, agreeable: 68, neurotic: 45 }
+values: { prosperity: 0.35, safety: 0.4, spirit: 0.1, charm: 0.15 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The tide tells you more than anybody in this town.
+  - A good knot is worth a dozen speeches.
+  - The Gannet has never once been late, and I'd know.
+  - Nobody needs to know how much I think about the cannery.
 voice:
-  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
-  tics: [ Fair. ]
-  never_says: [ no worries, awesome ]
+  register: Quiet and unhurried. He speaks in short sentences and leads with the weather. He rarely offers an
+    opinion unasked, and when he does it comes out flat and sensible.
+  tics: [ Fair enough., Tide's making., Could be worse. ]
+  never_says: [ I reckon, absolutely, you know what, to be honest ]
   samples:
-    - Fair. Wind's backing.
-    - Could be worse. Could be raining.
-    - Tide's making. I'll be off.
+    - Fair. Wind's backing west, we'll not get out before noon.
+    - Could be worse. Could be raining on the nets.
+    - Tam's scarf? Aye, I'll wear it. It's not as if I'd want to be cold.
 birthday: 83
-likes: [ flat calm at dawn, good rope, smoked fish ]
-dislikes: [ tangled gear, loud engines, gulls on the catch ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ Flat calm at dawn, Good rope, Smoked fish, Tam's knitting, The chime of the harbour bell ]
+dislikes: [ Tangled gear, Loud engines, Gulls on the catch, Being hurried on the steps ]
+fears: [ Losing a crewmate to a sudden squall, The cannery stays shut forever ]
 dream:
-  text: A boat with my name on it
+  text: I want the cannery open again, with a proper co-op and people working its floors.
   stages:
-    - Find a hull and bring it to the boathouse
-    - Raise 60 coins from catches and community work
-    - Launch on Regatta day
+    - Gather ten signatures for the co-op petition.
+    - Pitch the co-op plan to Nell Dunmore.
+    - Make the first landing at the cannery.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: wharf.home_10 }
-    - { at: "08:30", do: work, where: wharf.harbor_steps }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: wharf.harbor_steps }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_10 }
-    - { at: "20:00", do: read, where: wharf.home_10 }
-    - { at: "22:00", do: sleep, where: wharf.home_10 }
+    - { at: "05:30", do: eat, where: wharf.home_10 }
+    - { at: "06:00", do: work, where: wharf.harbor_steps }
+    - { at: "12:30", do: eat, where: wharf.harbor_steps }
+    - { at: "14:00", do: work, where: wharf.harbor_steps }
+    - { at: "17:00", do: shop, where: wharf.fish_market }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: walk, where: wharf.breakwater }
+    - { at: "22:30", do: sleep, where: wharf.home_10 }
   weekend:
-    - { at: "08:00", do: eat, where: wharf.home_10 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: wharf.home_10 }
-    - { at: "19:30", do: read, where: wharf.home_10 }
-    - { at: "22:00", do: sleep, where: wharf.home_10 }
-chores: [ sweep the step, black the stove ]
+    - { at: "07:30", do: eat, where: wharf.home_10 }
+    - { at: "09:00", do: tinker, where: wharf.boathouse }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: walk, where: commons.picnic_lawn }
+    - { at: "16:00", do: socialize, where: commons.duck_pond }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: wharf.home_10 }
+chores: [ Mend the sail patch by the window, Scrub the boots on the back step, Wash the scarf on Sundays ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - { id: piet_hendry, affinity: 12, trust: 10, tag: friend, note: Shares the galley on the long trips. }
+  - { id: caspar_underhill, affinity: 5, trust: 8, tag: fond, note: "Good deckhand, talks too much at sea." }
+  - {
+      id: efua_drummond,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Keeps his nets in repair without being asked.
+    }
+secrets:
+  - text: He has been drafting the co-op petition on the back of old tide tables for a year.
+    reveal: { regard_min: 55 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: volunteer
+generated_by: model
 household: wf_d01
 archetype: fisher
 employment: employed

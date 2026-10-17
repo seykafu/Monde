@@ -2096,7 +2096,7 @@ households:
         birthday: 23
         portrait: { source: procedural, look: { kind: human, skin: 7, hair: { style: swept, colour: 2 }, eyes: 4, build: medium, height: tall, outfit: { cut: jumper, top: 12, bottom: 4, bottom_style: trousers, shoes: 13 }, accessory: { kind: none }, face: { moustache: true } }, tags: { band: elder, presentation: m, skin: 3, skin_word: olive, hair_word: grey, hair_style: swept, attire: [ jumper ], build: average, caption: "An older man with grey hair swept back, a rose jumper and a moustache." } }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: ab7113351063a27c, cost_usd: 0.012193, written_at: 2026-10-17T19:53:53.125Z }
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: ab7113351063a27c, cost_usd: 0.012783, written_at: 2026-10-17T21:02:15.411Z }
   - id: mb_b06
     type: B
     zone: millbrook
@@ -2194,7 +2194,7 @@ households:
         birthday: 38
         portrait: { source: procedural, look: { kind: human, skin: 2, hair: { style: curly, colour: 11 }, eyes: 1, build: medium, height: tall, outfit: { cut: pinafore, top: 9, bottom: 5, bottom_style: skirt, shoes: 12, trim: 15 }, accessory: { kind: none } }, tags: { band: elder, presentation: f, skin: 3, skin_word: tan, hair_word: salt-and-pepper, hair_style: curly, attire: [ pinafore ], build: average, caption: An older woman with salt-and-pepper curls and a cream pinafore. } }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: af5fc475316ded12, cost_usd: 0.01232, written_at: 2026-10-17T19:55:31.945Z }
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: af5fc475316ded12, cost_usd: 0.00203, written_at: 2026-10-17T21:02:33.891Z }
   - id: oq_b01
     type: B
     zone: old_quarter
@@ -3165,7 +3165,7 @@ households:
         birthday: 84
         portrait: { source: library, id: lib_m38_064 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: fdf64459af699002, cost_usd: 0.007324, written_at: 2026-10-17T19:58:16.872Z }
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: fdf64459af699002, cost_usd: 0.0012, written_at: 2026-10-17T21:02:44.903Z }
   - id: oq_d02
     type: D
     zone: old_quarter
@@ -3311,7 +3311,7 @@ households:
         birthday: 83
         portrait: { source: library, id: lib_m44_090 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 62e6f256ca837941, cost_usd: 0.007589, written_at: 2026-10-17T19:59:13.773Z }
+    generation: { prompt: census-v1, attempts: 2, source: model, input_hash: 62e6f256ca837941, cost_usd: 0.002541, written_at: 2026-10-17T21:03:05.757Z }
   - id: wf_d02
     type: D
     zone: wharf
@@ -3517,7 +3517,7 @@ households:
         birthday: 51
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: long, colour: 11 }, eyes: 1, build: broad, height: tall, outfit: { cut: jumper, top: 4, bottom: 2, bottom_style: trousers, shoes: 12 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 5, skin_word: dark brown, hair_word: salt-and-pepper, hair_style: long, attire: [ jumper ], build: broad, caption: A woman in her fifties with long salt-and-pepper hair and a mustard jumper. } }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 5a79461b8c5f296a, cost_usd: 0.012148, written_at: 2026-10-17T20:02:25.729Z }
+    generation: { prompt: census-v1, attempts: 2, source: model, input_hash: 5a79461b8c5f296a, cost_usd: 0.00415, written_at: 2026-10-17T21:03:41.015Z }
   - id: mb_e04
     type: E
     zone: millbrook
@@ -3807,7 +3807,7 @@ households:
         birthday: 15
         portrait: { source: library, id: lib_a41_024 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 4bd3b2d344917fc2, cost_usd: 0.012408, written_at: 2026-10-17T20:04:01.864Z }
+    generation: { prompt: census-v1, attempts: 3, source: model, input_hash: 4bd3b2d344917fc2, cost_usd: 0.006164, written_at: 2026-10-17T21:04:30.018Z }
   - id: wf_e02
     type: E
     zone: wharf
@@ -3905,7 +3905,7 @@ households:
         birthday: 54
         portrait: { source: library, id: lib_m38_063 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 41780b61ac5e93ee, cost_usd: 0.01174, written_at: 2026-10-17T20:05:33.217Z }
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 41780b61ac5e93ee, cost_usd: 0.011777, written_at: 2026-10-17T21:06:02.569Z }
   - id: sh_e01
     type: E
     zone: station_hill
@@ -4176,7 +4176,7 @@ households:
         birthday: 60
         portrait: { source: library, id: lib_f30_084 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 2470ec2e6d272f71, cost_usd: 0.013014, written_at: 2026-10-17T20:07:12.809Z }
+    generation: { prompt: census-v1, attempts: 2, source: model, input_hash: 2470ec2e6d272f71, cost_usd: 0.004355, written_at: 2026-10-17T21:06:38.786Z }
   - id: oq_i01
     type: I
     zone: old_quarter
@@ -4567,7 +4567,7 @@ households:
         birthday: 72
         portrait: { source: procedural, look: { kind: human, skin: 0, hair: { style: tufty, colour: 5 }, eyes: 0, build: narrow, height: tall, outfit: { cut: dungarees, top: 14, bottom: 15, bottom_style: trousers, shoes: 2, trim: 11 }, accessory: { kind: none }, face: { freckles: true } }, tags: { band: teen, presentation: m, skin: 2, skin_word: fair, hair_word: sandy blond, hair_style: tufty, attire: [ dungarees ], build: slight, caption: "A boy of about thirteen with tufty sandy blond hair, grey dungarees and freckles." } }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 56902b9bca96a584, cost_usd: 0.020633, written_at: 2026-10-17T20:10:43.482Z }
+    generation: { prompt: census-v1, attempts: 5, source: model, input_hash: 56902b9bca96a584, cost_usd: 0.017178, written_at: 2026-10-17T21:08:53.779Z }
   - id: wf_l01
     type: L
     zone: wharf
@@ -4657,7 +4657,7 @@ households:
         birthday: 33
         portrait: { source: library, id: lib_m16_078 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: d5012ff3eea2273c, cost_usd: 0.02106, written_at: 2026-10-17T20:13:26.819Z }
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: d5012ff3eea2273c, cost_usd: 0.021231, written_at: 2026-10-17T21:11:39.772Z }
   - id: sh_l01
     type: L
     zone: station_hill
@@ -4747,7 +4747,7 @@ households:
         birthday: 81
         portrait: { source: library, id: lib_m16_077 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 6a1b4722d4a44347, cost_usd: 0.020893, written_at: 2026-10-17T20:16:12.979Z }
+    generation: { prompt: census-v1, attempts: 5, source: model, input_hash: 6a1b4722d4a44347, cost_usd: 0.017612, written_at: 2026-10-17T21:14:01.833Z }
   - id: wf_m01
     type: M
     zone: wharf
@@ -4924,7 +4924,7 @@ households:
         birthday: 78
         portrait: { source: library, id: lib_m09_002 }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 852444935089605e, cost_usd: 0.024329, written_at: 2026-10-17T20:19:30.753Z }
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 852444935089605e, cost_usd: 0.024498, written_at: 2026-10-17T21:17:23.831Z }
   - id: mb_n02
     type: N
     zone: millbrook
@@ -5034,7 +5034,7 @@ households:
         birthday: 99
         portrait: { source: procedural, look: { kind: human, skin: 9, hair: { style: short, colour: 3 }, eyes: 6, build: medium, height: short, outfit: { cut: plain, top: 9, bottom: 8, bottom_style: shorts, shoes: 15 }, accessory: { kind: scarf, colour: 3 } }, tags: { band: child, presentation: m, skin: 4, skin_word: golden brown, hair_word: black, hair_style: short, attire: [ scarf ], build: average, caption: "A small boy of about ten with short black hair, a cream shirt and a brick-red scarf." } }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 15260b5128cac9cc, cost_usd: 0.025022, written_at: 2026-10-17T20:22:50.928Z }
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 15260b5128cac9cc, cost_usd: 0.025149, written_at: 2026-10-17T21:20:47.416Z }
   - id: mb_n03
     type: N
     zone: millbrook
@@ -5144,7 +5144,7 @@ households:
         birthday: 44
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: braids, colour: 3 }, eyes: 6, build: medium, height: short, outfit: { cut: pinafore, top: 4, bottom: 5, bottom_style: skirt, shoes: 2, trim: 5 }, accessory: { kind: none } }, tags: { band: teen, presentation: f, skin: 5, skin_word: dark brown, hair_word: black, hair_style: braids, attire: [ pinafore ], build: average, caption: A girl of about fifteen with black braids and a mustard pinafore. } }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: da92bcf9c98bfcec, cost_usd: 0.024774, written_at: 2026-10-17T20:26:07.960Z }
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: da92bcf9c98bfcec, cost_usd: 0.025044, written_at: 2026-10-17T21:24:13.370Z }
   - id: wf_n01
     type: N
     zone: wharf
@@ -5254,7 +5254,7 @@ households:
         birthday: 24
         portrait: { source: procedural, look: { kind: human, skin: 1, hair: { style: bob, colour: 0 }, eyes: 2, build: narrow, height: short, outfit: { cut: plain, top: 12, bottom: 8, bottom_style: trousers, shoes: 9 }, accessory: { kind: none } }, tags: { band: child, presentation: f, skin: 2, skin_word: fair, hair_word: dark brown, hair_style: bob, attire: [ shirt ], build: slight, caption: A small girl of about five with a dark brown bob and a rose shirt. } }
         name_fixed: true
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: bf60ce0db396cb50, cost_usd: 0.024218, written_at: 2026-10-17T20:29:18.839Z }
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: bf60ce0db396cb50, cost_usd: 0.024306, written_at: 2026-10-17T21:27:22.673Z }
   - id: oq_p01
     type: P
     zone: old_quarter

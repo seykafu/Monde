@@ -4,13 +4,14 @@ name: Arvid Soto
 age: 7
 pronouns: he/him
 kind: resident
-occupation: pupil at Millbrook School
+occupation: Pupil at Millbrook School in Felix Amari's class.
 workplace: millbrook.home_26
 home: millbrook.home_26
 portrait: arvid_soto
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: arvid_soto
-appearance: A small boy with chestnut curls, brown dungarees and freckles.
+appearance: Chestnut curls stick up at the back. He wears brown dungarees with a patch on one knee and
+  freckles across his nose.
 look:
   kind: human
   skin: 1
@@ -21,32 +22,45 @@ look:
   outfit: { cut: dungarees, top: 1, bottom: 1, bottom_style: trousers, shoes: 5, trim: 10 }
   accessory: { kind: none }
   face: { freckles: true }
-backstory: Arvid was born in Monde and goes to Millbrook School. He likes the ducks on the Commons best.
+backstory: Arvid was born in the bedroom upstairs at No. 4 Mill Lane, during a storm that took out the ferry
+  for two days. He is the younger of the two brothers and keeps a tin of pebbles from the weir in his pocket.
+  He likes Felix's class because it is small enough that everyone gets a turn at the blackboard. He has
+  started to notice the empty seats in the room and thinks the school is simply losing people, the way the
+  ferry sometimes loses a crate. He does not yet understand the difference between leaving and disappearing.
 personality:
-  traits: [ wry, stubborn, warm ]
-  big5: { open: 93, conscientious: 46, extravert: 59, agreeable: 54, neurotic: 15 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ curious, chatty, restless, sunny ]
+  big5: { open: 72, conscientious: 40, extravert: 78, agreeable: 65, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.4, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Pebbles from the weir are the best kind of luck.
+  - The ferry always comes back, even if it's late.
+  - Felix knows everything about the mill.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ Can we go to the ducks? ]
-  never_says: [ no worries, awesome ]
+  register: Quick and loud, with lots of questions and interruptions. He reports what he has seen and asks what
+    it means.
+  tics: [ Why though?, Can I?, Guess what. ]
+  never_says: [ that's boring, I'm too little, nobody cares ]
   samples:
-    - Can we go to the ducks? Just for a minute.
-    - I'm not tired. I'm resting my eyes.
-    - Mr. Amari says my letters lean. They're fine.
+    - Guess what, Felix says the heron fountain has a secret. Can I see it?
+    - Why does the ferry only come on Tuesdays?
+    - Raoul says he's too old for pebbles. I still have mine.
 birthday: 86
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes:
+  [
+    Felix's blackboard,
+    Pebbles from the weir,
+    The duck pond on the Commons,
+    a lunch box packed right,
+    a teacher who remembers names
+  ]
+dislikes: [ Going to bed early, Being told to be quiet, Empty desks ]
+fears: [ The dark on the walk home, Losing his brother to the mainland ]
 dream:
-  text: A school worth the walk
+  text: Read his first whole book out loud at the front of the class.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Practise the first chapter at the library desk.
+    - Read the opening page to Felix on a Thursday.
+    - Stand at the blackboard and read it to the whole room.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_26 }
@@ -61,15 +75,29 @@ routine:
     - { at: "14:00", do: wander, where: wharf.breakwater }
     - { at: "18:00", do: eat, where: millbrook.home_26 }
     - { at: "20:30", do: sleep, where: millbrook.home_26 }
-chores: [ fold the washing, water the window box ]
+chores: [ Feed the hens with Raoul, Bring in the kindling ]
 relationships:
-  - { id: cordelia_soto, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: ayesha_soto, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: raoul_soto, affinity: 70, trust: 70, tag: brother, note: Same house. }
-secrets: []
+  - {
+      id: raoul_soto,
+      affinity: 20,
+      trust: 18,
+      tag: brother,
+      note: "His big brother, who is always too busy."
+    }
+  - {
+      id: cordelia_soto,
+      affinity: 15,
+      trust: 20,
+      tag: mother,
+      note: "His mum at home, who always knows where the boots are."
+    }
+  - { id: ayesha_soto, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
+secrets:
+  - text: He has been hiding a cracked pebble from the weir in his sock, convinced it is lucky.
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_l01
 archetype: school_family
 employment: pupil

@@ -4,13 +4,14 @@ name: Klara Fairweather
 age: 63
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired seamstress and occasional Lantern proofreader.
 workplace: millbrook.home_22
 home: millbrook.home_22
 portrait: klara_fairweather
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: klara_fairweather
-appearance: An older woman with salt-and-pepper curls and a cream pinafore.
+appearance: A broad-shouldered woman with salt-and-pepper curls held back by a blue ribbon and a cream
+  pinafore dusted with flour. Her forearms are freckled from years of wind off the harbour.
 look:
   kind: human
   skin: 2
@@ -20,58 +21,92 @@ look:
   height: tall
   outfit: { cut: pinafore, top: 9, bottom: 5, bottom_style: skirt, shoes: 12, trim: 15 }
   accessory: { kind: none }
-backstory: "Klara came to Monde from Hessle Cross 39 years ago and is retired now. What she wants most is
-  plain enough: a bench with a view."
+backstory: Klara grew up in a cramped Carrow tenement with four sisters and learned to sew before she could
+  read properly. She was twenty-four when she met Nkechi at a dance hall that has since closed, and she
+  followed her to Monde because she thought the sea air would clear her chest. It did not entirely. The town
+  gave her a sewing room above the old haberdashery and a steady stream of mending from the mill families. She
+  still believes the town will come back if enough people stop leaving, and she is quietly wrong about the
+  Gannet's timetable, which she insists runs on Mondays.
 personality:
-  traits: [ cheerful, steady, particular ]
-  big5: { open: 59, conscientious: 57, extravert: 25, agreeable: 46, neurotic: 42 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ warm, talkative, impatient, generous ]
+  big5: { open: 60, conscientious: 65, extravert: 72, agreeable: 68, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.25, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The Gannet runs on Mondays, I'm sure of it.
+  - If you feed a person they will tell you the truth.
+  - Someone should start a dance again before the summer.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Warm and quick, a little theatrical, with a seamstress's sharp eye for flaws. Often talks over
+    Nkechi and then stops to let her finish.
+  tics: [ "Don't we, dear?", "Oh, honestly.", Now listen. ]
+  never_says: [ I don't care, it's hopeless, nobody asked ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Don't we, dear? Tell them about the Gannet. Go on, tell them.
+    - Oh, honestly, the bread's still warm. Take one before it's gone.
+    - Now listen. A hall with a floor, a gramophone and a Saturday. That's all we need.
 birthday: 38
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    fresh bread from Fournier & Fille,
+    a good gossip on the doorstep,
+    music from the wireless,
+    the smell of the harbour in spring,
+    a morning paper
+  ]
+dislikes: [ drafts, cold tea, people who won't sit down, shuttered shopfronts ]
+fears: [ the flat growing too quiet, losing her voice in the cold ]
 dream:
-  text: A bench with a view
+  text: A Saturday night dance in a hall where the whole town turns out and nobody minds the damp.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Find a hall with a sound floor and room for chairs.
+    - Find a gramophone or a band willing to play for cider.
+    - Hold the dance and make Nkechi come down the middle.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_22 }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
-    - { at: "12:00", do: eat, where: millbrook.home_22 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_22 }
-    - { at: "19:30", do: read, where: millbrook.home_22 }
-    - { at: "21:30", do: sleep, where: millbrook.home_22 }
+    - { at: "07:00", do: eat, where: millbrook.home_22 }
+    - { at: "08:00", do: cook, where: millbrook.home_22 }
+    - { at: "09:00", do: sit, where: millbrook.laundry_green }
+    - { at: "10:30", do: shop, where: market_row.bakery }
+    - { at: "12:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:30", do: write, where: old_quarter.library }
+    - { at: "17:00", do: visit, where: old_quarter.fountain_square }
+    - { at: "21:00", do: sleep, where: millbrook.home_22 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_22 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_22 }
-    - { at: "19:30", do: read, where: millbrook.home_22 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:30", do: walk, where: commons.duck_pond }
+    - { at: "14:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "18:00", do: play_music, where: millbrook.home_22 }
     - { at: "22:00", do: sleep, where: millbrook.home_22 }
-chores: [ water the window box, wind the clock ]
+chores: [ bake on Fridays, darn the household socks, water the windowbox ]
 relationships:
-  - { id: nkechi_fairweather, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: nkechi_fairweather,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: "Her steady, sharp-tongued other half."
+    }
+  - {
+      id: frankie_chandra,
+      affinity: 14,
+      trust: 12,
+      tag: friend,
+      note: Swaps recipes and grievances over the fence.
+    }
+  - {
+      id: tomasz_blaauw,
+      affinity: -4,
+      trust: 6,
+      tag: wary,
+      note: Keeps minutes of things she finds nothing to write about.
+    }
+secrets:
+  - text: She has been writing a song for a dance in the Glasshouse and hums it while she bakes.
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_b07
 archetype: retired_couple
 employment: retired

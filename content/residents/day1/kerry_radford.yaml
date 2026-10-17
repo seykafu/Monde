@@ -4,14 +4,14 @@ name: Kerry Radford
 age: 38
 pronouns: they/them
 kind: resident
-occupation: fishing-boat crew
+occupation: Net-mender and cook aboard the harbour boats; potter in spare hours.
 workplace: wharf.harbor_steps
 home: wharf.home_16
 portrait: lib_a41_024
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: kerry_radford
-appearance: A person with short dark brown hair cropped close at the sides, a clay-streaked oatmeal potter's
-  smock and a handwoven teal scarf. A smear of dried clay on one cheekbone and an absorbed, unhurried look.
+appearance: A person with short dark brown hair cropped close at the sides and a smear of dried clay on one
+  cheekbone. They wear a clay-streaked oatmeal smock and a handwoven teal scarf.
 look:
   kind: human
   skin: 7
@@ -21,58 +21,96 @@ look:
   height: tall
   outfit: { cut: smock, top: 9, bottom: 2, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 0 }
-backstory: "Kerry came to Monde from Port Sallow 15 years ago and works as fishing-boat crew. What they want
-  most is plain enough: a boat with my name on it."
+backstory: Kerry was raised in a seaside town further up the coast, where the cannery and the potteries
+  employed nearly everyone. They came to Monde at 23 to take a deckhand's post, and found the clay banks
+  behind the breakwater and never left them alone. They have set a small kiln in the boathouse yard and sell
+  pots at the Saturday market, mostly to people who feel sorry for them. They worry that the town is slowly
+  forgetting how to make things. They believe Hartley is the one who keeps the town from drifting, though he
+  would deny it.
 personality:
-  traits: [ shy, practical, proud ]
-  big5: { open: 76, conscientious: 65, extravert: 93, agreeable: 21, neurotic: 31 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+  traits: [ absorbed, gentle, practical, unhurried ]
+  big5: { open: 78, conscientious: 65, extravert: 30, agreeable: 72, neurotic: 35 }
+values: { prosperity: 0.3, safety: 0.3, spirit: 0.22, charm: 0.18 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A pot that holds water is worth more than a pot that looks clever.
+  - The cannery should open again; the town has the hands for it.
+  - Hartley thinks he's the only one who can read the sea, which is nonsense.
 voice:
-  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
-  tics: [ Fair. ]
-  never_says: [ no worries, awesome ]
+  register: Unhurried and warm. Kerry thinks before answering and often answers with a practical question.
+    Gentle humor, usually at their own expense.
+  tics: [ Mm., Shall we see?, Give it a moment. ]
+  never_says: [ that's not my problem, nobody cares, it's hopeless ]
   samples:
-    - Fair. Wind's backing.
-    - Could be worse. Could be raining.
-    - Tide's making. I'll be off.
+    - Mm. It'll hold, if we don't rush the drying.
+    - Shall we see what the tide does first? I'm not going anywhere.
+    - Don't look at the pot like that, it can hear you.
 birthday: 15
-likes: [ flat calm at dawn, good rope, smoked fish ]
-dislikes: [ tangled gear, loud engines, gulls on the catch ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    wet clay under the fingernails,
+    Hartley's laugh,
+    the teal scarf they knitted badly,
+    bread from Fournier & Fille,
+    flat calm at dawn
+  ]
+dislikes: [ rushed glazes, people who touch the wheel without asking, the smell of diesel in the kitchen ]
+fears: [ the kiln cracking in winter, the town going quiet for good ]
 dream:
-  text: A boat with my name on it
+  text: I want the Liss Cannery running again, with Monde's own hands packing its own fish.
   stages:
-    - Find a hull and bring it to the boathouse
-    - Raise 60 coins from catches and community work
-    - Launch on Regatta day
+    - Be one of ten signatures on the co-op petition.
+    - Pitch the co-op to Nell Dunmore with a proper plan.
+    - Make the first landing at the cannery.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: wharf.home_16 }
-    - { at: "08:30", do: work, where: wharf.harbor_steps }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "06:00", do: eat, where: wharf.home_16 }
+    - { at: "06:30", do: cook, where: wharf.harbor_steps }
+    - { at: "09:00", do: work, where: wharf.harbor_steps }
+    - { at: "12:30", do: shop, where: wharf.fish_market }
     - { at: "13:30", do: work, where: wharf.harbor_steps }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_16 }
-    - { at: "20:00", do: read, where: wharf.home_16 }
-    - { at: "22:00", do: sleep, where: wharf.home_16 }
+    - { at: "16:00", do: tinker, where: wharf.boathouse }
+    - { at: "18:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "21:30", do: read, where: old_quarter.library }
+    - { at: "22:30", do: sleep, where: wharf.home_16 }
   weekend:
-    - { at: "08:00", do: eat, where: wharf.home_16 }
+    - { at: "07:00", do: eat, where: wharf.home_16 }
+    - { at: "08:00", do: tinker, where: wharf.boathouse }
     - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: wharf.home_16 }
-    - { at: "19:30", do: read, where: wharf.home_16 }
-    - { at: "22:00", do: sleep, where: wharf.home_16 }
-chores: [ fold the washing, black the stove ]
+    - { at: "12:30", do: sit, where: commons.duck_pond }
+    - { at: "15:00", do: walk, where: wharf.breakwater }
+    - { at: "18:30", do: cook, where: wharf.home_16 }
+    - { at: "21:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: wharf.home_16 }
+chores: [ Keeps the kiln fired and the shelves dry, Sews and mends the crew's oilskins, Bakes the Sunday loaf ]
 relationships:
-  - { id: hartley_radford, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: hartley_radford,
+      affinity: 70,
+      trust: 75,
+      tag: spouse,
+      note: Married to Hartley; the steady centre of the house.
+    }
+  - {
+      id: efua_drummond,
+      affinity: 25,
+      trust: 30,
+      tag: friend,
+      note: Shares net-mending chat and sweet tea on the steps.
+    }
+  - {
+      id: sabine_mendes,
+      affinity: 12,
+      trust: 15,
+      tag: curious,
+      note: Trades recipes; wants to know how they keep the clay so soft.
+    }
+secrets:
+  - text: They have a notebook of glaze recipes that they hope to sell to a café one day, and they have never
+      shown it to anyone.
+    reveal: { regard_min: 50 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: volunteer
+generated_by: model
 household: wf_e01
 archetype: fisher
 employment: employed

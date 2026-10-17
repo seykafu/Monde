@@ -4,13 +4,14 @@ name: Raoul Soto
 age: 13
 pronouns: he/him
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Teenager doing lessons by post at the library desk and Felix's Thursday-evening…
 workplace: millbrook.home_26
 home: millbrook.home_26
 portrait: raoul_soto
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: raoul_soto
-appearance: A boy with tufty sandy blond hair, grey dungarees and freckles.
+appearance: Sandy blond hair sticks up in tufts. He wears grey dungarees over a faded shirt and has freckles
+  like his brother's.
 look:
   kind: human
   skin: 0
@@ -21,57 +22,81 @@ look:
   outfit: { cut: dungarees, top: 14, bottom: 15, bottom_style: trousers, shoes: 2, trim: 11 }
   accessory: { kind: none }
   face: { freckles: true }
-backstory: Raoul was born in Monde and does lessons by post at the library desk. He likes the ducks on the Commons best.
+backstory: Raoul was born in Monde but barely remembers the mill's full shifts; he remembers the lamps going
+  out one by one in the yard. He is the older brother and is supposed to set an example, which he resents a
+  little. He takes his post lessons seriously at the library desk, where Margo keeps a kettle going. He has
+  started to think about leaving for the mainland, since his mother talks about it and his father is away most
+  of the week. He believes the town will stay small whatever anyone does. He is partly right, and he is also
+  hiding a plan to stay that he has not told anyone.
 personality:
-  traits: [ brisk, warm, shy ]
-  big5: { open: 42, conscientious: 76, extravert: 42, agreeable: 60, neurotic: 36 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ sardonic, restless, thoughtful, proud ]
+  big5: { open: 70, conscientious: 55, extravert: 38, agreeable: 45, neurotic: 52 }
+values: { prosperity: 0.3, safety: 0.2, spirit: 0.3, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Monde is going to shrink until only the lighthouse is left.
+  - The post lessons are fine, but they're not real school.
+  - My mum would leave if she could.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: Offhand and dry, with a teenager's flat delivery. He says more with silence than most people do with
+    speeches.
+  tics: [ Whatever., "Fine, sure.", It's not that deep. ]
+  never_says: [ I love this town, I want to be a farmer, let's go ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - Whatever. The post lesson's on the bench. I'll do it later.
+    - It's not that deep. The ferry's late, that's all.
+    - Felix says I'm good at arithmetic. I didn't ask.
 birthday: 72
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes:
+  [
+    Mechanical clocks and the old tower,
+    Quiet afternoons at the library desk,
+    The harbour steps at dusk,
+    a lunch box packed right,
+    a teacher who remembers names
+  ]
+dislikes: [ Being compared to his brother, Post lessons with no one to ask, Pretending everything's fine ]
+fears: [ Being stuck in Monde forever, Failing the school roll and being sent away ]
 dream:
-  text: A school worth the walk
+  text: Get a proper desk at the library so he can study with the other teenagers.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Ask Margo for a corner of the library desk.
+    - Back the Thursday-evening class with the other teenagers.
+    - Place himself with a Saturday master in the workshop.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_26 }
     - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: millbrook.home_26 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
-    - { at: "18:00", do: eat, where: millbrook.home_26 }
-    - { at: "21:30", do: sleep, where: millbrook.home_26 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_26 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "13:30", do: write, where: old_quarter.library }
+    - { at: "16:00", do: wander, where: wharf.harbor_steps }
     - { at: "18:00", do: eat, where: millbrook.home_26 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "19:00", do: attend, where: millbrook.school }
+    - { at: "21:00", do: sleep, where: millbrook.home_26 }
+  weekend:
+    - { at: "09:00", do: eat, where: millbrook.home_26 }
+    - { at: "10:30", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: walk, where: wharf.breakwater }
+    - { at: "18:30", do: eat, where: millbrook.home_26 }
     - { at: "22:00", do: sleep, where: millbrook.home_26 }
-chores: [ black the stove, wind the clock ]
+chores: [ Cut wood for the stove, Walk Arvid to school ]
 relationships:
-  - { id: cordelia_soto, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: ayesha_soto, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: arvid_soto, affinity: 70, trust: 70, tag: brother, note: Same house. }
-secrets: []
+  - {
+      id: arvid_soto,
+      affinity: 14,
+      trust: 18,
+      tag: brother,
+      note: "His little brother, who follows him everywhere."
+    }
+  - { id: ayesha_soto, affinity: 12, trust: 14, tag: mother, note: "Mum's wife, away in Hessle Cross." }
+  - { id: cordelia_soto, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
+secrets:
+  - text: He has been secretly drafting a letter to the Carrow technical college, asking for a place he doesn't
+      think he can take.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_l01
 archetype: school_family
 employment: lessons

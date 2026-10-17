@@ -4,14 +4,14 @@ name: Remy Corbett
 age: 15
 pronouns: they/them
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Student doing lessons by post and Felix's Thursday class; Saturday job at…
 workplace: old_quarter.lantern_office
 home: station_hill.home_03
 portrait: lib_a15_046
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: remy_corbett
-appearance: A lanky teenager with a dark brown mop, a face full of freckles and a too-big navy canvas work
-  apron over a mustard shirt. Eager, a little sheepish.
+appearance: A lanky teenager with a dark brown mop and a face full of freckles, wearing a too-big navy canvas
+  work apron over a mustard shirt. Fair skin, slight build, boots scuffed at the toe.
 look:
   kind: human
   skin: 1
@@ -22,57 +22,80 @@ look:
   outfit: { cut: apron, top: 4, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: apron, colour: 6 }
   face: { freckles: true }
-backstory: Remy was born in Monde and does lessons by post at the library desk. They like the ducks on the Commons best.
+backstory: Remy has never lived anywhere but Station Road and has spent most of their life fixing things other
+  people broke. They help Sable set type on Saturdays and enjoy the smell of ink more than they admit. The
+  school closing feels like a door being shut on them specifically, which they hate. They stayed because the
+  town still has old machines that need hands, and because their mum would never forgive them for leaving.
 personality:
-  traits: [ stubborn, cheerful, practical ]
-  big5: { open: 59, conscientious: 12, extravert: 25, agreeable: 77, neurotic: 27 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ curious, handy, sheepish, earnest ]
+  big5: { open: 80, conscientious: 50, extravert: 45, agreeable: 60, neurotic: 55 }
+values: { prosperity: 0.2, safety: 0.25, spirit: 0.35, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - If you can take a machine apart, you can make it work again.
+  - The Lantern is the only honest paper left in Monde.
+  - Nobody in town knows what the Tollmen do with the money, but I bet it's something useful.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: Eager, a bit sheepish, quick to joke and quicker to apologise. Fragments when excited.
+  tics: [ "Sorry, sorry", "right, right", ink on my hands ]
+  never_says: [ whatever, this is boring ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - Sorry, sorry, that's my fault. Got the lever stuck again.
+    - Right, right. Type's backwards. Fancy that.
+    - It's not a big deal. It's just the best thing I did all week.
 birthday: 55
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes:
+  [
+    the smell of ink,
+    Sable's kettle,
+    the clockwork in the Old Quarter tower,
+    a lunch box packed right,
+    a teacher who remembers names
+  ]
+dislikes: [ being called a kid, stiff school forms, cold hands on the press ]
+fears: [ the school closing for good, being stuck here forever ]
 dream:
-  text: A school worth the walk
+  text: Plant a proper garden behind the house so the Corbetts have something growing.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Clear the bindweed from the plot behind the house.
+    - Get seed from Dunmore's or from the Saturday market.
+    - Plant it before the next Saturday market.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: station_hill.home_03 }
-    - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: station_hill.home_03 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
-    - { at: "18:00", do: eat, where: station_hill.home_03 }
-    - { at: "21:30", do: sleep, where: station_hill.home_03 }
-  weekend:
     - { at: "08:00", do: eat, where: station_hill.home_03 }
-    - { at: "09:00", do: work, where: old_quarter.lantern_office }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "09:00", do: read, where: old_quarter.library }
+    - { at: "12:00", do: eat, where: market_row.bakery }
+    - { at: "13:30", do: tinker, where: station_hill.signal_box }
+    - { at: "16:00", do: socialize, where: old_quarter.fountain_square }
     - { at: "18:00", do: eat, where: station_hill.home_03 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "19:30", do: write, where: station_hill.home_03 }
     - { at: "22:00", do: sleep, where: station_hill.home_03 }
-chores: [ black the stove, mend a sock ]
+  weekend:
+    - { at: "08:30", do: eat, where: station_hill.home_03 }
+    - { at: "10:00", do: work, where: old_quarter.lantern_office }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: wander, where: station_hill.platform }
+    - { at: "18:00", do: eat, where: station_hill.home_03 }
+    - { at: "23:00", do: sleep, where: station_hill.home_03 }
+chores: [ Carry coal in, Feed the cat, Weed the back step ]
 relationships:
-  - { id: ilse_corbett, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: ottilie_verhoeven, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: iain_corbett, affinity: 70, trust: 70, tag: brother, note: Same house. }
-secrets: []
+  - {
+      id: sable,
+      affinity: 25,
+      trust: 30,
+      tag: fond,
+      note: Teaches them to set type and lets them ink the proofs.
+    }
+  - { id: omar_quarrie, affinity: 15, trust: 15, tag: fond, note: Lets them watch him fix the old clocks. }
+  - { id: ilse_corbett, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
+  - { id: ottilie_verhoeven, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
+  - { id: iain_corbett, affinity: 65, trust: 60, tag: brother, note: "Brother, under the same roof." }
+secrets:
+  - text: They have been writing a short serial about the clocktower stopping at 4:17, and hide the pages under
+      the stairs.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: sh_l01
 archetype: school_family
 employment: lessons

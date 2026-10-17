@@ -4,14 +4,14 @@ name: Olwen Wakefield
 age: 29
 pronouns: she/her
 kind: resident
-occupation: works in Hessle Cross
+occupation: Repair-counter keeper and shop founder, weekday commuter at a Hessle Cross firm
 workplace: offmap.city
 home: millbrook.home_19
 portrait: lib_f30_084
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: olwen_wakefield
-appearance: A young woman with long honey-blonde hair and a blunt fringe, a rose cardigan over a white blouse
-  and a satchel strap across her chest. A chalky handprint on one shoulder and an earnest, determined look.
+appearance: A slight young woman with long honey-blonde hair and a blunt fringe, wearing a rose cardigan over
+  a white blouse with a satchel strap across her chest and a chalky handprint on one shoulder.
 look:
   kind: human
   skin: 9
@@ -21,56 +21,99 @@ look:
   height: tall
   outfit: { cut: jumper, top: 12, bottom: 6, bottom_style: skirt, shoes: 1 }
   accessory: { kind: none }
-backstory: "Olwen came to Monde from Ashby Lock 2 years ago and works as a commuter to Hessle Cross. What she
-  wants most is plain enough: open by the end of the month."
+backstory: Olwen trained as a bookkeeper in Hessle Cross and spent six years balancing other people's margins
+  before she could afford her own. She met Malachy in Carrow on a bus where his sketchbook slid onto her lap.
+  She talked him into Monde because she had read that a town of two hundred people has room for a shop nobody
+  else would dare open. Her first year was spent on the ferry. The second was spent trying to get the bakery
+  to take her salt. She is still certain the Wharf has a fine building left in it, and wrong about how many
+  customers a month a shop needs.
 personality:
-  traits: [ steady, wry, restless ]
-  big5: { open: 8, conscientious: 34, extravert: 93, agreeable: 41, neurotic: 42 }
-values: { prosperity: 0.55, safety: 0.15, spirit: 0.1, charm: 0.2 }
+  traits: [ precise, warm, stubborn, thrifty, restless ]
+  big5: { open: 58, conscientious: 82, extravert: 60, agreeable: 52, neurotic: 46 }
+values: { prosperity: 0.55, safety: 0.25, spirit: 0.1, charm: 0.1 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A till that rings is the only honest proof a shop is open.
+  - Anyone who browses twice owes you a sale.
+  - Monde will pay a fair price for good repairs if somebody asks properly.
 voice:
-  register: Brisk. A salesperson's warmth with a ledger underneath. Talks in prices and margins.
-  tics: [ Let me do you a deal. ]
-  never_says: [ no worries, awesome ]
+  register: Brisk and businesslike, with a salesperson's warmth over a ledger. Talks in prices and margins.
+    Short sentences, then a laugh when she catches herself counting.
+  tics: [ that's a margin, "fair enough, two and six", let me check the book ]
+  never_says: [ just browsing, it's only a little, cheap ]
   samples:
-    - Let me do you a deal. Two for a bit more than one's price.
-    - Footfall's the thing. Footfall, then the window.
-    - Margins, mostly. And a good bell on the door.
+    - Four coins, no. Sorry, coins. Four coins for the lamp, and the wick's on me.
+    - Yes, I know the till's empty. That's why I'm counting it twice.
+    - Malachy's painting the sign. I'm doing the sums. We're a good team, if you don't ask about the bread.
 birthday: 60
-likes: [ a till that rings, hand-lettered signs, first customers ]
-dislikes: [ fees nobody explained, just browsing said twice, empty windows ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a till that rings, hand-lettered signs, first customers, the Hessle Cross bus timetable kept perfectly ]
+dislikes:
+  [
+    fees nobody explained,
+    empty windows,
+    weekend commutes that eat Saturday,
+    people who ask for credit twice
+  ]
+fears:
+  [
+    that the shop will open and nobody will come in,
+    losing the Hessle Cross job before the till earns anything
+  ]
 dream:
-  text: Open by the end of the month
+  text: I want my shop open by the end of the month, with the sign painted, the shelves full, and the mayor
+    cutting the ribbon.
   stages:
-    - Stock the shelves
-    - Get a sign painted
-    - Cut the ribbon with the mayor
+    - Stock the shelves with repairs and wicks before the first Saturday.
+    - Get a sign painted by Malachy and hang it on the glass.
+    - Cut the ribbon with the mayor on a Saturday in front of the whole row.
 routine:
   weekday:
     - { at: "06:30", do: eat, where: millbrook.home_19 }
-    - { at: "07:30", do: work, where: offmap.city }
-    - { at: "12:30", do: eat, where: offmap.city }
-    - { at: "13:30", do: work, where: offmap.city }
-    - { at: "19:00", do: eat, where: offmap.city }
-    - { at: "22:00", do: sleep, where: offmap.city }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_19 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: millbrook.home_19 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "07:10", do: walk, where: wharf.harbor_steps }
+    - { at: "08:00", do: work, where: offmap.city }
+    - { at: "18:00", do: eat, where: offmap.city }
     - { at: "22:00", do: sleep, where: millbrook.home_19 }
-chores: [ sweep the step, beat the doormat ]
+  weekend:
+    - { at: "08:00", do: tinker, where: millbrook.home_19 }
+    - { at: "09:30", do: shop, where: market_row.general_store }
+    - { at: "11:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: sleep, where: millbrook.home_19 }
+chores:
+  [
+    Balances the household accounts on Sunday evenings,
+    Packs the satchel for the ferry,
+    Scrubs the front step
+  ]
 relationships:
-  - { id: malachy_wakefield, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: malachy_wakefield,
+      affinity: 25,
+      trust: 20,
+      tag: spouse,
+      note: Husband; she trusts his eye and doubts his deadlines.
+    }
+  - {
+      id: nkechi_fairweather,
+      affinity: 10,
+      trust: 12,
+      tag: fond,
+      note: Sorts thread at the kitchen table and says her sums are sound.
+    }
+  - {
+      id: hamish_ortega,
+      affinity: 6,
+      trust: 10,
+      tag: curious,
+      note: Keeps the Loom Street ledger and admires her columns.
+    }
+secrets:
+  - text: She has been sending her old employers small paid invoices for work she never finished, so she can claim
+      it on her tax to the…
+    reveal: { regard_min: 65 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: shopkeeper
+generated_by: model
 household: mb_i02
 archetype: shop_founder
 employment: employed

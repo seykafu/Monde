@@ -4,13 +4,14 @@ name: Ilse Corbett
 age: 42
 pronouns: she/her
 kind: resident
-occupation: full-time carer at home
+occupation: Full-time carer at home, unpaid.
 workplace: station_hill.home_03
 home: station_hill.home_03
 portrait: ilse_corbett
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: ilse_corbett
-appearance: A woman with auburn hair in a bun and a charcoal shirt.
+appearance: Auburn hair in a bun, a charcoal shirt buttoned to the collar. Tan skin, average build, a pencil
+  tucked behind one ear.
 look:
   kind: human
   skin: 2
@@ -20,61 +21,83 @@ look:
   height: tall
   outfit: { cut: plain, top: 13, bottom: 14, bottom_style: trousers, shoes: 2 }
   accessory: { kind: none }
-backstory: "Ilse was born in Monde and looks after the household full-time. What she wants most is plain
-  enough: a school worth the walk."
+backstory: "Born on Station Road, Ilse left at eighteen to train as a bookkeeper in Carrow and came back when
+  her father fell ill. She has kept the household running ever since: the lunch boxes, the school forms, the
+  tab on the ferry fares. The school closing is the thing she cannot plan around. She stayed because her
+  father's garden is still here, and because she assumed the town would hold on as long as she did."
 personality:
-  traits: [ proud, warm, dreamy ]
-  big5: { open: 93, conscientious: 66, extravert: 76, agreeable: 83, neurotic: 76 }
+  traits: [ organized, practical, watchful, dutiful ]
+  big5: { open: 40, conscientious: 85, extravert: 35, agreeable: 60, neurotic: 65 }
 values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A school is only worth the walk if the teacher knows the children's names.
+  - Ferry times are a kind of promise the town makes.
+  - The Tollmen take more than they should, and I am sure they never ask anyone twice.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: Brisk and organising. Lists of three, questions like a form, sentences that end on the schedule.
+  tics: [ "Right, then.", Which means, Before Tuesday ]
+  never_says: [ don't worry, it'll be fine, trust me ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - Right, then. Lunch at twelve, Remy's form by Friday, and the ferry at four.
+    - Which means you need the forms signed, or the roll stays at nine. Shall we?
+    - Nine children. Felix can't do that alone, and neither can I.
 birthday: 43
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+likes:
+  [
+    a lunch box packed right,
+    a teacher who remembers names,
+    the bench by the school gate,
+    her father's old seed packets
+  ]
 dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+fears: [ the roll dropping below twenty for good, losing the house ]
 dream:
-  text: A school worth the walk
+  text: Get the school's roll to twenty and see the enrollment signed in front of the class.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Visit Felix's classroom and count the children with him.
+    - Help with a Friday lesson so the room knows her face.
+    - Sign the enrollment roll in front of the whole class.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: station_hill.home_03 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: station_hill.home_03 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: station_hill.home_03 }
-    - { at: "19:30", do: read, where: station_hill.home_03 }
-    - { at: "21:30", do: sleep, where: station_hill.home_03 }
+    - { at: "07:00", do: cook, where: station_hill.home_03 }
+    - { at: "08:30", do: visit, where: old_quarter.library }
+    - { at: "10:00", do: garden, where: station_hill.home_03 }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: station_hill.lookout_bench }
+    - { at: "18:00", do: cook, where: station_hill.home_03 }
+    - { at: "21:30", do: read, where: station_hill.home_03 }
+    - { at: "22:30", do: sleep, where: station_hill.home_03 }
   weekend:
     - { at: "08:00", do: eat, where: station_hill.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: station_hill.home_03 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "13:00", do: visit, where: commons.picnic_lawn }
+    - { at: "17:00", do: cook, where: station_hill.home_03 }
     - { at: "22:00", do: sleep, where: station_hill.home_03 }
-chores: [ fill the coal scuttle, fold the washing ]
+chores: [ Pack lunch boxes, Keep the ledger for the house, Water the garden plot ]
 relationships:
-  - { id: ottilie_verhoeven, affinity: 70, trust: 70, tag: partner, note: Same house. }
-  - { id: remy_corbett, affinity: 70, trust: 70, tag: child, note: Same house. }
-  - { id: iain_corbett, affinity: 70, trust: 70, tag: son, note: Same house. }
-secrets: []
+  - {
+      id: constance_ballard,
+      affinity: 12,
+      trust: 18,
+      tag: fond,
+      note: Neighbour who mends the children's hems for free.
+    }
+  - {
+      id: gerrit_jensen,
+      affinity: 5,
+      trust: 10,
+      tag: curious,
+      note: Talks about the crossing gates; she politely lets him.
+    }
+  - { id: ottilie_verhoeven, affinity: 70, trust: 75, tag: partner, note: "Partner, under the same roof." }
+  - { id: remy_corbett, affinity: 75, trust: 70, tag: child, note: "Child, under the same roof." }
+  - { id: iain_corbett, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+secrets:
+  - text: She has been keeping the school's old attendance registers in a drawer, hoping someone will ask for them.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: sh_l01
 archetype: school_family
 employment: carer

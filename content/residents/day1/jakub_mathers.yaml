@@ -4,13 +4,14 @@ name: Jakub Mathers
 age: 50
 pronouns: he/him
 kind: resident
-occupation: retired early
+occupation: Retired early; grows vegetables in the garden plots when his chest allows.
 workplace: millbrook.home_32
 home: millbrook.home_32
 portrait: jakub_mathers
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: jakub_mathers
-appearance: A man with dark brown curls and a green jumper.
+appearance: A slight man with dark brown curls and a green jumper with the elbows darned. He keeps a
+  toothbrush mug on the windowsill at home, which he will tell you is for brushes and nothing else.
 look:
   kind: human
   skin: 2
@@ -20,58 +21,79 @@ look:
   height: tall
   outfit: { cut: jumper, top: 7, bottom: 9, bottom_style: trousers, shoes: 9 }
   accessory: { kind: none }
-backstory: "Jakub came to Monde from Tarn End 30 years ago and had to stop working early. What he wants most
-  is plain enough: a plot that feeds the street."
+backstory: Jakub came to Monde at twenty from a mill town further up the coast, sent by an uncle who promised
+  work at Lissworth Mill. He spent nine years on the carding floor before his lungs gave out, and the mill
+  closed fourteen years later, so he always half-believes he left before he could be blamed for it. He married
+  Efua in the second year. He has kept a little plot of beans and chard in the garden plots for twenty years,
+  though the bindweed has taken most of the beds since he stopped being able to dig. He thinks the town will
+  recover once someone puts a new roof on the Glasshouse.
 personality:
-  traits: [ brisk, patient, careful ]
-  big5: { open: 76, conscientious: 22, extravert: 42, agreeable: 74, neurotic: 56 }
-values: { prosperity: 0.2, safety: 0.15, spirit: 0.4, charm: 0.25 }
+  traits: [ patient, stubborn, tender, wry ]
+  big5: { open: 62, conscientious: 58, extravert: 34, agreeable: 72, neurotic: 55 }
+values: { prosperity: 0.15, safety: 0.25, spirit: 0.35, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A garden is only ever a few seasons from ruin.
+  - The Glasshouse can be saved with enough glass.
+  - Efua knows more about the Tollmen than she lets on.
 voice:
-  register: Kind and earthy. Few metaphors, all small. "Give it time."
-  tics: [ Give it time. ]
-  never_says: [ no worries, awesome ]
+  register: Slow, soft and roundabout. He stops to cough mid-sentence and picks the thread back up. He likes to hedge.
+  tics: [ Give it time., "Mm, well.", He taps the table twice. ]
+  never_says: [ for sure, no point, I'm finished ]
   samples:
-    - Give it time. Everything's slow in April.
-    - Slugs had the lettuces. Every one. They're clever things.
-    - Rain last night. Good. Good.
+    - Mm, well. The beans came up anyway. Give it time.
+    - Glass is dear, but it's not impossible. I'll see what Idris says.
+    - Efua, you're doing that face again. I can hear it.
 birthday: 58
-likes: [ rain at night, good compost, children who pull carrots ]
-dislikes: [ slugs, bindweed, people who step on beds ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    rain at night,
+    good compost,
+    children who pull carrots,
+    the smell of the mill yard in summer,
+    a cup of strong tea
+  ]
+dislikes: [ slugs, bindweed, people who step on beds, dust in the lungs ]
+fears: [ being a burden on Efua, the garden going to seed for good ]
 dream:
-  text: A plot that feeds the street
+  text: Clear a bed in the garden plots and see it feed the street again.
   stages:
-    - Clear a bed in the Community Garden
-    - Plant a first row with seed from Teo
-    - Bring the first harvest to market
+    - Clear the bindweed from the north bed.
+    - Plant a first row with seed from Teo.
+    - Bring the first harvest to market on Saturday.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_32 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: millbrook.home_32 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_32 }
-    - { at: "19:30", do: read, where: millbrook.home_32 }
-    - { at: "21:30", do: sleep, where: millbrook.home_32 }
-  weekend:
+    - { at: "07:00", do: wander, where: millbrook.home_32 }
     - { at: "08:00", do: eat, where: millbrook.home_32 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: millbrook.home_32 }
-    - { at: "19:30", do: read, where: millbrook.home_32 }
-    - { at: "22:00", do: sleep, where: millbrook.home_32 }
-chores: [ fill the coal scuttle, water the window box ]
+    - { at: "09:00", do: garden, where: commons.picnic_lawn }
+    - { at: "12:00", do: eat, where: millbrook.home_32 }
+    - { at: "13:30", do: walk, where: millbrook.weir }
+    - { at: "16:00", do: visit, where: millbrook.kasimir_workshop }
+    - { at: "18:30", do: cook, where: millbrook.home_32 }
+    - { at: "21:30", do: read, where: millbrook.home_32 }
+    - { at: "23:00", do: sleep, where: millbrook.home_32 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_32 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: garden, where: commons.picnic_lawn }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: commons.duck_pond }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: millbrook.home_32 }
+chores: [ Mend the garden fence, Fetch the milk from the general store, Air the bedding on Mondays ]
 relationships:
-  - { id: efua_drummond, affinity: 70, trust: 70, tag: partner, note: Same house. }
-secrets: []
+  - {
+      id: efua_drummond,
+      affinity: 25,
+      trust: 25,
+      tag: partner,
+      note: Thirty years married; she is sharper than he is.
+    }
+secrets:
+  - text: He has been saving a packet of prize marrow seed in a tin under the stairs and has never planted it.
+    reveal: { regard_min: 60 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: volunteer
+generated_by: model
 household: mb_e03
 archetype: market_gardener
 employment: unable

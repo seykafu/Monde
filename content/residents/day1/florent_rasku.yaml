@@ -4,14 +4,14 @@ name: Florent Rasku
 age: 36
 pronouns: he/him
 kind: resident
-occupation: stallholder
+occupation: Market gardener and Saturday stallholder selling beans, leeks and rhubarb.
 workplace: market_row.market_street
 home: old_quarter.home_16
 portrait: lib_m38_064
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: florent_rasku
-appearance: A man with a sandy-blond beard, a mustard knit cap and a thick grey fisherman's jumper. A
-  short-spoken, weather-first face.
+appearance: A broad, sandy-bearded man in a mustard knit cap and a thick grey fisherman's jumper, his skin
+  ruddy from weather. He always has his oilskin hung over one shoulder.
 look:
   kind: human
   skin: 6
@@ -23,58 +23,93 @@ look:
   accessory: { kind: none }
   headwear: { kind: knit_cap, colour: 4 }
   face: { moustache: true, stubble: true }
-backstory: "Florent came to Monde from Hessle Cross 13 years ago and works as stallholder. What he wants most
-  is plain enough: a plot that feeds the street."
+backstory: Florent grew up on his uncle's allotments in a river town inland, where the land flooded every
+  second spring and nobody complained about it. He came to Monde at 23 because a Carrow agent wrote that the
+  Commons had good soil and nobody using it. The soil was poor and the agent was a liar, but he stayed,
+  learning the ground bed by bed. Thirteen years on he grows enough to sell and not enough to brag about. He
+  still thinks the town will turn around by next spring, and he keeps a plot ready for the people who will
+  come back to it.
 personality:
-  traits: [ particular, careful, cheerful ]
-  big5: { open: 44, conscientious: 38, extravert: 33, agreeable: 67, neurotic: 16 }
+  traits: [ patient, stubborn, dry, loyal ]
+  big5: { open: 45, conscientious: 82, extravert: 30, agreeable: 60, neurotic: 35 }
 values: { prosperity: 0.2, safety: 0.15, spirit: 0.4, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Good compost fixes any ground, given time.
+  - People in Monde will come back once the Glasshouse has glass again.
+  - Nobody in town talks to the Tollmen, so nobody knows what they want.
+  - Rain at night is the only honest weather.
 voice:
-  register: Kind and earthy. Few metaphors, all small. "Give it time."
-  tics: [ Give it time. ]
-  never_says: [ no worries, awesome ]
+  register: Short, weather-first, earthy. He answers questions with a question about the ground. Small, slow sentences.
+  tics: [ Give it time., "Mm, well.", Looks like rain. ]
+  never_says: [ in my opinion, I feel, trust me, it's a sign ]
   samples:
-    - Give it time. Everything's slow in April.
-    - Slugs had the lettuces. Every one. They're clever things.
-    - Rain last night. Good. Good.
+    - Give it time. Soil doesn't hurry.
+    - Mm, well. Beans don't care who's watching.
+    - Looks like rain tonight. Good. The bed needed it.
 birthday: 84
-likes: [ rain at night, good compost, children who pull carrots ]
-dislikes: [ slugs, bindweed, people who step on beds ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    rain at night,
+    good compost,
+    children who pull carrots,
+    the smell of wet earth,
+    the picnic lawn in early morning
+  ]
+dislikes: [ slugs, bindweed, people who step on beds, the Tollmen's Saturday visits, loud radios on the Commons ]
+fears: [ the garden plots going back to bindweed, a winter with nobody to sell to ]
 dream:
-  text: A plot that feeds the street
+  text: A plot on the Commons that feeds the whole street, with the first row planted from seed he has been
+    saving for years.
   stages:
-    - Clear a bed in the Community Garden
-    - Plant a first row with seed from Teo
-    - Bring the first harvest to market
+    - Clear a bed in the garden plots before the frost breaks.
+    - Plant a first row with seed from the old allotment tin.
+    - Bring the first harvest to market on a Saturday morning.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: old_quarter.home_16 }
-    - { at: "08:30", do: work, where: market_row.market_street }
+    - { at: "06:30", do: eat, where: old_quarter.home_16 }
+    - { at: "07:00", do: garden, where: commons.picnic_lawn }
+    - { at: "11:30", do: shop, where: market_row.general_store }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: market_row.market_street }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: old_quarter.home_16 }
-    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: old_quarter.home_16 }
+    - { at: "13:30", do: garden, where: commons.picnic_lawn }
+    - { at: "17:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: old_quarter.home_16 }
   weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_16 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: old_quarter.home_16 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: old_quarter.home_16 }
-chores: [ water the window box, fold the washing ]
+    - { at: "06:30", do: eat, where: old_quarter.home_16 }
+    - { at: "07:00", do: work, where: market_row.market_street }
+    - { at: "13:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: walk, where: commons.duck_pond }
+    - { at: "21:00", do: sleep, where: old_quarter.home_16 }
+chores: [ Sweep the upstairs landing, Mend the fence on the back yard, Carry water up from the well ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: lars_marsden,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Shares the Saturday stall lane and trades ribbon for beans.
+    }
+  - {
+      id: hana_okonjo,
+      affinity: 8,
+      trust: 6,
+      tag: fond,
+      note: Gives him the last loaf on Saturdays and asks after his beds.
+    }
+  - {
+      id: benedek_menon,
+      affinity: 6,
+      trust: 5,
+      tag: curious,
+      note: "Asks him to help with garden work, pays in eggs."
+    }
+secrets:
+  - text: He has been secretly saving seed from a forgotten strain of tomato and hopes to give the first plant to
+      Hana.
+    reveal: { regard_min: 60 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: shopkeeper
+generated_by: model
 household: oq_d01
 archetype: market_gardener
 employment: employed

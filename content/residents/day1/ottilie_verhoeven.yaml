@@ -4,13 +4,14 @@ name: Ottilie Verhoeven
 age: 36
 pronouns: she/her
 kind: resident
-occupation: post round
+occupation: Post round and haulage; ticket booth at the wharf.
 workplace: wharf.ticket_booth
 home: station_hill.home_03
 portrait: ottilie_verhoeven
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: ottilie_verhoeven
-appearance: A woman with copper hair in a bun and a slate-blue shirt, and a skirt.
+appearance: Copper hair in a bun, a slate-blue shirt with the sleeves rolled, in a skirt. Fair skin, slight
+  build, a leather satchel strap across her chest.
 look:
   kind: human
   skin: 1
@@ -20,61 +21,83 @@ look:
   height: short
   outfit: { cut: plain, top: 6, bottom: 13, bottom_style: skirt, shoes: 15 }
   accessory: { kind: none }
-backstory: "Ottilie was born in Monde and works as post round. What she wants most is plain enough: a school
-  worth the walk."
+backstory: Ottilie grew up two doors from the Corbetts and was the girl who knew every shortcut on the harbour
+  steps. She learned to drive the post van on the mainland road when the mill was still running, then took the
+  ticket booth when the Liss runs thinned. She likes the work because it keeps her moving and talking. She
+  stayed because her brother moved to Carrow and she is not going to be the one who left.
 personality:
-  traits: [ cheerful, patient, steady ]
-  big5: { open: 76, conscientious: 28, extravert: 8, agreeable: 47, neurotic: 44 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ quick, friendly, restless, loyal ]
+  big5: { open: 60, conscientious: 55, extravert: 80, agreeable: 65, neurotic: 35 }
+values: { prosperity: 0.25, safety: 0.25, spirit: 0.3, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everyone on the ferry is heading somewhere better, so I try to make the ticket booth a bit warmer.
+  - Nothing in Monde is ever really closed, just resting.
+  - The post comes through no matter what, so the town can't be dead.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: Quick, warm and teasing. Short bursts, a laugh in the middle of sentences, sometimes trails off.
+  tics: [ "Oh, go on", mind the step, there you are ]
+  never_says: [ that's the spirit, mind your business ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - Oh, go on, you can squeeze one more parcel in.
+    - Ferry's late. Ferry's always late. Mind the step.
+    - Ilse's worried again, isn't she? Tell her it's a Tuesday, that's all.
 birthday: 25
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    the Gannet's horn in fog,
+    a full post sack,
+    gossip on the harbour steps,
+    a lunch box packed right,
+    a teacher who remembers names
+  ]
+dislikes: [ a long queue at the booth, people who never say goodbye, rain on the post ]
+fears: [ the wharf going quiet for good, letting Ilse down ]
 dream:
-  text: A school worth the walk
+  text: See the Corbett children back in a full classroom and the Gannet's timetable kept.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - Sit in on the Thursday class with Remy.
+    - Carry a parcel for Felix's roll, the old way.
+    - Watch the ferry come in with a full deck of pupils.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: station_hill.home_03 }
-    - { at: "08:30", do: work, where: wharf.ticket_booth }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: wharf.ticket_booth }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: station_hill.home_03 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "06:45", do: eat, where: station_hill.home_03 }
+    - { at: "07:30", do: work, where: wharf.ticket_booth }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: work, where: wharf.ticket_booth }
+    - { at: "17:30", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: station_hill.home_03 }
   weekend:
-    - { at: "08:00", do: eat, where: station_hill.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: station_hill.home_03 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: station_hill.home_03 }
-chores: [ mend a sock, fill the coal scuttle ]
+    - { at: "08:30", do: eat, where: station_hill.home_03 }
+    - { at: "10:00", do: walk, where: wharf.breakwater }
+    - { at: "13:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: station_hill.home_03 }
+chores: [ Sort the post sacks, Mend the booth bench, Wash the van ]
 relationships:
-  - { id: ilse_corbett, affinity: 70, trust: 70, tag: partner, note: Same house. }
-  - { id: remy_corbett, affinity: 70, trust: 70, tag: child, note: Same house. }
-  - { id: iain_corbett, affinity: 70, trust: 70, tag: son, note: Same house. }
-secrets: []
+  - {
+      id: ada,
+      affinity: 18,
+      trust: 20,
+      tag: friend,
+      note: "Keeps the post hatch beside her, and they trade gossip."
+    }
+  - {
+      id: liv_brodsky,
+      affinity: 10,
+      trust: 12,
+      tag: friend,
+      note: Shares the post round and the route complaints.
+    }
+  - { id: ilse_corbett, affinity: 70, trust: 75, tag: partner, note: "Partner, under the same roof." }
+  - { id: remy_corbett, affinity: 75, trust: 70, tag: child, note: "Child, under the same roof." }
+  - { id: iain_corbett, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+secrets:
+  - text: She still keeps the ferry timetable from before the Liss runs were cut, folded in her coat.
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: sh_l01
 archetype: school_family
 employment: employed

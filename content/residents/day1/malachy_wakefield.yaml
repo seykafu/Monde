@@ -4,13 +4,14 @@ name: Malachy Wakefield
 age: 24
 pronouns: he/him
 kind: resident
-occupation: out of work, looking
+occupation: Sign painter, currently out of work and looking
 workplace: millbrook.home_19
 home: millbrook.home_19
 portrait: malachy_wakefield
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: malachy_wakefield
-appearance: A young man with dark brown hair swept back, a dark brown coat and heavy glasses.
+appearance: A young man with dark brown hair swept back, wearing a dark brown coat over a paint-speckled shirt
+  and heavy glasses that he pushes up with one knuckle.
 look:
   kind: human
   skin: 3
@@ -21,58 +22,101 @@ look:
   outfit: { cut: coat, top: 2, bottom: 10, bottom_style: trousers, shoes: 0 }
   accessory: { kind: glasses }
   glasses: heavy
-backstory: "Malachy came to Monde from Marrow Quay 2 years ago and has been out of work and looking since the
-  last job went. What he wants most is plain enough: a wall that's finished."
+backstory: Malachy grew up in a river town near Carrow, where he painted shop signs for a living until the
+  chandlery he worked for closed. He drew constantly in the margins of ledgers and ferry timetables. He came
+  to Monde at twenty-two with a rucksack of brushes and a half-finished plan to paint the whole Market Row.
+  The plan stalled after the first shutter. He met Olwen at a fish market queue and married her within a year.
+  He still believes the town's walls are waiting for him, though most of them are simply tired.
 personality:
-  traits: [ practical, shy, stubborn ]
-  big5: { open: 59, conscientious: 40, extravert: 59, agreeable: 38, neurotic: 85 }
-values: { prosperity: 0.15, safety: 0.1, spirit: 0.3, charm: 0.45 }
+  traits: [ quick, funny, anxious, generous, distractible ]
+  big5: { open: 82, conscientious: 35, extravert: 66, agreeable: 68, neurotic: 60 }
+values: { prosperity: 0.15, safety: 0.1, spirit: 0.4, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Every blank wall in Monde is an invitation.
+  - Talent is mostly just noticing what's already there.
+  - Nobody in Monde reads signs anymore, which is why we need better ones.
 voice:
-  register: Quick and funny. Over-explains, then apologizes. Uses art words slightly wrong and knows it.
-  tics: [ It's a sort of chiaroscuro. ]
-  never_says: [ no worries, awesome ]
+  register: Talks fast and runs over himself, then stops to apologise for the tangle. Uses art terms a little
+    wrong, such as calling every shade of grey a tone, and knows it and laughs at himself. Warm, easily
+    sidetracked.
+  tics: [ "sorry, go on", "that's a tone, not a colour", I'll do a sketch ]
+  never_says: [ talented, my masterpiece, as an artist ]
   samples:
-    - It's a sort of chiaroscuro. Is that the word? It's the dark bit.
-    - Sorry. I talk with my hands and they're blue.
-    - Ha. No. Well, yes, but not on purpose.
+    - Sorry, I was going to say the mural, and then I thought about the wall, and now I've forgotten the mural.
+    - No, I'm not sulking, I'm sketching the bench. It's a good bench. Nobody looks at it.
+    - Olwen says I should get a proper job. I said I've got a proper job, I just haven't been paid for it yet.
 birthday: 30
-likes: [ good light through a dirty window, old signage, being asked what it's for ]
-dislikes: [ talented said like a diagnosis, work offered for exposure, rain on a wet mural ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    good light through a dirty window,
+    old signage,
+    being asked what the picture is for,
+    the smell of linseed in the mornings
+  ]
+dislikes:
+  [
+    being called talented like a diagnosis,
+    work offered for exposure,
+    rain on a wet mural,
+    people who say they could do that
+  ]
+fears:
+  [
+    that the town will close around us before we've done anything here,
+    that Olwen will stop asking me what I'm working on
+  ]
 dream:
-  text: A wall that's finished
+  text: I want to paint one wall in Monde that people stop to look at, and then stand back and watch them do it.
   stages:
-    - Pick a blank wall with Sable's help
-    - Get the owner's and the mayor's permission (Regard ≥ 25 with pell)
-    - Paint it over two weekends and hold the unveiling
+    - Pick a blank wall with Sable's help and sketch three versions.
+    - Get the owner's and the mayor's permission before the first brushstroke.
+    - Paint it over two weekends and hold the unveiling on the market steps.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_19 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: millbrook.home_19 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_19 }
-    - { at: "19:30", do: read, where: millbrook.home_19 }
-    - { at: "21:30", do: sleep, where: millbrook.home_19 }
+    - { at: "07:30", do: wander, where: millbrook.home_19 }
+    - { at: "08:15", do: eat, where: market_row.bakery }
+    - { at: "09:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: write, where: old_quarter.library }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: millbrook.home_19 }
   weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_19 }
+    - { at: "08:30", do: sit, where: millbrook.home_19 }
     - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: millbrook.home_19 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_19 }
-chores: [ mend a sock, fold the washing ]
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: millbrook.home_19 }
+chores: [ Washes brushes at the laundry green, Sweeps the attic studio, Buys bread for the week ]
 relationships:
-  - { id: olwen_wakefield, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: olwen_wakefield,
+      affinity: 25,
+      trust: 20,
+      tag: spouse,
+      note: Wife; teases him about the unfinished wall.
+    }
+  - {
+      id: klara_fairweather,
+      affinity: 12,
+      trust: 8,
+      tag: curious,
+      note: Proofreads his Lantern notices and corrects his spelling.
+    }
+  - {
+      id: signe_starling,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Asked him to paint her boat's name once.
+    }
+secrets:
+  - text: He keeps a sketchbook of every shutter on Market Row and has painted fake shop names on the insides of
+      them.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_i02
 archetype: young_creative
 employment: out_of_work
