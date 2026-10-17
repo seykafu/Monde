@@ -201,7 +201,7 @@ describe("naming: what each resident calls the Fellow (GDD §12.1)", () => {
     const stranger = buildDialogueRequest(input(5));
     const friend = buildDialogueRequest(input(45));
     const user = (req: ReturnType<typeof buildDialogueRequest>) => req.messages.at(-1)!.content as string;
-    expect(user(stranger)).toMatch(/<player> Name: Wren \(she\/her; never "he", "him", "a man" or "lad"\)\. Your regard: Stranger\. Background: Tinkerer\. Call her "Fellow" \("dear" now and then\), not "Wren"/);
+    expect(user(stranger)).toMatch(/<player> Name: Wren \(she\/her; never "he", "him", "a man" or "lad"\)\. Your regard: Stranger\. What the town has heard of them \(not their own words to you\): Tinkerer\. Call her "Fellow" \("dear" now and then\), not "Wren"/);
     expect(user(friend)).toContain('Call her "Wren" when it\'s just the two of you');
     expect(JSON.stringify(friend.system)).toBe(JSON.stringify(stranger.system));
     expect(JSON.stringify(stranger.system)).not.toContain('Call her');

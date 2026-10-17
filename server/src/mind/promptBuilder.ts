@@ -112,7 +112,7 @@ type Templates = Readonly<Record<TemplateName, string>>;
  * Bump when the code-side serialization below changes in a way the template files don't show (list formats,
  * field order), so the logged prompt version still changes.
  */
-const SERIALIZER_VERSION = "q01.4";
+const SERIALIZER_VERSION = "q01.5";
 
 /**
  * Where the templates live. Source runs read them next to this file. The bundled server (tsup → server/dist)

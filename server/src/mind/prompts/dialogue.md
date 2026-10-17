@@ -17,7 +17,7 @@ on purpose.
 <player_said> {{player_said}} </player_said>
 {{focus}}
 <scene> Day {{day}} ({{weekday}}, {{season}}), {{time}}, {{place}}. Weather: {{weather}}. You: {{emotion}} ({{intensity}}), energy {{energy}}, stress {{stress}}. Doing: {{doing}}. </scene>
-<player> Name: {{player_name}} ({{player_pronouns}}). Your regard: {{regard_tier}}. Background: {{player_background}}. {{address}} </player>
+<player> Name: {{player_name}} ({{player_pronouns}}). Your regard: {{regard_tier}}. What the town has heard of them (not their own words to you): {{player_background}}. {{address}} </player>
 {{shared_past}}
 <memories>
 {{memories}}
