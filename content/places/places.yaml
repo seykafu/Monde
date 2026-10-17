@@ -1,6 +1,7 @@
 # Place registry (GDD §9.5). Residents may only plan at these places.
 # Coordinates, hours and capacity are added per place when the zone maps are built (MVP W-03).
-# Occupied homes created for generated residents use <zone>.home_NN (Appendix A.1.3).
+# Occupied homes not named in §9.5 use <zone>.home_NN (Appendix A.1.3, A.6); every home is in homes.yaml too (the
+# content linter keeps the two in step).
 old_quarter:
   - town_hall
   - mayor_office
@@ -28,6 +29,29 @@ old_quarter:
   - vacant_house_45
   - vacant_house_46
   - vacant_house_47
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
+  - home_01
+  - home_02
+  - home_03
+  - home_04
+  - home_05
+  - home_06
+  - home_07
+  - home_08
+  - home_09
+  - home_10
+  - home_11
+  - home_12
+  - home_13
+  - home_14
+  - home_15
+  - home_16
+  - home_17
+  - home_18
+  - home_19
+  - home_20
+  - home_21
+  - home_22
 market_row:
   - market_hall
   - market_street
@@ -49,6 +73,22 @@ market_row:
   - storefront_7
   - storefront_8
   - storefront_9
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
+  - home_01
+  - home_02
+  - home_03
+  - home_04
+  - home_05
+  - home_06
+  - home_07
+  - home_08
+  - home_09
+  - home_10
+  - home_11
+  - home_12
+  - home_13
+  - home_14
+  - home_15
 wharf:
   - fish_market
   - cannery
@@ -71,6 +111,23 @@ wharf:
   - vacant_house_54
   - vacant_house_55
   - home_bunkhouse
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
+  - home_01
+  - home_02
+  - home_03
+  - home_04
+  - home_05
+  - home_06
+  - home_07
+  - home_08
+  - home_09
+  - home_10
+  - home_11
+  - home_12
+  - home_13
+  - home_14
+  - home_15
+  - home_16
 commons:
   - bandstand
   - community_garden
@@ -81,6 +138,9 @@ commons:
   - sundial_lawn
   - old_elm
   - picnic_lawn
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
+  - home_01
+  - home_02
 millbrook:
   - mill
   - mill_yard
@@ -131,6 +191,48 @@ millbrook:
   - vacant_house_36
   - vacant_house_37
   - vacant_house_38
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
+  - home_01
+  - home_02
+  - home_03
+  - home_04
+  - home_05
+  - home_06
+  - home_07
+  - home_08
+  - home_09
+  - home_10
+  - home_11
+  - home_12
+  - home_13
+  - home_14
+  - home_15
+  - home_16
+  - home_17
+  - home_18
+  - home_19
+  - home_20
+  - home_21
+  - home_22
+  - home_23
+  - home_24
+  - home_25
+  - home_26
+  - home_27
+  - home_28
+  - home_29
+  - home_30
+  - home_31
+  - home_32
+  - home_33
+  - home_34
+  - home_35
+  - home_36
+  - home_37
+  - home_38
+  - home_39
+  - home_40
+  - home_41
 station_hill:
   - station
   - platform
@@ -145,6 +247,14 @@ station_hill:
   - vacant_house_59
   - vacant_house_60
   - vacant_house_61
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
+  - home_01
+  - home_02
+  - home_03
+  - home_04
+  - home_05
+  - home_06
+  - home_07
 briar_woods:
   - briar_gate
   - forage_path

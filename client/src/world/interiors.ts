@@ -132,6 +132,9 @@ export const DOOR_ONLY: readonly { place: RegExp; why: string }[] = [
   { place: /^wharf\.ticket_booth$/, why: 'a kiosk: Ada serves through its window (the Mail Round starts there)' },
   { place: /^wharf\.lighthouse$/, why: 'the lantern room (PZ-05, WF-5) is reached from its door until the light is relit and climbed' },
   { place: /^wharf\.(nell_cottage|harbormaster_house|home_bunkhouse)$/, why: 'homes' },
+  // The census households' homes (content/places/homes.yaml): townhouses and cottages, and the flats over the empty
+  // storefronts. The flat over Café Liss (market_row.home_01) is upstairs in the café's room.
+  { place: /^(old_quarter\.home_\d{2}|market_row\.home_(0[2-9]|1\d)|wharf\.home_\d{2})$/, why: 'census households’ homes: their residents have no cards yet (M-03)' },
   { place: /^wharf\.vane_office$/, why: 'Vane’s trailer: his scenes use its backdrop (bg_vane_trailer_interior)' },
   { place: /^commons\.(bandstand|glasshouse|teo_cottage)$/, why: 'the bandstand is open-sided; the glasshouse and Teo’s cottage open after Spring' }
 ];

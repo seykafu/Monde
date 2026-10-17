@@ -75,9 +75,11 @@ it('rejects missing targets and blocked arrivals', () => {
   expect(() => validateZoneLinks({ test: zone, other: { ...zone, id: 'other' } })).toThrow(/reciprocal/);
 });
 const interiorOnly = new Set(['mayor_office', 'margo_flat', 'sable_flat', 'bakery_flat', 'dunmore_flat', 'roz_flat', 'pub_rooms']);
+/** The census homes (`home_NN`, content/places/homes.yaml) are flats in drawn houses or on lanes off the board: not board places. */
+const censusHome = /^home_\d{2}$/;
 for (const z of Object.values(zones)) {
   it(`${z.id}: includes exactly the outdoor registry places`, () => {
-    expect(z.places.map(p => p.id).sort()).toEqual(registry[z.id]!.filter(id => !interiorOnly.has(id)).sort());
+    expect(z.places.map(p => p.id).sort()).toEqual(registry[z.id]!.filter(id => !interiorOnly.has(id) && !censusHome.test(id)).sort());
   });
   it(`${z.id}: all doors and exits are reachable from spawn`, () => {
     const seen = new Set<string>(), queue = [z.spawn];

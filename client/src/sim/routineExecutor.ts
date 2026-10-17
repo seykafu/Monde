@@ -20,10 +20,17 @@
 //   building  a place with walls: they walk to its door and go in (invisible) until they leave.
 //   interior  a room with no street door of its own (bakery_flat, pub_rooms, mayor_office…): the
 //             building it's in, as above.
-//   offboard  a place in a zone that isn't built (wharf, commons, millbrook…): they walk to the road
+//   offboard  a place in a zone that isn't built (millbrook, station_hill…): they walk to the road
 //             toward it on a built board, step off the edge, and come back the same way.
+//   lane      a home on a street its own board doesn't draw (content/places/homes.yaml `lane`): they walk to
+//             that edge cell of the board and step off it, a few minutes from the door.
 //   unresolved an id no zone knows: treated as off-board, and recorded in `warnings`.
+//
+// Homes (§9.5, A.1.3) resolve through the homes registry: a home inside a drawn building is that building's door (a
+// flat over a shop is an interior of the shop; a flat in a census townhouse is the townhouse), a lane home is `lane`,
+// and a home in an unbuilt zone is off-board as before.
 
+import type { HomeRegistry } from '@monde/shared';
 import type { Point, SocialSpot, ZoneDef } from '../world/zoneFormat';
 import { borderPoint, borderSide, centre, cumulative, isWalkable, pointAlong, type Loc, type Vec, type ZoneGraph } from '../world/nav';
 import { MS_PER_GAME_MINUTE } from './clock';
@@ -45,6 +52,11 @@ export const TILES_PER_GAME_MINUTE = (RESIDENT_SPEED * MS_PER_GAME_MINUTE) / 100
  */
 export const OFFBOARD_LEG_MINUTES = 15;
 export const OFFBOARD_LOCAL_MINUTES = 8;
+/**
+ * GDD-GAP: a lane home stands on a street just past its board's edge (Kasey's D3 for M-03), so the walk between that
+ * edge and the door is short: 4 game minutes (about ten tiles).
+ */
+export const LANE_LEG_MINUTES = 4;
 /** When even the zone graph can't find a way (a data error), the resident vanishes for this long instead. */
 const FAILED_ROUTE_MINUTES = 5;
 /** Verbs that wander about an open place instead of standing at one spot. */
@@ -124,7 +136,7 @@ export const INTERIOR_HOSTS: Readonly<Record<string, string>> = {
 };
 
 export type PlaceRegistry = Readonly<Record<string, readonly string[]>>;
-export type PlaceKind = 'open' | 'building' | 'interior' | 'offboard' | 'unresolved';
+export type PlaceKind = 'open' | 'building' | 'interior' | 'offboard' | 'lane' | 'unresolved';
 
 export interface PlaceInfo {
   /** Full place id, `zone.place`. */
@@ -137,7 +149,7 @@ export interface PlaceInfo {
   door: Point | null;
   /** Open ground only: the cells a resident may stand on, row-major. */
   spots: readonly Point[];
-  /** Off-board only: the unbuilt zone, and the board cell where its road leaves. */
+  /** Off-board and lane only: the unbuilt zone (a lane home's own key), and the board cell where its road leaves. */
   offZone?: string;
   road?: Loc;
 }
@@ -147,6 +159,8 @@ export interface ExecutorWorld {
   graph: ZoneGraph;
   /** The §9.5 registry (zone → place ids); used to tell unbuilt places from unknown ones. */
   registry?: PlaceRegistry;
+  /** content/places/homes.yaml: where each home stands (a building's door, a lane off the board, or off-board). */
+  homes?: HomeRegistry;
 }
 
 export interface Travel { from: string; to: string; progress: number }
@@ -252,6 +266,8 @@ export class RoutineExecutor {
         ? { id, kind: 'building', zone: zoneId, local, door: place.door, spots: [] }
         : { id, kind: 'open', zone: zoneId, local, door: place.door, spots: spotsIn(zone, place.rect, place.door) };
     }
+    const home = this.homeOf(zone, id, local);
+    if (home) return home;
     const host = this.hostOf(zone, id, local);
     if (host) return { id, kind: 'interior', zone: zoneId, local: host.id, door: host.door, spots: [] };
     this.warnings.add(id);
@@ -273,6 +289,24 @@ export class RoutineExecutor {
       this.areas.set(key, info);
     }
     return info;
+  }
+
+  /**
+   * A home on a built board, through the homes registry: inside the building that holds it (the building's own place
+   * when it has one, so a flat over a shop is that shop's interior), or on a lane off the board's edge.
+   */
+  private homeOf(zone: ZoneDef, id: string, local: string): PlaceInfo | null {
+    const host = this.world.homes?.get(id)?.host;
+    if (!host || host === 'offboard') return null;
+    if ('lane' in host) {
+      const road: Loc = { zone: zone.id, tile: [host.lane[0], host.lane[1]] };
+      return { id, kind: 'lane', zone: null, local: null, door: null, spots: [], offZone: `${zone.id}~${local}`, road };
+    }
+    const b = zone.town?.buildings.find(x => x.id === host.building || x.homes.includes(host.building));
+    if (!b) return null;
+    const place = b.id ? zone.places.find(p => p.id === b.id) : undefined;
+    if (place) return { id, kind: 'interior', zone: zone.id, local: place.id, door: place.door, spots: [] };
+    return b.door ? { id, kind: 'building', zone: zone.id, local, door: b.door, spots: [] } : null;
   }
 
   /** The building an interior is in: the §9.5 table, else an obvious name match (`bakery_flat` → `bakery`). */
@@ -373,12 +407,13 @@ export class RoutineExecutor {
   private journey(from: Anchor, to: Anchor, failures: string[]): Piece[] {
     if (from.key === to.key) return [];
     const off = (minutes: number): Piece => ({ minutes, zone: null, points: null, visible: false });
+    const leg = (info: PlaceInfo) => (info.kind === 'lane' ? LANE_LEG_MINUTES : OFFBOARD_LEG_MINUTES);
     const fromOff = from.zone === null, toOff = to.zone === null;
     if (fromOff && toOff && from.info.offZone === to.info.offZone) return [off(OFFBOARD_LOCAL_MINUTES)];
     const a: Loc = fromOff ? from.info.road! : { zone: from.zone!, tile: from.tile! };
     const b: Loc = toOff ? to.info.road! : { zone: to.zone!, tile: to.tile! };
     const pieces: Piece[] = [];
-    if (fromOff) pieces.push(off(OFFBOARD_LEG_MINUTES));
+    if (fromOff) pieces.push(off(leg(from.info)));
     if (a.zone !== b.zone || !samePoint(a.tile, b.tile)) {
       const route = this.world.graph.route(a, b);
       if (!route) {
@@ -395,7 +430,7 @@ export class RoutineExecutor {
         });
       }
     }
-    if (toOff) pieces.push(off(OFFBOARD_LEG_MINUTES));
+    if (toOff) pieces.push(off(leg(to.info)));
     return pieces;
   }
 

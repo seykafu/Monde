@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { RoutineBlock } from '@monde/shared';
 import { DAY_START, PASS_OUT, type Weekday } from '../clock';
 import { blocksFromRoutine, dayPlan, syntheticPlans, type DayPlan } from '../plans';
-import { OFFBOARD_LEG_MINUTES, RoutineExecutor, TILES_PER_GAME_MINUTE, type ResidentState } from '../routineExecutor';
-import { loadCards, loadWorld } from './content';
+import { LANE_LEG_MINUTES, OFFBOARD_LEG_MINUTES, RoutineExecutor, TILES_PER_GAME_MINUTE, type ResidentState } from '../routineExecutor';
+import { loadCards, loadHomes, loadWorld } from './content';
 
 const world = loadWorld();
 const cards = loadCards();
@@ -206,5 +206,66 @@ describe('full-day soak', () => {
       expect(walking, day).toBeGreaterThan(0);
       console.info(`[soak] ${day}: 30 residents laid out in ${layout.toFixed(0)} ms; ${walking} in sight at 12:25`);
     }
+  });
+});
+
+describe('homes (content/places/homes.yaml)', () => {
+  const homes = loadHomes();
+  const reachable = (zone: string, tile: readonly [number, number]) =>
+    world.graph.route({ zone, tile: world.zones[zone]!.spawn }, { zone, tile: [tile[0], tile[1]] }) !== null;
+
+  it('resolves every home: its building\'s door on the board, a lane off its edge, or off-board', () => {
+    const ex = new RoutineExecutor(world);
+    expect(homes.size).toBe(184);
+    for (const [id, home] of homes) {
+      const zone = id.slice(0, id.indexOf('.')), info = ex.resolve(id), board = world.zones[zone];
+      if (home.host === 'offboard') {
+        expect(board, id).toBeUndefined();
+        expect(info, id).toMatchObject({ kind: 'offboard', offZone: zone });
+      } else if ('lane' in home.host) {
+        const [x, y] = home.host.lane;
+        expect(info, id).toMatchObject({ kind: 'lane', zone: null, road: { zone, tile: [x, y] } });
+        expect(x === 0 || y === 0 || x === board!.width - 1 || y === board!.height - 1, `${id}: a lane leaves by a border cell`).toBe(true);
+        expect(board!.walkability[y]![x], id).toBe(true);
+        expect(reachable(zone, [x, y]), id).toBe(true);
+      } else {
+        expect(['building', 'interior'], id).toContain(info.kind);
+        expect(info.zone, id).toBe(zone);
+        expect(board!.walkability[info.door![1]]![info.door![0]], id).toBe(true);
+        expect(reachable(zone, info.door!), id).toBe(true);
+      }
+    }
+    expect([...ex.warnings]).toEqual([]);
+    // Flats share their building's door; a flat over a shop is the shop's interior.
+    expect(ex.resolve('old_quarter.home_09').door).toEqual(ex.resolve('old_quarter.home_01').door);
+    expect(ex.resolve('market_row.home_13')).toMatchObject({ kind: 'interior', local: 'storefront_6' });
+    expect(ex.resolve('market_row.bakery_flat')).toMatchObject({ kind: 'interior', local: 'bakery' });
+  });
+
+  it('walks a lane resident off their board\'s edge at the lane, a few minutes from the door', () => {
+    const ex = new RoutineExecutor(world);
+    const p = plan('shore', 'wharf.home_05', [['07:00', 'eat', 'wharf.home_05'], ['09:00', 'work', 'wharf.fish_market'], ['18:00', 'sleep', 'wharf.home_05']]);
+    const [seen] = flips(ex, p, 420, 600, s => s.zone !== null);
+    const first = ex.stateAt(p, seen!);
+    expect(first).toMatchObject({ zone: 'wharf', visible: true, moving: true });
+    expect(first.position!.x).toBeGreaterThan(55); // stepping on at the east edge, by Shore Lane's cell [55, 2]
+    expect(first.position!.y).toBeCloseTo(2.5, 0);
+    // Off the board between the door and the edge for LANE_LEG_MINUTES, not the long off-board leg.
+    const gone = flips(ex, p, 17 * 60, 18 * 60 + 30, s => s.zone === null)[0]!;
+    expect(ex.stateAt(p, gone + LANE_LEG_MINUTES + 1)).toMatchObject({ zone: null, place: 'wharf.home_05', traveling: null });
+    expect(LANE_LEG_MINUTES).toBeLessThan(OFFBOARD_LEG_MINUTES);
+  });
+
+  it('soaks a resident from every home (lanes and flats included) through a whole day without anyone stuck', () => {
+    const ex = new RoutineExecutor(world);
+    const plans = [...homes.keys()].map(id => plan(`at_${id}`, id, [
+      ['07:30', 'eat', id], ['09:00', 'work', 'market_row.general_store'], ['12:30', 'eat', 'wharf.fish_market'],
+      ['14:00', 'visit', 'millbrook.school'], ['16:00', 'walk', 'commons.picnic_lawn'], ['18:00', 'eat', id], ['21:30', 'sleep', id]
+    ]));
+    const result = soak(ex, plans);
+    expect(result.offTile).toEqual([]);
+    expect(result.failures).toEqual([]);
+    expect(result.stuck).toEqual([]);
+    expect([...ex.warnings]).toEqual([]);
   });
 });

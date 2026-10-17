@@ -1,0 +1,292 @@
+# What the Day-1 census skeleton (MVP M-03; GDD Appendix A.1, §12.4) must hold fixed before the seed decides the rest.
+# shared/src/census/pins.ts reads it; tools/census.ts builds content/census/day1.yaml around it.
+#
+#   households  the 30 the skeleton never draws: the 16 the cards already fill (A.1's core-held households, so the
+#               tables close), the three mixed ones (a card and someone still to write), and the eleven of the named
+#               people. Members are listed in their type's slot order (shared/src/census/day1Tables.ts HOUSEHOLD_SHAPES):
+#                 { card: id }    a carded resident: the core cast, or one of the four carded people inside the 192
+#                 { person: id }  one of the named people below (a card still to write)
+#                 { slot: {…} }   someone still to invent, with whatever is fixed about them
+#               `home: null` lets the skeleton pick the home inside the zone.
+#   people      the 14 named canon people inside the 192 who have no card yet (A.1.5, §12.4), and the four who do (`card:
+#               true`: their name, age and pronouns are the card's). Hook and voice are the §12.4 seed for the card writer;
+#               canon_locks are drafts for Kasey to rule on.
+#   links       kin and ties across households that the cards must agree on.
+#   mirrors     links the existing cards already make to the named people: each must be returned when that card is
+#               written (the content linter's reciprocity rule, §12.2). census.test.ts checks this list against the cards.
+version: 1
+
+households:
+  # ── Core-held: every member already has a card (A.1.2's named rows, §9.5's "who lives where") ──
+  - { id: pell, type: A, zone: old_quarter, home: old_quarter.pell_house, surname: Pell, members: [{ card: pell }] }
+  - { id: achterberg, type: A, zone: old_quarter, home: old_quarter.bertrand_house, surname: Achterberg, members: [{ card: bertrand }] }
+  - { id: liang, type: G, zone: old_quarter, home: old_quarter.margo_flat, surname: Liang, members: [{ card: margo }] }
+  - { id: reyes, type: D, zone: old_quarter, home: old_quarter.augusta_house, surname: Reyes, members: [{ card: augusta }] }
+  - { id: moreau, type: D, zone: old_quarter, home: old_quarter.sable_flat, surname: Moreau, members: [{ card: sable }] }
+  - { id: okafor, type: M, zone: old_quarter, home: old_quarter.okafor_house, surname: Okafor, members: [{ card: ada }, { card: tib }] }
+  - { id: fournier, type: A, zone: market_row, home: market_row.bakery_flat, surname: Fournier, members: [{ card: odile }] }
+  - { id: hale, type: D, zone: market_row, home: market_row.roz_flat, surname: Hale, members: [{ card: rosalind }] }
+  - { id: dunmore_nell, type: D, zone: wharf, home: wharf.nell_cottage, surname: Dunmore, members: [{ card: nell }] }
+  - { id: ferrante, type: A, zone: wharf, home: wharf.boathouse, surname: Ferrante, members: [{ card: moss }] }
+  - { id: petrescu, type: G, zone: commons, home: commons.teo_cottage, surname: Petrescu, members: [{ card: teo }] }
+  - { id: mercer, type: O, zone: millbrook, home: millbrook.mercer_house, surname: Mercer, members: [{ card: rook }, { card: delphine }] }
+  - { id: amari, type: D, zone: millbrook, home: millbrook.felix_house, surname: Amari, members: [{ card: felix }] }
+  - { id: wolanski, type: D, zone: millbrook, home: millbrook.kasimir_workshop, surname: Wolanski, members: [{ card: kasimir }] }
+  - { id: brandt, type: A, zone: station_hill, home: station_hill.hollis_house, surname: Brandt, members: [{ card: hollis }] }
+  # Bru's bed on Terrace Row (his card: Rook "handed him a tin of soup and a bed on Terrace Row"), D4.
+  - { id: haskett, type: G, zone: millbrook, home: millbrook.home_02, surname: Haskett, members: [{ card: bru }] }
+
+  # ── Mixed: a card and someone to write ──
+  # A.1.2: "june, ines and one more lodger are the Market Row row of type H (pub_rooms)". Flatmates keep their names.
+  - id: pub_rooms
+    type: H
+    zone: market_row
+    home: market_row.pub_rooms
+    surname: null
+    members:
+      - { card: june }
+      - { card: ines }
+      - { slot: { note: "The third room at the Gull & Anchor (A.1.2's 'one more lodger')." } }
+  # A.1.2: Priya and Raman are a type O row in Millbrook.
+  - { id: ramaswamy, type: O, zone: millbrook, home: millbrook.priya_house, surname: Ramaswamy, members: [{ card: priya }, { person: raman }] }
+  # A.1.2: Nettie and her grandmother Ilona; Nettie's card: "lives on Terrace Row with her grandmother Ilona" (D4: No. 12).
+  - { id: szabo_ilona, type: O, zone: millbrook, home: millbrook.home_05, surname: Szabo, members: [{ card: nettie }, { person: ilona }] }
+
+  # ── The named people's households ──
+  # §12.4: Barney's home is market_row.dunmore_flat; he lives alone over the shop.
+  - { id: dunmore_barney, type: D, zone: market_row, home: market_row.dunmore_flat, surname: Dunmore, members: [{ person: barney }] }
+  # D4: Hester and a partner as "the Quills" on Lamplighter Lane (§12.4's old_quarter.lamplighter_lane), the townhouse
+  # two doors up from the Fellow's. A.3.3: a household shares its archetype, so Mr. Quill is a shop_founder too.
+  - id: quill
+    type: E
+    zone: old_quarter
+    home: old_quarter.home_03
+    surname: Quill
+    members:
+      - { person: hester }
+      - slot:
+          archetype: shop_founder
+          presentation: m
+          surname: Quill
+          note: "Mr. Quill (§13.3a): ran a shop on the corner of Lamplighter Lane and was the cottage's last tenant (he had the keys cut twice). Mrs. Quill's cat is Tib's back way (tib.yaml)."
+  # §12.4: Frye on Lamplighter Lane too; D4: in his own flat, upstairs in the Quills' townhouse.
+  - { id: frye, type: A, zone: old_quarter, home: old_quarter.home_13, surname: Frye, members: [{ person: frye }] }
+  # §12.4 Maud Szabo, 9, on Terrace Row; Nettie's card: "a few doors from her cousin Maud". Her parent is Ilona's child.
+  - id: szabo_maud
+    type: M
+    zone: millbrook
+    home: millbrook.home_07
+    surname: Szabo
+    members:
+      - { slot: { surname: Szabo, note: "Maud's parent: Ilona's son or daughter, Nettie's uncle or aunt." } }
+      - { person: maud }
+      - { slot: { surname: Szabo, note: "Maud's brother or sister." } }
+  # A.1.2: "the Calloway twins and a cousin are the Wharf row of type H (the old cannery bunkhouse)".
+  - id: calloway
+    type: H
+    zone: wharf
+    home: wharf.home_bunkhouse
+    surname: Calloway
+    members:
+      - { person: dex }
+      - { person: dom }
+      - { slot: { note: "The twins' cousin (A.1.2); not one of the Tollmen (A.1.5 names the five)." } }
+  # §12.4 put Weasel at the hideout; A.1.3: "each has a bed on paper elsewhere". D4: a flat over a Market Row storefront,
+  # No. 6, the old ironmonger's with the Tollmen's bench outside, where he hears everything on Market Row.
+  - { id: pike, type: G, zone: market_row, home: market_row.home_13, surname: Pike, members: [{ person: weasel }] }
+  # §12.4: old_quarter.st_brigids. D4: she is A.1.4's sexton.
+  - { id: cobb, type: A, zone: old_quarter, home: old_quarter.st_brigids, surname: Cobb, members: [{ person: cobb }] }
+  # A.1.5: "a birdwatcher who lives by the duck pond" (Pond Lane, off the Commons board by the pond).
+  - { id: quist, type: A, zone: commons, home: commons.home_01, surname: Quist, members: [{ person: quist }] }
+  # A.1.5: "a retired_magician in the Old Quarter".
+  - { id: marchetti, type: A, zone: old_quarter, home: null, surname: Marchetti, members: [{ person: marchetti }] }
+  # A.1.5 doesn't place her. GDD-GAP: the Old Quarter, near the library that keeps Aurélien's original map (A.2 d1).
+  - { id: voss, type: D, zone: old_quarter, home: null, surname: Voss, members: [{ person: voss }] }
+  # A.1.5: "a radio_tinkerer on Market Row". A.2 Requires home.bench: the skeleton picks a home with one.
+  - { id: frane, type: A, zone: market_row, home: null, surname: Frane, members: [{ person: frane }] }
+
+people:
+  # ── The four carded people inside the 192 (A.1.5): the card is the record ──
+  ada: { card: true, archetype: single_parent, job: { row: 10, title: ticket clerk, workplace: wharf.ticket_booth } }
+  moss: { card: true, archetype: fisher, job: { row: 10, title: skipper of the Gannet, workplace: wharf.ferry_slip } }
+  bru: { card: true, archetype: drifter, job: { row: 23, title: Tollman, workplace: briar_woods.tollmen_hideout } }
+  nettie: { card: true, archetype: apprentice, job: { row: 23, title: Tollman, workplace: briar_woods.tollmen_hideout } }
+
+  # ── The fourteen named people still to write ──
+  barney:
+    name: Barnaby "Barney" Dunmore
+    age: 51
+    presentation: m
+    archetype: shop_founder
+    job: { row: 5, title: counter clerk, workplace: market_row.general_store }
+    source: "§12.4, A.1.5 (shop_founder), nell.yaml"
+    hook: "Hands the Tollmen 20 coins from the till at the back door every Saturday and books it as 'sundries.' Nell doesn't know."
+    voice: "Apologetic; counts change aloud; 'Mm, well.'"
+    canon_locks:
+      - { while: "!flag.barney_confessed", fact: "Every Saturday Barney hands the Tollmen 20 coins from Dunmore's till at the back door and books it as 'sundries'. He never tells Nell, and says nothing that would let her guess." }
+  hester:
+    name: Hester Quill
+    age: 59
+    presentation: f
+    archetype: shop_founder
+    job: { row: 7, title: owner of Café Liss, workplace: market_row.cafe_liss }
+    source: "§12.4, A.1.5 (shop_founder), june.yaml, §13.3a (Mrs. Quill's cat)"
+    hook: "Runs a coffee house and drinks only tea. Gives June the morning shift and a free cup."
+    voice: "Fussy and exact; 'I'll have you know.'"
+    canon_locks:
+      - { while: "true", fact: "Hester owns Café Liss and drinks only tea. June Castellanos has the morning shift and a free cup." }
+  frye:
+    name: Dunstan Frye
+    age: 62
+    presentation: m
+    archetype: retired_organizer
+    job: { row: 1, title: clerk, workplace: old_quarter.town_hall }
+    source: "§12.4 (council archivist; the clerk's post was folded into the mayor's eleven years ago), pell.yaml"
+    hook: "Keeps the council archive key and has never opened the file Pell asked him to leave shut."
+    voice: "Official hedging; 'It is minuted.'"
+    canon_locks:
+      - { while: "true", fact: "Frye keeps the council archive key. He has never opened the file Pell asked him to leave shut and does not know what is in it." }
+  cobb:
+    name: Rev. Alma Cobb
+    age: 66
+    presentation: f
+    archetype: retired_organizer
+    job: { row: 1, title: sexton, workplace: old_quarter.st_brigids }
+    source: "§12.4 (chaplain of St. Brigid's), rook.yaml; D4 (A.1.4's sexton)"
+    hook: "Carries the Monday poor-box envelope to Millbrook and has never asked who puts it in."
+    voice: "Unhurried; six-minute sermons; practical advice."
+    canon_locks:
+      - { while: "true", fact: "Every Monday Rev. Cobb carries the St. Brigid's poor-box envelope marked 'Mercer, Millbrook' to Delphine. She has never asked who puts it in." }
+  maud:
+    name: Maud Szabo
+    age: 9
+    presentation: f
+    archetype: single_parent
+    source: "§12.4, nettie.yaml, bru.yaml, tib.yaml"
+    hook: "Draws everyone she meets in the margin of her slate; Felix pins the best ones to the wall."
+    voice: "Shy; whispers; 'I drew you.'"
+    canon_locks:
+      - { while: "!flag.school_saved", fact: "Maud is nine and one of the nine pupils at Millbrook School, in Felix's class with Tib. Nettie Szabo is her cousin." }
+  raman:
+    name: Raman Ramaswamy
+    age: 66
+    presentation: m
+    archetype: widowed_elder
+    source: "§12.4 (retired mill electrician), A.1.5 (widowed_elder), priya.yaml, kasimir.yaml"
+    hook: "Has walked the weir path alone since June and is hiding it so Priya will stop fussing. Wants her to go."
+    voice: "Slow and wry; names the weather after radio programmes ('a Tuesday-play sort of day')."
+    canon_locks:
+      - { while: "true", fact: "Raman had a stroke on the weir path eight months ago. He has walked it alone since June and hides it so Priya will stop fussing. He wants her to go." }
+  ilona:
+    name: Ilona Szabo
+    # GDD-GAP: no age anywhere. Nettie (19) is her granddaughter; A.2 widowed_elder runs 63–88.
+    age: [68, 80]
+    presentation: f
+    archetype: widowed_elder
+    source: "A.1.2, A.1.5 (widowed_elder), nettie.yaml"
+    hook: "Counts the coal and doesn't ask what the lookout rota is for. Sunday is chapel with Nettie."
+    # GDD-GAP: no voice note anywhere; the card writer starts from widowed_elder's.
+    voice: null
+    canon_locks:
+      - { while: "true", fact: "Ilona is Nettie's grandmother and Maud's; Nettie lives with her on Terrace Row and Maud a few doors along." }
+  dex:
+    name: Dex Calloway
+    age: 21
+    presentation: m
+    archetype: drifter
+    twin_of: dom
+    job: { row: 23, title: Tollman, workplace: briar_woods.tollmen_hideout }
+    source: "§12.4, A.1.5 (drifter), rook.yaml"
+    hook: "Plans every Saturday round and loses at draughts to Hollis on purpose."
+    voice: "Precise; finishes his brother's sentences."
+    canon_locks:
+      - { while: "!flag.tollmen_broken", fact: "Dex is a Tollman. He plans the crew's Saturday round: 20 coins from every open shop, split six ways." }
+  dom:
+    name: Dom Calloway
+    age: 21
+    presentation: m
+    archetype: drifter
+    twin_of: dex
+    job: { row: 23, title: Tollman, workplace: briar_woods.tollmen_hideout }
+    source: "§12.4, A.1.5 (drifter), rook.yaml"
+    hook: "Charms shopkeepers into paying on time and can't lie to a child."
+    voice: "Jokey; talks too much."
+    canon_locks:
+      - { while: "!flag.tollmen_broken", fact: "Dom is a Tollman. On the Saturday round he does the talking at the till, and he can't lie to a child." }
+  weasel:
+    name: Wendell "Weasel" Pike
+    age: 28
+    presentation: m
+    archetype: drifter
+    job: { row: 23, title: Tollman, workplace: briar_woods.tollmen_hideout }
+    source: "§12.4 (messenger and fixer), A.1.5 (drifter), rook.yaml, sable.yaml, bru.yaml, §13.3a (the jam jars)"
+    hook: "Carries the envelope to the van, hears everything on Market Row, and threw the brick through the Lantern's window."
+    voice: "Fast and over-friendly; 'Between friends.'"
+    canon_locks:
+      - { while: "!flag.tollmen_broken", fact: "Weasel carries the crew's envelope to the grey van at the crane yard on Saturday nights and keeps the take in labelled jam jars, one per shop." }
+  quist:
+    name: Alphonse Quist
+    age: 68
+    presentation: m
+    archetype: birdwatcher
+    source: "A.1.5 (a birdwatcher who lives by the duck pond)"
+    hook: "Lives by the duck pond and counts its birds for a society in Carrow."
+    voice: null
+    canon_locks: []
+  marchetti:
+    name: Ferdinand Marchetti
+    age: 73
+    presentation: m
+    archetype: retired_magician
+    source: "A.1.5 (a retired_magician in the Old Quarter), A.6 ('The Marvelous Marchetti')"
+    hook: "Billed once as The Marvelous Marchetti; the trunk of props has outlived three assistants."
+    voice: null
+    canon_locks: []
+  voss:
+    name: Ignatia Voss
+    age: 58
+    presentation: f
+    archetype: cartographer
+    source: "A.1.5 (a cartographer who is never lost and always late)"
+    hook: "Never lost and always late."
+    voice: null
+    canon_locks: []
+  frane:
+    name: Dolores "Dolly" Frane
+    age: 61
+    presentation: f
+    archetype: radio_tinkerer
+    source: "A.1.5 (a radio_tinkerer on Market Row)"
+    hook: "Mends the town's wirelesses and clocks in a back room on Market Row."
+    voice: null
+    canon_locks: []
+
+links:
+  # Kin across households (D4). Ids are residents', or `<household>/<slot>` for someone still to name.
+  - { a: barney, b: nell, tag: kin, note: "Brother and sister (§12.4: Nell's brother)." }
+  - { a: maud, b: nettie, tag: kin, note: "Cousins (§12.4)." }
+  - { a: maud, b: ilona, tag: kin, note: "Granddaughter and grandmother (Nettie's cousin, Ilona's son's or daughter's child)." }
+  - { a: szabo_maud/m1, b: ilona, tag: kin, note: "Ilona's son or daughter." }
+  - { a: szabo_maud/m1, b: nettie, tag: kin, note: "Nettie's uncle or aunt." }
+  - { a: szabo_maud/m3, b: nettie, tag: kin, note: "Cousins." }
+  - { a: szabo_maud/m3, b: ilona, tag: kin, note: "Grandchild and grandmother." }
+  - { a: calloway/m3, b: dex, tag: kin, note: "Cousins (A.1.2)." }
+  - { a: calloway/m3, b: dom, tag: kin, note: "Cousins (A.1.2)." }
+  - { a: dex, b: dom, tag: kin, note: "Twins (§12.4)." }
+  - { a: raman, b: priya, tag: kin, note: "Father and daughter (§12.4)." }
+  - { a: quill/m2, b: hester, tag: kin, note: "Husband and wife: the Quills (§13.3a)." }
+
+mirrors:
+  # The links the cards already make to people who have no card yet (from → to, as the `from` card has it). Each named
+  # card must return them.
+  - { from: nell, to: barney, tag: brother, affinity: 70, trust: 80 }
+  - { from: bru, to: barney, tag: embarrassed, affinity: 40, trust: 35 }
+  - { from: june, to: hester, tag: employer, affinity: 45, trust: 50 }
+  - { from: pell, to: frye, tag: clerk, affinity: 50, trust: 70 }
+  - { from: priya, to: raman, tag: father, affinity: 85, trust: 70 }
+  - { from: nettie, to: maud, tag: cousin, affinity: 90, trust: 85 }
+  - { from: nettie, to: ilona, tag: grandmother, affinity: 85, trust: 70 }
+  - { from: bru, to: maud, tag: friend, affinity: 65, trust: 50 }
+  - { from: rook, to: dex, tag: crew, affinity: 45, trust: 40 }
+  - { from: rook, to: dom, tag: crew, affinity: 55, trust: 45 }
+  - { from: rook, to: weasel, tag: crew, affinity: 30, trust: 25 }

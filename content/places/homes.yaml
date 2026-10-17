@@ -1,0 +1,228 @@
+# Every home in Monde (GDD Appendix A.1.3, A.3.4 rule 1, A.6; Kasey's D3 for M-03): the 123 lived in on Day 1 and
+# the 61 vacant, 184 in all. Each has an address, the A.3.4 attributes (beds, ground_floor, bench) and a host, where
+# it stands (shared/src/census/homes.ts):
+#   { building: x }  inside the building on its zone's board whose id is x or whose `home:` names x (its door);
+#   { lane: [x, y] } on a street the board doesn't draw: residents walk to that edge cell and step off;
+#   offboard         in a zone with no board yet (Millbrook, Station Hill).
+# Every id here is registered in places.yaml, and the content linter keeps the two (and the zone files) in step.
+# Vacant houses keep their numbers (vacant_house_47 is No. 47 Lamplighter Lane, as the Dawn Report prints it) and
+# the beds the arrivals have always seen (three in the Old Quarter, two on the Wharf).
+version: 1
+homes:
+  # Old Quarter: 29 lived in, 9 vacant (A.1.3). Every household lives in a building drawn on the board (D3): the
+  # named houses and flats (§9.5), St Brigid's for its chaplain (§12.4), and the eight townhouses, most of them
+  # divided into two or three flats (A ground floor, B and C up the stairs).
+  # The High Street's civic row.
+  old_quarter.st_brigids: { street: "High Street", number: 1, name: "the chaplain's rooms at St Brigid's", beds: 1, ground_floor: true, bench: false, host: { building: "st_brigids" } }
+  old_quarter.margo_flat: { street: "High Street", number: 9, name: "the flat over the library", beds: 1, ground_floor: false, bench: false, host: { building: "library" } }
+  old_quarter.sable_flat: { street: "High Street", number: 11, name: "the flat over the Lantern", beds: 1, ground_floor: false, bench: false, host: { building: "lantern_office" } }
+  old_quarter.bertrand_house: { street: "High Street", number: 13, name: "the rooms over Achterberg Horlogerie", beds: 2, ground_floor: false, bench: true, host: { building: "bertrand_house" } }
+  old_quarter.augusta_house: { street: "High Street", number: 17, beds: 2, ground_floor: true, bench: false, host: { building: "augusta_house" } }
+  # Heron Lane, west of Fountain Square.
+  old_quarter.pell_house: { street: "Heron Lane", number: 36, beds: 3, ground_floor: true, bench: true, host: { building: "pell_house" } }
+  old_quarter.home_01: { street: "Heron Lane", number: 37, flat: A, beds: 2, ground_floor: true, bench: false, host: { building: "home_01" } }
+  old_quarter.home_09: { street: "Heron Lane", number: 37, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_01" } }
+  old_quarter.home_10: { street: "Heron Lane", number: 37, flat: C, beds: 1, ground_floor: false, bench: false, host: { building: "home_01" } }
+  old_quarter.okafor_house: { street: "Heron Lane", number: 38, beds: 3, ground_floor: true, bench: false, host: { building: "okafor_house" } }
+  old_quarter.vacant_house_39: { street: "Heron Lane", number: 39, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_39" } }
+  # Bell Row, east of the square: the empty terrace, and one lived-in house at the end.
+  old_quarter.vacant_house_40: { street: "Bell Row", number: 40, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_40" } }
+  old_quarter.vacant_house_41: { street: "Bell Row", number: 41, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_41" } }
+  old_quarter.vacant_house_42: { street: "Bell Row", number: 42, beds: 3, ground_floor: true, bench: true, host: { building: "vacant_house_42" } }
+  old_quarter.vacant_house_43: { street: "Bell Row", number: 43, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_43" } }
+  old_quarter.vacant_house_44: { street: "Bell Row", number: 44, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_44" } }
+  old_quarter.home_02: { street: "Bell Row", number: 45, flat: A, beds: 2, ground_floor: true, bench: true, host: { building: "home_02" } }
+  old_quarter.home_11: { street: "Bell Row", number: 45, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_02" } }
+  old_quarter.home_12: { street: "Bell Row", number: 45, flat: C, beds: 1, ground_floor: false, bench: false, host: { building: "home_02" } }
+  # Lamplighter Lane: three empty houses, the Quills' (Frye upstairs, §12.4), then the Lamplighter's Cottage (the
+  # Fellow's, not a census home).
+  old_quarter.vacant_house_45: { street: "Lamplighter Lane", number: 45, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_45" } }
+  old_quarter.vacant_house_46: { street: "Lamplighter Lane", number: 46, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_46" } }
+  old_quarter.vacant_house_47: { street: "Lamplighter Lane", number: 47, beds: 3, ground_floor: true, bench: false, host: { building: "vacant_house_47" } }
+  old_quarter.home_03: { street: "Lamplighter Lane", number: 48, flat: A, beds: 2, ground_floor: true, bench: true, host: { building: "home_03" } }
+  old_quarter.home_13: { street: "Lamplighter Lane", number: 48, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_03" } }
+  # Well Row, along the top of the green.
+  old_quarter.home_04: { street: "Well Row", number: 1, flat: A, beds: 2, ground_floor: true, bench: false, host: { building: "home_04" } }
+  old_quarter.home_14: { street: "Well Row", number: 1, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_04" } }
+  old_quarter.home_15: { street: "Well Row", number: 1, flat: C, beds: 1, ground_floor: false, bench: false, host: { building: "home_04" } }
+  old_quarter.home_05: { street: "Well Row", number: 2, flat: A, beds: 2, ground_floor: true, bench: true, host: { building: "home_05" } }
+  old_quarter.home_16: { street: "Well Row", number: 2, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_05" } }
+  old_quarter.home_17: { street: "Well Row", number: 2, flat: C, beds: 1, ground_floor: false, bench: false, host: { building: "home_05" } }
+  old_quarter.home_06: { street: "Well Row", number: 3, flat: A, beds: 2, ground_floor: true, bench: false, host: { building: "home_06" } }
+  old_quarter.home_18: { street: "Well Row", number: 3, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_06" } }
+  old_quarter.home_19: { street: "Well Row", number: 3, flat: C, beds: 1, ground_floor: false, bench: false, host: { building: "home_06" } }
+  old_quarter.home_07: { street: "Well Row", number: 4, flat: A, beds: 2, ground_floor: true, bench: true, host: { building: "home_07" } }
+  old_quarter.home_20: { street: "Well Row", number: 4, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_07" } }
+  old_quarter.home_21: { street: "Well Row", number: 4, flat: C, beds: 1, ground_floor: false, bench: false, host: { building: "home_07" } }
+  old_quarter.home_08: { street: "Well Row", number: 5, flat: A, beds: 2, ground_floor: true, bench: false, host: { building: "home_08" } }
+  old_quarter.home_22: { street: "Well Row", number: 5, flat: B, beds: 1, ground_floor: false, bench: false, host: { building: "home_08" } }
+  # Market Row: 19 lived in, none vacant (A.1.3). The flats over the open shops (§9.5), the café's, seven houses on
+  # Lower Row, and seven flats over the empty storefronts, which A.1.3 counts as homes (the shops below stay shut and
+  # dark; No. 3 is Strand's Hardware's storeroom and No. 9 Aurélien's print shop, so neither has a flat).
+  market_row.home_01: { street: "Market Street", number: 2, name: "the flat over Café Liss", beds: 2, ground_floor: false, bench: false, host: { building: "cafe_liss" } }
+  market_row.pub_rooms: { street: "Market Street", number: 4, name: "the rooms at the Gull & Anchor", beds: 3, ground_floor: false, bench: false, host: { building: "gull_and_anchor" } }
+  market_row.roz_flat: { street: "Market Street", number: 4, name: "the flat over the Gull & Anchor", beds: 1, ground_floor: false, bench: false, host: { building: "gull_and_anchor" } }
+  market_row.dunmore_flat: { street: "Market Street", number: 8, name: "the flat over Dunmore's", beds: 2, ground_floor: false, bench: false, host: { building: "general_store" } }
+  market_row.bakery_flat: { street: "Market Street", number: 10, name: "the flat over the bakery", beds: 2, ground_floor: false, bench: false, host: { building: "bakery" } }
+  # Lower Row, behind the market.
+  market_row.home_02: { street: "Lower Row", number: 1, beds: 3, ground_floor: true, bench: false, host: { building: "home_02" } }
+  market_row.home_03: { street: "Lower Row", number: 2, beds: 3, ground_floor: true, bench: false, host: { building: "home_03" } }
+  market_row.home_04: { street: "Lower Row", number: 3, beds: 3, ground_floor: true, bench: true, host: { building: "home_04" } }
+  market_row.home_05: { street: "Lower Row", number: 4, beds: 3, ground_floor: true, bench: false, host: { building: "home_05" } }
+  market_row.home_06: { street: "Lower Row", number: 5, beds: 3, ground_floor: true, bench: false, host: { building: "home_06" } }
+  market_row.home_07: { street: "Lower Row", number: 6, beds: 3, ground_floor: true, bench: true, host: { building: "home_07" } }
+  market_row.home_08: { street: "Lower Row", number: 7, beds: 3, ground_floor: true, bench: false, host: { building: "home_08" } }
+  # Over the empty storefronts (their door plates are their Market Row numbers, MR-4).
+  market_row.home_09: { street: "Market Row", number: 1, name: "the flat over No. 1 Market Row", beds: 2, ground_floor: false, bench: true, host: { building: "storefront_1" } }
+  market_row.home_10: { street: "Market Row", number: 2, name: "the flat over No. 2 Market Row", beds: 1, ground_floor: false, bench: false, host: { building: "storefront_2" } }
+  market_row.home_11: { street: "Market Row", number: 4, name: "the flat over No. 4 Market Row", beds: 1, ground_floor: false, bench: true, host: { building: "storefront_4" } }
+  market_row.home_12: { street: "Market Row", number: 5, name: "the flat over No. 5 Market Row", beds: 2, ground_floor: false, bench: false, host: { building: "storefront_5" } }
+  market_row.home_13: { street: "Market Row", number: 6, name: "the flat over No. 6 Market Row", beds: 1, ground_floor: false, bench: false, host: { building: "storefront_6" } }
+  market_row.home_14: { street: "Market Row", number: 7, name: "the flat over No. 7 Market Row", beds: 1, ground_floor: false, bench: false, host: { building: "storefront_7" } }
+  market_row.home_15: { street: "Market Row", number: 8, name: "the flat over No. 8 Market Row", beds: 2, ground_floor: false, bench: true, host: { building: "storefront_8" } }
+  # The Wharf: 19 lived in, 8 vacant (A.1.3). Net Lane and Quay Street are drawn, the houses squeezed in between the
+  # old numbers carry a letter; the rest stand on two lanes the board doesn't show, off its east edge (D3).
+  # Net Lane.
+  wharf.vacant_house_48: { street: "Net Lane", number: 48, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_48" } }
+  wharf.vacant_house_49: { street: "Net Lane", number: 49, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_49" } }
+  wharf.home_01: { street: "Net Lane", number: "49A", beds: 2, ground_floor: true, bench: true, host: { building: "home_01" } }
+  wharf.vacant_house_50: { street: "Net Lane", number: 50, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_50" } }
+  wharf.vacant_house_51: { street: "Net Lane", number: 51, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_51" } }
+  # Quay Street.
+  wharf.vacant_house_52: { street: "Quay Street", number: 52, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_52" } }
+  wharf.home_02: { street: "Quay Street", number: "52A", beds: 2, ground_floor: true, bench: false, host: { building: "home_02" } }
+  wharf.vacant_house_53: { street: "Quay Street", number: 53, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_53" } }
+  wharf.nell_cottage: { street: "Quay Street", number: "53A", name: "Nell's cottage on Quay Street", beds: 2, ground_floor: true, bench: false, host: { building: "nell_cottage" } }
+  wharf.vacant_house_54: { street: "Quay Street", number: 54, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_54" } }
+  wharf.home_03: { street: "Quay Street", number: "54A", beds: 2, ground_floor: true, bench: false, host: { building: "home_03" } }
+  wharf.vacant_house_55: { street: "Quay Street", number: 55, beds: 2, ground_floor: true, bench: false, host: { building: "vacant_house_55" } }
+  # East of the road: the old cannery bunkhouse and the cottage beyond it; the boathouse on its slipway.
+  wharf.home_bunkhouse: { street: "Cannery Row", number: 1, name: "the old cannery bunkhouse", beds: 4, ground_floor: true, bench: false, host: { building: "home_bunkhouse" } }
+  wharf.home_04: { street: "Cannery Row", number: 2, beds: 2, ground_floor: true, bench: false, host: { building: "home_04" } }
+  wharf.boathouse: { street: "The Slipway", number: 1, name: "the Boathouse", beds: 1, ground_floor: true, bench: true, host: { building: "boathouse" } }
+  # Shore Lane, up the coast past the bunkhouse: off the board's north-east corner.
+  wharf.home_05: { street: "Shore Lane", number: 1, beds: 2, ground_floor: true, bench: true, host: { lane: [55, 2] } }
+  wharf.home_06: { street: "Shore Lane", number: 2, beds: 1, ground_floor: true, bench: false, host: { lane: [55, 2] } }
+  wharf.home_07: { street: "Shore Lane", number: 3, beds: 3, ground_floor: true, bench: false, host: { lane: [55, 2] } }
+  wharf.home_08: { street: "Shore Lane", number: 4, beds: 2, ground_floor: true, bench: false, host: { lane: [55, 2] } }
+  wharf.home_09: { street: "Shore Lane", number: 5, beds: 1, ground_floor: true, bench: true, host: { lane: [55, 2] } }
+  wharf.home_10: { street: "Shore Lane", number: 6, beds: 2, ground_floor: true, bench: false, host: { lane: [55, 2] } }
+  # Shingle Row, along the shore east of the quay: off the board's east edge by the breakwater.
+  wharf.home_11: { street: "Shingle Row", number: 1, beds: 2, ground_floor: true, bench: false, host: { lane: [55, 23] } }
+  wharf.home_12: { street: "Shingle Row", number: 2, beds: 1, ground_floor: true, bench: false, host: { lane: [55, 23] } }
+  wharf.home_13: { street: "Shingle Row", number: 3, beds: 2, ground_floor: true, bench: true, host: { lane: [55, 23] } }
+  wharf.home_14: { street: "Shingle Row", number: 4, beds: 3, ground_floor: true, bench: false, host: { lane: [55, 23] } }
+  wharf.home_15: { street: "Shingle Row", number: 5, beds: 1, ground_floor: true, bench: false, host: { lane: [55, 23] } }
+  wharf.home_16: { street: "Shingle Row", number: 6, beds: 2, ground_floor: true, bench: false, host: { lane: [55, 23] } }
+  # The Commons: 3 lived in (A.1.3). Teo's cottage, and two cottages on lanes off the board.
+  commons.teo_cottage: { street: "Glasshouse Walk", number: 1, name: "Teo's cottage", beds: 1, ground_floor: true, bench: true, host: { building: "teo_cottage" } }
+  commons.home_01: { street: "Pond Lane", number: 1, beds: 1, ground_floor: true, bench: true, host: { lane: [0, 20] } }
+  commons.home_02: { street: "Railings Lane", number: 1, beds: 2, ground_floor: true, bench: false, host: { lane: [47, 28] } }
+  # Millbrook: 45 lived in, 38 vacant (A.1.3), none of it on a board yet (offboard). GDD-GAP: §9.5 names only Terrace
+  # Row; the other streets are the skeleton's. Terrace Row is the mill terrace, two up two down; Weir Road and School
+  # Lane have the bigger houses.
+  # Terrace Row (Bru at No. 7, Nettie and her grandmother at No. 12, Maud a few doors on at No. 15).
+  millbrook.vacant_house_01: { street: "Terrace Row", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_02: { street: "Terrace Row", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_01: { street: "Terrace Row", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_03: { street: "Terrace Row", number: 4, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_04: { street: "Terrace Row", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_05: { street: "Terrace Row", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_02: { street: "Terrace Row", number: 7, beds: 2, ground_floor: true, bench: true, host: offboard }
+  millbrook.vacant_house_06: { street: "Terrace Row", number: 8, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_03: { street: "Terrace Row", number: 9, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_07: { street: "Terrace Row", number: 10, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_04: { street: "Terrace Row", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_05: { street: "Terrace Row", number: 12, beds: 2, ground_floor: false, bench: true, host: offboard }
+  millbrook.vacant_house_08: { street: "Terrace Row", number: 13, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_06: { street: "Terrace Row", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_07: { street: "Terrace Row", number: 15, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_09: { street: "Terrace Row", number: 16, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_08: { street: "Terrace Row", number: 17, beds: 2, ground_floor: true, bench: true, host: offboard }
+  millbrook.vacant_house_10: { street: "Terrace Row", number: 18, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_09: { street: "Terrace Row", number: 19, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_11: { street: "Terrace Row", number: 20, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_10: { street: "Terrace Row", number: 21, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_12: { street: "Terrace Row", number: 22, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_11: { street: "Terrace Row", number: 23, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_13: { street: "Terrace Row", number: 24, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_12: { street: "Terrace Row", number: 25, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_14: { street: "Terrace Row", number: 26, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_13: { street: "Terrace Row", number: 27, beds: 2, ground_floor: true, bench: true, host: offboard }
+  millbrook.vacant_house_15: { street: "Terrace Row", number: 28, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_16: { street: "Terrace Row", number: 29, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_14: { street: "Terrace Row", number: 30, beds: 2, ground_floor: true, bench: false, host: offboard }
+  # Loom Street.
+  millbrook.home_15: { street: "Loom Street", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_17: { street: "Loom Street", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_16: { street: "Loom Street", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_18: { street: "Loom Street", number: 4, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_17: { street: "Loom Street", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_18: { street: "Loom Street", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_19: { street: "Loom Street", number: 7, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_19: { street: "Loom Street", number: 8, beds: 2, ground_floor: false, bench: false, host: offboard }
+  millbrook.vacant_house_20: { street: "Loom Street", number: 9, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_21: { street: "Loom Street", number: 10, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_20: { street: "Loom Street", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_22: { street: "Loom Street", number: 12, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_21: { street: "Loom Street", number: 13, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_22: { street: "Loom Street", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_23: { street: "Loom Street", number: 15, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_23: { street: "Loom Street", number: 16, beds: 2, ground_floor: false, bench: false, host: offboard }
+  # Mill Lane.
+  millbrook.home_24: { street: "Mill Lane", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_25: { street: "Mill Lane", number: 2, beds: 2, ground_floor: true, bench: true, host: offboard }
+  millbrook.vacant_house_24: { street: "Mill Lane", number: 3, beds: 1, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_26: { street: "Mill Lane", number: 4, beds: 2, ground_floor: false, bench: false, host: offboard }
+  millbrook.vacant_house_25: { street: "Mill Lane", number: 5, beds: 1, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_27: { street: "Mill Lane", number: 6, beds: 1, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_26: { street: "Mill Lane", number: 7, beds: 1, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_28: { street: "Mill Lane", number: 8, beds: 2, ground_floor: false, bench: false, host: offboard }
+  millbrook.vacant_house_27: { street: "Mill Lane", number: 9, beds: 1, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_28: { street: "Mill Lane", number: 10, beds: 1, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_29: { street: "Mill Lane", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_29: { street: "Mill Lane", number: 12, beds: 1, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_30: { street: "Mill Lane", number: 13, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_31: { street: "Mill Lane", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
+  # Weir Road (the Ramaswamys at No. 2: Raman walks the weir path).
+  millbrook.home_32: { street: "Weir Road", number: 1, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.priya_house: { street: "Weir Road", number: 2, name: "the Ramaswamys' house on Weir Road", beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_33: { street: "Weir Road", number: 3, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_34: { street: "Weir Road", number: 4, beds: 3, ground_floor: false, bench: false, host: offboard }
+  millbrook.vacant_house_30: { street: "Weir Road", number: 5, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_35: { street: "Weir Road", number: 6, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_31: { street: "Weir Road", number: 7, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_36: { street: "Weir Road", number: 8, beds: 3, ground_floor: false, bench: false, host: offboard }
+  millbrook.vacant_house_32: { street: "Weir Road", number: 9, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_33: { street: "Weir Road", number: 10, beds: 3, ground_floor: true, bench: false, host: offboard }
+  # School Lane (Felix at No. 1).
+  millbrook.felix_house: { street: "School Lane", number: 1, name: "the schoolmaster's house on School Lane", beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_37: { street: "School Lane", number: 2, beds: 3, ground_floor: true, bench: true, host: offboard }
+  millbrook.vacant_house_34: { street: "School Lane", number: 3, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_38: { street: "School Lane", number: 4, beds: 3, ground_floor: false, bench: false, host: offboard }
+  millbrook.vacant_house_35: { street: "School Lane", number: 5, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_39: { street: "School Lane", number: 6, beds: 3, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_36: { street: "School Lane", number: 7, beds: 3, ground_floor: true, bench: false, host: offboard }
+  # Laundry Green (the Mercers at No. 1).
+  millbrook.mercer_house: { street: "Laundry Green", number: 1, name: "the Mercer house on Laundry Green", beds: 2, ground_floor: true, bench: true, host: offboard }
+  millbrook.home_40: { street: "Laundry Green", number: 2, beds: 2, ground_floor: true, bench: true, host: offboard }
+  millbrook.vacant_house_37: { street: "Laundry Green", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.home_41: { street: "Laundry Green", number: 4, beds: 2, ground_floor: false, bench: false, host: offboard }
+  millbrook.vacant_house_38: { street: "Laundry Green", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
+  # Mill Yard.
+  millbrook.kasimir_workshop: { street: "Mill Yard", number: 1, name: "Wolanski's workshop in Mill Yard", beds: 1, ground_floor: true, bench: true, host: offboard }
+  # Station Hill: 8 lived in, 6 vacant (A.1.3), offboard. GDD-GAP: the streets are the skeleton's.
+  station_hill.hollis_house: { street: "Station Road", number: 1, name: "the signalman's cottage", beds: 1, ground_floor: true, bench: true, host: offboard }
+  station_hill.home_01: { street: "Station Road", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.vacant_house_56: { street: "Station Road", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.home_02: { street: "Station Road", number: 4, beds: 2, ground_floor: true, bench: true, host: offboard }
+  station_hill.vacant_house_57: { street: "Station Road", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.home_03: { street: "Station Road", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.vacant_house_58: { street: "Station Road", number: 7, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.vacant_house_59: { street: "Station Road", number: 8, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.home_04: { street: "Tower Lane", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.home_05: { street: "Tower Lane", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.vacant_house_60: { street: "Tower Lane", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.home_06: { street: "Tower Lane", number: 4, beds: 2, ground_floor: true, bench: true, host: offboard }
+  station_hill.home_07: { street: "Tower Lane", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.vacant_house_61: { street: "Tower Lane", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }

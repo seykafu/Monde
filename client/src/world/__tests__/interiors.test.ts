@@ -9,7 +9,7 @@ import { boards, doorLinks, interiors, zones } from '../zones';
 import { DOOR_ONLY, doorAt, doorOnly, linkInteriors, placeArrival, roomOf, standingPlace, walkingIn } from '../interiors';
 import { IndoorView } from '../indoorResidents';
 import { movePlayer } from '../player';
-import { placeRegistry } from '../places';
+import { homeRegistry, placeRegistry } from '../places';
 import { personaCards } from '../residents';
 import { ZoneGraph, findPath } from '../nav';
 import { ResidentSim } from '../../sim/residentSim';
@@ -174,7 +174,7 @@ describe('the shipped rooms', () => {
   });
 
   it('has every indoor place of the Spring boards in a room, or door-only for a stated reason (GDD-GAP)', () => {
-    const executor = new RoutineExecutor({ zones, graph: new ZoneGraph(zones), registry: placeRegistry });
+    const executor = new RoutineExecutor({ zones, graph: new ZoneGraph(zones), registry: placeRegistry, homes: homeRegistry });
     const inRooms: string[] = [], doors: string[] = [];
     for (const zone of Object.keys(zones)) for (const local of placeRegistry[zone] ?? []) {
       const id = `${zone}.${local}`, info = executor.resolve(id);
@@ -186,8 +186,8 @@ describe('the shipped rooms', () => {
     }
     // §9.5's rooms with no street door of their own are in their building's room (upstairs, or Pell's office).
     for (const id of ['old_quarter.mayor_office', 'old_quarter.margo_flat', 'old_quarter.sable_flat', 'market_row.bakery_flat', 'market_row.dunmore_flat',
-      'market_row.roz_flat', 'market_row.pub_rooms']) expect(inRooms, id).toContain(id);
-    expect(inRooms.length).toBe(19);
+      'market_row.roz_flat', 'market_row.pub_rooms', 'market_row.home_01']) expect(inRooms, id).toContain(id);
+    expect(inRooms.length).toBe(20);
     // Every door-only rule names something on the boards.
     for (const rule of DOOR_ONLY) expect(doors.some(id => rule.place.test(id)), String(rule.place)).toBe(true);
   });
@@ -228,7 +228,7 @@ describe('the shipped rooms', () => {
 });
 
 describe('residents indoors (world/indoorResidents.ts)', () => {
-  const sim = new ResidentSim(personaCards, { zones, graph: new ZoneGraph(zones), registry: placeRegistry });
+  const sim = new ResidentSim(personaCards, { zones, graph: new ZoneGraph(zones), registry: placeRegistry, homes: homeRegistry });
   const view = (room: string) => new IndoorView(interiors[room]!, sim.executor, (id, day, minute) => sim.sample(id, day, minute));
   const at = (h: number, m = 0) => h * 60 + m;
   const DAY = 1; // a Tuesday

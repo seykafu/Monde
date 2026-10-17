@@ -38,7 +38,7 @@ import { IndoorView } from '../../world/indoorResidents';
 import type { Position } from '../../world/player';
 import type { ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
-import { placeRegistry } from '../../world/places';
+import { homeRegistry, placeRegistry } from '../../world/places';
 import { personaCards } from '../../world/residents';
 import { findCard } from '../../world/roster';
 import { PREWARM_RANGE } from '../../mind/prewarm';
@@ -85,7 +85,7 @@ export function sharedResidentSim(scene: Phaser.Scene): ResidentSim {
     const wanted = Number(query.get('npcs')) || 0;
     // The dawn package's model plans replace templates for their day (G-13 client, scenes/friendship.ts).
     const registry = scene.registry;
-    sim = new ResidentSim(personaCards, { zones, graph: new ZoneGraph(zones), registry: placeRegistry }, Math.max(0, wanted - personaCards.length),
+    sim = new ResidentSim(personaCards, { zones, graph: new ZoneGraph(zones), registry: placeRegistry, homes: homeRegistry }, Math.max(0, wanted - personaCards.length),
       day => livePlansFor(registry, day));
     scene.registry.set(SIM_KEY, sim);
   }

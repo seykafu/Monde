@@ -8,7 +8,8 @@
 # Point Lumiere's dark lighthouse. Who lives where (town/occupancy.ts, A.1.3: the Wharf is thinning, 19
 # households and 8 vacant homes): Nell, Old Moss in the boathouse, the Calloways' bunkhouse, four census
 # households (home_01..04) among the empty cottages, and the Harbormaster's House standing empty until Vane buys
-# it (Day 48, §9.5). The Gannet lies at the slip between sailings. Zone format v2 (world/zoneFormat.ts).
+# it (Day 48, §9.5). The other twelve households live on Shore Lane and Shingle Row, off the east edge (home_05..16,
+# content/places/homes.yaml `lane`). The Gannet lies at the slip between sailings. Zone format v2 (world/zoneFormat.ts).
 format: 2
 id: wharf
 name: The Wharf
@@ -99,23 +100,23 @@ buildings:
   # Net Lane: the fishermen's cottages, four of five empty.
   - { id: vacant_house_48, sprite: wharf_cottage, at: [7, 3], door: [7, 6] }
   - { id: vacant_house_49, sprite: wharf_cottage, at: [10, 3], door: [10, 6] }
-  - { sprite: wharf_cottage, at: [13, 3], home: home_01 }
+  - { sprite: wharf_cottage, at: [13, 3], door: [13, 6], home: home_01 }
   - { id: vacant_house_50, sprite: wharf_cottage, at: [16, 3], door: [16, 6] }
   - { id: vacant_house_51, sprite: wharf_cottage, at: [19, 3], door: [19, 6] }
   - { id: harbormaster_house, sprite: harbormaster_house, at: [24, 3], door: [25, 6] }
   # Quay Street: four more empty cottages, two lived in, and Nell's.
   - { id: vacant_house_52, sprite: wharf_cottage, at: [7, 10], door: [7, 13] }
-  - { sprite: wharf_cottage, at: [10, 10], home: home_02 }
+  - { sprite: wharf_cottage, at: [10, 10], door: [10, 13], home: home_02 }
   - { id: vacant_house_53, sprite: wharf_cottage, at: [13, 10], door: [13, 13] }
   - { id: nell_cottage, sprite: nell_cottage, at: [17, 10], door: [18, 13] }
   - { id: vacant_house_54, sprite: wharf_cottage, at: [21, 10], door: [21, 13] }
-  - { sprite: wharf_cottage, at: [24, 10], home: home_03 }
+  - { sprite: wharf_cottage, at: [24, 10], door: [24, 13], home: home_03 }
   - { id: vacant_house_55, sprite: wharf_cottage, at: [27, 10], door: [27, 13] }
   # East of the road: the shuttered Liss Cannery, the Calloways' bunkhouse (a cousin too, A.1.2), a cottage
   # beyond it, Vane's slick trailer.
   - { id: cannery, sprite: cannery, at: [34, 3], door: [36, 9] }
   - { id: home_bunkhouse, sprite: bunkhouse, at: [42, 5], door: [44, 8], home: home_bunkhouse }
-  - { sprite: wharf_cottage, at: [48, 3], home: home_04 }
+  - { sprite: wharf_cottage, at: [48, 3], door: [48, 6], home: home_04 }
   - { id: vane_office, sprite: vane_office, at: [48, 10], door: [49, 12] }
   # The working wharf: the boathouse on its slipway, the fish market, the ferry's ticket booth.
   - { id: boathouse, sprite: boathouse, at: [6, 16], door: [7, 21] }

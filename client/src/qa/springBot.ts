@@ -71,7 +71,7 @@ import { minutes } from '../story/triggers';
 import { doorLocked } from '../scenes/zone/indoors';
 import { placeArrival, roomOf, standingPlace } from '../world/interiors';
 import { ZoneGraph } from '../world/nav';
-import { placeRegistry } from '../world/places';
+import { homeRegistry, placeRegistry } from '../world/places';
 import { PLAYER_SPEED, placeName } from '../world/player';
 import { personaCards } from '../world/residents';
 import { allCards, findCard, resetRoster } from '../world/roster';
@@ -347,7 +347,7 @@ export class SpringBot {
     // The shared resident simulation (scenes/zone/residents.ts sharedResidentSim), with the Projects' shifts and arrivals.
     let sim = this.r.get('monde.residents') as ResidentSim | undefined;
     if (!sim) {
-      sim = new ResidentSim(personaCards, { zones, graph, registry: placeRegistry }, 0, day => livePlansFor(r, day));
+      sim = new ResidentSim(personaCards, { zones, graph, registry: placeRegistry, homes: homeRegistry }, 0, day => livePlansFor(r, day));
       this.r.set('monde.residents', sim);
     }
     this.sim = sim;

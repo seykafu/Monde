@@ -1,6 +1,9 @@
-// The place registry (GDD §9.5), loaded like the zones: Vite raw import + the yaml parser.
+// The place registry (GDD §9.5) and the homes registry (A.1.3, content/places/homes.yaml), loaded like the zones: Vite
+// raw imports + the yaml parser.
 import placesYaml from '../../../content/places/places.yaml?raw';
+import homesYaml from '../../../content/places/homes.yaml?raw';
 import { parse } from 'yaml';
+import { parseHomes, type HomeRegistry } from '@monde/shared';
 import type { PlaceRegistry } from '../sim/routineExecutor';
 
 function load(text: string): PlaceRegistry {
@@ -13,3 +16,5 @@ function load(text: string): PlaceRegistry {
 }
 
 export const placeRegistry: PlaceRegistry = load(placesYaml);
+/** Every home, its address, beds and where it stands (shared/src/census/homes.ts). */
+export const homeRegistry: HomeRegistry = parseHomes(parse(homesYaml));

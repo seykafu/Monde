@@ -6,8 +6,9 @@
 // their dialogue bust agree: the card's `look` is the library entry's.
 //
 // GDD-GAP: A.3.5 sizes the library at 526+ busts and never reuses one while its owner lives in Monde. The MVP library
-// is 16 busts, so a bust can be shared; the picker strongly prefers unused ones (and never repeats one inside a
-// household while another fits).
+// is 120 identities (A-05: 40 masters, each with two colour variants that share its face), so a bust can still be
+// shared; the picker strongly prefers unused ones (and never repeats one inside a household while another fits). The
+// Day-1 census assigns its share without any reuse (shared/src/census/portraitPlan.ts).
 import { z } from "zod";
 import data from "../../../content/portraits/library.json";
 import { CardHumanLook, HAIR_COLOURS, SKIN_TONES, swatchColour } from "../look";
@@ -39,6 +40,10 @@ export const PortraitEntry = z.object({
   build: z.enum(["slight", "average", "broad"]),
   caption: z.string(),
   look: CardHumanLook,
+  /** A colour variant names its master: the same face, age, build and attire with other hair and clothing colours. */
+  variant_of: z.string().regex(/^lib_[fma]\d{2}_\d{3}$/).optional(),
+  /** What a variant changed ("hair: …", "top: …"). */
+  recolour: z.array(z.string()).optional(),
 });
 export type PortraitEntry = z.infer<typeof PortraitEntry>;
 
@@ -46,6 +51,8 @@ export const PORTRAIT_LIBRARY: readonly PortraitEntry[] = z.array(PortraitEntry)
 const BY_ID = new Map(PORTRAIT_LIBRARY.map(p => [p.id, p]));
 export const portraitById = (id: string): PortraitEntry | undefined => BY_ID.get(id);
 export const isLibraryPortrait = (id: string): boolean => /^lib_[fma]\d{2}_\d{3}$/.test(id);
+/** The master an identity belongs to (itself for a master). */
+export const masterOf = (entry: Pick<PortraitEntry, "id" | "variant_of">): string => entry.variant_of ?? entry.id;
 
 /** What a member's portrait should be. */
 export interface PortraitWant {
@@ -57,7 +64,19 @@ export interface PortraitWant {
   nearSkin?: number;
   /** A look to match (a person who already has one: an old save's card whose portrait went missing). */
   look?: CardHumanLook;
+  /** The person's age: inside a band, the bust drawn nearest it wins (a toddler's bust never goes to a twelve-year-old). */
+  age?: number;
 }
+
+/**
+ * GDD-GAP: A.3.5 matches by band only. Within a band the bust's drawn age should still be near the person's: a point off
+ * per this many years (children change fastest), and never further than `AGE_REACH` years.
+ */
+export const AGE_YEARS_PER_POINT: Readonly<Record<AgeBand, number>> = { child: 1, teen: 1, young_adult: 3, adult: 4, elder: 5 };
+export const AGE_REACH: Readonly<Record<AgeBand, number>> = { child: 3, teen: 3, young_adult: 9, adult: 12, elder: 14 };
+/** The age penalty for wearing `entry` at `age` (0 when no age is given). */
+export const agePenalty = (entry: Pick<PortraitEntry, "band" | "age">, age: number | undefined): number =>
+  age === undefined ? 0 : Math.abs(entry.age - age) / AGE_YEARS_PER_POINT[entry.band];
 
 /** Brightness of a 0xRRGGBB colour, 0..1. */
 const luma = (c: number): number => (0.2126 * ((c >> 16) & 255) + 0.7152 * ((c >> 8) & 255) + 0.0722 * (c & 255)) / 255;
@@ -80,6 +99,7 @@ export function scorePortrait(entry: PortraitEntry, want: PortraitWant, uses: nu
   score += 2 * entry.attire.filter(t => want.attire.includes(t)).length;
   if (want.nearSkin !== undefined && Math.abs(entry.skin - want.nearSkin) <= 1) score += 2;
   if (want.look) score += lookMatch(want.look, entry.look);
+  score -= agePenalty(entry, want.age);
   // GDD-GAP: A.3.4 rule 5 never reuses a portrait; with 16 busts the picker only avoids it.
   score -= 4 * uses;
   return score;

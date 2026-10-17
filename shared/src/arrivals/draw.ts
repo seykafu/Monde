@@ -271,7 +271,7 @@ export function drawHousehold(ctx: DrawContext): HouseholdDraw | null {
     const age = rng.int(band.lo, band.hi);
     const presentation = presentationOf(rng, plan.role === "child" ? CHILD_PRESENTATION : archetype.presentation);
     const attire = plan.role === "child" ? ["jumper", "school_jumper", "satchel", "boots"] : archetype.attire;
-    const portrait: PortraitEntry = assignPortrait({ band: band.band, presentation, attire, nearSkin: plan.role === "child" ? first?.skin : undefined }, rng, uses);
+    const portrait: PortraitEntry = assignPortrait({ band: band.band, presentation, attire, nearSkin: plan.role === "child" ? first?.skin : undefined, age }, rng, uses);
     uses.set(portrait.id, (uses.get(portrait.id) ?? 0) + 1);
     if (!first) first = { age, skin: portrait.skin };
     // A.2: "Pronouns default to the portrait (f she/her, m he/him, a they/them)": the bust decides when the picker

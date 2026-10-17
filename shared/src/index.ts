@@ -29,3 +29,4 @@ export * from './scuffles';
 export * from './arrivals';
 export * from './election';
 export * from './telemetry';
+export * from './census';

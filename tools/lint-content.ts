@@ -8,8 +8,8 @@ import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
 import {
-  ItemCatalog, COMMUNITY_TASKS, PersonaCard, STANDARD_EXPRESSIONS, cardLookProblems, compileScenes, evaluate, fillReply, registryFromContent,
-  type PersonaCard as Card
+  ItemCatalog, COMMUNITY_TASKS, HOMES_BY_ZONE, PersonaCard, STANDARD_EXPRESSIONS, cardLookProblems, compileScenes, evaluate, fillReply, isVacantHome,
+  parseHomes, registryFromContent, type HomeRegistry, type PersonaCard as Card
 } from "@monde/shared";
 import { firstName, parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
 import {
@@ -109,6 +109,47 @@ for (const c of cards.values())
     const other = cards.get(r.id);
     if (other && !other.relationships.some((x) => x.id === c.id)) err(`relationship ${c.id} → ${r.id} is not reciprocated`);
   }
+
+// ---- homes (content/places/homes.yaml, A.1.3): every home registered and every registered home listed, A.1.3's
+// counts by zone, hosts the boards have (a building that holds it, a lane cell, or off-board where there's no board), and
+// every card's home among them.
+let homes: HomeRegistry = new Map();
+try {
+  homes = parseHomes(YAML.parse(fs.readFileSync(path.join(root, "content/places/homes.yaml"), "utf8")));
+} catch (e) {
+  err(`homes.yaml: ${(e as Error).message}`);
+}
+const HOME_ID = /\.(home_[a-z0-9_]+|vacant_house_\d+)$/;
+for (const id of homes.keys()) if (!places.has(id)) err(`homes.yaml: ${id} is not in places.yaml`);
+for (const id of places) if (HOME_ID.test(id) && !homes.has(id)) err(`places.yaml: ${id} looks like a home but homes.yaml has no entry for it`);
+for (const [zone, want] of Object.entries(HOMES_BY_ZONE)) {
+  const ids = [...homes.keys()].filter(id => id.startsWith(`${zone}.`));
+  const vacant = ids.filter(isVacantHome).length;
+  if (ids.length !== want.total || vacant !== want.vacant) err(`homes.yaml: ${zone} has ${ids.length} homes (${vacant} vacant); A.1.3 says ${want.total} (${want.vacant} vacant)`);
+}
+const boards = new Map<string, { buildings: { id?: string; home?: string | string[] }[] }>();
+for (const f of fs.readdirSync(path.join(root, "content/zones")).filter((f) => f.endsWith(".zone.yaml"))) {
+  const z = YAML.parse(fs.readFileSync(path.join(root, "content/zones", f), "utf8")) as { id: string; buildings?: { id?: string; home?: string | string[] }[] };
+  boards.set(z.id, { buildings: z.buildings ?? [] });
+}
+for (const [zone, board] of boards) for (const b of board.buildings) {
+  const held = [...(b.home === undefined ? [] : Array.isArray(b.home) ? b.home : [b.home]), ...(b.id && /^vacant_house_\d+$/.test(b.id) ? [b.id] : [])];
+  for (const h of held) if (h !== "vacant" && !homes.has(`${zone}.${h}`)) err(`zones/${zone}: building ${b.id ?? b.home} holds home ${h}, which homes.yaml doesn't list`);
+}
+for (const [id, home] of homes) {
+  const zone = id.slice(0, id.indexOf(".")), board = boards.get(zone);
+  if (home.host === "offboard") { if (board) err(`homes.yaml: ${id} is offboard, but ${zone} has a board`); continue; }
+  if (!board) { err(`homes.yaml: ${id} names a host on ${zone}, which has no board`); continue; }
+  if ("building" in home.host) {
+    const name = home.host.building;
+    const b = board.buildings.find(x => x.id === name || (Array.isArray(x.home) ? x.home.includes(name) : x.home === name));
+    if (!b) err(`homes.yaml: ${id} is in building ${name}, which zones/${zone} doesn't have`);
+  }
+}
+for (const c of cards.values()) {
+  if (c.kind === "animal" || c.home.startsWith("offmap.")) continue;
+  if (!homes.has(c.home)) err(`residents/${c.id}.yaml: home ${c.home} isn't in homes.yaml`);
+}
 
 // ---- Quiet Mode lines (Appendix B) and their replies: the client's own parser (it throws on a bad entry), then
 // the server's lexical filters over every line and reply (nothing modern, no brands, no banned style).
@@ -261,7 +302,7 @@ if (projectsContent) {
 for (const w of warnings) console.warn(`warn  ${w}`);
 for (const e of errors) console.error(`error ${e}`);
 const looks = [...cards.values()].filter((c) => c.look).length;
-console.log(`content: ${cards.size} cards (${looks} with a look), ${places.size} places, ${declared.size} declared flags, `
+console.log(`content: ${cards.size} cards (${looks} with a look), ${places.size} places, ${homes.size} homes, ${declared.size} declared flags, `
   + `${library?.lines.length ?? 0} lines with ${replyCount} replies, `
   + `${scripted?.exchanges.length ?? 0} scripted exchanges (${scriptedTurns} nodes, ${scriptedPaths} paths; ${laterCues} later {ai_open} cues still to write), `
   + `${projectsContent?.projects.length ?? 0} Projects (${projectLines} lines) `

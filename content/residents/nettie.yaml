@@ -6,7 +6,7 @@ pronouns: she/her
 kind: resident
 occupation: Tollman, the lookout (slingshot)
 workplace: briar_woods.tollmen_hideout
-home: millbrook.terrace_row
+home: millbrook.home_05          # No. 12 Terrace Row, with her grandmother Ilona (content/places/homes.yaml)
 portrait: nettie
 sprite: nettie
 portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, sidelong]

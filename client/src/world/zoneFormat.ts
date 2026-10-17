@@ -34,10 +34,11 @@ import { RUG_COLOURS, WALL_STYLES, type RoomLook, type RugColour, type WallStyle
 //       # in front of the footprint's front edge, inside its columns. With an id the building IS that place
 //       # (rect = footprint), so it is not listed again under places:. Without one it is scenery.
 //       # state: restored | faded | auto (default; world/townSprites.ts resolveState); project: <id> optional
-//     - { sprite: townhouse_b, at: [4, 17], home: home_03 }
+//     - { sprite: townhouse_b, at: [4, 17], door: [5, 20], home: home_03 }
 //       # home: who lives there (town/occupancy.ts): a home id or a list of them (flats: [pub_rooms, roz_flat]),
 //       # `home_NN` for a census household (A.1.3), `vacant` for a plain vacant home. A building whose id is a
 //       # resident's home or a vacant_house_NN is its own home. Scenery houses (a `dwelling` sprite) must say.
+//       # A census house's `door:` is where its residents (content/places/homes.yaml) go in; it must be reachable.
 //       # datestone: 1850 (a carved year over the door), sign: "A. MONDE|MAPS & PRINTS" (lettered on the
 //       # sprite's sign panel, `|` breaks a line), number: 9 (a door number plate): lettered in code, exact
 //   props:                   # sprites of kind prop
@@ -572,6 +573,8 @@ function compileTown(raw: Record<string, unknown>, manifest: TownManifest): Zone
     queue.push([x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]);
   }
   for (const p of places) check(reached[at(p.door[0], p.door[1])], `Place unreachable from the spawn: ${p.id}`);
+  // A census house's door (scenery with `home:` and a `door:`) is where its residents go in: walkable and reachable too.
+  for (const b of buildings) if (!b.id && b.door) check(walkable(b.door) && reached[at(b.door[0], b.door[1])], `Home door unreachable from the spawn: ${b.homes.join(', ')}`);
   for (const e of edges) for (let n = e.from; n <= e.to; n++) { const c = edgeCell(f, e.side, n); check(reached[at(c[0], c[1])], `Edge unreachable from the spawn: ${e.side} ${n}`); }
 
   // Gathering spots: an open place's, near it, with ground to stand on.

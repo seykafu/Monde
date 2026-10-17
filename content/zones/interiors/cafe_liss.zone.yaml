@@ -19,6 +19,7 @@ terrain: |
   ######T######
 door: [6, 9]
 room: { wall: paper, rug: gold, windows: [7, 10] }
+upstairs: [home_01]          # the census household's flat over the café (homes.yaml market_row.home_01)
 props:
   - { sprite: potted_plant, at: [1, 3], offset: [4, -8] }
   - { sprite: wall_shelf, at: [2, 3], offset: [0, -16], lift: 54 }

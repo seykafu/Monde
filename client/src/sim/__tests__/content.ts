@@ -1,9 +1,9 @@
-// Test helper: the shipped zones, place registry and persona cards, read from content/ with fs (the game
+// Test helper: the shipped zones, place and homes registries and persona cards, read from content/ with fs (the game
 // loads the same files through Vite imports).
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'yaml';
-import { PersonaCard } from '@monde/shared';
+import { PersonaCard, parseHomes, type HomeRegistry } from '@monde/shared';
 import { compileZone, validateZoneLinks, type ZoneDef } from '../../world/zoneFormat';
 import { ZoneGraph } from '../../world/nav';
 import type { ExecutorWorld, PlaceRegistry } from '../routineExecutor';
@@ -20,6 +20,7 @@ export function loadZones(): Record<string, ZoneDef> {
 }
 
 export const loadRegistry = (): PlaceRegistry => parse(readFileSync(resolve(content, 'places/places.yaml'), 'utf8')) as PlaceRegistry;
+export const loadHomes = (): HomeRegistry => parseHomes(parse(readFileSync(resolve(content, 'places/homes.yaml'), 'utf8')));
 
 export function loadCards(): PersonaCard[] {
   return readdirSync(resolve(content, 'residents')).filter(f => f.endsWith('.yaml')).sort()
@@ -28,5 +29,5 @@ export function loadCards(): PersonaCard[] {
 
 export function loadWorld(): ExecutorWorld {
   const zones = loadZones();
-  return { zones, graph: new ZoneGraph(zones), registry: loadRegistry() };
+  return { zones, graph: new ZoneGraph(zones), registry: loadRegistry(), homes: loadHomes() };
 }

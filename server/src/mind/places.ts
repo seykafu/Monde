@@ -85,11 +85,13 @@ const hhmm = (minute: number): string =>
 export const hoursText = (hours: Hours): string => `open ${hhmm(hours.open)}-${hhmm(hours.close)}`;
 
 const VACANT = /\.vacant_house_\d+$/;
+/** The census households' homes (A.1.3 `<zone>.home_NN`, content/places/homes.yaml): private, like the vacant houses. */
+const CENSUS_HOME = /\.home_\d{2,3}$/;
 
 /**
  * The open-places list for one resident's plan prompt (§9.17 "Places open tomorrow: {place ids with hours}").
- * Every registered place except the vacant houses and the mainland, which nobody plans a day at unless their own
- * routine already goes there. Hours are written only where they differ from the all-day default, and never on the
+ * Every registered place except the vacant houses, other households' homes and the mainland, which nobody plans a day
+ * at unless their own routine already goes there. Hours are written only where they differ from the all-day default, and never on the
  * resident's own home or workplace (an owner isn't held to the shop's hours), which keeps the list short.
  */
 export function openPlacesFor(
@@ -99,7 +101,7 @@ export function openPlacesFor(
   const own = new Set<string>([card.home, card.workplace, ...card.routine.weekday.map((b) => b.where),
     ...card.routine.weekend.map((b) => b.where)]);
   return registry.list
-    .filter((id) => own.has(id) || (!VACANT.test(id) && !id.startsWith("offmap.")))
+    .filter((id) => own.has(id) || (!VACANT.test(id) && !CENSUS_HOME.test(id) && !id.startsWith("offmap.")))
     .map((id) => {
       const hours = placeHours(id);
       const custom = hours !== DEFAULT_HOURS && id !== card.home && id !== card.workplace;

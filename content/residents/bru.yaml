@@ -6,7 +6,7 @@ pronouns: he/him
 kind: resident
 occupation: Tollman, the crew's bruiser; carves wooden birds
 workplace: briar_woods.tollmen_hideout
-home: millbrook.terrace_row
+home: millbrook.home_02          # No. 7 Terrace Row (content/places/homes.yaml)
 portrait: bru
 sprite: bru
 portrait_expressions: [neutral, warm, laugh, sad, angry, surprised, worried, thinking, cap_in_hands]
