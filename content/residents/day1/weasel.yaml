@@ -1,10 +1,10 @@
-# Generated (census-v1) for pike; curated not yet. Edit here.
+# Generated (census-v1) for pike; curated by hand (MVP M-03). Edit here.
 id: weasel
 name: Wendell "Weasel" Pike
 age: 28
 pronouns: he/him
 kind: resident
-occupation: Tollman, runs envelopes and listens at doors on Market Row.
+occupation: Tollman; the crew's messenger and fixer
 workplace: briar_woods.tollmen_hideout
 home: market_row.home_13
 portrait: lib_m22_079
@@ -21,92 +21,80 @@ look:
   height: tall
   outfit: { cut: apron, top: 3, bottom: 13, bottom_style: trousers, shoes: 2 }
   accessory: { kind: apron, colour: 9 }
-backstory: Came to Monde six years ago at twenty-two, off the Tuesday ferry with one rucksack and a letter of
-  introduction to a cousin who had already left town. The cousin was gone; the bakery upstairs had a room
-  going. He worked the ovens for Odile for two years and was good at it until he burned three batches in a row
-  and was let go. A man in a van, Rook, offered him a day's pay for carrying a sealed envelope to Briar Woods.
-  He has carried envelopes ever since, and tells himself the work is mostly walking.
+backstory: >
+  Weasel came off the Tuesday ferry six years ago, at twenty-two, with one rucksack and a letter of
+  introduction to a cousin who had already left town. He ran errands for anyone who paid, then for the crew,
+  because the crew paid on Saturdays. Now he carries the envelope to the crane yard, keeps the take in labelled
+  jam jars, one to a shop, and hears everything said on Market Row, because a man in an apron is a man nobody
+  sees. He calls the Saturday twenty the arrangement. He would like, once, to be called Wendell by somebody
+  who isn't asking him for something.
 personality:
   traits: [ quick, chatty, loyal, restless, soft ]
   big5: { open: 62, conscientious: 30, extravert: 82, agreeable: 68, neurotic: 64 }
-values: { prosperity: 0.3, safety: 0.1, spirit: 0.2, charm: 0.4 }
+values: { prosperity: 0.30, safety: 0.10, spirit: 0.20, charm: 0.40 }
 beliefs:
-  - Everybody on Market Row tells me things, so I must be trusted.
-  - The Tollmen only collect what the shops would have paid anyway.
-  - Odile will come round if I bring her the right loaf.
+  - Everybody on Market Row tells me things, so they must like me.   # wrong: they tell him things so he will go away
+  - The arrangement is only what the shops would have paid anyway, in a different pocket.
+  - A man in an apron is a man nobody sees.
 voice:
-  register: Fast and over-friendly. Talks in bursts, offers small favours before being asked, and trails off
-    when a subject gets close. Likes to reassure.
-  tics: [ Between friends., Only a minute., you know how it is ]
-  never_says: [ I did it, I'm sorry for, the Tollmen are ]
+  register: >
+    Fast and over-friendly, offering small favours before they're asked. Talks in bursts, calls the Saturday
+    twenty "the arrangement" and "the contribution schedule". Lowers his voice for the harmless gossip. Trails
+    off if the Lantern comes up.
+  tics: [ "Between friends,", "Friendly question.", "Only a minute." ]
+  never_says: [ brick, I did it, I'm sorry for, the Tollmen are ]
   samples:
-    - Between friends, Odile, I'd not say a word about the rolls. Only a minute, I'll have the tray in.
-    - Morning! Oh, you'll want the good flour, I'll pop it in your basket. No charge.
-    - Didn't see a thing. Didn't hear a thing either, if anyone asks.
+    - "Morning, morning. Let me take that, it's no weight at all. I was only going your way. I'm always only going your way."
+    - "Heard the Gull's changing a cider barrel Thursday. Friendly question, who's the supplier? No reason. Only a minute of your time."
+    - "Didn't see a thing, didn't hear a thing, and if anyone asks I was in the bakery for a roll. Which I was."
 birthday: 18
-likes:
-  [
-    warm bread at four in the morning,
-    gossip passed quietly,
-    runner beans climbing a string,
-    the ferry horn on Tuesdays,
-    free breakfast
-  ]
-dislikes: [ being asked where he was, cold tea, the smell of wet wool, Lantern readers who spell his name wrong ]
-fears: [ being sent back to the city, Odile finding out about the brick ]
+likes: [ free breakfast, strangers' stories, bread, gossip passed quietly, runner beans climbing a string ]
+dislikes: [ being asked where he was, wet wool, Lantern readers who spell his name wrong, a jar without its label ]
+fears: [ being found out by someone kind, his name on the Lantern's front page, the sum on the jar label never getting smaller ]
 dream:
-  text: Be good at one thing, and be known for it on Market Row.
+  text: Be done with owing, and earn his keep carrying parcels on Market Row for pay, like the post round.
   stages:
-    - Try three jobs in a week at the mill, the cannery, and the bakery.
-    - Choose the one that stuck and stay with it for a month.
-    - Tell Odile out loud that you're staying in Monde.
+    - Say out loud what he owes, to one person (Regard ≥ 45)
+    - Carry parcels for the Market Hall stalls on a Saturday, for pay and with no jar in sight
+    - Pay the first hundred with coin he earned carrying
 routine:
   weekday:
-    - { at: "05:30", do: wander, where: market_row.home_13 }
-    - { at: "06:00", do: eat, where: market_row.bakery }
-    - { at: "08:00", do: work, where: briar_woods.tollmen_hideout }
+    - { at: "06:30", do: eat, where: market_row.home_13 }
+    - { at: "07:30", do: wander, where: market_row.market_street }
+    - { at: "10:30", do: work, where: briar_woods.tollmen_hideout }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:00", do: work, where: briar_woods.tollmen_hideout }
-    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "14:00", do: wander, where: market_row.back_alley }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:30", do: sleep, where: market_row.home_13 }
-  weekend:
+  weekend:                       # Saturday: the round, Café Liss at ten, the jars, and the envelope to the van at the crane yard. Sunday there is no round
     - { at: "07:00", do: eat, where: market_row.home_13 }
-    - { at: "09:00", do: shop, where: market_row.market_street }
-    - { at: "11:00", do: garden, where: market_row.home_13 }
-    - { at: "14:00", do: wander, where: commons.picnic_lawn }
-    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "23:00", do: sleep, where: market_row.home_13 }
-chores: [ sweep the stair, water the runner beans in the back alley, wash the one good shirt ]
+    - { at: "09:00", do: work, where: market_row.market_street }
+    - { at: "10:00", do: work, where: market_row.cafe_liss }
+    - { at: "12:30", do: eat, where: market_row.bakery }
+    - { at: "14:00", do: tinker, where: briar_woods.tollmen_hideout }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: work, where: wharf.crane_yard }
+    - { at: "23:30", do: sleep, where: market_row.home_13 }
+chores: [ sweep the stair, label the jars before the round, water the runner beans in the back alley, wash the one good shirt ]
 relationships:
-  - {
-      id: rook,
-      affinity: 30,
-      trust: 25,
-      tag: friend,
-      note: Gives him work and a day's pay; doesn't ask questions.
-    }
-  - {
-      id: odile,
-      affinity: 18,
-      trust: 6,
-      tag: wary,
-      note: His old boss; she still hands him the heel of the loaf.
-    }
-  - {
-      id: june,
-      affinity: 22,
-      trust: 14,
-      tag: friend,
-      note: Hums over the morning coffee; he brings her crumbs.
-    }
+  - { id: rook, affinity: 30, trust: 25, tag: fond, note: "Boss. Gets 'Pike' and a look. Wants to be called Weasel by him once, or Wendell, and would settle for either." }
+  - { id: odile, affinity: 20, trust: 5, tag: wary, note: "Buys a roll from her most mornings and has never once been handed the heel for nothing. Wants her to say his name." }
+  - { id: june, affinity: 22, trust: 14, tag: friend, note: "Hums over the morning cups; he comes in at ten on Saturdays for his twenty and a biscuit. Wants to know the song." }
+  - { id: hester, affinity: 10, trust: -5, tag: curious, note: "Counts the biscuits and has stopped putting out the good plate. Wants to know whether she would miss him if the Saturday stopped." }
+  - { id: sable, affinity: -10, trust: -5, tag: wary, note: "Goes the long way round the Lantern's step. Wants to know whether she ever looks up from the type." }
+  - { id: bru, affinity: 35, trust: 30, tag: fond, note: "Carries the soup up to the quarry when Bru forgets, and Bru says sorry to the tin." }
 secrets:
-  - text: Threw the brick through the Lantern's window and has been too ashamed to buy a replacement pane.
+  - text: "He threw the brick through the Lantern's window. He has bought the paper every Thursday since, and keeps the price of a pane in a cocoa tin that is nearly full."
     reveal: { regard_min: 70 }
-  - text: Keeps a pressed runner bean from his first summer in town inside his bread-tin.
+  - text: "He owes three hundred coins and keeps the sum pencilled on the back of a jar label in his apron pocket. It is why he carries the envelope, and why he has not left."
     reveal: { regard_min: 50 }
-canon_locks: []
-story_role: none
+canon_locks:
+  - { while: "!flag.tollmen_broken", fact: "Weasel carries the crew's envelope to the grey van at the crane yard on Saturday nights and keeps the take in labelled jam jars, one per shop." }
+  - { while: "true", fact: "Weasel Pike, 28, is the Tollmen's messenger and fixer. He lives in a flat over a shut shop at No. 6 Market Row, hears everything said on the Row, and calls the Saturday twenty 'the arrangement'." }
+story_role: "Tollmen messenger and fixer. Sells the Saturday book (S16) and works the Harvest Supper for the grey caps (S20); his ambush on the Briar Woods path fires if he hasn't flipped (§7.9). Quits if his debt is paid or the evidence is published (§7.7)."
 generated_by: model
+curated: true
 household: pike
 archetype: drifter
 employment: employed

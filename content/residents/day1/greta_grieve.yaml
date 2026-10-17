@@ -4,13 +4,14 @@ name: Greta Grieve
 age: 52
 pronouns: she/her
 kind: resident
-occupation: works in Carrow
+occupation: Commuter bookkeeper, working weekdays in Carrow, home weekends.
 workplace: offmap.city
 home: millbrook.home_24
 portrait: greta_grieve
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: greta_grieve
-appearance: A woman with a sandy blond bob, a teal coat and round glasses.
+appearance: A woman with a sandy blond bob and round glasses, wearing a teal coat buttoned to the collar
+  against the ferry wind.
 look:
   kind: human
   skin: 6
@@ -21,56 +22,98 @@ look:
   outfit: { cut: coat, top: 0, bottom: 0, bottom_style: skirt, shoes: 1 }
   accessory: { kind: glasses }
   glasses: round
-backstory: "Greta came to Monde from Ashby Lock 26 years ago and works as a commuter to Carrow. What she wants
-  most is plain enough: open by the end of the month."
+backstory: Greta trained as a bookkeeper in Carrow and took a clerk's post there before she was twenty-five.
+  At twenty-six she married a ferryman's cousin, Teo's uncle, and moved to Monde for the quiet and the cheaper
+  rent on Mill Lane. The marriage ended within four years, but she stayed, mostly because the ferry timetable
+  suited her. She still keeps the ledger for the Liss Cannery's old pension fund from her kitchen table,
+  though nobody has paid her for it in years. She tells herself the town will come back. She believes the
+  Tollmen collect only because people are too polite to refuse them.
 personality:
-  traits: [ proud, kind, curious ]
-  big5: { open: 73, conscientious: 42, extravert: 24, agreeable: 44, neurotic: 57 }
-values: { prosperity: 0.55, safety: 0.15, spirit: 0.1, charm: 0.2 }
+  traits: [ precise, dry, loyal, guarded ]
+  big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 58, neurotic: 55 }
+values: { prosperity: 0.35, safety: 0.35, spirit: 0.1, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Figures never lie, people only round them.
+  - The Tollmen are just a tidy way of being robbed.
+  - Monde stays alive because the ferry still runs.
 voice:
-  register: Brisk. A salesperson's warmth with a ledger underneath. Talks in prices and margins.
-  tics: [ Let me do you a deal. ]
-  never_says: [ no worries, awesome ]
+  register: Measured and exact, with a dry edge. Prefers numbers to adjectives and says less when she is hurt.
+  tics: [ to be fair, that's the sum of it, mm ]
+  never_says: [ I feel, honestly, you know ]
   samples:
-    - Let me do you a deal. Two for a bit more than one's price.
-    - Footfall's the thing. Footfall, then the window.
-    - Margins, mostly. And a good bell on the door.
+    - The Gannet's late again. Two minutes is a rounding error, and I've rounded it into a grudge.
+    - Pass the salt. And no, I'm not going to tell you what the Saturday fee is for.
+    - Mm. Fair enough. Put the kettle on, then, if you're staying.
 birthday: 75
-likes: [ a till that rings, hand-lettered signs, first customers ]
-dislikes: [ fees nobody explained, just browsing said twice, empty windows ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    a well-balanced column,
+    the ferry horn at dusk,
+    Café Liss coffee on Tuesdays,
+    a till that rings,
+    hand-lettered signs
+  ]
+dislikes:
+  [
+    estimates with no basis,
+    people who talk over the radio,
+    shuttered shopfronts,
+    being called 'Mrs Grieve'
+  ]
+fears: [ running out of money before the ferry does, being the last one left on Mill Lane ]
 dream:
-  text: Open by the end of the month
+  text: Open a small accounts-and-ledgers counter on Market Row where neighbours can pay their bills without the
+    Carrow trip.
   stages:
-    - Stock the shelves
-    - Get a sign painted
-    - Cut the ribbon with the mayor
+    - Find a vacant storefront on Market Row.
+    - Stock the counter with ledger books and pencils.
+    - Cut the ribbon with the mayor.
 routine:
   weekday:
-    - { at: "06:30", do: eat, where: millbrook.home_24 }
-    - { at: "07:30", do: work, where: offmap.city }
-    - { at: "12:30", do: eat, where: offmap.city }
-    - { at: "13:30", do: work, where: offmap.city }
-    - { at: "19:00", do: eat, where: offmap.city }
-    - { at: "22:00", do: sleep, where: offmap.city }
+    - { at: "06:40", do: eat, where: millbrook.home_24 }
+    - { at: "07:10", do: walk, where: millbrook.terrace_row }
+    - { at: "07:30", do: wander, where: wharf.harbor_steps }
+    - { at: "08:00", do: work, where: offmap.city }
+    - { at: "17:30", do: sit, where: wharf.breakwater }
+    - { at: "21:30", do: read, where: millbrook.home_24 }
+    - { at: "22:30", do: sleep, where: millbrook.home_24 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_24 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: millbrook.home_24 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_24 }
-chores: [ beat the doormat, water the window box ]
+    - { at: "09:30", do: shop, where: market_row.bakery }
+    - { at: "11:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "13:00", do: walk, where: millbrook.weir }
+    - { at: "16:00", do: read, where: old_quarter.library }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: millbrook.home_24 }
+chores: [ balance the household accounts on Sundays, sweep the front step, keep the kettle descaled ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: anouk_clancy,
+      affinity: 12,
+      trust: 8,
+      tag: fond,
+      note: Neighbour across the lane; trades seed and gossip.
+    }
+  - {
+      id: birgit_almeida,
+      affinity: 6,
+      trust: 5,
+      tag: curious,
+      note: Knows her from the hem-mending on Mill Lane.
+    }
+  - {
+      id: ayesha_soto,
+      affinity: -4,
+      trust: 2,
+      tag: wary,
+      note: Works in Hessle Cross; they nod on the ferry and little else.
+    }
+secrets:
+  - text: She still has the first wage slip from her Carrow clerk job pinned inside the pantry door.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_d01
 archetype: shop_founder
 employment: employed

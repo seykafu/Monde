@@ -4,13 +4,14 @@ name: Annick Olsen
 age: 62
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired; formerly a seamstress for a draper on Market Row.
 workplace: wharf.home_13
 home: wharf.home_13
 portrait: annick_olsen
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: annick_olsen
-appearance: An older woman with grey curls and a cream pinafore.
+appearance: An older woman with grey curls pinned loosely back, wearing a cream pinafore with the strings tied
+  in a bow at the back. Her golden-brown skin is lined from years of sun on the harbour.
 look:
   kind: human
   skin: 9
@@ -20,58 +21,81 @@ look:
   height: short
   outfit: { cut: pinafore, top: 9, bottom: 0, bottom_style: skirt, shoes: 2, trim: 6 }
   accessory: { kind: none }
-backstory: "Annick came to Monde from Hessle Cross 14 years ago and is retired now. What she wants most is
-  plain enough: a bench with a view."
+backstory: Annick sewed for a draper on Carrow's high street for nineteen years before she married Walter and
+  followed him to the coast. She still thinks of Monde as a holiday that got out of hand. When the draper's on
+  Market Row closed she took over his unsold bolts of cloth and now mends for half the street, asking only
+  that people bring their own thread. Her garden is the best on Shingle Row, though she will not admit it, and
+  she gives away the beans to anyone who holds the gate for her. She believes the town has forgotten how to be
+  kind to strangers, which is only half true; she has never once been unkind to one.
 personality:
-  traits: [ restless, dreamy, proud ]
-  big5: { open: 25, conscientious: 35, extravert: 25, agreeable: 84, neurotic: 66 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ warm, practical, teasing, observant ]
+  big5: { open: 55, conscientious: 70, extravert: 65, agreeable: 80, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.25, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A hem tells you more about a person than their face.
+  - Everyone in Monde is lonelier than they let on.
+  - Walter would forget his own name if I didn't say it.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Warm and quick, she finishes Walter's sentences and disagrees with him as a form of love. She asks
+    questions she already knows the answer to, and rarely raises her voice.
+  tics: [ "Don't we, dear?", "Well, I never.", Isn't that the way. ]
+  never_says: [ that's not my business, I can't be bothered, everything happens for a reason ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Don't we, dear? He'll say he's fine, but he's not sleeping.
+    - Well, I never. Bring that jacket here and I'll have the sleeve back by Friday.
+    - Isn't that the way. The beans are ready if anyone wants them, they won't keep.
 birthday: 96
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    a kettle on the stove,
+    pleasant strangers,
+    fresh beans from her own garden,
+    the morning paper read aloud
+  ]
+dislikes: [ drafts, being fussed over, cold tea, loud talk after dark ]
+fears: [ Walter's chest worsening, the library closing, being forgotten by the town ]
 dream:
-  text: A bench with a view
+  text: She wants to be useful to the town, and to be thanked by name in the Lantern.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Volunteer three shifts at the library desk.
+    - Get thanked by name in the Lantern.
+    - Take a regular chair at the Gull & Anchor.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: wharf.home_13 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: wharf.home_13 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: wharf.home_13 }
-    - { at: "19:30", do: read, where: wharf.home_13 }
-    - { at: "21:30", do: sleep, where: wharf.home_13 }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_13 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "07:00", do: cook, where: wharf.home_13 }
+    - { at: "08:00", do: read, where: old_quarter.library }
+    - { at: "09:30", do: garden, where: wharf.home_13 }
+    - { at: "11:00", do: socialize, where: market_row.general_store }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: wharf.home_13 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: wharf.home_13 }
-chores: [ sweep the step, black the stove ]
+    - { at: "14:00", do: volunteer, where: old_quarter.library }
+    - { at: "16:30", do: sit, where: old_quarter.fountain_square }
+    - { at: "18:30", do: cook, where: wharf.home_13 }
+    - { at: "21:00", do: sleep, where: wharf.home_13 }
+  weekend:
+    - { at: "08:30", do: eat, where: wharf.home_13 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "11:30", do: socialize, where: market_row.bakery }
+    - { at: "13:00", do: walk, where: commons.picnic_lawn }
+    - { at: "16:00", do: pray, where: old_quarter.st_brigids }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: wharf.home_13 }
+chores: [ Mend neighbours' hems, Sweep the front step, Tend the bean rows ]
 relationships:
-  - { id: walter_olsen, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: walter_olsen,
+      affinity: 30,
+      trust: 30,
+      tag: spouse,
+      note: Her husband; she keeps his secrets and his hats.
+    }
+  - { id: elin_fleury, affinity: 15, trust: 12, tag: friend, note: Fellow needle-worker along Shingle Row. }
+  - { id: mei_lindgren, affinity: 10, trust: 8, tag: fond, note: Trades seed packets over the fence. }
+secrets:
+  - text: She still has the pattern book from the Carrow draper and copies designs from it at night.
+    reveal: { regard_min: 50 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: volunteer
+generated_by: model
 household: wf_c01
 archetype: retired_couple
 employment: retired

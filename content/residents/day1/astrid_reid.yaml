@@ -4,13 +4,14 @@ name: Astrid Reid
 age: 76
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired postmistress, mends buttonholes when asked.
 workplace: millbrook.home_03
 home: millbrook.home_03
 portrait: astrid_reid
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: astrid_reid
-appearance: An older woman with grey hair in a bun and a brick-red pinafore.
+appearance: A slight woman with grey hair in a tidy bun and a brick-red pinafore, always with a pencil tucked
+  behind one ear. Her hands are quick and dry from years of sorting and sewing.
 look:
   kind: human
   skin: 5
@@ -20,58 +21,106 @@ look:
   height: tall
   outfit: { cut: pinafore, top: 3, bottom: 11, bottom_style: skirt, shoes: 12, trim: 9 }
   accessory: { kind: none }
-backstory: "Astrid came to Monde from Tarn End 21 years ago and is retired now. What she wants most is plain
-  enough: someone to eat supper with."
+backstory: Astrid ran the sorting office in Hessle Cross for thirty years, weighing parcels and reading
+  everyone's postmarks before they did. When her husband Tomas died, she could not bear the flat above the
+  office, so she sold up and took the ferry to Monde at fifty-five, mostly because a notice in the Lantern
+  said the terraces were cheap. She has been here twenty-one years and still thinks of the town as the place
+  where the post comes late. She keeps Tomas's tin of barley sugar on the windowsill and eats one only on
+  Sundays. Her one great regret is never learning to swim, which she blames on the ferry.
 personality:
-  traits: [ kind, shy, careful ]
-  big5: { open: 57, conscientious: 36, extravert: 26, agreeable: 75, neurotic: 13 }
+  traits: [ patient, meandering, observant, stubborn ]
+  big5: { open: 62, conscientious: 70, extravert: 38, agreeable: 68, neurotic: 44 }
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Letters always arrive eventually, even the ones that shouldn't.
+  - The Mill would have reopened if people had written to Carrow more.
+  - A cold stove is the beginning of the end of any evening.
+  - The Gannet's timetable is a kindness nobody thanks the captain for.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Gentle and rambling on purpose, circling back to earlier threads. She remembers prices from forty
+    years ago and says so. Warm, a little formal, never hurried.
+  tics: [ Now where was I?, "In my day, a stamp cost next to nothing.", If you'll forgive me. ]
+  never_says: [ sorry for the bother, hurry along, that's just how it is ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Ah yes, the bread was two coins, no, I'm thinking of the coin and not the loaf.
+    - Come in, come in, the kettle's nearly on. Mind the step, it's been loose since the spring gales.
+    - No, I won't take the tin home for you. Tomas would have had words about it.
 birthday: 62
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    knitting by the window,
+    small birds on the sill,
+    being asked for a story,
+    Sunday barley sugar,
+    the ferry's whistle on Tuesdays
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    letters addressed with no postcode
+  ]
+fears: [ the Gannet being cancelled for good, falling on the stairs at night ]
 dream:
-  text: Someone to eat supper with
+  text: She wants someone to share supper with on a regular night, not just a neighbour dropping by with news.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Accept a supper invitation from a neighbour on Terrace Row.
+    - Return the invitation with a dish she has not made in years.
+    - Set a standing Thursday table and wait to see who comes.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_03 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: millbrook.home_03 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_03 }
-    - { at: "19:30", do: read, where: millbrook.home_03 }
+    - { at: "07:00", do: eat, where: millbrook.home_03 }
+    - { at: "08:30", do: walk, where: millbrook.terrace_row }
+    - { at: "10:00", do: shop, where: market_row.general_store }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: read, where: old_quarter.library }
+    - { at: "16:30", do: walk, where: millbrook.weir }
+    - { at: "18:30", do: cook, where: millbrook.home_03 }
     - { at: "21:30", do: sleep, where: millbrook.home_03 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: millbrook.home_03 }
-    - { at: "19:30", do: read, where: millbrook.home_03 }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:00", do: shop, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "14:30", do: sit, where: commons.picnic_lawn }
+    - { at: "17:00", do: pray, where: old_quarter.st_brigids }
+    - { at: "19:00", do: eat, where: millbrook.home_03 }
     - { at: "22:00", do: sleep, where: millbrook.home_03 }
-chores: [ water the window box, wind the clock ]
+chores:
+  [
+    Sweep the front step before the post comes,
+    Mend neighbours' buttonholes on Thursdays,
+    Trim the window box
+  ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: ilona,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: "Fellow postal retiree, swaps stories over the fence"
+    }
+  - {
+      id: frida_irvine,
+      affinity: 12,
+      trust: 10,
+      tag: fond,
+      note: Buttonhole rival; they compare thread counts
+    }
+  - {
+      id: cyprian_nowak,
+      affinity: -6,
+      trust: 2,
+      tag: wary,
+      note: Lets his bicycle bell go silent past her gate
+    }
+secrets:
+  - text: She still has Tomas's last letter to her, unopened, sealed in the drawer of her sewing box.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_a02
 archetype: widowed_elder
 employment: retired

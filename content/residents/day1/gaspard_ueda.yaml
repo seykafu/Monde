@@ -4,14 +4,14 @@ name: Gaspard Ueda
 age: 75
 pronouns: he/him
 kind: resident
-occupation: caretaker
+occupation: Caretaker at Town Hall, keeps the building, the boiler and the keys.
 workplace: old_quarter.town_hall
 home: old_quarter.home_22
 portrait: lib_m74_038
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: gaspard_ueda
-appearance: A barrel-chested old fisherman with white hair to his collar, a big white beard like a sea-washed
-  broom, an anchor tattoo on his neck and a mustard oilskin over a cream jumper. A slow, weather-reading look.
+appearance: A broad, barrel-chested man with white hair to his collar and a big white beard like a sea-washed
+  broom. He wears a mustard oilskin over a cream jumper, and an anchor tattoo shows at his neck.
 look:
   kind: human
   skin: 2
@@ -22,58 +22,86 @@ look:
   outfit: { cut: coat, top: 4, bottom: 6, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
   face: { moustache: true, stubble: true }
-backstory: "Gaspard came to Monde from Port Sallow 39 years ago and works as caretaker. What he wants most is
-  plain enough: a rota that works."
+backstory: Gaspard fished out of Harrowgate on a crabber until his knees gave out at thirty-six. He answered
+  the Town Hall notice for a caretaker because it paid a wage and let him keep an eye on the weather from the
+  roof. He once rowed a drowned dinghy's crew back to shore in a gale and has never told anyone the full
+  story. He came to Monde for the quiet and stayed because Effie liked the view of the breakwater. He still
+  believes the clocktower could be fixed with a spare spring, though nobody has let him try.
 personality:
-  traits: [ patient, restless, particular ]
-  big5: { open: 8, conscientious: 38, extravert: 42, agreeable: 59, neurotic: 29 }
-values: { prosperity: 0.15, safety: 0.15, spirit: 0.55, charm: 0.15 }
+  traits: [ steady, dry, watchful, practical ]
+  big5: { open: 40, conscientious: 78, extravert: 30, agreeable: 55, neurotic: 25 }
+values: { prosperity: 0.15, safety: 0.25, spirit: 0.4, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The weather tells you everything if you stop talking long enough.
+  - The clocktower stopped because someone forgot to wind it, not because time stopped.
+  - Nobody in Monde reads the minutes of anything.
 voice:
-  register: Brisk, formal with warmth. Says "Item one." Asks for volunteers by looking at you.
-  tics: [ Item one. ]
-  never_says: [ no worries, awesome ]
+  register: Slow and plain, little wasted breath. Speaks in weather and tide words. Dry humour that often misses.
+  tics: [ "Well, now.", Mind the step., Looks at the sky first ]
+  never_says: [ I feel, in my opinion, to be honest ]
   samples:
-    - Item one. Who's got the key to the hall?
-    - Volunteers? Thank you. I'd been looking at you.
-    - Minutes, please. Somebody always forgets the minutes.
+    - Wind's backing north. Shut the Hall windows, will you.
+    - No, I've not seen the archive key. Ask Frye, he hides it better than I do.
+    - Clock's stopped at 4:17. Some hours don't want starting again.
 birthday: 92
-likes: [ lists, a gavel, being thanked by name ]
-dislikes: [ meetings without minutes, people who don't do committees, cold tea ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    Early tide,
+    A hot cup of tea on the roof,
+    Effie's bread,
+    Repairing old hinges,
+    The sound of the harbour bell
+  ]
+dislikes: [ Loud radios at dawn, Paperwork left unsigned, Lukewarm tea, Gulls on the Town Hall roof ]
+fears: [ Losing his balance on the ladder, Effie going into hospital on the mainland ]
 dream:
-  text: A rota that works
+  text: He wants a proper rota for the Town Hall upkeep so the building is never left unlooked-after again.
   stages:
-    - Collect ten volunteers' names (Regard ≥ 20 with each)
-    - Print the rota at the Lantern
-    - Run one full week with no gap
+    - Ask Marthe to help draw up the duty list.
+    - Pin the rota on the Lantern noticeboard.
+    - Keep the Town Hall rota running for one full week.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: old_quarter.home_22 }
-    - { at: "08:30", do: work, where: old_quarter.town_hall }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: old_quarter.town_hall }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: old_quarter.home_22 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: old_quarter.home_22 }
+    - { at: "06:00", do: eat, where: old_quarter.home_22 }
+    - { at: "06:30", do: walk, where: wharf.breakwater }
+    - { at: "07:15", do: eat, where: old_quarter.home_22 }
+    - { at: "08:00", do: work, where: old_quarter.town_hall }
+    - { at: "12:30", do: eat, where: market_row.bakery }
+    - { at: "13:00", do: work, where: old_quarter.town_hall }
+    - { at: "17:30", do: sit, where: old_quarter.fountain_square }
+    - { at: "19:00", do: eat, where: old_quarter.home_22 }
+    - { at: "21:30", do: sleep, where: old_quarter.home_22 }
   weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_22 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: old_quarter.home_22 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "07:00", do: eat, where: old_quarter.home_22 }
+    - { at: "07:30", do: walk, where: wharf.harbor_steps }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "20:00", do: eat, where: old_quarter.home_22 }
     - { at: "22:00", do: sleep, where: old_quarter.home_22 }
-chores: [ sweep the step, wind the clock ]
+chores: [ Check the Town Hall boiler each morning, Carry coal up the stairs, Sweep the harbour steps on Fridays ]
 relationships:
-  - { id: effie_zielinski, affinity: 70, trust: 70, tag: partner, note: Same house. }
-secrets: []
+  - {
+      id: effie_zielinski,
+      affinity: 25,
+      trust: 25,
+      tag: partner,
+      note: Thirty-nine years married; she keeps him honest.
+    }
+  - { id: frye, affinity: 10, trust: 12, tag: wary, note: Hides the archive key and won't say where. }
+  - {
+      id: marthe_demir,
+      affinity: 12,
+      trust: 15,
+      tag: friend,
+      note: Does the Town Hall accounts without fuss.
+    }
+secrets:
+  - text: He keeps a spare clocktower spring wrapped in oilcloth under his bed, hoping someone will ask.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: oq_b01
 archetype: retired_organizer
 employment: employed

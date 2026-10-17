@@ -4,14 +4,14 @@ name: Fabian McAllister
 age: 68
 pronouns: he/him
 kind: resident
-occupation: retired
+occupation: Retired mill fitter, now tends the Lower Row garden plots.
 workplace: market_row.home_03
 home: market_row.home_03
 portrait: lib_m72_014
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: fabian_mcallister
-appearance: An older man with a grey moustache, a soft navy peaked cap and a thick navy jumper with brass
-  buttons at the shoulder. Laconic, watchful eyes.
+appearance: A man with a grey moustache and a soft navy peaked cap, wearing a thick navy jumper with brass
+  buttons at the shoulder. His brown skin is creased around watchful eyes.
 look:
   kind: human
   skin: 5
@@ -23,58 +23,93 @@ look:
   accessory: { kind: none }
   headwear: { kind: peaked_cap, colour: 6 }
   face: { moustache: true }
-backstory: "Fabian came to Monde from Carrow 60 years ago and is retired now. What he wants most is plain
-  enough: a bench with a view."
+backstory: Fabian arrived in Monde at eight, when his father took work at Lissworth Mill. He spent forty years
+  fitting frames on the mill floor until the doors closed, and he still has the mill key on his belt. Since
+  then he has grown beans and marrows on the Commons plots, most of which have gone to bindweed. He believes
+  the mill will reopen if someone asks the right people, and he is wrong about that, though he is right that
+  somebody should. He has been quietly building a bench for the Commons for two winters, and Zuzanna does not
+  know yet.
 personality:
-  traits: [ curious, steady, dreamy ]
-  big5: { open: 8, conscientious: 31, extravert: 42, agreeable: 87, neurotic: 51 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ laconic, patient, handy, private ]
+  big5: { open: 38, conscientious: 67, extravert: 30, agreeable: 58, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.36, spirit: 0.24, charm: 0.3 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A good bench outlasts a good speech.
+  - The mill will reopen if the right people ask.
+  - Anyone who needs a tape measure is measuring for the wrong thing.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Slow and few-worded. He answers questions with a short sentence and rarely offers more unless asked
+    twice. Warmth shows in what he fixes, not what he says.
+  tics: [ Mm., "Aye, well.", Give it here. ]
+  never_says: [ I'm sure it'll be fine, everything happens for a reason, you know what I mean ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Mm. The gate's sticking. Give it here.
+    - Aye, well. Beans don't care who's watching.
+    - Could be the mill. Could be nothing. Let's see.
 birthday: 42
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    the smell of cut pine,
+    the Gannet's horn on Tuesdays,
+    a tape measure in his pocket,
+    a morning paper,
+    a kettle on the stove
+  ]
+dislikes: [ loud music in the morning, people who call the mill a ruin, bindweed, being hurried, gulls on the bins ]
+fears: [ the mill being pulled down, losing his hands to the cold ]
 dream:
-  text: A bench with a view
+  text: A proper bench on the Commons, with a view of the lighthouse, and Zuzanna on it.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Choose the spot by the bandstand where the view is clearest.
+    - Raise the coins or ask Kasimir to cut the timber.
+    - Sit on it with the first neighbour who stops to talk.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: market_row.home_03 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
+    - { at: "06:30", do: eat, where: market_row.home_03 }
+    - { at: "07:00", do: walk, where: wharf.harbor_steps }
+    - { at: "08:30", do: garden, where: commons.picnic_lawn }
     - { at: "12:00", do: eat, where: market_row.home_03 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: market_row.home_03 }
-    - { at: "19:30", do: read, where: market_row.home_03 }
-    - { at: "21:30", do: sleep, where: market_row.home_03 }
+    - { at: "13:30", do: tinker, where: market_row.home_03 }
+    - { at: "16:00", do: fish, where: wharf.breakwater }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: sleep, where: market_row.home_03 }
   weekend:
-    - { at: "08:00", do: eat, where: market_row.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: market_row.home_03 }
-    - { at: "19:30", do: read, where: market_row.home_03 }
+    - { at: "07:30", do: eat, where: market_row.home_03 }
+    - { at: "09:00", do: garden, where: commons.picnic_lawn }
+    - { at: "12:00", do: shop, where: market_row.market_street }
+    - { at: "14:00", do: tinker, where: market_row.home_03 }
+    - { at: "17:00", do: walk, where: wharf.breakwater }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: market_row.home_03 }
-chores: [ water the window box, wind the clock ]
+chores: [ Dig the garden plots before the frost lifts., Oil the back gate hinges., Carry coal in from the yard. ]
 relationships:
-  - { id: zuzanna_mcallister, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: zuzanna_mcallister,
+      affinity: 20,
+      trust: 26,
+      tag: spouse,
+      note: His wife; she keeps his accounts and his secrets badly.
+    }
+  - {
+      id: mikael_saunders,
+      affinity: 16,
+      trust: 14,
+      tag: friend,
+      note: Mikael mends the pub chairs and Fabian helps for free.
+    }
+  - {
+      id: yaa_ennis,
+      affinity: 6,
+      trust: 4,
+      tag: curious,
+      note: Asks too many questions about the mill ledgers.
+    }
+secrets:
+  - text: He has been secretly building a bench for the Commons for two winters, meant as a surprise for Zuzanna.
+    reveal: { regard_min: 50 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: favor_giver
+generated_by: model
 household: mr_b01
 archetype: retired_couple
 employment: retired

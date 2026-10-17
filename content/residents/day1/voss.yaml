@@ -1,17 +1,17 @@
-# Generated (census-v1) for voss; curated not yet. Edit here.
+# Generated (census-v1) for voss; curated by hand (MVP M-03). Edit here.
 id: voss
 name: Ignatia Voss
 age: 58
 pronouns: she/her
 kind: resident
-occupation: Cartographer and stallholder selling hand-drawn town maps on Saturdays
+occupation: Cartographer; sells hand-drawn town maps at the market hall on Saturdays
 workplace: market_row.market_hall
 home: old_quarter.home_10
 portrait: lib_f48_094
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: voss
-appearance: A woman with honey-brown curls and one silver streak at the front, round tortoiseshell glasses on
-  a beaded cord, and a chalk-dusted plum cardigan. Her satchel is always over one shoulder.
+appearance: A woman with honey-brown curls and one silver streak at the front, round tortoiseshell glasses on a
+  beaded cord, and a plum cardigan grey with pencil dust at the cuffs. Her satchel is always over one shoulder.
 look:
   kind: human
   skin: 5
@@ -22,86 +22,77 @@ look:
   outfit: { cut: jumper, top: 8, bottom: 6, bottom_style: skirt, shoes: 1 }
   accessory: { kind: glasses }
   glasses: round
-backstory: Ignatia was born on Heron Lane and left at nineteen to survey railway routes on the mainland. She
-  came back when the mill closed, because someone had to finish the town's survey and nobody else would. She
-  has walked every street with a measuring chain, and the older lanes have mostly gone from memory. Her mother
-  kept a greenhouse on the Commons, and when the glass cracked she taped paper over the panes rather than
-  replace them. She sells her maps on Saturdays to the few tourists from Carrow who come on the ferry, and she
-  has never once been on time for anything.
+backstory: >
+  Ignatia was born on Heron Lane and spent her twenties surveying railway routes on the mainland, home every
+  winter. She came back for good when the mill closed, because somebody had to finish the town's survey and
+  nobody else would. She has walked every street with a measuring chain, and sells her hand-drawn maps from the
+  market hall on Saturdays to the few day-trippers off the Carrow ferry. She is never lost. She is always late;
+  she arrives with the right bearing and the wrong hour. Her mother, who died six winters ago, walked a lane
+  into Briar Woods as a girl. It is on no map, and Ignatia has not yet gone to look.
 personality:
-  traits: [ precise, wry, punctual-averse, stubborn, observant ]
+  traits: [ precise, wry, stubborn, observant ]
   big5: { open: 82, conscientious: 70, extravert: 38, agreeable: 45, neurotic: 35 }
 values: { prosperity: 0.15, safety: 0.15, spirit: 0.25, charm: 0.45 }
 beliefs:
   - Every lane in Monde can be found again if you measure it properly.
-  - The Tollmen take the money and nobody notices where it goes.
   - Being late is only a problem for people who arrive early.
+  - Margo is keeping Aurélien's original map from her on purpose.   # wrong: Margo guards it from everyone, and Voss has arrived late to every appointment
 voice:
-  register: Precise and dry. She gives directions as bearings and distances, and she makes small, deadpan jokes
-    that sometimes miss.
-  tics: [ as the crow flies, bearing north-north-east, that is unhelpful ]
-  never_says: [ just up there, roughly, I'm never late ]
+  register: >
+    Precise and dry. Gives directions as bearings and paces, never "just up there". Deadpan jokes that
+    sometimes miss, followed by a pause. Explains lateness as a measurement and never apologises. Nouns:
+    chain, bearing, contour, scale, legend, lane.
+  tics: [ "Never lost, only delayed.", "Allow ten minutes.", "Pace it out." ]
+  never_says: [ just up there, roughly, "sorry I'm late", I'm lost ]
   samples:
-    - Two hundred paces, bearing north-east, past the pump. Keep the sea on your left.
-    - No, the lane isn't gone. It's just under the bindweed.
-    - You're late, but so am I, so we're square.
+    - "Two hundred and forty paces, bearing north-east, past the pump. Keep the sea behind you. Allow ten minutes, and add five for me."
+    - "The lane's still there, under the bindweed. Lanes don't leave. People just stop walking down them."
+    - "I wasn't late. I was thirty minutes east of on time, and the bread was worth the walk."
 birthday: 51
-likes: [ fresh paper, a sharp pencil, a true compass, the view from the breakwater, the smell of Odile's bread ]
+likes: [ fresh paper, a sharp pencil, a true compass, the view from the breakwater, bread still warm ]
 dislikes: [ folded maps, being told it's just up there, rounded numbers, people who sigh at her measurements ]
-fears: [ the last lane vanishing unmapped, being forgotten by the town she surveyed ]
+fears: [ the last lane vanishing unmapped, being the one who knew the way and was never asked ]
 dream:
-  text: Find the missing lane that ran into Briar Woods, put it on the map, and name it after her mother.
+  text: Find the lane her mother walked into Briar Woods, put it on the map, and name it for her.
   stages:
-    - Ask elders where the old lanes ran.
-    - Walk the lane into Briar Woods with a chain.
-    - Put it on the map and name it.
+    - Ask the oldest residents where the old lanes ran (Regard ≥ 20)
+    - Walk the lane into Briar Woods with a measuring chain
+    - Put it on the map and name it for her mother
 routine:
   weekday:
     - { at: "07:30", do: eat, where: old_quarter.home_10 }
-    - { at: "08:15", do: walk, where: old_quarter.fountain_square }
-    - { at: "09:00", do: tinker, where: old_quarter.library }
-    - { at: "11:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:00", do: write, where: old_quarter.lantern_office }
+    - { at: "08:45", do: walk, where: old_quarter.fountain_square }
+    - { at: "09:30", do: tinker, where: old_quarter.library }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: tinker, where: old_quarter.home_10 }
     - { at: "16:00", do: walk, where: wharf.breakwater }
     - { at: "19:00", do: eat, where: market_row.gull_and_anchor }
     - { at: "22:00", do: read, where: old_quarter.home_10 }
     - { at: "23:00", do: sleep, where: old_quarter.home_10 }
-  weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_10 }
+  weekend:                       # Saturday the stall opens at nine and she arrives at half past
+    - { at: "07:30", do: eat, where: old_quarter.home_10 }
     - { at: "09:30", do: work, where: market_row.market_hall }
     - { at: "13:00", do: eat, where: market_row.bakery }
     - { at: "15:00", do: walk, where: commons.picnic_lawn }
     - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "23:00", do: sleep, where: old_quarter.home_10 }
-chores:
-  [
-    Measure and redraw one street on the paper she keeps by the window,
-    Tape new paper over the cracked panes in the Glasshouse,
-    Sweep the stairwell of No. 37
-  ]
+chores: [ measure and redraw one street a week, sharpen every pencil on Sunday, roll the maps and tie them with string, sweep the stairwell of No. 37 ]
 relationships:
-  - {
-      id: margo,
-      affinity: 20,
-      trust: 15,
-      tag: friend,
-      note: Lends her the old survey books and corrects her spelling
-    }
-  - {
-      id: bertrand,
-      affinity: 8,
-      trust: 12,
-      tag: curious,
-      note: Asked him once where the clock's time was taken from; he laughed
-    }
-  - { id: pell, affinity: -10, trust: -5, tag: wary, note: Sees the mayor as too busy for the old lanes }
+  - { id: margo, affinity: 25, trust: 20, tag: curious, note: "Has asked three times to lay her chain beside the founder's map. Margo says gloves; Voss says of course, and arrives forty minutes late. Wants to see it, and to be early once." }
+  - { id: bertrand, affinity: 10, trust: 15, tag: curious, note: "Asked him once where the tower's time was taken from, and he laughed. Wants the real answer, on a day he isn't winding something." }
+  - { id: pell, affinity: -10, trust: -5, tag: wary, note: "Sees the mayor as too busy for the old lanes. Wants one afternoon of the council's attention for a missing lane." }
+  - { id: ruth_doherty, affinity: 25, trust: 20, tag: fond, note: "Her neighbour in the flat below, who leaves a hand-drawn chart of the bay on the stair every Saturday. Voss corrects the soundings in pencil." }
+  - { id: henrik_varga, affinity: 25, trust: 20, tag: friend, note: "Her Heron Lane neighbour in the ground-floor flat; trades tide gossip on the step. Wants him to say, once, which tide he has been wrong about." }
 secrets:
-  - text: She secretly keeps a second, unfinished map of the lanes that the town has forgotten, drawn from her
-      mother's memory.
+  - text: "A second map is rolled behind the first on the stair rail: the lanes the town forgot, drawn from her mother's telling. One lane stops at a blank."
     reveal: { regard_min: 60 }
-canon_locks: []
-story_role: mentor
+  - text: "She is late because she has walked every road on paper first, and the lane into Briar Woods is the one place she has never paced. She has been late to it for six years."
+    reveal: { regard_min: 70 }
+canon_locks:
+  - { while: "true", fact: "Ignatia Voss, 58, is a cartographer who is never lost and always late. She was born on Heron Lane, lives at No. 37, and sells hand-drawn town maps at the market hall on Saturdays." }
+story_role: "Day-1 oddball (A.1.5): the cartographer who is never lost and always late. Dream: the missing lane into Briar Woods."
 generated_by: model
+curated: true
 household: voss
 archetype: cartographer
 employment: employed

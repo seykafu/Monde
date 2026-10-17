@@ -4,14 +4,14 @@ name: Walter Olsen
 age: 59
 pronouns: he/him
 kind: resident
-occupation: retired early
+occupation: Retired early; formerly a mill floor fitter at Lissworth.
 workplace: wharf.home_13
 home: wharf.home_13
 portrait: lib_m53_097
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: walter_olsen
-appearance: A stocky man with black hair under a grey tweed flat cap, a nose broken long ago and set a little
-  crooked, and an oatmeal work cardigan with leather elbow patches. A long-suffering, dryly amused look.
+appearance: A stocky man with black hair under a grey tweed flat cap, and an oatmeal cardigan with leather
+  elbow patches he wears buttoned to the top. His nose has been set a little crooked.
 look:
   kind: human
   skin: 2
@@ -23,58 +23,92 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 14 }
   face: { stubble: true }
-backstory: "Walter came to Monde from Tarn End 14 years ago and had to stop working early. What he wants most
-  is plain enough: a bench with a view."
+backstory: Walter spent twenty-two years on the floor at Lissworth Mill, fitting frames and breathing the
+  fibre dust that eventually made him stop. He was not sorry to leave the city, though he misses the foremen's
+  jokes. He and Annick came to Monde after a summer's holiday that went on for three weeks longer than
+  planned, and they took the empty half of a house on Shingle Row. He is not a joiner, but he has been mending
+  the Gull & Anchor's stool legs for nothing since his first winter, which he claims is only to keep his hands
+  busy. Walter still thinks the Lissworth frames will be sold off one day, which nobody else believes.
 personality:
-  traits: [ patient, steady, restless ]
-  big5: { open: 59, conscientious: 60, extravert: 8, agreeable: 63, neurotic: 68 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ dry, stubborn, patient, handy ]
+  big5: { open: 40, conscientious: 75, extravert: 35, agreeable: 45, neurotic: 55 }
+values: { prosperity: 0.15, safety: 0.4, spirit: 0.15, charm: 0.3 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A bench mended is worth three promised.
+  - The mill will reopen before the cannery does.
+  - Annick knows where everything is better than I do.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Short and dry, with long pauses. He answers questions before they are finished and rarely offers
+    more than he is asked. He does not hurry and does not apologise for silence.
+  tics: [ "Well, that's that.", Mm., "Don't we, dear?" ]
+  never_says: [ I feel, in my opinion, you must ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Mm. Stool's wobbling again, I'd say.
+    - Can't say I've seen the ferry on time since the winter, but it's not my boat.
+    - Well, that's that. Annick'll want the kettle on, I'd bet you won't.
 birthday: 98
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    a morning paper,
+    a sharp saw,
+    the smell of cut pine,
+    stout at the Gull & Anchor on Fridays,
+    a kettle on the stove
+  ]
+dislikes: [ stairs, drafts, being managed, rainy harbour mornings ]
+fears: [ losing the workbench to damp, being put in a home ]
 dream:
-  text: A bench with a view
+  text: He wants a bench on the Commons facing the sea that he built himself, so people can sit with a view.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Choose a spot on the Commons near the picnic lawn.
+    - Raise fifteen coins or ask Kasimir to cut the timber.
+    - Sit on it with the first neighbour who stops.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: wharf.home_13 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: wharf.home_13 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: wharf.home_13 }
-    - { at: "19:30", do: read, where: wharf.home_13 }
+    - { at: "07:00", do: wander, where: wharf.home_13 }
+    - { at: "07:30", do: read, where: market_row.bakery }
+    - { at: "08:30", do: sit, where: wharf.harbor_steps }
+    - { at: "10:00", do: tinker, where: wharf.boathouse }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: walk, where: commons.duck_pond }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
     - { at: "21:30", do: sleep, where: wharf.home_13 }
   weekend:
     - { at: "08:00", do: eat, where: wharf.home_13 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: wharf.home_13 }
-    - { at: "19:30", do: read, where: wharf.home_13 }
+    - { at: "09:30", do: fish, where: wharf.harbor_steps }
+    - { at: "12:00", do: socialize, where: market_row.market_street }
+    - { at: "15:00", do: tinker, where: wharf.boathouse }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: wharf.home_13 }
-chores: [ water the window box, sweep the step ]
+chores: [ Mend stool legs at the pub, Split kindling for the stove, Oil the door hinges on Shingle Row ]
 relationships:
-  - { id: annick_olsen, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: annick_olsen,
+      affinity: 30,
+      trust: 30,
+      tag: spouse,
+      note: His wife of thirty-five years; she corrects his facts.
+    }
+  - {
+      id: desmond_esposito,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Once shared the harbour tide tables with him.
+    }
+  - {
+      id: hartley_radford,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Asks about the boats; Walter asks back.
+    }
+secrets:
+  - text: He keeps the first wage packet he ever earned at the mill, folded in his tool case.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: wf_c01
 archetype: retired_couple
 employment: unable

@@ -4,15 +4,14 @@ name: Lucas Okonjo
 age: 87
 pronouns: he/him
 kind: resident
-occupation: retired
+occupation: Retired postmaster in Carrow
 workplace: old_quarter.home_18
 home: old_quarter.home_18
 portrait: lib_m86_119
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: lucas_okonjo
-appearance: A frail, smiling old man with a fringe of iron-grey hair under a tweedy charcoal flat cap, big
-  kindly ears, iron-grey stubble, and a mustard cardigan with a navy tartan scarf tucked in. A slow, sweet,
-  bemused look.
+appearance: A frail, smiling old man with iron-grey tufty hair under a charcoal tweed flat cap, big kindly
+  ears and stubble. He wears a mustard cardigan with a navy tartan scarf tucked into it.
 look:
   kind: human
   skin: 8
@@ -24,58 +23,78 @@ look:
   accessory: { kind: scarf, colour: 6 }
   headwear: { kind: flat_cap, colour: 13 }
   face: { stubble: true }
-backstory: "Lucas came to Monde from Carrow 19 years ago and is retired now. What he wants most is plain
-  enough: someone to eat supper with."
+backstory: Lucas ran the sorting office in Carrow for thirty-one years and knew most of the city's street
+  names by the handwriting on envelopes. He retired at sixty-eight, the year his wife died, and came to Monde
+  because his daughter would not let him live alone above a noisy street. He still remembers what a
+  first-class stamp cost in 1958 and will tell you without being asked. He never managed to be a good cook,
+  though he tried for Hana's sake, and he was glad when she took over the kitchen. He is slowly losing track
+  of the days, and has started to think the post still comes on Tuesdays.
 personality:
-  traits: [ particular, stubborn, practical ]
-  big5: { open: 59, conscientious: 12, extravert: 25, agreeable: 35, neurotic: 46 }
+  traits: [ gentle, rambling, observant, fussy ]
+  big5: { open: 62, conscientious: 40, extravert: 55, agreeable: 80, neurotic: 30 }
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Letters still matter more than any wireless.
+  - Carrow was a better place to get a bargain in my day.
+  - The ferry comes on Fridays, and Tuesdays are for the post.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Slow and sweet, circling back to earlier points. Remembers prices from forty years ago and sometimes
+    misplaces the day.
+  tics: [ now where was I, in my day, mind the step ]
+  never_says: [ I don't know, that's modern, no thank you ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Ah, yes, a coin stamp in my day, and nobody thought twice.
+    - Is it Tuesday? I thought the post had come, but perhaps it's still waiting.
+    - Oh, that's lovely, dear. You'll have to tell me the story again slower.
 birthday: 42
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ knitting, small birds at the window, being asked for a story, the tartan scarf his wife gave him ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, hurried conversation ]
+fears: [ forgetting his wife's face, being sent back to Carrow ]
 dream:
-  text: Someone to eat supper with
+  text: Be asked to supper by a neighbour and then return the kindness with a standing Thursday table for anyone
+    who comes.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Be invited to supper by a neighbour on Well Row.
+    - Return the invitation with a dish from Hana's kitchen.
+    - Set a standing Thursday table on the front step.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: old_quarter.home_18 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: old_quarter.home_18 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: old_quarter.home_18 }
-    - { at: "19:30", do: read, where: old_quarter.home_18 }
+    - { at: "08:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "10:00", do: sit, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "14:00", do: read, where: old_quarter.library }
+    - { at: "16:00", do: walk, where: commons.duck_pond }
+    - { at: "18:30", do: eat, where: old_quarter.home_18 }
+    - { at: "20:30", do: read, where: old_quarter.home_18 }
     - { at: "21:30", do: sleep, where: old_quarter.home_18 }
   weekend:
     - { at: "08:00", do: eat, where: old_quarter.home_18 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: old_quarter.home_18 }
-    - { at: "19:30", do: read, where: old_quarter.home_18 }
-    - { at: "22:00", do: sleep, where: old_quarter.home_18 }
-chores: [ black the stove, mend a sock ]
+    - { at: "09:30", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "11:00", do: sit, where: commons.picnic_lawn }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: write, where: old_quarter.home_18 }
+    - { at: "17:30", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: eat, where: old_quarter.home_18 }
+    - { at: "21:00", do: sleep, where: old_quarter.home_18 }
+chores: [ fold the washing, feed the sparrows, wind the mantel clock ]
 relationships:
-  - { id: hana_okonjo, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-secrets: []
+  - {
+      id: hana_okonjo,
+      affinity: 24,
+      trust: 26,
+      tag: daughter,
+      note: His daughter; he is proud and a little bewildered by her.
+    }
+  - { id: camilla_kelleher, affinity: 14, trust: 10, tag: friend, note: Talks sewing with her on the step. }
+  - { id: gaspard_ueda, affinity: 8, trust: 6, tag: curious, note: Asks him about the Town Hall boiler. }
+secrets:
+  - text: He has kept every letter his wife wrote him from their courting years, tied with a tartan ribbon, and
+      reads them when Hana is asleep.
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: oq_p01
 archetype: widowed_elder
 employment: retired

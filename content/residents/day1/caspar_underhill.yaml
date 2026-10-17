@@ -4,14 +4,14 @@ name: Caspar Underhill
 age: 26
 pronouns: he/him
 kind: resident
-occupation: fishing-boat crew
+occupation: Fishing-boat crew on one of Monde's nine boats.
 workplace: wharf.harbor_steps
 home: old_quarter.home_12
 portrait: lib_m33_053
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: caspar_underhill
-appearance: A man with short honey-blond hair and stubble, a navy oilskin jacket over a grey cable-knit
-  jumper. A weathered, steady look.
+appearance: Short honey-blond hair and stubble, a broad tanned build in a navy oilskin over a grey cable-knit
+  jumper. Steady, weathered look.
 look:
   kind: human
   skin: 2
@@ -22,58 +22,70 @@ look:
   outfit: { cut: coat, top: 6, bottom: 6, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
   face: { stubble: true }
-backstory: "Caspar was born in Monde and works as fishing-boat crew. What he wants most is plain enough: a
-  boat with my name on it."
+backstory: Born on Bell Row and taken out on his father's crab boat before he could reliably tie a knot. He
+  left school at fifteen when the Mill closed and the family's income shrank, and has crewed the harbour boats
+  since. He wanted to sail to Carrow once and turned back at the breakwater, and he still tells people it was
+  the weather. He stayed because the bay is the only map he trusts and because Sander is here.
 personality:
-  traits: [ shy, brisk, warm ]
-  big5: { open: 59, conscientious: 52, extravert: 25, agreeable: 63, neurotic: 64 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+  traits: [ steady, patient, dry, practical ]
+  big5: { open: 35, conscientious: 75, extravert: 40, agreeable: 65, neurotic: 30 }
+values: { prosperity: 0.35, safety: 0.4, spirit: 0.1, charm: 0.15 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The bay tells you everything if you stop talking.
+  - Monde would survive if people stopped waiting for the ferry.
+  - Nobody needs a clocktower when the tide keeps time.
 voice:
-  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
-  tics: [ Fair. ]
-  never_says: [ no worries, awesome ]
+  register: Short and weather-first. He reports the sea before he reports feelings and leaves gaps where a
+    stranger would expect comfort.
+  tics: [ Fair., Tide's making., Could be worse. ]
+  never_says: [ I feel, "you're right, honestly", it's a shame ]
   samples:
-    - Fair. Wind's backing.
-    - Could be worse. Could be raining.
-    - Tide's making. I'll be off.
+    - Fair. Wind's backing west, so we'll be out early.
+    - Could be worse. Could be raining on the Gannet.
+    - Tide's making. Leave the hooks for Sander.
 birthday: 34
-likes: [ flat calm at dawn, good rope, smoked fish ]
+likes: [ flat calm at dawn, good rope, smoked fish, Sander's burnt bread ]
 dislikes: [ tangled gear, loud engines, gulls on the catch ]
-fears: [ the last ferry leaving with nobody coming back ]
+fears: [ the boat not coming home, being asked to talk about the Mill ]
 dream:
-  text: A boat with my name on it
+  text: A boat with my name on it, rowed out of the boathouse on Regatta day.
   stages:
-    - Find a hull and bring it to the boathouse
-    - Raise 60 coins from catches and community work
-    - Launch on Regatta day
+    - Find a hull that's sound enough to bring home.
+    - Raise sixty coins from catches and harbour work.
+    - Launch it on Regatta day with Sander at the oars.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: old_quarter.home_12 }
-    - { at: "08:30", do: work, where: wharf.harbor_steps }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: wharf.harbor_steps }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: old_quarter.home_12 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: old_quarter.home_12 }
+    - { at: "05:00", do: eat, where: old_quarter.home_12 }
+    - { at: "05:30", do: work, where: wharf.harbor_steps }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: work, where: wharf.harbor_steps }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: old_quarter.home_12 }
   weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_12 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: old_quarter.home_12 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "07:00", do: eat, where: old_quarter.home_12 }
+    - { at: "08:00", do: fish, where: wharf.breakwater }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: old_quarter.home_12 }
-chores: [ black the stove, beat the doormat ]
+chores: [ mend the net on the back step, coil and stow the spare rope, carry water up the stairs ]
 relationships:
-  - { id: sander_rennick, affinity: 70, trust: 70, tag: partner, note: Same house. }
-secrets: []
+  - {
+      id: sander_rennick,
+      affinity: 70,
+      trust: 75,
+      tag: partner,
+      note: Sander is the reason he stays in Monde.
+    }
+  - { id: cyprian_keane, affinity: 15, trust: 20, tag: friend, note: Shares a deck and very few words. }
+  - { id: hartley_radford, affinity: -5, trust: 10, tag: rival, note: Always argues about tide tables. }
+secrets:
+  - text: He keeps a child's rowing oar under his bunk, carved with his name, from the summer he first went out
+      alone.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: oq_i01
 archetype: fisher
 employment: employed

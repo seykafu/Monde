@@ -1,10 +1,10 @@
-# Generated (census-v1) for quill; curated not yet. Edit here.
+# Generated (census-v1) for quill; curated by hand (MVP M-03). Edit here.
 id: hester
 name: Hester Quill
 age: 59
 pronouns: she/her
 kind: resident
-occupation: Owner of Café Liss, tea and coffee for the town
+occupation: Owner of Café Liss, who sells coffee and drinks only tea
 workplace: market_row.cafe_liss
 home: old_quarter.home_03
 portrait: lib_f51_011
@@ -22,88 +22,82 @@ look:
   outfit: { cut: jumper, top: 8, bottom: 13, bottom_style: skirt, shoes: 2 }
   accessory: { kind: glasses }
   glasses: halfmoon
-backstory: "Hester came to Monde at 36 from a department store in Carrow where she ran the haberdashery
-  counter. She had saved for a shop of her own and found the Market Row premises cheap because the mill was
-  failing. Her first year was thin: she sold mending and buttons out of a cardboard box until a neighbour
-  asked for coffee. She switched the box for a counter and a kettle. The café has kept her solvent for
-  twenty-three years, which she considers proof of sound judgement, though the Tollmen's Saturday visits still
-  rattle her. Her husband stays in Hessle Cross during the week because the pay there is steadier, and she has
-  never quite forgiven the arrangement."
+backstory: >
+  Hester came to Monde at thirty-six from the haberdashery counter of a Carrow department store, with a tape
+  measure round her neck and a cardboard box of buttons. The mill still ran three shifts then. She sold
+  buttons and mending from the box until a neighbour asked for a coffee, so she bought a kettle and a counter,
+  and Café Liss has paid its way for twenty-three years. She drinks only tea. Lucien clerks at a Hessle Cross
+  desk on weekdays so the cottage and the café can both be paid for, and she has never forgiven the sums that
+  make him. She wants him home on a Tuesday.
 personality:
   traits: [ exact, fussy, generous, proud, practical ]
   big5: { open: 40, conscientious: 85, extravert: 65, agreeable: 55, neurotic: 50 }
-values: { prosperity: 0.45, safety: 0.15, spirit: 0.1, charm: 0.3 }
+values: { prosperity: 0.45, safety: 0.15, spirit: 0.10, charm: 0.30 }
 beliefs:
   - A shop that opens on time is half the battle.
+  - "Lucien likes the quiet of his Hessle Cross lodgings better than the noise of the café."   # wrong: he stays away for the café's sake and would come home tomorrow
   - Monde would come back if the Market Row windows were lit.
-  - Tea is a sacrament, coffee is a convenience.
+  - Tea is a discipline and coffee is a convenience.
 voice:
-  register: Fussy and exact, with a habit of correcting small details and then softening. Speaks in prices and
-    times, and warms up slowly.
-  tics: [ I'll have you know, that is not the point, mind the step ]
-  never_says: [ whatever you like, no harm done, I'm sure it's fine ]
+  register: >
+    Fussy and exact, correcting a small detail and then softening. Speaks in cups, minutes and prices. Café
+    nouns: pot, saucer, strainer, urn, the pass. Warms up slowly, and the warmth arrives as a refilled pot.
+  tics: [ "I'll have you know,", "Level, not heaped.", "Saucer, if you please." ]
+  never_says: [ whatever you like, no harm done, I'm sure it's fine, instant ]
   samples:
-    - Tea's on the house this morning, and don't argue, I'll have you know I've counted the cups.
-    - The milk is off, love. Take the coffee, it's the same price and twice the trouble.
-    - Shutters down at six. I won't say it twice, and I shan't say it once more.
+    - "Sit there, not there, there's a draught. Four minutes for the pot, I'll have you know, and not a second under."
+    - "The milk's turned. Take the coffee, it's the same price and twice the trouble. Saucer, if you please, I counted them Tuesday."
+    - "Ten o'clock Saturday, twenty coins and a biscuit. I've stopped putting out the good plate. He takes the biscuit anyway."
 birthday: 22
-likes:
-  [
-    a till that rings,
-    early customers,
-    June's cheerful singing,
-    tea tins lined up neatly,
-    a well-tied apron
-  ]
-dislikes: [ fees nobody explained, customers who linger without ordering, damp tea leaves, the Saturday collection ]
-fears: [ the café closing with no one to take it on, another winter with the windows dark ]
+likes: [ tea, first customers, a till that rings, June humming over the first pot, tea tins lined up level ]
+dislikes: [ fees nobody explained, customers who linger over one cup, chipped saucers, the Saturday biscuit ]
+fears: [ the café closing before Lucien is home on a Tuesday, another winter with Market Row's windows dark ]
 dream:
-  text: Have the café's name painted on the window glass so the whole row can see it from the harbour steps.
+  text: Take enough at Café Liss that Lucien can leave the Hessle Cross desk and be home on a Tuesday.
   stages:
-    - Sell to ten different residents this month.
-    - Win a standing order from the pub for their Sunday teas.
-    - Commission a painter to put the name on the glass.
+    - Sell to ten different residents in a week (Regard ≥ 25)
+    - Win the Gull & Anchor's standing order for Sunday teas
+    - Put the café's name on the window glass, and keep a chair in it for Lucien
 routine:
   weekday:
-    - { at: "06:30", do: sleep, where: old_quarter.home_03 }
+    - { at: "06:15", do: eat, where: old_quarter.home_03 }
     - { at: "07:00", do: work, where: market_row.cafe_liss }
-    - { at: "09:30", do: eat, where: market_row.cafe_liss }
-    - { at: "12:30", do: shop, where: market_row.general_store }
-    - { at: "15:00", do: work, where: market_row.cafe_liss }
-    - { at: "18:00", do: walk, where: old_quarter.lamplighter_lane }
-    - { at: "19:30", do: eat, where: old_quarter.home_03 }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: shop, where: market_row.general_store }
+    - { at: "14:30", do: work, where: market_row.cafe_liss }
+    - { at: "17:30", do: clean, where: market_row.cafe_liss }
+    - { at: "18:30", do: cook, where: old_quarter.home_03 }
+    - { at: "20:30", do: read, where: old_quarter.home_03 }
     - { at: "22:00", do: sleep, where: old_quarter.home_03 }
-  weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_03 }
-    - { at: "09:30", do: work, where: market_row.cafe_liss }
-    - { at: "13:00", do: shop, where: market_row.market_street }
-    - { at: "15:00", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "20:00", do: read, where: old_quarter.home_03 }
-    - { at: "23:00", do: sleep, where: old_quarter.home_03 }
-chores: [ Balance the till each evening, Wash the cloths and aprons, Order flour and milk on Mondays ]
+  weekend:                       # Saturday the collection comes in at ten; Lucien is home from Friday night
+    - { at: "07:30", do: eat, where: old_quarter.home_03 }
+    - { at: "08:45", do: work, where: market_row.cafe_liss }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: work, where: market_row.cafe_liss }
+    - { at: "17:30", do: clean, where: market_row.cafe_liss }
+    - { at: "19:00", do: cook, where: old_quarter.home_03, with: [ lucien_quill ] }
+    - { at: "21:30", do: read, where: old_quarter.home_03 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_03 }
+chores: [ scald the pot before every brew, count the saucers on Tuesdays, balance the till each evening, order flour and milk on Mondays ]
 relationships:
-  - {
-      id: june,
-      affinity: 45,
-      trust: 50,
-      tag: fond,
-      note: Employer; June opens the café on the morning shift.
-    }
+  - { id: june, affinity: 45, trust: 50, tag: fond, note: "Her morning shift, paid in wages and a free cup. Wants June to say whether she is staying, so Hester can hire for winter." }
   - { id: lucien_quill, affinity: 60, trust: 70, tag: spouse, note: "Her husband, away most weekdays." }
-  - {
-      id: odile,
-      affinity: 25,
-      trust: 30,
-      tag: curious,
-      note: Rival baker across Market Row; they trade gossip.
-    }
+  - { id: frye, affinity: 35, trust: 50, tag: friend, note: "Lives in the flat upstairs and takes his pot on the landing at half past six, steeped four minutes exactly. Wants him to say what he thinks of the strength." }
+  - { id: odile, affinity: 35, trust: 45, tag: fond, note: "Buys eleven loaves a week from her and has never been thanked, which she counts as a compliment. Wants Odile to set foot in the café once." }
+  - { id: weasel, affinity: -15, trust: -20, tag: wary, note: "Takes the Saturday twenty and a biscuit at ten. Wants him to take the twenty and leave the biscuit." }
+  - { id: tib, affinity: 30, trust: 20, tag: curious, note: "A boy's back way runs past her cat, and he thinks she hasn't noticed. Wants him to take a biscuit, not just the shortcut." }
 secrets:
-  - text: She still keeps the cardboard box from her first year under the counter, and reads the faded price list
-      when the shop is quiet.
-    reveal: { regard_min: 55 }
-canon_locks: []
-story_role: shopkeeper
+  - text: "She has never finished a cup of the coffee she sells. She judges the pot by its smell and by June's face."
+    reveal: { regard_min: 45 }
+  - text: "A cardboard box of buttons from her first year sits under the counter with the price list still in it, in pencil. She counts them on bad Saturdays."
+    reveal: { regard_min: 60 }
+canon_locks:
+  - { while: "true", fact: "Hester owns Café Liss and drinks only tea. June Castellanos has the morning shift and a free cup." }
+  - { while: "true", fact: "Hester's husband Lucien clerks at a Hessle Cross firm and is away on weekdays. They live at No. 48 Lamplighter Lane, with Dunstan Frye in the flat upstairs." }
+  - { while: "!flag.tollmen_broken", fact: "On Saturdays the Tollmen collect 20 coins at Café Liss. Weasel Pike comes in at ten, takes the twenty and a biscuit, and Hester pays." }
+story_role: "Owner of Café Liss and June's employer. Where Pell lunches and the town stops for tea; the Saturday collection comes in at ten."
 generated_by: model
+curated: true
 household: quill
 archetype: shop_founder
 employment: employed

@@ -4,13 +4,14 @@ name: Esme Hallam
 age: 87
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired seamstress and former alterations hand at the Liss Cannery stitching room.
 workplace: station_hill.home_04
 home: station_hill.home_04
 portrait: esme_hallam
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: esme_hallam
-appearance: An older woman with a salt-and-pepper bob, a sky-blue shirt and half-moon glasses.
+appearance: A small, upright woman with a salt-and-pepper bob, half-moon glasses on a beaded cord, and a
+  sky-blue shirt buttoned to the collar.
 look:
   kind: human
   skin: 1
@@ -21,58 +22,91 @@ look:
   outfit: { cut: plain, top: 5, bottom: 8, bottom_style: trousers, shoes: 12 }
   accessory: { kind: glasses }
   glasses: halfmoon
-backstory: "Esme came to Monde from Hessle Cross 54 years ago and is retired now. What she wants most is plain
-  enough: someone to eat supper with."
+backstory: Esme came to Monde at thirty-three, a city girl from Carrow who had married a cannery foreman named
+  Walt. She sewed for the Liss Cannery's stitching room for twenty years, mending nets and then canvas aprons,
+  and later took in alterations for the whole of Tower Lane. Walt drowned off the breakwater the winter before
+  the cannery closed, and she never found his thermos on the jetty again, though she still counts it among the
+  things that went missing. She tells everyone she stayed because the rent was low. The truth is she could not
+  face the train back, and has not got over the shame of that.
 personality:
-  traits: [ warm, stubborn, shy ]
-  big5: { open: 33, conscientious: 79, extravert: 32, agreeable: 75, neurotic: 39 }
+  traits: [ patient, wistful, stubborn, thrifty ]
+  big5: { open: 55, conscientious: 80, extravert: 35, agreeable: 70, neurotic: 45 }
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Things mended are worth more than things new.
+  - Nobody on Tower Lane ever knocks anymore.
+  - The fare to Carrow was cheaper when the trains ran.
+  - Walt would have liked the Tollmen's tidy books.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Gentle and rambling, with long asides that circle back. She remembers prices from forty years ago
+    and quotes them without being asked. Warm but a little formal.
+  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  never_says: [ sure thing, whatever, no offence meant ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Oh yes, the price of thread. Eleven coins a spool, and that was robbery.
+    - Would you hold this end for me, dear? It's only a sleeve, but it wants two pairs of hands.
+    - I'm fine. Really. I only sat down because the kettle's still warm and it seemed a shame to waste it.
 birthday: 63
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    knitting,
+    small birds at the window,
+    being asked for a story,
+    the smell of starch,
+    Thursday afternoons on the lookout bench
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    loud radios on the ferry
+  ]
+fears: [ the damp getting into the scraps, being forgotten on Tower Lane ]
 dream:
-  text: Someone to eat supper with
+  text: I would like someone to sit at my table and eat supper with me once a week, the way Walt and I used to.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Accept an invitation to supper from a neighbour on Tower Lane.
+    - Return the invitation with a plate of something baked at home.
+    - Set a standing Thursday table and wait to see who comes.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: station_hill.home_04 }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
-    - { at: "12:00", do: eat, where: station_hill.home_04 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: station_hill.home_04 }
-    - { at: "19:30", do: read, where: station_hill.home_04 }
+    - { at: "07:00", do: eat, where: station_hill.home_04 }
+    - { at: "08:30", do: walk, where: station_hill.lookout_bench }
+    - { at: "09:30", do: shop, where: market_row.general_store }
+    - { at: "10:30", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: station_hill.home_04 }
+    - { at: "16:30", do: walk, where: commons.duck_pond }
+    - { at: "18:00", do: cook, where: station_hill.home_04 }
     - { at: "21:30", do: sleep, where: station_hill.home_04 }
   weekend:
     - { at: "08:00", do: eat, where: station_hill.home_04 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: station_hill.home_04 }
-    - { at: "19:30", do: read, where: station_hill.home_04 }
-    - { at: "22:00", do: sleep, where: station_hill.home_04 }
-chores: [ water the window box, wind the clock ]
+    - { at: "09:00", do: walk, where: old_quarter.st_brigids }
+    - { at: "10:30", do: shop, where: market_row.bakery }
+    - { at: "12:00", do: socialize, where: market_row.market_street }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "18:30", do: eat, where: station_hill.home_04 }
+    - { at: "21:30", do: sleep, where: station_hill.home_04 }
+chores:
+  [
+    Mend the Tower Lane neighbours' hems on Tuesdays.,
+    Dust the chapel pews if the sexton is short-handed.,
+    Air the bedding on the line each morning.
+  ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - { id: ilse_adebayo, affinity: 12, trust: 10, tag: fond, note: Brings her the Carrow papers on Fridays. }
+  - { id: idris_pryce, affinity: 5, trust: 8, tag: wary, note: Owes her a mended net and has not paid. }
+  - { id: hollis, affinity: 18, trust: 15, tag: friend, note: Talks trains with him by the station gate. }
+secrets:
+  - text: She still keeps Walt's last letter folded inside her sewing box and reads it when the stove is cold.
+    reveal: { regard_min: 60 }
+  - text: She once let the chapel's brass candlesticks go to a Carrow dealer for coins and has never told the
+      sexton.
+    reveal: { regard_min: 70 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: favor_giver
+generated_by: model
 household: sh_a02
 archetype: widowed_elder
 employment: retired

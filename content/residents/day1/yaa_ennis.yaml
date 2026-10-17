@@ -4,14 +4,14 @@ name: Yaa Ennis
 age: 68
 pronouns: she/her
 kind: resident
-occupation: stallholder
+occupation: Cartographer and market stallholder selling hand-drawn town maps
 workplace: market_row.market_hall
 home: market_row.home_06
 portrait: lib_f76_070
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: yaa_ennis
-appearance: An older woman with short curls dyed jet black, heavy dark-framed glasses and a belted brick-red
-  raincoat with the collar up. A shrewd, amused look.
+appearance: Short jet-black curls and heavy dark-framed glasses, with a belted brick-red raincoat worn with
+  the collar up. She looks shrewd and faintly amused.
 look:
   kind: human
   skin: 8
@@ -22,58 +22,94 @@ look:
   outfit: { cut: coat, top: 3, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: glasses }
   glasses: heavy
-backstory: "Yaa came to Monde from Tarn End 46 years ago and works as stallholder. What she wants most is
-  plain enough: redraw Monde from the ground up."
+backstory: Yaa trained as a draughtswoman in Carrow and spent her twenties surveying harbour depths for a
+  shipping office there. She came to Monde at twenty-two to draw the coast for a dull commission and never
+  left. Her first Saturday stall was a bet with a fishwife who said nobody would pay for a map of their own
+  street. Eleven maps sold that morning. She still keeps the coin from the first sale in her raincoat pocket
+  and shows it to anyone who asks about the Lower Row houses. Her husband wanted to move back to the city; he
+  is buried in St Brigid's yard now, and she does not discuss it.
 personality:
-  traits: [ steady, dreamy, practical ]
-  big5: { open: 32, conscientious: 67, extravert: 71, agreeable: 73, neurotic: 22 }
+  traits: [ precise, wry, stubborn, generous, observant ]
+  big5: { open: 82, conscientious: 78, extravert: 38, agreeable: 52, neurotic: 30 }
 values: { prosperity: 0.2, safety: 0.15, spirit: 0.2, charm: 0.45 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Every street in Monde can be measured, and measuring it is a kindness.
+  - Folded maps are a moral failing.
+  - The missing lane runs behind the old mill wall.
+  - People here stopped asking where they are going years ago.
 voice:
-  register: Precise and wry. Gives directions as bearings and distances. "As the crow flies, which is unhelpful."
-  tics: [ "Two hundred yards, bearing north-east." ]
-  never_says: [ no worries, awesome ]
+  register: Measured and dry. Gives directions as bearings and distances, and corrects small errors without
+    raising her voice. Likes a precise word over a vague one.
+  tics: [ as the crow flies, bearing north-north-east, which is unhelpful ]
+  never_says: [ just up there, roughly, about there ]
   samples:
-    - Two hundred yards, bearing north-east. As the crow flies, which is unhelpful.
-    - Roughly? Nothing's roughly. Everything's somewhere.
-    - Don't fold it. Roll it. Thank you.
+    - It's four hundred paces north-north-east, and you'll not find it by squinting.
+    - I've sold eleven maps today, and I've corrected nine of them in pen.
+    - No, that's the wrong lane. Turn left at the heron and you'll be right.
 birthday: 24
-likes: [ fresh paper, a sharp pencil, a true compass ]
-dislikes: [ roughly, folded maps, being told it's just up there ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ fresh paper, a sharp pencil, a true compass, the sound of the harbour bell, sugar mice ]
+dislikes:
+  [
+    roughly,
+    folded maps,
+    being told it's just up there,
+    the ferry timetable changing,
+    tourists who ask for the castle
+  ]
+fears: [ the old lanes being built over before she records them, losing her sight before the survey is done ]
 dream:
-  text: Redraw Monde from the ground up
+  text: Find the lane that runs behind the mill wall and put it on the map under her own name.
   stages:
-    - Walk each zone with a measuring chain
-    - Compare it with Aurélien's original in the library with Margo
-    - Print one and post it at the station
+    - Ask the oldest residents where the lanes used to run.
+    - Walk the lane into Briar Woods and mark every turning.
+    - Put the finished line on the map and name it on the page.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: market_row.home_06 }
-    - { at: "08:30", do: work, where: market_row.market_hall }
+    - { at: "07:30", do: eat, where: market_row.home_06 }
+    - { at: "08:00", do: tinker, where: market_row.home_06 }
+    - { at: "09:00", do: write, where: old_quarter.library }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: market_row.market_hall }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: market_row.home_06 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: market_row.home_06 }
+    - { at: "14:00", do: walk, where: commons.duck_pond }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: read, where: market_row.home_06 }
+    - { at: "22:30", do: sleep, where: market_row.home_06 }
   weekend:
     - { at: "08:00", do: eat, where: market_row.home_06 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: market_row.home_06 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "09:00", do: work, where: market_row.market_hall }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: market_row.home_06 }
-chores: [ mend a sock, wind the clock ]
+chores: [ sweep the front step, wind the kitchen clock, mend her own raincoat ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: voss,
+      affinity: 12,
+      trust: 8,
+      tag: rival,
+      note: Sells the same maps on the next stall and disputes every bearing.
+    }
+  - {
+      id: cecily_talbot,
+      affinity: 18,
+      trust: 10,
+      tag: fond,
+      note: Lends her pencils and asks for distances in paces.
+    }
+  - {
+      id: vera_sheehan,
+      affinity: 14,
+      trust: 12,
+      tag: friend,
+      note: Mends the raincoat's torn belt loop without being asked.
+    }
+secrets:
+  - text: She still draws the lane behind the mill wall at night, though she has never been able to walk it to the
+      end.
+    reveal: { regard_min: 60 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: shopkeeper
+generated_by: model
 household: mr_a01
 archetype: cartographer
 employment: employed

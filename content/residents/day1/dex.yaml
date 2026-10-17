@@ -1,10 +1,10 @@
-# Generated (census-v1) for calloway; curated not yet. Edit here.
+# Generated (census-v1) for calloway; curated by hand (MVP M-03). Edit here.
 id: dex
 name: Dex Calloway
 age: 21
 pronouns: he/him
 kind: resident
-occupation: Tollman
+occupation: Tollman; plans the Saturday round
 workplace: briar_woods.tollmen_hideout
 home: wharf.home_bunkhouse
 portrait: lib_m26_005
@@ -21,60 +21,79 @@ look:
   height: tall
   outfit: { cut: coat, top: 10, bottom: 2, bottom_style: trousers, shoes: 13 }
   accessory: { kind: scarf, colour: 3 }
-backstory: "Dex came to Monde from Ashby Lock 3 years ago and works as Tollman. What he wants most is plain
-  enough: be good at one thing."
+backstory: >
+  Dex and Dom left Marrow Quay at eighteen on the first boat that would take them, with their cousin Amara and
+  one suitcase between three. Amara found the bunkhouse; Rook, that first winter, found them something to do on
+  Saturdays. Dex drew the round on the back of a ferry timetable: six doors, twelve minutes a door, nobody kept
+  waiting. Rook has used it ever since. On weeknights Dex plays draughts with Hollis at the Gull & Anchor and
+  listens to the branch timetable being recited, which he is learning by ear. He wants to be good at something
+  that doesn't happen on a Saturday.
 personality:
-  traits: [ proud, steady, particular ]
-  big5: { open: 8, conscientious: 52, extravert: 59, agreeable: 62, neurotic: 32 }
-values: { prosperity: 0.15, safety: 0.1, spirit: 0.25, charm: 0.5 }
+  traits: [ precise, dry, patient, loyal, watchful ]
+  big5: { open: 35, conscientious: 82, extravert: 45, agreeable: 62, neurotic: 40 }
+values: { prosperity: 0.25, safety: 0.20, spirit: 0.25, charm: 0.30 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Nobody on the Row has ever gone short because of twenty coins.
+  - Hollis hasn't noticed the one-move losses.   # wrong: Hollis notices everything that runs a minute off
+  - A round with an order is a round nobody gets hurt on.
+  - The plan is the one thing in this town that has never run late.
 voice:
-  register: Easy and ironic. Tells stories that start well and trail off. Answers a question with a question.
-  tics: [ Plans? ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Precise and dry. Gives round numbers: minutes per door, paces between. Finishes other people's sentences,
+    his brother's most of all, and is usually right. Planner's nouns: round, door, float, order, count.
+  tics: [ "What I mean is,", "As drawn.", "Count it." ]
+  never_says: [ protection, no worries, awesome, or else ]
   samples:
-    - Plans? Who's been talking about plans.
-    - There was this fellow in Port Sallow, right, with a goat. Anyway.
-    - Breakfast's free if you look hungry enough. I look hungry.
+    - "Six doors, twelve minutes a door, the bakery last because she counts twice. Don't look at me like that, it's only arithmetic."
+    - "You were going to say unfair. Maybe so. But Saturday has an order, Fellow, and I drew it, and nobody's been kept waiting yet."
+    - "Dom says I finish his sentences. I don't. I just get to the end first."
 birthday: 4
-likes: [ free breakfast, high places, strangers' stories ]
-dislikes: [ being asked their plan, paperwork, rain on a borrowed coat ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ free breakfast, high places, a timetable with every minute filled in, bread still warm ]
+dislikes: [ rain on a borrowed coat, loose ends, Dom improvising at the till, being asked who drew the round ]
+fears: [ the round going wrong on a Saturday and the fault being his, Dom saying the true thing at the wrong till ]
 dream:
-  text: Be good at one thing
+  text: Draw a timetable for something that isn't a Saturday round, and see it pinned up with a train on it.
   stages:
-    - Try three jobs in a week
-    - Choose the one that stuck
-    - Tell someone out loud that you're staying
+    - Learn the branch timetable from Hollis, one game of draughts at a time (Regard ≥ 25 with Hollis)
+    - Draw a draft timetable for the Station and carry it to Hollis
+    - Be on the platform the day the first train is due
 routine:
   weekday:
     - { at: "07:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "08:30", do: work, where: briar_woods.tollmen_hideout }
+    - { at: "08:30", do: write, where: briar_woods.tollmen_hideout }
+    - { at: "10:30", do: wander, where: millbrook.mill_yard }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: briar_woods.tollmen_hideout }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_bunkhouse }
-    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "14:00", do: play_music, where: briar_woods.tollmen_hideout }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor, with: [ hollis ] }
+    - { at: "19:30", do: eat, where: wharf.home_bunkhouse }
     - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
-chores: [ wind the clock, water the window box ]
+  weekend:                       # Saturday: the round, to the minute. Sunday there is no round
+    - { at: "07:30", do: eat, where: wharf.home_bunkhouse }
+    - { at: "08:30", do: write, where: briar_woods.tollmen_hideout }
+    - { at: "09:00", do: work, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: briar_woods.tollmen_hideout }
+    - { at: "15:00", do: play_music, where: briar_woods.tollmen_hideout }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: wharf.home_bunkhouse }
+chores: [ fold the round and put it back in his scarf, wind the bunkhouse clock, check Dom's coat has both its buttons, sweep the bunkhouse step ]
 relationships:
-  - { id: rook, affinity: 30, trust: 30, tag: fond, note: Known for years. }
   - { id: dom, affinity: 70, trust: 70, tag: twin, note: Same house. }
   - { id: amara_borowski, affinity: 70, trust: 70, tag: cousin, note: Same house. }
-secrets: []
-canon_locks: []
-story_role: none
+  - { id: rook, affinity: 45, trust: 40, tag: fond, note: "Boss. Trusts the plan more than the planner, and Dex knows it. Wants him to say the plan is good, once, with the word good in it." }
+  - { id: hollis, affinity: 40, trust: 35, tag: friend, note: "Plays him at draughts at the Gull & Anchor and takes in the branch timetable by ear. Wants to be shown how the timetable was drawn." }
+  - { id: bru, affinity: 50, trust: 55, tag: friend, note: "Walks the round a step behind him and ducks every lintel Dex has marked. Wants him to stop saying sorry to the plan." }
+  - { id: nettie, affinity: 45, trust: 40, tag: friend, note: "Orders the Calloways about like a corporal and gets obeyed. Wants her to tell him what she sees from the ledge before the round, not after." }
+secrets:
+  - text: "He loses at draughts to Hollis on purpose, by exactly one move, so the old man will talk another half hour about the branch timetable."
+    reveal: { regard_min: 40 }
+  - text: "The Saturday round is drawn on the back of a ferry timetable folded inside his scarf. On the other side he has drawn the same six doors with no collecting, only the walk, and timed it. It takes eleven minutes less."
+    reveal: { regard_min: 60 }
+canon_locks:
+  - { while: "!flag.tollmen_broken", fact: "Dex is a Tollman. He plans the crew's Saturday round: 20 coins from every open shop, split six ways." }
+  - { while: "true", fact: "Dex and Dom Calloway are twins, 21, who came from Marrow Quay three years ago and share the old cannery bunkhouse with their cousin Amara Borowski. They drum on an oil drum with wooden spoons." }
+story_role: "Tollman who plans the Saturday round; twin of Dom. Quarry fight (S13, with Dom). The twins quit if they drum at the bandstand's first concert or win the regatta with the player's crew (§7.7)."
 generated_by: template
+curated: true
 household: calloway
 archetype: drifter
 employment: employed

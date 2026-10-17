@@ -4,13 +4,14 @@ name: Anders Ogden
 age: 52
 pronouns: he/him
 kind: resident
-occupation: retired early
+occupation: Retired baker and pie-maker, unable to work
 workplace: millbrook.home_37
 home: millbrook.home_37
 portrait: anders_ogden
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: anders_ogden
-appearance: A man with short dark brown hair, a brick-red apron and a rose scarf.
+appearance: A man with short dark brown hair and a brick-red apron, a rose scarf knotted at his neck. His
+  build is average and he stands a little carefully, one hand often on the table.
 look:
   kind: human
   skin: 3
@@ -20,58 +21,95 @@ look:
   height: short
   outfit: { cut: apron, top: 3, bottom: 3, bottom_style: trousers, shoes: 5 }
   accessory: { kind: scarf, colour: 12 }
-backstory: "Anders came to Monde from Ashby Lock 33 years ago and had to stop working early. What he wants
-  most is plain enough: learn the starter."
+backstory: Anders trained as a baker in Hessle Cross from nineteen, then came to Monde to work the ovens at
+  Fournier & Fille. He loved the four a.m. start, the first loaf out, the smell that reached the harbour. A
+  lung complaint from years of flour dust, and a bad fall in the bakery's cellar, ended his work early. He
+  never told Benedek how much the quiet hurt him, and he still bakes small batches at home for the lane. He
+  stayed in Monde because Benedek would not leave, and because the bread he made here fed people who had
+  nothing else.
 personality:
-  traits: [ restless, curious, shy ]
-  big5: { open: 76, conscientious: 70, extravert: 76, agreeable: 81, neurotic: 46 }
-values: { prosperity: 0.4, safety: 0.1, spirit: 0.2, charm: 0.3 }
+  traits: [ warm, bossy, patient, proud ]
+  big5: { open: 60, conscientious: 70, extravert: 65, agreeable: 75, neurotic: 35 }
+values: { prosperity: 0.3, safety: 0.1, spirit: 0.25, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A kitchen with no salt is a kitchen with no heart.
+  - Everyone in Monde is one good meal from talking again.
+  - The bakery will reopen if somebody starts the starter.
 voice:
-  register: Bossy-kind. Kitchen warnings as terms of endearment. Measures in handfuls.
-  tics: [ Behind you. ]
-  never_says: [ no worries, awesome ]
+  register: Bossy-kind. He gives kitchen warnings as terms of endearment and measures everything in handfuls. He
+    teases warmly and lets silence do the rest.
+  tics: [ "Handful of this, pinch of that.", "Mind the oven, love.", "Eat, eat." ]
+  never_says: [ roughly, approximately, I don't cook ]
   samples:
-    - Behind you. Hot. Mind yourself, I'm carrying.
-    - A handful. Yours, not mine. Mine's bigger.
-    - Eat. Then talk. Then eat again.
+    - Pinch of salt, a handful of flour, and don't you dare skimp.
+    - Mind the oven, love, it bites.
+    - Sit. Eat. Then tell me what's wrong.
 birthday: 85
-likes: [ a hot oven at dawn, people who ask for seconds, rye flour ]
-dislikes: [ skimping, cold kitchens, a bit of salt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    a hot oven at dawn,
+    people who ask for seconds,
+    rye flour,
+    Benedek's laugh over the washing-up,
+    the bells of St Brigid's
+  ]
+dislikes: [ skimping, cold kitchens, a bit of salt, people who take bread without a word ]
+fears: [ his hands losing their skill, Benedek going out to work and not coming home easy ]
 dream:
-  text: Learn the starter
+  text: Cook a harvest supper for a hundred, enough to fill the Market Hall and bring the town round one table.
   stages:
-    - Turn up at four in the morning (Regard ≥ 30 with a baker)
-    - Feed the starter three days running
-    - Bake a loaf under supervision
+    - Plan a Harvest Supper menu with the town.
+    - Cook with four volunteers in the Market Hall.
+    - Serve the supper and count every plate taken.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_37 }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
-    - { at: "12:00", do: eat, where: millbrook.home_37 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_37 }
-    - { at: "19:30", do: read, where: millbrook.home_37 }
-    - { at: "21:30", do: sleep, where: millbrook.home_37 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_37 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_37 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "06:00", do: eat, where: millbrook.home_37 }
+    - { at: "07:00", do: cook, where: millbrook.home_37 }
+    - { at: "09:00", do: visit, where: market_row.bakery }
+    - { at: "10:30", do: socialize, where: millbrook.terrace_row }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: garden, where: millbrook.laundry_green }
+    - { at: "16:30", do: walk, where: millbrook.weir }
+    - { at: "18:30", do: cook, where: millbrook.home_37 }
     - { at: "22:00", do: sleep, where: millbrook.home_37 }
-chores: [ fill the coal scuttle, black the stove ]
+  weekend:
+    - { at: "07:00", do: cook, where: millbrook.home_37 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:30", do: visit, where: old_quarter.st_brigids }
+    - { at: "13:00", do: eat, where: millbrook.home_37 }
+    - { at: "15:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "17:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: sleep, where: millbrook.home_37 }
+chores: [ Bakes bread for the lane twice a week, Keeps the kitchen spotless, Sews the household linen ]
 relationships:
-  - { id: benedek_ogden, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: benedek_ogden,
+      affinity: 25,
+      trust: 25,
+      tag: spouse,
+      note: Husband; the one who keeps the house steady.
+    }
+  - {
+      id: tilde_osei,
+      affinity: 12,
+      trust: 14,
+      tag: friend,
+      note: Retired neighbour who swaps recipes over the wall.
+    }
+  - {
+      id: anselm_osei,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Cook-caretaker who once asked for his starter.
+    }
+secrets:
+  - text: He has been secretly writing down recipes for a booklet, hoping to sell it on market day for the school
+      fund.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_e01
 archetype: cook_baker
 employment: unable

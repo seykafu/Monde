@@ -112,7 +112,8 @@ export function censusProgressReset(sk: Day1Skeleton, pinned: ReadonlySet<string
       ...h,
       status: pinned.has(h.id) ? "pinned" : "skeleton",
       generation: h.generation ? blankGeneration() : null,
-      members: h.members.map(m => (m.kind === "anonymous" ? { ...m, id: null, name: null } : m)),
+      // A regen's fixed name is generation progress too (generate.ts --regen), not the seed's.
+      members: h.members.map(({ name_fixed: _kept, ...m }) => (m.kind === "anonymous" ? { ...m, id: null, name: null } : m)),
     })),
   };
 }

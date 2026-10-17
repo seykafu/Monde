@@ -4,13 +4,14 @@ name: Constance Nakamura
 age: 78
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired seamstress, still mends a neighbour's hem now and then.
 workplace: millbrook.home_30
 home: millbrook.home_30
 portrait: constance_nakamura
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: constance_nakamura
-appearance: An older woman with grey hair in a bun, a brick-red shirt and an olive scarf.
+appearance: A slight, tan-skinned woman with a grey bun and a brick-red shirt, an olive scarf knotted loosely
+  at her throat.
 look:
   kind: human
   skin: 2
@@ -20,58 +21,97 @@ look:
   height: short
   outfit: { cut: plain, top: 3, bottom: 13, bottom_style: skirt, shoes: 15 }
   accessory: { kind: scarf, colour: 10 }
-backstory: "Constance came to Monde from Ashby Lock 28 years ago and is retired now. What she wants most is
-  plain enough: someone to eat supper with."
+backstory: Constance sewed for a dressmaker's in Carrow for twenty years before her husband Tomas took the
+  post at Lissworth Mill, and the two of them moved out to Monde when she was fifty. Tomas died six winters
+  ago, and she still keeps his thermos in the hall cupboard though it has not held tea since. She opened the
+  sewing room at the back of the house to whoever wanted a hem taken up, and most of the street came. She
+  believes the ferry timetable was kinder when she was young, which is not quite true, and she thinks the
+  young people on Mill Lane have forgotten how to be still.
 personality:
-  traits: [ practical, dreamy, brisk ]
-  big5: { open: 59, conscientious: 55, extravert: 54, agreeable: 77, neurotic: 31 }
+  traits: [ patient, wry, meandering, thrifty ]
+  big5: { open: 55, conscientious: 72, extravert: 30, agreeable: 68, neurotic: 40 }
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everything was cheaper when I was young, and better made.
+  - The boys on Mill Lane ride too fast because nobody teaches them manners.
+  - The Commons will come right once someone with sense takes it in hand.
+  - Tomas would have known where the lost spool went.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Gentle and rambling on purpose, circling back to earlier threads. Often starts with a price from
+    forty years ago. Speaks slowly and warmly, with contractions, and drops into quiet when she loses her
+    thread.
+  tics: [ Now where was I?, "In my day, that was a coin", Mind the step ]
+  never_says: [ honestly, to be fair, in a nutshell ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Oh yes, the bread was two coins and nobody complained.
+    - Sit down, love, you look like you've been up since dawn and I can see it.
+    - Lost things turn up. They always do, if you give them time and don't go hunting.
 birthday: 25
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    knitting,
+    small birds at the window,
+    being asked for a story,
+    the smell of cut cloth,
+    Thursday afternoons
+  ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, hurry ]
+fears: [ the house going quiet for good, forgetting Tomas's voice ]
 dream:
-  text: Someone to eat supper with
+  text: Someone to eat supper with, a standing table once a week.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Accept a neighbour's invitation to supper at the Gull and Anchor.
+    - Return the invitation with a loaf and a story from Carrow.
+    - Set a standing Thursday table at number thirteen.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_30 }
-    - { at: "09:30", do: walk, where: wharf.breakwater }
-    - { at: "12:00", do: eat, where: millbrook.home_30 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_30 }
-    - { at: "19:30", do: read, where: millbrook.home_30 }
-    - { at: "21:30", do: sleep, where: millbrook.home_30 }
+    - { at: "07:00", do: eat, where: millbrook.home_30 }
+    - { at: "08:30", do: walk, where: millbrook.terrace_row }
+    - { at: "09:30", do: shop, where: market_row.bakery }
+    - { at: "11:00", do: read, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: garden, where: millbrook.laundry_green }
+    - { at: "17:30", do: cook, where: millbrook.home_30 }
+    - { at: "20:30", do: write, where: millbrook.home_30 }
+    - { at: "22:00", do: sleep, where: millbrook.home_30 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_30 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: millbrook.home_30 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_30 }
-chores: [ sweep the step, wind the clock ]
+    - { at: "09:30", do: walk, where: wharf.harbor_steps }
+    - { at: "11:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: millbrook.laundry_green }
+    - { at: "15:00", do: sit, where: commons.duck_pond }
+    - { at: "18:00", do: cook, where: millbrook.home_30 }
+    - { at: "21:00", do: sleep, where: millbrook.home_30 }
+chores: [ Mend hems for neighbours on Thursdays, Water the sill herbs, Air the bedding on the green ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: anouk_clancy,
+      affinity: 12,
+      trust: 8,
+      tag: friend,
+      note: Anouk brings her the Lantern each morning and stays for tea.
+    }
+  - {
+      id: birgit_almeida,
+      affinity: 6,
+      trust: 5,
+      tag: curious,
+      note: Another seamstress; they swap patterns and quietly compare hems.
+    }
+  - {
+      id: arvid_soto,
+      affinity: -12,
+      trust: -5,
+      tag: wary,
+      note: Arvid rides his bicycle past her gate with no bell.
+    }
+secrets:
+  - text: She still keeps Tomas's last unfinished waistcoat folded in the trunk and sometimes sews one buttonhole
+      on it at night.
+    reveal: { regard_min: 60 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: favor_giver
+generated_by: model
 household: mb_a06
 archetype: widowed_elder
 employment: retired

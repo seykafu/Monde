@@ -4,13 +4,14 @@ name: Linnea Talbot
 age: 28
 pronouns: she/her
 kind: resident
-occupation: out of work, looking
+occupation: Out of work, painting and minding her daughter.
 workplace: market_row.home_05
 home: market_row.home_05
 portrait: lib_f24_004
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: linnea_talbot
-appearance: A young woman with long black braids, a paint-spattered cream smock and a mustard scarf. Quick, amused eyes.
+appearance: Long black braids fall past her shoulders and she wears a paint-spattered cream smock over a
+  mustard scarf. Her quick, amused eyes are always moving toward something.
 look:
   kind: human
   skin: 5
@@ -20,58 +21,94 @@ look:
   height: tall
   outfit: { cut: smock, top: 9, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 4 }
-backstory: "Linnea came to Monde from Tarn End 10 years ago and has been out of work and looking since the
-  last job went. What she wants most is plain enough: hours that fit around the school run."
+backstory: Linnea grew up in Carrow above a dry cleaner's and came to Monde at eighteen, drawn by a cheap room
+  and the idea of painting the sea. She got work at the Liss Cannery packing tins until it closed eleven years
+  ago, then at the Gull & Anchor pulling pints until a bad winter and a child on the way cost her the job.
+  Cecily was born in the back bedroom of No. 4. Linnea still paints every night after bedtime, mostly the
+  breakwater, mostly badly. She tells herself she stayed for the light. Really she stayed because leaving
+  would mean admitting the Cannery was never coming back.
 personality:
-  traits: [ brisk, restless, careful ]
-  big5: { open: 42, conscientious: 54, extravert: 42, agreeable: 77, neurotic: 58 }
-values: { prosperity: 0.4, safety: 0.25, spirit: 0.2, charm: 0.15 }
+  traits: [ brisk, watchful, stubborn, dry ]
+  big5: { open: 72, conscientious: 68, extravert: 40, agreeable: 45, neurotic: 62 }
+values: { prosperity: 0.3, safety: 0.35, spirit: 0.2, charm: 0.15 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The Cannery will reopen if enough of us hold on.
+  - Neighbours who offer advice mean well, mostly.
+  - I can manage the timetable alone.
 voice:
-  register: Efficient and dry, with one eye on a small person. Clipped sentences and the odd long breath.
-  tics: [ Two minutes. ]
-  never_says: [ no worries, awesome ]
+  register: Efficient and dry, with one eye on a small person. Short sentences, clipped, occasionally a long
+    breath before a true thing. Uses contractions freely.
+  tics: [ right then, that's that, hang on ]
+  never_says: [ I'm fine, poor me, you don't understand ]
   samples:
-    - Two minutes. That's what I've got. Go.
-    - No, she's fine. She's always fine. I'm the one who's late.
-    - Sit, if you're sitting. Mind the crayons.
+    - Right then, shoes on. Not the blue ones, we've been through this.
+    - Tea's stewed. Drink it anyway, it's still tea.
+    - No, I can manage. I've been managing since the cannery shut.
 birthday: 59
-likes: [ tea that stays hot long enough to finish, neighbors who knock before advising, a back door that locks ]
-dislikes: [ being pitied, visitors at bedtime, being asked who watches the children ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    tea that stays hot long enough to finish,
+    neighbours who knock before advising,
+    a back door that locks,
+    the smell of linseed oil,
+    Cecily's wet-hair cuddles
+  ]
+dislikes: [ being pitied, visitors at bedtime, being asked who watches the children, gulls on the washing line ]
+fears: [ losing the house, Cecily getting sick with no doctor nearer than the ferry ]
 dream:
-  text: Hours that fit around the school run
+  text: Hours that fit around the school run, so I can finally take a shift I'm not dreading.
   stages:
-    - Ask a shop owner for fixed morning hours (Regard ≥ 25)
-    - Swap school-run days with a neighbor (Regard ≥ 20)
-    - Write the timetable on the kitchen wall
+    - Ask the bakery for fixed morning hours.
+    - Swap school-run days with a neighbour.
+    - Write the new timetable on the kitchen wall.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: market_row.home_05 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: market_row.home_05 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: market_row.home_05 }
-    - { at: "19:30", do: read, where: market_row.home_05 }
-    - { at: "21:30", do: sleep, where: market_row.home_05 }
-  weekend:
-    - { at: "08:00", do: eat, where: market_row.home_05 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "06:45", do: eat, where: market_row.home_05 }
+    - { at: "07:30", do: walk, where: market_row.home_05 }
+    - { at: "08:15", do: visit, where: market_row.bakery }
+    - { at: "09:30", do: tinker, where: market_row.home_05 }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: market_row.home_05 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: market_row.home_05 }
-chores: [ sweep the step, fill the coal scuttle ]
+    - { at: "14:00", do: wander, where: commons.duck_pond }
+    - { at: "17:30", do: cook, where: market_row.home_05 }
+    - { at: "21:00", do: write, where: market_row.home_05 }
+    - { at: "23:00", do: sleep, where: market_row.home_05 }
+  weekend:
+    - { at: "08:30", do: eat, where: market_row.home_05 }
+    - { at: "10:00", do: shop, where: market_row.market_hall }
+    - { at: "12:00", do: socialize, where: commons.picnic_lawn }
+    - { at: "15:00", do: read, where: old_quarter.library }
+    - { at: "18:00", do: cook, where: market_row.home_05 }
+    - { at: "21:30", do: read, where: market_row.home_05 }
+    - { at: "23:00", do: sleep, where: market_row.home_05 }
+chores:
+  [
+    Wash brushes and wipe paint from the kitchen table,
+    Mend Cecily's jumper cuffs,
+    Air the back bedroom before bed
+  ]
 relationships:
-  - { id: cecily_talbot, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-secrets: []
+  - {
+      id: cecily_talbot,
+      affinity: 30,
+      trust: 25,
+      tag: daughter,
+      note: Her daughter; the centre of every plan.
+    }
+  - {
+      id: philippa_pascoe,
+      affinity: 12,
+      trust: 6,
+      tag: wary,
+      note: Used to share shifts; they stopped speaking after a row.
+    }
+  - { id: fabian_mcallister, affinity: 10, trust: 12, tag: fond, note: Lets her pick beans from his plots. }
+secrets:
+  - text: She has been painting a second, smaller bedroom mural in secret for Cecily's birthday, using leftover
+      paint from the pub.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mr_k01
 archetype: single_parent
 employment: out_of_work

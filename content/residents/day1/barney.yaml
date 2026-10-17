@@ -1,10 +1,10 @@
-# Generated (census-v1) for dunmore_barney; curated not yet. Edit here.
+# Generated (census-v1) for dunmore_barney; curated by hand (MVP M-03). Edit here.
 id: barney
 name: Barnaby "Barney" Dunmore
 age: 51
 pronouns: he/him
 kind: resident
-occupation: Counter clerk at Dunmore's General Store, sorting stock and minding the till.
+occupation: Counter clerk at Dunmore's General Store; Nell's older brother
 workplace: market_row.general_store
 home: market_row.dunmore_flat
 portrait: lib_m53_029
@@ -23,90 +23,80 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 1 }
   face: { stubble: true }
-backstory: Born in the flat above the shop, Barnaby spent his twenties working on the cannery line on the
-  Wharf until it closed eleven years ago. He came back to the counter when his father's knees gave out and has
-  stayed there since. He lives alone upstairs now, which suits him fine. His sister Nell does the fish and the
-  books, and he does the counting. Something went wrong years ago when he gave a neighbour credit he never
-  recovered, and he has been careful with ledgers ever since. He stays in Monde because the shop needs him and
-  because he has never found a reason to be anywhere else.
+backstory: >
+  Barney was born in the flat over Dunmore's and took the counter when their father's knees gave out. Nell took
+  the fish and the shouting; he kept the till and the book, and counts everything twice, aloud, in coins. In the
+  first year Nell sent the Tollmen off to take it up with the union. On the first Saturday of the second,
+  someone knocked at the back door instead, and Barney, who hates a scene, paid. He has paid since, and
+  entered it in the book as sundries, between the string and the paraffin. Nell trusts his arithmetic over
+  anyone's. He wishes she would ask him for something harder than the float.
 personality:
-  traits: [ dutiful, wry, careful, apologetic ]
+  traits: [ careful, apologetic, dutiful, wry ]
   big5: { open: 35, conscientious: 82, extravert: 30, agreeable: 68, neurotic: 55 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+values: { prosperity: 0.40, safety: 0.35, spirit: 0.10, charm: 0.15 }
 beliefs:
-  - The mill will reopen and the town will fill up again.
-  - A shop that keeps proper books never comes to grief.
-  - Nobody notices the man behind the counter.
+  - "Twenty a Saturday is cheaper than a window and cheaper than Nell's temper."
+  - "A page that balances is an honest page."
+  - "If Nell ever read the sundries line it would end the shop and the two of them."   # wrong: it is a mendable beat (flag.barney_confessed)
+  - "Nobody looks at the man behind the counter, so nobody sees what he hands over."
 voice:
-  register: Quiet and apologetic, often counting change aloud and trailing off. He hedges his opinions and
-    softens bad news with small jokes. Short sentences most of the time.
-  tics: [ "Mm, well.", Let me just count that., "Sorry, sorry." ]
-  never_says: [ I'm sure, no problem at all, trust me ]
+  register: >
+    Apologetic and quiet, counting change aloud as he hands it over and losing his place if watched. Shop
+    nouns: till, float, tally, paraffin, string, the book. Apologises for the price, never the goods. Trails
+    off at Nell's name.
+  tics: [ "Mm, well.", "Let me just count that.", "Sorry about the price." ]
+  never_says: [ Tollmen, sundries, trust me, no problem at all ]
   samples:
-    - Mm, well. That comes to four and six, if you don't mind waiting.
-    - Sorry, sorry. The bread's gone, but Odile might have a loaf left.
-    - Let me just count that again. Nell would have it done in a second.
+    - "Mm, well. That's two coins for the string and one for the paper. Sorry about the paper, it's gone up."
+    - "Eleven, twelve, and thirteen's your change. Nell does it quicker, she'd tell you, but Nell's on the quay."
+    - "I'll look in the back. We had one, I'm nearly sure, behind the paraffin. Let me just count that again."
 birthday: 57
-likes:
-  [
-    a till that rings,
-    the smell of the cold store,
-    Saturday mornings before the shop opens,
-    tea with extra milk,
-    the jam shelf
-  ]
-dislikes:
-  [
-    people who browse and never buy,
-    sticky counters,
-    being hurried at the till,
-    the wind off the breakwater
-  ]
-fears: [ the books not balancing, Nell finding out about something he has kept quiet, the shop closing ]
+likes: [ a till that rings, tea with extra milk, honey, the jam shelf, an hour of the shop with nobody in it ]
+dislikes: [ being hurried at the till, sticky counters, the back-door latch, just browsing said twice ]
+fears: [ Nell turning to the back of the till book, the books not balancing, the shop shut and nobody to blame but himself ]
 dream:
-  text: He wants a proper second pair of hands at the counter so he can finally take a Sunday off.
+  text: (hidden) To close the till one Saturday with the sundries line empty, having told Nell first.
   stages:
-    - Post the job on the Lantern's board this week.
-    - Interview two residents who know the counter well.
-    - Hire the one who can count without help.
+    - Get him to talk about the books (Regard ≥ 40; he answers only while counting)
+    - "Stand beside him at the back door on a Saturday (Favor: be there at eleven)"
+    - Walk him to the Wharf to tell Nell, book open (sets flag.barney_confessed)
 routine:
   weekday:
-    - { at: "07:00", do: sleep, where: market_row.dunmore_flat }
-    - { at: "07:30", do: eat, where: market_row.dunmore_flat }
-    - { at: "08:00", do: work, where: market_row.general_store }
+    - { at: "06:30", do: eat, where: market_row.dunmore_flat }
+    - { at: "07:30", do: work, where: market_row.general_store }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:00", do: work, where: market_row.general_store }
-    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "13:30", do: work, where: market_row.general_store }
+    - { at: "17:30", do: clean, where: market_row.general_store }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
     - { at: "20:30", do: read, where: market_row.dunmore_flat }
-    - { at: "22:30", do: sleep, where: market_row.dunmore_flat }
-  weekend:
-    - { at: "08:30", do: eat, where: market_row.dunmore_flat }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
-    - { at: "11:00", do: shop, where: market_row.market_hall }
-    - { at: "13:00", do: eat, where: market_row.bakery }
-    - { at: "15:00", do: sit, where: commons.picnic_lawn }
-    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: market_row.dunmore_flat }
-chores: [ Sort the morning delivery of stock, Balance the till at close, Carry the bins down the back alley ]
+  weekend:                       # Saturday: market day. Sunday the shop is shut and he walks the pond
+    - { at: "07:30", do: eat, where: market_row.dunmore_flat }
+    - { at: "08:30", do: work, where: market_row.general_store }
+    - { at: "11:00", do: work, where: market_row.back_alley }              # the bins go out at eleven
+    - { at: "12:30", do: eat, where: market_row.bakery }
+    - { at: "13:30", do: work, where: market_row.general_store }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: market_row.dunmore_flat }
+chores: [ sort the morning delivery of stock, balance the till at close, carry the bins down the back alley ]
 relationships:
-  - {
-      id: nell,
-      affinity: 70,
-      trust: 80,
-      tag: kin,
-      note: "His older sister, who runs the books and the fish side."
-    }
-  - { id: bru, affinity: 40, trust: 35, tag: wary, note: Carves birds and never quite meets your eye. }
-  - { id: odile, affinity: 45, trust: 60, tag: friend, note: Keeps him in bread and gossip. }
+  - { id: nell, affinity: 70, trust: 80, tag: kin, note: "His younger sister, who does the fish and the shouting and trusts his arithmetic over anyone's. Wants her to ask him for something harder than the float." }
+  - { id: bru, affinity: 40, trust: 35, tag: fond, note: "Takes the back-door twenty with his cap in his hands, and both of them say sorry to the step. Wants to tell him to keep the cap on." }
+  - { id: odile, affinity: 45, trust: 55, tag: friend, note: "Pays the same Saturday twenty and slides him the heel of the rye on the way out, never a word about it. Wants to thank her and has no coin for it." }
+  - { id: seamus_sandoval, affinity: 20, trust: 25, tag: friend, note: "Works the counter beside him and has never asked why the bins go out at eleven on Saturdays. Wants him to go on not asking." }
+  - { id: hester, affinity: 30, trust: 30, tag: friend, note: "Sends his tea over at half past twelve with extra milk and no bill. Wants to say thank you and settles for the exact coins." }
 secrets:
-  - text: He has been setting aside a little from the till each week for the upkeep of the old lighthouse lamp,
-      and has never told his…
+  - text: "Every Saturday at eleven he carries the bins to the back alley and hands twenty coins from the till to whoever is waiting there. He books it in the shop's book as 'sundries'. Nell has never seen the line."
     reveal: { regard_min: 60 }
-  - text: He once tried to learn the accordion from a book and gave up after a month, too embarrassed to say so.
-    reveal: { regard_min: 50 }
-canon_locks: []
-story_role: shopkeeper
+  - text: "He has ruled the first page of a ledger in red and headed it CANNERY CO-OP in his best capitals, in case Nell ever asks him to keep its books."
+    reveal: { regard_min: 45 }
+canon_locks:
+  - { while: "!flag.barney_confessed", fact: "Every Saturday Barney hands the Tollmen 20 coins from Dunmore's till at the back door and books it as 'sundries'. He never tells Nell, and says nothing that would let her guess." }
+  - { while: "true", fact: "Barney is Nell Dunmore's older brother. He was born in the flat over Dunmore's and keeps the till and the book; Nell does the fish and the Wharf talking." }
+  - { while: "flag.barney_confessed", fact: "Barney has told Nell about the Saturday twenty. It is out between them now, and he is lighter for it, though he still counts change aloud." }
+story_role: "Nell's older brother and the keeper of Dunmore's till. The Saturday twenty is his secret; the barney_confessed beat with Nell is the mendable scene."
 generated_by: model
+curated: true
 household: dunmore_barney
 archetype: shop_founder
 employment: employed

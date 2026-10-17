@@ -1,10 +1,10 @@
-# Generated (census-v1) for frye; curated not yet. Edit here.
+# Generated (census-v1) for frye; curated by hand (MVP M-03). Edit here.
 id: frye
 name: Dunstan Frye
 age: 62
 pronouns: he/him
 kind: resident
-occupation: Clerk at Town Hall, keeper of the council archive key.
+occupation: Council archivist at the Town Hall; keeps the archive key
 workplace: old_quarter.town_hall
 home: old_quarter.home_13
 portrait: lib_m71_112
@@ -24,39 +24,43 @@ look:
   accessory: { kind: glasses }
   glasses: round
   face: { moustache: true, stubble: true }
-backstory: Dunstan came to Monde at nineteen to take a junior post at the Town Hall, after a year of clerking
-  for a cotton merchant in Carrow that he found tedious. He has stayed forty-three years. He ran the Harvest
-  Supper committee for two decades and the minutes for longer. His wife Lena left for Hessle Cross in the year
-  the mill shut, and he never followed her, though he still sends her a card each Christmas. Mayor Pell asked
-  him, years ago, to keep one archive drawer locked and to leave it unread. He has honoured that for longer
-  than either of them expected.
+backstory: >
+  Dunstan came to Monde at nineteen as a junior clerk at the Town Hall and became the town clerk in his
+  thirties. Eleven years ago the council folded the post into the mayor's and kept him on in the basement as
+  archivist, with the key. His wife Lena left for Hessle Cross the winter the mill shut and sends a card at
+  Christmas, which he files. Mayor Pell once asked him, plainly, to leave one folder alone. It is the only
+  request in forty-three years he has not minuted. He would like her to say that it can be opened, or that it
+  never need be.
 personality:
   traits: [ meticulous, courtly, dry, loyal ]
   big5: { open: 40, conscientious: 88, extravert: 45, agreeable: 68, neurotic: 35 }
-values: { prosperity: 0.1, safety: 0.25, spirit: 0.4, charm: 0.25 }
+values: { prosperity: 0.10, safety: 0.25, spirit: 0.40, charm: 0.25 }
 beliefs:
   - A meeting without minutes never happened.
-  - The Harvest Supper is the one thing this town has never let down.
-  - Lena will write back one day, and I will have the reply filed.
+  - "The Streetlight file is a dull file, because a careful woman files dull things carefully."   # wrong: it holds the loan and the Option Clause
+  - Lena will write back one day, and he will have the reply filed.
+  - A promise kept to the Mayor is a promise kept to the town.
 voice:
-  register: Measured and official, always hedging with procedure. He is warm underneath and prefers to be
-    thanked by name. He doesn't rush, and he rarely raises his voice.
-  tics: [ It is minuted., Item one., If I may ]
-  never_says: [ I'm not sure, whatever you think, no idea ]
+  register: >
+    Official hedging in full, courteous sentences ("it would appear", "so far as the record shows"). Cites the
+    page and the date. Archive nouns: minute book, docket, carbon, shelf-list. Warm underneath; likes being
+    thanked by name.
+  tics: [ "It is minuted.", "I should have to consult the book.", "So far as the record shows," ]
+  never_says: [ I'm not sure, no idea, off the record, whatever you think ]
   samples:
-    - It is minuted, so we needn't argue about it. Item one.
-    - I can't open that drawer for you, I'm afraid. But I'll make a note of your interest.
-    - Thank you. You'll find the Harvest rota on the hook by the door, if you'd be so good.
+    - "It is minuted, Fellow, on page ninety, so we needn't argue it. I shouldn't want to quote a date I hadn't checked."
+    - "The archive is by appointment, Fellow. The key stays with me, and so does the register, and I'm afraid the register is rather full."
+    - "I'd set it down on paper, if I were you, and keep the carbon. A carbon outlives everybody's memory, mine included."
 birthday: 5
-likes: [ Typed carbon copies, Being thanked by name, The Harvest Supper, A tidy desk at closing, lists ]
-dislikes: [ Meetings without minutes, People who won't join a committee, Cold tea ]
-fears: [ The town forgetting its own history, Being asked to open the locked drawer ]
+likes: [ lists, being thanked by name, carbon copies in triplicate, a tidy desk at closing, weak tea ]
+dislikes: [ meetings without minutes, a drawer pulled out unasked, ink on the wrong side of the blotter, people who won't join a committee ]
+fears: [ being asked to open the drawer, the town forgetting its own minutes ]
 dream:
-  text: A Harvest Supper committee that runs itself, with the town sitting down together for once.
+  text: Every minute book since 1866 on a shelf-list, and the basement open to the town one Thursday a month.
   stages:
-    - Hold a first meeting in the pub's back room.
-    - Assign roles to every willing hand.
-    - Run the supper on time, with the lamps lit.
+    - Help him list the loose minute books on the long table (Regard ≥ 25)
+    - Carry the finished shelf-list to Sable to be set in the Lantern
+    - Walk the basement with him on the first open Thursday
 routine:
   weekday:
     - { at: "07:30", do: eat, where: old_quarter.home_13 }
@@ -65,33 +69,35 @@ routine:
     - { at: "13:30", do: work, where: old_quarter.town_hall }
     - { at: "17:30", do: walk, where: old_quarter.fountain_square }
     - { at: "18:30", do: eat, where: old_quarter.home_13 }
-    - { at: "21:30", do: read, where: old_quarter.home_13 }
-    - { at: "22:30", do: sleep, where: old_quarter.home_13 }
-  weekend:
+    - { at: "20:30", do: read, where: old_quarter.home_13 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_13 }
+  weekend:                       # Sunday: chapel, then he winds the hall clock
     - { at: "08:30", do: eat, where: old_quarter.home_13 }
     - { at: "10:00", do: attend, where: old_quarter.st_brigids }
-    - { at: "11:30", do: walk, where: commons.duck_pond }
+    - { at: "11:30", do: work, where: old_quarter.town_hall }
     - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
     - { at: "15:00", do: read, where: old_quarter.library }
     - { at: "19:00", do: eat, where: old_quarter.home_13 }
     - { at: "22:00", do: sleep, where: old_quarter.home_13 }
-chores: [ Winds the hall clock on Sundays, Writes out the Lantern's notices by hand, Irons the bow ties on Friday ]
+chores: [ wind the Town Hall clock on Sundays, write out the Harvest rota in longhand, iron the bow ties on Friday, dust the minute-book spines ]
 relationships:
-  - { id: pell, affinity: 50, trust: 70, tag: fond, note: Clerk to the mayor; she trusts his discretion. }
-  - {
-      id: hester,
-      affinity: 25,
-      trust: 40,
-      tag: friend,
-      note: Keeps him supplied with weak tea he pretends to enjoy.
-    }
-  - { id: margo, affinity: 20, trust: 45, tag: curious, note: Borrows archive books and argues about dating. }
+  - { id: pell, affinity: 50, trust: 70, tag: fond, note: "Her clerk for years and her archivist since. She asked one thing of him and has never mentioned it again. Wants her to say he may stop, or that he never need." }
+  - { id: hester, affinity: 35, trust: 50, tag: friend, note: "Lives below him and leaves a pot on the landing at half past six, steeped four minutes exactly. Wants to tell her he prefers it weaker, and hasn't dared." }
+  - { id: margo, affinity: 20, trust: 45, tag: curious, note: "Asks for the basement every month and gets the minute books on the reading-room table instead. Wants her to put the request in writing, which she never does." }
+  - { id: sable, affinity: 15, trust: 20, tag: curious, note: "Signs the register at nine each morning and asks for the minute books by year. Wants to know what she is looking for, and is too polite to ask." }
+  - { id: cobb, affinity: 30, trust: 40, tag: friend, note: "Compares minute books with her after chapel and wins on page count. Wants her to date her entries." }
 secrets:
-  - text: He has written a letter to his estranged wife every Christmas for nineteen years and never posted one.
-    reveal: { regard_min: 60 }
-canon_locks: []
-story_role: mentor
+  - text: "Pell asked him once, plainly, to leave the Streetlight Contract folder alone. The drawer's lock has been broken for years, so nothing but his word keeps it shut. He has read every other page in the basement and has never minuted the request."
+    reveal: { regard_min: 55 }
+  - text: "He drafts a reply to Lena's Christmas card every year and files the draft under L. He has never posted one."
+    reveal: { regard_min: 70 }
+canon_locks:
+  - { while: "true", fact: "Dunstan Frye is the council archivist and keeps the key to the Town Hall archive. Pell asked him to leave one file shut; he has never opened it and does not know what is in it." }
+  - { while: "true", fact: "The clerk's post was folded into the mayor's eleven years ago; Pell does the clerk's work now. Frye kept the basement and the key." }
+  - { while: "flag.option_public", fact: "The town now knows what the Streetlight file held. Frye learned it from the town, not from the page, and has still not opened the drawer." }
+story_role: "Council archivist and keeper of the archive key. Has never opened the Streetlight Contract file Pell asked him to leave shut."
 generated_by: model
+curated: true
 household: frye
 archetype: retired_organizer
 employment: employed

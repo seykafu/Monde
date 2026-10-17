@@ -1,10 +1,10 @@
-# Generated (census-v1) for szabo_ilona; curated not yet. Edit here.
+# Generated (census-v1) for szabo_ilona; curated by hand (MVP M-03). Edit here.
 id: ilona
 name: Ilona Szabo
 age: 74
 pronouns: she/her
 kind: resident
-occupation: Retired postmistress, mending clothes for neighbours when asked.
+occupation: Retired postmistress, who mends clothes for neighbours
 workplace: millbrook.home_05
 home: millbrook.home_05
 portrait: lib_f68_013
@@ -21,98 +21,81 @@ look:
   height: short
   outfit: { cut: jumper, top: 8, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: none }
-backstory: Ilona ran the Monde sorting office for thirty-one years, back when the ferry brought the post every
-  morning and the mill whistle set the clocks. She knew every hand on every envelope in town. After the mill
-  closed she moved to Carrow to be near a son who never quite wrote back, and she came home to Millbrook when
-  her husband Tibor died, because the terrace on Row Five was the only place where the kettle always had
-  someone to talk to. Her granddaughter Nettie moved in after a bad winter in Carrow, and they have kept the
-  house warm between them ever since.
+backstory: >
+  Ilona ran the Monde post office for thirty-one years, back when the ferry brought the post every morning and
+  the mill whistle set the clocks. She knew every hand on every envelope in town and kept it to herself. Tibor
+  died the winter the cannery shut. Her son Gideon lives three doors along with Maud and Sol; her granddaughter
+  Nettie lives in the second bedroom and keeps late hours. Ilona counts the coal each morning, mends what she is
+  given, and has never asked what the chalk on Nettie's sleeve is for. She is waiting to be told, and would
+  rather not be.
 personality:
   traits: [ patient, wry, digressive, observant ]
   big5: { open: 55, conscientious: 78, extravert: 42, agreeable: 70, neurotic: 35 }
-values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+values: { prosperity: 0.10, safety: 0.40, spirit: 0.30, charm: 0.20 }
 beliefs:
-  - The post used to come on time and that is the measure of a town.
-  - Nobody in Monde ever asks the right question the first time.
+  - Nettie will tell her when she is ready.   # wrong: Nettie can't; she has stopped trying to find the words
+  - The post used to come on time, and that is the measure of a town.
+  - Handwriting never lies, even when the writer does.
   - Sunday chapel is the one hour the whole street agrees on.
 voice:
-  register: Gentle and rambling on purpose, circling back to earlier points. Remembers prices from forty years
-    ago and quotes them without being asked. Asks questions and then answers them herself.
-  tics: [ Now where was I?, "In my day,", Mind the step. ]
-  never_says: [ that's a shame, you should, honestly, for what it's worth ]
+  register: >
+    Gentle and circling; asks a question and answers it herself. Remembers prices and postmarks from forty
+    years back and quotes them unasked. Post nouns: hatch, postmark, franking, second delivery, parcel string.
+    Goes quiet when a question gets near Nettie.
+  tics: [ "I'd know that hand.", "That was a coin, then." ]
+  never_says: [ you should, honestly, the rota, that's a shame ]
   samples:
-    - Now where was I? Ah, yes, the price of a loaf in 'eighty-one, and you won't believe what the baker said.
-    - Coal's down to a scuttle, love. Don't you go worrying, I counted it twice.
-    - Chapel's at ten. Wear something warm, the pews have never once been dry.
+    - "Is it cold? It's cold. A scuttle of coal was two coins when I started at the hatch, and nobody counted it twice."
+    - "I'd know that hand anywhere. Left-leaning, a hook on the y. I won't say whose, but it's a good hand, whoever's it is."
+    - "Chapel's at ten, and the pews have never been dry. Nettie carries the hymnbook, I carry the cake, and nothing else gets carried."
 birthday: 79
-likes:
-  [
-    knitting by the window,
-    small birds at the feeder,
-    being asked for a story,
-    Nettie's Sunday cake,
-    the ferry's whistle on a clear morning
-  ]
-dislikes:
-  [
-    boys on bicycles with no bells,
-    being called grandma by strangers,
-    a cold stove,
-    unposted letters left on the mantel
-  ]
-fears:
-  [
-    the chapel's candles going out for good,
-    Nettie getting hurt on the cliff path,
-    being forgotten in an empty house
-  ]
+likes: [ knitting, being asked for a story, honey on toast, Nettie's Sunday cake, small birds at the window ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, unposted letters left on the mantel ]
+fears: [ a knock after dark that is not Nettie, the coal running out in February, being told what the rota is for ]
 dream:
-  text: I want someone to eat supper with at my table, not just the wireless.
+  text: Lay the good cloth for a Thursday supper at her own table, with Nettie telling her, unasked, what she does all day.
   stages:
-    - Invite a neighbour round for a Thursday supper and set the good cloth.
-    - Return the invitation at their door before the week is out.
-    - Set a standing Thursday table so the chairs stay warm.
+    - Be invited to a neighbour's supper, and lay the good cloth in return (Regard ≥ 25)
+    - Return the invitation at their own door before the week is out
+    - Set a standing Thursday table, with Nettie's chair at the end
 routine:
   weekday:
     - { at: "07:00", do: eat, where: millbrook.home_05 }
     - { at: "08:30", do: walk, where: millbrook.terrace_row }
     - { at: "09:30", do: shop, where: market_row.general_store }
-    - { at: "11:00", do: read, where: old_quarter.library }
+    - { at: "11:30", do: write, where: millbrook.home_05 }
     - { at: "13:00", do: eat, where: millbrook.home_05 }
-    - { at: "14:00", do: write, where: millbrook.home_05 }
+    - { at: "15:30", do: visit, where: millbrook.home_07 }
     - { at: "16:30", do: socialize, where: millbrook.laundry_green }
     - { at: "18:30", do: cook, where: millbrook.home_05 }
     - { at: "21:30", do: sleep, where: millbrook.home_05 }
-  weekend:
+  weekend:                       # Sunday: chapel with Nettie, then the family at her table
     - { at: "08:00", do: eat, where: millbrook.home_05 }
-    - { at: "10:00", do: attend, where: old_quarter.st_brigids }
-    - { at: "12:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "10:00", do: attend, where: old_quarter.st_brigids, with: [ nettie ] }
+    - { at: "12:00", do: eat, where: millbrook.home_05 }
     - { at: "14:00", do: sit, where: commons.picnic_lawn }
     - { at: "17:00", do: cook, where: millbrook.home_05 }
     - { at: "21:00", do: sleep, where: millbrook.home_05 }
-chores: [ Count the coal and fill the scuttle, Mend Nettie's jumpers, Trim the chapel candles on Saturday ]
+chores: [ count the coal and fill the scuttle, mend what the neighbours bring, trim the chapel candles on Saturday, mend Nettie's jumpers ]
 relationships:
-  - {
-      id: nettie,
-      affinity: 18,
-      trust: 20,
-      tag: granddaughter,
-      note: Granddaughter who keeps late hours and says little.
-    }
-  - {
-      id: maud,
-      affinity: 12,
-      trust: 15,
-      tag: kin,
-      note: Cousin on the other side; they share recipes by post.
-    }
-  - { id: priya, affinity: 15, trust: 20, tag: friend, note: Nurse who checks on Ilona's chest in winter. }
+  - { id: nettie, affinity: 85, trust: 70, tag: kin, note: "Her granddaughter, who keeps late hours and chalk on her sleeves. Wants her to say what the lookout rota is for, and will not ask." }
+  - { id: maud, affinity: 85, trust: 80, tag: kin, note: "Her granddaughter, three doors along, who draws her in the margin of a slate. Saves her the crusts. Wants to see the drawing Maud keeps face down." }
+  - { id: gideon_szabo, affinity: 80, trust: 60, tag: kin, note: "Her son, three doors along, who runs his house on his own. She mends his shirts unasked and he lets her. Wants him to stop counting coins twice in front of her." }
+  - { id: sol_szabo, affinity: 80, trust: 65, tag: kin, note: "Her grandchild, seventeen, whose lessons arrive by post. She checks the franking on every envelope. Wants Sol at her Thursday table." }
+  - { id: ada, affinity: 40, trust: 55, tag: fond, note: "Took over the post across the ticket hatch when the office shut and does it in pencil. Wants to show her how to frank a parcel and not be asked." }
+  - { id: raman, affinity: 40, trust: 45, tag: friend, note: "Sits beside her on the laundry green at half past four and gives her the weather like a wireless announcer. Wants him at her Thursday table." }
+  - { id: priya, affinity: 35, trust: 40, tag: fond, note: "Checks her chest every February and calls it the stairs. Wants her to stay for the tea she brings." }
 secrets:
-  - text: Ilona keeps a jar of birthday candles under the stairs and has never once used them.
-    reveal: { regard_min: 55 }
-canon_locks: []
-story_role: none
+  - text: "She has known since the first winter that the coal money comes from no stall and no shop. She counts the scuttle every morning and has never asked where it comes from, because asking would end it."
+    reveal: { regard_min: 60 }
+  - text: "A jar of birthday candles sits under the stairs, unused. Nobody in the street knows her birthday."
+    reveal: { regard_min: 45 }
+canon_locks:
+  - { while: "true", fact: "Ilona is Nettie's grandmother and Maud's. Nettie lives with her at No. 12 Terrace Row; Maud lives three doors along with Ilona's son Gideon. Ilona goes to chapel with Nettie every Sunday." }
+  - { while: "!flag.tollmen_broken", fact: "Ilona counts the coal every morning and has never asked what Nettie's lookout rota is for." }
+story_role: "Nettie's and Maud's grandmother and the street's retired postmistress. Counts the coal and does not ask; her Thursday supper is a Favor dream."
 generated_by: model
+curated: true
 household: szabo_ilona
 archetype: widowed_elder
 employment: retired

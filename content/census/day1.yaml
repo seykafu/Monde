@@ -1148,7 +1148,8 @@ households:
         first_names: [ Astrid, Mei, Folake, Moira, Malin, Janneke ]
         birthday: 62
         portrait: { source: procedural, look: { kind: human, skin: 5, hair: { style: bun, colour: 2 }, eyes: 4, build: narrow, height: tall, outfit: { cut: pinafore, top: 3, bottom: 11, bottom_style: skirt, shoes: 12, trim: 9 }, accessory: { kind: none } }, tags: { band: elder, presentation: f, skin: 4, skin_word: brown, hair_word: grey, hair_style: bun, attire: [ pinafore ], build: slight, caption: An older woman with grey hair in a bun and a brick-red pinafore. } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 3bb634fffa236292, cost_usd: 0.007699, written_at: 2026-10-17T19:18:26.446Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: ef34060640e3411b, cost_usd: 0.001769, written_at: 2026-10-17T19:49:02.389Z }
   - id: mb_a03
     type: A
     zone: millbrook
@@ -1235,7 +1236,8 @@ households:
         first_names: [ Konrad, Basile, Rufus, Arjun, Armand, Emil ]
         birthday: 14
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: short, colour: 2 }, eyes: 3, build: narrow, height: tall, outfit: { cut: plain, top: 14, bottom: 13, bottom_style: trousers, shoes: 7 }, accessory: { kind: glasses }, glasses: round, face: { moustache: true } }, tags: { band: elder, presentation: m, skin: 5, skin_word: dark brown, hair_word: grey, hair_style: short, attire: [ glasses ], build: slight, caption: "An older man with short grey hair, a grey shirt, round glasses and a moustache." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 56fa2fb30c4d5b46, cost_usd: 0.007669, written_at: 2026-10-17T19:16:04.717Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 3, source: model, input_hash: ece92796bd8c01f3, cost_usd: 0.003856, written_at: 2026-10-17T19:49:38.055Z }
   - id: mb_a06
     type: A
     zone: millbrook
@@ -1264,7 +1266,8 @@ households:
         first_names: [ Constance, Saoirse, Malin, Morwenna, Frida, Philippa ]
         birthday: 25
         portrait: { source: procedural, look: { kind: human, skin: 2, hair: { style: bun, colour: 2 }, eyes: 0, build: narrow, height: short, outfit: { cut: plain, top: 3, bottom: 13, bottom_style: skirt, shoes: 15 }, accessory: { kind: scarf, colour: 10 } }, tags: { band: elder, presentation: f, skin: 3, skin_word: tan, hair_word: grey, hair_style: bun, attire: [ scarf ], build: slight, caption: "An older woman with grey hair in a bun, a brick-red shirt and an olive scarf." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 540f460e8e2665f1, cost_usd: 0.007752, written_at: 2026-10-17T19:16:48.552Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: 6bd54259b998c996, cost_usd: 0.001281, written_at: 2026-10-17T19:49:49.663Z }
   - id: mb_a07
     type: A
     zone: millbrook
@@ -1380,7 +1383,8 @@ households:
         first_names: [ Alys, Kerensa, Ruth, Philippa, Gwendolen, Hedda ]
         birthday: 67
         portrait: { source: procedural, look: { kind: human, skin: 5, hair: { style: bun, colour: 11 }, eyes: 2, build: broad, height: tall, outfit: { cut: coat, top: 8, bottom: 12, bottom_style: skirt, shoes: 15 }, accessory: { kind: glasses }, glasses: heavy }, tags: { band: elder, presentation: f, skin: 4, skin_word: brown, hair_word: salt-and-pepper, hair_style: bun, attire: [ coat, glasses ], build: broad, caption: "An older woman with salt-and-pepper hair in a bun, a plum coat and heavy glasses." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: ae201337d1c75be0, cost_usd: 0.007914, written_at: 2026-10-17T19:16:03.871Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: fdaba244448f252b, cost_usd: 0.001317, written_at: 2026-10-17T19:50:01.776Z }
   - id: mb_a11
     type: A
     zone: millbrook
@@ -1583,7 +1587,8 @@ households:
         first_names: [ Camilla, Hanne, Ulla, Marthe, Irene, Mette ]
         birthday: 69
         portrait: { source: library, id: lib_f84_118 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 62ebcd5d17e52e14, cost_usd: 0.007822, written_at: 2026-10-17T19:14:56.411Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: 0882a75868d46409, cost_usd: 0.001289, written_at: 2026-10-17T19:50:13.262Z }
   - id: mr_a01
     type: A
     zone: market_row
@@ -1612,7 +1617,8 @@ households:
         first_names: [ Yaa, Farida, Elspeth, Adaeze, Adela, Antje ]
         birthday: 24
         portrait: { source: library, id: lib_f76_070 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 97eebe7bd7f8154a, cost_usd: 0.00732, written_at: 2026-10-17T18:53:39.170Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 2, source: model, input_hash: 51ed0fc228670a23, cost_usd: 0.002486, written_at: 2026-10-17T19:50:33.638Z }
   - id: mr_a02
     type: A
     zone: market_row
@@ -1815,7 +1821,8 @@ households:
         first_names: [ Esme, Ulla, Noor, Amara, Ingrid, Ottilie ]
         birthday: 63
         portrait: { source: procedural, look: { kind: human, skin: 1, hair: { style: bob, colour: 11 }, eyes: 2, build: medium, height: short, outfit: { cut: plain, top: 5, bottom: 8, bottom_style: trousers, shoes: 12 }, accessory: { kind: glasses }, glasses: halfmoon }, tags: { band: elder, presentation: f, skin: 2, skin_word: fair, hair_word: salt-and-pepper, hair_style: bob, attire: [ glasses ], build: average, caption: "An older woman with a salt-and-pepper bob, a sky-blue shirt and half-moon glasses." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: bb81239b2f0cf078, cost_usd: 0.007747, written_at: 2026-10-17T19:17:00.913Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: 9adc8fe432d195e7, cost_usd: 0.00131, written_at: 2026-10-17T19:50:46.271Z }
   - id: sh_a03
     type: A
     zone: station_hill
@@ -1844,7 +1851,8 @@ households:
         first_names: [ Imke, Clemency, Anjali, Elin, Philippa, Rosalie ]
         birthday: 8
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: curly, colour: 11 }, eyes: 5, build: narrow, height: tall, outfit: { cut: coat, top: 11, bottom: 1, bottom_style: skirt, shoes: 1 }, accessory: { kind: none } }, tags: { band: elder, presentation: f, skin: 5, skin_word: dark brown, hair_word: salt-and-pepper, hair_style: curly, attire: [ coat ], build: slight, caption: An older woman with salt-and-pepper curls and a rust coat. } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 76e7983b8ad497c4, cost_usd: 0.007547, written_at: 2026-10-17T19:16:59.175Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 4, source: model, input_hash: cd281548cb713dab, cost_usd: 0.00509, written_at: 2026-10-17T19:51:26.432Z }
   - id: mb_b01
     type: B
     zone: millbrook
@@ -1969,6 +1977,7 @@ households:
         first_names: [ Lars, Walter, Obi, Augustin, Fabian, Rasmus ]
         birthday: 58
         portrait: { source: library, id: lib_m71_111 }
+        name_fixed: true
       - slot: m2
         id: cyprian_nowak
         name: Cyprian Nowak
@@ -1988,7 +1997,8 @@ households:
         first_names: [ Cyprian, Fintan, Aksel, Emrys, Einar, Kojo ]
         birthday: 80
         portrait: { source: procedural, look: { kind: human, skin: 8, hair: { style: tufty, colour: 11 }, eyes: 1, build: broad, height: short, outfit: { cut: plain, top: 10, bottom: 2, bottom_style: trousers, shoes: 12 }, accessory: { kind: none }, face: { moustache: true } }, tags: { band: elder, presentation: m, skin: 6, skin_word: deep brown, hair_word: salt-and-pepper, hair_style: tufty, attire: [ shirt ], build: broad, caption: "An older man with tufty salt-and-pepper hair, an olive shirt and a moustache." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: ded0d2a409a28f6f, cost_usd: 0.01222, written_at: 2026-10-17T19:01:31.460Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 3, source: model, input_hash: 03b66be738cbf9d4, cost_usd: 0.006228, written_at: 2026-10-17T19:52:16.190Z }
   - id: mb_b04
     type: B
     zone: millbrook
@@ -2065,6 +2075,7 @@ households:
         first_names: [ Signe, Adela, Malin, Agathe, Mireille, Matilde ]
         birthday: 17
         portrait: { source: library, id: lib_f62_104 }
+        name_fixed: true
       - slot: m2
         id: corentin_frazer
         name: Corentin Frazer
@@ -2084,7 +2095,8 @@ households:
         first_names: [ Corentin, Arjun, Kester, Henrik, Joaquim, Leopold ]
         birthday: 23
         portrait: { source: procedural, look: { kind: human, skin: 7, hair: { style: swept, colour: 2 }, eyes: 4, build: medium, height: tall, outfit: { cut: jumper, top: 12, bottom: 4, bottom_style: trousers, shoes: 13 }, accessory: { kind: none }, face: { moustache: true } }, tags: { band: elder, presentation: m, skin: 3, skin_word: olive, hair_word: grey, hair_style: swept, attire: [ jumper ], build: average, caption: "An older man with grey hair swept back, a rose jumper and a moustache." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 5e1d1ad0cd4ad011, cost_usd: 0.01213, written_at: 2026-10-17T19:03:51.189Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: ab7113351063a27c, cost_usd: 0.012193, written_at: 2026-10-17T19:53:53.125Z }
   - id: mb_b06
     type: B
     zone: millbrook
@@ -2161,6 +2173,7 @@ households:
         first_names: [ Nkechi, Freja, Antje, Abena, Bernadette, Alida ]
         birthday: 49
         portrait: { source: procedural, look: { kind: human, skin: 8, hair: { style: curly, colour: 2 }, eyes: 0, build: medium, height: short, outfit: { cut: coat, top: 9, bottom: 2, bottom_style: skirt, shoes: 3 }, accessory: { kind: none } }, tags: { band: elder, presentation: f, skin: 6, skin_word: deep brown, hair_word: grey, hair_style: curly, attire: [ coat ], build: average, caption: An older woman with grey curls and a cream coat. } }
+        name_fixed: true
       - slot: m2
         id: klara_fairweather
         name: Klara Fairweather
@@ -2180,7 +2193,8 @@ households:
         first_names: [ Klara, Paloma, Aino, Lorna, Nadia, Linnea ]
         birthday: 38
         portrait: { source: procedural, look: { kind: human, skin: 2, hair: { style: curly, colour: 11 }, eyes: 1, build: medium, height: tall, outfit: { cut: pinafore, top: 9, bottom: 5, bottom_style: skirt, shoes: 12, trim: 15 }, accessory: { kind: none } }, tags: { band: elder, presentation: f, skin: 3, skin_word: tan, hair_word: salt-and-pepper, hair_style: curly, attire: [ pinafore ], build: average, caption: An older woman with salt-and-pepper curls and a cream pinafore. } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 4532a55253377459, cost_usd: 0.011985, written_at: 2026-10-17T19:05:25.425Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: af5fc475316ded12, cost_usd: 0.01232, written_at: 2026-10-17T19:55:31.945Z }
   - id: oq_b01
     type: B
     zone: old_quarter
@@ -2209,6 +2223,7 @@ households:
         first_names: [ Gaspard, Halvard, Yusuf, Hector, Viggo, Sander ]
         birthday: 92
         portrait: { source: library, id: lib_m74_038 }
+        name_fixed: true
       - slot: m2
         id: effie_zielinski
         name: Effie Zielinski
@@ -2228,7 +2243,8 @@ households:
         first_names: [ Effie, Elspeth, Romy, Clemency, Bronwen, Ingrid ]
         birthday: 83
         portrait: { source: procedural, look: { kind: human, skin: 4, hair: { style: curly, colour: 8 }, eyes: 7, build: medium, height: tall, outfit: { cut: plain, top: 11, bottom: 10, bottom_style: trousers, shoes: 0 }, accessory: { kind: glasses }, glasses: round }, tags: { band: elder, presentation: f, skin: 1, skin_word: pale, hair_word: white, hair_style: curly, attire: [ glasses ], build: average, caption: "An older woman with white curls, a rust shirt and round glasses." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 05fd48960c157831, cost_usd: 0.012264, written_at: 2026-10-17T18:53:27.644Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: 5966e2fd3b85bf42, cost_usd: 0.002049, written_at: 2026-10-17T19:55:50.486Z }
   - id: oq_b02
     type: B
     zone: old_quarter
@@ -2305,6 +2321,7 @@ households:
         first_names: [ Yusuf, Valentin, Raoul, Arvid, Milan, Aurelio ]
         birthday: 13
         portrait: { source: procedural, look: { kind: human, skin: 8, hair: { style: short, colour: 8 }, eyes: 2, build: narrow, height: tall, outfit: { cut: plain, top: 2, bottom: 4, bottom_style: trousers, shoes: 13 }, accessory: { kind: glasses }, glasses: round }, tags: { band: elder, presentation: m, skin: 6, skin_word: deep brown, hair_word: white, hair_style: short, attire: [ glasses ], build: slight, caption: "An older man with short white hair, a dark brown shirt and round glasses." } }
+        name_fixed: true
       - slot: m2
         id: hilde_sorensen
         name: Hilde Sorensen
@@ -2324,7 +2341,8 @@ households:
         first_names: [ Hilde, Farida, Nadia, Yaa, Esme, Tilde ]
         birthday: 78
         portrait: { source: library, id: lib_f70_110 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: d0fd6cd8db8dd777, cost_usd: 0.012242, written_at: 2026-10-17T18:52:44.683Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: 1e2492d72d17a514, cost_usd: 0.002138, written_at: 2026-10-17T19:56:09.027Z }
   - id: oq_b04
     type: B
     zone: old_quarter
@@ -2449,6 +2467,7 @@ households:
         first_names: [ Zuzanna, Lucette, Una, Camilla, Ayesha, Lise ]
         birthday: 11
         portrait: { source: procedural, look: { kind: human, skin: 7, hair: { style: curly, colour: 11 }, eyes: 0, build: medium, height: tall, outfit: { cut: coat, top: 15, bottom: 7, bottom_style: skirt, shoes: 14 }, accessory: { kind: glasses }, glasses: halfmoon }, tags: { band: elder, presentation: f, skin: 3, skin_word: olive, hair_word: salt-and-pepper, hair_style: curly, attire: [ coat, glasses ], build: average, caption: "An older woman with salt-and-pepper curls, a tan coat and half-moon glasses." } }
+        name_fixed: true
       - slot: m2
         id: fabian_mcallister
         name: Fabian McAllister
@@ -2468,7 +2487,8 @@ households:
         first_names: [ Fabian, Lars, Sefton, Hamish, Kojo, Sven ]
         birthday: 42
         portrait: { source: library, id: lib_m72_014 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: afa1c636bd5db915, cost_usd: 0.012038, written_at: 2026-10-17T18:54:05.071Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: 230318e52c59a15e, cost_usd: 0.002032, written_at: 2026-10-17T19:56:27.477Z }
   - id: mr_b02
     type: B
     zone: market_row
@@ -2977,6 +2997,7 @@ households:
         first_names: [ Walter, Niall, Desmond, Emil, Jerome, Basile ]
         birthday: 98
         portrait: { source: library, id: lib_m53_097 }
+        name_fixed: true
       - slot: m2
         id: annick_olsen
         name: Annick Olsen
@@ -2996,7 +3017,8 @@ households:
         first_names: [ Annick, Rhona, Nerys, Bettina, Effie, Wanda ]
         birthday: 96
         portrait: { source: procedural, look: { kind: human, skin: 9, hair: { style: curly, colour: 2 }, eyes: 3, build: narrow, height: short, outfit: { cut: pinafore, top: 9, bottom: 0, bottom_style: skirt, shoes: 2, trim: 6 }, accessory: { kind: none } }, tags: { band: elder, presentation: f, skin: 4, skin_word: golden brown, hair_word: grey, hair_style: curly, attire: [ pinafore ], build: slight, caption: An older woman with grey curls and a cream pinafore. } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: d4b425c47795d2cb, cost_usd: 0.012243, written_at: 2026-10-17T18:59:55.476Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 2, source: model, input_hash: 52c0b967b50044ac, cost_usd: 0.004159, written_at: 2026-10-17T19:57:02.809Z }
   - id: mb_d01
     type: D
     zone: millbrook
@@ -3025,7 +3047,8 @@ households:
         first_names: [ Greta, Ayesha, Signe, Abena, Lucette, Aino ]
         birthday: 75
         portrait: { source: procedural, look: { kind: human, skin: 6, hair: { style: bob, colour: 5 }, eyes: 0, build: medium, height: tall, outfit: { cut: coat, top: 0, bottom: 0, bottom_style: skirt, shoes: 1 }, accessory: { kind: glasses }, glasses: round }, tags: { band: adult, presentation: f, skin: 1, skin_word: pale, hair_word: sandy blond, hair_style: bob, attire: [ coat, glasses ], build: average, caption: "A woman in her fifties with a sandy blond bob, a teal coat and round glasses." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 3126cfb7783481f8, cost_usd: 0.006999, written_at: 2026-10-17T19:04:45.792Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 2, source: model, input_hash: e10002f4b4d162bf, cost_usd: 0.002448, written_at: 2026-10-17T19:57:22.933Z }
   - id: mb_d02
     type: D
     zone: millbrook
@@ -3141,7 +3164,8 @@ households:
         first_names: [ Florent, Josef, Leopold, Laurent, Ilias, Marius ]
         birthday: 84
         portrait: { source: library, id: lib_m38_064 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: bce7fb7e035228e5, cost_usd: 0.007261, written_at: 2026-10-17T18:50:54.903Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: fdf64459af699002, cost_usd: 0.007324, written_at: 2026-10-17T19:58:16.872Z }
   - id: oq_d02
     type: D
     zone: old_quarter
@@ -3286,7 +3310,8 @@ households:
         first_names: [ Sefton, Nils, Xavier, Joaquim, Anders, Lucien ]
         birthday: 83
         portrait: { source: library, id: lib_m44_090 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 1fd0d0a56b21fd6e, cost_usd: 0.007387, written_at: 2026-10-17T18:58:21.227Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 62e6f256ca837941, cost_usd: 0.007589, written_at: 2026-10-17T19:59:13.773Z }
   - id: wf_d02
     type: D
     zone: wharf
@@ -3373,6 +3398,7 @@ households:
         first_names: [ Benedek, Chinedu, Raoul, Hakon, Desmond, Anatole ]
         birthday: 75
         portrait: { source: procedural, look: { kind: human, skin: 2, hair: { style: swept, colour: 6 }, eyes: 0, build: broad, height: short, outfit: { cut: plain, top: 8, bottom: 15, bottom_style: trousers, shoes: 14 }, accessory: { kind: none }, headwear: { kind: flat_cap, colour: 14 }, face: { moustache: true, stubble: true } }, tags: { band: adult, presentation: m, skin: 3, skin_word: tan, hair_word: chestnut, hair_style: swept, attire: [ flat_cap ], build: broad, caption: "A man in his fifties with chestnut hair swept back, a plum shirt, a grey flat cap and a moustache." } }
+        name_fixed: true
       - slot: m2
         id: anders_ogden
         name: Anders Ogden
@@ -3392,7 +3418,8 @@ households:
         first_names: [ Anders, Magnus, Leif, Cathal, Ruben, Einar ]
         birthday: 85
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: short, colour: 0 }, eyes: 4, build: medium, height: short, outfit: { cut: apron, top: 3, bottom: 3, bottom_style: trousers, shoes: 5 }, accessory: { kind: scarf, colour: 12 } }, tags: { band: adult, presentation: m, skin: 5, skin_word: dark brown, hair_word: dark brown, hair_style: short, attire: [ apron, scarf ], build: average, caption: "A man in his fifties with short dark brown hair, a brick-red apron and a rose scarf." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: a3db7ef12abffe5e, cost_usd: 0.012091, written_at: 2026-10-17T19:09:03.487Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: model, input_hash: b42cbcdad8066fe5, cost_usd: 0.012463, written_at: 2026-10-17T20:00:49.180Z }
   - id: mb_e02
     type: E
     zone: millbrook
@@ -3469,6 +3496,7 @@ households:
         first_names: [ Jakub, Jerome, Otto, Ravi, Omar, Jory ]
         birthday: 58
         portrait: { source: procedural, look: { kind: human, skin: 2, hair: { style: curly, colour: 0 }, eyes: 4, build: narrow, height: tall, outfit: { cut: jumper, top: 7, bottom: 9, bottom_style: trousers, shoes: 9 }, accessory: { kind: none } }, tags: { band: adult, presentation: m, skin: 3, skin_word: tan, hair_word: dark brown, hair_style: curly, attire: [ jumper ], build: slight, caption: A man in his fifties with dark brown curls and a green jumper. } }
+        name_fixed: true
       - slot: m2
         id: efua_drummond
         name: Efua Drummond
@@ -3488,7 +3516,8 @@ households:
         first_names: [ Efua, Sorcha, Janneke, Sinead, Astrid, Kaja ]
         birthday: 51
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: long, colour: 11 }, eyes: 1, build: broad, height: tall, outfit: { cut: jumper, top: 4, bottom: 2, bottom_style: trousers, shoes: 12 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 5, skin_word: dark brown, hair_word: salt-and-pepper, hair_style: long, attire: [ jumper ], build: broad, caption: A woman in her fifties with long salt-and-pepper hair and a mustard jumper. } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 49409cda1b888363, cost_usd: 0.011958, written_at: 2026-10-17T19:08:00.945Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 5a79461b8c5f296a, cost_usd: 0.012148, written_at: 2026-10-17T20:02:25.729Z }
   - id: mb_e04
     type: E
     zone: millbrook
@@ -3757,6 +3786,7 @@ households:
         first_names: [ Hartley, Armand, Edmund, Walter, Kester, Kwame ]
         birthday: 64
         portrait: { source: library, id: lib_m47_010 }
+        name_fixed: true
       - slot: m2
         id: kerry_radford
         name: Kerry Radford
@@ -3776,7 +3806,8 @@ households:
         first_names: [ Kerry, Val, Ash, Morgan, Marley, Marin ]
         birthday: 15
         portrait: { source: library, id: lib_a41_024 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: d53d9aba400e3367, cost_usd: 0.012182, written_at: 2026-10-17T19:00:39.948Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 4bd3b2d344917fc2, cost_usd: 0.012408, written_at: 2026-10-17T20:04:01.864Z }
   - id: wf_e02
     type: E
     zone: wharf
@@ -3853,6 +3884,7 @@ households:
         first_names: [ Ebba, Elke, Dalia, Ruth, Akiko, Magda ]
         birthday: 35
         portrait: { source: library, id: lib_f42_057 }
+        name_fixed: true
       - slot: m2
         id: rohan_forsyth
         name: Rohan Forsyth
@@ -3872,7 +3904,8 @@ households:
         first_names: [ Rohan, Hamish, Mathis, Anders, Klaus, Otto ]
         birthday: 54
         portrait: { source: library, id: lib_m38_063 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: dbf2969e2c1605e9, cost_usd: 0.0113, written_at: 2026-10-17T18:56:47.352Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 41780b61ac5e93ee, cost_usd: 0.01174, written_at: 2026-10-17T20:05:33.217Z }
   - id: sh_e01
     type: E
     zone: station_hill
@@ -4122,6 +4155,7 @@ households:
         first_names: [ Malachy, Alun, Wim, Vidar, Benoit, Sven ]
         birthday: 30
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: swept, colour: 0 }, eyes: 3, build: medium, height: short, outfit: { cut: coat, top: 2, bottom: 10, bottom_style: trousers, shoes: 0 }, accessory: { kind: glasses }, glasses: heavy }, tags: { band: young_adult, presentation: m, skin: 5, skin_word: dark brown, hair_word: dark brown, hair_style: swept, attire: [ coat, glasses ], build: average, caption: "A young man in his twenties with dark brown hair swept back, a dark brown coat and heavy glasses." } }
+        name_fixed: true
       - slot: m2
         id: olwen_wakefield
         name: Olwen Wakefield
@@ -4141,7 +4175,8 @@ households:
         first_names: [ Olwen, Coralie, Beata, Thea, Soraya, Kaja ]
         birthday: 60
         portrait: { source: library, id: lib_f30_084 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 43da713540fee2d2, cost_usd: 0.012672, written_at: 2026-10-17T19:04:23.794Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 2470ec2e6d272f71, cost_usd: 0.013014, written_at: 2026-10-17T20:07:12.809Z }
   - id: oq_i01
     type: I
     zone: old_quarter
@@ -4170,6 +4205,7 @@ households:
         first_names: [ Caspar, Damian, Oskar, Ivo, Halvard, Wim ]
         birthday: 34
         portrait: { source: library, id: lib_m33_053 }
+        name_fixed: true
       - slot: m2
         id: sander_rennick
         name: Sander Rennick
@@ -4189,7 +4225,8 @@ households:
         first_names: [ Sander, Aksel, Emil, Basile, Gunnar, Tomasz ]
         birthday: 82
         portrait: { source: library, id: lib_m22_020 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 5c768d68f11af19d, cost_usd: 0.012004, written_at: 2026-10-17T18:50:34.414Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 2, source: model, input_hash: 9ae34b3dce2fa38c, cost_usd: 0.003837, written_at: 2026-10-17T20:07:44.120Z }
   - id: mb_j01
     type: J
     zone: millbrook
@@ -4419,6 +4456,7 @@ households:
         first_names: [ Linnea, Leila, Fenella, Greta, Lotte, Akiko ]
         birthday: 59
         portrait: { source: library, id: lib_f24_004 }
+        name_fixed: true
       - slot: m2
         id: cecily_talbot
         name: Cecily Talbot
@@ -4438,7 +4476,8 @@ households:
         first_names: [ Cecily, Folake, Tamsin, Nkechi, Clio, Pilar ]
         birthday: 18
         portrait: { source: library, id: lib_f05_001 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: fda5259db5750d22, cost_usd: 0.011766, written_at: 2026-10-17T18:54:03.287Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 1, source: model, input_hash: 978c5b5a5a4dda29, cost_usd: 0.00199, written_at: 2026-10-17T20:08:01.666Z }
   - id: mb_l01
     type: L
     zone: millbrook
@@ -4467,6 +4506,7 @@ households:
         first_names: [ Cordelia, Dorota, Pilar, Heloise, Linnea, Coralie ]
         birthday: 13
         portrait: { source: procedural, look: { kind: human, skin: 7, hair: { style: long, colour: 6 }, eyes: 1, build: medium, height: short, outfit: { cut: jumper, top: 9, bottom: 12, bottom_style: trousers, shoes: 4 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 3, skin_word: olive, hair_word: chestnut, hair_style: long, attire: [ jumper ], build: average, caption: A woman in her thirties with long chestnut hair and a cream jumper. } }
+        name_fixed: true
       - slot: m2
         id: ayesha_soto
         name: Ayesha Soto
@@ -4486,6 +4526,7 @@ households:
         first_names: [ Ayesha, Annick, Fenna, Magda, Agathe, Ebba ]
         birthday: 45
         portrait: { source: procedural, look: { kind: human, skin: 5, hair: { style: braids, colour: 3 }, eyes: 0, build: narrow, height: tall, outfit: { cut: coat, top: 12, bottom: 14, bottom_style: trousers, shoes: 8 }, accessory: { kind: scarf, colour: 11 } }, tags: { band: adult, presentation: f, skin: 4, skin_word: brown, hair_word: black, hair_style: braids, attire: [ coat, scarf ], build: slight, caption: "A woman in her thirties with black braids, a rose coat and a rust scarf." } }
+        name_fixed: true
       - slot: m3
         id: arvid_soto
         name: Arvid Soto
@@ -4505,6 +4546,7 @@ households:
         first_names: [ Arvid, Benedek, Rodrigo, Lucas, Seamus, Tristan ]
         birthday: 86
         portrait: { source: procedural, look: { kind: human, skin: 1, hair: { style: curly, colour: 6 }, eyes: 6, build: medium, height: short, outfit: { cut: dungarees, top: 1, bottom: 1, bottom_style: trousers, shoes: 5, trim: 10 }, accessory: { kind: none }, face: { freckles: true } }, tags: { band: child, presentation: m, skin: 2, skin_word: fair, hair_word: chestnut, hair_style: curly, attire: [ dungarees ], build: average, caption: "A small boy of about seven with chestnut curls, brown dungarees and freckles." } }
+        name_fixed: true
       - slot: m4
         id: raoul_soto
         name: Raoul Soto
@@ -4524,7 +4566,8 @@ households:
         first_names: [ Raoul, Ivo, Olav, Bram, Anatole, Emeka ]
         birthday: 72
         portrait: { source: procedural, look: { kind: human, skin: 0, hair: { style: tufty, colour: 5 }, eyes: 0, build: narrow, height: tall, outfit: { cut: dungarees, top: 14, bottom: 15, bottom_style: trousers, shoes: 2, trim: 11 }, accessory: { kind: none }, face: { freckles: true } }, tags: { band: teen, presentation: m, skin: 2, skin_word: fair, hair_word: sandy blond, hair_style: tufty, attire: [ dungarees ], build: slight, caption: "A boy of about thirteen with tufty sandy blond hair, grey dungarees and freckles." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 69f511d4544ff043, cost_usd: 0.020868, written_at: 2026-10-17T19:07:08.485Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 56902b9bca96a584, cost_usd: 0.020633, written_at: 2026-10-17T20:10:43.482Z }
   - id: wf_l01
     type: L
     zone: wharf
@@ -4553,6 +4596,7 @@ households:
         first_names: [ Liv, Katrien, Matilde, Esme, Celeste, Sabine ]
         birthday: 7
         portrait: { source: library, id: lib_f48_027 }
+        name_fixed: true
       - slot: m2
         id: thora_brodsky
         name: Thora Brodsky
@@ -4572,6 +4616,7 @@ households:
         first_names: [ Thora, Anjali, Lavinia, Tilde, Vera, Clio ]
         birthday: 50
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: ponytail, colour: 3 }, eyes: 1, build: narrow, height: tall, outfit: { cut: coat, top: 8, bottom: 12, bottom_style: trousers, shoes: 14 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 5, skin_word: dark brown, hair_word: black, hair_style: ponytail, attire: [ coat ], build: slight, caption: A woman in her forties with black hair in a ponytail and a plum coat. } }
+        name_fixed: true
       - slot: m3
         id: leonie_brodsky
         name: Leonie Brodsky
@@ -4591,6 +4636,7 @@ households:
         first_names: [ Leonie, Orla, Zofia, Abena, Ebba, Anneke ]
         birthday: 32
         portrait: { source: library, id: lib_f05_042 }
+        name_fixed: true
       - slot: m4
         id: kester_brodsky
         name: Kester Brodsky
@@ -4610,7 +4656,8 @@ households:
         first_names: [ Kester, Nikolai, Olav, Gilles, Rafael, Ludo ]
         birthday: 33
         portrait: { source: library, id: lib_m16_078 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: af507994f1a8f40b, cost_usd: 0.020983, written_at: 2026-10-17T18:58:21.367Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: d5012ff3eea2273c, cost_usd: 0.02106, written_at: 2026-10-17T20:13:26.819Z }
   - id: sh_l01
     type: L
     zone: station_hill
@@ -4639,6 +4686,7 @@ households:
         first_names: [ Ilse, Una, Isolde, Imke, Edda, Heloise ]
         birthday: 43
         portrait: { source: procedural, look: { kind: human, skin: 2, hair: { style: bun, colour: 9 }, eyes: 4, build: medium, height: tall, outfit: { cut: plain, top: 13, bottom: 14, bottom_style: trousers, shoes: 2 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 3, skin_word: tan, hair_word: auburn, hair_style: bun, attire: [ shirt ], build: average, caption: A woman in her forties with auburn hair in a bun and a charcoal shirt. } }
+        name_fixed: true
       - slot: m2
         id: ottilie_verhoeven
         name: Ottilie Verhoeven
@@ -4658,6 +4706,7 @@ households:
         first_names: [ Ottilie, Amara, Clemency, Soraya, Estelle, Aurore ]
         birthday: 25
         portrait: { source: procedural, look: { kind: human, skin: 1, hair: { style: bun, colour: 4 }, eyes: 4, build: narrow, height: short, outfit: { cut: plain, top: 6, bottom: 13, bottom_style: skirt, shoes: 15 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 2, skin_word: fair, hair_word: copper, hair_style: bun, attire: [ skirt ], build: slight, caption: A woman in her thirties with copper hair in a bun and a slate-blue shirt. } }
+        name_fixed: true
       - slot: m3
         id: remy_corbett
         name: Remy Corbett
@@ -4677,6 +4726,7 @@ households:
         first_names: [ Remy, Claude, Sawyer, Nico, Elliot, Glen ]
         birthday: 55
         portrait: { source: library, id: lib_a15_046 }
+        name_fixed: true
       - slot: m4
         id: iain_corbett
         name: Iain Corbett
@@ -4696,7 +4746,8 @@ households:
         first_names: [ Iain, Corentin, Lorcan, Rafael, Matthias, Rufus ]
         birthday: 81
         portrait: { source: library, id: lib_m16_077 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 3d6d68b31ece759a, cost_usd: 0.020788, written_at: 2026-10-17T19:13:23.749Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 6a1b4722d4a44347, cost_usd: 0.020893, written_at: 2026-10-17T20:16:12.979Z }
   - id: wf_m01
     type: M
     zone: wharf
@@ -4792,6 +4843,7 @@ households:
         first_names: [ Elke, Lucinda, Hilde, Gudrun, Anneke, Estelle ]
         birthday: 16
         portrait: { source: procedural, look: { kind: human, skin: 7, hair: { style: bun, colour: 1 }, eyes: 2, build: narrow, height: tall, outfit: { cut: jumper, top: 11, bottom: 12, bottom_style: trousers, shoes: 4 }, accessory: { kind: none }, face: { grey_temples: true } }, tags: { band: adult, presentation: f, skin: 3, skin_word: olive, hair_word: light brown, hair_style: bun, attire: [ jumper ], build: slight, caption: A woman in her forties with light brown hair in a bun and a rust jumper. } }
+        name_fixed: true
       - slot: m2
         id: corin_madsen
         name: Corin Madsen
@@ -4811,6 +4863,7 @@ households:
         first_names: [ Corin, Wynn, Avery, Teagan, Riley, Bryn ]
         birthday: 20
         portrait: { source: procedural, look: { kind: human, skin: 5, hair: { style: cropped, colour: 7 }, eyes: 4, build: narrow, height: tall, outfit: { cut: plain, top: 2, bottom: 13, bottom_style: trousers, shoes: 12 }, accessory: { kind: none } }, tags: { band: adult, presentation: a, skin: 4, skin_word: brown, hair_word: blue-black, hair_style: cropped, attire: [ shirt ], build: slight, caption: A person in their thirties with close-cropped blue-black hair and a dark brown shirt. } }
+        name_fixed: true
       - slot: m3
         id: leila_nesbitt
         name: Leila Nesbitt
@@ -4830,6 +4883,7 @@ households:
         first_names: [ Leila, Ingrid, Oona, Lorna, Selma, Wanda ]
         birthday: 57
         portrait: { source: procedural, look: { kind: human, skin: 4, hair: { style: bun, colour: 11 }, eyes: 0, build: medium, height: tall, outfit: { cut: jumper, top: 8, bottom: 3, bottom_style: skirt, shoes: 2 }, accessory: { kind: none } }, tags: { band: elder, presentation: f, skin: 1, skin_word: pale, hair_word: salt-and-pepper, hair_style: bun, attire: [ jumper ], build: average, caption: An older woman with salt-and-pepper hair in a bun and a plum jumper. } }
+        name_fixed: true
       - slot: m4
         id: hanne_nesbitt
         name: Hanne Nesbitt
@@ -4849,6 +4903,7 @@ households:
         first_names: [ Hanne, Dagny, Malin, Adela, Marthe, Thora ]
         birthday: 97
         portrait: { source: procedural, look: { kind: human, skin: 1, hair: { style: braids, colour: 0 }, eyes: 3, build: narrow, height: short, outfit: { cut: jumper, top: 3, bottom: 5, bottom_style: trousers, shoes: 12 }, accessory: { kind: none } }, tags: { band: teen, presentation: f, skin: 2, skin_word: fair, hair_word: dark brown, hair_style: braids, attire: [ jumper ], build: slight, caption: A girl of about fifteen with dark brown braids and a brick-red jumper. } }
+        name_fixed: true
       - slot: m5
         id: josef_nesbitt
         name: Josef Nesbitt
@@ -4868,7 +4923,8 @@ households:
         first_names: [ Josef, Fintan, Florent, Mattias, Benoit, Adrien ]
         birthday: 78
         portrait: { source: library, id: lib_m09_002 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 318f248aa16a4437, cost_usd: 0.024504, written_at: 2026-10-17T19:11:09.987Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 852444935089605e, cost_usd: 0.024329, written_at: 2026-10-17T20:19:30.753Z }
   - id: mb_n02
     type: N
     zone: millbrook
@@ -4897,6 +4953,7 @@ households:
         first_names: [ Dmitri, Mathis, Tadeusz, Adrien, Maurice, Tomasz ]
         birthday: 47
         portrait: { source: procedural, look: { kind: human, skin: 9, hair: { style: cropped, colour: 3 }, eyes: 4, build: medium, height: tall, outfit: { cut: coat, top: 11, bottom: 14, bottom_style: trousers, shoes: 10 }, accessory: { kind: none }, face: { stubble: true } }, tags: { band: adult, presentation: m, skin: 4, skin_word: golden brown, hair_word: black, hair_style: cropped, attire: [ coat ], build: average, caption: A man in his thirties with close-cropped black hair and a rust coat. } }
+        name_fixed: true
       - slot: m2
         id: anselm_osei
         name: Anselm Osei
@@ -4916,6 +4973,7 @@ households:
         first_names: [ Anselm, Laurent, Kofi, Stig, Mattias, Gilles ]
         birthday: 6
         portrait: { source: procedural, look: { kind: human, skin: 0, hair: { style: short, colour: 0 }, eyes: 5, build: narrow, height: short, outfit: { cut: jumper, top: 8, bottom: 12, bottom_style: trousers, shoes: 14 }, accessory: { kind: none }, face: { moustache: true, stubble: true } }, tags: { band: adult, presentation: m, skin: 2, skin_word: fair, hair_word: dark brown, hair_style: short, attire: [ jumper ], build: slight, caption: "A man in his forties with short dark brown hair, a plum jumper and a moustache." } }
+        name_fixed: true
       - slot: m3
         id: tilde_osei
         name: Tilde Osei
@@ -4935,6 +4993,7 @@ households:
         first_names: [ Tilde, Irene, Carmen, Birgit, Alys, Bernadette ]
         birthday: 80
         portrait: { source: procedural, look: { kind: human, skin: 5, hair: { style: short, colour: 8 }, eyes: 1, build: medium, height: tall, outfit: { cut: jumper, top: 4, bottom: 12, bottom_style: trousers, shoes: 5 }, accessory: { kind: scarf, colour: 2 } }, tags: { band: elder, presentation: f, skin: 4, skin_word: brown, hair_word: white, hair_style: short, attire: [ jumper, scarf ], build: average, caption: "An older woman with short white hair, a mustard jumper and a dark brown scarf." } }
+        name_fixed: true
       - slot: m4
         id: elodie_osei
         name: Elodie Osei
@@ -4954,6 +5013,7 @@ households:
         first_names: [ Elodie, Leonie, Petra, Mina, Silke, Liesel ]
         birthday: 88
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: long, colour: 3 }, eyes: 6, build: medium, height: short, outfit: { cut: jumper, top: 4, bottom: 10, bottom_style: trousers, shoes: 10 }, accessory: { kind: none } }, tags: { band: teen, presentation: f, skin: 5, skin_word: dark brown, hair_word: black, hair_style: long, attire: [ jumper ], build: average, caption: A girl of about seventeen with long black hair and a mustard jumper. } }
+        name_fixed: true
       - slot: m5
         id: alun_osei
         name: Alun Osei
@@ -4973,7 +5033,8 @@ households:
         first_names: [ Alun, Gideon, Pascal, Kenji, Quentin, Egon ]
         birthday: 99
         portrait: { source: procedural, look: { kind: human, skin: 9, hair: { style: short, colour: 3 }, eyes: 6, build: medium, height: short, outfit: { cut: plain, top: 9, bottom: 8, bottom_style: shorts, shoes: 15 }, accessory: { kind: scarf, colour: 3 } }, tags: { band: child, presentation: m, skin: 4, skin_word: golden brown, hair_word: black, hair_style: short, attire: [ scarf ], build: average, caption: "A small boy of about ten with short black hair, a cream shirt and a brick-red scarf." } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 7ad16c4c1d357c09, cost_usd: 0.024811, written_at: 2026-10-17T19:11:16.978Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 15260b5128cac9cc, cost_usd: 0.025022, written_at: 2026-10-17T20:22:50.928Z }
   - id: mb_n03
     type: N
     zone: millbrook
@@ -5002,6 +5063,7 @@ households:
         first_names: [ Pilar, Liv, Saoirse, Leonie, Ottilie, Hanne ]
         birthday: 29
         portrait: { source: procedural, look: { kind: human, skin: 8, hair: { style: bun, colour: 0 }, eyes: 4, build: medium, height: tall, outfit: { cut: coat, top: 9, bottom: 5, bottom_style: skirt, shoes: 11 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 6, skin_word: deep brown, hair_word: dark brown, hair_style: bun, attire: [ coat ], build: average, caption: A woman in her thirties with dark brown hair in a bun and a cream coat. } }
+        name_fixed: true
       - slot: m2
         id: orla_goddard
         name: Orla Goddard
@@ -5021,6 +5083,7 @@ households:
         first_names: [ Orla, Rosamund, Signe, Carmen, Zuzanna, Aline ]
         birthday: 49
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: bun, colour: 3 }, eyes: 6, build: medium, height: tall, outfit: { cut: jumper, top: 1, bottom: 14, bottom_style: trousers, shoes: 8 }, accessory: { kind: none } }, tags: { band: adult, presentation: f, skin: 5, skin_word: dark brown, hair_word: black, hair_style: bun, attire: [ jumper ], build: average, caption: A woman in her thirties with black hair in a bun and a brown jumper. } }
+        name_fixed: true
       - slot: m3
         id: dagny_callan
         name: Dagny Callan
@@ -5040,6 +5103,7 @@ households:
         first_names: [ Dagny, Irene, Leila, Lise, Pernille, Aurore ]
         birthday: 87
         portrait: { source: procedural, look: { kind: human, skin: 9, hair: { style: bun, colour: 8 }, eyes: 6, build: medium, height: short, outfit: { cut: jumper, top: 13, bottom: 6, bottom_style: skirt, shoes: 7 }, accessory: { kind: scarf, colour: 9 } }, tags: { band: elder, presentation: f, skin: 4, skin_word: golden brown, hair_word: white, hair_style: bun, attire: [ jumper, scarf ], build: average, caption: "An older woman with white hair in a bun, a charcoal jumper and a cream scarf." } }
+        name_fixed: true
       - slot: m4
         id: paloma_callan
         name: Paloma Callan
@@ -5059,6 +5123,7 @@ households:
         first_names: [ Paloma, Magda, Liesel, Heloise, Oona, Solveig ]
         birthday: 67
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: bob, colour: 0 }, eyes: 1, build: narrow, height: short, outfit: { cut: plain, top: 8, bottom: 11, bottom_style: skirt, shoes: 5 }, accessory: { kind: none } }, tags: { band: teen, presentation: f, skin: 5, skin_word: dark brown, hair_word: dark brown, hair_style: bob, attire: [ skirt ], build: slight, caption: A girl of about seventeen with a dark brown bob and a plum shirt. } }
+        name_fixed: true
       - slot: m5
         id: svea_callan
         name: Svea Callan
@@ -5078,7 +5143,8 @@ households:
         first_names: [ Svea, Rosalie, Delia, Klara, Mina, Thea ]
         birthday: 44
         portrait: { source: procedural, look: { kind: human, skin: 3, hair: { style: braids, colour: 3 }, eyes: 6, build: medium, height: short, outfit: { cut: pinafore, top: 4, bottom: 5, bottom_style: skirt, shoes: 2, trim: 5 }, accessory: { kind: none } }, tags: { band: teen, presentation: f, skin: 5, skin_word: dark brown, hair_word: black, hair_style: braids, attire: [ pinafore ], build: average, caption: A girl of about fifteen with black braids and a mustard pinafore. } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: fbf62768a3c6cc65, cost_usd: 0.024902, written_at: 2026-10-17T19:09:57.593Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: da92bcf9c98bfcec, cost_usd: 0.024774, written_at: 2026-10-17T20:26:07.960Z }
   - id: wf_n01
     type: N
     zone: wharf
@@ -5107,6 +5173,7 @@ households:
         first_names: [ Bram, Ruben, Sander, Dorian, Pascal, Tariq ]
         birthday: 17
         portrait: { source: procedural, look: { kind: human, skin: 6, hair: { style: tufty, colour: 9 }, eyes: 6, build: broad, height: short, outfit: { cut: jumper, top: 14, bottom: 10, bottom_style: trousers, shoes: 4 }, accessory: { kind: scarf, colour: 6 }, face: { moustache: true } }, tags: { band: adult, presentation: m, skin: 1, skin_word: pale, hair_word: auburn, hair_style: tufty, attire: [ jumper, scarf ], build: broad, caption: "A man in his forties with tufty auburn hair, a grey jumper, a slate-blue scarf and a moustache." } }
+        name_fixed: true
       - slot: m2
         id: marthe_demir
         name: Marthe Demir
@@ -5126,6 +5193,7 @@ households:
         first_names: [ Marthe, Sunita, Mette, Emmeline, Seren, Bettina ]
         birthday: 90
         portrait: { source: library, id: lib_f39_086 }
+        name_fixed: true
       - slot: m3
         id: mei_lindgren
         name: Mei Lindgren
@@ -5145,6 +5213,7 @@ households:
         first_names: [ Mei, Gudrun, Klara, Leila, Bernadette, Yara ]
         birthday: 77
         portrait: { source: library, id: lib_f76_069 }
+        name_fixed: true
       - slot: m4
         id: olav_lindgren
         name: Olav Lindgren
@@ -5164,6 +5233,7 @@ households:
         first_names: [ Olav, Leif, Ewan, Marek, Arvid, Egon ]
         birthday: 73
         portrait: { source: library, id: lib_m09_043 }
+        name_fixed: true
       - slot: m5
         id: meera_lindgren
         name: Meera Lindgren
@@ -5183,7 +5253,8 @@ households:
         first_names: [ Meera, Liv, Frida, Lucinda, Bronwen, Sinead ]
         birthday: 24
         portrait: { source: procedural, look: { kind: human, skin: 1, hair: { style: bob, colour: 0 }, eyes: 2, build: narrow, height: short, outfit: { cut: plain, top: 12, bottom: 8, bottom_style: trousers, shoes: 9 }, accessory: { kind: none } }, tags: { band: child, presentation: f, skin: 2, skin_word: fair, hair_word: dark brown, hair_style: bob, attire: [ shirt ], build: slight, caption: A small girl of about five with a dark brown bob and a rose shirt. } }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 6a480900edc5bce1, cost_usd: 0.024162, written_at: 2026-10-17T19:01:31.581Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: bf60ce0db396cb50, cost_usd: 0.024218, written_at: 2026-10-17T20:29:18.839Z }
   - id: oq_p01
     type: P
     zone: old_quarter
@@ -5212,6 +5283,7 @@ households:
         first_names: [ Hana, Brigitte, Camilla, Thea, Rosamund, Carmen ]
         birthday: 26
         portrait: { source: procedural, look: { kind: human, skin: 2, hair: { style: braids, colour: 11 }, eyes: 6, build: narrow, height: short, outfit: { cut: plain, top: 2, bottom: 5, bottom_style: trousers, shoes: 5 }, accessory: { kind: glasses }, glasses: heavy }, tags: { band: adult, presentation: f, skin: 3, skin_word: tan, hair_word: salt-and-pepper, hair_style: braids, attire: [ glasses ], build: slight, caption: "A woman in her fifties with salt-and-pepper braids, a dark brown shirt and heavy glasses." } }
+        name_fixed: true
       - slot: m2
         id: lucas_okonjo
         name: Lucas Okonjo
@@ -5231,7 +5303,8 @@ households:
         first_names: [ Lucas, Raoul, Corentin, Egon, Tristan, Wilfred ]
         birthday: 42
         portrait: { source: library, id: lib_m86_119 }
-    generation: { prompt: census-v1, attempts: 6, source: template, input_hash: 3a7e7d1e11ab2f99, cost_usd: 0.013001, written_at: 2026-10-17T19:15:38.297Z }
+        name_fixed: true
+    generation: { prompt: census-v1, attempts: 6, source: model, input_hash: b103d27990d1d406, cost_usd: 0.012989, written_at: 2026-10-17T20:31:00.520Z }
 links:
   - { a: barney, b: nell, tag: kin, note: "Brother and sister (§12.4: Nell's brother).", source: pin }
   - { a: maud, b: nettie, tag: kin, note: Cousins (§12.4)., source: pin }

@@ -4,15 +4,15 @@ name: Camilla Kelleher
 age: 83
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired seamstress, mends for the street when asked.
 workplace: old_quarter.home_04
 home: old_quarter.home_04
 portrait: lib_f84_118
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: camilla_kelleher
-appearance: A tiny, very old woman with wispy hair dyed auburn escaping a red knitted hat that looks
-  suspiciously like a tea cosy, half-moon glasses on a chain and a sky-blue cardigan over a crocheted collar.
-  A twinkling, mischievous, I'll-outlive-you-all look.
+appearance: A tiny, very old woman with auburn-dyed hair escaping a red knitted hat, half-moon glasses on a
+  chain, and a sky-blue cardigan over a crocheted collar. Her eyes twinkle whenever she thinks someone is
+  about to be foolish.
 look:
   kind: human
   skin: 2
@@ -24,58 +24,93 @@ look:
   accessory: { kind: glasses }
   glasses: halfmoon
   headwear: { kind: knit_cap, colour: 3 }
-backstory: "Camilla came to Monde from Ashby Lock 37 years ago and is retired now. What she wants most is
-  plain enough: someone to eat supper with."
+backstory: Camilla sewed hems and wedding dresses in Carrow for twenty years before a bad winter cost her the
+  shop lease. She came to Monde at 46 on the Gannet with one trunk and a sewing machine she still uses. She
+  taught half the girls on Well Row to hem a skirt, and she says the mill would have had her if the mill had
+  lasted. Her husband Tom left her in the second year, and she never bothered to be cross about it. She keeps
+  a tin of buttons from every coat she ever altered and will not say why.
 personality:
-  traits: [ warm, curious, dreamy ]
-  big5: { open: 79, conscientious: 25, extravert: 35, agreeable: 70, neurotic: 85 }
-values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+  traits: [ teasing, patient, stubborn, warm ]
+  big5: { open: 62, conscientious: 70, extravert: 55, agreeable: 68, neurotic: 30 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.25, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everyone on this street is too thin for the weather.
+  - Nobody reads the Lantern properly anymore.
+  - The clocktower stopped the year I stopped waiting for a better job.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Gentle and rambling on purpose, circling back to earlier points. She remembers old prices and
+    comments on them. She speaks in full sentences with long pauses.
+  tics: [ Now where was I?, "In my day,", Mind the step ]
+  never_says: [ stuff like that, whatever, no offence ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Oh yes, a good wool coat cost less than a loaf of bread in my first year here.
+    - Sit down, love, the kettle's on. You look like you've walked all the way from Carrow.
+    - I'll outlive the lot of you, mark my words, and I'll have the last biscuit too.
 birthday: 69
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ knitting, small birds at the window, being asked for a story, the smell of cut cloth, Lantern Night ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    loud radio in the mornings
+  ]
+fears: [ the stove going out in winter, being forgotten by the street ]
 dream:
-  text: Someone to eat supper with
+  text: Finish the quilt she started for the town, stitched from scraps that each carry someone's story.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Gather scraps from five residents, each with a story to tell.
+    - Sew at the library table through the long afternoons.
+    - Hang the finished quilt at the Harvest Supper for everyone to see.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: old_quarter.home_04 }
-    - { at: "09:30", do: walk, where: wharf.breakwater }
-    - { at: "12:00", do: eat, where: old_quarter.home_04 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: old_quarter.home_04 }
-    - { at: "19:30", do: read, where: old_quarter.home_04 }
+    - { at: "07:00", do: eat, where: old_quarter.home_04 }
+    - { at: "08:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "10:00", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: sit, where: commons.duck_pond }
+    - { at: "17:00", do: socialize, where: market_row.general_store }
+    - { at: "19:00", do: eat, where: old_quarter.home_04 }
     - { at: "21:30", do: sleep, where: old_quarter.home_04 }
   weekend:
     - { at: "08:00", do: eat, where: old_quarter.home_04 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: old_quarter.home_04 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: socialize, where: commons.picnic_lawn }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: write, where: old_quarter.home_04 }
+    - { at: "18:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "20:00", do: eat, where: old_quarter.home_04 }
     - { at: "22:00", do: sleep, where: old_quarter.home_04 }
-chores: [ water the window box, wind the clock ]
+chores: [ Mend a neighbour's coat on Thursdays, Trim the candles at St Brigid's, Wind wool for the Saturday stall ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: fenna_renard,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Fenna swaps mending jobs and gossip with her.
+    }
+  - {
+      id: hilde_sorensen,
+      affinity: 6,
+      trust: 4,
+      tag: curious,
+      note: Hilde borrows her knitting patterns and never returns them.
+    }
+  - {
+      id: effie_zielinski,
+      affinity: -4,
+      trust: 2,
+      tag: wary,
+      note: Effie talks too loudly across the street.
+    }
+secrets:
+  - text: She still has the first wedding veil she ever sewed and keeps it folded in a drawer under her spare
+      stockings.
+    reveal: { regard_min: 55 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: volunteer
+generated_by: model
 household: oq_a05
 archetype: widowed_elder
 employment: retired

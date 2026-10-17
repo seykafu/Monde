@@ -1,10 +1,10 @@
-# Generated (census-v1) for calloway; curated not yet. Edit here.
+# Generated (census-v1) for calloway; curated by hand (MVP M-03). Edit here.
 id: dom
 name: Dom Calloway
 age: 21
 pronouns: he/him
 kind: resident
-occupation: Tollman
+occupation: Tollman; does the talking at the till
 workplace: briar_woods.tollmen_hideout
 home: wharf.home_bunkhouse
 portrait: lib_m26_050
@@ -21,60 +21,77 @@ look:
   height: tall
   outfit: { cut: coat, top: 6, bottom: 2, bottom_style: trousers, shoes: 13 }
   accessory: { kind: scarf, colour: 4 }
-backstory: "Dom came to Monde from Carrow 3 years ago and works as Tollman. What he wants most is plain
-  enough: be good at one thing."
+backstory: >
+  Dom left Marrow Quay at eighteen with his twin, a cousin and one suitcase, and has talked his way into every
+  shop on Market Row since. Dex draws the Saturday round; Dom does the till. He learns the shopkeeper's first
+  name, the children's names and what the rain did to the roof, and the twenty is in the tray before the word
+  is said. He can't lie to a child, which he tells as a joke. He and Dex drum on an oil drum with wooden
+  spoons, not quite together, and Dom has begun to want a proper drum and a place where the noise is the point.
 personality:
-  traits: [ proud, brisk, curious ]
-  big5: { open: 25, conscientious: 35, extravert: 25, agreeable: 53, neurotic: 28 }
-values: { prosperity: 0.15, safety: 0.1, spirit: 0.25, charm: 0.5 }
+  traits: [ jokey, warm, restless, soft ]
+  big5: { open: 70, conscientious: 30, extravert: 88, agreeable: 70, neurotic: 35 }
+values: { prosperity: 0.15, safety: 0.10, spirit: 0.35, charm: 0.40 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everyone pays quicker when they're laughing.   # wrong: they pay quicker when they want him gone
+  - Odile will smile by the Harvest Supper if he keeps at it.   # wrong: she doesn't smile for the crew
+  - Dex has the plan and Dom has the town, and that is a fair split.
+  - Nobody ever asks a man with an oil drum who he works for.
 voice:
-  register: Easy and ironic. Tells stories that start well and trail off. Answers a question with a question.
-  tics: [ Plans? ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Jokey and over-long: takes the scenic road to every point and comes back by the same one. Banter for
+    shopkeepers, plain talk for children. Rounds compliments up. Counter nouns: till, tray, bell, tab, change.
+  tics: [ "Cross my heart.", "Fair's fair.", "Funny you should ask." ]
+  never_says: [ protection, no worries, or else, awesome ]
   samples:
-    - Plans? Who's been talking about plans.
-    - There was this fellow in Port Sallow, right, with a goat. Anyway.
-    - Breakfast's free if you look hungry enough. I look hungry.
+    - "Lovely morning, and the till's looking well. Twenty, please, and not a word about the weather, which for me is a record."
+    - "I can't lie to a kid. Tried it once. She looked at me until the truth fell out, then asked for a biscuit."
+    - "Dex says I talk too much. Dex says this in ninety words, so I'm not sure he's the authority."
 birthday: 4
-likes: [ free breakfast, high places, strangers' stories ]
-dislikes: [ being asked their plan, paperwork, rain on a borrowed coat ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ strangers' stories, free breakfast, a drum with a proper skin, the first laugh of a Saturday, anything sweet ]
+dislikes: [ silence after the till closes, being asked who he works for, wet spoons, a joke explained ]
+fears: [ the silence after the till shuts, a child asking him a straight question ]
 dream:
-  text: Be good at one thing
+  text: Drum at the first concert on the rebuilt bandstand, with a proper kit, and hear the Commons clap for the noise.
   stages:
-    - Try three jobs in a week
-    - Choose the one that stuck
-    - Tell someone out loud that you're staying
+    - Bring June a spoons-and-drum rhythm to try on the bandstand steps (Regard ≥ 25 with June)
+    - Find him a proper drum, or a barrel to make one from
+    - Be there when the rebuilt bandstand plays its first concert (needs flag.bandstand_rebuilt)
 routine:
   weekday:
     - { at: "07:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "08:30", do: work, where: briar_woods.tollmen_hideout }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: briar_woods.tollmen_hideout }
+    - { at: "08:30", do: wander, where: market_row.market_street }
+    - { at: "10:30", do: visit, where: wharf.fish_market }
+    - { at: "12:30", do: eat, where: market_row.bakery }
+    - { at: "14:00", do: play_music, where: briar_woods.tollmen_hideout }
     - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_bunkhouse }
-    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: wharf.home_bunkhouse }
     - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
-chores: [ water the window box, fill the coal scuttle ]
+  weekend:                       # Saturday: the round, and the talking. Sunday there is no round
+    - { at: "07:30", do: eat, where: wharf.home_bunkhouse }
+    - { at: "08:45", do: work, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: briar_woods.tollmen_hideout }
+    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "17:00", do: play_music, where: briar_woods.tollmen_hideout }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: wharf.home_bunkhouse }
+chores: [ fill the coal scuttle, water the window box, learn one shopkeeper's children's names a week, practise the spoon rhythm on the bunkhouse table ]
 relationships:
-  - { id: rook, affinity: 30, trust: 30, tag: fond, note: Known for years. }
   - { id: dex, affinity: 70, trust: 70, tag: twin, note: Same house. }
   - { id: amara_borowski, affinity: 70, trust: 70, tag: cousin, note: Same house. }
-secrets: []
-canon_locks: []
-story_role: none
+  - { id: rook, affinity: 55, trust: 45, tag: fond, note: "Boss. Can't stop him joking at the till and has stopped trying. Wants Rook to laugh once on a Saturday and see what it does to the round." }
+  - { id: odile, affinity: 20, trust: 5, tag: wary, note: "Has not got one smile out of her in a hundred and thirty Saturdays, and keeps the count. Wants one, and would take a Hm." }
+  - { id: june, affinity: 30, trust: 20, tag: curious, note: "Listens from the rail when she plays the bandstand steps to nobody, and has never let her see him. Wants to ask if he can bring a spoon." }
+secrets:
+  - text: "A girl on Terrace Row once asked him straight out whether he was a bad man. He said 'Saturdays, a bit,' because he can't lie to a child. He has thought about the answer every day since."
+    reveal: { regard_min: 40 }
+  - text: "He has lost to Dex at cards every Sunday for three years, on purpose, because Dex hates to be behind on a plan. Dex has never noticed."
+    reveal: { regard_min: 55 }
+canon_locks:
+  - { while: "!flag.tollmen_broken", fact: "Dom is a Tollman. On the Saturday round he does the talking at the till, and he can't lie to a child." }
+  - { while: "true", fact: "Dom and Dex Calloway are twins, 21, who came from Marrow Quay three years ago and share the old cannery bunkhouse with their cousin Amara Borowski. They drum on an oil drum with wooden spoons." }
+story_role: "Tollman who does the talking at the till; twin of Dex. Quarry fight (S13, with Dex). Wants to drum at the bandstand's first concert (a quit condition, §7.7)."
 generated_by: template
+curated: true
 household: calloway
 archetype: drifter
 employment: employed

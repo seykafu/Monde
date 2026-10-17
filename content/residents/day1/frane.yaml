@@ -1,18 +1,17 @@
-# Generated (census-v1) for frane; curated not yet. Edit here.
+# Generated (census-v1) for frane; curated by hand (MVP M-03). Edit here.
 id: frane
 name: Dolores "Dolly" Frane
 age: 61
 pronouns: she/her
 kind: resident
-occupation: Retired repairer of wirelesses and clocks, tinkering from a back room.
+occupation: Retired wireless and clock repairer who still mends for neighbours
 workplace: market_row.home_04
 home: market_row.home_04
 portrait: lib_f62_103
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: frane
 appearance: A brisk woman with close-cropped white hair, reading glasses pushed up on her head and a navy
-  blazer with a round enamel committee badge on the lapel. She always wears her darning mushroom tucked in one
-  pocket.
+  blazer with a round enamel badge on the lapel. A small screwdriver always rides in her breast pocket.
 look:
   kind: human
   skin: 3
@@ -23,47 +22,43 @@ look:
   outfit: { cut: coat, top: 6, bottom: 13, bottom_style: skirt, shoes: 13 }
   accessory: { kind: none }
   glasses: on_head
-backstory: Dolly spent thirty years repairing wirelesses and church clocks for a firm in Hessle Cross, where
-  she was known for fixing sets nobody else would touch. When the firm folded she came home to Monde, where
-  she was born, and took the back room on Lower Row because it had a window that caught the morning light for
-  her bench. She still feels guilty about leaving her sister's family behind in Carrow, and she writes to them
-  every second Sunday without fail. She is certain the town's wirelesses could be repaired and returned to
-  every house if only people would bring them in, though most residents have quietly stopped listening at all.
+backstory: >
+  Dolly was born in the house on Lower Row where her father mended bicycles and wirelesses, and has had a bench
+  in its back room since she was fourteen. She spent thirty years repairing sets and church clocks for a firm
+  in Hessle Cross, home on Saturdays, and came back for good when the firm folded. She mends whatever is
+  brought round and is paid in tea, cake or nothing. Most of the town has quietly stopped listening, and she
+  minds. Her sister across the bay writes that she should come to Carrow; Dolly writes back every second
+  Sunday and never says no.
 personality:
   traits: [ practical, stubborn, precise, dry, loyal ]
   big5: { open: 45, conscientious: 85, extravert: 40, agreeable: 50, neurotic: 30 }
-values: { prosperity: 0.2, safety: 0.15, spirit: 0.35, charm: 0.3 }
+values: { prosperity: 0.20, safety: 0.15, spirit: 0.35, charm: 0.30 }
 beliefs:
   - A broken thing just needs someone patient enough to find the fault.
-  - Monde's clocks would run again if people stopped waiting for permission.
-  - Most folk here would rather shout than listen.
+  - Most folk would rather shout than listen.
+  - Nobody would come to a Listening Night.   # wrong: they would, if the set came to them
+  - The Hall's old set only wants one valve and an invitation.
 voice:
-  register: Clipped and practical, she explains things with plumbing metaphors and checks her own sentences as
-    she goes. She is warmer in writing than in person, and her humour is small and dry.
-  tics: [ "Hold this. No, the other this.", "Mm, that's the fault.", "Well, there it is." ]
-  never_says: [ I'm sorry for your trouble, that's just how it is, feelings, bless your heart ]
+  register: >
+    Clipped and practical, murmuring to the set under her hands more than to you. Explains with plumbing:
+    pressure, pipe, valve, leak. Warmer in writing than aloud. Small dry jokes, delivered to the back of a
+    radio.
+  tics: [ "Give it a minute to warm.", "Don't touch the dial.", "Hush a moment." ]
+  never_says: [ it's only a radio, that's just how it is, bless your heart, feelings ]
   samples:
-    - Hold this. No, the other this. There, see? It was the valve all along.
-    - I don't need a hammer, love. I need you to stop jiggling the set.
-    - Mm, that's the fault. Took me half an hour to find it, which is embarrassing.
+    - "Give it a minute to warm. Nothing worth hearing speaks the second you ask. There. That's the shipping forecast, faint as a mouse."
+    - "Don't touch the dial, love. It's a pipe. The signal's the water, and you're shaking the hose."
+    - "A loose wire and a bad temper, that set. The wire I fixed. The temper stays with the owner."
 birthday: 85
-likes:
-  [
-    a hot soldering iron,
-    a fault found,
-    patient audiences,
-    the smell of warm valves,
-    evening shipping forecasts
-  ]
+likes: [ a hot soldering iron, a fault found, patient audiences, brass offcuts for clock wheels, the evening shipping forecast ]
 dislikes: [ it's only a radio, static in the evening, being handed a hammer, people who fidget at the bench ]
-fears: [ that the last working clock will stop for good, losing her steady hands ]
+fears: [ the last working clock in Monde stopping for good, her hands losing their steadiness before the Hall set is fixed ]
 dream:
-  text: Dolly wants one wireless set working well enough to carry the evening shipping forecast into the Gull &
-    Anchor, so the whole pub can hear…
+  text: Get one wireless working well enough to carry the evening shipping forecast through the Gull & Anchor, so the whole pub listens.
   stages:
-    - Fix the Hall's old set before the spring fair.
-    - Tune the evening shipping forecast for the pub on a Friday.
-    - Hold the first Listening Night and invite everyone who ever stopped listening.
+    - Fix the Town Hall's old set before the Bloom Fair (Regard ≥ 25)
+    - Tune the evening shipping forecast for the pub on a Friday
+    - Hold the first Listening Night and invite everyone who stopped listening
 routine:
   weekday:
     - { at: "07:30", do: eat, where: market_row.home_04 }
@@ -71,47 +66,37 @@ routine:
     - { at: "10:30", do: shop, where: market_row.general_store }
     - { at: "12:00", do: eat, where: market_row.cafe_liss }
     - { at: "13:30", do: tinker, where: market_row.home_04 }
-    - { at: "16:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "15:00", do: tinker, where: market_row.gull_and_anchor }        # Roz lets her tune the pub's set on quiet afternoons
     - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
     - { at: "21:30", do: read, where: market_row.home_04 }
     - { at: "22:30", do: sleep, where: market_row.home_04 }
-  weekend:
+  weekend:                       # every second Sunday she writes to her sister
     - { at: "08:30", do: eat, where: market_row.home_04 }
     - { at: "09:30", do: walk, where: commons.duck_pond }
     - { at: "11:00", do: shop, where: market_row.market_hall }
     - { at: "13:00", do: eat, where: market_row.cafe_liss }
     - { at: "15:00", do: tinker, where: market_row.home_04 }
+    - { at: "16:30", do: write, where: market_row.home_04 }
     - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: market_row.home_04 }
-chores:
-  [
-    Mends wirelesses for anyone who brings one round,
-    Winds the back-room clocks each Sunday,
-    Writes to her sister in Carrow every second Sunday
-  ]
+chores: [ mend wirelesses for anyone who brings one round, wind the back-room clocks each Sunday, write to her sister across the bay every second Sunday, dust the valves ]
 relationships:
-  - {
-      id: rosalind,
-      affinity: 12,
-      trust: 8,
-      tag: friend,
-      note: Rosalind lets her tune the pub set on quiet afternoons.
-    }
-  - {
-      id: pell,
-      affinity: -4,
-      trust: 2,
-      tag: wary,
-      note: Edwina keeps asking her to fix the Hall set for free.
-    }
-  - { id: nell, affinity: 6, trust: 5, tag: curious, note: Nell brings her bent fish-market scales to mend. }
+  - { id: rosalind, affinity: 35, trust: 40, tag: friend, note: "Lets her tune the pub's set on quiet afternoons and never asks what it costs. Wants her to switch it on at six, and leave it on." }
+  - { id: hollis, affinity: 35, trust: 45, tag: friend, note: "Mends the wireless he sets his watch by. He pays exact change and says 'two seconds fast'. Wants him to hear a whole shipping forecast, once." }
+  - { id: pell, affinity: -5, trust: 5, tag: wary, note: "Has asked her three times to look at the Hall set and calls it a favour. Wants to be asked in person, with the valve's price named." }
+  - { id: nell, affinity: 20, trust: 25, tag: curious, note: "Brings her bent fish-market scales to mend and argues the price down to a biscuit. Wants to know who else on the Wharf still has a set." }
+  - { id: philippa_pascoe, affinity: 30, trust: 30, tag: friend, note: "Her neighbour on Lower Row, who trades cake for wireless repairs. Wants her to say what the pub's kitchen listens to." }
+  - { id: soren_falk, affinity: 30, trust: 35, tag: friend, note: "Brings her the crossword; she mends his set without being asked. Wants him to stop saying it works fine." }
 secrets:
-  - text: She has kept a half-built crystal set in a biscuit tin since she arrived, hoping to hear one station she
-      used to love.
-    reveal: { regard_min: 55 }
-canon_locks: []
-story_role: mentor
+  - text: "She built a crystal set into a toffee tin and has caught a faint voice from Carrow three Sundays running. She has told no one, in case telling stops it."
+    reveal: { regard_min: 50 }
+  - text: "Her father's last repair still sits on the top shelf, mended and unclaimed for nineteen years. She switches it on every Sunday so the valves won't forget."
+    reveal: { regard_min: 65 }
+canon_locks:
+  - { while: "true", fact: "Dolly Frane, 61, mends wirelesses and clocks from a back room on Lower Row, Market Row, in the house where she was born. She is retired and takes payment in tea, cake or nothing." }
+story_role: "Day-1 oddball (A.1.5): the radio and clock tinkerer on Market Row. Dream: one working wireless for the whole pub, and a first Listening Night."
 generated_by: model
+curated: true
 household: frane
 archetype: radio_tinkerer
 employment: retired

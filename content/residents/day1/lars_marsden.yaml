@@ -4,15 +4,14 @@ name: Lars Marsden
 age: 64
 pronouns: he/him
 kind: resident
-occupation: stallholder
+occupation: Stallholder selling buttons and ribbon on market days
 workplace: market_row.market_street
 home: millbrook.home_01
 portrait: lib_m71_111
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: lars_marsden
-appearance: A dapper man with close-cropped iron-grey hair, a neat iron-grey beard, round gold-rimmed
-  spectacles, a red bow tie and a camel raincoat over a cardigan. A gentle, courtly, slightly mischievous
-  look.
+appearance: A dapper man with close-cropped iron-grey hair and a neat grey beard, round gold spectacles and a
+  red bow tie. He wears a camel raincoat over a cardigan with leather buttons.
 look:
   kind: human
   skin: 3
@@ -24,57 +23,95 @@ look:
   accessory: { kind: glasses }
   glasses: round
   face: { moustache: true, stubble: true }
-backstory: "Lars was born in Monde and works as stallholder. What he wants most is plain enough: a bench with a view."
+backstory: Lars was born in the Millbrook terraces and his father was a loom-setter at the mill. He kept the
+  books for a draper's on Market Row until the shop shut, then took a stall on Saturdays selling notions he
+  buys wholesale from Carrow. He still counts the Mill's old wage bells in his head when the church clock is
+  silent. He has told Cyprian for forty years that he never liked the sea, which is untrue; he simply prefers
+  to watch it from a bench. He stayed because the terraces are where his mother's sewing box still sits on the
+  windowsill.
 personality:
-  traits: [ practical, stubborn, warm ]
-  big5: { open: 59, conscientious: 48, extravert: 76, agreeable: 61, neurotic: 21 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ courtly, precise, teasing, stubborn ]
+  big5: { open: 45, conscientious: 78, extravert: 62, agreeable: 66, neurotic: 38 }
+values: { prosperity: 0.15, safety: 0.35, spirit: 0.15, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everything fixed in Monde can be fixed with a good needle and patience.
+  - The Tollmen only want what is owed to them.
+  - Cyprian has never once been on time.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Measured and courteous, with small precise corrections and a dry lift at the end of sentences. He
+    enjoys a well-placed understatement.
+  tics: [ "Don't we, dear?", Quite so., If you'll permit me ]
+  never_says: [ sorry for your trouble, that's a bit much, whatever you like ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Two buttons for a coin, though I'm told we don't say coin. Coins, then. Two for a coin, and a ribbon
+      thrown in.
+    - The Gannet's late again, Cyprian. Don't we, dear? Still, I'd rather wait for a boat than for the Tollmen.
+    - I've mended that coat three times. A fourth won't hurt it, and it won't hurt me either.
 birthday: 58
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    a morning paper,
+    a kettle on the stove,
+    the cardigan with leather buttons,
+    Saturday market chatter,
+    Cyprian's bad jokes
+  ]
+dislikes: [ stairs, drafts, being managed, wet shoes, loud music before noon ]
+fears: [ the last stall closing, being forgotten on the terrace ]
 dream:
-  text: A bench with a view
+  text: Be useful to Monde, not only present in it. Be thanked by name, and sit in a regular chair at the Gull &
+    Anchor.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Volunteer three shifts at the library desk for Margo.
+    - Ask Roz to keep a chair for the pair of you.
+    - Sit in the regular chair and be greeted by name on Saturday.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: millbrook.home_01 }
-    - { at: "08:30", do: work, where: market_row.market_street }
+    - { at: "07:30", do: eat, where: millbrook.home_01 }
+    - { at: "08:00", do: read, where: millbrook.home_01 }
+    - { at: "09:30", do: walk, where: millbrook.weir }
+    - { at: "11:00", do: shop, where: market_row.bakery }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: market_row.market_street }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: millbrook.home_01 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:00", do: volunteer, where: old_quarter.library }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "19:00", do: eat, where: millbrook.home_01 }
     - { at: "22:00", do: sleep, where: millbrook.home_01 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_01 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_01 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_01 }
-chores: [ sweep the step, wind the clock ]
+    - { at: "09:00", do: work, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: millbrook.home_01 }
+chores: [ Iron the cardigans, Sweep the front step, Carry the kettle to the stove ]
 relationships:
-  - { id: cyprian_nowak, affinity: 70, trust: 70, tag: partner, note: Same house. }
-secrets: []
+  - {
+      id: cyprian_nowak,
+      affinity: 22,
+      trust: 28,
+      tag: partner,
+      note: His oldest friend and housemate for thirty years.
+    }
+  - {
+      id: florent_rasku,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Shares Market Row and an opinion on bread.
+    }
+  - {
+      id: astrid_reid,
+      affinity: 14,
+      trust: 12,
+      tag: fond,
+      note: Brings him buttonholes to mend on Terrace Row.
+    }
+secrets:
+  - text: He still knits small scarves at night and gives them to the school children without saying who made them.
+    reveal: { regard_min: 60 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: shopkeeper
+generated_by: model
 household: mb_b03
 archetype: retired_couple
 employment: employed

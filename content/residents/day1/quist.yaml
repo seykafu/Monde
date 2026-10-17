@@ -1,10 +1,10 @@
-# Generated (census-v1) for quist; curated not yet. Edit here.
+# Generated (census-v1) for quist; curated by hand (MVP M-03). Edit here.
 id: quist
 name: Alphonse Quist
 age: 68
 pronouns: he/him
 kind: resident
-occupation: Retired bird counter; volunteer recorder of pond birds for a Carrow society.
+occupation: Retired rail clerk who counts the pond's birds for a Carrow society
 workplace: commons.home_01
 home: commons.home_01
 portrait: lib_m71_036
@@ -23,75 +23,82 @@ look:
   accessory: { kind: glasses }
   glasses: round
   face: { moustache: true, stubble: true }
-backstory: Lionel spent thirty years as a clerk at a rail office in Carrow, filing timetables for lines that
-  later closed. He retired at forty-two, a little early, after a bad winter with his chest, and took the ferry
-  to Monde on a whim because the notice said a cottage was going cheap. The cottage was damp, the town was
-  half empty, and he loved it at once. He reads the pond every morning with a flask of tea and a notebook, and
-  sends his counts to a society in Carrow that has never once replied in person.
+backstory: >
+  Alphonse clerked at a Carrow rail office for twenty years, filing timetables for lines that later closed, and
+  retired at forty-two after a bad winter on his chest. He came to Monde on a whim because a notice said a
+  cottage by the duck pond was going cheap. It was damp, the town was half empty, and he loved it at once. He
+  counts the pond every morning with a flask and a notebook and posts the numbers to a bird society in Carrow
+  that has never replied in person. Three springs ago he saw something in the reeds below the footbridge. The
+  society wrote back: unconfirmed. He wants a second pair of eyes.
 personality:
   traits: [ patient, precise, courtly, wry ]
   big5: { open: 62, conscientious: 78, extravert: 28, agreeable: 66, neurotic: 35 }
-values: { prosperity: 0.05, safety: 0.25, spirit: 0.35, charm: 0.35 }
+values: { prosperity: 0.05, safety: 0.25, spirit: 0.30, charm: 0.40 }
 beliefs:
   - Birds tell you the truth about a place before people do.
-  - Monde has always been quieter than it used to be, which suits me.
-  - The mill closed because nobody in charge was paying attention.
+  - Nobody in Monde looks at the water.   # wrong: Teo does, every day at five, and a girl with a slate
+  - A bird seen once and unconfirmed is still a bird.
+  - Monde has always been quieter than it used to be, which suits him.
 voice:
-  register: Whispers by default, precise about species and vague about people. Courtly phrasing, short
-    sentences, a dry aside now and then.
-  tics: [ Shh., "No, wait.", Fine. It's gone. ]
-  never_says: [ cheerio, the Tollmen, "of course, obviously", it's a seagull ]
+  register: >
+    Whispers by default and stops mid-sentence when a bird moves. Precise about species, vague about people
+    ("the tall one in the grey coat"). Courtly, dry, short sentences. Nouns: hide, flight, clutch, call,
+    plumage, footbridge.
+  tics: [ "Quiet, now.", "Wait for it." ]
+  never_says: [ seagull, cheerio, obviously, just a duck ]
   samples:
-    - Shh. No, wait. Moorhen, not a coot. Fine. It's gone.
-    - There was a heron on the footbridge at six. Nobody else saw it.
-    - Tea's gone cold, but the pond is still worth the walk, I think.
+    - "Quiet, now. Left of the reeds, dark, red bill. Moorhen. The man on the bench says coot. He's wrong, and loud."
+    - "Nineteen mallard, six coot, one heron I shan't mention until it mentions me. Come back at six, if you're able."
+    - "A person in a grey suit walks the rail at half past five. I don't know their name. They've never once looked at the water."
 birthday: 34
-likes: [ stillness, flasks of tea, being believed, the first heron of spring, the duck pond at dawn ]
-dislikes: [ dogs off the lead, brass bands in nesting season, people who call every white bird a seagull ]
+likes: [ stillness, flasks of tea, being believed, seeds scattered on the sill, the first heron of spring ]
+dislikes: [ dogs off the lead, loud bands in nesting season, people who call every white bird a seagull, being asked to hurry a count ]
 fears: [ the pond being drained, losing his hearing before the owls are counted ]
 dream:
-  text: Log the first heron of spring on the footbridge and get it recorded in the Lantern.
+  text: Log a heron on the footbridge at dawn with a second witness, and see it printed in the Lantern's nature column.
   stages:
-    - Watch from the footbridge at dawn for three mornings.
-    - Write the sighting into the Lantern's nature column.
-    - Name the heron after the clerk who first taught him to look.
+    - Watch from the footbridge at dawn for three mornings (Regard ≥ 20)
+    - Bring a second witness to the footbridge at dawn
+    - Write the sighting into the Lantern's nature column with him
 routine:
   weekday:
-    - { at: "05:45", do: wander, where: commons.home_01 }
+    - { at: "05:45", do: eat, where: commons.home_01 }
     - { at: "06:15", do: sit, where: commons.duck_pond }
-    - { at: "08:00", do: eat, where: commons.home_01 }
+    - { at: "08:30", do: eat, where: commons.home_01 }
     - { at: "09:30", do: walk, where: commons.footbridge }
     - { at: "11:00", do: read, where: old_quarter.library }
     - { at: "13:00", do: eat, where: market_row.cafe_liss }
-    - { at: "15:00", do: tinker, where: commons.home_01 }
-    - { at: "18:30", do: sit, where: commons.duck_pond }
+    - { at: "15:00", do: write, where: commons.home_01 }
+    - { at: "17:30", do: sit, where: commons.duck_pond }
     - { at: "21:30", do: sleep, where: commons.home_01 }
   weekend:
-    - { at: "06:00", do: wander, where: commons.home_01 }
+    - { at: "06:00", do: eat, where: commons.home_01 }
     - { at: "06:30", do: sit, where: commons.duck_pond }
-    - { at: "09:00", do: eat, where: commons.home_01 }
+    - { at: "09:30", do: eat, where: commons.home_01 }
     - { at: "10:30", do: shop, where: market_row.market_street }
     - { at: "12:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "16:00", do: walk, where: commons.picnic_lawn }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "17:30", do: sit, where: commons.duck_pond }
     - { at: "20:00", do: read, where: commons.home_01 }
     - { at: "22:00", do: sleep, where: commons.home_01 }
-chores: [ Mends the draught under the front door, Keeps the workbench oiled, Writes the pond counts by lamplight ]
+chores: [ mend the draught under the front door, fill the feeder on the sill, oil the tripod, write the pond counts by lamplight ]
 relationships:
-  - { id: odile, affinity: 10, trust: 12, tag: fond, note: Brings him the heel of the loaf each morning. }
-  - { id: felix, affinity: 6, trust: 8, tag: curious, note: Asked him once to bring the pupils to the pond. }
-  - {
-      id: teo,
-      affinity: -8,
-      trust: -4,
-      tag: wary,
-      note: Thinks the Glasshouse plants are too loud for the birds.
-    }
+  - { id: odile, affinity: 25, trust: 35, tag: friend, note: "Hands him the heel of the day-old for the ducks, which he scatters and she pretends not to know. Wants to tell her the moorhens prefer rye, and has not found the moment." }
+  - { id: felix, affinity: 25, trust: 30, tag: fond, note: "Asked him three times to bring the pupils to the pond for a morning and was told 'when the stove is mended'. Wants the children, quietly, in a line." }
+  - { id: maud, affinity: 25, trust: 20, tag: fond, note: "A girl who draws the herons and whispers back. Wants to see how she drew the heron's legs." }
+  - { id: teo, affinity: 20, trust: 25, tag: curious, note: "Sits at the pond at five and murmurs to something in his apron. Quist counts his own breaths until he has finished, and hopes it is not a bird." }
+  - { id: ines, affinity: 5, trust: 10, tag: curious, note: "'The grey suit', who walks the rail at half past five and has never looked at the water. Wants her to look down, once." }
 secrets:
-  - text: He has never been to the Briar Woods at dusk, because he is afraid of the dark there.
+  - text: "Three springs ago he saw a bittern in the reeds below the footbridge. The society in Carrow wrote back 'unconfirmed'. He has told no one it was a bittern; he says it was 'a brown bird'."
+    reveal: { regard_min: 45 }
+  - text: "He has named every duck on the pond after the clerks at the rail office, and says the names under his breath as he counts."
     reveal: { regard_min: 60 }
-canon_locks: []
-story_role: none
+canon_locks:
+  - { while: "true", fact: "Alphonse Quist, 68, is a birdwatcher who lives by the duck pond (No. 1 Pond Lane) and counts its birds for a society in Carrow. He has never once called a white bird a seagull." }
+  - { while: "true", fact: "Quist retired at forty-two from a rail office in Carrow and has lived in Monde for twenty-six years." }
+story_role: "Day-1 oddball (A.1.5): the duck pond's birdwatcher. Dream: the first heron of spring, logged with a second witness."
 generated_by: model
+curated: true
 household: quist
 archetype: birdwatcher
 employment: retired

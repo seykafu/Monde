@@ -4,13 +4,14 @@ name: Benedek Ogden
 age: 59
 pronouns: he/him
 kind: resident
-occupation: out of work, looking
+occupation: Out of work loom-setter and casual repair hand
 workplace: millbrook.home_37
 home: millbrook.home_37
 portrait: benedek_ogden
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: benedek_ogden
-appearance: A man with chestnut hair swept back, a plum shirt, a grey flat cap and a moustache.
+appearance: A broad man with chestnut hair swept back, a plum shirt and a grey flat cap. His moustache is neat
+  and his forearms are scarred from years of looms.
 look:
   kind: human
   skin: 2
@@ -22,58 +23,94 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 14 }
   face: { moustache: true, stubble: true }
-backstory: "Benedek came to Monde from Port Sallow 33 years ago and has been out of work and looking since the
-  last job went. What he wants most is plain enough: wages for work again."
+backstory: Benedek came to Monde at twenty-six to set looms at Lissworth Mill, after a long apprenticeship in
+  a Carrow weaving shed. He liked the steady rhythm of the frames and the pay that came every Friday. When the
+  Mill closed fourteen years ago he took casual repair jobs and boathouse shifts, and he has kept a wooden box
+  of loom spanners under the stairs ever since. He stayed in Monde for Anders, whom he met at the chapel fête
+  the year he arrived. Benedek still believes the Mill could run again if someone asked the right people,
+  which the town has heard from him many times.
 personality:
-  traits: [ proud, warm, curious ]
-  big5: { open: 42, conscientious: 51, extravert: 42, agreeable: 85, neurotic: 27 }
+  traits: [ stubborn, practical, loyal, quiet ]
+  big5: { open: 35, conscientious: 80, extravert: 30, agreeable: 55, neurotic: 45 }
 values: { prosperity: 0.6, safety: 0.15, spirit: 0.1, charm: 0.15 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A machine that runs true needs only patience and oil.
+  - The Mill will open again before the year is out.
+  - A man who works is a man who is listened to.
 voice:
-  register: 'Plain and short. Knows the numbers: picks, bolts, hours. "Used to be."'
-  tics: [ Used to be eight hundred picks a minute. ]
-  never_says: [ no worries, awesome ]
+  register: "Plain and short. He knows the numbers: picks, bolts, hours. He speaks in fragments and rarely
+    offers more than he is asked."
+  tics: [ Used to be., "Right, then.", Mm. ]
+  never_says: [ I suppose, so to speak, you see ]
   samples:
-    - Used to be eight hundred picks a minute. Used to be.
-    - Short shift. Short pay. Tea's the same.
-    - Clock's three minutes fast. Somebody should see to it.
+    - Sixty bolts an hour, that's the rate. Used to be.
+    - Right, then. Pass me the spanner.
+    - Mm. Tea's in the tin.
 birthday: 75
-likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time ]
-dislikes: [ being retrained, short shifts, men with clipboards ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    tea in a tin mug,
+    the sound of a loom running true,
+    a clock that keeps time,
+    Anders's cooking on Sundays,
+    the weir in the early morning
+  ]
+dislikes: [ being retrained, short shifts, men with clipboards, the stopped clock in the Old Quarter ]
+fears: [ being idle for good, the Mill being pulled down with its frames inside ]
 dream:
-  text: Wages for work again
+  text: Wages for work again, earned honestly, so he can hold his head up at the Gull & Anchor.
   stages:
-    - Register at Town Hall
-    - Do one casual job a day for three days
-    - Take a shift at the boathouse, or a floor job when the Mill reopens
+    - Register at Town Hall for casual work.
+    - Do one casual job a day for three days.
+    - Take a shift at the boathouse, or a floor job if the Mill reopens.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_37 }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
-    - { at: "12:00", do: eat, where: millbrook.home_37 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_37 }
-    - { at: "19:30", do: read, where: millbrook.home_37 }
+    - { at: "06:30", do: eat, where: millbrook.home_37 }
+    - { at: "07:00", do: walk, where: millbrook.weir }
+    - { at: "08:30", do: wander, where: millbrook.mill_yard }
+    - { at: "10:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "12:30", do: eat, where: market_row.bakery }
+    - { at: "14:00", do: wander, where: wharf.harbor_steps }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: eat, where: millbrook.home_37 }
     - { at: "21:30", do: sleep, where: millbrook.home_37 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_37 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_37 }
-    - { at: "19:30", do: read, where: millbrook.home_37 }
+    - { at: "09:30", do: walk, where: millbrook.weir }
+    - { at: "11:00", do: socialize, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: millbrook.home_37 }
-chores: [ wind the clock, beat the doormat ]
+chores: [ Keeps the coal scuttle full, Mends the back gate, Oils the workbench tools ]
 relationships:
-  - { id: anders_ogden, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: anders_ogden,
+      affinity: 25,
+      trust: 25,
+      tag: spouse,
+      note: Husband of thirty-three years; cooks the Sunday dinner.
+    }
+  - {
+      id: corin_madsen,
+      affinity: 10,
+      trust: 12,
+      tag: fond,
+      note: Neighbour who helps with the heavy lifting on the lane.
+    }
+  - {
+      id: dmitri_osei,
+      affinity: 8,
+      trust: 10,
+      tag: curious,
+      note: Haulier who once offered him a casual load.
+    }
+secrets:
+  - text: He keeps a folded notebook of loom speeds and repair times he hopes to publish in the Lantern someday.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_e01
 archetype: mill_hand
 employment: out_of_work

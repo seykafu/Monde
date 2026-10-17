@@ -4,13 +4,14 @@ name: Imke Kinsella
 age: 63
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired postmistress, still sorts her own letters each morning
 workplace: station_hill.home_06
 home: station_hill.home_06
 portrait: imke_kinsella
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: imke_kinsella
-appearance: An older woman with salt-and-pepper curls and a rust coat.
+appearance: A slight woman with salt-and-pepper curls and a rust-coloured wool coat she wears buttoned to the
+  throat, even indoors in spring. Her hands are always busy with a ball of grey yarn.
 look:
   kind: human
   skin: 3
@@ -20,58 +21,97 @@ look:
   height: tall
   outfit: { cut: coat, top: 11, bottom: 1, bottom_style: skirt, shoes: 1 }
   accessory: { kind: none }
-backstory: "Imke came to Monde from Port Sallow 29 years ago and is retired now. What she wants most is plain
-  enough: someone to eat supper with."
+backstory: Imke grew up in a mill town inland and took the post office counter job at Liss at nineteen, when
+  the branch still had a telegraph key. She married Piet Kinsella, a fitter at the mill, and they came to
+  Monde when she was thirty-four because the rent on Tower Lane was low and the sea air was supposed to be
+  good for his chest. Piet died eleven winters ago. She ran the Monde sorting office until it closed, then
+  kept the letter-box key out of habit. Her one regret is that she never learned to drive the ferry timetable
+  by heart, which she thinks makes her look foolish when visitors ask.
 personality:
-  traits: [ cheerful, steady, patient ]
-  big5: { open: 63, conscientious: 50, extravert: 79, agreeable: 54, neurotic: 27 }
+  traits: [ patient, meandering, observant, stubborn ]
+  big5: { open: 55, conscientious: 72, extravert: 35, agreeable: 68, neurotic: 40 }
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A kitchen table is the only proper place to make a decision.
+  - Monde will fill back up within ten years.
+  - Children should learn their letters before anything else.
+  - The Tollmen are a passing nuisance, not a real problem.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Unhurried and wandering on purpose, she starts one story and drifts into another, often correcting
+    herself. She remembers prices from forty years ago and quotes them without being asked.
+  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  never_says: [ sorry for the bother, whatever, in a hurry, modern ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Oh yes, a loaf cost fourpence-coin then, and the baker would give you the crust for
+      nothing.
+    - Sit down, love, the kettle's nearly there. No, the other chair, the one with the good springs.
+    - Piet liked it cold, the stove, I mean. Never mind. You'll have a cup of tea anyway.
 birthday: 8
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    knitting by the window,
+    small birds on the sill,
+    being asked for a story,
+    the smell of the bakery on Market Row,
+    the lookout bench at dusk
+  ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, hurried conversation ]
+fears: [ being forgotten on Tower Lane, the stove going out in the night ]
 dream:
-  text: Someone to eat supper with
+  text: Have someone to share a supper with, and be invited to a neighbour's table once in a while.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Ask Esme Hallam round for soup on a Thursday.
+    - Return the invitation with a loaf from Fournier & Fille.
+    - Set a standing Thursday table for whoever comes by.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: station_hill.home_06 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: station_hill.home_06 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: station_hill.home_06 }
-    - { at: "19:30", do: read, where: station_hill.home_06 }
-    - { at: "21:30", do: sleep, where: station_hill.home_06 }
-  weekend:
-    - { at: "08:00", do: eat, where: station_hill.home_06 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "06:30", do: wander, where: station_hill.home_06 }
+    - { at: "07:15", do: eat, where: station_hill.home_06 }
+    - { at: "08:00", do: walk, where: station_hill.lookout_bench }
+    - { at: "09:30", do: shop, where: market_row.general_store }
+    - { at: "10:30", do: read, where: old_quarter.library }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: station_hill.home_06 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: station_hill.home_06 }
-chores: [ mend a sock, beat the doormat ]
+    - { at: "14:00", do: sit, where: commons.picnic_lawn }
+    - { at: "17:30", do: cook, where: station_hill.home_06 }
+    - { at: "21:00", do: sleep, where: station_hill.home_06 }
+  weekend:
+    - { at: "07:30", do: wander, where: station_hill.home_06 }
+    - { at: "08:30", do: eat, where: station_hill.home_06 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: socialize, where: market_row.bakery }
+    - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:00", do: cook, where: station_hill.home_06 }
+    - { at: "21:00", do: sleep, where: station_hill.home_06 }
+chores:
+  [
+    Sort the post on the hall table,
+    Trim the candles and dust the window sills,
+    Air the blankets on the line on Mondays
+  ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: esme_hallam,
+      affinity: 12,
+      trust: 8,
+      tag: fond,
+      note: Neighbour on Tower Lane who sews with her on Thursdays.
+    }
+  - {
+      id: hollis,
+      affinity: 6,
+      trust: 5,
+      tag: curious,
+      note: Retired engine driver; she asks him about the old line.
+    }
+  - { id: pell, affinity: -8, trust: -4, tag: wary, note: "Thinks the mayor talks in circles, like her." }
+secrets:
+  - text: She still has Piet's flannel shirt folded in the bottom drawer and wears it under her coat on cold
+      nights.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: sh_a03
 archetype: widowed_elder
 employment: retired

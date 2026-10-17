@@ -4,14 +4,14 @@ name: Sander Rennick
 age: 27
 pronouns: he/him
 kind: resident
-occupation: fishing-boat crew
+occupation: Crew on a harbour boat and baker's hand at dawn.
 workplace: wharf.harbor_steps
 home: old_quarter.home_12
 portrait: lib_m22_020
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: sander_rennick
-appearance: A young man with an unruly mop of dark brown hair, a smudge of flour on his nose and a white
-  baker's apron over a blue striped shirt with rolled sleeves. An eager, sleepy, up-since-four look.
+appearance: An unruly mop of dark brown hair and a flour smudge on his nose, a slight build in a white baker's
+  apron over a blue striped shirt with rolled sleeves. Eager and sleepy.
 look:
   kind: human
   skin: 2
@@ -21,58 +21,71 @@ look:
   height: tall
   outfit: { cut: apron, top: 5, bottom: 13, bottom_style: trousers, shoes: 2 }
   accessory: { kind: apron, colour: 9 }
-backstory: "Sander came to Monde from Marrow Quay 26 years ago and works as fishing-boat crew. What he wants
-  most is plain enough: a boat with my name on it."
+backstory: Came to Monde at one, when his mother took the bakery's back room at Fournier & Fille and never
+  left. He learned to bake before he learned to swim, and has split his days between dough and deck ever
+  since. He once tried to leave for the city at nineteen and got as far as the Carrow ferry's first cabin
+  before he got off. He believes the town will come back if people just keep baking for each other.
 personality:
-  traits: [ practical, proud, shy ]
-  big5: { open: 42, conscientious: 28, extravert: 8, agreeable: 13, neurotic: 37 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+  traits: [ eager, warm, restless, loyal ]
+  big5: { open: 70, conscientious: 45, extravert: 75, agreeable: 80, neurotic: 35 }
+values: { prosperity: 0.3, safety: 0.3, spirit: 0.2, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Bread fixes most arguments in Monde.
+  - The Mill will reopen once someone asks the right person.
+  - Everyone on Market Row would stay if the lights were on.
 voice:
-  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
-  tics: [ Fair. ]
-  never_says: [ no worries, awesome ]
+  register: Quick, friendly and a little breathless. He jumps between topics and laughs at his own asides.
+  tics: [ Right then!, "Wait, listen,", "Mm, warm one." ]
+  never_says: [ "honestly, no", I can't, whatever ]
   samples:
-    - Fair. Wind's backing.
-    - Could be worse. Could be raining.
-    - Tide's making. I'll be off.
+    - Mm, warm one. Still steaming, so eat it fast.
+    - Wait, listen, the Gannet's late again and I'm not sad about it.
+    - Right then! Porridge tomorrow, and you're not allowed to say no.
 birthday: 82
-likes: [ flat calm at dawn, good rope, smoked fish ]
-dislikes: [ tangled gear, loud engines, gulls on the catch ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    the smell of proving dough,
+    sunrise over the harbour,
+    Caspar's terrible jokes,
+    flat calm at dawn,
+    good rope
+  ]
+dislikes: [ cold ovens, early starts he didn't choose, being called a boy ]
+fears: [ the bakery closing like the cannery, Caspar leaving on the ferry ]
 dream:
-  text: A boat with my name on it
+  text: Get the cannery reopened so the fish and the bread can both sell again.
   stages:
-    - Find a hull and bring it to the boathouse
-    - Raise 60 coins from catches and community work
-    - Launch on Regatta day
+    - Gather ten signatures for the co-op petition.
+    - Pitch the co-op to Nell Dunmore at the fish market.
+    - Make the first landing at the cannery.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: old_quarter.home_12 }
-    - { at: "08:30", do: work, where: wharf.harbor_steps }
+    - { at: "04:00", do: eat, where: old_quarter.home_12 }
+    - { at: "04:00", do: cook, where: market_row.bakery }
+    - { at: "05:30", do: work, where: wharf.harbor_steps }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: wharf.harbor_steps }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: old_quarter.home_12 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:00", do: visit, where: market_row.bakery }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: old_quarter.home_12 }
   weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_12 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: old_quarter.home_12 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: old_quarter.home_12 }
-chores: [ beat the doormat, black the stove ]
+    - { at: "05:30", do: eat, where: old_quarter.home_12 }
+    - { at: "06:00", do: cook, where: market_row.bakery }
+    - { at: "09:00", do: socialize, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: commons.picnic_lawn }
+    - { at: "16:00", do: fish, where: wharf.breakwater }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: old_quarter.home_12 }
+chores: [ knead for the morning batch, sweep the flour off the stairs, feed the wharf cats ]
 relationships:
-  - { id: caspar_underhill, affinity: 70, trust: 70, tag: partner, note: Same house. }
-secrets: []
+  - { id: caspar_underhill, affinity: 70, trust: 75, tag: partner, note: Caspar is his steadying weight. }
+  - { id: efua_drummond, affinity: 10, trust: 15, tag: friend, note: Swaps net-mending for bread. }
+  - { id: piet_hendry, affinity: -10, trust: 5, tag: wary, note: Piet took the last of the ginger loaves. }
+secrets:
+  - text: He has been writing a small book of recipes for the bakery's lost customers, hidden in the flour bin.
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: oq_i01
 archetype: fisher
 employment: employed

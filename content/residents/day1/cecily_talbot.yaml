@@ -4,14 +4,14 @@ name: Cecily Talbot
 age: 4
 pronouns: she/her
 kind: resident
-occupation: too small for school yet
+occupation: Small child, at home.
 workplace: market_row.home_05
 home: market_row.home_05
 portrait: lib_f05_001
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: cecily_talbot
-appearance: A small girl with dark brown pigtails tied with yellow ribbons and a red knitted jumper. A
-  gap-toothed, curious look.
+appearance: Dark brown pigtails tied with yellow ribbons, and a red knitted jumper with boots. She has a
+  gap-toothed grin and an intent, curious look.
 look:
   kind: human
   skin: 7
@@ -21,32 +21,44 @@ look:
   height: short
   outfit: { cut: jumper, top: 3, bottom: 5, bottom_style: trousers, shoes: 4 }
   accessory: { kind: none }
-backstory: Cecily was born in Monde and is too small for school yet. She likes the ducks on the Commons best.
+backstory: Cecily was born in the back bedroom at No. 4 Lower Row during a February gale. She knows the ferry
+  by its horn and has been told the Gannet is her grandfather's boat, which is not true, but she has decided
+  to believe it. She collects bottle tops and buttons in a biscuit tin and keeps them under the bed where the
+  damp does not reach. She has never seen a doctor, only the nurse who came to the door with her bag, and she
+  thinks that is how doctors arrive.
 personality:
-  traits: [ careful, restless, steady ]
-  big5: { open: 25, conscientious: 32, extravert: 93, agreeable: 48, neurotic: 57 }
-values: { prosperity: 0.4, safety: 0.25, spirit: 0.2, charm: 0.15 }
+  traits: [ curious, bold, chatty ]
+  big5: { open: 85, conscientious: 30, extravert: 80, agreeable: 60, neurotic: 35 }
+values: { prosperity: 0.2, safety: 0.25, spirit: 0.4, charm: 0.15 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The ferry horn is a giant saying hello.
+  - Gulls are friends who want chips.
+  - Mummy can fix anything with tea.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ Can we go to the ducks? ]
-  never_says: [ no worries, awesome ]
+  register: Quick, bright, short sentences with odd logic. Says 'because' a lot. Repeats things she likes.
+  tics: [ because because, look look, is it time now ]
+  never_says: [ I don't know, that's boring, no thank you ]
   samples:
-    - Can we go to the ducks? Just for a minute.
-    - I'm not tired. I'm resting my eyes.
-    - Mr. Amari says my letters lean. They're fine.
+    - Look, a gull! He has a wet hat.
+    - Is it time for the boat yet? The boat says hello.
+    - Mummy, I put a button in the duck. Sorry duck.
 birthday: 18
-likes: [ tea that stays hot long enough to finish, neighbors who knock before advising, a back door that locks ]
-dislikes: [ being pitied, visitors at bedtime, being asked who watches the children ]
-fears: [ the dark on the stairs ]
+likes:
+  [
+    the duck pond,
+    yellow ribbons,
+    buttons in her biscuit tin,
+    tea that stays hot long enough to finish,
+    neighbors who knock before advising
+  ]
+dislikes: [ hats, going to bed early, wet socks ]
+fears: [ the dark clocktower, being left at the sitter's ]
 dream:
-  text: Hours that fit around the school run
+  text: A bedroom painted the colour of the sea, with a heron on the wall.
   stages:
-    - Ask a shop owner for fixed morning hours (Regard ≥ 25)
-    - Swap school-run days with a neighbor (Regard ≥ 20)
-    - Write the timetable on the kitchen wall
+    - Buy paint at Dunmore's.
+    - Borrow brushes from Wolanski's workshop.
+    - Finish before the birthday.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: market_row.home_05 }
@@ -60,13 +72,22 @@ routine:
     - { at: "12:30", do: eat, where: market_row.home_05 }
     - { at: "13:30", do: nap, where: market_row.home_05 }
     - { at: "19:00", do: sleep, where: market_row.home_05 }
-chores: [ fill the coal scuttle, beat the doormat ]
+chores: [ Put her bottle tops back in the biscuit tin, Feed the duck crusts on Saturdays ]
 relationships:
-  - { id: linnea_talbot, affinity: 70, trust: 70, tag: mother, note: Same house. }
-secrets: []
+  - { id: linnea_talbot, affinity: 30, trust: 28, tag: mother, note: "Her mother, who always has tea." }
+  - {
+      id: fabian_mcallister,
+      affinity: 15,
+      trust: 10,
+      tag: friend,
+      note: Gives her bean pods and calls her Miss Pod.
+    }
+secrets:
+  - text: She has hidden a tackle box of buttons under the stairs and thinks nobody knows.
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mr_k01
 archetype: single_parent
 employment: under_five

@@ -1,18 +1,17 @@
-# Generated (census-v1) for cobb; curated not yet. Edit here.
+# Generated (census-v1) for cobb; curated by hand (MVP M-03). Edit here.
 id: cobb
 name: Rev. Alma Cobb
 age: 66
 pronouns: she/her
 kind: resident
-occupation: Sexton and chaplain's warden at St Brigid's; keeps the chapel and the…
+occupation: Chaplain and sexton of St Brigid's
 workplace: old_quarter.st_brigids
 home: old_quarter.st_brigids
 portrait: lib_f62_032
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: cobb
 appearance: A brisk woman with close-cropped pepper-grey hair, reading glasses pushed up on her head, and a
-  brick-red blazer with a round enamel committee badge on the lapel. Her skin is deep brown and her build is
-  average.
+  brick-red blazer with a round enamel badge on the lapel. Her skin is deep brown and her build is average.
 look:
   kind: human
   skin: 3
@@ -23,107 +22,80 @@ look:
   outfit: { cut: coat, top: 3, bottom: 13, bottom_style: skirt, shoes: 13 }
   accessory: { kind: none }
   glasses: on_head
-backstory: Born in Monde above the old cooperage on Lamplighter Lane, Alma spent thirty years on the Mill
-  Hands' committee before a stroke retired her from the union table. She took the sexton's post when the
-  rectory closed and moved into the chaplain's rooms with one bed, a kettle and forty years of minute books.
-  Her one failure was the Harvest Supper two years ago, which ran out of bread at seven and never recovered
-  its name. She stayed because the town still needs someone to write things down, and because nobody else
-  would count the volunteers.
+backstory: >
+  Alma was born over the cooperage on Lamplighter Lane and has never lived further than a bell rope's length
+  from St Brigid's. The parish could afford one salary and found one woman who would take the chaplain's rooms
+  and the sexton's keys together, so she holds both. Her sermons run six minutes by the vestry clock. Every
+  Monday she empties the poor box and carries the envelope marked Mercer, Millbrook to the terrace door, where
+  it is taken on the step and the door is shut. In all those Mondays she has not once been asked in. She would
+  like to be asked in for tea, once, and stay for the whole pot.
 personality:
-  traits: [ organised, dry, patient, stubborn ]
-  big5: { open: 40, conscientious: 92, extravert: 55, agreeable: 60, neurotic: 35 }
-values: { prosperity: 0.15, safety: 0.2, spirit: 0.45, charm: 0.2 }
+  traits: [ practical, unhurried, dry, stubborn, kind ]
+  big5: { open: 40, conscientious: 92, extravert: 55, agreeable: 65, neurotic: 30 }
+values: { prosperity: 0.10, safety: 0.25, spirit: 0.45, charm: 0.20 }
 beliefs:
-  - A town survives on minutes and rotas, not speeches.
+  - "The Mercer envelope comes from some old friend of Gil Mercer's off the loom floor, too proud to hand it over himself."   # wrong: it is Rook's
   - Everyone in Monde would volunteer if somebody asked them properly.
-  - The Mill closed because nobody wrote down what it cost.
-  - Cold tea is a moral failing.
+  - A stove blacked in spring lasts the winter.
+  - A sermon that outlasts the kettle has outlasted its point.
 voice:
-  register: Brisk and formal with warmth. Short declaratives, numbered points, and the occasional long pause
-    before a kindness. She asks for help by looking at you, not by asking.
-  tics: [ Item one., "Right, then.", Shall we say. ]
-  never_says: [ I feel, no worries, whatever you like, I suppose ]
+  register: >
+    Unhurried and plain; a pause before the practical advice, which is nearly always a chore: wash it, mend it,
+    ask her. Chapel nouns: pew, hymn board, collection, candle-end, bell rope. Answers a trouble with a rota.
+  tics: [ "Six minutes, no more.", "Practically speaking,", "What wants doing?" ]
+  never_says: [ I'll pray for you, everything happens for a reason, no worries, I suppose ]
   samples:
-    - Item one. The Harvest Supper needs a chair, and you've got good hands.
-    - It's not complicated. Bring a pencil, sit at the back, and write what's said.
-    - You'll have had your tea? No, you won't. Sit down, I'll put the kettle on.
+    - "Six minutes, Sunday at ten. If the kettle's not on by the second hymn, I'll be in the vestry, hunting the matches."
+    - "Practically speaking, the stove wants blacking before the damp gets in. Saturday suits. Bring a brush. I have two, and one of them is good."
+    - "The hymn board's short two numbers. Someone burned the nines in the cold snap. Don't look at me, I only had the sevens."
 birthday: 47
-likes:
-  [
-    a well-kept minute book,
-    being thanked by name,
-    the bell rope in the chapel,
-    Thursday rota meetings,
-    lists
-  ]
-dislikes:
-  [
-    meetings without minutes,
-    people who won't commit to a committee,
-    cold tea,
-    anyone who calls the Lantern a newsletter
-  ]
-fears: [ the rota collapsing with no one to notice, a lone Monday envelope that goes unclaimed ]
+likes: [ lists, a stove drawing well, the bell rope in her hands, tea with the pot warmed first, honey ]
+dislikes: [ sermons over six minutes, the cold in the vestry, a collection counted once, being asked what she is thinking ]
+fears: [ an empty poor box on a Monday, the chapel closing with nobody left to count the pews ]
 dream:
-  text: A rota that works, with ten volunteers' names on it and no gaps for a full week.
+  text: Be asked in at the Mercer door, and stay for the whole pot.
   stages:
-    - Collect ten volunteers' names from people who've said yes once.
-    - Print the rota at the Lantern office and pin it on the board.
-    - Run one full week with no gap and no one missing.
+    - Walk the Monday envelope to Millbrook with her (Regard ≥ 30)
+    - Bring her a hem to take to Delphine, as a reason to knock twice
+    - Be asked in at the Mercer door (Regard ≥ 50 with Delphine)
 routine:
   weekday:
-    - { at: "07:00", do: pray, where: old_quarter.st_brigids }
+    - { at: "06:30", do: pray, where: old_quarter.st_brigids }
     - { at: "07:30", do: eat, where: old_quarter.st_brigids }
-    - { at: "08:00", do: work, where: old_quarter.st_brigids }
-    - { at: "10:30", do: visit, where: old_quarter.lantern_office }
-    - { at: "12:00", do: eat, where: market_row.cafe_liss }
-    - { at: "13:00", do: volunteer, where: old_quarter.town_hall }
-    - { at: "16:00", do: walk, where: wharf.harbor_steps }
-    - { at: "18:00", do: eat, where: old_quarter.st_brigids }
+    - { at: "08:30", do: work, where: old_quarter.st_brigids }
+    - { at: "10:30", do: visit, where: millbrook.terrace_row }              # the parish round; Mondays on to the Mercer door
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: work, where: old_quarter.st_brigids }
+    - { at: "17:00", do: pray, where: old_quarter.st_brigids }              # Pell is in the third pew at five
+    - { at: "18:30", do: cook, where: old_quarter.st_brigids }
     - { at: "21:30", do: sleep, where: old_quarter.st_brigids }
-  weekend:
+  weekend:                       # Sunday service is six minutes, then tea in the porch
+    - { at: "07:00", do: eat, where: old_quarter.st_brigids }
     - { at: "08:30", do: pray, where: old_quarter.st_brigids }
-    - { at: "09:30", do: shop, where: market_row.market_street }
-    - { at: "11:00", do: socialize, where: market_row.bakery }
+    - { at: "09:30", do: work, where: old_quarter.st_brigids }
+    - { at: "11:30", do: socialize, where: old_quarter.st_brigids }
     - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
     - { at: "15:00", do: walk, where: commons.duck_pond }
     - { at: "17:30", do: read, where: old_quarter.library }
     - { at: "21:00", do: sleep, where: old_quarter.st_brigids }
-chores:
-  [
-    Wind the chapel bell rope every morning.,
-    Carry the Monday poor-box envelope to Millbrook.,
-    Keep the parish lists current.
-  ]
+chores: [ ring the morning bell, carry the Monday poor-box envelope to Millbrook, black the vestry stove, keep the parish list current ]
 relationships:
-  - {
-      id: pell,
-      affinity: 12,
-      trust: 18,
-      tag: friend,
-      note: Fifty years of committee fights; she still wins most of them.
-    }
-  - {
-      id: margo,
-      affinity: 20,
-      trust: 22,
-      tag: fond,
-      note: "Borrows her archive and returns it late, always with thanks."
-    }
-  - {
-      id: augusta,
-      affinity: 6,
-      trust: 10,
-      tag: curious,
-      note: Respects her discipline; distrusts her habit of not writing things down.
-    }
+  - { id: pell, affinity: 55, trust: 60, tag: friend, note: "Sits in the third pew every afternoon at five for nine minutes by the vestry clock. Cobb has never asked what for. Wants her to stay for the tea." }
+  - { id: delphine, affinity: 40, trust: 20, tag: curious, note: "Takes the Monday envelope on the step, says 'thank the church', and shuts the door. Wants to be asked in, once." }
+  - { id: ilona, affinity: 50, trust: 55, tag: friend, note: "Trims the candle-ends on Saturdays and writes the hymn numbers on the board in a post-office hand. Wants her to take the good pew by the stove." }
+  - { id: frye, affinity: 30, trust: 40, tag: friend, note: "Compares minute books with him after chapel and loses on page count. Wants him to leave a margin." }
+  - { id: bru, affinity: 45, trust: 40, tag: fond, note: "Stays after the last hymn to stack the chairs and has never been asked. Wants him to stay for the tea and sit on one." }
 secrets:
-  - text: She still keeps the rota of volunteers who once left a basket on the steps of the empty mill house, and
-      she never says who…
-    reveal: { regard_min: 60 }
-canon_locks: []
-story_role: volunteer
+  - text: "Every Monday she carries the poor-box envelope marked 'Mercer, Millbrook' to Delphine's step. She has never asked who puts it in, and has decided she never will. She has a guess, an old friend of Gil Mercer's, and has not let herself check it."
+    reveal: { regard_min: 50 }
+  - text: "Her first sermon ran forty minutes and a man slid out of the front pew in his sleep. She has timed every sermon since by the vestry clock, and stops at the sixth minute even mid-sentence."
+    reveal: { regard_min: 40 }
+canon_locks:
+  - { while: "true", fact: "Every Monday Rev. Cobb carries the St. Brigid's poor-box envelope marked 'Mercer, Millbrook' to Delphine. She has never asked who puts it in." }
+  - { while: "true", fact: "Rev. Alma Cobb is the chaplain of St. Brigid's and also its sexton; she lives in the chaplain's rooms at the chapel. Her sermons run six minutes." }
+story_role: "Chaplain and sexton of St Brigid's. Carries the Monday poor-box envelope to Delphine Mercer and has never asked who sends it."
 generated_by: model
+curated: true
 household: cobb
 archetype: retired_organizer
 employment: employed

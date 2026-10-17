@@ -4,13 +4,14 @@ name: Alys Lefevre
 age: 80
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired seamstress, still takes in the odd buttonhole.
 workplace: millbrook.home_04
 home: millbrook.home_04
 portrait: alys_lefevre
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: alys_lefevre
-appearance: An older woman with salt-and-pepper hair in a bun, a plum coat and heavy glasses.
+appearance: A broad, upright woman with salt-and-pepper hair in a tight bun, heavy glasses and a plum coat
+  buttoned to the throat. She wears one odd glove on her left hand and a mismatched one on her right.
 look:
   kind: human
   skin: 5
@@ -21,57 +22,102 @@ look:
   outfit: { cut: coat, top: 8, bottom: 12, bottom_style: skirt, shoes: 15 }
   accessory: { kind: glasses }
   glasses: heavy
-backstory: "Alys was born in Monde and is retired now. What she wants most is plain enough: someone to eat supper with."
+backstory: Alys was born in the house on Terrace Row and sewed for the whole street for forty years, first at
+  the mill's finishing room and then from her front parlour after the looms went quiet. She married Pierre
+  Lefevre, a rigger from the harbour, and they had three children, two of whom went to Carrow and one who went
+  further. Pierre died eight winters ago on the breakwater steps, after a rope gave way, and she has not been
+  able to finish the quilt she started for him. She stayed because the street still knows her name and because
+  leaving felt like admitting the town had finished with her.
 personality:
-  traits: [ warm, practical, careful ]
-  big5: { open: 49, conscientious: 87, extravert: 47, agreeable: 37, neurotic: 40 }
+  traits: [ patient, stubborn, warm, rambling ]
+  big5: { open: 40, conscientious: 78, extravert: 45, agreeable: 70, neurotic: 35 }
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A good neighbour answers the door the first time.
+  - The Liss has been higher every year since I was a girl.
+  - Nobody sews a straight seam any more.
+  - My children will come back when the ferry runs properly.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Gentle and meandering, she starts a sentence about one thing and ends up on another. She uses old
+    prices and names, and circles back to a point she forgot she had.
+  tics: [ Now where was I?, "In my day,", "Well, there's a thing." ]
+  never_says: [ that's modern, "I suppose so, dear", hurry up ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Oh yes, a loaf was two coins once, and you'd have thought the baker had given it to you.
+    - Pierre always said the Liss would tell you when to go. It hasn't told me yet.
+    - Mm. Pass me that scrap of blue, would you? Sit a while.
 birthday: 67
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    knitting,
+    small birds at the window,
+    being asked for a story,
+    the smell of the bakery on a Saturday,
+    a warm kitchen
+  ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, gulls on the bins ]
+fears: [ the quilt never getting finished, being forgotten on Terrace Row, the breakwater in a storm ]
 dream:
-  text: Someone to eat supper with
+  text: Finish the quilt she began for Pierre, with a patch from every street that will give her one.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Gather scraps from five residents, each with a story to tell.
+    - Sew at the library table where the light is good.
+    - Hang the quilt at the Harvest Supper for the whole town to see.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_04 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: millbrook.home_04 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_04 }
-    - { at: "19:30", do: read, where: millbrook.home_04 }
+    - { at: "08:30", do: walk, where: millbrook.terrace_row }
+    - { at: "09:30", do: shop, where: market_row.bakery }
+    - { at: "11:00", do: socialize, where: millbrook.laundry_green }
+    - { at: "13:00", do: eat, where: millbrook.home_04 }
+    - { at: "14:30", do: write, where: old_quarter.library }
+    - { at: "17:30", do: cook, where: millbrook.home_04 }
+    - { at: "20:00", do: read, where: millbrook.home_04 }
     - { at: "21:30", do: sleep, where: millbrook.home_04 }
   weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_04 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: millbrook.home_04 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_04 }
-chores: [ water the window box, beat the doormat ]
+    - { at: "08:30", do: eat, where: millbrook.home_04 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:30", do: visit, where: old_quarter.st_brigids }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: millbrook.weir }
+    - { at: "18:00", do: cook, where: millbrook.home_04 }
+    - { at: "21:00", do: sleep, where: millbrook.home_04 }
+chores:
+  [
+    Sew buttonholes for neighbours on Thursdays.,
+    Keep the stove banked before dark.,
+    Take scraps to the library desk.
+  ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: astrid_reid,
+      affinity: 22,
+      trust: 18,
+      tag: friend,
+      note: "Old postmistress, sends Alys the week's gossip by hand."
+    }
+  - {
+      id: frida_irvine,
+      affinity: 14,
+      trust: 12,
+      tag: fond,
+      note: Retired draper who trades thread for stories.
+    }
+  - {
+      id: iain_marchant,
+      affinity: -6,
+      trust: 4,
+      tag: wary,
+      note: Ran the wage office; she thinks he weighed things too carefully.
+    }
+secrets:
+  - text: She still keeps Pierre's last letter folded inside the quilt's lining, unread since the day it arrived.
+    reveal: { regard_min: 60 }
+  - text: She has been fixing the Glasshouse's broken panes in secret with glazier's putty from Kasimir's shed.
+    reveal: { regard_min: 70 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: favor_giver
+generated_by: model
 household: mb_a10
 archetype: widowed_elder
 employment: retired

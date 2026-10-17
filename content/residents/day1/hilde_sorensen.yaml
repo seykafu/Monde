@@ -4,15 +4,14 @@ name: Hilde Sorensen
 age: 67
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired draper who now takes in neighbours' hems and gossip in equal…
 workplace: old_quarter.home_08
 home: old_quarter.home_08
 portrait: lib_f70_110
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: hilde_sorensen
-appearance: A plump, smiling woman with hair dyed a rich mahogany swept up in a loose bun, big round earrings
-  like boiled sweets, a teal raincoat buttoned to the chin and a rose spotted scarf. A warm, nosy,
-  delighted-to-see-you look.
+appearance: A plump, smiling woman with mahogany-dyed hair swept into a loose bun and big round earrings like
+  boiled sweets. She wears a teal raincoat buttoned to the chin and a rose-spotted scarf.
 look:
   kind: human
   skin: 5
@@ -22,58 +21,88 @@ look:
   height: short
   outfit: { cut: coat, top: 0, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: scarf, colour: 12 }
-backstory: "Hilde came to Monde from Port Sallow 32 years ago and is retired now. What she wants most is plain
-  enough: a bench with a view."
+backstory: Hilde ran a dressmaker's counter in Carrow for thirty years, measuring brides and widows alike. She
+  came to Monde with Yusuf when the shop was sold, meaning only to rest. Within a month she had mended half of
+  Well Row for nothing and been told everything. She still thinks the Saturday market needs a proper bunting
+  line, and she has been asking Florent to stop hanging it crooked for three years. She stayed because she
+  could not imagine a street without someone to tell the news to.
 personality:
-  traits: [ steady, brisk, wry ]
-  big5: { open: 93, conscientious: 18, extravert: 25, agreeable: 59, neurotic: 37 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ warm, nosy, generous, stubborn ]
+  big5: { open: 60, conscientious: 65, extravert: 85, agreeable: 80, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.25, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everyone in this town is lonelier than they let on.
+  - A good hem can fix any mood.
+  - Florent hangs bunting upside down on purpose.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Warm, quick and affectionate, with a habit of answering questions nobody asked. She teases Yusuf in
+    front of guests and expects him to tease back.
+  tics: [ "oh, love", "don't we, dear?", well I never ]
+  never_says: [ that's none of my business, I don't gossip, I can't be bothered ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Oh, love, you look peaky. Sit down before you fall down, and I'll put the kettle on.
+    - Yusuf says the ferry's late. I say he's just never liked the captain.
+    - Well I never. Who's been sitting on the good chair?
 birthday: 78
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a morning paper, a kettle on the stove, strangers who stop to chat, sweet tea, bright buttons ]
+dislikes: [ drafts, being managed, cold hands, unhemmed trousers ]
+fears: [ being forgotten by the street, Yusuf getting sick ]
 dream:
-  text: A bench with a view
+  text: A dance in the old hall on a Saturday night, with the whole street in their best coats and a gramophone
+    playing something loud.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Find a hall with a working floor and enough chairs.
+    - Find a gramophone or a band willing to play for free.
+    - Hold the dance and make Yusuf waltz at least once.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: old_quarter.home_08 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: old_quarter.home_08 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: old_quarter.home_08 }
-    - { at: "19:30", do: read, where: old_quarter.home_08 }
-    - { at: "21:30", do: sleep, where: old_quarter.home_08 }
+    - { at: "07:15", do: wander, where: old_quarter.home_08 }
+    - { at: "07:45", do: eat, where: old_quarter.home_08 }
+    - { at: "09:30", do: socialize, where: market_row.general_store }
+    - { at: "11:00", do: cook, where: old_quarter.home_08 }
+    - { at: "13:00", do: sit, where: commons.picnic_lawn }
+    - { at: "15:00", do: write, where: old_quarter.library }
+    - { at: "18:30", do: eat, where: old_quarter.home_08 }
+    - { at: "21:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:45", do: sleep, where: old_quarter.home_08 }
   weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_08 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: old_quarter.home_08 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: old_quarter.home_08 }
-chores: [ water the window box, beat the doormat ]
+    - { at: "08:00", do: cook, where: old_quarter.home_08 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "13:30", do: walk, where: commons.duck_pond }
+    - { at: "16:00", do: volunteer, where: old_quarter.st_brigids }
+    - { at: "19:00", do: eat, where: old_quarter.home_08 }
+    - { at: "21:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: old_quarter.home_08 }
+chores: [ mend neighbours' hems, water the window boxes, sweep the step ]
 relationships:
-  - { id: yusuf_sorensen, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: yusuf_sorensen,
+      affinity: 25,
+      trust: 25,
+      tag: spouse,
+      note: "Her husband, who she still finds the best company in Monde."
+    }
+  - {
+      id: camilla_kelleher,
+      affinity: 14,
+      trust: 18,
+      tag: friend,
+      note: Fellow seamstress; they trade patterns and disapprove of each other's hems.
+    }
+  - {
+      id: florent_rasku,
+      affinity: -10,
+      trust: 0,
+      tag: rival,
+      note: Has spent three years asking him to hang the bunting straight.
+    }
+secrets:
+  - text: She still keeps the wedding dress she never wore, and takes it out on winter nights to let out the seams.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: oq_b03
 archetype: retired_couple
 employment: retired

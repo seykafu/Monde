@@ -4,13 +4,14 @@ name: Hana Okonjo
 age: 58
 pronouns: she/her
 kind: resident
-occupation: café hand
+occupation: Café hand at Café Liss, baker in the mornings
 workplace: market_row.cafe_liss
 home: old_quarter.home_18
 portrait: hana_okonjo
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: hana_okonjo
-appearance: A woman with salt-and-pepper braids, a dark brown shirt and heavy glasses.
+appearance: A slight woman with salt-and-pepper braids tied back, heavy glasses and a dark brown shirt with
+  flour on the cuffs. She wears a red oven glove tucked in her apron pocket.
 look:
   kind: human
   skin: 2
@@ -21,58 +22,84 @@ look:
   outfit: { cut: plain, top: 2, bottom: 5, bottom_style: trousers, shoes: 5 }
   accessory: { kind: glasses }
   glasses: heavy
-backstory: "Hana came to Monde from Hessle Cross 19 years ago and works as café hand. What she wants most is
-  plain enough: learn the starter."
+backstory: Hana grew up in Carrow above her mother's bakery and learned bread before she learned to read. She
+  ran a hotel kitchen on the mainland until her mother died, then came to Monde with her father, who could no
+  longer manage the stairs in Carrow. The Liss ovens were cold when she arrived, and she started baking for
+  the café on a borrowed tray. The café does not pay her what the hotel did, and she has never once said so to
+  Hester. Her father believes she came for him. She came because she could not bear the hotel without her
+  mother, and she has let him think the town needed her.
 personality:
-  traits: [ cheerful, patient, steady ]
-  big5: { open: 8, conscientious: 51, extravert: 8, agreeable: 63, neurotic: 68 }
-values: { prosperity: 0.4, safety: 0.1, spirit: 0.2, charm: 0.3 }
+  traits: [ exacting, warm, stubborn, practical ]
+  big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 58, neurotic: 35 }
+values: { prosperity: 0.3, safety: 0.15, spirit: 0.2, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Bread tells you whether a town is doing well.
+  - Nobody in Monde eats breakfast properly anymore.
+  - Hester undercharges for the cakes, which is kind and also foolish.
 voice:
-  register: Bossy-kind. Kitchen warnings as terms of endearment. Measures in handfuls.
-  tics: [ Behind you. ]
-  never_says: [ no worries, awesome ]
+  register: Bossy but affectionate, with kitchen warnings used as pet names. She counts out measures in handfuls
+    and says what she means without padding it.
+  tics: [ "mind the door, love", a handful of this, that's too hot for you ]
+  never_says: [ I'm fine, it doesn't matter, whatever you like ]
   samples:
-    - Behind you. Hot. Mind yourself, I'm carrying.
-    - A handful. Yours, not mine. Mine's bigger.
-    - Eat. Then talk. Then eat again.
+    - Sit down before you fall down, love. There's a heel of rye going spare.
+    - Too much salt. Half a handful, not a fistful. Start again.
+    - Your father's asked for you twice. Go on, I've got the oven.
 birthday: 26
-likes: [ a hot oven at dawn, people who ask for seconds, rye flour ]
-dislikes: [ skimping, cold kitchens, a bit of salt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a hot oven at dawn, people who ask for seconds, rye flour, the sound of the first customer on the bell ]
+dislikes:
+  [
+    skimping on butter,
+    cold kitchens,
+    a bit of salt in the wrong place,
+    people who leave the door open in winter
+  ]
+fears: [ the ovens going cold for good, her father falling on the stairs ]
 dream:
-  text: Learn the starter
+  text: Learn the starter properly, from the beginning, the way her mother kept it in Carrow, and bake a loaf
+    that tastes like home.
   stages:
-    - Turn up at four in the morning (Regard ≥ 30 with a baker)
-    - Feed the starter three days running
-    - Bake a loaf under supervision
+    - Turn up at four in the morning and ask Odile Fournier for the starter.
+    - Feed the starter three days running without forgetting once.
+    - Bake a loaf under supervision and let someone else taste it first.
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: old_quarter.home_18 }
-    - { at: "08:30", do: work, where: market_row.cafe_liss }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: market_row.cafe_liss }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: old_quarter.home_18 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: old_quarter.home_18 }
+    - { at: "05:30", do: cook, where: old_quarter.home_18 }
+    - { at: "06:00", do: work, where: market_row.cafe_liss }
+    - { at: "09:30", do: eat, where: market_row.cafe_liss }
+    - { at: "12:00", do: shop, where: market_row.general_store }
+    - { at: "14:00", do: work, where: market_row.cafe_liss }
+    - { at: "17:30", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: cook, where: old_quarter.home_18 }
+    - { at: "21:30", do: read, where: old_quarter.home_18 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_18 }
   weekend:
-    - { at: "08:00", do: eat, where: old_quarter.home_18 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: old_quarter.home_18 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: old_quarter.home_18 }
-chores: [ water the window box, fill the coal scuttle ]
+    - { at: "07:00", do: cook, where: old_quarter.home_18 }
+    - { at: "09:00", do: shop, where: market_row.bakery }
+    - { at: "10:30", do: visit, where: old_quarter.home_18 }
+    - { at: "12:30", do: eat, where: commons.picnic_lawn }
+    - { at: "15:00", do: garden, where: commons.duck_pond }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: read, where: old_quarter.home_18 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_18 }
+chores: [ bake the morning loaves, mend the stair rail, wash the flour sacks ]
 relationships:
-  - { id: lucas_okonjo, affinity: 70, trust: 70, tag: father, note: Same house. }
-secrets: []
+  - {
+      id: lucas_okonjo,
+      affinity: 18,
+      trust: 22,
+      tag: father,
+      note: Her father; she loves him and worries he forgets his pills.
+    }
+  - { id: hester, affinity: 12, trust: 6, tag: wary, note: "Respects her, resents the wages." }
+  - { id: june, affinity: 15, trust: 14, tag: friend, note: Shares the early shift and the gossip. }
+secrets:
+  - text: She has been keeping her own sourdough starter alive in a jar under the stairs, a sample of her
+      mother's, and has never told anyone.
+    reveal: { regard_min: 55 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: mentor
+generated_by: model
 household: oq_p01
 archetype: cook_baker
 employment: employed

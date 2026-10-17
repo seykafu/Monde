@@ -4,13 +4,14 @@ name: Zuzanna McAllister
 age: 60
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired clerk, formerly kept shop accounts at Dunmore's.
 workplace: market_row.home_03
 home: market_row.home_03
 portrait: zuzanna_mcallister
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: zuzanna_mcallister
-appearance: An older woman with salt-and-pepper curls, a tan coat and half-moon glasses.
+appearance: A woman with salt-and-pepper curls and half-moon glasses, wearing a tan coat buttoned to the
+  collar. Her olive skin is weathered from years of walking the breakwater.
 look:
   kind: human
   skin: 7
@@ -21,57 +22,90 @@ look:
   outfit: { cut: coat, top: 15, bottom: 7, bottom_style: skirt, shoes: 14 }
   accessory: { kind: glasses }
   glasses: halfmoon
-backstory: "Zuzanna was born in Monde and is retired now. What she wants most is plain enough: a bench with a view."
+backstory: Zuzanna was born on Lower Row and left only once, for a year at a draper's in Carrow when she was
+  nineteen. She came back when her mother fell ill and never quite went again. She kept the books at Dunmore's
+  for thirty-one years, and she still knows what everyone in town used to spend on tea. She believes the town
+  will hold together if people just keep turning up. She is less sure about Fabian's garden, which she thinks
+  is a hazard to the cat.
 personality:
-  traits: [ curious, cheerful, warm ]
-  big5: { open: 59, conscientious: 61, extravert: 8, agreeable: 44, neurotic: 78 }
-values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+  traits: [ precise, warm, stubborn, observant ]
+  big5: { open: 45, conscientious: 82, extravert: 58, agreeable: 64, neurotic: 41 }
+values: { prosperity: 0.12, safety: 0.38, spirit: 0.15, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Most problems in Monde would fade if people wrote things down.
+  - Fabian is the only man in Monde who can make a kettle sulk.
+  - The lighthouse will light again once someone stops waiting for it.
 voice:
-  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
-  tics: [ "We take the paper, don't we, dear?" ]
-  never_says: [ no worries, awesome ]
+  register: Brisk and fond, quick to correct small errors and quicker to forgive them. She speaks in full
+    sentences and leaves the last word to Fabian when she can bear to.
+  tics: [ "Don't we, dear?", "Well, that's that." ]
+  never_says: [ I suppose, no need to fuss, frankly ]
   samples:
-    - We take the paper, don't we, dear? Both of us. Separately.
-    - He says the tea's stewed. It isn't. He likes it stewed.
-    - Lovely morning. Bit of a draught, but lovely.
+    - Don't we, dear? The bakery's shut again, so it's soup for supper.
+    - Mm. Put the kettle on, then. I'll find the good cups.
+    - Well, that's that. The Tollmen have been and gone, and nobody will say a word.
 birthday: 11
-likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
-dislikes: [ stairs, drafts, being managed ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    a morning paper,
+    a kettle on the stove,
+    pleasant strangers,
+    tidy ledgers,
+    the sound of gulls over Lower Row
+  ]
+dislikes: [ stairs, drafts, being managed, wet shoes, people who don't reply to letters ]
+fears: [ the house going quiet, being left behind by the town ]
 dream:
-  text: A bench with a view
+  text: Be useful to Monde again, with her name in the paper and a chair of her own at the pub.
   stages:
-    - Choose a spot on the Commons
-    - Raise 15 coins or ask Kasimir to build it
-    - Sit on it with the first neighbor who stops
+    - Volunteer three shifts at the library desk this month.
+    - Get thanked by name in the Lantern for the work.
+    - Take a regular chair at the Gull & Anchor on Friday evenings.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: market_row.home_03 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: market_row.home_03 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: market_row.home_03 }
-    - { at: "19:30", do: read, where: market_row.home_03 }
+    - { at: "07:00", do: eat, where: market_row.home_03 }
+    - { at: "07:30", do: read, where: market_row.home_03 }
+    - { at: "09:00", do: shop, where: market_row.general_store }
+    - { at: "10:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "13:00", do: eat, where: market_row.home_03 }
+    - { at: "15:00", do: walk, where: commons.duck_pond }
+    - { at: "18:30", do: cook, where: market_row.home_03 }
     - { at: "21:30", do: sleep, where: market_row.home_03 }
   weekend:
     - { at: "08:00", do: eat, where: market_row.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: market_row.home_03 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "10:00", do: shop, where: market_row.market_hall }
+    - { at: "12:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: visit, where: old_quarter.library }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: market_row.home_03 }
-chores: [ mend a sock, water the window box ]
+chores:
+  [
+    Balance the household accounts on Sunday.,
+    Mend the lace on the front curtains.,
+    Sweep the step before the Lantern arrives.
+  ]
 relationships:
-  - { id: fabian_mcallister, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - {
+      id: fabian_mcallister,
+      affinity: 20,
+      trust: 24,
+      tag: spouse,
+      note: Her husband of forty years; they argue for affection.
+    }
+  - { id: philippa_pascoe, affinity: 12, trust: 10, tag: friend, note: Good for a gossip over the pub bar. }
+  - {
+      id: soren_falk,
+      affinity: 14,
+      trust: 12,
+      tag: fond,
+      note: A fellow former clerk who misses the mill office.
+    }
+secrets:
+  - text: She still keeps a ledger of every coin she lent a neighbour and never once asked for it back.
+    reveal: { regard_min: 60 }
 canon_locks: []
-story_role: none
-generated_by: template
+story_role: volunteer
+generated_by: model
 household: mr_b01
 archetype: retired_couple
 employment: retired

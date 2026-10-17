@@ -4,13 +4,14 @@ name: Konrad Maguire
 age: 88
 pronouns: he/him
 kind: resident
-occupation: retired
+occupation: Retired, formerly a loom-setter at Lissworth Mill.
 workplace: millbrook.home_17
 home: millbrook.home_17
 portrait: konrad_maguire
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: konrad_maguire
-appearance: An older man with short grey hair, a grey shirt, round glasses and a moustache.
+appearance: A slight older man with short grey hair, round glasses and a neat grey moustache. He wears a grey
+  shirt buttoned to the collar, and his glasses are always pushed up on his forehead when he reads.
 look:
   kind: human
   skin: 3
@@ -22,58 +23,101 @@ look:
   accessory: { kind: glasses }
   glasses: round
   face: { moustache: true }
-backstory: "Konrad came to Monde from Port Sallow 51 years ago and is retired now. What he wants most is plain
-  enough: someone to eat supper with."
+backstory: "Konrad grew up in a mill town two rivers inland and came to Monde at thirty-seven, when the
+  Lissworth loom-shop was taking on setters. He set looms for twenty-two years, and his wife Ruthie kept the
+  house on Loom Street with a stove that never drew properly. She died in the winter the mill's second shift
+  was cut, and he has kept her wooden spoon in the drawer ever since. He tells people the mill closed because
+  of the price of cotton. He is half wrong: it was the new owners, and he still hasn't forgiven them. He
+  stayed because the terraces were cheap and the weir sounds like the river he grew up on."
 personality:
-  traits: [ restless, careful, kind ]
-  big5: { open: 12, conscientious: 60, extravert: 43, agreeable: 85, neurotic: 33 }
+  traits: [ patient, rambling, stubborn, tender ]
+  big5: { open: 55, conscientious: 70, extravert: 35, agreeable: 65, neurotic: 40 }
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A house with a cold stove is no house at all.
+  - Boys on bicycles should carry bells.
+  - The mill would have reopened if people had written letters.
 voice:
-  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
-  tics: [ Now where was I? ]
-  never_says: [ no worries, awesome ]
+  register: Slow and warm, with long digressions he always comes back from. He remembers what things cost forty
+    years ago and says so. Short when tired, expansive when asked for a story.
+  tics: [ Now where was I?, "Back in my day,", that's the way of it ]
+  never_says: [ you'll be fine, in my opinion, to be honest ]
   samples:
-    - Now where was I? The bread. One coin, it was. One coin.
-    - Sit down, sit down. The kettle's thinking about it.
-    - Little sparrow on the sill this morning. Bold as you like, he's back.
+    - Now where was I? Ah, the loom-shop. Bread was two coins, mind, and nobody thought twice.
+    - Don't you fret about the ferry, it'll come when it's good and ready.
+    - Aye. Ruthie would've had the kettle on by now, so I'll see to it. 
 birthday: 14
-likes: [ knitting, small birds at the window, being asked for a story ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes:
+  [
+    knitting,
+    small birds at the window,
+    being asked for a story,
+    the weir in early morning,
+    sweet tea with two sugars
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    loud radios on the terrace
+  ]
+fears: [ the house going quiet for good, forgetting Ruthie's voice ]
 dream:
-  text: Someone to eat supper with
+  text: Someone to eat supper with, and a reason to lay two plates again.
   stages:
-    - Be invited to supper by a neighbor (Regard ≥ 25)
-    - Return the invitation
-    - Set a standing Thursday table
+    - Be invited to supper by a neighbour.
+    - Return the invitation at Loom Street.
+    - Set a standing Thursday table for whoever comes.
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_17 }
-    - { at: "09:30", do: walk, where: wharf.breakwater }
-    - { at: "12:00", do: eat, where: millbrook.home_17 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_17 }
-    - { at: "19:30", do: read, where: millbrook.home_17 }
+    - { at: "06:30", do: wander, where: millbrook.home_17 }
+    - { at: "07:00", do: eat, where: millbrook.home_17 }
+    - { at: "08:00", do: walk, where: millbrook.weir }
+    - { at: "10:00", do: shop, where: market_row.general_store }
+    - { at: "12:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "15:00", do: read, where: old_quarter.library }
+    - { at: "17:30", do: sit, where: millbrook.terrace_row }
+    - { at: "19:00", do: cook, where: millbrook.home_17 }
     - { at: "21:30", do: sleep, where: millbrook.home_17 }
   weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_17 }
+    - { at: "08:30", do: eat, where: millbrook.home_17 }
     - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: millbrook.home_17 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_17 }
-chores: [ fill the coal scuttle, water the window box ]
+    - { at: "12:00", do: sit, where: commons.picnic_lawn }
+    - { at: "14:00", do: visit, where: old_quarter.st_brigids }
+    - { at: "16:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: millbrook.home_17 }
+chores: [ Keeps the stove riddled and banked, Mends his own socks by the window, Sweeps the front step on Fridays ]
 relationships:
-  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
-secrets: []
+  - {
+      id: frankie_chandra,
+      affinity: 18,
+      trust: 14,
+      tag: fond,
+      note: Brings him the Lantern before anyone else and argues about it.
+    }
+  - {
+      id: hamish_ortega,
+      affinity: 6,
+      trust: 10,
+      tag: curious,
+      note: Checks Loom Street accounts and disagrees with his sums.
+    }
+  - {
+      id: klara_fairweather,
+      affinity: 12,
+      trust: 8,
+      tag: friend,
+      note: Shares a pot of tea on wash day now and then.
+    }
+secrets:
+  - text: He has been keeping Ruthie's last letter unopened in the spoon drawer because he cannot bear to read the
+      end.
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
-generated_by: template
+generated_by: model
 household: mb_a05
 archetype: widowed_elder
 employment: retired
