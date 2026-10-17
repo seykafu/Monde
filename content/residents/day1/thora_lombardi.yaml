@@ -1,0 +1,130 @@
+# Generated (census-v1) for mb_a03; curated not yet. Edit here.
+id: thora_lombardi
+name: Thora Lombardi
+age: 62
+pronouns: she/her
+kind: resident
+occupation: Night watchman at the cannery and the old mill yard.
+workplace: wharf.cannery
+home: millbrook.home_06
+portrait: thora_lombardi
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: thora_lombardi
+appearance: Grey curls pinned loosely under a cream scarf, an olive shirt buttoned to the collar. Her tan skin
+  is weathered from years of walking the wharf in every weather.
+look:
+  kind: human
+  skin: 2
+  hair: { style: curly, colour: 2 }
+  eyes: 7
+  build: medium
+  height: tall
+  outfit: { cut: plain, top: 10, bottom: 9, bottom_style: trousers, shoes: 14 }
+  accessory: { kind: scarf, colour: 9 }
+backstory: Came to Monde at twenty-seven from a mill town inland, drawn by Lissworth's steady wage and a
+  foreman's letter promising work for life. She set looms for eight years, then the Mill closed fourteen years
+  ago and the cannery took her on as night watch when it was still running. The cannery shut eleven years ago,
+  but the company never formally released its watch contract, so she still walks the Wharf most nights and
+  logs nothing. Her husband Emil drowned off the breakwater nine years back, and she keeps his thermos in the
+  boathouse and never fills it. She tells people she stays because the rent is cheap.
+personality:
+  traits: [ steady, watchful, dry, loyal, stubborn ]
+  big5: { open: 35, conscientious: 82, extravert: 30, agreeable: 55, neurotic: 40 }
+values: { prosperity: 0.5, safety: 0.25, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - The Mill will reopen if people just hold on.
+  - Nobody on Market Row pays attention to the harbour anymore.
+  - A tin mug of tea is worth more than any clock.
+voice:
+  register: "Plain and short. Speaks in numbers when she can: hours, tides, bolts. Says things once and does not
+    repeat herself."
+  tics: [ Used to be., Mind the step., That's the tide talking. ]
+  never_says: [ I feel, sorry for your trouble, you know what I mean ]
+  samples:
+    - Tide's turning. Mind the step on the harbour side.
+    - Used to be eight hours a shift, and a hot dinner after. Now it's a cold cup.
+    - No, I don't need company. But the kettle's on if you're passing.
+birthday: 9
+likes:
+  [
+    Tea in a tin mug,
+    The sound of a loom running true,
+    A clock that keeps time,
+    Quiet nights on the breakwater,
+    Fresh bread from Fournier & Fille
+  ]
+dislikes:
+  [
+    Being retrained,
+    Short shifts,
+    Men with clipboards,
+    Clocks that have stopped,
+    People who talk over the tide
+  ]
+fears: [ The harbour taking someone else, Being moved out of Terrace Row, Forgetting the sound of the looms ]
+dream:
+  text: Get the old loom turning again and run one bolt of cloth before she dies.
+  stages:
+    - Find the loom parts in the Mill yard.
+    - Oil and set them with Kasimir.
+    - Run the first bolt of cloth.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_06 }
+    - { at: "07:15", do: walk, where: millbrook.terrace_row }
+    - { at: "08:00", do: shop, where: market_row.bakery }
+    - { at: "10:00", do: sit, where: millbrook.laundry_green }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: nap, where: millbrook.home_06 }
+    - { at: "20:00", do: work, where: wharf.cannery }
+    - { at: "23:00", do: walk, where: wharf.breakwater }
+    - { at: "24:30", do: sleep, where: millbrook.home_06 }
+  weekend:
+    - { at: "07:30", do: eat, where: millbrook.home_06 }
+    - { at: "09:00", do: garden, where: millbrook.laundry_green }
+    - { at: "11:00", do: shop, where: market_row.market_street }
+    - { at: "13:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: walk, where: commons.duck_pond }
+    - { at: "19:00", do: visit, where: millbrook.terrace_row }
+    - { at: "22:00", do: sleep, where: millbrook.home_06 }
+chores:
+  [
+    Mends her own shirts by the window,
+    Fills the coal scuttle before dark,
+    Brushes salt off the step each morning
+  ]
+relationships:
+  - {
+      id: anneke_moran,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Shared the loom floor; still trades gossip over the wall.
+    }
+  - {
+      id: henrike_ruskova,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Asks too many questions about the old frames.
+    }
+  - {
+      id: iain_marchant,
+      affinity: -6,
+      trust: -4,
+      tag: wary,
+      note: Tallied her wages at the Mill and got one figure wrong.
+    }
+secrets:
+  - text: She still has Emil's thermos and fills it some nights, then pours it onto the harbour steps before dawn.
+    reveal: { regard_min: 60 }
+  - text: She keeps a plum stone in her coat pocket from the orchard her mother had inland, and turns it when she
+      cannot sleep.
+    reveal: { regard_min: 45 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_a03
+archetype: mill_hand
+employment: employed
+years_in_monde: 35

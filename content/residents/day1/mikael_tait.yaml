@@ -1,0 +1,110 @@
+# Generated (census-v1) for oq_c02; curated not yet. Edit here.
+id: mikael_tait
+name: Mikael Tait
+age: 40
+pronouns: he/him
+kind: resident
+occupation: Plumber and general builder working from the Bell Row workshop.
+workplace: old_quarter.home_02
+home: old_quarter.home_02
+portrait: lib_m47_060
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: mikael_tait
+appearance: A broad man with a short white beard and prematurely white hair under a charcoal flat cap, a
+  pencil tucked behind one ear. He wears a slate-blue canvas work jacket with the sleeves rolled to the elbow.
+look:
+  kind: human
+  skin: 3
+  hair: { style: short, colour: 8 }
+  eyes: 0
+  build: broad
+  height: tall
+  outfit: { cut: coat, top: 6, bottom: 6, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 13 }
+  face: { grey_temples: true, stubble: true }
+backstory: Mikael grew up in a mill town on the northern coast where his father ran a plumbing van until the
+  lanes emptied. He trained with a firm in Hessle Cross, then went freelance at nineteen, taking any job the
+  ferry would carry him to. A burst main in a Monde cellar in his second year got him talking to the town's
+  old men about its roofs, and he never left. He married Mikael's partner Viggo's counterpart in the same
+  year, and they bought the Bell Row flat. He still regrets leaving his first apprentice behind on the
+  mainland, and he believes the town will rebuild itself if someone simply starts with the worst roof.
+personality:
+  traits: [ patient, methodical, stubborn, warm ]
+  big5: { open: 45, conscientious: 82, extravert: 38, agreeable: 65, neurotic: 30 }
+values: { prosperity: 0.4, safety: 0.25, spirit: 0.15, charm: 0.2 }
+beliefs:
+  - A good roof is the start of everything.
+  - Most people here are waiting for permission to repair their own homes.
+  - Plain tea is the only honest drink.
+voice:
+  register: Slow and measured, short sentences, metaphors from building. He says mm while judging a wall and
+    pauses before answering. Rarely swears and never raises his voice.
+  tics: [ "mm, then nothing", that'll hold, level it first ]
+  never_says: [ it'll do, good enough, whatever ]
+  samples:
+    - Mm. Roof's sound, mostly. Give me a Saturday and I'll tell you the rest.
+    - Slate's worth more than gold round here, if you ask me.
+    - Not today. The beam's still wet and I won't rush it.
+birthday: 50
+likes:
+  [
+    seasoned timber,
+    a sharp chisel,
+    plain tea,
+    early mornings on the harbour steps,
+    the sound of a good saw
+  ]
+dislikes: [ it'll do, damp, scaffolding that wobbles, idle talk about the Tollmen ]
+fears: [ a roof coming down on someone, leaving the town half-finished ]
+dream:
+  text: Raise the bandstand on the Commons so the town has somewhere to gather again.
+  stages:
+    - Examine the collapsed bandstand with a plumb line and a notebook.
+    - Draw the plan with Kasimir over a long pot of tea.
+    - Lift the first beam on a Saturday with whoever turns up.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: old_quarter.home_02 }
+    - { at: "07:15", do: walk, where: wharf.harbor_steps }
+    - { at: "08:00", do: work, where: old_quarter.home_02 }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:15", do: work, where: old_quarter.home_02 }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: read, where: old_quarter.home_02 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_02 }
+  weekend:
+    - { at: "08:30", do: eat, where: old_quarter.home_02 }
+    - { at: "09:30", do: walk, where: commons.picnic_lawn }
+    - { at: "11:00", do: visit, where: old_quarter.clocktower }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: tinker, where: old_quarter.home_02 }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: old_quarter.home_02 }
+chores: [ mend the workshop bench, fix the kitchen tap washer, sweep the Bell Row step ]
+relationships:
+  - {
+      id: viggo_tait,
+      affinity: 22,
+      trust: 28,
+      tag: spouse,
+      note: Husband of twenty-one years; teases him about the flat cap.
+    }
+  - {
+      id: augusta,
+      affinity: 8,
+      trust: 12,
+      tag: curious,
+      note: Keeps asking about the constabulary's leaking roof.
+    }
+  - { id: pell, affinity: -6, trust: 4, tag: wary, note: Thinks the mayor sits on repairs too long. }
+secrets:
+  - text: He keeps a child's cloth-bound notebook of every roof he has ever mended, with sketches of the faults.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: oq_c02
+archetype: builder
+employment: employed
+years_in_monde: 21

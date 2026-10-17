@@ -1,0 +1,107 @@
+# Generated (census-v1) for wf_b01; curated not yet. Edit here.
+id: anouk_seaton
+name: Anouk Seaton
+age: 73
+pronouns: she/her
+kind: resident
+occupation: Retired draper
+workplace: wharf.home_06
+home: wharf.home_06
+portrait: lib_f68_066
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: anouk_seaton
+appearance: A slim older woman with auburn hair in a bun, a dry and patient look, and a teal cardigan. A
+  brooch is pinned at her collar.
+look:
+  kind: human
+  skin: 1
+  hair: { style: bun, colour: 4 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 0, bottom: 6, bottom_style: skirt, shoes: 13 }
+  accessory: { kind: none }
+backstory: Anouk spent her working life measuring and cutting cloth in a draper's shop in a mill town inland,
+  where she was known for never letting a customer leave with the wrong length. When the mill closed she moved
+  to Monde to be near a cousin, and found the cousin had gone to the mainland. She kept the lease on the Shore
+  Lane flat anyway and took up odd sewing for the lane. She met Genevieve at the pub quiz and has been arguing
+  with her ever since. Her private belief is that Monde would never have lasted without the cannery, though
+  the cannery closed eleven years ago and took most of the town's money with it.
+personality:
+  traits: [ patient, dry, exact, loyal ]
+  big5: { open: 45, conscientious: 82, extravert: 38, agreeable: 60, neurotic: 30 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.15, charm: 0.35 }
+beliefs:
+  - A good hem outlasts any argument.
+  - Monde would never have lasted without the cannery.
+  - Genevieve will never be on time for anything.
+voice:
+  register: Measured and dry, with short sentences and a habit of correcting small details. She disagrees as a
+    kind of affection and seldom raises her voice.
+  tics: [ "Don't we, dear?", That's not quite right., Mm. ]
+  never_says: [ I'm sure it'll be fine, Just a little ]
+  samples:
+    - Mm. You've hemmed that the wrong way, but it'll do.
+    - Genevieve says the cat is ours. I say the cat has never asked either of us.
+    - Don't we, dear? I was only saying the bread was better on Tuesday.
+birthday: 81
+likes: [ a morning paper, her teal cardigan, quiet afternoons with a needle, neat seams, a kettle on the stove ]
+dislikes: [ drafts, being managed, loud pubs, uneven hems ]
+fears: [ being left alone in the flat, forgetting how to do a fine stitch ]
+dream:
+  text: To be useful again, sewing and mending for the town, and to be thanked by name in the Lantern.
+  stages:
+    - Volunteer three shifts at the library or the school.
+    - Get thanked by name in the Lantern.
+    - Take a regular chair at the Gull & Anchor.
+routine:
+  weekday:
+    - { at: "07:30", do: wander, where: wharf.home_06 }
+    - { at: "08:00", do: eat, where: wharf.home_06 }
+    - { at: "09:00", do: volunteer, where: old_quarter.library }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: write, where: wharf.home_06 }
+    - { at: "16:30", do: walk, where: wharf.harbor_steps }
+    - { at: "18:00", do: cook, where: wharf.home_06 }
+    - { at: "21:00", do: read, where: wharf.home_06 }
+    - { at: "22:00", do: sleep, where: wharf.home_06 }
+  weekend:
+    - { at: "08:30", do: eat, where: wharf.home_06 }
+    - { at: "10:00", do: walk, where: commons.picnic_lawn }
+    - { at: "12:00", do: shop, where: market_row.general_store }
+    - { at: "15:00", do: read, where: old_quarter.fountain_square }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: wharf.home_06 }
+chores: [ Mend the household's linen, Set out the morning paper, Keep the kettle full ]
+relationships:
+  - {
+      id: genevieve_corrigan,
+      affinity: 25,
+      trust: 28,
+      tag: partner,
+      note: Her partner of thirty-six years; argues with her fondly.
+    }
+  - {
+      id: amara_borowski,
+      affinity: 10,
+      trust: 12,
+      tag: fond,
+      note: Brings her offcuts from the fish-market lines.
+    }
+  - {
+      id: freja_treharne,
+      affinity: 14,
+      trust: 12,
+      tag: curious,
+      note: Pupil next door who borrows her thread.
+    }
+secrets:
+  - text: She still keeps her old shop ledger and checks the mill's closing figures every spring.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_b01
+archetype: retired_couple
+employment: retired
+years_in_monde: 36

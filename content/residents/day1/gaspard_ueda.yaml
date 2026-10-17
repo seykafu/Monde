@@ -1,0 +1,80 @@
+# Generated (census-v1) for oq_b01; curated not yet. Edit here.
+id: gaspard_ueda
+name: Gaspard Ueda
+age: 75
+pronouns: he/him
+kind: resident
+occupation: caretaker
+workplace: old_quarter.town_hall
+home: old_quarter.home_22
+portrait: lib_m74_038
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: gaspard_ueda
+appearance: A barrel-chested old fisherman with white hair to his collar, a big white beard like a sea-washed
+  broom, an anchor tattoo on his neck and a mustard oilskin over a cream jumper. A slow, weather-reading look.
+look:
+  kind: human
+  skin: 2
+  hair: { style: long, colour: 8 }
+  eyes: 4
+  build: broad
+  height: tall
+  outfit: { cut: coat, top: 4, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  face: { moustache: true, stubble: true }
+backstory: "Gaspard came to Monde from Port Sallow 39 years ago and works as caretaker. What he wants most is
+  plain enough: a rota that works."
+personality:
+  traits: [ patient, restless, particular ]
+  big5: { open: 8, conscientious: 38, extravert: 42, agreeable: 59, neurotic: 29 }
+values: { prosperity: 0.15, safety: 0.15, spirit: 0.55, charm: 0.15 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk, formal with warmth. Says "Item one." Asks for volunteers by looking at you.
+  tics: [ Item one. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Item one. Who's got the key to the hall?
+    - Volunteers? Thank you. I'd been looking at you.
+    - Minutes, please. Somebody always forgets the minutes.
+birthday: 92
+likes: [ lists, a gavel, being thanked by name ]
+dislikes: [ meetings without minutes, people who don't do committees, cold tea ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A rota that works
+  stages:
+    - Collect ten volunteers' names (Regard ≥ 20 with each)
+    - Print the rota at the Lantern
+    - Run one full week with no gap
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.home_22 }
+    - { at: "08:30", do: work, where: old_quarter.town_hall }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: old_quarter.town_hall }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: old_quarter.home_22 }
+    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: old_quarter.home_22 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_22 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "18:00", do: eat, where: old_quarter.home_22 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: old_quarter.home_22 }
+chores: [ sweep the step, wind the clock ]
+relationships:
+  - { id: effie_zielinski, affinity: 70, trust: 70, tag: partner, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: oq_b01
+archetype: retired_organizer
+employment: employed
+years_in_monde: 39

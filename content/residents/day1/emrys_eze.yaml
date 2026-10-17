@@ -1,0 +1,116 @@
+# Generated (census-v1) for mb_b01; curated not yet. Edit here.
+id: emrys_eze
+name: Emrys Eze
+age: 77
+pronouns: he/him
+kind: resident
+occupation: Groundskeeper for the Glasshouse and Commons grounds.
+workplace: commons.glasshouse
+home: millbrook.home_10
+portrait: emrys_eze
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: emrys_eze
+appearance: A broad, unhurried man with salt-and-pepper hair swept back from his forehead and half-moon
+  glasses. He wears an olive shirt with the sleeves rolled to the elbow.
+look:
+  kind: human
+  skin: 8
+  hair: { style: swept, colour: 11 }
+  eyes: 1
+  build: medium
+  height: short
+  outfit: { cut: plain, top: 10, bottom: 2, bottom_style: trousers, shoes: 6 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
+backstory: Emrys trained as a boatwright in a yard on the coast before the yard closed. He came to Monde at
+  forty-two to repair the Gannet's hull, stayed for the work, and never went back. For years he fixed boats
+  for anyone who could pay in coins or fish. When the Commons went to seed he started cutting paths through it
+  with a borrowed scythe, and nobody asked him to stop. The Glasshouse panes are his particular grief; he has
+  replaced nine and believes the tenth will hold. He is sure the bandstand can be saved with a few good beams,
+  which Kasimir has told him is not true.
+personality:
+  traits: [ patient, practical, teasing, sentimental ]
+  big5: { open: 55, conscientious: 67, extravert: 45, agreeable: 73, neurotic: 25 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.3, charm: 0.3 }
+beliefs:
+  - Every wall in this town can be made sound again with patience.
+  - The Gannet will outlast us all if somebody keeps her caulked.
+  - Klara is always right about dates and I am always right about wood.
+voice:
+  register: Slow and warm, with a laugh that arrives before the joke. He speaks in short practical sentences and
+    trails off into kindness.
+  tics: [ mind the step, that'll hold, well now ]
+  never_says: [ that's beyond saving, nothing I can do, I give up ]
+  samples:
+    - Give me the good ladder, that one's rotten at the top.
+    - Teo says the grapes are dead. I say they're sulking.
+    - Come and look at this pane, it's the tenth one and it's holding.
+birthday: 59
+likes:
+  [
+    the smell of tar and cut wood,
+    the Glasshouse at midday,
+    Klara's kettle,
+    fixing things nobody else will touch,
+    a morning paper
+  ]
+dislikes: [ the Tollmen's little visits, bindweed, people who call the bandstand a lost cause ]
+fears: [ the last panes breaking in a storm, being unable to climb a ladder ]
+dream:
+  text: A bench with a view, on the Commons, where the first neighbour who stops can sit with him.
+  stages:
+    - Choose a spot by the duck pond with a clear view of the harbour.
+    - Cut the timber from the old bandstand planks, carefully.
+    - Sit on it with the first neighbour who stops, and do not hurry.
+routine:
+  weekday:
+    - { at: "06:45", do: eat, where: millbrook.home_10 }
+    - { at: "07:30", do: work, where: commons.glasshouse }
+    - { at: "10:30", do: garden, where: commons.picnic_lawn }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: commons.glasshouse }
+    - { at: "16:30", do: walk, where: millbrook.weir }
+    - { at: "18:00", do: cook, where: millbrook.home_10 }
+    - { at: "21:00", do: sleep, where: millbrook.home_10 }
+  weekend:
+    - { at: "07:30", do: eat, where: millbrook.home_10 }
+    - { at: "08:30", do: fish, where: wharf.breakwater }
+    - { at: "11:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: sit, where: commons.duck_pond }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_10 }
+chores: [ mends the terrace gate, hauls water for the Glasshouse, sweeps the harbour steps on Fridays ]
+relationships:
+  - {
+      id: klara_eze,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: His wife of fifty years. She keeps the list; he keeps the house.
+    }
+  - {
+      id: teo,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Shares the Glasshouse work and the same complaints.
+    }
+  - {
+      id: bru,
+      affinity: -14,
+      trust: -8,
+      tag: wary,
+      note: Carves birds and asks too many questions about the Commons.
+    }
+secrets:
+  - text: He still keeps a small boat he built in the yard, hidden under the Glasshouse tarpaulin, and sails it
+      alone at dawn.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: favor_giver
+generated_by: model
+household: mb_b01
+archetype: retired_couple
+employment: employed
+years_in_monde: 35

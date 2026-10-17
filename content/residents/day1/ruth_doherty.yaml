@@ -1,0 +1,112 @@
+# Generated (census-v1) for oq_d02; curated not yet. Edit here.
+id: ruth_doherty
+name: Ruth Doherty
+age: 53
+pronouns: she/her
+kind: resident
+occupation: Boat repairer at the Wharf boathouse, patching hulls and rigging
+workplace: wharf.boathouse
+home: old_quarter.home_09
+portrait: lib_f56_030
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: ruth_doherty
+appearance: Sun-freckled cheeks and a faded strawberry-blonde plait over one shoulder, in leaf-green dungarees
+  over a cream jumper. A sprig of rosemary is tucked behind one ear, and she squints into the light as if it
+  owes her money.
+look:
+  kind: human
+  skin: 0
+  hair: { style: long, colour: 10 }
+  eyes: 2
+  build: medium
+  height: tall
+  outfit: { cut: dungarees, top: 7, bottom: 7, bottom_style: trousers, shoes: 2, trim: 9 }
+  accessory: { kind: none }
+  face: { freckles: true }
+backstory: Grew up inland, where her father kept a mill and she learned to splice rope before she learned to
+  read. Married young to a man who sold insurance in the city, and spent twenty years being very good at a
+  life that did not suit her. When the marriage ended she took a train to the coast with one suitcase and a
+  map she had torn from a library book. The boathouse on the Wharf needed someone who could caulk a seam, and
+  nobody else in Monde could. She has never told anyone why she picked a town with no doctor. She thinks it
+  was the smell of the water.
+personality:
+  traits: [ steady, dry, practical, stubborn ]
+  big5: { open: 42, conscientious: 78, extravert: 30, agreeable: 58, neurotic: 35 }
+values: { prosperity: 0.35, safety: 0.4, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - A boat that is patched properly outlasts a new one bought badly.
+  - The town will come back once the mill lights go on again.
+  - Gulls know when the catch is good, and that is why they follow the wrong boats.
+voice:
+  register: Short and weather-first. She answers questions with a fact about tides or wood before she answers
+    the question itself, and she rarely asks anything back.
+  tics: [ Fair., Tide's making., Could be worse. ]
+  never_says: [ I'm fine, you should, to be honest ]
+  samples:
+    - Fair. Hull's sound, the rest is paint.
+    - Could be worse. Could be raining, mind.
+    - Tide's making. Come back Friday if you want the bench.
+birthday: 46
+likes:
+  [
+    flat calm at dawn,
+    good rope,
+    smoked fish,
+    the smell of tar on a warm day,
+    a book of knots she keeps by the kettle
+  ]
+dislikes: [ tangled gear, loud engines, gulls on the catch, people who lean on the hull while it's wet ]
+fears: [ the boathouse roof coming down in a gale, being asked why she left the city ]
+dream:
+  text: Find a hull with good bones and turn it into a boat with my name painted on the transom.
+  stages:
+    - Find a sound hull at the back of the Wharf and haul it out.
+    - Raise sixty coins from catches and mending work.
+    - Launch her on Regatta day under her own name.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: old_quarter.home_09 }
+    - { at: "07:00", do: walk, where: wharf.harbor_steps }
+    - { at: "07:20", do: work, where: wharf.boathouse }
+    - { at: "12:00", do: eat, where: wharf.breakwater }
+    - { at: "12:40", do: work, where: wharf.boathouse }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: cook, where: old_quarter.home_09 }
+    - { at: "21:00", do: read, where: old_quarter.home_09 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_09 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_09 }
+    - { at: "09:00", do: walk, where: commons.duck_pond }
+    - { at: "10:30", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: fish, where: wharf.breakwater }
+    - { at: "19:00", do: cook, where: old_quarter.home_09 }
+    - { at: "21:30", do: read, where: old_quarter.library }
+    - { at: "23:00", do: sleep, where: old_quarter.home_09 }
+chores: [ Mend the nets on Sunday evenings, Sweep the gutter outside Flat B, Water the rosemary by the gate ]
+relationships:
+  - {
+      id: voss,
+      affinity: 12,
+      trust: 8,
+      tag: fond,
+      note: Brings her a hand-drawn chart of the bay every Saturday.
+    }
+  - {
+      id: margo,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Lends her the knot book and never asks for it back.
+    }
+secrets:
+  - text: She still writes letters to her sister in the city and posts them unsigned, so the postmark is the only
+      name.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: oq_d02
+archetype: fisher
+employment: employed
+years_in_monde: 14

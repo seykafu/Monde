@@ -1,0 +1,81 @@
+# Generated (census-v1) for mb_n01; curated not yet. Edit here.
+id: elke_nesbitt
+name: Elke Nesbitt
+age: 41
+pronouns: she/her
+kind: resident
+occupation: works in Carrow
+workplace: offmap.city
+home: millbrook.home_38
+portrait: elke_nesbitt
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: elke_nesbitt
+appearance: A woman with light brown hair in a bun and a rust jumper.
+look:
+  kind: human
+  skin: 7
+  hair: { style: bun, colour: 1 }
+  eyes: 2
+  build: narrow
+  height: tall
+  outfit: { cut: jumper, top: 11, bottom: 12, bottom_style: trousers, shoes: 4 }
+  accessory: { kind: none }
+  face: { grey_temples: true }
+backstory: "Elke was born in Monde and works as a commuter to Carrow. What she wants most is plain enough: a
+  school worth the walk."
+personality:
+  traits: [ curious, restless, cheerful ]
+  big5: { open: 42, conscientious: 27, extravert: 59, agreeable: 68, neurotic: 59 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
+    schedule.
+  tics: [ "Shoes, satchels, sandwiches." ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Shoes, satchels, sandwiches. Three things. We're out by eight.
+    - Who runs the Thursday class? Name and time, please.
+    - They'll settle. I asked them, and they said they'd settle.
+birthday: 16
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_38 }
+    - { at: "07:30", do: work, where: offmap.city }
+    - { at: "12:30", do: eat, where: offmap.city }
+    - { at: "13:30", do: work, where: offmap.city }
+    - { at: "19:00", do: eat, where: offmap.city }
+    - { at: "22:00", do: sleep, where: offmap.city }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_38 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: millbrook.home_38 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: millbrook.home_38 }
+chores: [ black the stove, water the window box ]
+relationships:
+  - { id: corin_madsen, affinity: 70, trust: 70, tag: partner, note: Same house. }
+  - { id: leila_nesbitt, affinity: 70, trust: 70, tag: mother, note: Same house. }
+  - { id: hanne_nesbitt, affinity: 70, trust: 70, tag: daughter, note: Same house. }
+  - { id: josef_nesbitt, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_n01
+archetype: school_family
+employment: employed
+years_in_monde: 41

@@ -1,0 +1,107 @@
+# Generated (census-v1) for sh_a01; curated not yet. Edit here.
+id: gerrit_jensen
+name: Gerrit Jensen
+age: 78
+pronouns: he/him
+kind: resident
+occupation: Retired railway signalman, kept the Liss branch line's crossing gates for decades.
+workplace: station_hill.home_01
+home: station_hill.home_01
+portrait: gerrit_jensen
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: gerrit_jensen
+appearance: A tall, stooped man with short grey hair and round glasses, always in his cream coat even indoors.
+  He keeps a pencil behind one ear for crossword clues.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 2 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 9, bottom: 2, bottom_style: trousers, shoes: 1 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Gerrit worked the signals at the Liss branch for most of his life, before Monde Station lost its
+  stop nine years ago, but he came to the town at forty-seven when a job at a Carrow depot ended and his
+  marriage did too. His wife Anneke liked the sea and he liked her, so he stayed on after she died, in the
+  house on Station Road that still smells faintly of her lavender soap. He keeps a log of every train that
+  once passed through, in a ledger he is sure someone will want one day.
+personality:
+  traits: [ patient, precise, wistful, stubborn ]
+  big5: { open: 45, conscientious: 82, extravert: 25, agreeable: 60, neurotic: 55 }
+values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - A town that loses its trains is already half gone.
+  - Nobody comes to the lookout bench any more.
+  - Most people here would rather not be asked anything.
+voice:
+  register: Slow and courteous, rambling in a patient way and circling back to his point. Gives exact times and
+    prices, and corrects himself on dates.
+  tics: [ "Now, where was I?", Mind the step., That would be the eleven-forty. ]
+  never_says: [ hurry along, cheers mate, it's fine honestly ]
+  samples:
+    - Now, where was I? Ah, yes. The eleven-forty never ran late, not once in twelve years.
+    - Tea's on the stove if you want it. Mind the step, the third board gives.
+    - I'd not go up to the lookout after dark. The bench is sound, but the lamp isn't.
+birthday: 6
+likes:
+  [
+    the lookout bench over the bay,
+    his ledger of train times,
+    the heron fountain at dusk,
+    bread from Fournier & Fille on Saturday,
+    knitting
+  ]
+dislikes: [ boys on bicycles with no bells, a cold stove, loud talk on the ferry ]
+fears: [ forgetting the timetable, being moved into a home in Carrow ]
+dream:
+  text: Someone to eat supper with, now that Anneke's chair sits empty at the table.
+  stages:
+    - Accept an invitation to supper from a neighbour.
+    - Return the invitation with a meal of his own.
+    - Set a standing Thursday table for whoever comes.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: station_hill.home_01 }
+    - { at: "08:30", do: walk, where: station_hill.platform }
+    - { at: "10:00", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: sit, where: station_hill.lookout_bench }
+    - { at: "16:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: cook, where: station_hill.home_01 }
+    - { at: "21:30", do: sleep, where: station_hill.home_01 }
+  weekend:
+    - { at: "08:00", do: eat, where: station_hill.home_01 }
+    - { at: "09:30", do: shop, where: market_row.bakery }
+    - { at: "11:00", do: wander, where: commons.duck_pond }
+    - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: sit, where: wharf.harbor_steps }
+    - { at: "19:00", do: cook, where: station_hill.home_01 }
+    - { at: "22:00", do: sleep, where: station_hill.home_01 }
+chores:
+  [
+    Winds the kitchen clock every Sunday,
+    Sweeps the step and salts the path,
+    Sews buttons on his coat each autumn
+  ]
+relationships:
+  - {
+      id: hollis,
+      affinity: 18,
+      trust: 12,
+      tag: friend,
+      note: Fellow railwayman; they trade old timetables and grievances.
+    }
+  - { id: pell, affinity: -6, trust: 4, tag: wary, note: Thinks the mayor spends too long on speeches. }
+  - { id: odile, affinity: 14, trust: 10, tag: fond, note: Saves him the heel of the loaf on Saturdays. }
+secrets:
+  - text: He still writes to Anneke's sister in Carrow every month and never posts the letters.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: sh_a01
+archetype: widowed_elder
+employment: retired
+years_in_monde: 31

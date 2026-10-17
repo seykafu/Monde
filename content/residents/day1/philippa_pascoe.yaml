@@ -1,0 +1,109 @@
+# Generated (census-v1) for mr_d03; curated not yet. Edit here.
+id: philippa_pascoe
+name: Philippa Pascoe
+age: 53
+pronouns: she/her
+kind: resident
+occupation: Bar and kitchen hand at The Gull & Anchor, cooking the pub's…
+workplace: market_row.gull_and_anchor
+home: market_row.home_02
+portrait: lib_f42_009
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: philippa_pascoe
+appearance: Auburn hair in a messy bun with a pencil through it, a blue checked shirt with the sleeves rolled
+  to the elbow, and a clean white apron tied tight at the back.
+look:
+  kind: human
+  skin: 0
+  hair: { style: bun, colour: 4 }
+  eyes: 2
+  build: medium
+  height: tall
+  outfit: { cut: apron, top: 5, bottom: 2, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: apron, colour: 9 }
+backstory: Philippa cooked in a busy hotel kitchen in Carrow for twenty years, rising from peeler to sous
+  chef. Her marriage ended quietly and she wanted a smaller life, so she took the ferry to Monde with two
+  knives and a cast-iron pan. The first winter she nearly left, because the pub had one stove that ran hot on
+  the left side only. She learned to turn every tray halfway through. Nobody thanked her for it, and she has
+  never needed them to. Lower Row has the best light in the mornings, and the Gull's kitchen has the one oven
+  that holds its heat, so she stayed.
+personality:
+  traits: [ bossy, warm, exacting, practical ]
+  big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 58, neurotic: 35 }
+values: { prosperity: 0.3, safety: 0.1, spirit: 0.25, charm: 0.35 }
+beliefs:
+  - A kitchen that is cold is a kitchen that is lying.
+  - Roz pays too little and would be lost without me.
+  - Nobody in Monde eats enough vegetables.
+voice:
+  register: Brisk and affectionate, with kitchen warnings delivered as pet names. Measures everything in
+    handfuls and pinches. Short sentences when busy, longer when she's pleased.
+  tics: [ "mind the tray, love", a handful of, that's my girl ]
+  never_says: [ I'm sorry for your loss, it's not a big deal, I don't know how ]
+  samples:
+    - Don't touch that tray, love, it's hot enough to bite. Go and sit down.
+    - A handful of salt, a bit more, there. Now it tastes like something.
+    - Well. That's a pie I'd be proud to put my name to.
+birthday: 28
+likes:
+  [
+    a hot oven at dawn,
+    people who ask for seconds,
+    rye flour,
+    the hymn-humming hush of an empty kitchen,
+    Roz's terrible jokes
+  ]
+dislikes: [ skimping on butter, cold kitchens, a bit of salt, bought bread ]
+fears: [ the Gull closing and the stove going cold for good, burning someone she's fond of ]
+dream:
+  text: Cook a Harvest Supper big enough to feed the whole town, and serve it in the Market Hall on the autumn
+    night.
+  stages:
+    - Plan a Harvest Supper menu with Roz and the Lantern's printer.
+    - Cook alongside four volunteers in the Gull's kitchen.
+    - Serve the supper at the Market Hall to every household in town.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: market_row.home_02 }
+    - { at: "07:00", do: work, where: market_row.gull_and_anchor }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: work, where: market_row.gull_and_anchor }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: walk, where: wharf.harbor_steps }
+    - { at: "22:30", do: sleep, where: market_row.home_02 }
+  weekend:
+    - { at: "07:30", do: eat, where: market_row.home_02 }
+    - { at: "09:00", do: shop, where: market_row.bakery }
+    - { at: "10:30", do: wander, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "18:00", do: cook, where: market_row.home_02 }
+    - { at: "21:30", do: sleep, where: market_row.home_02 }
+chores: [ bakes a loaf every second morning, scrubs the stove on Sundays, keeps the Lower Row window box green ]
+relationships:
+  - {
+      id: rosalind,
+      affinity: 14,
+      trust: 10,
+      tag: friend,
+      note: Her employer and sparring partner; they bicker about the pay.
+    }
+  - {
+      id: lavinia_garnier,
+      affinity: 18,
+      trust: 12,
+      tag: fond,
+      note: Teaches her to peel fast without losing skin.
+    }
+  - { id: frane, affinity: 8, trust: 6, tag: curious, note: Her neighbour; trades cake for wireless repairs. }
+secrets:
+  - text: She still hums the old harbour hymn her mother sang, badly, when she thinks nobody can hear.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_d03
+archetype: cook_baker
+employment: employed
+years_in_monde: 14

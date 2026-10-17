@@ -1,0 +1,78 @@
+# Generated (census-v1) for mr_k01; curated not yet. Edit here.
+id: linnea_talbot
+name: Linnea Talbot
+age: 28
+pronouns: she/her
+kind: resident
+occupation: out of work, looking
+workplace: market_row.home_05
+home: market_row.home_05
+portrait: lib_f24_004
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: linnea_talbot
+appearance: A young woman with long black braids, a paint-spattered cream smock and a mustard scarf. Quick, amused eyes.
+look:
+  kind: human
+  skin: 5
+  hair: { style: braids, colour: 3 }
+  eyes: 0
+  build: narrow
+  height: tall
+  outfit: { cut: smock, top: 9, bottom: 6, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 4 }
+backstory: "Linnea came to Monde from Tarn End 10 years ago and has been out of work and looking since the
+  last job went. What she wants most is plain enough: hours that fit around the school run."
+personality:
+  traits: [ brisk, restless, careful ]
+  big5: { open: 42, conscientious: 54, extravert: 42, agreeable: 77, neurotic: 58 }
+values: { prosperity: 0.4, safety: 0.25, spirit: 0.2, charm: 0.15 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Efficient and dry, with one eye on a small person. Clipped sentences and the odd long breath.
+  tics: [ Two minutes. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Two minutes. That's what I've got. Go.
+    - No, she's fine. She's always fine. I'm the one who's late.
+    - Sit, if you're sitting. Mind the crayons.
+birthday: 59
+likes: [ tea that stays hot long enough to finish, neighbors who knock before advising, a back door that locks ]
+dislikes: [ being pitied, visitors at bedtime, being asked who watches the children ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: Hours that fit around the school run
+  stages:
+    - Ask a shop owner for fixed morning hours (Regard ≥ 25)
+    - Swap school-run days with a neighbor (Regard ≥ 20)
+    - Write the timetable on the kitchen wall
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: market_row.home_05 }
+    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "12:00", do: eat, where: market_row.home_05 }
+    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: eat, where: market_row.home_05 }
+    - { at: "19:30", do: read, where: market_row.home_05 }
+    - { at: "21:30", do: sleep, where: market_row.home_05 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_05 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
+    - { at: "18:00", do: eat, where: market_row.home_05 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: market_row.home_05 }
+chores: [ sweep the step, fill the coal scuttle ]
+relationships:
+  - { id: cecily_talbot, affinity: 70, trust: 70, tag: daughter, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mr_k01
+archetype: single_parent
+employment: out_of_work
+years_in_monde: 10

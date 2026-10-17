@@ -1,0 +1,80 @@
+# Generated (census-v1) for calloway; curated not yet. Edit here.
+id: amara_borowski
+name: Amara Borowski
+age: 34
+pronouns: she/her
+kind: resident
+occupation: fish-market hand
+workplace: wharf.fish_market
+home: wharf.home_bunkhouse
+portrait: lib_f31_051
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: amara_borowski
+appearance: A woman with close-cropped bleached-blonde hair, small gold hoop earrings and a practical teal
+  coat with a tote bag strap on one shoulder. Dry, efficient look.
+look:
+  kind: human
+  skin: 8
+  hair: { style: cropped, colour: 5 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 0, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+backstory: "Amara came to Monde from Marrow Quay 3 years ago and works as fish-market hand. What she wants
+  most is plain enough: a kiln or a loom that isn't in the kitchen."
+personality:
+  traits: [ dreamy, restless, patient ]
+  big5: { open: 76, conscientious: 74, extravert: 42, agreeable: 47, neurotic: 44 }
+values: { prosperity: 0.2, safety: 0.15, spirit: 0.25, charm: 0.4 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Patient and exact. Talks in process words and describes weather by what it does to materials.
+  tics: [ Damp morning. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Damp morning. The glaze won't take till noon.
+    - Wedge it first. Always. Then you can argue with it.
+    - It's tension, mostly. Too tight and it puckers.
+birthday: 53
+likes: [ parcels arriving unbroken, steady north light, people who ask how it's made ]
+dislikes: [ could you do it cheaper, damp materials, the ferry missing a day ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A kiln or a loom that isn't in the kitchen
+  stages:
+    - Find a workspace
+    - Get venting or power put in by Kasimir
+    - Make the first piece with an audience
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: wharf.home_bunkhouse }
+    - { at: "08:30", do: work, where: wharf.fish_market }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: wharf.fish_market }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: wharf.home_bunkhouse }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_bunkhouse }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
+    - { at: "18:00", do: eat, where: wharf.home_bunkhouse }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
+chores: [ fill the coal scuttle, beat the doormat ]
+relationships:
+  - { id: dex, affinity: 70, trust: 70, tag: cousin, note: Same house. }
+  - { id: dom, affinity: 70, trust: 70, tag: cousin, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: calloway
+archetype: remote_craftsperson
+employment: employed
+years_in_monde: 3

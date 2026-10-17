@@ -1,0 +1,124 @@
+# Generated (census-v1) for mr_a02; curated not yet. Edit here.
+id: vera_sheehan
+name: Vera Sheehan
+age: 66
+pronouns: she/her
+kind: resident
+occupation: Retired seamstress, mends neighbours' clothes when asked.
+workplace: market_row.home_08
+home: market_row.home_08
+portrait: vera_sheehan
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: vera_sheehan
+appearance: A grey bob framing a tan, lined face, wearing a brown shirt buttoned to the collar. A tape measure
+  hangs around her neck like a habit.
+look:
+  kind: human
+  skin: 2
+  hair: { style: bob, colour: 2 }
+  eyes: 7
+  build: medium
+  height: short
+  outfit: { cut: plain, top: 1, bottom: 4, bottom_style: trousers, shoes: 1 }
+  accessory: { kind: none }
+backstory: Vera was born on Lower Row and trained as a seamstress at the mill office's tailoring room before
+  the frames went quiet. She sewed uniforms for the mill girls for thirty years and later took in alterations
+  from half the town. Her husband Tom drowned off the breakwater the winter before the cannery closed, and she
+  has kept his thermos hanging by the back door ever since, never filled. She stayed in Monde because she
+  could not picture her own kitchen anywhere else, though she tells people it was the price of the rent. She
+  believes the Gannet still runs to Carrow every day, and she is quietly sure the mill will reopen one spring.
+personality:
+  traits: [ patient, wry, stubborn, tender ]
+  big5: { open: 45, conscientious: 78, extravert: 40, agreeable: 72, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Nothing gets fixed by complaining, but everything gets fixed by asking nicely.
+  - The mill will open again once someone writes the right letter.
+  - Lower Row is the only street where neighbours still lend each other salt.
+voice:
+  register: Gentle and rambling on purpose, circling back to earlier threads. She remembers what things cost
+    forty years ago and says so. Speaks in warm, slow sentences with the occasional sharp aside.
+  tics: [ Now where was I?, Back in my day, "mm, yes" ]
+  never_says: [ sorry for your trouble, that's the spirit, out of curiosity, honestly ]
+  samples:
+    - Now where was I? Oh yes, the thread. A reel of it cost fourpence, and you could sew a whole collar with
+      what was left…
+    - Tea's on the back burner if you want it. Mind the cat, she's been sulking since breakfast.
+    - No, I don't need company today, thank you. Well. Perhaps just a minute on the step.
+birthday: 74
+likes:
+  [
+    knitting by the window,
+    small birds at the feeder,
+    being asked to tell a story,
+    the smell of bread from Fournier & Fille,
+    the anchor she keeps in the garden
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    the Tollmen's Saturday rounds
+  ]
+fears: [ the house going quiet for good, forgetting Tom's voice, winter with no one to check on her ]
+dream:
+  text: Someone to eat supper with, and a standing Thursday table where the street can gather without asking.
+  stages:
+    - Accept an invitation to supper from a neighbour on Lower Row.
+    - Return the invitation with a dish of your own cooking.
+    - Set a standing Thursday table in your front room for anyone who comes.
+routine:
+  weekday:
+    - { at: "06:30", do: wander, where: market_row.home_08 }
+    - { at: "07:00", do: eat, where: market_row.home_08 }
+    - { at: "08:00", do: shop, where: market_row.bakery }
+    - { at: "09:30", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: garden, where: market_row.home_08 }
+    - { at: "16:30", do: walk, where: commons.duck_pond }
+    - { at: "18:30", do: cook, where: market_row.home_08 }
+    - { at: "21:30", do: sleep, where: market_row.home_08 }
+  weekend:
+    - { at: "07:30", do: eat, where: market_row.home_08 }
+    - { at: "09:00", do: shop, where: market_row.market_hall }
+    - { at: "10:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "13:00", do: socialize, where: market_row.market_street }
+    - { at: "15:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "18:00", do: cook, where: market_row.home_08 }
+    - { at: "21:30", do: sleep, where: market_row.home_08 }
+chores: [ mend a neighbour's hem, water the window boxes, wind wool on Sundays ]
+relationships:
+  - {
+      id: yaa_ennis,
+      affinity: 12,
+      trust: 10,
+      tag: fond,
+      note: Buys thread from her stall and always haggles kindly.
+    }
+  - {
+      id: fabian_mcallister,
+      affinity: 8,
+      trust: 12,
+      tag: friend,
+      note: Sits on the same bench every afternoon and argues about the weather.
+    }
+  - {
+      id: cecily_talbot,
+      affinity: 10,
+      trust: 6,
+      tag: curious,
+      note: "Lets the little girl see her needles, watched closely."
+    }
+secrets:
+  - text: She still keeps Tom's last letter folded inside her Bible and reads it when the house is too quiet.
+    reveal: { regard_min: 60 }
+  - text: She secretly sewed a yellow dress she never wears, meant for a dance that was cancelled years ago.
+    reveal: { regard_min: 70 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mr_a02
+archetype: widowed_elder
+employment: retired
+years_in_monde: 66

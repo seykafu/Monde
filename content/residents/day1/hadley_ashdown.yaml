@@ -1,0 +1,100 @@
+# Generated (census-v1) for oq_e01; curated not yet. Edit here.
+id: hadley_ashdown
+name: Hadley Ashdown
+age: 42
+pronouns: they/them
+kind: resident
+occupation: Weaver working from home, selling cloth at the Saturday market.
+workplace: old_quarter.home_05
+home: old_quarter.home_05
+portrait: lib_a41_087
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: hadley_ashdown
+appearance: Short bleached-blond hair cropped close at the sides, with a clay-streaked rust-red smock and a
+  handwoven mustard scarf. A smear of dried clay sits on one cheekbone.
+look:
+  kind: human
+  skin: 7
+  hair: { style: cropped, colour: 5 }
+  eyes: 2
+  build: medium
+  height: tall
+  outfit: { cut: smock, top: 11, bottom: 2, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 4 }
+backstory: Hadley trained in a textile mill in Carrow before the mill's weaving floor was sold for scrap. They
+  arrived in Monde at 21, drawn by the empty houses and cheap rent, and rented the front rooms on Well Row.
+  The first winter was long and they taught themselves to dye with onion skins from the bakery. Their loom now
+  fills the back room, and they have never once been warm enough in the mornings. They believe the Saturday
+  market will fill again if enough people just keep showing up. They have not sold a standing order to any
+  shop yet, and they tell people otherwise.
+personality:
+  traits: [ patient, exact, dry, stubborn ]
+  big5: { open: 72, conscientious: 80, extravert: 35, agreeable: 58, neurotic: 40 }
+values: { prosperity: 0.25, safety: 0.2, spirit: 0.2, charm: 0.35 }
+beliefs:
+  - Good cloth sells itself if you leave it where people walk.
+  - The Commons will be fixed once someone starts weeding it properly.
+  - Everyone in town has a loom somewhere in their attic.
+voice:
+  register: Measured and precise, reaching for process words. Describes weather by what it does to yarn or dye.
+    Speaks softly and waits for the other person to finish.
+  tics: [ "'well, the warp is set'", "'it wants another day'" ]
+  never_says: [ ever so, "not bad, actually", I suppose ]
+  samples:
+    - The damp got into the wool overnight. It'll take a day to come right.
+    - Ulla's basket's on the sill again. She's watching the ferry.
+    - Come round Thursday and I'll show you the cochineal. It's temperamental.
+birthday: 91
+likes: [ parcels arriving unbroken, steady north light, people who ask how it's made, Ulla's sewing basket ]
+dislikes: [ could you do it cheaper, damp materials, the ferry missing a day ]
+fears: [ the loom seizing for good, running out of undyed wool ]
+dream:
+  text: A loom in a proper workroom with a window that opens, where people can watch the cloth come off it.
+  stages:
+    - Find a room with proper ventilation and a second window.
+    - Ask Kasimir for a lintel and a power point for the dye vats.
+    - Weave the first full length in front of whoever comes to watch.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.home_05 }
+    - { at: "07:30", do: work, where: old_quarter.home_05 }
+    - { at: "12:30", do: eat, where: old_quarter.home_05 }
+    - { at: "13:30", do: work, where: old_quarter.home_05 }
+    - { at: "17:30", do: walk, where: commons.duck_pond }
+    - { at: "18:30", do: cook, where: old_quarter.home_05 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_05 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_05 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:00", do: walk, where: commons.picnic_lawn }
+    - { at: "17:00", do: read, where: old_quarter.library }
+    - { at: "19:30", do: eat, where: old_quarter.home_05 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_05 }
+chores: [ dye skeins in the back yard, mend the loom's heddles, sweep the workroom floor ]
+relationships:
+  - { id: noam_ashdown, affinity: 25, trust: 30, tag: spouse, note: Husband; the one who keeps the kiln lit. }
+  - {
+      id: ulla_ferreira,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Neighbour across the lane; trades thread for gossip.
+    }
+  - {
+      id: margo,
+      affinity: 10,
+      trust: 8,
+      tag: curious,
+      note: Keeps asking about the old mill's pattern books.
+    }
+secrets:
+  - text: Hadley has kept the first, badly woven scarf they ever made and wears it in secret when it rains.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: oq_e01
+archetype: remote_craftsperson
+employment: employed
+years_in_monde: 21

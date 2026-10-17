@@ -1,0 +1,118 @@
+# Generated (census-v1) for oq_f01; curated not yet. Edit here.
+id: edda_finch
+name: Edda Finch
+age: 45
+pronouns: she/her
+kind: resident
+occupation: Retired early; does bookkeeping for neighbours on request.
+workplace: old_quarter.home_07
+home: old_quarter.home_07
+portrait: lib_f42_058
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: edda_finch
+appearance: A woman with dark brown hair in a messy bun, a green checked shirt with rolled sleeves and a clean
+  navy apron tied at the waist. Her eyes are bossy but kind.
+look:
+  kind: human
+  skin: 0
+  hair: { style: bun, colour: 0 }
+  eyes: 2
+  build: medium
+  height: tall
+  outfit: { cut: apron, top: 7, bottom: 2, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: apron, colour: 6 }
+backstory: Edda worked the winding floor at Lissworth Mill from sixteen until the lungs gave out at
+  thirty-nine. She tells people it was the dust, which is true, but the doctor in Carrow also blamed her habit
+  of climbing the frames without a mask. When the mill closed she had a choice of a flat in Carrow or the flat
+  her late mother left on Well Row, and she chose Well Row because her brother had already moved in and she
+  could not let him run the place alone. She still keeps the mill's old shift bell on the windowsill.
+personality:
+  traits: [ brisk, practical, stubborn, warm ]
+  big5: { open: 40, conscientious: 82, extravert: 55, agreeable: 60, neurotic: 45 }
+values: { prosperity: 0.3, safety: 0.25, spirit: 0.15, charm: 0.3 }
+beliefs:
+  - Anything broken can be made to work again with enough patience.
+  - The Lantern prints too many opinions and not enough tide times.
+  - Nobody in Monde reads a ledger but me.
+voice:
+  register: Short, decisive sentences. Gives instructions more often than opinions. Warm underneath, but rarely
+    shows it.
+  tics: [ "Right, then.", Mind the step., Sit down before you fall down. ]
+  never_says: [ I'm sorry for your loss, you should feel, it's all going to be fine ]
+  samples:
+    - Right, then. Sit, and tell me what's wrong with it.
+    - Mind the step, the third one's loose and it always has been.
+    - Ask me again in spring. I'll have the figures by then.
+birthday: 53
+likes:
+  [
+    Ledgers that balance,
+    Strong tea with no sugar,
+    The sound of the mill bell,
+    "Brother's bad jokes, quietly",
+    a hot soldering iron
+  ]
+dislikes: [ People who waste bread, Unpaid debts, Being fussed over, Wet washing on Mondays ]
+fears: [ Her brother's lungs getting worse, Losing the flat ]
+dream:
+  text: She wants Bertrand's clock running again so the town hears the hour properly, and she will not admit the
+    sentiment behind it.
+  stages:
+    - Visit Bertrand and ask him plainly what the clock needs.
+    - Find a missing part, probably in the mill's old stores.
+    - Present the working clock at the Town Hall steps.
+routine:
+  weekday:
+    - { at: "07:00", do: wander, where: old_quarter.home_07 }
+    - { at: "07:30", do: eat, where: old_quarter.home_07 }
+    - { at: "08:30", do: shop, where: market_row.general_store }
+    - { at: "10:00", do: clean, where: old_quarter.home_07 }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: write, where: old_quarter.lantern_office }
+    - { at: "17:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: old_quarter.home_07 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_07 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: socialize, where: commons.picnic_lawn }
+    - { at: "15:00", do: read, where: old_quarter.library }
+    - { at: "18:00", do: eat, where: old_quarter.home_07 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_07 }
+chores:
+  [
+    Balance the household accounts on Sundays,
+    Mend the flat's kettle and lamps,
+    Carry water from the fountain square
+  ]
+relationships:
+  - {
+      id: lucas_finch,
+      affinity: 12,
+      trust: 25,
+      tag: brother,
+      note: "Her brother, who needs watching on the stairs."
+    }
+  - {
+      id: ulla_ferreira,
+      affinity: 18,
+      trust: 20,
+      tag: friend,
+      note: Trades sewing repairs for her ledger help.
+    }
+  - {
+      id: honor_hedley,
+      affinity: -8,
+      trust: 6,
+      tag: wary,
+      note: Disputes the rain gauge readings every winter.
+    }
+secrets:
+  - text: She still climbs the mill stair at night when she cannot sleep, just to hear the frames.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: oq_f01
+archetype: radio_tinkerer
+employment: unable
+years_in_monde: 45

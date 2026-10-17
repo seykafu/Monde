@@ -1,0 +1,100 @@
+# Generated (census-v1) for wf_b01; curated not yet. Edit here.
+id: genevieve_corrigan
+name: Genevieve Corrigan
+age: 78
+pronouns: she/her
+kind: resident
+occupation: Fish-market hand at Nell's stall, mornings only
+workplace: wharf.fish_market
+home: wharf.home_06
+portrait: lib_f70_109
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: genevieve_corrigan
+appearance: A plump, smiling woman with snow-white hair in a loose bun and big round earrings like boiled
+  sweets. She wears a sunflower-yellow raincoat buttoned to the chin and a navy spotted scarf.
+look:
+  kind: human
+  skin: 5
+  hair: { style: bun, colour: 8 }
+  eyes: 3
+  build: broad
+  height: short
+  outfit: { cut: coat, top: 4, bottom: 6, bottom_style: skirt, shoes: 13 }
+  accessory: { kind: scarf, colour: 6 }
+backstory: Genevieve grew up inland in a rail town where her father ran the signal box. She came to Monde at
+  forty-two to help her aunt run a boarding house, and the aunt died within two winters. She stayed on the
+  strength of the harbour, and took the fish-market job when her knees were still good enough to lift crates.
+  Her great regret is that she never learned to swim, though she has lived by the sea for thirty-six years.
+  She is certain the ferry timetable was kinder before Moss changed the Tuesday crossing, which is not true;
+  he changed it to suit the tide.
+personality:
+  traits: [ nosy, warm, delighted, stubborn ]
+  big5: { open: 62, conscientious: 48, extravert: 84, agreeable: 76, neurotic: 38 }
+values: { prosperity: 0.15, safety: 0.3, spirit: 0.2, charm: 0.35 }
+beliefs:
+  - Everyone in Monde tells her their business sooner or later.
+  - The ferry was kinder before Moss changed the Tuesday crossing.
+  - A cat flap is the most sensible invention of the last century.
+voice:
+  register: Quick, chatty and affectionate, with a habit of asking questions and answering them herself. She
+    teases her partner openly and laughs at her own jokes before they land.
+  tics: [ "Well now,", "Don't we, Henrike?", I'm only saying. ]
+  never_says: [ I'm not one for gossip, I couldn't possibly ]
+  samples:
+    - Well now, you're up early. Did you hear the gulls wake the whole lane?
+    - Henrike says I talk too much. I told her someone has to keep the town informed.
+    - Oh, don't look at me like that. Have a bit of the cod, it's going spare.
+birthday: 86
+likes:
+  [
+    the morning paper,
+    pleasant strangers,
+    her yellow raincoat,
+    a kettle on the stove,
+    the cat flap she is planning
+  ]
+dislikes: [ stairs, drafts, being managed, cold fish ]
+fears: [ the lane going quiet for good, running out of people to talk to ]
+dream:
+  text: A dance on a Saturday night in a hall with real music, the way the town used to do it.
+  stages:
+    - Find a hall with a floor that will hold up.
+    - Find a gramophone or ask the Treharne boy to bring his fiddle.
+    - Hold the dance and make sure Henrike leads the first waltz.
+routine:
+  weekday:
+    - { at: "06:30", do: wander, where: wharf.home_06 }
+    - { at: "07:00", do: work, where: wharf.fish_market }
+    - { at: "11:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: socialize, where: wharf.harbor_steps }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: wharf.home_06 }
+    - { at: "21:30", do: sleep, where: wharf.home_06 }
+  weekend:
+    - { at: "08:30", do: eat, where: wharf.home_06 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.bakery }
+    - { at: "15:00", do: sit, where: commons.duck_pond }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: wharf.home_06 }
+chores: [ Sweep the step and the stoop, Wash the yellow raincoat, Feed the lane cats ]
+relationships:
+  - {
+      id: anouk_seaton,
+      affinity: 25,
+      trust: 28,
+      tag: partner,
+      note: Her partner of thirty-six years; teases her gently.
+    }
+  - { id: nell, affinity: 12, trust: 10, tag: fond, note: Works the stall beside her; they trade gossip. }
+  - { id: florian_garvey, affinity: 8, trust: 6, tag: curious, note: Neighbour who knows the fishing boats. }
+secrets:
+  - text: She has been saving coins in a teapot to buy a proper cat flap, and has never told Henrike.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_b01
+archetype: retired_couple
+employment: employed
+years_in_monde: 36

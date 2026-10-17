@@ -1,0 +1,106 @@
+# Generated (census-v1) for mb_i01; curated not yet. Edit here.
+id: dmitri_lyall
+name: Dmitri Lyall
+age: 32
+pronouns: he/him
+kind: resident
+occupation: Sign painter, currently out of work and taking odd lettering jobs for…
+workplace: millbrook.home_29
+home: millbrook.home_29
+portrait: lib_m33_054
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: dmitri_lyall
+appearance: Broad-shouldered with short black hair and stubble, a steady gaze. He wears a brick-red oilskin
+  jacket over a navy cable-knit jumper.
+look:
+  kind: human
+  skin: 2
+  hair: { style: short, colour: 3 }
+  eyes: 3
+  build: broad
+  height: tall
+  outfit: { cut: coat, top: 3, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  face: { stubble: true }
+backstory: Dmitri painted shop signs in Carrow for nine years before a firm there switched to printed vinyl
+  and let him go. He came to Monde at twenty-nine with a van full of brushes and a half-finished plan to open
+  his own sign shop. The van died on the coast road and he never replaced it. He still believes the Market Row
+  shopfronts will want new lettering once someone is brave enough to ask. Nobody has asked. He stays because
+  Cass is happy here, and because the light on the harbour steps is the best he has seen for paint.
+personality:
+  traits: [ chatty, earnest, stubborn, tender ]
+  big5: { open: 72, conscientious: 48, extravert: 66, agreeable: 58, neurotic: 55 }
+values: { prosperity: 0.2, safety: 0.1, spirit: 0.35, charm: 0.35 }
+beliefs:
+  - Every shopfront on Market Row is one fresh coat of paint from reopening.
+  - The Tollmen are just a crew with a ledger and nothing to hide.
+  - A sign is the first thing a town says about itself.
+voice:
+  register: Quick and funny, talks in bursts, over-explains a point and then apologises for it. Uses art words a
+    little wrong and knows it.
+  tics: [ "sorry, go on", which is to say, "I mean, technically" ]
+  never_says: [ as a matter of fact, that's a diagnosis ]
+  samples:
+    - No, sorry, I'm rambling. The gold leaf needs a dry day, which is to say, not this one.
+    - Fair point. Honestly the shopfront's crying out for a proper serif, or at least a less sad one.
+    - Cass says I've got a face for bad news. I say it's just concentration. We'll see who wins.
+birthday: 71
+likes:
+  [
+    good light through a dirty window,
+    old signage,
+    being asked what a piece is for,
+    fresh gesso in the morning
+  ]
+dislikes: [ being told his talent is a diagnosis, work offered for exposure, rain on a wet mural, vinyl lettering ]
+fears: [ the van never being replaced, Cass deciding Monde is a mistake ]
+dream:
+  text: Paint a wall in Monde that people stop and point at, with the whole town there to see it finished.
+  stages:
+    - Pick a blank wall with Sable's help and walk its length at dawn.
+    - Get the owner's and the mayor's permission from Edwina Pell.
+    - Paint it over two weekends and hold the unveiling on the Commons.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_29 }
+    - { at: "08:15", do: walk, where: millbrook.terrace_row }
+    - { at: "09:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: wander, where: wharf.harbor_steps }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: millbrook.home_29 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_29 }
+    - { at: "09:30", do: walk, where: millbrook.weir }
+    - { at: "11:00", do: shop, where: market_row.market_street }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: wander, where: commons.picnic_lawn }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: millbrook.home_29 }
+chores: [ mix paint in the back kitchen, sweep the yard, take brushes to the weir to rinse ]
+relationships:
+  - {
+      id: cass_lyall,
+      affinity: 25,
+      trust: 20,
+      tag: spouse,
+      note: "Partner, who keeps him honest about money."
+    }
+  - { id: billie_pengelly, affinity: 12, trust: 10, tag: fond, note: Neighbour who lends him ledger paper. }
+  - {
+      id: gaspard_clancy,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Asks about the old mill signs he can still read.
+    }
+secrets:
+  - text: He keeps a sketchbook of Monde's empty shopfronts, lettering he would paint if anyone asked.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_i01
+archetype: young_creative
+employment: out_of_work
+years_in_monde: 3

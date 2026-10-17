@@ -1,0 +1,110 @@
+# Generated (census-v1) for oq_e01; curated not yet. Edit here.
+id: noam_ashdown
+name: Noam Ashdown
+age: 38
+pronouns: he/him
+kind: resident
+occupation: Potter working from home, firing pieces for the Saturday stall.
+workplace: old_quarter.home_05
+home: old_quarter.home_05
+portrait: lib_m44_089
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: noam_ashdown
+appearance: Tall and soft-spoken with tidy ginger hair and a neat beard. He wears a navy duffel coat and a
+  long, lopsided mustard striped scarf that a child knitted for him.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 10 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 6, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 4 }
+  face: { moustache: true, stubble: true }
+backstory: Noam grew up on the mainland and came to Monde at 17 with his aunt, who wanted a quieter life after
+  the factories closed. He apprenticed under an old kiln-keeper on the harbour steps before the kiln cracked
+  and was never mended. He met Hadley at the library desk, both of them returning the same borrowed book on
+  glazes. He still thinks the kiln can be repaired with a single good brick. Most afternoons he carries clay
+  up from the harbour in a bucket and tells anyone who will listen about the next firing. He has not told
+  Hadley how many bowls he has cracked this winter.
+personality:
+  traits: [ gentle, frazzled, thorough, hopeful ]
+  big5: { open: 65, conscientious: 55, extravert: 45, agreeable: 75, neurotic: 50 }
+values: { prosperity: 0.2, safety: 0.25, spirit: 0.25, charm: 0.3 }
+beliefs:
+  - A kiln fires true if you keep it dry for a week beforehand.
+  - The harbour clay is better than anything from Carrow.
+  - Tib will be a potter one day if someone shows him the wheel.
+voice:
+  register: Warm and a little rambling, trailing into asides about clay. Gentle humour that sometimes falls
+    flat. Often trails off mid-sentence.
+  tics: [ "'the thing is'", "'give it a go'" ]
+  never_says: [ never mind, obviously, you wouldn't understand ]
+  samples:
+    - The bowl's fine. It just needs a bit of persuading.
+    - Mind the bucket, it's heavier than it looks.
+    - Hadley says I should stop, but I've nearly got the glaze right.
+birthday: 37
+likes:
+  [
+    the smell of wet clay,
+    the scarf Ulla's grandson knitted,
+    the harbour steps at dusk,
+    parcels arriving unbroken,
+    steady north light
+  ]
+dislikes: [ bowls that crack in the cooling, lost clay bags, the ferry running late ]
+fears: [ the kiln never working again, letting the aunt's memory fade ]
+dream:
+  text: Teach a proper class and see a student sign their first piece beside his own.
+  stages:
+    - Meet a student who wants to learn the wheel.
+    - Run three sessions at the library desk, wet clay and all.
+    - Watch the first student sign their piece beside his name.
+routine:
+  weekday:
+    - { at: "07:15", do: eat, where: old_quarter.home_05 }
+    - { at: "08:00", do: work, where: old_quarter.home_05 }
+    - { at: "11:00", do: wander, where: wharf.harbor_steps }
+    - { at: "13:00", do: eat, where: old_quarter.home_05 }
+    - { at: "14:00", do: work, where: old_quarter.home_05 }
+    - { at: "18:00", do: walk, where: wharf.breakwater }
+    - { at: "19:30", do: cook, where: old_quarter.home_05 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_05 }
+  weekend:
+    - { at: "08:30", do: eat, where: old_quarter.home_05 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: fish, where: wharf.harbor_steps }
+    - { at: "17:30", do: socialize, where: commons.duck_pond }
+    - { at: "20:00", do: eat, where: old_quarter.home_05 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_05 }
+chores: [ bring clay up from the harbour, keep the kiln door wedged dry, wash the wheel splash ]
+relationships:
+  - {
+      id: hadley_ashdown,
+      affinity: 25,
+      trust: 30,
+      tag: spouse,
+      note: Wife; the one who keeps the loom going.
+    }
+  - {
+      id: ulla_ferreira,
+      affinity: 15,
+      trust: 12,
+      tag: fond,
+      note: Knitted her grandson a scarf and never got it back.
+    }
+  - { id: tib, affinity: 12, trust: 8, tag: friend, note: Watches him throw pots at the library steps. }
+secrets:
+  - text: Noam has been quietly practising the wheel every night in the back yard, and his first bowl is in the
+      cupboard, lopsided.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: oq_e01
+archetype: remote_craftsperson
+employment: employed
+years_in_monde: 21

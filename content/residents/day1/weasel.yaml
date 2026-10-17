@@ -1,0 +1,113 @@
+# Generated (census-v1) for pike; curated not yet. Edit here.
+id: weasel
+name: Wendell "Weasel" Pike
+age: 28
+pronouns: he/him
+kind: resident
+occupation: Tollman, runs envelopes and listens at doors on Market Row.
+workplace: briar_woods.tollmen_hideout
+home: market_row.home_13
+portrait: lib_m22_079
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: weasel
+appearance: Slight and quick, with a sandy-blond mop of hair that never lies flat and a smudge of flour on his
+  nose. He wears a white baker's apron over a red striped shirt with the sleeves rolled, and scuffed boots.
+look:
+  kind: human
+  skin: 2
+  hair: { style: tufty, colour: 5 }
+  eyes: 3
+  build: narrow
+  height: tall
+  outfit: { cut: apron, top: 3, bottom: 13, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: apron, colour: 9 }
+backstory: Came to Monde six years ago at twenty-two, off the Tuesday ferry with one rucksack and a letter of
+  introduction to a cousin who had already left town. The cousin was gone; the bakery upstairs had a room
+  going. He worked the ovens for Odile for two years and was good at it until he burned three batches in a row
+  and was let go. A man in a van, Rook, offered him a day's pay for carrying a sealed envelope to Briar Woods.
+  He has carried envelopes ever since, and tells himself the work is mostly walking.
+personality:
+  traits: [ quick, chatty, loyal, restless, soft ]
+  big5: { open: 62, conscientious: 30, extravert: 82, agreeable: 68, neurotic: 64 }
+values: { prosperity: 0.3, safety: 0.1, spirit: 0.2, charm: 0.4 }
+beliefs:
+  - Everybody on Market Row tells me things, so I must be trusted.
+  - The Tollmen only collect what the shops would have paid anyway.
+  - Odile will come round if I bring her the right loaf.
+voice:
+  register: Fast and over-friendly. Talks in bursts, offers small favours before being asked, and trails off
+    when a subject gets close. Likes to reassure.
+  tics: [ Between friends., Only a minute., you know how it is ]
+  never_says: [ I did it, I'm sorry for, the Tollmen are ]
+  samples:
+    - Between friends, Odile, I'd not say a word about the rolls. Only a minute, I'll have the tray in.
+    - Morning! Oh, you'll want the good flour, I'll pop it in your basket. No charge.
+    - Didn't see a thing. Didn't hear a thing either, if anyone asks.
+birthday: 18
+likes:
+  [
+    warm bread at four in the morning,
+    gossip passed quietly,
+    runner beans climbing a string,
+    the ferry horn on Tuesdays,
+    free breakfast
+  ]
+dislikes: [ being asked where he was, cold tea, the smell of wet wool, Lantern readers who spell his name wrong ]
+fears: [ being sent back to the city, Odile finding out about the brick ]
+dream:
+  text: Be good at one thing, and be known for it on Market Row.
+  stages:
+    - Try three jobs in a week at the mill, the cannery, and the bakery.
+    - Choose the one that stuck and stay with it for a month.
+    - Tell Odile out loud that you're staying in Monde.
+routine:
+  weekday:
+    - { at: "05:30", do: wander, where: market_row.home_13 }
+    - { at: "06:00", do: eat, where: market_row.bakery }
+    - { at: "08:00", do: work, where: briar_woods.tollmen_hideout }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: work, where: briar_woods.tollmen_hideout }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: market_row.home_13 }
+  weekend:
+    - { at: "07:00", do: eat, where: market_row.home_13 }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: garden, where: market_row.home_13 }
+    - { at: "14:00", do: wander, where: commons.picnic_lawn }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: market_row.home_13 }
+chores: [ sweep the stair, water the runner beans in the back alley, wash the one good shirt ]
+relationships:
+  - {
+      id: rook,
+      affinity: 30,
+      trust: 25,
+      tag: friend,
+      note: Gives him work and a day's pay; doesn't ask questions.
+    }
+  - {
+      id: odile,
+      affinity: 18,
+      trust: 6,
+      tag: wary,
+      note: His old boss; she still hands him the heel of the loaf.
+    }
+  - {
+      id: june,
+      affinity: 22,
+      trust: 14,
+      tag: friend,
+      note: Hums over the morning coffee; he brings her crumbs.
+    }
+secrets:
+  - text: Threw the brick through the Lantern's window and has been too ashamed to buy a replacement pane.
+    reveal: { regard_min: 70 }
+  - text: Keeps a pressed runner bean from his first summer in town inside his bread-tin.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: pike
+archetype: drifter
+employment: employed
+years_in_monde: 6

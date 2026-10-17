@@ -1,0 +1,112 @@
+# Generated (census-v1) for oq_a02; curated not yet. Edit here.
+id: fenna_renard
+name: Fenna Renard
+age: 80
+pronouns: she/her
+kind: resident
+occupation: Retired seamstress, mends for the street when asked.
+workplace: old_quarter.home_15
+home: old_quarter.home_15
+portrait: fenna_renard
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: fenna_renard
+appearance: A slight woman with white hair in a bun, heavy glasses and a dark brown coat buttoned to the
+  throat. She carries a knitting bag wherever she goes.
+look:
+  kind: human
+  skin: 3
+  hair: { style: bun, colour: 8 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 2, bottom: 3, bottom_style: trousers, shoes: 15 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: Fenna trained as a seamstress in Carrow and took in alterations for the big department houses there
+  until her hands got stiff. She came to Monde at 41 when her husband Piet took a job at the mill, and she set
+  up a sewing table in the front window. Piet died in the cold winter eleven years later and she kept the flat
+  because the view of the harbour was the only thing he ever asked her to keep. She still thinks the mill
+  whistle should sound at six, and she is certain the Gannet's timetable was kinder before the cannery closed.
+  She has been asked to take the Well Row quilt in hand twice and never finished it.
+personality:
+  traits: [ patient, wry, stubborn, warm ]
+  big5: { open: 62, conscientious: 74, extravert: 38, agreeable: 68, neurotic: 41 }
+values: { prosperity: 0.1, safety: 0.35, spirit: 0.3, charm: 0.25 }
+beliefs:
+  - Things were better when the mill was running.
+  - A good seam holds longer than any promise.
+  - Nobody in Monde asks an old woman for help twice.
+voice:
+  register: Gentle and rambling on purpose, she circles back to earlier threads. She remembers what things used
+    to cost and says so. She is kind but will not hurry.
+  tics: [ Now where was I?, "Oh, that's a long way round.", "In my day," ]
+  never_says: [ cheap at the price, I don't mind, too old for that ]
+  samples:
+    - Now where was I? Ah yes, the thread. It's never the thread that goes first, it's the nerve in your
+      fingers.
+    - Tea's on the stove if you want it. Don't mind the basket, I'll move it when I've found the right blue.
+    - I can't say I'd take that job again. But you've asked nicely, and nobody asks nicely round here anymore.
+birthday: 94
+likes:
+  [
+    knitting,
+    small birds at the window,
+    being asked for a story,
+    the smell of pressed linen,
+    the harbour light at dusk
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    loud wireless in the morning
+  ]
+fears: [ the flat going empty like the others on Well Row, forgetting Piet's voice ]
+dream:
+  text: Finish the quilt of Well Row's scraps and hang it at the Harvest Supper so the street can see its own
+    stories.
+  stages:
+    - Gather scraps from five residents, each with a story to tell.
+    - Sew at the library table where the light is good.
+    - Hang the quilt at the Harvest Supper for everyone to see.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.home_15 }
+    - { at: "08:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "10:00", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: sit, where: commons.duck_pond }
+    - { at: "16:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: cook, where: old_quarter.home_15 }
+    - { at: "21:30", do: sleep, where: old_quarter.home_15 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_15 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: sit, where: commons.picnic_lawn }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: visit, where: old_quarter.st_brigids }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: old_quarter.home_15 }
+chores: [ Mend coats for Well Row, Trim the window box, Air the flat on Thursdays ]
+relationships:
+  - {
+      id: ulla_ferreira,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Works the same window trade; they trade gossip over the wall.
+    }
+  - { id: margo, affinity: 12, trust: 10, tag: fond, note: Lends her the library's old pattern books. }
+  - { id: tib, affinity: 8, trust: 4, tag: curious, note: "Hates his bicycle, admires his questions." }
+secrets:
+  - text: She still keeps Piet's last letter from the mill folded in her knitting bag and reads it when the nights
+      are long.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: oq_a02
+archetype: widowed_elder
+employment: retired
+years_in_monde: 39

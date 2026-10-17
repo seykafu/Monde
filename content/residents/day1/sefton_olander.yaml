@@ -1,0 +1,80 @@
+# Generated (census-v1) for wf_d01; curated not yet. Edit here.
+id: sefton_olander
+name: Sefton Olander
+age: 42
+pronouns: he/him
+kind: resident
+occupation: fishing-boat crew
+workplace: wharf.harbor_steps
+home: wharf.home_10
+portrait: lib_m44_090
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: sefton_olander
+appearance: A tall, soft-spoken man with tidy black hair, a neatly trimmed beard, a camel duffel coat and a
+  long, lopsided sky-blue striped scarf that a child clearly knitted. A patient, slightly frazzled look.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 3 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 15, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 5 }
+  face: { moustache: true, stubble: true }
+backstory: "Sefton came to Monde from Carrow 18 years ago and works as fishing-boat crew. What he wants most
+  is plain enough: a boat with my name on it."
+personality:
+  traits: [ particular, shy, wry ]
+  big5: { open: 64, conscientious: 75, extravert: 81, agreeable: 57, neurotic: 67 }
+values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
+  tics: [ Fair. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Fair. Wind's backing.
+    - Could be worse. Could be raining.
+    - Tide's making. I'll be off.
+birthday: 83
+likes: [ flat calm at dawn, good rope, smoked fish ]
+dislikes: [ tangled gear, loud engines, gulls on the catch ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A boat with my name on it
+  stages:
+    - Find a hull and bring it to the boathouse
+    - Raise 60 coins from catches and community work
+    - Launch on Regatta day
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: wharf.home_10 }
+    - { at: "08:30", do: work, where: wharf.harbor_steps }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: wharf.harbor_steps }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: wharf.home_10 }
+    - { at: "20:00", do: read, where: wharf.home_10 }
+    - { at: "22:00", do: sleep, where: wharf.home_10 }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_10 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "18:00", do: eat, where: wharf.home_10 }
+    - { at: "19:30", do: read, where: wharf.home_10 }
+    - { at: "22:00", do: sleep, where: wharf.home_10 }
+chores: [ sweep the step, black the stove ]
+relationships:
+  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: wf_d01
+archetype: fisher
+employment: employed
+years_in_monde: 18

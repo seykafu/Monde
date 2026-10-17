@@ -1,0 +1,110 @@
+# Generated (census-v1) for mb_b02; curated not yet. Edit here.
+id: signe_marchant
+name: Signe Marchant
+age: 65
+pronouns: she/her
+kind: resident
+occupation: Retired draper's assistant, now mends linen for her own household.
+workplace: millbrook.home_14
+home: millbrook.home_14
+portrait: signe_marchant
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: signe_marchant
+appearance: A slight woman with a white bob and heavy glasses that she pushes up with one knuckle. She wears a
+  charcoal pinafore over a grey blouse, with a thimble on a cord at her collar.
+look:
+  kind: human
+  skin: 3
+  hair: { style: bob, colour: 8 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: pinafore, top: 13, bottom: 10, bottom_style: trousers, shoes: 1, trim: 9 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: Signe came to Monde at nineteen to work in the draper's on Market Row, where she learned to measure
+  a bolt of cloth by eye. She met Iain when he came in to buy thread for his mother. They married and took the
+  terrace house at No. 30, and she has been stitching for the whole street ever since. She remembers which
+  children outgrew which coats and what every family's linen looks like. When the draper closed she kept her
+  shears and her pattern books and never complained about it once.
+personality:
+  traits: [ observant, patient, wry, warm ]
+  big5: { open: 52, conscientious: 70, extravert: 45, agreeable: 80, neurotic: 38 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.25, charm: 0.35 }
+beliefs:
+  - A good seam shows you who someone was.
+  - Iain thinks he is in charge of the house, and it is kinder to let him.
+  - Everyone in Monde has a hem somewhere that needs taking up.
+voice:
+  register: Gentle and teasing, quick to correct a detail. She speaks in complete sentences and often ends with
+    a question to the listener.
+  tics: [ "Don't we, dear?", Hold still a moment. ]
+  never_says: [ that's not my business, whatever, I'm fine, it doesn't matter ]
+  samples:
+    - Hold still, dear, you'll pull the whole sleeve out.
+    - Iain says the boat is late. I say the boat is always late. Don't we, love?
+    - There, that's better. Now you look like someone who meant to come out today.
+birthday: 46
+likes:
+  [
+    a morning paper,
+    good thread,
+    the sound of the kettle,
+    people who sit still while she pins,
+    a kettle on the stove
+  ]
+dislikes: [ drafts, stairs in the cold, being hurried, badly cut cloth ]
+fears: [ going blind before her eyes are done with the needle, the terrace emptying out one house at a time ]
+dream:
+  text: A Saturday night with music in a hall, Iain on the floor and the whole street dancing until the lamps go
+    out.
+  stages:
+    - Find a hall with a floor that will hold a waltz.
+    - Find a gramophone or a band willing to play for coins.
+    - Hold the dance and make Iain take the first turn.
+routine:
+  weekday:
+    - { at: "06:45", do: eat, where: millbrook.home_14 }
+    - { at: "08:00", do: clean, where: millbrook.home_14 }
+    - { at: "09:00", do: socialize, where: millbrook.laundry_green }
+    - { at: "11:30", do: shop, where: market_row.bakery }
+    - { at: "13:00", do: eat, where: millbrook.home_14 }
+    - { at: "14:00", do: tinker, where: millbrook.home_14 }
+    - { at: "16:30", do: visit, where: millbrook.terrace_row }
+    - { at: "20:00", do: read, where: millbrook.home_14 }
+    - { at: "22:00", do: sleep, where: millbrook.home_14 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_14 }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:00", do: shop, where: market_row.market_street }
+    - { at: "13:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "15:00", do: garden, where: commons.picnic_lawn }
+    - { at: "19:30", do: cook, where: millbrook.home_14 }
+    - { at: "22:00", do: sleep, where: millbrook.home_14 }
+chores: [ mend the terrace's linen, refill the thermos each morning, sweep the front step ]
+relationships:
+  - {
+      id: iain_marchant,
+      affinity: 28,
+      trust: 25,
+      tag: spouse,
+      note: "Her husband of forty-six years, and her favourite argument."
+    }
+  - {
+      id: ilona,
+      affinity: 18,
+      trust: 15,
+      tag: friend,
+      note: Ilona brings her the neighbours' mending and they swap gossip over it.
+    }
+  - { id: gideon_szabo, affinity: 6, trust: 4, tag: curious, note: Keeps asking after his mother's health. }
+secrets:
+  - text: She still has the draper's pattern book with her own sketches of dresses she never made.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_b02
+archetype: retired_couple
+employment: retired
+years_in_monde: 46

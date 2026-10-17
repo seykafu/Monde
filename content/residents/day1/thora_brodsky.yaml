@@ -1,0 +1,79 @@
+# Generated (census-v1) for wf_l01; curated not yet. Edit here.
+id: thora_brodsky
+name: Thora Brodsky
+age: 44
+pronouns: she/her
+kind: resident
+occupation: works in Hessle Cross
+workplace: offmap.city
+home: wharf.home_03
+portrait: thora_brodsky
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: thora_brodsky
+appearance: A woman with black hair in a ponytail and a plum coat.
+look:
+  kind: human
+  skin: 3
+  hair: { style: ponytail, colour: 3 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 8, bottom: 12, bottom_style: trousers, shoes: 14 }
+  accessory: { kind: none }
+backstory: "Thora came to Monde from Hessle Cross 42 years ago and works as a commuter to Hessle Cross. What
+  she wants most is plain enough: a school worth the walk."
+personality:
+  traits: [ particular, careful, restless ]
+  big5: { open: 25, conscientious: 50, extravert: 8, agreeable: 49, neurotic: 28 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
+    schedule.
+  tics: [ "Shoes, satchels, sandwiches." ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Shoes, satchels, sandwiches. Three things. We're out by eight.
+    - Who runs the Thursday class? Name and time, please.
+    - They'll settle. I asked them, and they said they'd settle.
+birthday: 50
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: wharf.home_03 }
+    - { at: "07:30", do: work, where: offmap.city }
+    - { at: "12:30", do: eat, where: offmap.city }
+    - { at: "13:30", do: work, where: offmap.city }
+    - { at: "19:00", do: eat, where: offmap.city }
+    - { at: "22:00", do: sleep, where: offmap.city }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_03 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.duck_pond }
+    - { at: "18:00", do: eat, where: wharf.home_03 }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: wharf.home_03 }
+chores: [ sweep the step, fold the washing ]
+relationships:
+  - { id: liv_brodsky, affinity: 70, trust: 70, tag: spouse, note: Same house. }
+  - { id: leonie_brodsky, affinity: 70, trust: 70, tag: daughter, note: Same house. }
+  - { id: kester_brodsky, affinity: 70, trust: 70, tag: son, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: wf_l01
+archetype: school_family
+employment: employed
+years_in_monde: 42

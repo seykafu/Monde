@@ -1,0 +1,102 @@
+# Generated (census-v1) for mr_c01; curated not yet. Edit here.
+id: kofi_santos
+name: Kofi Santos
+age: 48
+pronouns: he/him
+kind: resident
+occupation: Full-time carer at home, unpaid; keeps the household running.
+workplace: market_row.home_09
+home: market_row.home_09
+portrait: lib_m44_025
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: kofi_santos
+appearance: A tall, soft-spoken man with tidy light-brown hair and a neatly trimmed beard. He wears a charcoal
+  duffel coat and a long, lopsided green striped scarf that a child knitted for him.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 1 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 13, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 7 }
+  face: { moustache: true, stubble: true }
+backstory: Kofi grew up in a crowded port flat two countries away and took the Carrow ferry at seventeen with
+  one suitcase and a letter of introduction to a cousin who had already left. He worked the Liss Cannery
+  packing line until it closed eleven years ago, then turned to looking after the house and Oona. He still
+  thinks the town should have fought harder for the mill, and he is wrong that anyone could have saved it. He
+  stays because Oona's workshop light is the first thing he sees from the harbour steps when the ferry comes
+  in.
+personality:
+  traits: [ patient, dry, attentive, stubborn ]
+  big5: { open: 55, conscientious: 82, extravert: 30, agreeable: 72, neurotic: 58 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.15, charm: 0.3 }
+beliefs:
+  - Somebody should have stopped the mill closing.
+  - A house runs on small routines kept every day.
+  - Oona's boats are the best thing made in Monde.
+voice:
+  register: Slow and warm, with short sentences and plain nouns. He asks a question when he is unsure and rarely
+    raises his voice.
+  tics: [ Right then., Let's see. ]
+  never_says: [ I suppose, whatever you think ]
+  samples:
+    - Tea's on, if you want it before the bread goes.
+    - No, the ferry's not in till four. Sit a minute.
+    - Oona says the glue needs warmth. So does the stove, so we wait.
+birthday: 73
+likes: [ the harbour at dusk, knitting patterns, bread still warm, the ferry horn, parcels arriving unbroken ]
+dislikes: [ rain on washing, rushing, shouting in the street, cold porridge ]
+fears: [ the ferry stopping for good, losing the house ]
+dream:
+  text: Teach a child to knit a scarf that stays on straight, and watch them wear it.
+  stages:
+    - Find a child who wants to learn from him.
+    - Teach three afternoons at the library table.
+    - Sign the finished scarf with both their names.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: market_row.home_09 }
+    - { at: "08:30", do: clean, where: market_row.home_09 }
+    - { at: "09:30", do: shop, where: market_row.bakery }
+    - { at: "11:00", do: walk, where: wharf.harbor_steps }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: read, where: old_quarter.library }
+    - { at: "18:00", do: cook, where: market_row.home_09 }
+    - { at: "21:30", do: sleep, where: market_row.home_09 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_09 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: sit, where: commons.picnic_lawn }
+    - { at: "14:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: walk, where: commons.duck_pond }
+    - { at: "19:00", do: cook, where: market_row.home_09 }
+    - { at: "22:00", do: sleep, where: market_row.home_09 }
+chores: [ Does the shopping and the bread run, Mends the household's clothes, Keeps the stove lit ]
+relationships:
+  - {
+      id: oona_santos,
+      affinity: 25,
+      trust: 25,
+      tag: spouse,
+      note: His wife; he watches her hands when she works.
+    }
+  - {
+      id: winifred_gallo,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Trades morning loaves for stories about the mill.
+    }
+  - { id: odile, affinity: 8, trust: 6, tag: fond, note: Gives him the bread heels nobody else wants. }
+secrets:
+  - text: He has kept every birthday candle the children here ever left behind, in a tin under the sink.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_c01
+archetype: remote_craftsperson
+employment: carer
+years_in_monde: 31

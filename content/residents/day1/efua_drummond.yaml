@@ -1,0 +1,78 @@
+# Generated (census-v1) for mb_e03; curated not yet. Edit here.
+id: efua_drummond
+name: Efua Drummond
+age: 52
+pronouns: she/her
+kind: resident
+occupation: net mending
+workplace: wharf.harbor_steps
+home: millbrook.home_32
+portrait: efua_drummond
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: efua_drummond
+appearance: A woman with long salt-and-pepper hair and a mustard jumper.
+look:
+  kind: human
+  skin: 3
+  hair: { style: long, colour: 11 }
+  eyes: 1
+  build: broad
+  height: tall
+  outfit: { cut: jumper, top: 4, bottom: 2, bottom_style: trousers, shoes: 12 }
+  accessory: { kind: none }
+backstory: "Efua came to Monde from Marrow Quay 30 years ago and works as net mending. What she wants most is
+  plain enough: a plot that feeds the street."
+personality:
+  traits: [ kind, stubborn, warm ]
+  big5: { open: 59, conscientious: 52, extravert: 59, agreeable: 84, neurotic: 66 }
+values: { prosperity: 0.2, safety: 0.15, spirit: 0.4, charm: 0.25 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Kind and earthy. Few metaphors, all small. "Give it time."
+  tics: [ Give it time. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Give it time. Everything's slow in April.
+    - Slugs had the lettuces. Every one. They're clever things.
+    - Rain last night. Good. Good.
+birthday: 51
+likes: [ rain at night, good compost, children who pull carrots ]
+dislikes: [ slugs, bindweed, people who step on beds ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A plot that feeds the street
+  stages:
+    - Clear a bed in the Community Garden
+    - Plant a first row with seed from Teo
+    - Bring the first harvest to market
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_32 }
+    - { at: "08:30", do: work, where: wharf.harbor_steps }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: wharf.harbor_steps }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: millbrook.home_32 }
+    - { at: "20:00", do: read, where: millbrook.home_32 }
+    - { at: "22:00", do: sleep, where: millbrook.home_32 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_32 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.duck_pond }
+    - { at: "18:00", do: eat, where: millbrook.home_32 }
+    - { at: "19:30", do: read, where: millbrook.home_32 }
+    - { at: "22:00", do: sleep, where: millbrook.home_32 }
+chores: [ black the stove, beat the doormat ]
+relationships:
+  - { id: jakub_mathers, affinity: 70, trust: 70, tag: partner, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_e03
+archetype: market_gardener
+employment: employed
+years_in_monde: 30

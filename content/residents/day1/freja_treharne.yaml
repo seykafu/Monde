@@ -1,0 +1,91 @@
+# Generated (census-v1) for wf_m01; curated not yet. Edit here.
+id: freja_treharne
+name: Freja Treharne
+age: 12
+pronouns: she/her
+kind: resident
+occupation: Pupil at Millbrook School, one of nine in Felix Amari's class.
+workplace: wharf.home_08
+home: wharf.home_08
+portrait: lib_f12_076
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: freja_treharne
+appearance: A girl with long dark brown hair held back by a hairband, wearing a plum school jumper and a teal
+  knitted scarf. A satchel strap crosses her chest and a sticking plaster sits on her chin.
+look:
+  kind: human
+  skin: 6
+  hair: { style: long, colour: 0 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 8, bottom: 13, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: scarf, colour: 0 }
+backstory: Born in the back bedroom of this house and has known no other home. She remembers the school with
+  thirty pupils and the cannery whistle, though the cannery closed when she was barely old enough to read. She
+  does lessons by post at the library desk on the days the class is too quiet, and she is clever enough to
+  notice that her father tires faster than he says. She wants the school to reach twenty so her class stays
+  together. She believes adults keep bad news from children on purpose; she is partly right and partly wrong
+  about who decides what.
+personality:
+  traits: [ sceptical, clever, reserved, watchful ]
+  big5: { open: 85, conscientious: 70, extravert: 30, agreeable: 40, neurotic: 60 }
+values: { prosperity: 0.25, safety: 0.25, spirit: 0.3, charm: 0.2 }
+beliefs:
+  - The school closes if nobody notices.
+  - Adults always say it's nothing when it isn't.
+  - The lighthouse was lit once, and someone turned it off.
+voice:
+  register: Dry and exact, quick to correct a loose statement. Says things straight and then looks away to see
+    how they land.
+  tics: [ "well, actually", that's not the point, hm. ]
+  never_says: [ that's so cute, whatever, I don't care ]
+  samples:
+    - Hm. Felix says twenty, not nineteen. Someone should count again.
+    - Fine. The ferry's late, so we'll post the sums.
+    - It's nothing, Dad. I fell off the wall. Obviously.
+birthday: 36
+likes: [ library books, the lighthouse at night, sums, the Gull's cider cake ]
+dislikes: [ being called little, the Saturday collection, wet satchels ]
+fears: [ the school closing, her father getting worse ]
+dream:
+  text: A week where the school run fits around her father's hours and nobody has to ask.
+  stages:
+    - Ask the shopkeeper for fixed morning hours.
+    - Swap school-run days with Florian's family.
+    - Write the timetable on the kitchen wall.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: wharf.home_08 }
+    - { at: "08:30", do: attend, where: millbrook.school }
+    - { at: "15:30", do: wander, where: old_quarter.fountain_square }
+    - { at: "17:30", do: eat, where: wharf.home_08 }
+    - { at: "20:00", do: sleep, where: wharf.home_08 }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_08 }
+    - { at: "10:00", do: wander, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: wharf.home_08 }
+    - { at: "14:00", do: wander, where: old_quarter.fountain_square }
+    - { at: "18:00", do: eat, where: wharf.home_08 }
+    - { at: "20:30", do: sleep, where: wharf.home_08 }
+chores: [ fetch the post, help with Laila's bath, sweep the step ]
+relationships:
+  - {
+      id: anatole_treharne,
+      affinity: 55,
+      trust: 45,
+      tag: father,
+      note: "Her father, whom she watches for tiredness."
+    }
+  - { id: laila_treharne, affinity: 60, trust: 40, tag: sister, note: "Her baby sister, who she reads to." }
+  - { id: florian_garvey, affinity: 25, trust: 20, tag: friend, note: Lends her his old atlas. }
+secrets:
+  - text: She has been writing a serial story about the lighthouse keeper and hides it in her atlas.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_m01
+archetype: single_parent
+employment: pupil
+years_in_monde: 12

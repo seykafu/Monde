@@ -1,0 +1,81 @@
+# Generated (census-v1) for wf_e01; curated not yet. Edit here.
+id: hartley_radford
+name: Hartley Radford
+age: 41
+pronouns: he/him
+kind: resident
+occupation: fishing-boat crew
+workplace: wharf.harbor_steps
+home: wharf.home_16
+portrait: lib_m47_010
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: hartley_radford
+appearance: A broad man with a short grey-flecked beard, greying temples under a grey flat cap, a pencil
+  behind one ear and a brown canvas work jacket. A measured, patient look.
+look:
+  kind: human
+  skin: 3
+  hair: { style: short, colour: 3 }
+  eyes: 0
+  build: broad
+  height: tall
+  outfit: { cut: coat, top: 1, bottom: 6, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 14 }
+  face: { grey_temples: true, stubble: true }
+backstory: "Hartley came to Monde from Tarn End 15 years ago and works as fishing-boat crew. What he wants
+  most is plain enough: a boat with my name on it."
+personality:
+  traits: [ wry, cheerful, curious ]
+  big5: { open: 8, conscientious: 28, extravert: 25, agreeable: 56, neurotic: 29 }
+values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
+  tics: [ Fair. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Fair. Wind's backing.
+    - Could be worse. Could be raining.
+    - Tide's making. I'll be off.
+birthday: 64
+likes: [ flat calm at dawn, good rope, smoked fish ]
+dislikes: [ tangled gear, loud engines, gulls on the catch ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A boat with my name on it
+  stages:
+    - Find a hull and bring it to the boathouse
+    - Raise 60 coins from catches and community work
+    - Launch on Regatta day
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: wharf.home_16 }
+    - { at: "08:30", do: work, where: wharf.harbor_steps }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: wharf.harbor_steps }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: wharf.home_16 }
+    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: wharf.home_16 }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_16 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "18:00", do: eat, where: wharf.home_16 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: wharf.home_16 }
+chores: [ water the window box, wind the clock ]
+relationships:
+  - { id: kerry_radford, affinity: 70, trust: 70, tag: spouse, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: wf_e01
+archetype: fisher
+employment: employed
+years_in_monde: 15

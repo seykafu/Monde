@@ -1,0 +1,77 @@
+# Generated (census-v1) for mb_d01; curated not yet. Edit here.
+id: greta_grieve
+name: Greta Grieve
+age: 52
+pronouns: she/her
+kind: resident
+occupation: works in Carrow
+workplace: offmap.city
+home: millbrook.home_24
+portrait: greta_grieve
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: greta_grieve
+appearance: A woman with a sandy blond bob, a teal coat and round glasses.
+look:
+  kind: human
+  skin: 6
+  hair: { style: bob, colour: 5 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 0, bottom: 0, bottom_style: skirt, shoes: 1 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: "Greta came to Monde from Ashby Lock 26 years ago and works as a commuter to Carrow. What she wants
+  most is plain enough: open by the end of the month."
+personality:
+  traits: [ proud, kind, curious ]
+  big5: { open: 73, conscientious: 42, extravert: 24, agreeable: 44, neurotic: 57 }
+values: { prosperity: 0.55, safety: 0.15, spirit: 0.1, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk. A salesperson's warmth with a ledger underneath. Talks in prices and margins.
+  tics: [ Let me do you a deal. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Let me do you a deal. Two for a bit more than one's price.
+    - Footfall's the thing. Footfall, then the window.
+    - Margins, mostly. And a good bell on the door.
+birthday: 75
+likes: [ a till that rings, hand-lettered signs, first customers ]
+dislikes: [ fees nobody explained, just browsing said twice, empty windows ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: Open by the end of the month
+  stages:
+    - Stock the shelves
+    - Get a sign painted
+    - Cut the ribbon with the mayor
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_24 }
+    - { at: "07:30", do: work, where: offmap.city }
+    - { at: "12:30", do: eat, where: offmap.city }
+    - { at: "13:30", do: work, where: offmap.city }
+    - { at: "19:00", do: eat, where: offmap.city }
+    - { at: "22:00", do: sleep, where: offmap.city }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_24 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "18:00", do: eat, where: millbrook.home_24 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: millbrook.home_24 }
+chores: [ beat the doormat, water the window box ]
+relationships:
+  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_d01
+archetype: shop_founder
+employment: employed
+years_in_monde: 26

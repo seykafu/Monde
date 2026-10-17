@@ -1,0 +1,120 @@
+# Generated (census-v1) for mr_d01; curated not yet. Edit here.
+id: yannick_rudd
+name: Yannick Rudd
+age: 59
+pronouns: he/him
+kind: resident
+occupation: Retired early; self-taught birdwatcher and occasional nature writer for the Lantern
+workplace: market_row.home_15
+home: market_row.home_15
+portrait: lib_m58_031
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: yannick_rudd
+appearance: A wiry man with grey hair in a stubby ponytail and a neat grey goatee, a brass-rimmed magnifying
+  visor pushed up on his forehead. He wears a slate-blue work smock full of small pockets.
+look:
+  kind: human
+  skin: 9
+  hair: { style: ponytail, colour: 2 }
+  eyes: 5
+  build: narrow
+  height: tall
+  outfit: { cut: smock, top: 6, bottom: 13, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  glasses: on_head
+  face: { moustache: true }
+backstory: Yannick was born in the terrace on Millbrook Lane and went to work at Lissworth Mill at seventeen,
+  sweeping fibre from the frames. The dust got into his chest and the mill closed fourteen years ago, so he
+  came home to the flat above Market Row with his tools and a pair of old field glasses. He had meant to leave
+  for Carrow once, but his mother needed him, and then she died in the flat, and he stayed. Mornings on the
+  footbridge gave him a reason to get up. He is sure the herons have stopped coming because of the new fishing
+  boats, though he has never actually counted them before the boats arrived.
+personality:
+  traits: [ patient, precise, wistful, stubborn, curious ]
+  big5: { open: 78, conscientious: 66, extravert: 24, agreeable: 58, neurotic: 41 }
+values: { prosperity: 0.05, safety: 0.25, spirit: 0.35, charm: 0.35 }
+beliefs:
+  - The herons left because of the fishing boats.
+  - A bird that stays still for a minute is telling you something.
+  - Nobody in Monde looks up anymore.
+voice:
+  register: Hushed and exact. He names species without hesitation and goes vague about people, trailing off when
+    the talk turns personal. Short sentences, lots of half-stops.
+  tics: [ "Shh. No, wait.", Fine. It's gone., Count it twice. ]
+  never_says: [ bird brain, for the record, as it were ]
+  samples:
+    - Shh. No, wait. There, grey heron, on the piling. Don't move.
+    - Fine. It's gone. It was a juvenile, I think. Probably.
+    - I used to work the frames at the mill. Long time ago. Anyway, the owls.
+birthday: 70
+likes:
+  [
+    Stillness at dawn,
+    Flasks of strong tea,
+    Being believed when he reports a sighting,
+    The footbridge in mist,
+    The heron fountain in the square
+  ]
+dislikes:
+  [
+    Dogs off the lead,
+    Brass bands in nesting season,
+    People who call every white bird a seagull,
+    Sudden noise near the water
+  ]
+fears: [ The herons never coming back, Being forgotten in the flat when he is ill ]
+dream:
+  text: Yannick wants to see the first heron of spring return to the footbridge and to name it, so the town will
+    know it came back.
+  stages:
+    - Watch from the footbridge at dawn for three mornings.
+    - Log the sighting in the Lantern's nature column.
+    - Name the heron aloud at the fountain so people remember it.
+routine:
+  weekday:
+    - { at: "05:30", do: wander, where: market_row.home_15 }
+    - { at: "06:00", do: walk, where: commons.duck_pond }
+    - { at: "07:15", do: eat, where: market_row.bakery }
+    - { at: "08:00", do: read, where: old_quarter.library }
+    - { at: "11:30", do: walk, where: wharf.breakwater }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: tinker, where: market_row.back_alley }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: market_row.home_15 }
+  weekend:
+    - { at: "06:30", do: wander, where: market_row.home_15 }
+    - { at: "07:00", do: walk, where: old_quarter.fountain_square }
+    - { at: "09:00", do: shop, where: market_row.general_store }
+    - { at: "10:30", do: sit, where: commons.picnic_lawn }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:30", do: write, where: old_quarter.library }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: market_row.home_15 }
+chores:
+  [
+    Wipe the field glasses and log sightings nightly,
+    Carry the workbench scraps down to the back alley,
+    Water the window box with rainwater
+  ]
+relationships:
+  - { id: kofi_santos, affinity: 12, trust: 10, tag: fond, note: Kofi brings him the good tea on Sundays. }
+  - { id: weasel, affinity: -8, trust: -5, tag: wary, note: Weasel listens at doors and Yannick knows it. }
+  - {
+      id: winifred_gallo,
+      affinity: 14,
+      trust: 12,
+      tag: friend,
+      note: She saves him the heel of the rye each morning.
+    }
+secrets:
+  - text: He still keeps his mother's last letter, unopened in the drawer, because he is afraid of what it says.
+    reveal: { regard_min: 60 }
+  - text: He once sketched every heron in Monde in a notebook and has never shown anyone.
+    reveal: { regard_min: 45 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mr_d01
+archetype: birdwatcher
+employment: unable
+years_in_monde: 59

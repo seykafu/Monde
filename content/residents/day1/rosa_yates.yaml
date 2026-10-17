@@ -1,0 +1,85 @@
+# Generated (census-v1) for mb_j02; curated not yet. Edit here.
+id: rosa_yates
+name: Rosa Yates
+age: 1
+pronouns: she/her
+kind: resident
+occupation: Under five, at home.
+workplace: millbrook.home_28
+home: millbrook.home_28
+portrait: rosa_yates
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: rosa_yates
+appearance: A baby with black hair in a neat bun and a charcoal jumper, usually slightly damp at the cuffs.
+  She is most often held upright on a hip, staring at the window.
+look:
+  kind: human
+  skin: 3
+  hair: { style: bun, colour: 3 }
+  eyes: 0
+  build: medium
+  height: short
+  outfit: { cut: jumper, top: 13, bottom: 3, bottom_style: trousers, shoes: 6 }
+  accessory: { kind: none }
+backstory: "Rosa was born in the upstairs bedroom at No. 8 Mill Lane during a February gale, and her first
+  words were reportedly directed at the ferry horn. She has no memories yet, only routines: the morning bread,
+  the walk along the weir, the chair that squeaks. Her parents are the whole of her world at present, and the
+  neighbours wave at her through the glass. She has not yet decided whether the town is a place or a person."
+personality:
+  traits: [ curious, loud, sunny, stubborn ]
+  big5: { open: 70, conscientious: 30, extravert: 85, agreeable: 60, neurotic: 25 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - The ferry horn is a friend.
+  - Everyone waving at the window is waving at me.
+  - Bread is the best thing in the world.
+voice:
+  register: Babble and single words, with pointing and a great deal of volume.
+  tics: [ ba!, no-no, ooh ]
+  never_says: [ please, thank you, wait ]
+  samples:
+    - Ba! Ba!
+    - Boat. Big boat. Ooh.
+    - No-no, mine, bread.
+birthday: 38
+likes: [ the squeaky chair, the ferry horn, bread crusts, being waved at, the weir's noise ]
+dislikes: [ being put down, wet cuffs, the dark ]
+fears: [ the loud gull on the wall, being left alone in a room ]
+dream:
+  text: Grown, she wants a Saturday job at the bakery.
+  stages:
+    - Ask around Market Row for part-time hours.
+    - Do a trial week at Fournier & Fille.
+    - Get on the rota.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_28 }
+    - { at: "10:00", do: sit, where: millbrook.home_28 }
+    - { at: "12:00", do: eat, where: millbrook.home_28 }
+    - { at: "13:00", do: nap, where: millbrook.home_28 }
+    - { at: "19:00", do: sleep, where: millbrook.home_28 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_28 }
+    - { at: "10:30", do: sit, where: millbrook.home_28 }
+    - { at: "12:30", do: eat, where: millbrook.home_28 }
+    - { at: "13:30", do: nap, where: millbrook.home_28 }
+    - { at: "19:00", do: sleep, where: millbrook.home_28 }
+chores: [ drop spoons, pat the window glass ]
+relationships:
+  - { id: ivo_yates, affinity: 80, trust: 60, tag: father, note: "Her father, who makes the boat noises." }
+  - {
+      id: mina_lacey,
+      affinity: 85,
+      trust: 65,
+      tag: mother,
+      note: "Her mother, the warmest place in the house."
+    }
+  - { id: greta_grieve, affinity: 15, trust: 10, tag: curious, note: The neighbour who is always waving. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_j02
+archetype: young_family
+employment: under_five
+years_in_monde: 1

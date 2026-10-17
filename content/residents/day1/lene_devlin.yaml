@@ -1,0 +1,108 @@
+# Generated (census-v1) for sh_e01; curated not yet. Edit here.
+id: lene_devlin
+name: Lene Devlin
+age: 47
+pronouns: she/her
+kind: resident
+occupation: Out of work and looking; does occasional sewing and alterations for neighbours.
+workplace: station_hill.home_05
+home: station_hill.home_05
+portrait: lene_devlin
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: lene_devlin
+appearance: A broad, sturdy woman with dark brown hair in a ponytail and a sky-blue jumper with the cuffs
+  pushed up. A pin cushion is usually tied at her wrist.
+look:
+  kind: human
+  skin: 8
+  hair: { style: ponytail, colour: 0 }
+  eyes: 3
+  build: broad
+  height: tall
+  outfit: { cut: jumper, top: 5, bottom: 12, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: none }
+backstory: Came to Monde at 14 when her mother took a post at the cannery, and she worked the line there from
+  sixteen until it closed eleven years ago. She married Idris in her twenties and has kept the house on Tower
+  Lane ever since. Since the cannery shut she has taken in mending and the odd alteration, and she is waiting
+  on a place at the Carrow post office that she has not yet heard back about. She tells people she is happy
+  here, and mostly she is. She is less sure the town will still be here when her own children would have
+  needed it.
+personality:
+  traits: [ warm, direct, proud, restless ]
+  big5: { open: 55, conscientious: 65, extravert: 70, agreeable: 60, neurotic: 40 }
+values: { prosperity: 0.45, safety: 0.2, spirit: 0.15, charm: 0.2 }
+beliefs:
+  - Things always turn up for people who keep their hands busy.
+  - The Tollmen take their fee to keep the lights on somewhere, though nobody will say where.
+  - Carrow would have had her by now if she'd moved sooner.
+voice:
+  register: Quick and warm, asks questions back. Uses small sayings. Laughs at herself more than at others.
+  tics: [ love, mind you, that's you sorted ]
+  never_says: [ "I'm fine, really", it's not my place, nobody cares ]
+  samples:
+    - Kettle's on, love. Sit down before you fall.
+    - Mind you, the post office might write back. They might.
+    - Fourteen years and I still wait for the ferry like it's Christmas.
+birthday: 48
+likes:
+  [
+    the smell of fresh bread from Fournier & Fille,
+    people who come to the door with news,
+    cider on a warm evening,
+    sewing by lamplight,
+    tea in a tin mug
+  ]
+dislikes: [ waiting on letters, the Tollmen's Saturday rounds, being told to slow down ]
+fears: [ the school closing before the children arrive, losing the house ]
+dream:
+  text: Find steady paid work again, something she can do with her own hands in town.
+  stages:
+    - Register at Town Hall with a list of every job she has ever done.
+    - Take a casual job at the bakery three mornings a week.
+    - Get taken on for a full post at the boathouse or the post office.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: station_hill.home_05 }
+    - { at: "08:00", do: shop, where: market_row.bakery }
+    - { at: "09:00", do: cook, where: station_hill.home_05 }
+    - { at: "10:30", do: sit, where: station_hill.lookout_bench }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: visit, where: market_row.general_store }
+    - { at: "16:30", do: clean, where: station_hill.home_05 }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: station_hill.home_05 }
+  weekend:
+    - { at: "08:30", do: eat, where: station_hill.home_05 }
+    - { at: "10:00", do: garden, where: station_hill.home_05 }
+    - { at: "12:00", do: visit, where: commons.picnic_lawn }
+    - { at: "14:00", do: wander, where: commons.duck_pond }
+    - { at: "17:00", do: read, where: old_quarter.library }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: station_hill.home_05 }
+chores: [ bake the Sunday loaf, mend the sheets, keep the windowboxes watered ]
+relationships:
+  - {
+      id: idris_pryce,
+      affinity: 22,
+      trust: 28,
+      tag: partner,
+      note: "Her husband, her anchor and her argument partner."
+    }
+  - { id: esme_hedley, affinity: 10, trust: 8, tag: friend, note: They trade gossip and salt cod recipes. }
+  - {
+      id: cyprian_keane,
+      affinity: -6,
+      trust: -4,
+      tag: wary,
+      note: Owes her money for a torn coat he never came back for.
+    }
+secrets:
+  - text: She has written a letter to the post office in Carrow twice and burned both drafts before posting.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: sh_e01
+archetype: mill_hand
+employment: out_of_work
+years_in_monde: 33

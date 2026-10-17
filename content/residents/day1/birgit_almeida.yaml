@@ -1,0 +1,113 @@
+# Generated (census-v1) for mb_a11; curated not yet. Edit here.
+id: birgit_almeida
+name: Birgit Almeida
+age: 65
+pronouns: she/her
+kind: resident
+occupation: Retired seamstress, still hems for neighbours when asked.
+workplace: millbrook.home_31
+home: millbrook.home_31
+portrait: birgit_almeida
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: birgit_almeida
+appearance: A broad-built older woman with a white bun, half-moon glasses and an olive pinafore over a cream
+  blouse, a thimble always on her left finger. Her tan skin is creased from years outdoors on the terrace
+  step.
+look:
+  kind: human
+  skin: 2
+  hair: { style: bun, colour: 8 }
+  eyes: 7
+  build: broad
+  height: tall
+  outfit: { cut: pinafore, top: 10, bottom: 1, bottom_style: trousers, shoes: 0, trim: 15 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
+backstory: Birgit sewed for a tailoring house in Carrow for nineteen years, mostly wedding hems and the
+  occasional funeral coat. When her husband Tomas took a post at the Carrow docks, they rented a flat near the
+  tram sheds, but the noise wore him down, and they bought a cheap terrace house in Monde because it was quiet
+  and the rent was nothing. Tomas died eight years later, in the front room, with the radio on. She has kept
+  the house as he left it, including his pipe rack. She tells people she came for the sea air. She came
+  because Tomas wanted a garden, and she never planted one, which she privately regrets.
+personality:
+  traits: [ patient, wry, stubborn, warm, rambling ]
+  big5: { open: 45, conscientious: 78, extravert: 40, agreeable: 55, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - A hem tells you more about a person than their face does.
+  - Mill Lane was better before the boys started riding bicycles without bells.
+  - The Tollmen's Saturday visits are just the price of having a town square.
+voice:
+  register: Gentle and meandering, she starts one story and wanders into another, then pulls herself back. She
+    remembers old prices exactly and says so. Her sentences are long and kind, with a dry edge when someone
+    annoys her.
+  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  never_says: [ that's fine, nobody cares, I'm busy ]
+  samples:
+    - Now where was I? Oh yes, a wedding hem in Carrow, and the bride cried over the sleeve, poor lamb.
+    - Come in, come in, don't stand on the step like a stray. The kettle's been on since nine.
+    - No bell on that bicycle and no manners either. I've told that boy twice, and I'll tell his mother.
+birthday: 35
+likes:
+  [
+    knitting by the front window,
+    small birds at the window,
+    being asked for a story,
+    the smell of cut wool,
+    Thursday afternoons
+  ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, loud radios after dark ]
+fears: [ the front room going quiet for good, being forgotten by the town ]
+dream:
+  text: Have a neighbour to supper, and set a table that stays set every Thursday.
+  stages:
+    - Invite Anouk Clancy to supper on Thursday evening.
+    - Return the invitation with a plate of her seed cake.
+    - Set a standing Thursday table and keep the second chair ready.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_31 }
+    - { at: "08:30", do: walk, where: millbrook.terrace_row }
+    - { at: "10:00", do: shop, where: market_row.general_store }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: sit, where: millbrook.laundry_green }
+    - { at: "16:00", do: walk, where: millbrook.weir }
+    - { at: "18:30", do: cook, where: millbrook.home_31 }
+    - { at: "21:00", do: read, where: millbrook.home_31 }
+    - { at: "22:00", do: sleep, where: millbrook.home_31 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_31 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: socialize, where: millbrook.laundry_green }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "18:00", do: cook, where: millbrook.home_31 }
+    - { at: "21:00", do: read, where: millbrook.home_31 }
+    - { at: "22:00", do: sleep, where: millbrook.home_31 }
+chores: [ Sweep the front step every morning, Mend neighbours' hems on Tuesdays, Polish the stove and keep it lit ]
+relationships:
+  - {
+      id: anouk_clancy,
+      affinity: 12,
+      trust: 18,
+      tag: friend,
+      note: Old draper's friend; trades patterns and gossip across the lane.
+    }
+  - {
+      id: ayesha_soto,
+      affinity: -8,
+      trust: 2,
+      tag: wary,
+      note: Her boys ride bikes past the house without bells.
+    }
+  - { id: cordelia_soto, affinity: 5, trust: 10, tag: fond, note: Sends her cheese from the carer's rounds. }
+secrets:
+  - text: She has never planted the garden Tomas wanted, and still has his seed packets in a tin under the sink.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_a11
+archetype: widowed_elder
+employment: retired
+years_in_monde: 21

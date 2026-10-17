@@ -1,0 +1,115 @@
+# Generated (census-v1) for mb_b06; curated not yet. Edit here.
+id: sinead_rios
+name: Sinead Rios
+age: 75
+pronouns: she/her
+kind: resident
+occupation: Retired schoolcook, bakes for the library desk
+workplace: millbrook.home_11
+home: millbrook.home_11
+portrait: sinead_rios
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: sinead_rios
+appearance: A slight older woman with white curls, a brown pinafore over a grey dress, and half-moon glasses
+  on a cord. Flour usually dusts the pinafore pocket.
+look:
+  kind: human
+  skin: 5
+  hair: { style: curly, colour: 8 }
+  eyes: 2
+  build: narrow
+  height: tall
+  outfit: { cut: pinafore, top: 1, bottom: 0, bottom_style: trousers, shoes: 1, trim: 6 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
+backstory: Sinead cooked for the Carrow schools for twenty-eight years and kept a notebook of every child's
+  allergies. She met Frida at the drapers when she came in for a pair of gloves and left with a button she
+  didn't need. They lived in Carrow until the children moved to Hessle Cross, and then they chose Monde
+  because Frida had grown up here and missed the sea. Sinead's knees gave out on the Carrow hill, so the
+  ground floor on Terrace Row suited them. Sinead thinks the bench on the Commons will change everything. She
+  is wrong that anyone will sit on it without being asked.
+personality:
+  traits: [ warm, wry, patient, observant ]
+  big5: { open: 62, conscientious: 70, extravert: 44, agreeable: 76, neurotic: 46 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.25, charm: 0.25 }
+beliefs:
+  - Nobody is too old to be asked for help.
+  - A bench is a promise that people will stay a while.
+  - Frida is brisker than she needs to be, and it keeps her warm.
+voice:
+  register: Soft and drawn out, with dry asides. Asks gentle questions and waits for answers. Likes to tease but
+    rarely lands it hard.
+  tics: [ "Oh, now.", Mm., "Well, there." ]
+  never_says: [ you should have, hurry up, in my day ]
+  samples:
+    - Mm. Put the kettle on, dear, and we'll see.
+    - Oh, now, that's a lovely bench idea. Who'd sit on it, though?
+    - Well, there. Frida's buttons have found their way to a drawer again.
+birthday: 90
+likes:
+  [
+    tea in a chipped blue pot,
+    letters from the children,
+    the heron fountain,
+    bread still warm,
+    a good crossword
+  ]
+dislikes: [ drafts, rushed meals, gossip about the Tollmen, bright lights at night ]
+fears: [ being left behind by Frida, her knees giving out on the hill ]
+dream:
+  text: A bench on the Commons where a neighbour will sit beside her for an hour.
+  stages:
+    - Choose a quiet spot on the Commons near the pond.
+    - Raise fifteen coins or ask Kasimir to build the bench.
+    - Sit on it with the first neighbour who stops to talk.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_11 }
+    - { at: "09:00", do: cook, where: millbrook.home_11 }
+    - { at: "10:30", do: visit, where: millbrook.clinic }
+    - { at: "12:00", do: shop, where: market_row.general_store }
+    - { at: "14:30", do: garden, where: commons.duck_pond }
+    - { at: "18:00", do: cook, where: millbrook.home_11 }
+    - { at: "21:00", do: read, where: millbrook.home_11 }
+    - { at: "22:00", do: sleep, where: millbrook.home_11 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_11 }
+    - { at: "10:00", do: shop, where: market_row.bakery }
+    - { at: "12:00", do: socialize, where: millbrook.laundry_green }
+    - { at: "16:00", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: millbrook.home_11 }
+chores: [ bake for the library, take in the washing, feed the cat from the Eze house ]
+relationships:
+  - {
+      id: frida_irvine,
+      affinity: 25,
+      trust: 28,
+      tag: partner,
+      note: "Frida, her partner; they finish each other's sentences."
+    }
+  - {
+      id: gideon_szabo,
+      affinity: 10,
+      trust: 12,
+      tag: friend,
+      note: Gideon's patience with his wife moves her.
+    }
+  - {
+      id: emrys_eze,
+      affinity: 8,
+      trust: 10,
+      tag: curious,
+      note: He could build her bench if he had the timber.
+    }
+secrets:
+  - text: She still has the wedding picture from Carrow in her handbag, folded soft at the corners, and looks at
+      it on bad nights.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_b06
+archetype: retired_couple
+employment: retired
+years_in_monde: 75

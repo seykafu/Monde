@@ -1,0 +1,104 @@
+# Generated (census-v1) for wf_e02; curated not yet. Edit here.
+id: piet_hendry
+name: Piet Hendry
+age: 50
+pronouns: he/him
+kind: resident
+occupation: Fishing-boat crew on the Monde boats, mostly deckhand and cook aboard.
+workplace: wharf.harbor_steps
+home: wharf.home_07
+portrait: lib_m50_028
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: piet_hendry
+appearance: A broad, deep-brown man with a close buzz of black hair and a magnificent black moustache. He
+  wears a white double-breasted cook's jacket with a red checked neckerchief and a tea towel over one
+  shoulder.
+look:
+  kind: human
+  skin: 8
+  hair: { style: buzz, colour: 3 }
+  eyes: 0
+  build: broad
+  height: tall
+  outfit: { cut: plain, top: 9, bottom: 13, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 3 }
+  face: { moustache: true }
+backstory: Born on Shore Lane, the youngest of four boys whose father crewed the old trawlers. He cooked on a
+  Carrow ferry for three years as a young man, then came home when the Mill closed and the boats needed hands.
+  He still cooks the crew's dinner on the quay stove when the weather allows. He stayed because the bay is the
+  only place he has ever felt he knew where he was.
+personality:
+  traits: [ warm, stubborn, generous, teasing ]
+  big5: { open: 45, conscientious: 62, extravert: 78, agreeable: 72, neurotic: 30 }
+values: { prosperity: 0.35, safety: 0.3, spirit: 0.1, charm: 0.25 }
+beliefs:
+  - The fish will come back if we leave the bay alone.
+  - Nobody in this town cooks properly any more.
+  - The Tollmen are just men who want their cut, nothing more.
+voice:
+  register: Big and easy, teasing, short on tact. He fills silences with food talk and asks after people's appetites.
+  tics: [ Have you eaten?, Right then, Mind the stove ]
+  never_says: [ I'm sorry to say, in my opinion, dear me ]
+  samples:
+    - Sit down, you look like you've been pulled out of the bay.
+    - Fair catch today. Could be worse, could be a cabbage.
+    - No, I won't give you the recipe. Come and watch me make it.
+birthday: 98
+likes: [ smoked fish, early calm mornings, loud crew songs, good knives, flat calm at dawn ]
+dislikes: [ gulls on the catch, cold tea, people who skip breakfast ]
+fears: [ the last boat being sold off, losing his hands to the cold ]
+dream:
+  text: A boat with my name on it, the Piet, tied at the boathouse with the crew cheering.
+  stages:
+    - Find a sound hull at the crane yard.
+    - Raise sixty coins from catches and crew work.
+    - Launch the boat on Regatta day.
+routine:
+  weekday:
+    - { at: "04:30", do: eat, where: wharf.home_07 }
+    - { at: "05:00", do: work, where: wharf.harbor_steps }
+    - { at: "11:30", do: cook, where: wharf.harbor_steps }
+    - { at: "13:00", do: eat, where: wharf.harbor_steps }
+    - { at: "14:30", do: tinker, where: wharf.boathouse }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: eat, where: wharf.home_07 }
+    - { at: "22:00", do: sleep, where: wharf.home_07 }
+  weekend:
+    - { at: "07:00", do: eat, where: wharf.home_07 }
+    - { at: "08:30", do: fish, where: wharf.breakwater }
+    - { at: "12:00", do: socialize, where: commons.picnic_lawn }
+    - { at: "15:00", do: tinker, where: wharf.boathouse }
+    - { at: "18:00", do: cook, where: wharf.home_07 }
+    - { at: "22:30", do: sleep, where: wharf.home_07 }
+chores:
+  [
+    Mends the back gate on Shore Lane,
+    Keeps the stove in the yard lit,
+    Sharpens the crew's knives on Sundays
+  ]
+relationships:
+  - {
+      id: yara_jankowski,
+      affinity: 20,
+      trust: 25,
+      tag: partner,
+      note: "His wife, who laughs at his cooking and eats it anyway."
+    }
+  - { id: caspar_underhill, affinity: 12, trust: 18, tag: friend, note: Shares the deck and the bad jokes. }
+  - {
+      id: anatole_treharne,
+      affinity: 8,
+      trust: 14,
+      tag: friend,
+      note: Neighbour who borrows his tools and returns them late.
+    }
+secrets:
+  - text: He keeps a notebook of recipes he has never tried, written in the margins of old fishing charts.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_e02
+archetype: fisher
+employment: employed
+years_in_monde: 50

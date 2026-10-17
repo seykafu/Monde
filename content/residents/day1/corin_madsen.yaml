@@ -1,0 +1,82 @@
+# Generated (census-v1) for mb_n01; curated not yet. Edit here.
+id: corin_madsen
+name: Corin Madsen
+age: 38
+pronouns: they/them
+kind: resident
+occupation: full-time carer at home
+workplace: millbrook.home_38
+home: millbrook.home_38
+portrait: corin_madsen
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: corin_madsen
+appearance: A person with close-cropped blue-black hair and a dark brown shirt.
+look:
+  kind: human
+  skin: 5
+  hair: { style: cropped, colour: 7 }
+  eyes: 4
+  build: narrow
+  height: tall
+  outfit: { cut: plain, top: 2, bottom: 13, bottom_style: trousers, shoes: 12 }
+  accessory: { kind: none }
+backstory: "Corin was born in Monde and looks after the household full-time. What they want most is plain
+  enough: a school worth the walk."
+personality:
+  traits: [ steady, wry, proud ]
+  big5: { open: 59, conscientious: 47, extravert: 42, agreeable: 75, neurotic: 76 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
+    schedule.
+  tics: [ "Shoes, satchels, sandwiches." ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Shoes, satchels, sandwiches. Three things. We're out by eight.
+    - Who runs the Thursday class? Name and time, please.
+    - They'll settle. I asked them, and they said they'd settle.
+birthday: 20
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_38 }
+    - { at: "09:30", do: walk, where: commons.picnic_lawn }
+    - { at: "12:00", do: eat, where: millbrook.home_38 }
+    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: eat, where: millbrook.home_38 }
+    - { at: "19:30", do: read, where: millbrook.home_38 }
+    - { at: "21:30", do: sleep, where: millbrook.home_38 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_38 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: millbrook.home_38 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: millbrook.home_38 }
+chores: [ mend a sock, fill the coal scuttle ]
+relationships:
+  - { id: elke_nesbitt, affinity: 70, trust: 70, tag: partner, note: Same house. }
+  - { id: leila_nesbitt, affinity: 70, trust: 70, tag: family, note: Same house. }
+  - { id: hanne_nesbitt, affinity: 70, trust: 70, tag: daughter, note: Same house. }
+  - { id: josef_nesbitt, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_n01
+archetype: school_family
+employment: carer
+years_in_monde: 38

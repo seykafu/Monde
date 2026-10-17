@@ -1,0 +1,115 @@
+# Generated (census-v1) for mr_f01; curated not yet. Edit here.
+id: aline_barros
+name: Aline Barros
+age: 57
+pronouns: she/her
+kind: resident
+occupation: "Odd-jobs worker: net mending, harvest, and whatever comes through the door."
+workplace: market_row.home_14
+home: market_row.home_14
+portrait: lib_f45_091
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: aline_barros
+appearance: A wiry woman with short dark auburn hair under a brown tweed flat cap. She wears a darned
+  bottle-green cardigan buttoned to the neck and has a chipped front tooth.
+look:
+  kind: human
+  skin: 1
+  hair: { style: short, colour: 9 }
+  eyes: 3
+  build: narrow
+  height: tall
+  outfit: { cut: jumper, top: 10, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 1 }
+backstory: Aline worked the Lissworth Mill's spinning room until the year it started laying people off by the
+  alphabet. She came to Monde at forty with a suitcase and a grudge, then took net-mending work from the
+  fishermen who had never bothered to learn it. She has never been convinced by any scheme that involves a
+  meeting, and she says so. Her brother's wages paid for the flat's rent through the lean years, and she has
+  never let him forget she kept the books. She mends for half the harbour now and charges fairly, which nobody
+  expects. She has not forgiven Monde for letting the cannery go, and she is not sure she has forgiven herself
+  for staying.
+personality:
+  traits: [ sharp, practical, wry, loyal ]
+  big5: { open: 35, conscientious: 75, extravert: 45, agreeable: 40, neurotic: 55 }
+values: { prosperity: 0.45, safety: 0.25, spirit: 0.1, charm: 0.2 }
+beliefs:
+  - Every meeting in Monde ends with nothing decided.
+  - People who fish know the sea better than the council does.
+  - Charm is what people use when they have run out of work.
+voice:
+  register: Dry and quick, with a habit of answering questions with questions. Brief when annoyed, unexpectedly
+    warm once she has decided you are worth it.
+  tics: [ "Well, there it is.", Don't look at me like that., Hm. ]
+  never_says: [ that's brilliant, I'm sure it'll be fine, no worries ]
+  samples:
+    - Well, there it is. You want the nets done or you want a speech?
+    - Don't look at me like that. I've mended worse than your conscience.
+    - Hm. Bring the tea in. I'll hear you out over the mending.
+birthday: 11
+likes:
+  [
+    a good net with no holes,
+    strong tea in a cracked cup,
+    the harbour at low tide,
+    honest tradesmen,
+    tea in a tin mug
+  ]
+dislikes: [ meetings with no agenda, people who ask for favours twice, the smell of paraffin in the flat ]
+fears: [ being left with the bills after her brother dies ]
+dream:
+  text: Be the one people come to for advice on the work.
+  stages:
+    - Teach a younger hand to splice and mend properly.
+    - Give a short talk on safe work to the harbour crews.
+    - Be named floor lead when the Mill finally reopens.
+routine:
+  weekday:
+    - { at: "06:45", do: eat, where: market_row.home_14 }
+    - { at: "08:00", do: work, where: market_row.home_14 }
+    - { at: "11:30", do: shop, where: market_row.general_store }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: work, where: market_row.home_14 }
+    - { at: "17:30", do: walk, where: wharf.harbor_steps }
+    - { at: "20:00", do: read, where: market_row.home_14 }
+    - { at: "22:30", do: sleep, where: market_row.home_14 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_14 }
+    - { at: "09:30", do: shop, where: market_row.market_hall }
+    - { at: "11:00", do: socialize, where: old_quarter.fountain_square }
+    - { at: "15:00", do: read, where: old_quarter.library }
+    - { at: "18:00", do: visit, where: market_row.bakery }
+    - { at: "22:00", do: sleep, where: market_row.home_14 }
+chores: [ Mends nets on the kitchen table, Keeps the books for the flat, Sweeps the stair landing on Saturdays ]
+relationships:
+  - {
+      id: karim_barros,
+      affinity: 18,
+      trust: 25,
+      tag: brother,
+      note: Her brother; she keeps him fed and honest.
+    }
+  - {
+      id: winifred_gallo,
+      affinity: 12,
+      trust: 15,
+      tag: friend,
+      note: Trades mending for rye from the bakery.
+    }
+  - {
+      id: odile,
+      affinity: 5,
+      trust: 4,
+      tag: wary,
+      note: Thinks the bakery prices are fair but says otherwise.
+    }
+secrets:
+  - text: She has kept a notebook of every shift she worked at the Mill, and reads it aloud to nobody.
+    reveal: { regard_min: 65 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_f01
+archetype: mill_hand
+employment: employed
+years_in_monde: 17

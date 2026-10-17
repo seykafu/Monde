@@ -1,0 +1,111 @@
+# Generated (census-v1) for wf_a04; curated not yet. Edit here.
+id: desmond_esposito
+name: Desmond Esposito
+age: 86
+pronouns: he/him
+kind: resident
+occupation: Retired; once kept the harbour's tide tables by hand
+workplace: wharf.home_15
+home: wharf.home_15
+portrait: lib_m86_120
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: desmond_esposito
+appearance: A slight, smiling old man with pepper-grey tufts escaping a brown tweed flat cap, big kindly ears,
+  and a plum cardigan with a green tartan scarf tucked into it.
+look:
+  kind: human
+  skin: 8
+  hair: { style: tufty, colour: 11 }
+  eyes: 6
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 8, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 7 }
+  headwear: { kind: flat_cap, colour: 1 }
+  face: { stubble: true }
+backstory: Desmond came to Monde at thirty-five from a grain town inland, having failed at selling insurance
+  in a city that never looked at him twice. He took a post copying tide tables for the harbour office and
+  stayed when the office closed. He married Ruth, a seamstress who sang off-key in St. Brigid's, and she died
+  eleven winters ago in the front room. He still sets two cups out before he remembers. The Lissworth Mill
+  closing took half his neighbours, and he thinks the town should have fought harder for the mill, though he
+  never went to a single meeting about it.
+personality:
+  traits: [ gentle, rambling, patient, wistful ]
+  big5: { open: 62, conscientious: 48, extravert: 38, agreeable: 80, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.25, charm: 0.25 }
+beliefs:
+  - The mill would have reopened if somebody had simply written to Carrow.
+  - Boys on bicycles are the only thing in Monde that still makes noise.
+  - A cup of tea fixes most things, including things it cannot fix.
+voice:
+  register: Slow and warm, circling back to earlier threads, with prices from forty years ago dropped in
+    unprompted. He trails off and restarts, and asks people to tell him a story when he runs out.
+  tics: [ Now where was I?, "Back in my day, a loaf cost", Mind the step ]
+  never_says: [ "Dear me, I'm fine", you should have known, it's all over now ]
+  samples:
+    - Now where was I? Oh yes, the ferry. Tuesday, always Tuesday.
+    - Ruth would've had the kettle on by now. Would you like a cup, or shall I just talk at you?
+    - A fish supper, that's the thing. Nell's cod, wrapped in the Lantern. Don't tell the Lantern.
+birthday: 97
+likes:
+  [
+    knitting,
+    small birds at the window,
+    being asked for a story,
+    the ferry going out on Tuesdays,
+    Nell's cod on a Friday
+  ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, the mill's closed gate ]
+fears: [ the house going quiet for good, forgetting the way Ruth hummed ]
+dream:
+  text: Be invited to supper by a neighbour, and then sit at a table with someone who will stay until the kettle
+    is cold.
+  stages:
+    - Walk the length of Shingle Row and knock on a door.
+    - Return the invitation with a fish supper from Nell's.
+    - Set a standing Thursday table for whoever comes.
+routine:
+  weekday:
+    - { at: "07:00", do: sit, where: wharf.home_15 }
+    - { at: "08:30", do: walk, where: wharf.harbor_steps }
+    - { at: "10:00", do: shop, where: wharf.fish_market }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: read, where: old_quarter.library }
+    - { at: "16:30", do: walk, where: commons.duck_pond }
+    - { at: "18:30", do: cook, where: wharf.home_15 }
+    - { at: "21:00", do: sleep, where: wharf.home_15 }
+  weekend:
+    - { at: "08:00", do: sit, where: wharf.home_15 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: pray, where: old_quarter.st_brigids }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: wharf.home_15 }
+chores:
+  [
+    Trims the candle stubs in the front window,
+    Shells peas on the step in season,
+    Sweeps the shingle path before the gulls get to it
+  ]
+relationships:
+  - {
+      id: annick_olsen,
+      affinity: 22,
+      trust: 18,
+      tag: friend,
+      note: Swaps seed packets and gossip over the gate.
+    }
+  - { id: mei_lindgren, affinity: 14, trust: 12, tag: fond, note: Brings him soup when she remembers. }
+  - { id: olav_lindgren, affinity: -12, trust: -6, tag: wary, note: The bicycle boy who rings nothing. }
+secrets:
+  - text: He still writes Ruth a short letter each Tuesday and posts it in the library box, which is his own
+      private joke about the post.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_a04
+archetype: widowed_elder
+employment: retired
+years_in_monde: 51

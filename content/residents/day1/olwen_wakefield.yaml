@@ -1,0 +1,77 @@
+# Generated (census-v1) for mb_i02; curated not yet. Edit here.
+id: olwen_wakefield
+name: Olwen Wakefield
+age: 29
+pronouns: she/her
+kind: resident
+occupation: works in Hessle Cross
+workplace: offmap.city
+home: millbrook.home_19
+portrait: lib_f30_084
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: olwen_wakefield
+appearance: A young woman with long honey-blonde hair and a blunt fringe, a rose cardigan over a white blouse
+  and a satchel strap across her chest. A chalky handprint on one shoulder and an earnest, determined look.
+look:
+  kind: human
+  skin: 9
+  hair: { style: long, colour: 10 }
+  eyes: 0
+  build: narrow
+  height: tall
+  outfit: { cut: jumper, top: 12, bottom: 6, bottom_style: skirt, shoes: 1 }
+  accessory: { kind: none }
+backstory: "Olwen came to Monde from Ashby Lock 2 years ago and works as a commuter to Hessle Cross. What she
+  wants most is plain enough: open by the end of the month."
+personality:
+  traits: [ steady, wry, restless ]
+  big5: { open: 8, conscientious: 34, extravert: 93, agreeable: 41, neurotic: 42 }
+values: { prosperity: 0.55, safety: 0.15, spirit: 0.1, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk. A salesperson's warmth with a ledger underneath. Talks in prices and margins.
+  tics: [ Let me do you a deal. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Let me do you a deal. Two for a bit more than one's price.
+    - Footfall's the thing. Footfall, then the window.
+    - Margins, mostly. And a good bell on the door.
+birthday: 60
+likes: [ a till that rings, hand-lettered signs, first customers ]
+dislikes: [ fees nobody explained, just browsing said twice, empty windows ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: Open by the end of the month
+  stages:
+    - Stock the shelves
+    - Get a sign painted
+    - Cut the ribbon with the mayor
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_19 }
+    - { at: "07:30", do: work, where: offmap.city }
+    - { at: "12:30", do: eat, where: offmap.city }
+    - { at: "13:30", do: work, where: offmap.city }
+    - { at: "19:00", do: eat, where: offmap.city }
+    - { at: "22:00", do: sleep, where: offmap.city }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_19 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
+    - { at: "18:00", do: eat, where: millbrook.home_19 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: millbrook.home_19 }
+chores: [ sweep the step, beat the doormat ]
+relationships:
+  - { id: malachy_wakefield, affinity: 70, trust: 70, tag: spouse, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_i02
+archetype: shop_founder
+employment: employed
+years_in_monde: 2

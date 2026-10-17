@@ -417,7 +417,7 @@ export const ARCHETYPES: readonly Archetype[] = [
     shape: { kind: "widowed" },
     requires: f => f.pillars.spirit >= 30,
     reasons: ["for the quiet, after the house in Hessle Cross got too big", "because her late husband always said they'd retire by the sea", "to be nearer a nephew who never visits"],
-    samples: ["Now where was I? The bread. A penny, it was. A penny.", "Sit down, sit down. The kettle's thinking about it.", "Little sparrow on the sill this morning. Bold as you like, he's back."],
+    samples: ["Now where was I? The bread. One coin, it was. One coin.", "Sit down, sit down. The kettle's thinking about it.", "Little sparrow on the sill this morning. Bold as you like, he's back."],
   },
   {
     id: "retired_keeper", label: "Retired keeper of lights", age: [62, 80], lean: "O", presentation: W(30, 68, 2),

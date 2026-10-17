@@ -1,0 +1,78 @@
+# Generated (census-v1) for mb_l01; curated not yet. Edit here.
+id: raoul_soto
+name: Raoul Soto
+age: 13
+pronouns: he/him
+kind: resident
+occupation: lessons by post at the library desk
+workplace: millbrook.home_26
+home: millbrook.home_26
+portrait: raoul_soto
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: raoul_soto
+appearance: A boy with tufty sandy blond hair, grey dungarees and freckles.
+look:
+  kind: human
+  skin: 0
+  hair: { style: tufty, colour: 5 }
+  eyes: 0
+  build: narrow
+  height: tall
+  outfit: { cut: dungarees, top: 14, bottom: 15, bottom_style: trousers, shoes: 2, trim: 11 }
+  accessory: { kind: none }
+  face: { freckles: true }
+backstory: Raoul was born in Monde and does lessons by post at the library desk. He likes the ducks on the Commons best.
+personality:
+  traits: [ brisk, warm, shy ]
+  big5: { open: 42, conscientious: 76, extravert: 42, agreeable: 60, neurotic: 36 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: "A young voice: questions, then more questions."
+  tics: [ It's fine. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - It's fine. It's a town. There's a pub. Can't go in it.
+    - Did you see the lighthouse? It's not even on.
+    - I'll do the lessons later. Probably.
+birthday: 72
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the dark on the stairs ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_26 }
+    - { at: "09:00", do: read, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: millbrook.home_26 }
+    - { at: "15:00", do: wander, where: market_row.market_street }
+    - { at: "18:00", do: eat, where: millbrook.home_26 }
+    - { at: "21:30", do: sleep, where: millbrook.home_26 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_26 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "18:00", do: eat, where: millbrook.home_26 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: millbrook.home_26 }
+chores: [ black the stove, wind the clock ]
+relationships:
+  - { id: cordelia_soto, affinity: 70, trust: 70, tag: mother, note: Same house. }
+  - { id: ayesha_soto, affinity: 70, trust: 70, tag: mother, note: Same house. }
+  - { id: arvid_soto, affinity: 70, trust: 70, tag: brother, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_l01
+archetype: school_family
+employment: lessons
+years_in_monde: 13

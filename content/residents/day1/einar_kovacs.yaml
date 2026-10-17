@@ -1,0 +1,102 @@
+# Generated (census-v1) for cm_b01; curated not yet. Edit here.
+id: einar_kovacs
+name: Einar Kovacs
+age: 62
+pronouns: he/him
+kind: resident
+occupation: Retired carver of wooden spoons and small toys
+workplace: commons.home_02
+home: commons.home_02
+portrait: lib_m72_068
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: einar_kovacs
+appearance: A salt-and-pepper moustache under a soft grey peaked cap, with a thick oatmeal jumper with brass
+  buttons at the shoulder.
+look:
+  kind: human
+  skin: 5
+  hair: { style: short, colour: 11 }
+  eyes: 4
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 9, bottom: 13, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  headwear: { kind: peaked_cap, colour: 14 }
+  face: { moustache: true }
+backstory: Einar arrived at 25 with a bag of carving tools and a notion of living by the sea. He worked in a
+  city workshop for years before Monde, making furniture for people he never met. In Monde he found he
+  preferred making spoons for neighbours he could name. He and Wilfred married in the town chapel in a small
+  ceremony after the ferry brought the rings. He stopped carving for sale when his hands grew stiff, but he
+  still whittles on the step most evenings. He has never told Wilfred how often he wishes they had gone back
+  to the city together, just once.
+personality:
+  traits: [ watchful, quiet, patient, kind ]
+  big5: { open: 55, conscientious: 60, extravert: 25, agreeable: 70, neurotic: 35 }
+values: { prosperity: 0.33, safety: 0.29, spirit: 0.19, charm: 0.19 }
+beliefs:
+  - A good spoon takes a whole winter.
+  - Most people only need someone to listen.
+  - The town will hold on if people keep talking on the doorstep.
+voice:
+  register: Laconic. Says little and lets silence do the work. Gentle warmth shows in the few words he chooses.
+  tics: [ hm, that'll do, wait and see ]
+  never_says: [ in my opinion, trust me, amazing ]
+  samples:
+    - Hm. Give it a day.
+    - That'll do for the stew.
+    - Tea's on the step if you want it.
+birthday: 44
+likes:
+  [
+    the smell of cut pine,
+    evening whittling on the step,
+    quiet ferry crossings,
+    tea in a tin mug,
+    the sound of a loom running true
+  ]
+dislikes: [ loud radios in the morning, rushed work, people who don't wipe their boots ]
+fears: [ his hands failing for good, Wilfred going first ]
+dream:
+  text: Be asked to teach someone the craft before the hands give out.
+  stages:
+    - Find a young apprentice willing to sit still.
+    - Show them how to hold the knife safely.
+    - Watch them finish their first spoon.
+routine:
+  weekday:
+    - { at: "07:15", do: eat, where: commons.home_02 }
+    - { at: "09:00", do: tinker, where: commons.home_02 }
+    - { at: "11:00", do: walk, where: old_quarter.fountain_square }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "14:30", do: sit, where: wharf.harbor_steps }
+    - { at: "17:30", do: cook, where: commons.home_02 }
+    - { at: "22:00", do: sleep, where: commons.home_02 }
+  weekend:
+    - { at: "08:00", do: eat, where: commons.home_02 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: commons.footbridge }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: commons.home_02 }
+chores: [ whittle the day's shavings into the stove, wash the tin mugs, sweep the yard gate ]
+relationships:
+  - { id: wilfred_kovacs, affinity: 25, trust: 28, tag: spouse, note: Keeps the peace and the teapot full. }
+  - { id: odile, affinity: 10, trust: 8, tag: fond, note: Brings her the offcuts for the bakery's kindling. }
+  - {
+      id: felix,
+      affinity: 6,
+      trust: 5,
+      tag: curious,
+      note: Once asked him to show the pupils how to hold a chisel.
+    }
+secrets:
+  - text: He has kept every letter Wilfred wrote him in the city before they moved to Monde, tied with string
+      under the floorboards.
+    reveal: { regard_min: 70 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: cm_b01
+archetype: mill_hand
+employment: retired
+years_in_monde: 37

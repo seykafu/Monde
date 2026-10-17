@@ -1,0 +1,109 @@
+# Generated (census-v1) for sh_b01; curated not yet. Edit here.
+id: omar_quarrie
+name: Omar Quarrie
+age: 73
+pronouns: he/him
+kind: resident
+occupation: Retired engineer's apprentice, now fixes clocks for fun
+workplace: station_hill.home_02
+home: station_hill.home_02
+portrait: omar_quarrie
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: omar_quarrie
+appearance: A tall, lean man with short salt-and-pepper hair, round glasses and a mustard shirt buttoned to
+  the collar. He keeps a pencil tucked behind one ear.
+look:
+  kind: human
+  skin: 8
+  hair: { style: short, colour: 11 }
+  eyes: 1
+  build: medium
+  height: short
+  outfit: { cut: plain, top: 4, bottom: 12, bottom_style: trousers, shoes: 12 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Omar's family came over on the Carrow ferry when he was three, and he has never seen the point of
+  anywhere else. He apprenticed at Lissworth Mill and spent his twenties keeping the great looms running,
+  until the day the last shift went home and the frames stopped for good. Since then he has tinkered with
+  clocks, most of them his neighbours' and none of them the tower's, which he is fairly sure he could fix if
+  anyone asked. He married Constance after a dance in the Gull, and he still claims he proposed first. He is
+  wrong about that.
+personality:
+  traits: [ patient, dry, curious, stubborn ]
+  big5: { open: 72, conscientious: 70, extravert: 40, agreeable: 60, neurotic: 30 }
+values: { prosperity: 0.15, safety: 0.3, spirit: 0.25, charm: 0.3 }
+beliefs:
+  - The clocktower could run again with one good spring and a bit of nerve.
+  - Nobody in Monde has ever really been lost, only mislaid.
+  - Tinkering is the only honest kind of work left.
+voice:
+  register: Slow and deliberate, with dry understatement and the occasional technical word he then explains. He
+    answers questions with questions when he wants to think.
+  tics: [ "Hmm, well.", Let me look at it., That's not quite right. ]
+  never_says: [ that's impossible, nothing to be done, trust me ]
+  samples:
+    - Hmm. The escapement's sound, but the hands are wrong.
+    - Let me look at it. No, the tower's not my business. Yet.
+    - Constance says I proposed late. I say I proposed on time.
+birthday: 60
+likes: [ the smell of machine oil, pocket watches, a good argument over tea, the lookout over the bay ]
+dislikes: [ loud radios, being rushed, people who say a thing is broken without looking ]
+fears: [ the clocktower stopping for good, forgetting how a movement sounds ]
+dream:
+  text: A bench with a view over the bay, where he can sit and listen for the tower.
+  stages:
+    - Choose a spot on the Commons with a clear line to the lighthouse.
+    - Raise fifteen coins or ask Kasimir to build the bench.
+    - Sit on it with the first neighbour who stops to talk.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: station_hill.home_02 }
+    - { at: "08:00", do: tinker, where: station_hill.home_02 }
+    - { at: "10:30", do: walk, where: station_hill.platform }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: read, where: old_quarter.library }
+    - { at: "15:30", do: sit, where: station_hill.lookout_bench }
+    - { at: "17:30", do: walk, where: wharf.harbor_steps }
+    - { at: "20:30", do: read, where: station_hill.home_02 }
+    - { at: "22:00", do: sleep, where: station_hill.home_02 }
+  weekend:
+    - { at: "08:00", do: eat, where: station_hill.home_02 }
+    - { at: "09:30", do: tinker, where: station_hill.home_02 }
+    - { at: "11:00", do: walk, where: station_hill.water_tower }
+    - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: fish, where: wharf.breakwater }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: station_hill.home_02 }
+chores: [ wind the kitchen clock, sweep the workbench, split the kindling ]
+relationships:
+  - {
+      id: constance_ballard,
+      affinity: 25,
+      trust: 30,
+      tag: partner,
+      note: His wife; she keeps him honest and he keeps her entertained.
+    }
+  - {
+      id: hollis,
+      affinity: 15,
+      trust: 20,
+      tag: friend,
+      note: Retired engine driver; they swap railway stories on the platform.
+    }
+  - {
+      id: pell,
+      affinity: -5,
+      trust: 0,
+      tag: wary,
+      note: The mayor keeps promising to look at the tower; he doubts she will.
+    }
+secrets:
+  - text: He has kept the tower's old key in his tool box for nine years and has never tried it in the lock.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: sh_b01
+archetype: retired_couple
+employment: retired
+years_in_monde: 70

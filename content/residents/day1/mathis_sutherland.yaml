@@ -1,0 +1,117 @@
+# Generated (census-v1) for mb_e05; curated not yet. Edit here.
+id: mathis_sutherland
+name: Mathis Sutherland
+age: 52
+pronouns: he/him
+kind: resident
+occupation: Casual boathouse hand and fair-day odd-jobber; out of work since the cannery…
+workplace: millbrook.home_36
+home: millbrook.home_36
+portrait: mathis_sutherland
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: mathis_sutherland
+appearance: A broad man with black hair swept back and a brick-red shirt under his green flat cap. He has the
+  easy stance of someone who spent years lifting crates on the harbour steps.
+look:
+  kind: human
+  skin: 8
+  hair: { style: swept, colour: 3 }
+  eyes: 3
+  build: broad
+  height: tall
+  outfit: { cut: plain, top: 3, bottom: 14, bottom_style: trousers, shoes: 9 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 7 }
+backstory: Mathis arrived in Monde at twenty-two, as Dafydd did, and went straight to the Liss Cannery on the
+  Wharf, where he worked the packing line for ten years before it shut. He is the one who talks to people on
+  the doorstep and knows which house has a leaky roof before the owner does. He thinks the Tollmen are a bad
+  lot but also that they are the only ones who ever show up on a Saturday, which he admits is an unhappy thing
+  to say. He wants to see the Wharf working again, and he wants Dafydd to stop looking at the mill like a
+  grave.
+personality:
+  traits: [ warm, restless, talkative, loyal, wry ]
+  big5: { open: 55, conscientious: 45, extravert: 80, agreeable: 70, neurotic: 40 }
+values: { prosperity: 0.4, safety: 0.2, spirit: 0.2, charm: 0.2 }
+beliefs:
+  - A town that talks on its doorsteps is a town that will survive.
+  - The cannery was closed by people who never smelled the fish.
+  - Nobody in Monde is really out of work; they just have not been asked.
+voice:
+  register: Chatty, warm and quick, with a laugh ready. Uses the Wharf's slang. Will go on a little, then catch
+    himself.
+  tics: [ Mind the step., "Oh, go on.", "Well, there it is." ]
+  never_says: [ that's not my problem, I don't care, nothing ever happens here ]
+  samples:
+    - Oh, go on, have the last heel of the loaf. Odile won't miss it.
+    - Dafydd says it's all over. I say the boathouse wants a hand Thursday.
+    - Mind the step, the fish smell gets into everything, even the Sunday shirt.
+birthday: 65
+likes:
+  [
+    the harbour steps at dusk,
+    chatting over the wall,
+    fresh bread from the bakery,
+    Gull & Anchor cider,
+    tea in a tin mug
+  ]
+dislikes: [ cold tea, people who never come out to talk, the cannery's shuttered windows ]
+fears: [ Dafydd giving up completely, the Wharf going quiet for good ]
+dream:
+  text: Get a steady wage back, at the boathouse or the cannery, so Dafydd stops sitting in the dark.
+  stages:
+    - Register at Town Hall and sign up for every casual job.
+    - Work a shift at the boathouse three days running.
+    - Take a floor job at the cannery if it reopens.
+routine:
+  weekday:
+    - { at: "06:45", do: eat, where: millbrook.home_36 }
+    - { at: "07:30", do: walk, where: wharf.harbor_steps }
+    - { at: "08:00", do: shop, where: market_row.bakery }
+    - { at: "09:00", do: socialize, where: market_row.market_street }
+    - { at: "11:30", do: volunteer, where: wharf.breakwater }
+    - { at: "13:30", do: eat, where: market_row.cafe_liss }
+    - { at: "16:00", do: wander, where: old_quarter.fountain_square }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_36 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_36 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: socialize, where: commons.picnic_lawn }
+    - { at: "14:00", do: fish, where: wharf.breakwater }
+    - { at: "18:00", do: cook, where: millbrook.home_36 }
+    - { at: "20:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: millbrook.home_36 }
+chores: [ Sweeps the front step, Bakes on Sundays, Chases the cat off the washing ]
+relationships:
+  - {
+      id: dafydd_sutherland,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: Brother-in-spirit; he worries about Dafydd and says so too often.
+    }
+  - {
+      id: bru,
+      affinity: -15,
+      trust: -10,
+      tag: wary,
+      note: Tollman bruiser; Mathis resents the fees but nods to him on the steps.
+    }
+  - {
+      id: nettie,
+      affinity: 8,
+      trust: 12,
+      tag: friend,
+      note: Tollman lookout who once helped carry his crates up the steps.
+    }
+secrets:
+  - text: He has been secretly teaching himself to read the Lantern's headlines aloud to the cat, because he can
+      read but never writes a letter.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mb_e05
+archetype: mill_hand
+employment: out_of_work
+years_in_monde: 30

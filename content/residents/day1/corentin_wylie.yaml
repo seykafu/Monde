@@ -1,0 +1,103 @@
+# Generated (census-v1) for mr_e02; curated not yet. Edit here.
+id: corentin_wylie
+name: Corentin Wylie
+age: 56
+pronouns: he/him
+kind: resident
+occupation: Mason and cook who works from the flat above Market Row, laying…
+workplace: market_row.home_11
+home: market_row.home_11
+portrait: lib_m50_096
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: corentin_wylie
+appearance: A big, broad man with a close-shaved head and a magnificent salt-and-pepper moustache, deep brown
+  skin, and a pale-blue double-breasted cook's jacket. He wears a green checked neckerchief and has a tea
+  towel slung over one shoulder.
+look:
+  kind: human
+  skin: 8
+  hair: { style: buzz, colour: 11 }
+  eyes: 0
+  build: broad
+  height: tall
+  outfit: { cut: plain, top: 5, bottom: 13, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 7 }
+  face: { moustache: true }
+backstory: Corentin trained as a mason in his home city of Hessle Cross, laying stone for churches and garden
+  walls. He came to Monde at thirty-nine when the mill still ran and the town needed walls rebuilt after a
+  flood. He cooked in the Gull and Anchor's kitchen for three summers when Roz was short-staffed, and people
+  still say his fish stew was the best thing the town ever ate. Hartley was the one who asked him to stay. He
+  still believes the Market Row walls are sound, though one has a crack he has been meaning to point for six
+  years.
+personality:
+  traits: [ warm, generous, proud, teasing ]
+  big5: { open: 62, conscientious: 70, extravert: 78, agreeable: 80, neurotic: 30 }
+values: { prosperity: 0.3, safety: 0.18, spirit: 0.22, charm: 0.3 }
+beliefs:
+  - A town that eats together doesn't fall apart.
+  - Stone remembers who built it.
+  - Nobody in Monde has ever been turned away from a stew.
+voice:
+  register: Warm, booming and playful. Speaks with easy confidence and laughs at his own jokes. Cooks and builds
+    in the same breath.
+  tics: [ come eat, my dear, that wall is listening ]
+  never_says: [ I don't have time, that's not my problem, "sorry, we're closed" ]
+  samples:
+    - Come in, come in, there's stew on and nobody's leaving hungry.
+    - That crack's been there six years, my dear. It can wait one more Saturday.
+    - Ha! The gull on that statue has more sense than the Tollmen, I'd say.
+birthday: 62
+likes: [ fish stew, good stone, the Saturday market crowd, a warm kitchen, seasoned timber ]
+dislikes: [ raw fish left out, sour bread, people who skip meals ]
+fears: [ the town emptying out, losing the flat to a sale ]
+dream:
+  text: See the collapsed bandstand on the Commons standing again, with the whole town's stew served on its steps.
+  stages:
+    - Examine the collapsed bandstand on the Commons.
+    - Draw the plan with Kasimir at the workshop.
+    - Lift the first beam on a Saturday with everyone helping.
+routine:
+  weekday:
+    - { at: "06:00", do: eat, where: market_row.home_11 }
+    - { at: "07:00", do: cook, where: market_row.home_11 }
+    - { at: "09:00", do: work, where: market_row.home_11 }
+    - { at: "12:30", do: socialize, where: market_row.market_hall }
+    - { at: "14:00", do: work, where: market_row.home_11 }
+    - { at: "18:00", do: cook, where: market_row.home_11 }
+    - { at: "21:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: market_row.home_11 }
+  weekend:
+    - { at: "07:30", do: cook, where: market_row.home_11 }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: socialize, where: commons.picnic_lawn }
+    - { at: "15:00", do: walk, where: old_quarter.fountain_square }
+    - { at: "18:00", do: cook, where: market_row.home_11 }
+    - { at: "22:00", do: sleep, where: market_row.home_11 }
+chores: [ bake the bread for the flat, scrub the stock pot, check the mortar bucket ]
+relationships:
+  - {
+      id: hartley_wylie,
+      affinity: 28,
+      trust: 25,
+      tag: spouse,
+      note: Husband; the steady hand to his big heart.
+    }
+  - {
+      id: odile,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Swaps recipes and the good flour with her on Saturdays.
+    }
+  - { id: rosalind, affinity: 14, trust: 12, tag: fond, note: Misses his stew nights at the Gull and Anchor. }
+secrets:
+  - text: He keeps a tin of his mother's ginger biscuits hidden in the wall cavity and eats them only when Hartley
+      is out roofing.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: shopkeeper
+generated_by: model
+household: mr_e02
+archetype: builder
+employment: employed
+years_in_monde: 17

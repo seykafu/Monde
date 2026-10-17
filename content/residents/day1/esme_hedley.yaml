@@ -1,0 +1,107 @@
+# Generated (census-v1) for oq_b05; curated not yet. Edit here.
+id: esme_hedley
+name: Esme Hedley
+age: 68
+pronouns: she/her
+kind: resident
+occupation: Fishing-boat crew on one of Monde's nine boats.
+workplace: wharf.harbor_steps
+home: old_quarter.home_17
+portrait: lib_f73_114
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: esme_hedley
+appearance: A small, wiry woman with faded flaxen hair under a teal knit cap, and a gold hoop in one ear. She
+  wears a bottle-green fisherman's gansey and has sea-squint crow's feet.
+look:
+  kind: human
+  skin: 6
+  hair: { style: short, colour: 5 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 10, bottom: 13, bottom_style: trousers, shoes: 4 }
+  accessory: { kind: none }
+  headwear: { kind: knit_cap, colour: 0 }
+backstory: Esme came to Monde at thirty-six from a trawler out of the north, after a bad winter when her boat
+  was lost and she was the only one to make it to shore. She signed on with a Monde crew because they took
+  anyone who could haul line. She has been on the water every morning since, through the cannery's closing and
+  the mill's silence. She met Honor at the harbour steps when Honor came down to check the tide and complained
+  about the ferry. They have shared Flat C ever since, and Esme still thinks the stairs are a trial.
+personality:
+  traits: [ blunt, wry, loyal, stubborn ]
+  big5: { open: 40, conscientious: 65, extravert: 72, agreeable: 45, neurotic: 30 }
+values: { prosperity: 0.2, safety: 0.3, spirit: 0.3, charm: 0.2 }
+beliefs:
+  - The fish will come back if the town stops fussing about the cannery.
+  - Anyone who can't haul a line should keep their opinions to themselves.
+  - Honor is always right about the weather, which is the most annoying thing about her.
+voice:
+  register: Short, sardonic sentences with sailor's shorthand. She ends a topic by changing it. Warmer when
+    talking to Honor, and only then.
+  tics: [ "Aye, well.", Mind the rope., Hm. ]
+  never_says: [ sorry, I suppose, with respect, my feelings ]
+  samples:
+    - Aye, well. Nine boats and one of them leaks.
+    - Mind the rope. It's wetter than it looks.
+    - Hm. Put the kettle on, then. She's coming up the stairs cursing.
+birthday: 55
+likes: [ the smell of tar, a hard day's haul, Honor's terrible tea, the gull that steals her bait, barometers ]
+dislikes: [ the ferry running late, people who stand on the steps and talk, the town's silence after the cannery ]
+fears: [ being too old for the boat, Honor getting sick ]
+dream:
+  text: She wants a true record of the catch kept by the crews, printed in the Lantern for the town to see.
+  stages:
+    - Start a catch ledger at the harbour steps.
+    - Give the ledger to the Lantern to print.
+    - Hand the ledger on to the youngest deckhand.
+routine:
+  weekday:
+    - { at: "04:30", do: wander, where: old_quarter.home_17 }
+    - { at: "05:00", do: work, where: wharf.harbor_steps }
+    - { at: "11:00", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: work, where: wharf.harbor_steps }
+    - { at: "17:00", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: eat, where: old_quarter.home_17 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_17 }
+  weekend:
+    - { at: "07:00", do: sleep, where: old_quarter.home_17 }
+    - { at: "09:00", do: fish, where: wharf.breakwater }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: wharf.harbor_steps }
+    - { at: "17:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: eat, where: old_quarter.home_17 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_17 }
+chores: [ Dry and mend the nets, Carry the catch up the steps, Keep Honor's tea away from the good cups ]
+relationships:
+  - {
+      id: honor_hedley,
+      affinity: 25,
+      trust: 30,
+      tag: spouse,
+      note: Her partner; the only person she lets the last word.
+    }
+  - {
+      id: ada,
+      affinity: 5,
+      trust: 8,
+      tag: fond,
+      note: Sees her every morning at the ferry hatch and teases her about her post.
+    }
+  - {
+      id: pell,
+      affinity: -10,
+      trust: 5,
+      tag: wary,
+      note: Thinks the mayor talks too much about the fleet and does too little.
+    }
+secrets:
+  - text: She still sings the old northern trawler songs on the boat when she thinks nobody can hear.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: favor_giver
+generated_by: model
+household: oq_b05
+archetype: retired_keeper
+employment: employed
+years_in_monde: 32

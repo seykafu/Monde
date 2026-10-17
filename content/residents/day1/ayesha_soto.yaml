@@ -1,0 +1,79 @@
+# Generated (census-v1) for mb_l01; curated not yet. Edit here.
+id: ayesha_soto
+name: Ayesha Soto
+age: 36
+pronouns: she/her
+kind: resident
+occupation: works in Hessle Cross
+workplace: offmap.city
+home: millbrook.home_26
+portrait: ayesha_soto
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: ayesha_soto
+appearance: A woman with black braids, a rose coat and a rust scarf.
+look:
+  kind: human
+  skin: 5
+  hair: { style: braids, colour: 3 }
+  eyes: 0
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 12, bottom: 14, bottom_style: trousers, shoes: 8 }
+  accessory: { kind: scarf, colour: 11 }
+backstory: "Ayesha was born in Monde and works as a commuter to Hessle Cross. What she wants most is plain
+  enough: a school worth the walk."
+personality:
+  traits: [ shy, patient, warm ]
+  big5: { open: 25, conscientious: 79, extravert: 76, agreeable: 72, neurotic: 16 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
+    schedule.
+  tics: [ "Shoes, satchels, sandwiches." ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Shoes, satchels, sandwiches. Three things. We're out by eight.
+    - Who runs the Thursday class? Name and time, please.
+    - They'll settle. I asked them, and they said they'd settle.
+birthday: 45
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_26 }
+    - { at: "07:30", do: work, where: offmap.city }
+    - { at: "12:30", do: eat, where: offmap.city }
+    - { at: "13:30", do: work, where: offmap.city }
+    - { at: "19:00", do: eat, where: offmap.city }
+    - { at: "22:00", do: sleep, where: offmap.city }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_26 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.duck_pond }
+    - { at: "18:00", do: eat, where: millbrook.home_26 }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_26 }
+chores: [ mend a sock, wind the clock ]
+relationships:
+  - { id: cordelia_soto, affinity: 70, trust: 70, tag: spouse, note: Same house. }
+  - { id: arvid_soto, affinity: 70, trust: 70, tag: son, note: Same house. }
+  - { id: raoul_soto, affinity: 70, trust: 70, tag: son, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_l01
+archetype: school_family
+employment: employed
+years_in_monde: 36

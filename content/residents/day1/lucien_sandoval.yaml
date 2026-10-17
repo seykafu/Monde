@@ -1,0 +1,90 @@
+# Generated (census-v1) for mr_j01; curated not yet. Edit here.
+id: lucien_sandoval
+name: Lucien Sandoval
+age: 4
+pronouns: he/him
+kind: resident
+occupation: Under five, at home.
+workplace: market_row.home_12
+home: market_row.home_12
+portrait: lib_m03_074
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: lucien_sandoval
+appearance: A slight toddler with round cheeks and dark brown curls under a red bobble hat, wearing leaf-green
+  corduroy dungarees over a sky-blue jumper.
+look:
+  kind: human
+  skin: 8
+  hair: { style: curly, colour: 0 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: dungarees, top: 7, bottom: 7, bottom_style: trousers, shoes: 4, trim: 5 }
+  accessory: { kind: none }
+  headwear: { kind: knit_cap, colour: 3 }
+backstory: Lucien was born in the flat above Market Row during a February gale, and he has never once been to
+  Carrow. He knows the heron on the fountain better than most adults and insists the bakery's rye is the best
+  thing in the world. His days are spent between the stairs, the harbour steps and whichever shop has a dog.
+  He collects bottle tops and keeps them in a tin his father painted. He doesn't yet understand why the clock
+  on the tower is stopped, and asks about it often.
+personality:
+  traits: [ curious, solemn, determined, sweet ]
+  big5: { open: 80, conscientious: 30, extravert: 60, agreeable: 55, neurotic: 40 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.2, charm: 0.25 }
+beliefs:
+  - The heron on the fountain is hungry.
+  - Bottle tops are money.
+  - The clock stopped because it got tired.
+voice:
+  register: Small, direct, and often a single word. Repeats things he likes. Asks questions in the middle of
+    other people's sentences.
+  tics: [ Why?, More., Look. ]
+  never_says: [ please, maybe later, I don't know ]
+  samples:
+    - Why's the clock tired?
+    - More rye.
+    - Look, the heron's got a fish!
+birthday: 40
+likes: [ bottle tops, the wooden horse, the bakery counter, hand-me-downs, a gate that latches ]
+dislikes: [ hats in the wrong order, the sound of the foghorn, being left on the stairs ]
+fears: [ the dark stairwell, losing the wooden horse ]
+dream:
+  text: A reading corner full of other children and a kettle that works.
+  stages:
+    - Ask Margo if the library can open a Tuesday corner.
+    - Find two other families with small children to come.
+    - Run the first hour with biscuits and bottle tops.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: market_row.home_12 }
+    - { at: "10:00", do: walk, where: commons.duck_pond }
+    - { at: "12:00", do: eat, where: market_row.home_12 }
+    - { at: "13:00", do: nap, where: market_row.home_12 }
+    - { at: "19:00", do: sleep, where: market_row.home_12 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_12 }
+    - { at: "10:30", do: walk, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: market_row.home_12 }
+    - { at: "13:30", do: nap, where: market_row.home_12 }
+    - { at: "19:00", do: sleep, where: market_row.home_12 }
+chores: [ Put the bottle tops back in the tin, Carry his own cup, Feed the heron scraps ]
+relationships:
+  - {
+      id: seamus_sandoval,
+      affinity: 32,
+      trust: 28,
+      tag: father,
+      note: Dad with the dry hands and the good pockets.
+    }
+  - { id: tristan_sandoval, affinity: 30, trust: 26, tag: father, note: "Papa, who tells the best stories." }
+  - { id: winifred_gallo, affinity: 18, trust: 14, tag: fond, note: Always gives him the end of the loaf. }
+secrets:
+  - text: He has hidden one bottle top in his hat every day for a week, because he wants to give it to the clock.
+    reveal: { regard_min: 40 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_j01
+archetype: young_family
+employment: under_five
+years_in_monde: 4

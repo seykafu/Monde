@@ -1,0 +1,98 @@
+# Generated (census-v1) for mb_e04; curated not yet. Edit here.
+id: gilles_tremaine
+name: Gilles Tremaine
+age: 59
+pronouns: he/him
+kind: resident
+occupation: Former mill hand, out of work since the cannery closed
+workplace: millbrook.home_33
+home: millbrook.home_33
+portrait: gilles_tremaine
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: gilles_tremaine
+appearance: A man with tufty sandy blond hair and a grey jumper, the wool worn thin at the cuffs. He has a
+  pencil stub tucked behind one ear.
+look:
+  kind: human
+  skin: 6
+  hair: { style: tufty, colour: 5 }
+  eyes: 6
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 14, bottom: 7, bottom_style: trousers, shoes: 5 }
+  accessory: { kind: none }
+backstory: Came to Monde at twenty-four from a fishing village down the coast, meaning to stay one season. He
+  ended up at Lissworth Mill, then at the Liss Cannery on the Wharf after the mill shut. He stayed for Rosa
+  and never went back. He is handy but not fast, and he likes working with his hands more than talking about
+  it. When the cannery closed he helped strip the packing shed and kept a few tins of sardines he never sold.
+  He still thinks the ferry will bring work back if the timetable improves.
+personality:
+  traits: [ gentle, stubborn, dry, patient ]
+  big5: { open: 55, conscientious: 60, extravert: 35, agreeable: 75, neurotic: 40 }
+values: { prosperity: 0.35, safety: 0.3, spirit: 0.1, charm: 0.25 }
+beliefs:
+  - The ferry will be the thing that brings work back.
+  - Rosa would be better off without the mill's old ways.
+  - A man should always have a spare pair of boots.
+voice:
+  register: Quiet and dry. Short sentences, a little teasing. Says less when he is worried.
+  tics: [ "well, then", mind the step ]
+  never_says: [ that's the spirit, I'm no expert ]
+  samples:
+    - Ferry's Tuesday and Friday. Ask me again then.
+    - Well, then. We'll see how the tide treats us.
+    - Don't fuss. I've mended worse than this jumper.
+birthday: 9
+likes: [ old fishing boats, Rosa's laugh, sardines on toast, tea in a tin mug, the sound of a loom running true ]
+dislikes: [ being told to slow down, clipboard surveys, sweet tea ]
+fears: [ being a burden to Rosa, the cannery shed being pulled down ]
+dream:
+  text: Be asked for advice by the next generation, and be trusted with the work.
+  stages:
+    - Mentor an apprentice at the boathouse.
+    - Give a safety talk before the Mill reopens.
+    - Be named floor lead when the Mill runs again.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_33 }
+    - { at: "08:00", do: walk, where: wharf.breakwater }
+    - { at: "09:30", do: fish, where: wharf.harbor_steps }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "17:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: cook, where: millbrook.home_33 }
+    - { at: "22:00", do: sleep, where: millbrook.home_33 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_33 }
+    - { at: "10:00", do: fish, where: wharf.breakwater }
+    - { at: "13:00", do: shop, where: market_row.market_street }
+    - { at: "15:30", do: visit, where: millbrook.weir }
+    - { at: "19:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: millbrook.home_33 }
+chores: [ mend the garden fence, fill the coal scuttle, oil the kitchen door hinge ]
+relationships:
+  - {
+      id: rosa_zanetti,
+      affinity: 25,
+      trust: 25,
+      tag: partner,
+      note: "His wife of thirty-five years, the one who makes the decisions."
+    }
+  - { id: kasimir, affinity: 20, trust: 20, tag: friend, note: Shares tools and bad weather talk. }
+  - {
+      id: mathis_sutherland,
+      affinity: 15,
+      trust: 15,
+      tag: fond,
+      note: Boathouse hand he hopes will take him on.
+    }
+secrets:
+  - text: He keeps a tin of sardines from the cannery shed, unsold, and hopes the ferry will bring a buyer.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_e04
+archetype: mill_hand
+employment: out_of_work
+years_in_monde: 35

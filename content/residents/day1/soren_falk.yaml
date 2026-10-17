@@ -1,0 +1,108 @@
+# Generated (census-v1) for mr_b02; curated not yet. Edit here.
+id: soren_falk
+name: Soren Falk
+age: 70
+pronouns: he/him
+kind: resident
+occupation: Retired clerk, once kept the books at the mill office.
+workplace: market_row.home_07
+home: market_row.home_07
+portrait: soren_falk
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: soren_falk
+appearance: A broad-shouldered older man with short white hair, round glasses and a charcoal coat he wears
+  buttoned to the top even indoors. Tan skin from years of walking the breakwater.
+look:
+  kind: human
+  skin: 2
+  hair: { style: short, colour: 8 }
+  eyes: 1
+  build: medium
+  height: short
+  outfit: { cut: coat, top: 13, bottom: 11, bottom_style: trousers, shoes: 10 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Soren came to Monde at twenty-six to take a post as clerk at Lissworth Mill, which was then hiring
+  nearly everyone who could count. He kept the wage ledgers for eleven years and still remembers the names of
+  the women who ran the spinning frames. When the mill closed he was offered a clerk's job in Carrow and
+  refused it, because he had already decided the town was where he wanted to be old. He has never regretted
+  it, though he will tell you he has.
+personality:
+  traits: [ precise, fond, stubborn, dry, patient ]
+  big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 62, neurotic: 38 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+beliefs:
+  - The mill would have reopened if the council had asked the right people.
+  - Anyone who leaves Monde for good was never really from here.
+  - A kettle on the stove is the only honest clock in the house.
+voice:
+  register: Measured and exact, a clerk's habit of finishing a point before anyone else can start. Tends toward
+    complete sentences even in small talk.
+  tics: [ Let's see., "That's a fact, dear." ]
+  never_says: [ I suppose, whatever you like, no harm done ]
+  samples:
+    - The Gannet is at half past eight, Tuesdays and Fridays. Don't let Moss tell you otherwise.
+    - I kept those wage books for eleven years. I could tell you what every frame-girl earned.
+    - Well. Ask me again when the kettle's on.
+birthday: 40
+likes: [ the morning paper, tide tables, a clean ledger, Fournier's rye bread, a morning paper ]
+dislikes: [ stairs, drafts, being managed, rounded numbers ]
+fears: [ the house going quiet, forgetting a name from the mill ]
+dream:
+  text: A bench on the Commons facing the water, where he and Mikael can sit and count the boats coming in.
+  stages:
+    - Choose a spot on the Commons near the bandstand.
+    - Raise fifteen coins or ask Kasimir to build the bench.
+    - Sit on it with the first neighbour who stops.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: market_row.home_07 }
+    - { at: "07:30", do: read, where: market_row.home_07 }
+    - { at: "09:00", do: shop, where: market_row.bakery }
+    - { at: "10:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "13:00", do: eat, where: market_row.home_07 }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: market_row.home_07 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_07 }
+    - { at: "09:30", do: walk, where: commons.picnic_lawn }
+    - { at: "12:00", do: shop, where: market_row.market_hall }
+    - { at: "13:30", do: eat, where: market_row.cafe_liss }
+    - { at: "16:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: market_row.home_07 }
+chores: [ Wind the kitchen clock, Keep the tide table current, Carry the coal in ]
+relationships:
+  - {
+      id: mikael_saunders,
+      affinity: 25,
+      trust: 28,
+      tag: partner,
+      note: "Forty-four years of arguing about everything, and still the first person he checks on."
+    }
+  - {
+      id: frane,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Brings her the crossword; she fixes his radio without being asked.
+    }
+  - {
+      id: odile,
+      affinity: 8,
+      trust: 6,
+      tag: fond,
+      note: Pays for his rye bread on Fridays and pretends not to notice.
+    }
+secrets:
+  - text: He still has the first pay envelope from Lissworth Mill, signed by a foreman who later died in the
+      cannery fire of another town.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_b02
+archetype: retired_couple
+employment: retired
+years_in_monde: 44

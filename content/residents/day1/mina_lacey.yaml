@@ -1,0 +1,108 @@
+# Generated (census-v1) for mb_j02; curated not yet. Edit here.
+id: mina_lacey
+name: Mina Lacey
+age: 26
+pronouns: she/her
+kind: resident
+occupation: Full-time carer at home, unpaid.
+workplace: millbrook.home_28
+home: millbrook.home_28
+portrait: lib_f27_081
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: mina_lacey
+appearance: A young woman with honey-brown curls escaping a mustard bobble hat, a navy oilskin over a cream
+  jumper, and a muslin cloth slung over one shoulder. She looks like she has been awake since five and is glad
+  of it.
+look:
+  kind: human
+  skin: 3
+  hair: { style: curly, colour: 1 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 6, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  headwear: { kind: knit_cap, colour: 4 }
+backstory: Mina grew up in Carrow until her father's printing business failed, and her family moved to Monde
+  when she was eighteen because a cousin had a cottage to spare. She expected to hate it and instead fell for
+  the quiet and the way people wave from doorsteps. When Ivo's shifts took him to the mainland she became the
+  household's keeper, learning to make bread from a starter Odile gave her and to ration tea. She is certain
+  that the library's reading corner would keep her sane on Tuesday mornings. What she has not noticed is how
+  much of the town already leans on her, the way neighbours bring round soup and assume she has time for it.
+personality:
+  traits: [ warm, tired, stubborn, funny ]
+  big5: { open: 62, conscientious: 70, extravert: 72, agreeable: 80, neurotic: 45 }
+values: { prosperity: 0.2, safety: 0.3, spirit: 0.25, charm: 0.25 }
+beliefs:
+  - A toddler who meets other toddlers is a calmer toddler.
+  - Everyone in Monde owes the library a visit.
+  - Nobody notices how much I do, and that is fine.
+voice:
+  register: Warm and quick, often cut off mid-sentence by a child. Counts the day in naps and talks in run-on
+    lists when stressed.
+  tics: [ "right, sorry", that's nap gone, "oh, he's—" ]
+  never_says: [ I can't manage, don't mind me, it's nothing ]
+  samples:
+    - Right, sorry, she's up, and that's nap gone for good.
+    - If you bring biscuits I will love you forever, or until supper.
+    - Ask Margo about Tuesdays? Yes, I'm asking, I'm absolutely asking.
+birthday: 93
+likes: [ hand-me-downs, a gate that latches, being waved at from windows, strong tea, Margo's picture books ]
+dislikes: [ steep steps without a rail, people calling her brave, cold mornings with no kettle ]
+fears: [ being isolated with the baby all winter, the school closing ]
+dream:
+  text: A Tuesday morning toddler hour that isn't just the two of us, with biscuits and one working kettle.
+  stages:
+    - Ask Margo if the library's reading corner can host a Tuesday morning.
+    - Find two other households with a small child or grandchild.
+    - Run the first hour with biscuits and one working kettle.
+routine:
+  weekday:
+    - { at: "06:00", do: eat, where: millbrook.home_28 }
+    - { at: "07:00", do: clean, where: millbrook.home_28 }
+    - { at: "09:00", do: walk, where: millbrook.laundry_green }
+    - { at: "11:00", do: visit, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "18:30", do: cook, where: millbrook.home_28 }
+    - { at: "21:00", do: sleep, where: millbrook.home_28 }
+  weekend:
+    - { at: "07:30", do: eat, where: millbrook.home_28 }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "11:30", do: visit, where: market_row.bakery }
+    - { at: "14:00", do: walk, where: millbrook.weir }
+    - { at: "17:00", do: cook, where: millbrook.home_28 }
+    - { at: "21:30", do: sleep, where: millbrook.home_28 }
+chores: [ bake the week's loaf, wash the muslin cloths, sweep the step ]
+relationships:
+  - {
+      id: ivo_yates,
+      affinity: 70,
+      trust: 75,
+      tag: partner,
+      note: "Her husband, who she worries carries too much."
+    }
+  - {
+      id: rosa_yates,
+      affinity: 80,
+      trust: 50,
+      tag: daughter,
+      note: "Her daughter, the centre of every plan."
+    }
+  - {
+      id: billie_pengelly,
+      affinity: 25,
+      trust: 30,
+      tag: friend,
+      note: "Neighbour across Mill Lane, good for borrowed books."
+    }
+secrets:
+  - text: She has a notebook of drawings of Monde's gates and latches and hopes to sell them one day.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_j02
+archetype: young_family
+employment: carer
+years_in_monde: 8

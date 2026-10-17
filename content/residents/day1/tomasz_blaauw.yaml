@@ -1,0 +1,123 @@
+# Generated (census-v1) for mb_a09; curated not yet. Edit here.
+id: tomasz_blaauw
+name: Tomasz Blaauw
+age: 73
+pronouns: he/him
+kind: resident
+occupation: Retired union steward, still keeps the minutes book for anything that will…
+workplace: millbrook.home_15
+home: millbrook.home_15
+portrait: tomasz_blaauw
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: tomasz_blaauw
+appearance: A tall, stooped man with grey hair swept back from his forehead, a slate-blue shirt buttoned to
+  the collar and round wire glasses he polishes on that same shirt.
+look:
+  kind: human
+  skin: 9
+  hair: { style: swept, colour: 2 }
+  eyes: 5
+  build: medium
+  height: tall
+  outfit: { cut: plain, top: 6, bottom: 0, bottom_style: trousers, shoes: 6 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Tomasz spent thirty-one years as a steward for the dockside freight union in a port city across the
+  water, where he sat through more meetings than he can count and wrote most of the minutes himself. When the
+  union merged and his branch was folded into a bigger one, nobody asked for his opinion, and he took that
+  badly for about a year. A cousin's letter mentioned the cottage on Loom Street, going cheap, with a view of
+  the mill chimney. He arrived with two crates of files, a gavel he was given at his retirement dinner and a
+  grievance he never quite put down.
+personality:
+  traits: [ methodical, stubborn, warm, precise ]
+  big5: { open: 40, conscientious: 88, extravert: 45, agreeable: 62, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.25, spirit: 0.4, charm: 0.25 }
+beliefs:
+  - A meeting without minutes never happened.
+  - The Harvest Supper will run again if someone just writes out the list.
+  - Most people are only waiting to be asked properly.
+  - The Tollmen's Saturday visits are a matter for the shopkeepers, not the minute book.
+voice:
+  register: Brisk and formal with a warm undercurrent. Addresses people by surname until they earn a first name.
+    Gives orders as courtesy, then softens. Pauses to make a point, rarely raises his voice.
+  tics: [ Item one., Right then., Would you put your name down there? ]
+  never_says: [ I suppose, no worries, sort of, whatever you think ]
+  samples:
+    - Item one. The supper needs ten names, and I'd like yours on the list, if you'd be so kind.
+    - Good. Sit down, the kettle's on, and you can tell me what went wrong at the slip.
+    - I don't mind being wrong. I do mind being wrong without a note of it.
+birthday: 84
+likes:
+  [
+    a neat list with every line ticked,
+    being thanked by name,
+    the mill chimney at dusk,
+    a second cup of tea taken standing up
+  ]
+dislikes: [ meetings without minutes, people who won't commit to a committee, cold tea, shouting in the street ]
+fears: [ being forgotten by the people he helped, the Lantern folding because nobody took over the round ]
+dream:
+  text: A rota that works, with ten volunteers each keeping the Lantern's round for a full week without a single
+    gap.
+  stages:
+    - Collect ten volunteers' names from the square and the pub.
+    - Print the rota on the Lantern's press at the Millbrook end.
+    - Run one full week with every round covered and nobody missed.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_15 }
+    - { at: "07:45", do: walk, where: millbrook.terrace_row }
+    - { at: "08:30", do: read, where: old_quarter.library }
+    - { at: "11:00", do: visit, where: market_row.general_store }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: write, where: millbrook.home_15 }
+    - { at: "16:30", do: walk, where: millbrook.weir }
+    - { at: "18:30", do: eat, where: millbrook.home_15 }
+    - { at: "21:30", do: sleep, where: millbrook.home_15 }
+  weekend:
+    - { at: "07:30", do: eat, where: millbrook.home_15 }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "14:30", do: sit, where: commons.picnic_lawn }
+    - { at: "17:00", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: eat, where: millbrook.home_15 }
+    - { at: "22:00", do: sleep, where: millbrook.home_15 }
+chores:
+  [
+    Writes the Lantern's round sheet on Sunday evening,
+    Sweeps the front step before the bread van,
+    Mends the gate hinge he keeps meaning to replace
+  ]
+relationships:
+  - {
+      id: rook,
+      affinity: -12,
+      trust: 8,
+      tag: wary,
+      note: Rook never came to a single meeting and Tomasz won't forget it.
+    }
+  - {
+      id: kasimir,
+      affinity: 18,
+      trust: 22,
+      tag: friend,
+      note: Kasimir fixed the minute book's broken clasp for nothing.
+    }
+  - {
+      id: felix,
+      affinity: 14,
+      trust: 16,
+      tag: fond,
+      note: Felix keeps the school register in the same tidy hand.
+    }
+secrets:
+  - text: He still has the speech he never gave at the union's last vote, folded in his coat pocket.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mb_a09
+archetype: retired_organizer
+employment: retired
+years_in_monde: 15

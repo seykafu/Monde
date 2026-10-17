@@ -1,0 +1,130 @@
+# Generated (census-v1) for mb_a08; curated not yet. Edit here.
+id: frankie_chandra
+name: Frankie Chandra
+age: 69
+pronouns: they/them
+kind: resident
+occupation: Retired, formerly the Monde postmistress.
+workplace: millbrook.home_20
+home: millbrook.home_20
+portrait: frankie_chandra
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: frankie_chandra
+appearance: Tufty salt-and-pepper hair frames a kind, deep-brown face behind round glasses. They wear a faded
+  green coat buttoned to the collar.
+look:
+  kind: human
+  skin: 8
+  hair: { style: tufty, colour: 11 }
+  eyes: 2
+  build: medium
+  height: short
+  outfit: { cut: coat, top: 7, bottom: 14, bottom_style: trousers, shoes: 7 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Frankie was born in the top room of a Millbrook terrace and ran the Monde post office counter for
+  thirty-one years, until the Carrow mail stopped coming on the Gannet. They knew every household's
+  handwriting and which letters were bad news before they were opened. Their husband Lee drowned off the
+  breakwater before Frankie retired, and they have kept his thermos on the windowsill ever since, though
+  nobody has filled it in years. Frankie stayed in Monde when the mill closed because they believe the town
+  will turn at the next tide, and because the postmark belongs here. Lately the rooms feel too quiet at
+  supper.
+personality:
+  traits: [ patient, nosy, warm, stubborn ]
+  big5: { open: 62, conscientious: 70, extravert: 45, agreeable: 68, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.25, charm: 0.25 }
+beliefs:
+  - The post always comes back when people are ready for it.
+  - Nobody in Monde has ever really been a stranger.
+  - Tea needs a full five minutes or it is not worth making.
+voice:
+  register: Unhurried and rambling, drifting off a thread and returning to it on purpose. Speaks warmly, with
+    long pauses and old prices recalled exactly. Uses contractions freely and asks after people's families.
+  tics: [ Now where was I?, Back in my day, Mind the step ]
+  never_says: [ that's not my problem, hurry up, I don't know anyone ]
+  samples:
+    - Now where was I? Ah, yes, the eggs were fourpence a dozen, and you'd not believe the fuss.
+    - Oh, come in out of the wind, love. The kettle's been on since the ferry went.
+    - Don't mind me. I'm only sitting with the window, same as always.
+birthday: 33
+likes:
+  [
+    knitting by the window,
+    small birds at the sill,
+    being asked for a story,
+    the smell of bread from Fournier & Fille,
+    the Gannet's horn on Tuesdays
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    letters left unanswered
+  ]
+fears: [ the house going quiet for good, forgetting Lee's voice ]
+dream:
+  text: Have someone to eat supper with again, most nights, without it needing to be arranged.
+  stages:
+    - Accept a supper invitation from a neighbour on Loom Street.
+    - Return the invitation with a dish of your own cooking.
+    - Set a standing Thursday table and keep it set every week.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_20 }
+    - { at: "08:30", do: walk, where: millbrook.terrace_row }
+    - { at: "09:30", do: shop, where: market_row.general_store }
+    - { at: "11:00", do: sit, where: commons.duck_pond }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: read, where: old_quarter.library }
+    - { at: "17:00", do: walk, where: millbrook.weir }
+    - { at: "19:00", do: eat, where: millbrook.home_20 }
+    - { at: "21:30", do: sleep, where: millbrook.home_20 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_20 }
+    - { at: "09:00", do: attend, where: old_quarter.st_brigids }
+    - { at: "10:30", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "18:30", do: cook, where: millbrook.home_20 }
+    - { at: "21:30", do: sleep, where: millbrook.home_20 }
+chores:
+  [
+    Trim the window candle each evening,
+    Mend the coat hem in the lamplight,
+    Fill the coal scuttle before dark
+  ]
+relationships:
+  - {
+      id: hamish_ortega,
+      affinity: 12,
+      trust: 10,
+      tag: fond,
+      note: Keeps the Loom Street ledger and checks your figures aloud.
+    }
+  - {
+      id: nkechi_fairweather,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Shares a fence line and swaps seed packets every spring.
+    }
+  - {
+      id: tomasz_blaauw,
+      affinity: -6,
+      trust: 4,
+      tag: wary,
+      note: "Minutes every meeting, including the ones nobody wanted minuted."
+    }
+secrets:
+  - text: Frankie still reads every postcard that reaches Monde before it is delivered, and feels guilty about it.
+    reveal: { regard_min: 60 }
+  - text: Lee wrote a sea shanty they never finished, and Frankie has the last verse hidden in the thermos lid.
+    reveal: { regard_min: 70 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_a08
+archetype: widowed_elder
+employment: retired
+years_in_monde: 69

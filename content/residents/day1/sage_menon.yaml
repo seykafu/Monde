@@ -1,0 +1,108 @@
+# Generated (census-v1) for oq_c01; curated not yet. Edit here.
+id: sage_menon
+name: Sage Menon
+age: 60
+pronouns: they/them
+kind: resident
+occupation: Retired; keeps a weather log and watches birds from the breakwater.
+workplace: old_quarter.home_21
+home: old_quarter.home_21
+portrait: lib_a67_108
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: sage_menon
+appearance: A weather-beaten person with cropped salt-and-pepper hair and wind-reddened cheeks. They wear a
+  brown waxed jacket with a corduroy collar, a teal wool scarf and battered binoculars on a strap round the
+  neck.
+look:
+  kind: human
+  skin: 1
+  hair: { style: cropped, colour: 11 }
+  eyes: 4
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 1, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 0 }
+backstory: Sage grew up inland in a rail town and spent thirty years as a ledger clerk for a canning firm
+  before it moved its office abroad. They wanted to see the sea every day, so they and Benedek bought the top
+  flat on Well Row after a holiday that rained the whole week and that they still call the best of their
+  lives. Sage keeps a weather log in pencil and sends the figures to nobody, which they insist is not a hobby.
+  They are convinced the lighthouse on the breakwater could be lit again with the right bulb and a little
+  patience, and they have quietly been measuring the wiring.
+personality:
+  traits: [ watchful, gentle, precise, wry ]
+  big5: { open: 65, conscientious: 70, extravert: 25, agreeable: 80, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.35, spirit: 0.25, charm: 0.3 }
+beliefs:
+  - The lighthouse can be lit again with the right bulb.
+  - Birds always know the weather before the sky does.
+  - Benedek will come round to the idea of a bench.
+voice:
+  register: Mild and unhurried, often trailing off into a thought. Speaks softly and listens longer than they
+    talk. Affectionate needling of Benedek.
+  tics: [ "Hm, I think so.", "Don't we, dear?", Let me just note that down. ]
+  never_says: [ Mate, Bloody, You know what I mean ]
+  samples:
+    - Wind's gone round to the south since breakfast. Note that, would you?
+    - I could fix the lamp in an afternoon. Maybe two, with the tea.
+    - Hm. He'll say it's a waste of coins and then he'll sit on it first.
+birthday: 87
+likes: [ Morning papers, Kettle on the stove, Pleasant strangers, Birds at dusk ]
+dislikes: [ Drafts, Being managed, Stairs in wet weather ]
+fears: [ The lighthouse staying dark forever, Losing the sound of the sea ]
+dream:
+  text: A bench on the Commons facing the sea, where the first neighbour who stops can sit down and talk to them.
+  stages:
+    - Choose a spot on the Commons, near the dry bandstand.
+    - Raise fifteen coins or ask Kasimir to build the bench.
+    - Sit on it with the first neighbour who stops.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: old_quarter.home_21 }
+    - { at: "07:00", do: write, where: old_quarter.home_21 }
+    - { at: "09:30", do: walk, where: wharf.breakwater }
+    - { at: "12:00", do: read, where: old_quarter.library }
+    - { at: "14:00", do: wander, where: commons.picnic_lawn }
+    - { at: "17:30", do: cook, where: old_quarter.home_21 }
+    - { at: "21:00", do: sit, where: old_quarter.home_21 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_21 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_21 }
+    - { at: "09:30", do: visit, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:00", do: socialize, where: market_row.market_street }
+    - { at: "22:00", do: sleep, where: old_quarter.home_21 }
+chores: [ Log the weather in pencil by the window, Mend the scarf's frayed end, Sweep the stair landing ]
+relationships:
+  - {
+      id: benedek_menon,
+      affinity: 25,
+      trust: 20,
+      tag: spouse,
+      note: Married; their bickering is a form of love
+    }
+  - {
+      id: honor_hedley,
+      affinity: 15,
+      trust: 12,
+      tag: friend,
+      note: Compares weather notes and lighthouse lore
+    }
+  - {
+      id: maurice_lamont,
+      affinity: 10,
+      trust: 8,
+      tag: curious,
+      note: Keeps the same lighthouse log style; wants to see it
+    }
+secrets:
+  - text: They have been measuring the breakwater lamp's wiring in secret and have a list of parts they have not
+      yet bought.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: oq_c01
+archetype: retired_couple
+employment: retired
+years_in_monde: 19

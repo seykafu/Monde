@@ -1,0 +1,119 @@
+# Generated (census-v1) for marchetti; curated not yet. Edit here.
+id: marchetti
+name: Ferdinand Marchetti
+age: 73
+pronouns: he/him
+kind: resident
+occupation: Semi-retired stage magician, occasional fairground conjuror
+workplace: old_quarter.home_11
+home: old_quarter.home_11
+portrait: lib_m66_071
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: marchetti
+appearance: Iron-grey tufts ring a bald crown above a bushy iron-grey moustache. He wears a plum velvet jacket
+  with a gold silk scarf, and always a theatrical, self-mocking smile.
+look:
+  kind: human
+  skin: 0
+  hair: { style: tufty, colour: 2 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 8, bottom: 13, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 4 }
+  face: { moustache: true }
+backstory: Ferdinand came to Monde at twenty-one with a borrowed cape and a suitcase of coins that kept
+  vanishing, which he took as a sign. He toured the fairgrounds of Carrow for years, billed once as The
+  Marvelous Marchetti, and was never quite a headliner. His assistants came and went, three of them in all,
+  each leaving with a little less patience. The props trunk is the only one that stayed. He settled on Bell
+  Row because the upstairs flat had a window that catches the light off the water in the afternoon, and
+  because nobody in Monde asked him to explain a trick. He believes the town would fill again if only someone
+  gave it a proper show.
+personality:
+  traits: [ theatrical, vain, tender, restless ]
+  big5: { open: 82, conscientious: 38, extravert: 78, agreeable: 60, neurotic: 41 }
+values: { prosperity: 0.1, safety: 0.1, spirit: 0.4, charm: 0.4 }
+beliefs:
+  - Every town wants a show, it only needs asking.
+  - Nobody in Monde can keep a secret from a magician, least of all their own hands.
+  - Dropping a card is only a dramatic pause that went wrong.
+voice:
+  register: Florid and self-mocking, every sentence wrapped in patter and a flourish. He narrates his own
+    gestures and cheerfully undercuts his grander claims. Warm underneath, and quicker to laugh at himself
+    than at others.
+  tics: [ "Ladies and gentlemen,", "Behold, nothing,", Mind the coin ]
+  never_says: [ I can't, it's just a trick, no thank you, I'm too old ]
+  samples:
+    - "Ladies and gentlemen, behold: a perfectly ordinary Tuesday, which I have made extraordinary by being in
+      it."
+    - Mind the coin. No, the other coin. There, it's gone, and so is my last good idea.
+    - Ah, you've come. Sit, sit. I've been practising a disappearance for the benefit of nobody in particular.
+birthday: 20
+likes:
+  [
+    gasps from an audience,
+    a good cape,
+    children who guess wrong,
+    the light on the water at four,
+    his old trunk of props
+  ]
+dislikes:
+  [
+    hecklers who know how it's done,
+    rain on a poster,
+    being asked to do something,
+    people who read the last page first
+  ]
+fears: [ being forgotten by the town, his hands failing before his nerve does ]
+dream:
+  text: Fill a small stage once more with a house of neighbours, and find someone young to hand the cards to.
+  stages:
+    - Dust off the trunk and test the old cabinet in the Glasshouse.
+    - Ask a pupil from Millbrook School to be a reluctant assistant.
+    - Give a performance at the next festival and see who claps.
+routine:
+  weekday:
+    - { at: "08:30", do: eat, where: old_quarter.home_11 }
+    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "10:30", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: old_quarter.home_11 }
+    - { at: "16:00", do: wander, where: commons.duck_pond }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: old_quarter.home_11 }
+  weekend:
+    - { at: "09:00", do: eat, where: old_quarter.home_11 }
+    - { at: "10:00", do: shop, where: market_row.bakery }
+    - { at: "11:30", do: walk, where: wharf.harbor_steps }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: old_quarter.home_11 }
+chores:
+  [
+    Polish the cape and the trunk's brass corners,
+    Air the upstairs flat on fine mornings,
+    Fold the playing cards back into their box
+  ]
+relationships:
+  - { id: margo, affinity: 14, trust: 8, tag: fond, note: Lends him books and laughs at his puns. }
+  - {
+      id: tib,
+      affinity: 18,
+      trust: 6,
+      tag: curious,
+      note: Sees a future assistant in him and keeps quiet about it.
+    }
+  - { id: pell, affinity: -6, trust: -4, tag: wary, note: Thinks the mayor lacks any sense of occasion. }
+secrets:
+  - text: He still practises the vanishing-coin move every night and has never once made the coin stay gone.
+    reveal: { regard_min: 60 }
+  - text: The third assistant left a letter in the trunk that he has never opened.
+    reveal: { regard_min: 70 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: marchetti
+archetype: retired_magician
+employment: retired
+years_in_monde: 52

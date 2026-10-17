@@ -1,0 +1,98 @@
+# Generated (census-v1) for frye; curated not yet. Edit here.
+id: frye
+name: Dunstan Frye
+age: 62
+pronouns: he/him
+kind: resident
+occupation: Clerk at Town Hall, keeper of the council archive key.
+workplace: old_quarter.town_hall
+home: old_quarter.home_13
+portrait: lib_m71_112
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: frye
+appearance: A dapper man with close-cropped salt-and-pepper hair and a neat beard, round gold-rimmed
+  spectacles and a teal bow tie. He wears an olive raincoat over a cardigan, and the bow tie is always
+  straight.
+look:
+  kind: human
+  skin: 3
+  hair: { style: buzz, colour: 11 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 10, bottom: 14, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: glasses }
+  glasses: round
+  face: { moustache: true, stubble: true }
+backstory: Dunstan came to Monde at nineteen to take a junior post at the Town Hall, after a year of clerking
+  for a cotton merchant in Carrow that he found tedious. He has stayed forty-three years. He ran the Harvest
+  Supper committee for two decades and the minutes for longer. His wife Lena left for Hessle Cross in the year
+  the mill shut, and he never followed her, though he still sends her a card each Christmas. Mayor Pell asked
+  him, years ago, to keep one archive drawer locked and to leave it unread. He has honoured that for longer
+  than either of them expected.
+personality:
+  traits: [ meticulous, courtly, dry, loyal ]
+  big5: { open: 40, conscientious: 88, extravert: 45, agreeable: 68, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.25, spirit: 0.4, charm: 0.25 }
+beliefs:
+  - A meeting without minutes never happened.
+  - The Harvest Supper is the one thing this town has never let down.
+  - Lena will write back one day, and I will have the reply filed.
+voice:
+  register: Measured and official, always hedging with procedure. He is warm underneath and prefers to be
+    thanked by name. He doesn't rush, and he rarely raises his voice.
+  tics: [ It is minuted., Item one., If I may ]
+  never_says: [ I'm not sure, whatever you think, no idea ]
+  samples:
+    - It is minuted, so we needn't argue about it. Item one.
+    - I can't open that drawer for you, I'm afraid. But I'll make a note of your interest.
+    - Thank you. You'll find the Harvest rota on the hook by the door, if you'd be so good.
+birthday: 5
+likes: [ Typed carbon copies, Being thanked by name, The Harvest Supper, A tidy desk at closing, lists ]
+dislikes: [ Meetings without minutes, People who won't join a committee, Cold tea ]
+fears: [ The town forgetting its own history, Being asked to open the locked drawer ]
+dream:
+  text: A Harvest Supper committee that runs itself, with the town sitting down together for once.
+  stages:
+    - Hold a first meeting in the pub's back room.
+    - Assign roles to every willing hand.
+    - Run the supper on time, with the lamps lit.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: old_quarter.home_13 }
+    - { at: "08:30", do: work, where: old_quarter.town_hall }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: old_quarter.town_hall }
+    - { at: "17:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "18:30", do: eat, where: old_quarter.home_13 }
+    - { at: "21:30", do: read, where: old_quarter.home_13 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_13 }
+  weekend:
+    - { at: "08:30", do: eat, where: old_quarter.home_13 }
+    - { at: "10:00", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:30", do: walk, where: commons.duck_pond }
+    - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: read, where: old_quarter.library }
+    - { at: "19:00", do: eat, where: old_quarter.home_13 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_13 }
+chores: [ Winds the hall clock on Sundays, Writes out the Lantern's notices by hand, Irons the bow ties on Friday ]
+relationships:
+  - { id: pell, affinity: 50, trust: 70, tag: fond, note: Clerk to the mayor; she trusts his discretion. }
+  - {
+      id: hester,
+      affinity: 25,
+      trust: 40,
+      tag: friend,
+      note: Keeps him supplied with weak tea he pretends to enjoy.
+    }
+  - { id: margo, affinity: 20, trust: 45, tag: curious, note: Borrows archive books and argues about dating. }
+secrets:
+  - text: He has written a letter to his estranged wife every Christmas for nineteen years and never posted one.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: frye
+archetype: retired_organizer
+employment: employed
+years_in_monde: 43

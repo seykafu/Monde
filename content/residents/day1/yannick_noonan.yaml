@@ -1,0 +1,90 @@
+# Generated (census-v1) for wf_g01; curated not yet. Edit here.
+id: yannick_noonan
+name: Yannick Noonan
+age: 29
+pronouns: he/him
+kind: resident
+occupation: Ferry deckhand on the Gannet and ticket booth at the slip.
+workplace: wharf.ferry_slip
+home: wharf.home_04
+portrait: lib_m22_080
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: yannick_noonan
+appearance: A slight young man with an unruly mop of chestnut-red hair and a smudge of flour on his nose. He
+  wears a white baker's apron over a green striped shirt with the sleeves rolled up.
+look:
+  kind: human
+  skin: 2
+  hair: { style: tufty, colour: 9 }
+  eyes: 3
+  build: narrow
+  height: tall
+  outfit: { cut: apron, top: 7, bottom: 13, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: apron, colour: 9 }
+backstory: Yannick came to Monde at twenty-three with a rucksack and a return ticket he never used. Before
+  that he worked cook's shifts in a noisy port city, a job that ended when he walked out mid-service. He took
+  a day's labour on the Gannet, the skipper gave him a second day, and the second day turned into six years.
+  He still bakes bread at odd hours because the Fournier bakery lets him take the burnt ends. He tells people
+  he's only passing through. He has said it so often that he believes it, though the bunk is paid up for a
+  year and he has painted his door.
+personality:
+  traits: [ easygoing, sleepy, wry, restless ]
+  big5: { open: 78, conscientious: 35, extravert: 62, agreeable: 70, neurotic: 40 }
+values: { prosperity: 0.1, safety: 0.1, spirit: 0.35, charm: 0.45 }
+beliefs:
+  - I'll leave when the weather turns.
+  - Nobody here notices who's gone.
+  - Old Moss would have sacked me years ago if he didn't like me.
+  - A bad loaf is still worth eating.
+voice:
+  register: Easy and ironic. Starts stories well and lets them trail off. Often answers a question with another
+    question. Slightly drawling, with contractions.
+  tics: [ "Right, so—", Who's asking?, "Mm, go on then" ]
+  never_says: [ my plan is, I'm settled, I need to ]
+  samples:
+    - Morning. Boat's late, or I'm early, depends who you ask. You want a crust?
+    - Six years I've said I'm leaving. Rain's on the window, though. Who leaves in rain?
+    - Don't look at the crane yard like that. I was going to say something clever and it went off the boil.
+birthday: 10
+likes: [ free breakfast, high places, strangers' stories, the smell of proving dough, the ferry's deck at dusk ]
+dislikes: [ being asked his plan, paperwork, rain on a borrowed coat, early tide calls ]
+fears: [ being asked to sign something permanent, ending up like the mill men ]
+dream:
+  text: Pay my own way, sign the register at Town Hall as a resident, and stop being the lad who is just passing
+    through.
+  stages:
+    - Clear the twenty-coin debt I owe on the bunk.
+    - Fix the broken shutter on the Cannery Row boathouse.
+    - Sign the register at Town Hall as a resident.
+routine:
+  weekday:
+    - { at: "05:30", do: wander, where: wharf.home_04 }
+    - { at: "06:00", do: cook, where: market_row.bakery }
+    - { at: "07:00", do: work, where: wharf.ferry_slip }
+    - { at: "09:30", do: eat, where: market_row.cafe_liss }
+    - { at: "12:30", do: sit, where: wharf.harbor_steps }
+    - { at: "14:00", do: work, where: wharf.ferry_slip }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: wharf.home_04 }
+  weekend:
+    - { at: "07:30", do: sleep, where: wharf.home_04 }
+    - { at: "09:00", do: eat, where: market_row.bakery }
+    - { at: "10:30", do: walk, where: wharf.breakwater }
+    - { at: "13:00", do: fish, where: wharf.harbor_steps }
+    - { at: "17:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: wharf.home_04 }
+chores: [ Bakes the odd loaf for the bakery, Sweeps the Cannery Row step, Mends the ticket booth shutter ]
+relationships:
+  - { id: moss, affinity: 18, trust: 14, tag: friend, note: Taught him the knots and tolerates his hair. }
+  - { id: amara_borowski, affinity: 10, trust: 6, tag: fond, note: Shares a wall and stolen fish heads. }
+  - { id: dex, affinity: -6, trust: -4, tag: wary, note: Won't say what the Tollmen do with the coin. }
+secrets:
+  - text: He has a notebook of recipes he has never tried, and writes a new one each time the ferry is late.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_g01
+archetype: drifter
+employment: employed
+years_in_monde: 6

@@ -1,0 +1,107 @@
+# Generated (census-v1) for mr_f01; curated not yet. Edit here.
+id: karim_barros
+name: Karim Barros
+age: 50
+pronouns: he/him
+kind: resident
+occupation: Out of work loom-setter; takes casual repair jobs when offered.
+workplace: market_row.home_14
+home: market_row.home_14
+portrait: lib_m47_059
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: karim_barros
+appearance: A broad, measured man with a short iron-grey beard and iron-grey hair under a tan tweed flat cap.
+  He wears an olive canvas work jacket with a pencil tucked behind one ear.
+look:
+  kind: human
+  skin: 3
+  hair: { style: short, colour: 2 }
+  eyes: 0
+  build: broad
+  height: tall
+  outfit: { cut: coat, top: 10, bottom: 6, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 15 }
+  face: { grey_temples: true, stubble: true }
+backstory: Karim set looms at Lissworth Mill for nineteen years, first as a fitter's boy and then as the man
+  the floor leads sent for when a shuttle jammed. He came to Monde at thirty-three after a bad winter in
+  Carrow, following a cousin who promised work on the cannery line. He got eleven good years there before the
+  Liss Cannery shut, and then the Mill went the year after. His sister kept the flat from sinking into debt
+  while he learned to take whatever odd job came up. He still walks past the Mill yard most mornings, though
+  he tells himself it is only the shortest way to the harbour.
+personality:
+  traits: [ patient, methodical, stubborn, quiet ]
+  big5: { open: 40, conscientious: 82, extravert: 30, agreeable: 65, neurotic: 45 }
+values: { prosperity: 0.5, safety: 0.25, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - A machine that runs true needs no talking.
+  - The Mill will reopen once the right people push.
+  - Nobody in town wants to be retrained.
+voice:
+  register: "Plain and short. Speaks in numbers when he can: picks, bolts, hours. Rarely elaborates and leaves
+    silences that others fill."
+  tics: [ Used to be., That's the figure., Mm. ]
+  never_says: [ I feel, no offence, in my opinion ]
+  samples:
+    - Used to be forty picks an hour, on a good loom.
+    - Tea's on the hob. Mind the stair, it's soft.
+    - Mm. Ask me again when the Mill's got a roof on it.
+birthday: 12
+likes:
+  [
+    tea in a tin mug,
+    the sound of a loom running true,
+    a clock that keeps time,
+    mornings on the harbour steps
+  ]
+dislikes: [ being retrained, short shifts, men with clipboards ]
+fears: [ the Mill being pulled down with his frames still inside ]
+dream:
+  text: Get a proper wage again, doing work that needs his hands.
+  stages:
+    - Register at the Town Hall for any casual work offered.
+    - Do one casual job a day for three days running.
+    - Take a shift at the boathouse or a floor job if the Mill reopens.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: market_row.home_14 }
+    - { at: "07:00", do: walk, where: wharf.harbor_steps }
+    - { at: "08:30", do: wander, where: commons.duck_pond }
+    - { at: "10:00", do: sit, where: market_row.cafe_liss }
+    - { at: "12:30", do: eat, where: market_row.home_14 }
+    - { at: "14:00", do: tinker, where: market_row.back_alley }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: market_row.home_14 }
+  weekend:
+    - { at: "07:30", do: eat, where: market_row.home_14 }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: sit, where: commons.picnic_lawn }
+    - { at: "16:00", do: walk, where: wharf.breakwater }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: market_row.home_14 }
+chores:
+  [
+    Winds the kitchen clock every morning,
+    Carries coal up from the back alley,
+    Mends the stair treads when they give
+  ]
+relationships:
+  - {
+      id: aline_barros,
+      affinity: 18,
+      trust: 25,
+      tag: sister,
+      note: "His sister; she does the talking, he does the fixing."
+    }
+  - { id: kofi_santos, affinity: 10, trust: 12, tag: curious, note: Asks about the boat models Oona builds. }
+  - { id: hartley_wylie, affinity: 6, trust: 8, tag: fond, note: Shares a dislike of short-term contracts. }
+secrets:
+  - text: He still has the brass tally from his first Mill shift and turns it over when he can't sleep.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_f01
+archetype: mill_hand
+employment: out_of_work
+years_in_monde: 17

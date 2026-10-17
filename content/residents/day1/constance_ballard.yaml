@@ -1,0 +1,107 @@
+# Generated (census-v1) for sh_b01; curated not yet. Edit here.
+id: constance_ballard
+name: Constance Ballard
+age: 70
+pronouns: she/her
+kind: resident
+occupation: Retired draper, still mends neighbours' hems
+workplace: station_hill.home_02
+home: station_hill.home_02
+portrait: constance_ballard
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: constance_ballard
+appearance: A small woman with salt-and-pepper curls and a mustard shirt, cardigan sleeves pushed up. She
+  wears a thimble on a cord around her neck.
+look:
+  kind: human
+  skin: 4
+  hair: { style: curly, colour: 11 }
+  eyes: 2
+  build: medium
+  height: tall
+  outfit: { cut: plain, top: 4, bottom: 7, bottom_style: trousers, shoes: 3 }
+  accessory: { kind: none }
+backstory: Born in the terrace above the harbour, Constance ran the drapery counter in Dunmore's for
+  thirty-one years before her knees gave out. She sewed the bunting for every wedding and funeral in the Old
+  Quarter and kept a ledger of who owed what, mostly in thread. When the mill closed she thought the town
+  would empty in a season, and it did, but slowly enough that she stayed. She married Omar because he was the
+  only man in the Gull who laughed at her jokes before she finished them. Her one regret is that she never
+  learned to drive the ferry.
+personality:
+  traits: [ brisk, loyal, nosy, warm ]
+  big5: { open: 45, conscientious: 82, extravert: 60, agreeable: 68, neurotic: 40 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.15, charm: 0.35 }
+beliefs:
+  - Everyone in Monde owes someone a favour, and I keep the list.
+  - The Tollmen only want what is owed to them, and that is simple enough.
+  - A hem tells you more about a person than their letters do.
+voice:
+  register: Quick and matter-of-fact, with frequent asides to her husband. She lets sentences trail when she is
+    tactful and snaps them short when she is not.
+  tics: [ "Don't we, dear?", "Well, obviously.", Mind the step. ]
+  never_says: [ I suppose, no offence but, it is what it is ]
+  samples:
+    - Don't we, dear? The bunting's faded again, and I've got no thread left.
+    - Well, obviously the kettle's on. Sit down before you fall down.
+    - Ask me about the Tollmen again and you'll get the hem treatment.
+birthday: 70
+likes: [ a morning paper, a kettle on the stove, pleasant strangers, Saturday dances at the Gull, clean pins ]
+dislikes: [ stairs, drafts, being managed, people who return library books late ]
+fears: [ the bench going unused, losing her eyesight before her hands ]
+dream:
+  text: "Be useful, not just present: volunteer at the library and get thanked by name in the Lantern."
+  stages:
+    - Volunteer three shifts at Margo's library desk each week.
+    - Get thanked by name in the Lantern for the bunting repair.
+    - Take a regular chair at the Gull & Anchor and hold court.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: station_hill.home_02 }
+    - { at: "08:30", do: walk, where: market_row.market_street }
+    - { at: "09:30", do: shop, where: market_row.general_store }
+    - { at: "11:00", do: volunteer, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: sit, where: station_hill.lookout_bench }
+    - { at: "18:00", do: cook, where: station_hill.home_02 }
+    - { at: "21:30", do: sleep, where: station_hill.home_02 }
+  weekend:
+    - { at: "08:30", do: eat, where: station_hill.home_02 }
+    - { at: "10:00", do: walk, where: commons.duck_pond }
+    - { at: "12:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: visit, where: old_quarter.st_brigids }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: station_hill.home_02 }
+chores: [ mend the Saturday bunting, keep the kettle on, write the ledger of favours ]
+relationships:
+  - {
+      id: omar_quarrie,
+      affinity: 25,
+      trust: 30,
+      tag: partner,
+      note: Her husband of forty years; they bicker fondly.
+    }
+  - {
+      id: odile,
+      affinity: 12,
+      trust: 18,
+      tag: friend,
+      note: Buys her morning loaf and swaps gossip over the counter.
+    }
+  - {
+      id: gerrit_jensen,
+      affinity: 8,
+      trust: 10,
+      tag: curious,
+      note: Neighbour on Station Road; she watches his gate.
+    }
+secrets:
+  - text: She has been secretly teaching herself to drive the ferry's tiller from a chart, in case Moss ever
+      retires.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: sh_b01
+archetype: retired_couple
+employment: retired
+years_in_monde: 70

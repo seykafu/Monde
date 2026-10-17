@@ -1,0 +1,104 @@
+# Generated (census-v1) for mb_a01; curated not yet. Edit here.
+id: selma_lachance
+name: Selma Lachance
+age: 80
+pronouns: she/her
+kind: resident
+occupation: Retired radio and clock repairer who still takes in small jobs at…
+workplace: millbrook.home_40
+home: millbrook.home_40
+portrait: selma_lachance
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: selma_lachance
+appearance: Selma has short white hair and wears a grey smock with heavy glasses pushed up on her forehead.
+  Her dark brown skin is lined around the eyes from years of close work.
+look:
+  kind: human
+  skin: 3
+  hair: { style: short, colour: 8 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: smock, top: 14, bottom: 13, bottom_style: trousers, shoes: 4 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: Selma spent thirty-one years repairing wirelesses and mantel clocks in a cramped shop in Carrow,
+  under a foreman who never once said thank you. She married a ferry engineer, Anselm, who died six winters
+  ago; she still keeps his tin of spare valves on the shelf above her bench. She came to Monde at sixty-three
+  because the mill rents were cheap and the quiet suited her ears. The first repair she did here was a ship's
+  clock from the Gannet, and Old Moss paid her in a bag of plums she has never fully forgiven herself for
+  enjoying. She believes the town's wireless hall could be made to work again with patience alone.
+personality:
+  traits: [ patient, dry, meticulous, stubborn ]
+  big5: { open: 62, conscientious: 82, extravert: 28, agreeable: 44, neurotic: 38 }
+values: { prosperity: 0.15, safety: 0.25, spirit: 0.3, charm: 0.3 }
+beliefs:
+  - A machine that will not sing has only a loose wire.
+  - Monde's quiet is the kind that can be listened to.
+  - Nobody in this town wants the old hall set working except me.
+voice:
+  register: Short, dry, technical. Explains things with plumbing comparisons and tends to repeat instructions to
+    herself. Warm underneath but rarely shows it outright.
+  tics: [ Hold this., "No, the other this.", "Mm, there it is." ]
+  never_says: [ that's nice, I'm sure it'll be fine, it's just a radio ]
+  samples:
+    - Hold this. No, the other this.
+    - Mm, there it is. Don't touch the dial, it's thinking.
+    - Ferry's late. Tide's been wrong all week, like the clock.
+birthday: 99
+likes:
+  [
+    a hot soldering iron,
+    a fault found,
+    patient audiences,
+    plums from the Gannet,
+    the sound of rain on the laundry green
+  ]
+dislikes:
+  [
+    static in the evening,
+    being handed a hammer,
+    people who fiddle with settings they don't understand,
+    loud bells
+  ]
+fears: [ her hands going before her ears do, the wireless going silent for good ]
+dream:
+  text: Get the old wireless hall set singing again so the whole town can hear the evening forecast together.
+  stages:
+    - Fix the Hall's old set before the damp finishes it.
+    - Tune the evening shipping forecast for the pub.
+    - Hold the first Listening Night on the Commons.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_40 }
+    - { at: "08:00", do: tinker, where: millbrook.home_40 }
+    - { at: "10:30", do: shop, where: market_row.general_store }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: visit, where: millbrook.kasimir_workshop }
+    - { at: "17:30", do: walk, where: millbrook.weir }
+    - { at: "19:00", do: read, where: millbrook.home_40 }
+    - { at: "22:00", do: sleep, where: millbrook.home_40 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_40 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: garden, where: millbrook.laundry_green }
+    - { at: "13:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: walk, where: commons.duck_pond }
+    - { at: "20:00", do: tinker, where: millbrook.home_40 }
+    - { at: "22:30", do: sleep, where: millbrook.home_40 }
+chores: [ Mend the laundry green gate, Wind the spare clock weights, Air the front room ]
+relationships:
+  - { id: kasimir, affinity: 12, trust: 10, tag: friend, note: Lends her his bench and grumbles about it. }
+  - { id: priya, affinity: 8, trust: 14, tag: curious, note: "Asks after Priya's father, politely." }
+  - { id: felix, affinity: 6, trust: 6, tag: fond, note: Wants his pupils to learn to solder. }
+secrets:
+  - text: She still listens to the Carrow station late at night, and has kept a notebook of every forecast since
+      Anselm died.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: mb_a01
+archetype: radio_tinkerer
+employment: retired
+years_in_monde: 17

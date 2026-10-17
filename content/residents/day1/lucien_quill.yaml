@@ -1,0 +1,112 @@
+# Generated (census-v1) for quill; curated not yet. Edit here.
+id: lucien_quill
+name: Lucien Quill
+age: 55
+pronouns: he/him
+kind: resident
+occupation: Commuter clerk at a Hessle Cross firm, home weekends
+workplace: offmap.city
+home: old_quarter.home_03
+portrait: lucien_quill
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: lucien_quill
+appearance: A slight man with close-cropped chestnut hair and a teal coat, the collar turned up against the
+  harbour wind. He carries his keys on a loop and keeps them jingling.
+look:
+  kind: human
+  skin: 0
+  hair: { style: cropped, colour: 6 }
+  eyes: 6
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 0, bottom: 2, bottom_style: trousers, shoes: 3 }
+  accessory: { kind: none }
+backstory: Lucien ran a small shop on the corner of Lamplighter Lane for his first decade in Monde, selling
+  stationery and repairs, and was the last tenant of the cottage before it was let to the pair of them. He had
+  the front door keys cut twice after losing the first set in the harbour. When the shop failed, he took a
+  clerking post across the water. The commute is long and the work dull, but the wages cover the mortgage on
+  the cottage and his wife's ambitions for the café. He misses the old shop and the lane's gas lamps, and
+  privately thinks Hester would be happier if they both moved to Carrow.
+personality:
+  traits: [ patient, dry, tidy, wistful, loyal ]
+  big5: { open: 55, conscientious: 75, extravert: 35, agreeable: 70, neurotic: 45 }
+values: { prosperity: 0.35, safety: 0.3, spirit: 0.1, charm: 0.25 }
+beliefs:
+  - Every lock in Monde is a little bit wrong.
+  - Carrow would have given us a better life, we just never asked.
+  - The ferry is never late, the people are.
+voice:
+  register: Quiet and tidy in speech, prone to small domestic observations. Says less when tired, more when
+    happy. Dry humour that sometimes misses.
+  tics: [ mind the latch, "well, there it is", as ever ]
+  never_says: [ I don't care, that's the way it goes, it's no bother ]
+  samples:
+    - Keys are on the hook, love. Try the back door first, it's the one that sticks.
+    - The ferry was late again. I've decided not to be angry about it, which is new.
+    - I'll sit with the paper a while. Don't mind me, I'm only counting the lamps.
+birthday: 77
+likes:
+  [
+    the Gannet's rail on a calm day,
+    his wife's coffee,
+    mending clocks in the evening,
+    the gas lamps on the lane,
+    a till that rings
+  ]
+dislikes: [ the Hessle Cross commute, keys that stick, cold ferry platforms, shops with no lights on ]
+fears: [ losing the cottage, growing old on the wrong side of the water ]
+dream:
+  text: Hire a young apprentice for a small repair counter in the lane, so the old shop's lamp can be lit again.
+  stages:
+    - Post a notice for the apprentice on the Lantern's board.
+    - Interview two residents at the library desk.
+    - Hire the one who can find the lane's keys without help.
+routine:
+  weekday:
+    - { at: "06:00", do: sleep, where: old_quarter.home_03 }
+    - { at: "06:45", do: eat, where: old_quarter.home_03 }
+    - { at: "07:30", do: walk, where: wharf.harbor_steps }
+    - { at: "08:00", do: work, where: offmap.city }
+    - { at: "18:00", do: walk, where: offmap.city }
+    - { at: "21:00", do: sleep, where: offmap.city }
+  weekend:
+    - { at: "08:00", do: sleep, where: old_quarter.home_03 }
+    - { at: "09:30", do: tinker, where: old_quarter.home_03 }
+    - { at: "11:00", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: visit, where: old_quarter.library }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: old_quarter.home_03 }
+chores:
+  [
+    Mend the cottage's door latches,
+    Carry the shop's post home from the hatch,
+    Clean the front step on Saturdays
+  ]
+relationships:
+  - { id: hester, affinity: 60, trust: 70, tag: spouse, note: "His wife, who runs the café." }
+  - {
+      id: bertrand,
+      affinity: 30,
+      trust: 35,
+      tag: friend,
+      note: Swaps clock and lock repairs over the counter.
+    }
+  - {
+      id: tib,
+      affinity: 20,
+      trust: 25,
+      tag: curious,
+      note: Tib's sneaking through the Quills' back garden to visit the cat.
+    }
+secrets:
+  - text: He still has the first set of cottage keys, the ones he lost in the harbour, and checks the harbour
+      steps for them on ferry…
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: quill
+archetype: shop_founder
+employment: employed
+years_in_monde: 23

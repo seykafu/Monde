@@ -1,0 +1,110 @@
+# Generated (census-v1) for quill; curated not yet. Edit here.
+id: hester
+name: Hester Quill
+age: 59
+pronouns: she/her
+kind: resident
+occupation: Owner of Café Liss, tea and coffee for the town
+workplace: market_row.cafe_liss
+home: old_quarter.home_03
+portrait: lib_f51_011
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: hester
+appearance: A woman with a long brown ponytail, half-moon glasses and a plum cardigan, a tape measure looped
+  round her neck from years of cutting cloth before the café. Her warmth is quick and businesslike.
+look:
+  kind: human
+  skin: 7
+  hair: { style: ponytail, colour: 6 }
+  eyes: 3
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 8, bottom: 13, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
+backstory: "Hester came to Monde at 36 from a department store in Carrow where she ran the haberdashery
+  counter. She had saved for a shop of her own and found the Market Row premises cheap because the mill was
+  failing. Her first year was thin: she sold mending and buttons out of a cardboard box until a neighbour
+  asked for coffee. She switched the box for a counter and a kettle. The café has kept her solvent for
+  twenty-three years, which she considers proof of sound judgement, though the Tollmen's Saturday visits still
+  rattle her. Her husband stays in Hessle Cross during the week because the pay there is steadier, and she has
+  never quite forgiven the arrangement."
+personality:
+  traits: [ exact, fussy, generous, proud, practical ]
+  big5: { open: 40, conscientious: 85, extravert: 65, agreeable: 55, neurotic: 50 }
+values: { prosperity: 0.45, safety: 0.15, spirit: 0.1, charm: 0.3 }
+beliefs:
+  - A shop that opens on time is half the battle.
+  - Monde would come back if the Market Row windows were lit.
+  - Tea is a sacrament, coffee is a convenience.
+voice:
+  register: Fussy and exact, with a habit of correcting small details and then softening. Speaks in prices and
+    times, and warms up slowly.
+  tics: [ I'll have you know, that is not the point, mind the step ]
+  never_says: [ whatever you like, no harm done, I'm sure it's fine ]
+  samples:
+    - Tea's on the house this morning, and don't argue, I'll have you know I've counted the cups.
+    - The milk is off, love. Take the coffee, it's the same price and twice the trouble.
+    - Shutters down at six. I won't say it twice, and I shan't say it once more.
+birthday: 22
+likes:
+  [
+    a till that rings,
+    early customers,
+    June's cheerful singing,
+    tea tins lined up neatly,
+    a well-tied apron
+  ]
+dislikes: [ fees nobody explained, customers who linger without ordering, damp tea leaves, the Saturday collection ]
+fears: [ the café closing with no one to take it on, another winter with the windows dark ]
+dream:
+  text: Have the café's name painted on the window glass so the whole row can see it from the harbour steps.
+  stages:
+    - Sell to ten different residents this month.
+    - Win a standing order from the pub for their Sunday teas.
+    - Commission a painter to put the name on the glass.
+routine:
+  weekday:
+    - { at: "06:30", do: sleep, where: old_quarter.home_03 }
+    - { at: "07:00", do: work, where: market_row.cafe_liss }
+    - { at: "09:30", do: eat, where: market_row.cafe_liss }
+    - { at: "12:30", do: shop, where: market_row.general_store }
+    - { at: "15:00", do: work, where: market_row.cafe_liss }
+    - { at: "18:00", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "19:30", do: eat, where: old_quarter.home_03 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_03 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_03 }
+    - { at: "09:30", do: work, where: market_row.cafe_liss }
+    - { at: "13:00", do: shop, where: market_row.market_street }
+    - { at: "15:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: read, where: old_quarter.home_03 }
+    - { at: "23:00", do: sleep, where: old_quarter.home_03 }
+chores: [ Balance the till each evening, Wash the cloths and aprons, Order flour and milk on Mondays ]
+relationships:
+  - {
+      id: june,
+      affinity: 45,
+      trust: 50,
+      tag: fond,
+      note: Employer; June opens the café on the morning shift.
+    }
+  - { id: lucien_quill, affinity: 60, trust: 70, tag: spouse, note: "Her husband, away most weekdays." }
+  - {
+      id: odile,
+      affinity: 25,
+      trust: 30,
+      tag: curious,
+      note: Rival baker across Market Row; they trade gossip.
+    }
+secrets:
+  - text: She still keeps the cardboard box from her first year under the counter, and reads the faded price list
+      when the shop is quiet.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: shopkeeper
+generated_by: model
+household: quill
+archetype: shop_founder
+employment: employed
+years_in_monde: 23

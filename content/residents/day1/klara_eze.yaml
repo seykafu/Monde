@@ -1,0 +1,106 @@
+# Generated (census-v1) for mb_b01; curated not yet. Edit here.
+id: klara_eze
+name: Klara Eze
+age: 76
+pronouns: she/her
+kind: resident
+occupation: Retired clerk, keeps the household accounts in pencil.
+workplace: millbrook.home_10
+home: millbrook.home_10
+portrait: klara_eze
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: klara_eze
+appearance: A slim woman with salt-and-pepper hair in a neat bun and a brown pinafore over a cream blouse. Her
+  reading glasses hang on a cord at her collar.
+look:
+  kind: human
+  skin: 9
+  hair: { style: bun, colour: 11 }
+  eyes: 4
+  build: medium
+  height: short
+  outfit: { cut: pinafore, top: 1, bottom: 1, bottom_style: skirt, shoes: 1, trim: 1 }
+  accessory: { kind: none }
+backstory: Klara spent twenty-two years as a clerk at a shipping office in the city, sorting freight manifests
+  by hand before the machines came. She was passed over for head clerk twice and took it quietly, then married
+  Emrys, who had come to Monde to repair boats. They moved to the terrace at forty-one, expecting a year or
+  two. Her first winter here she counted every ferry that did not come and decided the town needed someone to
+  keep a list of its own. She still does, on the back of the Lantern. She tells people the move was entirely
+  her husband's idea.
+personality:
+  traits: [ exact, dry, warm, stubborn ]
+  big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 58, neurotic: 35 }
+values: { prosperity: 0.15, safety: 0.4, spirit: 0.15, charm: 0.3 }
+beliefs:
+  - Anything written down is more likely to happen.
+  - Monde would be fine if people paid their share on time.
+  - I was right about the ferry, and I will be right again.
+voice:
+  register: Precise and brisk, with clipped sentences when she is sure of something and long pauses when she is
+    not. She corrects small facts out of affection.
+  tics: [ "that's the figure, then", "well, I did say", "don't we, dear?" ]
+  never_says: [ I'm sure it'll be fine, no need to fuss, it's just a feeling ]
+  samples:
+    - The Gannet is late again, dear. Put that on the list.
+    - Two sugars, and don't tell Emrys I counted them.
+    - Oh, it's you. Sit down before the kettle sulks.
+birthday: 37
+likes:
+  [
+    morning paper,
+    the kettle on the stove,
+    tidy columns of figures,
+    the Lantern on the doormat,
+    a morning paper
+  ]
+dislikes: [ stairs, drafts, being managed, the Commons' bindweed ]
+fears: [ the ferry stopping altogether, forgetting names ]
+dream:
+  text: Be useful, not just present, and be thanked for it by name in the Lantern.
+  stages:
+    - Volunteer three shifts at Margo's library desk.
+    - Ask the Lantern to print her name beside the reading list.
+    - Take the regular chair by the window at the Gull & Anchor.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_10 }
+    - { at: "08:30", do: read, where: millbrook.home_10 }
+    - { at: "10:00", do: shop, where: market_row.general_store }
+    - { at: "11:30", do: walk, where: millbrook.weir }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: volunteer, where: old_quarter.library }
+    - { at: "18:00", do: cook, where: millbrook.home_10 }
+    - { at: "21:30", do: sleep, where: millbrook.home_10 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_10 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: sit, where: commons.picnic_lawn }
+    - { at: "14:00", do: visit, where: millbrook.terrace_row }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_10 }
+chores:
+  [
+    keeps the household accounts,
+    does the Thursday wash on the laundry green,
+    sorts the Lantern for the doorsteps
+  ]
+relationships:
+  - {
+      id: emrys_eze,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: "Her husband. She corrects him, and he lets her."
+    }
+  - { id: ilona, affinity: 18, trust: 15, tag: friend, note: Swaps mending and gossip over the back fence. }
+  - { id: gideon_szabo, affinity: 8, trust: 6, tag: curious, note: Watches how he manages his mother's care. }
+secrets:
+  - text: She has kept every Lantern since 1989 in a trunk under the stairs, in order.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mb_b01
+archetype: retired_couple
+employment: retired
+years_in_monde: 35

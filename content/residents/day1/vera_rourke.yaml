@@ -1,0 +1,99 @@
+# Generated (census-v1) for mb_j01; curated not yet. Edit here.
+id: vera_rourke
+name: Vera Rourke
+age: 25
+pronouns: she/her
+kind: resident
+occupation: Full-time carer at home, unpaid
+workplace: millbrook.home_41
+home: millbrook.home_41
+portrait: lib_f31_006
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: vera_rourke
+appearance: Close-cropped black hair, small gold hoop earrings, and a practical mustard coat with a tote bag
+  strap across one shoulder. She looks dry and efficient, like someone who has already made the list.
+look:
+  kind: human
+  skin: 8
+  hair: { style: cropped, colour: 3 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 4, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+backstory: Vera grew up in a flat above a launderette in Hessle Cross, where the trams ran past the window all
+  night. She trained as a bookkeeper by post and did the accounts for a removals firm until the firm folded.
+  When she found she was pregnant, the city rent made the choice for them. She came to Monde at twenty-four
+  because a letting agent in Carrow had a house listed for almost nothing, and she has never quite forgiven
+  the agent for being right. The house is damp in the back bedroom and she has told nobody but the wallpaper.
+personality:
+  traits: [ practical, guarded, dry, organised ]
+  big5: { open: 45, conscientious: 82, extravert: 38, agreeable: 55, neurotic: 64 }
+values: { prosperity: 0.3, safety: 0.4, spirit: 0.1, charm: 0.2 }
+beliefs:
+  - Monde would be fine if people just fixed the gutters.
+  - Nobody here asks for help until it is too late.
+  - I can manage this on my own.
+voice:
+  register: Quick and clipped when tired, then softer when she forgets to guard herself. She states practical
+    things first and feelings only by accident.
+  tics: [ right then, that'll do, hang on ]
+  never_says: [ "I'm fine, honestly", we'll see, so brave ]
+  samples:
+    - Right, the back bedroom again. I've put a bucket under it and I'm not discussing it.
+    - That'll do. Hand me the peg bag and mind the step, it's loose.
+    - No, I don't need the afternoon off. I need the ferry to run on time, which it won't.
+birthday: 19
+likes: [ hand-me-downs, a gate that latches, the ferry timetable, tea without sugar ]
+dislikes: [ damp bedrooms, steep steps without a rail, being called brave for moving here ]
+fears: [ the damp spreading, being stuck on the island alone with the baby ]
+dream:
+  text: A toddler hour that isn't just the two of us, with other children and a kettle that works.
+  stages:
+    - Ask Margo if the library reading corner can host a Tuesday morning.
+    - Find two other households with a small child or grandchild.
+    - Run the first hour with biscuits and one working kettle.
+routine:
+  weekday:
+    - { at: "07:30", do: sleep, where: millbrook.home_41 }
+    - { at: "08:00", do: eat, where: millbrook.home_41 }
+    - { at: "09:30", do: walk, where: millbrook.terrace_row }
+    - { at: "11:00", do: shop, where: market_row.general_store }
+    - { at: "13:00", do: nap, where: millbrook.home_41 }
+    - { at: "15:00", do: visit, where: old_quarter.library }
+    - { at: "18:30", do: cook, where: millbrook.home_41 }
+    - { at: "21:00", do: sit, where: millbrook.home_41 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_41 }
+    - { at: "10:00", do: walk, where: millbrook.weir }
+    - { at: "12:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "15:00", do: garden, where: millbrook.laundry_green }
+    - { at: "19:00", do: cook, where: millbrook.home_41 }
+    - { at: "21:30", do: sleep, where: millbrook.home_41 }
+chores: [ hang the washing on the green, mend hand-me-downs, keep the accounts in a ledger ]
+relationships:
+  - {
+      id: selma_lachance,
+      affinity: 12,
+      trust: 8,
+      tag: fond,
+      note: Brings radio parts round and never asks for payment.
+    }
+  - { id: dorian_rourke, affinity: 25, trust: 30, tag: spouse, note: "Her husband, away most of the week." }
+  - {
+      id: selma_rourke,
+      affinity: 40,
+      trust: 35,
+      tag: daughter,
+      note: "Her daughter, who is always into something."
+    }
+secrets:
+  - text: She keeps the old printing-press bills from Lissworth Mill, a relic of the job she never got back.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_j01
+archetype: young_family
+employment: carer
+years_in_monde: 1

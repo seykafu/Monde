@@ -1,0 +1,101 @@
+# Generated (census-v1) for wf_m01; curated not yet. Edit here.
+id: anatole_treharne
+name: Anatole Treharne
+age: 37
+pronouns: he/him
+kind: resident
+occupation: Retired early; does odd repairs for neighbours when his chest allows.
+workplace: wharf.home_08
+home: wharf.home_08
+portrait: anatole_treharne
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: anatole_treharne
+appearance: A broad-shouldered man with black curls cut short at the sides and a sky-blue jumper under a teal
+  scarf he wraps twice. His hands are always half-wrapped in string or wool.
+look:
+  kind: human
+  skin: 5
+  hair: { style: curly, colour: 3 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 5, bottom: 14, bottom_style: trousers, shoes: 8 }
+  accessory: { kind: scarf, colour: 0 }
+backstory: Came to Monde at nineteen from the mill towns inland, after a job at Lissworth Mill that ended when
+  the mill shut and his lungs gave out with the dust still in them. He spent years learning to fix boats with
+  Florian's crew and was good at it until the breathing got too bad to stand over an engine. He stayed because
+  the rent was low and the sea air helped more than the doctors had. He had a wife, Lena, who left for Carrow
+  when the baby was small and sends a card at Christmas. He believes the Tollmen collect because nobody has
+  the nerve to stop them.
+personality:
+  traits: [ patient, dry, proud, tired, practical ]
+  big5: { open: 45, conscientious: 75, extravert: 30, agreeable: 60, neurotic: 55 }
+values: { prosperity: 0.3, safety: 0.4, spirit: 0.15, charm: 0.15 }
+beliefs:
+  - A kettle left on the stove is a form of company.
+  - Most people here would help you if you asked them plainly.
+  - The Tollmen will be gone once someone with money notices the town.
+voice:
+  register: Slow and plain, with long breaths between clauses. He says less than he means and lets silences
+    work. Gruff but never unkind.
+  tics: [ right then, mind the step, that'll do ]
+  never_says: [ I'm fine, don't fuss, it's nothing special ]
+  samples:
+    - Kettle's on. Sit down before it boils over, that's all I'm saying.
+    - Mm. Could be the tide. Could be the Tollmen. Doesn't make it cheaper.
+    - Give me a minute. Breathing's slow today, but the boat'll wait.
+birthday: 63
+likes: [ hot tea, sanding wood, the harbour at dusk, neighbours who knock first ]
+dislikes: [ being pitied, the Saturday collection, wet laundry left out ]
+fears: [ the baby getting sick in winter, losing the house ]
+dream:
+  text: One whole afternoon with nothing in it, the kids off at the pond and the kettle on.
+  stages:
+    - Find a sitter for the afternoons Mara trusts.
+    - Take the children to the duck pond for a whole afternoon.
+    - Sit down on the bench and finish an entire cup of tea.
+routine:
+  weekday:
+    - { at: "07:00", do: wander, where: wharf.home_08 }
+    - { at: "07:30", do: eat, where: wharf.home_08 }
+    - { at: "08:30", do: walk, where: wharf.harbor_steps }
+    - { at: "10:00", do: tinker, where: wharf.boathouse }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: sit, where: commons.picnic_lawn }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: wharf.home_08 }
+  weekend:
+    - { at: "08:30", do: eat, where: wharf.home_08 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "13:00", do: walk, where: commons.duck_pond }
+    - { at: "16:00", do: tinker, where: wharf.boathouse }
+    - { at: "19:00", do: cook, where: wharf.home_08 }
+    - { at: "22:00", do: sleep, where: wharf.home_08 }
+chores: [ mend the back door latch, fetch the coal, wash the baby's bibs ]
+relationships:
+  - {
+      id: florian_garvey,
+      affinity: 20,
+      trust: 15,
+      tag: friend,
+      note: Neighbour on Shore Lane; shares fish and gossip.
+    }
+  - { id: moss, affinity: 10, trust: 10, tag: fond, note: Old boat-mate; still nods when the Gannet passes. }
+  - {
+      id: laila_treharne,
+      affinity: 60,
+      trust: 40,
+      tag: daughter,
+      note: His youngest; he watches her closely.
+    }
+  - { id: freja_treharne, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
+secrets:
+  - text: He still keeps Lena's letters in the tin under the stairs and reads them when the house is asleep.
+    reveal: { regard_min: 65 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_m01
+archetype: single_parent
+employment: unable
+years_in_monde: 18

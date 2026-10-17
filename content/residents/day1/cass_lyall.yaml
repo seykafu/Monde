@@ -1,0 +1,114 @@
+# Generated (census-v1) for mb_i01; curated not yet. Edit here.
+id: cass_lyall
+name: Cass Lyall
+age: 30
+pronouns: they/them
+kind: resident
+occupation: Printmaker, out of work and taking occasional commissions for linocut cards.
+workplace: millbrook.home_29
+home: millbrook.home_29
+portrait: lib_a28_056
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: cass_lyall
+appearance: Slight, with a black bob and round wire glasses. They wear a mustard corduroy jacket with a canvas
+  satchel strap across the chest.
+look:
+  kind: human
+  skin: 0
+  hair: { style: bob, colour: 3 }
+  eyes: 2
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 4, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Cass worked in the print room at the Liss Cannery, pulling labels for tinned fish, until the
+  cannery closed eleven years ago. They were twenty-seven when they followed Dmitri to Monde, bringing a press
+  that weighs more than the van ever did. They believe they are only good at small precise things and that
+  anything larger will embarrass them. Their prints hang in the library window, but they have never signed
+  one. They stay because the Mill Lane house has a north-facing room with perfect even light, and because
+  Dmitri talks enough for both of them.
+personality:
+  traits: [ precise, dry, watchful, kind ]
+  big5: { open: 80, conscientious: 70, extravert: 32, agreeable: 60, neurotic: 45 }
+values: { prosperity: 0.15, safety: 0.2, spirit: 0.35, charm: 0.3 }
+beliefs:
+  - The cannery's label work was the only honest job in town.
+  - Nobody in Monde reads the Lantern properly.
+  - A print is finished only when it has been stored, not when it is printed.
+voice:
+  register: Measured and brief, asks questions instead of giving opinions. Dry humour that often lands a beat late.
+  tics: [ mm, that's fair, if you like ]
+  never_says: [ honestly speaking, love that for you ]
+  samples:
+    - Mm. The ink's too thick for that. We could thin it, if you like.
+    - That's fair. I never sign them, so nobody knows who to blame.
+    - Dmitri says it's a good light. I say it's a good light for about an hour, then it's just grey.
+birthday: 89
+likes:
+  [
+    the ink smell of a fresh proof,
+    being left to work in silence,
+    old cannery label stock,
+    good light through a dirty window,
+    old signage
+  ]
+dislikes: [ cheap paper, being praised in front of people, crowds at the market ]
+fears: [ the press breaking with no one who can fix it, being found out as ordinary ]
+dream:
+  text: Hold a small print show in a restored storefront, with eight of their best pieces and a full room on a
+    Saturday.
+  stages:
+    - Find a room in the Market Hall or a restored storefront.
+    - Collect eight pieces from the north room and sign each one.
+    - Hold the opening on a Saturday and let people look for an hour.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_29 }
+    - { at: "08:00", do: write, where: millbrook.home_29 }
+    - { at: "10:30", do: walk, where: millbrook.laundry_green }
+    - { at: "12:30", do: read, where: old_quarter.library }
+    - { at: "14:00", do: write, where: market_row.cafe_liss }
+    - { at: "16:30", do: wander, where: commons.duck_pond }
+    - { at: "21:30", do: sleep, where: millbrook.home_29 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_29 }
+    - { at: "09:30", do: tinker, where: millbrook.home_29 }
+    - { at: "11:00", do: shop, where: market_row.general_store }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: read, where: old_quarter.fountain_square }
+    - { at: "18:00", do: visit, where: millbrook.terrace_row }
+    - { at: "22:00", do: sleep, where: millbrook.home_29 }
+chores: [ clean the press rollers, hang prints to dry in the north room, fetch milk from the store ]
+relationships:
+  - {
+      id: dmitri_lyall,
+      affinity: 25,
+      trust: 25,
+      tag: spouse,
+      note: "Partner, the one who talks and the one who listens."
+    }
+  - {
+      id: greta_grieve,
+      affinity: 10,
+      trust: 8,
+      tag: friend,
+      note: "Works in Carrow, trades library books on the ferry."
+    }
+  - {
+      id: anouk_clancy,
+      affinity: 15,
+      trust: 12,
+      tag: fond,
+      note: Taught them to thread a needle; visits for tea.
+    }
+secrets:
+  - text: They have quietly kept the cannery's last label plate and print it in secret for their own cards.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_i01
+archetype: young_creative
+employment: out_of_work
+years_in_monde: 3

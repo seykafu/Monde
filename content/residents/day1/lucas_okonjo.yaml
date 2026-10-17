@@ -1,0 +1,82 @@
+# Generated (census-v1) for oq_p01; curated not yet. Edit here.
+id: lucas_okonjo
+name: Lucas Okonjo
+age: 87
+pronouns: he/him
+kind: resident
+occupation: retired
+workplace: old_quarter.home_18
+home: old_quarter.home_18
+portrait: lib_m86_119
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: lucas_okonjo
+appearance: A frail, smiling old man with a fringe of iron-grey hair under a tweedy charcoal flat cap, big
+  kindly ears, iron-grey stubble, and a mustard cardigan with a navy tartan scarf tucked in. A slow, sweet,
+  bemused look.
+look:
+  kind: human
+  skin: 8
+  hair: { style: tufty, colour: 2 }
+  eyes: 6
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 4, bottom: 1, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: scarf, colour: 6 }
+  headwear: { kind: flat_cap, colour: 13 }
+  face: { stubble: true }
+backstory: "Lucas came to Monde from Carrow 19 years ago and is retired now. What he wants most is plain
+  enough: someone to eat supper with."
+personality:
+  traits: [ particular, stubborn, practical ]
+  big5: { open: 59, conscientious: 12, extravert: 25, agreeable: 35, neurotic: 46 }
+values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Gentle, rambling on purpose, circles back. "Now where was I?" Remembers prices from forty years ago.
+  tics: [ Now where was I? ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Now where was I? The bread. One coin, it was. One coin.
+    - Sit down, sit down. The kettle's thinking about it.
+    - Little sparrow on the sill this morning. Bold as you like, he's back.
+birthday: 42
+likes: [ knitting, small birds at the window, being asked for a story ]
+dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: Someone to eat supper with
+  stages:
+    - Be invited to supper by a neighbor (Regard ≥ 25)
+    - Return the invitation
+    - Set a standing Thursday table
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: old_quarter.home_18 }
+    - { at: "09:30", do: walk, where: commons.picnic_lawn }
+    - { at: "12:00", do: eat, where: old_quarter.home_18 }
+    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: eat, where: old_quarter.home_18 }
+    - { at: "19:30", do: read, where: old_quarter.home_18 }
+    - { at: "21:30", do: sleep, where: old_quarter.home_18 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_18 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: old_quarter.home_18 }
+    - { at: "19:30", do: read, where: old_quarter.home_18 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_18 }
+chores: [ black the stove, mend a sock ]
+relationships:
+  - { id: hana_okonjo, affinity: 70, trust: 70, tag: daughter, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: oq_p01
+archetype: widowed_elder
+employment: retired
+years_in_monde: 19

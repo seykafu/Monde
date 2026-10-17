@@ -1,0 +1,115 @@
+# Generated (census-v1) for mb_d04; curated not yet. Edit here.
+id: rodrigo_o_dowd
+name: Rodrigo O'Dowd
+age: 53
+pronouns: he/him
+kind: resident
+occupation: Former loom-setter; commuter on weekly casual repair contracts in Hessle Cross
+workplace: offmap.city
+home: millbrook.home_23
+portrait: rodrigo_o_dowd
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: rodrigo_o_dowd
+appearance: A tan man with chestnut hair swept back under a plum flat cap, wearing a brick-red shirt with the
+  sleeves rolled to the elbow. The cap is the one thing he never takes off indoors.
+look:
+  kind: human
+  skin: 2
+  hair: { style: swept, colour: 6 }
+  eyes: 7
+  build: medium
+  height: short
+  outfit: { cut: plain, top: 3, bottom: 10, bottom_style: trousers, shoes: 4 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 8 }
+backstory: He came to Monde at twenty-nine, when Lissworth Mill was still running three shifts and the frames
+  were loud enough to hear from the breakwater. He set looms for fourteen years and was good at it, quick with
+  a spanner and patient with the new lads. When the Mill shut he took what casual work there was, and for a
+  while that meant the boathouse and whatever Kasimir could spare. Now he goes across on the Gannet on Tuesday
+  and comes back on Saturday, because Hessle Cross pays by the job and Monde pays in promises. He stays in
+  Monde because the house is paid for and the tide sounds like something.
+personality:
+  traits: [ steady, dry, stubborn, practical ]
+  big5: { open: 35, conscientious: 78, extravert: 30, agreeable: 55, neurotic: 40 }
+values: { prosperity: 0.5, safety: 0.25, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - A job done properly is the only honest kind of thanks.
+  - The Mill would have reopened if the council had asked the right men.
+  - Anyone who talks more than they work has never worked a loom.
+  - I'm only here till the next contract, and I mean it.
+voice:
+  register: "Plain and short. Knows the numbers: picks, bolts, hours. Says 'used to be' when talking about the
+    Mill and drops it when talking about the job in front of him."
+  tics: [ used to be, right then, that's the lot ]
+  never_says: [ I feel, on purpose, it's a shame ]
+  samples:
+    - Four bolts by Friday, that's what I can do.
+    - Used to be a whistle at six. Now it's just the gulls.
+    - Pass me that spanner. No, the other one.
+birthday: 89
+likes:
+  [
+    tea in a tin mug,
+    the sound of a loom running true,
+    a clock that keeps time,
+    a job finished before the tide turns
+  ]
+dislikes: [ being retrained, short shifts, men with clipboards, the Gannet's late sailings ]
+fears: [ the Mill being pulled down with the frames still inside, ending up with nothing to set ]
+dream:
+  text: Get the old loom turning again, the way it used to run before the shutdown.
+  stages:
+    - Find the loom parts in the Mill yard before the weather takes them.
+    - Oil and set the frames with Kasimir over a long weekend.
+    - Run the first bolt of cloth and let someone else hear it.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_23 }
+    - { at: "07:10", do: walk, where: millbrook.terrace_row }
+    - { at: "08:00", do: work, where: offmap.city }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: millbrook.home_23 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_23 }
+    - { at: "09:30", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "16:00", do: fish, where: wharf.breakwater }
+    - { at: "21:00", do: sleep, where: millbrook.home_23 }
+chores:
+  [
+    Winds the kitchen clock every Sunday,
+    Sweeps the back step before leaving for the ferry,
+    Mends his own shirts at the table
+  ]
+relationships:
+  - {
+      id: kasimir,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Shares tools and the odd rough joke about Mill men.
+    }
+  - {
+      id: tomasz_blaauw,
+      affinity: 12,
+      trust: 10,
+      tag: fond,
+      note: Neighbour who keeps minutes; once argued him into a union vote.
+    }
+  - {
+      id: delphine,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Former loom hand at the Mill; they recognise each other's silences.
+    }
+secrets:
+  - text: He still keeps the Mill's last shift pay slip folded in his wallet, and reads it when the house is quiet.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_d04
+archetype: mill_hand
+employment: employed
+years_in_monde: 24

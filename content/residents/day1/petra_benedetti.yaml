@@ -1,0 +1,108 @@
+# Generated (census-v1) for mb_d03; curated not yet. Edit here.
+id: petra_benedetti
+name: Petra Benedetti
+age: 53
+pronouns: she/her
+kind: resident
+occupation: Electrician who works from home on Terrace Row, mending wiring for neighbours.
+workplace: millbrook.home_13
+home: millbrook.home_13
+portrait: petra_benedetti
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: petra_benedetti
+appearance: A broad-built woman with a grey bob and slate-blue dungarees, a pencil tucked behind one ear. Her
+  hands are always a little scuffed.
+look:
+  kind: human
+  skin: 3
+  hair: { style: bob, colour: 2 }
+  eyes: 5
+  build: broad
+  height: tall
+  outfit: { cut: dungarees, top: 6, bottom: 14, bottom_style: skirt, shoes: 11, trim: 13 }
+  accessory: { kind: none }
+backstory: Petra trained as an electrician in the inland towns and worked the big refit jobs until the
+  contracts dried up. She came to Monde at 32 after answering a notice for a cheap terrace and a cottage with
+  a sound roof. The first winter she rewired half of Millbrook for the price of coal. She never really left.
+  Her marriage did not survive the move, and she says so plainly when asked. She keeps a workbench in the
+  front room and a jar of old fuse wire she refuses to throw away. The town's houses are mostly sound, she
+  says, just neglected, and most people would rather pay for a patch than a proper repair.
+personality:
+  traits: [ patient, blunt, thorough, dry ]
+  big5: { open: 45, conscientious: 82, extravert: 30, agreeable: 55, neurotic: 35 }
+values: { prosperity: 0.4, safety: 0.3, spirit: 0.1, charm: 0.2 }
+beliefs:
+  - A proper repair beats three patches.
+  - Monde's houses are sounder than people think.
+  - Nobody here reads a wiring diagram properly.
+  - The bandstand can be saved with enough timber.
+voice:
+  register: Slow and measured, short sentences. Says mm while judging something. Builds metaphors out of wiring
+    and walls. Rarely raises her voice.
+  tics: [ mm, "Right, then.", Let's see what we've got. ]
+  never_says: [ "well, obviously", I suppose, trust me ]
+  samples:
+    - Mm. The wall's fine. It's the joist behind it that's been crying for help.
+    - Earth it properly or don't bother, that's my rule.
+    - Give me a day with the spirit level and I'll tell you what's been lying to you.
+birthday: 82
+likes: [ seasoned timber, a sharp chisel, plain tea, the hum of an old fuse box ]
+dislikes: [ it'll do, damp, scaffolding that wobbles, people who skip the earth wire ]
+fears: [ a house fire on a cold night, being asked to leave the terrace ]
+dream:
+  text: Raise the bandstand on the Commons, with a crew and a plan drawn properly.
+  stages:
+    - Examine the collapsed bandstand with a lamp and a notebook.
+    - Draw the plan with Kasimir over tea at his bench.
+    - Lift the first beam on a Saturday with the whole street watching.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_13 }
+    - { at: "08:00", do: work, where: millbrook.home_13 }
+    - { at: "12:30", do: eat, where: market_row.bakery }
+    - { at: "13:30", do: work, where: millbrook.home_13 }
+    - { at: "17:30", do: walk, where: millbrook.weir }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: read, where: millbrook.home_13 }
+    - { at: "23:00", do: sleep, where: millbrook.home_13 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_13 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "18:00", do: cook, where: millbrook.home_13 }
+    - { at: "21:00", do: read, where: millbrook.home_13 }
+    - { at: "23:30", do: sleep, where: millbrook.home_13 }
+chores: [ rewire the back bedroom, sweep the workshop floor, patch the terrace gutters ]
+relationships:
+  - {
+      id: gideon_szabo,
+      affinity: 12,
+      trust: 10,
+      tag: fond,
+      note: Helps him with a fuse box that keeps tripping.
+    }
+  - {
+      id: lars_marsden,
+      affinity: -8,
+      trust: 2,
+      tag: rival,
+      note: Argues about who really fixed the stall roof.
+    }
+  - {
+      id: noor_lombardi,
+      affinity: 15,
+      trust: 14,
+      tag: friend,
+      note: Shares night tea and quiet complaints about the damp.
+    }
+secrets:
+  - text: She still keeps the wedding ring of her first marriage in a tin of nails and has never sold it.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: mb_d03
+archetype: builder
+employment: employed
+years_in_monde: 21

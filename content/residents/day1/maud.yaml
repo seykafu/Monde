@@ -1,0 +1,105 @@
+# Generated (census-v1) for szabo_maud; curated not yet. Edit here.
+id: maud
+name: Maud Szabo
+age: 9
+pronouns: she/her
+kind: resident
+occupation: Pupil at Millbrook School
+workplace: millbrook.home_07
+home: millbrook.home_07
+portrait: lib_f12_075
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: maud
+appearance: A slight girl with long copper hair held back by a hairband, wearing a bottle-green school jumper
+  and a cream knitted scarf. A sticking plaster sits on her chin and her satchel strap crosses her chest.
+look:
+  kind: human
+  skin: 6
+  hair: { style: long, colour: 4 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 10, bottom: 13, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: scarf, colour: 9 }
+backstory: Maud was born in Carrow and came to Monde at six, when her father brought them home. She remembers
+  the rail line and the big station, and she misses neither much. At Millbrook School she sits at the window
+  with Felix Amari and draws everyone she meets in the margin of her slate. Felix pins the best ones to the
+  wall, which she pretends not to care about. She believes her grandmother Ilona knows every secret in town,
+  which is only half true.
+personality:
+  traits: [ observant, shy, stubborn, funny ]
+  big5: { open: 85, conscientious: 55, extravert: 25, agreeable: 60, neurotic: 50 }
+values: { prosperity: 0.2, safety: 0.3, spirit: 0.3, charm: 0.2 }
+beliefs:
+  - Grown-ups tell the truth when you draw them.
+  - The heron on the fountain is the only one who never moves.
+  - Nobody in Monde has ever seen the ferry arrive on time.
+voice:
+  register: Quiet and whispered in company, louder with the few she trusts. Short sentences, and she likes to
+    show rather than tell.
+  tics: [ I drew you, shh, hm ]
+  never_says: [ that's boring, I don't know, it's not fair ]
+  samples:
+    - I drew you. Don't look, you'll ruin the nose.
+    - Hm. The heron moved. Only a bit.
+    - Shh, Felix is counting again.
+birthday: 27
+likes:
+  [
+    drawing in the margin,
+    the duck pond,
+    Felix's stories,
+    tea that stays hot long enough to finish,
+    neighbors who knock before advising
+  ]
+dislikes: [ wet socks, being told to smile, the clocktower's silence ]
+fears: [ the school closing, her father going back to Carrow alone ]
+dream:
+  text: A bedroom painted the colour of the sea, finished before her birthday.
+  stages:
+    - Choose a blue at Dunmore's with Father.
+    - Borrow brushes from Kasimir on Saturday.
+    - Paint the wall before the birthday cake comes.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_07 }
+    - { at: "08:30", do: attend, where: millbrook.school }
+    - { at: "15:30", do: wander, where: commons.picnic_lawn }
+    - { at: "17:30", do: eat, where: millbrook.home_07 }
+    - { at: "20:00", do: sleep, where: millbrook.home_07 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_07 }
+    - { at: "10:00", do: wander, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: millbrook.home_07 }
+    - { at: "14:00", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: millbrook.home_07 }
+    - { at: "20:30", do: sleep, where: millbrook.home_07 }
+chores: [ feed the hens, set the table, keep her slate clean ]
+relationships:
+  - {
+      id: nettie,
+      affinity: 90,
+      trust: 85,
+      tag: kin,
+      note: Her cousin; Nettie teaches her to whistle through the teeth.
+    }
+  - { id: ilona, affinity: 85, trust: 80, tag: kin, note: Her grandmother; Ilona saves her the crusts. }
+  - {
+      id: bru,
+      affinity: 65,
+      trust: 50,
+      tag: friend,
+      note: Bru carves her wooden birds and never lets her finish one.
+    }
+  - { id: gideon_szabo, affinity: 75, trust: 70, tag: father, note: "Father, under the same roof." }
+  - { id: sol_szabo, affinity: 65, trust: 60, tag: sibling, note: "Sibling, under the same roof." }
+secrets:
+  - text: She has drawn Father sleeping in the chair a dozen times and hidden every one.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: szabo_maud
+archetype: single_parent
+employment: pupil
+years_in_monde: 9

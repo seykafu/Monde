@@ -1,0 +1,115 @@
+# Generated (census-v1) for wf_b02; curated not yet. Edit here.
+id: dorian_vale
+name: Dorian Vale
+age: 67
+pronouns: he/him
+kind: resident
+occupation: Retired draper, formerly on Market Row before the shops shut.
+workplace: wharf.home_11
+home: wharf.home_11
+portrait: dorian_vale
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: dorian_vale
+appearance: A man of average build with salt-and-pepper hair swept back from a tanned face. He wears a grey
+  coat over a sky-blue scarf knotted loosely at the throat.
+look:
+  kind: human
+  skin: 2
+  hair: { style: swept, colour: 11 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 14, bottom: 12, bottom_style: trousers, shoes: 0 }
+  accessory: { kind: scarf, colour: 5 }
+backstory: Dorian ran the draper's on Market Row for thirty-one years, measuring cloth for brides and widows
+  and the same farmers' wives every spring. When the Row emptied he kept his tape measure and his scarf and
+  very little else. He moved in with Edmund on Shingle Row twenty years ago and has stitched every torn
+  cushion in the place since. He once sewed a jacket for a visiting ferryman who never came back for it, and
+  it still hangs on the back of the door. He believes the Tollmen collect their fee so the shops can stay open
+  a little longer, which nobody has ever confirmed.
+personality:
+  traits: [ warm, tidy, sly, patient, sentimental ]
+  big5: { open: 55, conscientious: 70, extravert: 65, agreeable: 80, neurotic: 35 }
+values: { prosperity: 0.15, safety: 0.3, spirit: 0.2, charm: 0.35 }
+beliefs:
+  - A good hem can fix any mood.
+  - The Tollmen keep the lights on at the Glasshouse.
+  - Edmund will never admit a joke landed.
+voice:
+  register: Light and teasing, quick to reach for a small kindness. He often repeats the last word of a question
+    before answering it, and laughs at his own jokes first.
+  tics: [ "Oh, lovely.", "Mind the step,", "Well, there we are." ]
+  never_says: [ doom, nothing to be done, it's hopeless ]
+  samples:
+    - Oh, lovely. Edmund's left the kettle on again. Shall I pour, or shall we sulk?
+    - Well, there we are. A hem, a cup of tea, and the whole morning sorted.
+    - Ha. Did you hear that? The ferry's on time for once.
+birthday: 1
+likes:
+  [
+    Good cloth,
+    Saturday dances in the Gull,
+    The smell of the bakery,
+    a morning paper,
+    a kettle on the stove
+  ]
+dislikes: [ Cold hands, Empty shop windows, Being rushed ]
+fears: [ Forgetting a face, Going into a home in Carrow ]
+dream:
+  text: A proper dance on a Saturday night, with a gramophone and the whole row turning up in their good shoes.
+  stages:
+    - Find a hall with a floor that will take dancing.
+    - Borrow a gramophone or a band from the Gull.
+    - Hold the dance and make Edmund lead the first waltz.
+routine:
+  weekday:
+    - { at: "07:30", do: sleep, where: wharf.home_11 }
+    - { at: "08:00", do: eat, where: wharf.home_11 }
+    - { at: "09:00", do: tinker, where: wharf.home_11 }
+    - { at: "11:00", do: socialize, where: market_row.bakery }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: volunteer, where: old_quarter.library }
+    - { at: "17:00", do: walk, where: wharf.harbor_steps }
+    - { at: "19:30", do: eat, where: wharf.home_11 }
+    - { at: "22:00", do: sleep, where: wharf.home_11 }
+  weekend:
+    - { at: "08:30", do: eat, where: wharf.home_11 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "18:30", do: eat, where: wharf.home_11 }
+    - { at: "21:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:30", do: sleep, where: wharf.home_11 }
+chores: [ Mend cushions, Dust the cloth shelves, Set out the bread knife ]
+relationships:
+  - {
+      id: edmund_mcbride,
+      affinity: 20,
+      trust: 25,
+      tag: partner,
+      note: Partner of forty years; the only man who can make him laugh at a funeral.
+    }
+  - {
+      id: odile,
+      affinity: 15,
+      trust: 12,
+      tag: friend,
+      note: Brings him the day-old loaves and listens to his gossip.
+    }
+  - {
+      id: rosalind,
+      affinity: 10,
+      trust: 8,
+      tag: fond,
+      note: Keeps his regular chair at the Gull and his cider cold.
+    }
+secrets:
+  - text: He still writes letters to a bridal customer in Hessle Cross and never posts them.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_b02
+archetype: retired_couple
+employment: retired
+years_in_monde: 67

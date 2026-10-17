@@ -1,0 +1,96 @@
+# Generated (census-v1) for mr_e01; curated not yet. Edit here.
+id: pernille_vasquez
+name: Pernille Vasquez
+age: 59
+pronouns: she/her
+kind: resident
+occupation: Retired seamstress and shop hand at Café Liss
+workplace: market_row.home_01
+home: market_row.home_01
+portrait: lib_f51_061
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: pernille_vasquez
+appearance: A long salt-and-pepper ponytail, half-moon glasses, and a teal cardigan with a tape measure
+  hanging round her neck.
+look:
+  kind: human
+  skin: 7
+  hair: { style: ponytail, colour: 11 }
+  eyes: 3
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 0, bottom: 13, bottom_style: skirt, shoes: 2 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
+backstory: Pernille was born above the old dry goods on Market Row and sewed hems for the mill girls until the
+  mill closed. After that she took the sewing bench at Dunmore's back room for years, mending everything the
+  town brought in. Her knees gave out before her eyes did, and she retired early on a small pension. Morwenna
+  married her at nineteen in St Brigid's with the tide out. Pernille keeps the flat above the café neat and
+  mostly quiet, and she has opinions about everyone's hems. She still sees the Tollmen's men on Saturdays and
+  has decided, privately, that they count the till in the wrong order.
+personality:
+  traits: [ practical, dry, watchful, fond ]
+  big5: { open: 35, conscientious: 70, extravert: 40, agreeable: 65, neurotic: 30 }
+values: { prosperity: 0.25, safety: 0.2, spirit: 0.3, charm: 0.25 }
+beliefs:
+  - Anything can be mended if you look at it long enough.
+  - Morwenna would run the town into the ground if I let her.
+  - The Tollmen count the till backwards on purpose.
+voice:
+  register: Short and dry, practical, with a warmth that shows up in what she does rather than in what she says.
+    She rarely explains herself.
+  tics: [ Hm., Give it here., Mind the hem. ]
+  never_says: [ I'm sure it'll be fine, you should really, in my opinion ]
+  samples:
+    - Hm. Give it here, I'll have it sorted by teatime.
+    - Morwenna's got a rota for the rota. Leave her to it.
+    - Tea's on. Sit down before you fall down.
+birthday: 96
+likes: [ the smell of the café kitchen, a good seam, quiet Sunday mornings, lists, a gavel ]
+dislikes: [ loud arguments in the shop, unpicked stitches, being hurried ]
+fears: [ losing the flat over Café Liss, Morwenna's health getting worse ]
+dream:
+  text: A welcome for every newcomer who comes down the slip, with a basket and a hem already mended.
+  stages:
+    - Meet three arrivals at the slip.
+    - Give each a welcome basket.
+    - Add a newcomer's guide to the Lantern.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: market_row.home_01 }
+    - { at: "09:00", do: cook, where: market_row.cafe_liss }
+    - { at: "11:00", do: clean, where: market_row.cafe_liss }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: shop, where: market_row.general_store }
+    - { at: "17:00", do: walk, where: market_row.back_alley }
+    - { at: "21:00", do: read, where: market_row.home_01 }
+    - { at: "22:00", do: sleep, where: market_row.home_01 }
+  weekend:
+    - { at: "08:30", do: eat, where: market_row.home_01 }
+    - { at: "10:00", do: garden, where: commons.duck_pond }
+    - { at: "12:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "16:00", do: walk, where: wharf.breakwater }
+    - { at: "19:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: market_row.home_01 }
+chores: [ Mends the café aprons, Keeps the upstairs kettle full, Sweeps the back step ]
+relationships:
+  - { id: morwenna_vasquez, affinity: 25, trust: 30, tag: spouse, note: Her wife; keeps her in order. }
+  - { id: odile, affinity: 18, trust: 20, tag: friend, note: Trades bread for hemming. }
+  - {
+      id: lavinia_garnier,
+      affinity: 8,
+      trust: 6,
+      tag: curious,
+      note: Lives on Market Street; talks too fast.
+    }
+secrets:
+  - text: She still has the tiny embroidered anchor she made the day she first saw the ferry come in, and keeps it
+      in her sewing box.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: shopkeeper
+generated_by: model
+household: mr_e01
+archetype: retired_organizer
+employment: unable
+years_in_monde: 59

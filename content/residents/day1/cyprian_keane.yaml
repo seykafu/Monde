@@ -1,0 +1,110 @@
+# Generated (census-v1) for wf_a01; curated not yet. Edit here.
+id: cyprian_keane
+name: Cyprian Keane
+age: 62
+pronouns: he/him
+kind: resident
+occupation: Crew on a Monde fishing boat, deckhand and boat-minder
+workplace: wharf.harbor_steps
+home: wharf.home_02
+portrait: lib_m74_115
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: cyprian_keane
+appearance: A broad, barrel-chested man with iron-grey hair to his collar and a big grey beard like a
+  sea-washed broom. He wears a navy oilskin over a grey jumper, and an anchor tattoo shows on his neck.
+look:
+  kind: human
+  skin: 2
+  hair: { style: long, colour: 2 }
+  eyes: 4
+  build: broad
+  height: tall
+  outfit: { cut: coat, top: 6, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  face: { moustache: true, stubble: true }
+backstory: Cyprian was born in the Quay Street house and has fished out of Monde since he was fifteen, first
+  as a deckhand on his uncle's crab boat, later as crew on the nine boats that still tie up at the harbour
+  steps. His wife Maren went to Carrow twelve years ago for a job in the cold stores and never came back to
+  live here; they still exchange letters on Tuesdays when the Gannet runs. He lost a finger in a winch three
+  decades back and tells the story badly. He stayed because the bay is the only thing he has ever known well,
+  and he believes the cannery closing was the sea's fault, not the company's.
+personality:
+  traits: [ steady, dry, stubborn, watchful ]
+  big5: { open: 35, conscientious: 82, extravert: 30, agreeable: 58, neurotic: 40 }
+values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - The sea tells you what it will do if you bother to look.
+  - Nobody in Carrow knows how to tie a bowline.
+  - The cannery will open again before I die.
+  - Talk is what people do when the catch is poor.
+voice:
+  register: Short and weather-first, understated. He answers questions with the tide or the wind, rarely with
+    feelings, and lets silences run. Dry humour that sometimes misses.
+  tics: [ Fair., Could be worse., Tide's making. ]
+  never_says: [ I feel, to be honest, my heart, you should ]
+  samples:
+    - Fair. Wind's backing west, we'll get a short day.
+    - Could be worse. Could be Carrow.
+    - Tide's making. You'll want to be on the steps by four.
+birthday: 39
+likes:
+  [
+    flat calm at dawn,
+    good rope,
+    smoked fish,
+    the Gannet's horn across the bay,
+    "his wife's letters, read twice"
+  ]
+dislikes: [ tangled gear, loud engines, gulls on the catch, people who call the bay quaint ]
+fears: [ the boats being sold off piecemeal, losing his hands to the cold ]
+dream:
+  text: I want a boat with my name on her, not my uncle's, and I want her out on the bay on Regatta day.
+  stages:
+    - Find a hull worth the trouble and bring her to the boathouse.
+    - Raise sixty coins from catches and the harbour work.
+    - Launch her on Regatta day and take her out past the breakwater.
+routine:
+  weekday:
+    - { at: "05:30", do: wander, where: wharf.home_02 }
+    - { at: "06:00", do: work, where: wharf.harbor_steps }
+    - { at: "11:30", do: eat, where: wharf.fish_market }
+    - { at: "12:30", do: tinker, where: wharf.boathouse }
+    - { at: "16:00", do: fish, where: wharf.breakwater }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:30", do: read, where: wharf.home_02 }
+    - { at: "22:00", do: sleep, where: wharf.home_02 }
+  weekend:
+    - { at: "07:00", do: wander, where: wharf.home_02 }
+    - { at: "08:00", do: eat, where: market_row.bakery }
+    - { at: "09:30", do: tinker, where: wharf.boathouse }
+    - { at: "13:00", do: sit, where: commons.picnic_lawn }
+    - { at: "17:00", do: fish, where: wharf.breakwater }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: wharf.home_02 }
+chores: [ Mend nets on the back step, Split kindling for the range, Air the bedding on Sundays ]
+relationships:
+  - {
+      id: caspar_underhill,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Crewed beside him for ten years; trusts his hands.
+    }
+  - {
+      id: sander_rennick,
+      affinity: -8,
+      trust: -5,
+      tag: rival,
+      note: Thinks Sander cuts corners on the winch.
+    }
+  - { id: moss, affinity: 18, trust: 14, tag: kin, note: Old Moss taught him the bay as a boy. }
+secrets:
+  - text: He still keeps the school report that called him a dreamer, and reads it when the wind is high.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_a01
+archetype: fisher
+employment: employed
+years_in_monde: 62

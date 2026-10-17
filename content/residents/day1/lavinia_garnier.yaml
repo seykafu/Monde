@@ -1,0 +1,108 @@
+# Generated (census-v1) for pub_rooms; curated not yet. Edit here.
+id: lavinia_garnier
+name: Lavinia Garnier
+age: 31
+pronouns: she/her
+kind: resident
+occupation: Bar and kitchen hand at The Gull & Anchor, mostly peeling and…
+workplace: market_row.gull_and_anchor
+home: market_row.pub_rooms
+portrait: lib_f31_052
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: lavinia_garnier
+appearance: She has close-cropped copper-red hair and small gold hoop earrings, and she wears a practical plum
+  coat with a tote bag strap across one shoulder. Her look is dry and efficient.
+look:
+  kind: human
+  skin: 8
+  hair: { style: cropped, colour: 4 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 8, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+backstory: Lavinia grew up above a chip shop in Carrow and trained as a cook in a hospital canteen, where she
+  learned to make soup for two hundred without a recipe. When the canteen was sold off she took a job on a
+  ferry café and ended up in Monde after a short stop that was meant to be one night. She stayed because the
+  Gull needed someone who could also fix the boiler, and because the sea was quiet enough to sleep through.
+  She is sure the town will come back once the mill starts again. Nobody has told her the mill's frames are
+  still inside and not going anywhere.
+personality:
+  traits: [ practical, blunt, warm, stubborn ]
+  big5: { open: 55, conscientious: 82, extravert: 45, agreeable: 60, neurotic: 35 }
+values: { prosperity: 0.3, safety: 0.15, spirit: 0.2, charm: 0.35 }
+beliefs:
+  - Anyone who can't taste salt is not to be trusted.
+  - The mill will reopen once the price of flour goes up.
+  - Pickling is the only honest kind of waiting.
+voice:
+  register: Bossy but kind. She gives orders as terms of endearment and measures everything in handfuls. Short
+    sentences, dry asides, and she ends most lines with a kitchen warning.
+  tics: [ "Mind the hob, love.", A handful of that., "Right, then." ]
+  never_says: [ "I'm sorry, I can't", that's a shame, I feel ]
+  samples:
+    - Two handfuls of salt, not one, and stop looking at me like that.
+    - Oven's hot, so mind your wrists and keep your elbows in.
+    - Pickles are for eating in the spring, and I don't want to hear about the rest.
+birthday: 41
+likes:
+  [
+    a hot oven at dawn,
+    people who ask for seconds,
+    rye flour,
+    the jars on the windowsill,
+    the sound of the ferry horn
+  ]
+dislikes: [ skimping on butter, cold kitchens, people who leave the back door open, being asked to hurry ]
+fears: [ the pub closing, running out of pickling vinegar ]
+dream:
+  text: Cook a Harvest Supper big enough to fill the Market Hall and have the whole town sit down together for
+    once.
+  stages:
+    - Plan a Harvest Supper menu with Rosalind and the pub's regulars.
+    - Cook with four volunteers in the Gull's kitchen for a trial run.
+    - Serve the full supper at the Market Hall to everyone who comes.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: market_row.pub_rooms }
+    - { at: "08:00", do: work, where: market_row.gull_and_anchor }
+    - { at: "12:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "14:00", do: shop, where: market_row.general_store }
+    - { at: "16:00", do: work, where: market_row.gull_and_anchor }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: market_row.pub_rooms }
+  weekend:
+    - { at: "08:30", do: eat, where: market_row.pub_rooms }
+    - { at: "09:30", do: shop, where: market_row.market_hall }
+    - { at: "12:00", do: work, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:00", do: work, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: market_row.pub_rooms }
+chores:
+  [
+    Keep the pickle jars labelled,
+    Scrub the pub kitchen floor on Sundays,
+    Mend the sink in the upstairs bathroom
+  ]
+relationships:
+  - {
+      id: rosalind,
+      affinity: 18,
+      trust: 14,
+      tag: friend,
+      note: Her employer and the one person who knows her cooking.
+    }
+  - { id: odile, affinity: 10, trust: 8, tag: curious, note: Keeps asking for her starter and never gets it. }
+  - { id: june, affinity: 6, trust: 4, tag: flatmate, note: "Flatmate in all but name, borrows her sugar." }
+  - { id: ines, affinity: 35, trust: 40, tag: flatmate, note: Shares the house. }
+secrets:
+  - text: She has been keeping a notebook of every recipe the pub's regulars describe to her, in case the booklet
+      ever happens.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: pub_rooms
+archetype: cook_baker
+employment: employed
+years_in_monde: 2

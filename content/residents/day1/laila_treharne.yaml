@@ -1,0 +1,92 @@
+# Generated (census-v1) for wf_m01; curated not yet. Edit here.
+id: laila_treharne
+name: Laila Treharne
+age: 0
+pronouns: she/her
+kind: resident
+occupation: Under five; at home.
+workplace: wharf.home_08
+home: wharf.home_08
+portrait: laila_treharne
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: laila_treharne
+appearance: A baby with long black hair in loose curls and a rust jumper with a brick-red scarf tied under her
+  chin. Her cheeks are round and always rosy from the wind.
+look:
+  kind: human
+  skin: 5
+  hair: { style: long, colour: 3 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 11, bottom: 7, bottom_style: trousers, shoes: 6 }
+  accessory: { kind: scarf, colour: 3 }
+backstory: "Born in the front room at No. 4 Shore Lane on a grey February morning, the midwife coming up from
+  the harbour in the rain. Her mother left when she was small and she knows her only as a voice on the card at
+  Christmas. She is too young to have a past of her own, so the household's past sits on her: her father's
+  careful hands and her sister's long silences. She has already learned to follow Florian's dog down the lane
+  and to refuse the tinned peaches."
+personality:
+  traits: [ curious, loud, sunny, stubborn ]
+  big5: { open: 80, conscientious: 25, extravert: 90, agreeable: 65, neurotic: 30 }
+values: { prosperity: 0.2, safety: 0.3, spirit: 0.35, charm: 0.15 }
+beliefs:
+  - Everything shiny belongs to her.
+  - The duck pond is a lake.
+voice:
+  register: Mostly sounds and single syllables, with a few words that people can guess at. Rises at the end of
+    everything.
+  tics: [ ah!, da, more ]
+  never_says: [ no thank you, later ]
+  samples:
+    - Da! Da, boat!
+    - Duck. Duck. Ah!
+    - Mm. More. More.
+birthday: 79
+likes:
+  [
+    the ducks,
+    bread crusts,
+    being carried,
+    the sound of the ferry horn,
+    tea that stays hot long enough to finish
+  ]
+dislikes: [ the bath, tinned peaches, being left alone ]
+fears: [ the dark stairs ]
+dream:
+  text: A bedroom painted the colour of her scarf, finished before her birthday.
+  stages:
+    - Choose a paint colour at Dunmore's.
+    - Borrow brushes from the workshop.
+    - Finish the wall before the birthday.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: wharf.home_08 }
+    - { at: "10:00", do: sit, where: wharf.home_08 }
+    - { at: "12:00", do: eat, where: wharf.home_08 }
+    - { at: "13:00", do: nap, where: wharf.home_08 }
+    - { at: "19:00", do: sleep, where: wharf.home_08 }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_08 }
+    - { at: "10:30", do: sit, where: wharf.home_08 }
+    - { at: "12:30", do: eat, where: wharf.home_08 }
+    - { at: "13:30", do: nap, where: wharf.home_08 }
+    - { at: "19:00", do: sleep, where: wharf.home_08 }
+chores: [ fetch the nappies, hold the bread for the ducks ]
+relationships:
+  - {
+      id: anatole_treharne,
+      affinity: 60,
+      trust: 40,
+      tag: father,
+      note: "Her father, who carries her everywhere."
+    }
+  - { id: freja_treharne, affinity: 50, trust: 35, tag: sister, note: "Her big sister, who reads to her." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_m01
+archetype: single_parent
+employment: under_five
+years_in_monde: 0

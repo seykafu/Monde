@@ -1,0 +1,104 @@
+# Generated (census-v1) for mb_j02; curated not yet. Edit here.
+id: ivo_yates
+name: Ivo Yates
+age: 26
+pronouns: he/him
+kind: resident
+occupation: Commuter working weekdays in Carrow, home weekends.
+workplace: offmap.city
+home: millbrook.home_28
+portrait: ivo_yates
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: ivo_yates
+appearance: A broad-shouldered young man with close-shaved black hair and a mustard jumper pulled over his
+  shoulders. He wears it even on the crossing, when the wind off the Liss turns sharp.
+look:
+  kind: human
+  skin: 3
+  hair: { style: buzz, colour: 3 }
+  eyes: 7
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 4, bottom: 2, bottom_style: trousers, shoes: 0 }
+  accessory: { kind: none }
+backstory: Ivo came to Monde at eighteen, when his mother took the last vacant flat above the chandler's and
+  told him the sea air would straighten him out. It didn't, but he liked the ferry well enough. He took a
+  clerk's post in Carrow, working on invoices for a freight office, and has done the Tuesday crossing for
+  eight years. Monde is where he sleeps on weekends and where Mina waits. He thinks the town will keep its
+  shops open because people are too stubborn to leave, which is only half true. He also has a small habit of
+  buying a second loaf at Fournier's and quietly leaving it with a neighbour.
+personality:
+  traits: [ steady, dry, loyal, tired ]
+  big5: { open: 45, conscientious: 78, extravert: 40, agreeable: 68, neurotic: 35 }
+values: { prosperity: 0.35, safety: 0.35, spirit: 0.1, charm: 0.2 }
+beliefs:
+  - Monde will hold on if enough of us just keep turning up.
+  - The ferry is the only honest clock in town.
+  - A man should carry his own weight on the boat.
+voice:
+  register: Quiet and measured, with short sentences and the occasional dry aside. He trails off when tired and
+    laughs at himself lightly.
+  tics: [ right then, that's the boat, "mm, go on" ]
+  never_says: [ I suppose, in my opinion, to be honest ]
+  samples:
+    - Right then, the Gannet won't wait, and neither will the baby's bottle.
+    - Carrow's full of people who've never heard of a Tuesday.
+    - Mm, go on, tell Mina I'll bring the good tea back.
+birthday: 68
+likes: [ the Tuesday crossing, fresh bread from Fournier's, the sound of the weir, Mina's laugh, hand-me-downs ]
+dislikes: [ late ferries, damp bedrooms, being called brave for coming home ]
+fears: [ the ferry being cut, losing the house on Mill Lane ]
+dream:
+  text: A front door of our own, freshly painted and numbered, with the street out for the housewarming.
+  stages:
+    - Get the house surveyed by Kasimir or a builder.
+    - Gather three helpers for a paint-and-nail weekend.
+    - Hang the new house number and invite the street.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_28 }
+    - { at: "07:10", do: walk, where: millbrook.terrace_row }
+    - { at: "07:40", do: wander, where: wharf.harbor_steps }
+    - { at: "12:30", do: work, where: offmap.city }
+    - { at: "18:00", do: eat, where: offmap.city }
+    - { at: "21:30", do: sleep, where: millbrook.home_28 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_28 }
+    - { at: "09:30", do: shop, where: market_row.bakery }
+    - { at: "11:00", do: walk, where: millbrook.weir }
+    - { at: "15:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_28 }
+chores: [ mend the back gate latch, fetch water from the standpipe, tend the window boxes ]
+relationships:
+  - {
+      id: mina_lacey,
+      affinity: 70,
+      trust: 75,
+      tag: partner,
+      note: "His partner, his anchor in a town that is slowly thinning."
+    }
+  - {
+      id: rosa_yates,
+      affinity: 65,
+      trust: 40,
+      tag: daughter,
+      note: "His daughter, who already has his stubbornness."
+    }
+  - {
+      id: greta_grieve,
+      affinity: 20,
+      trust: 25,
+      tag: curious,
+      note: Neighbour on Mill Lane who commutes too and never complains.
+    }
+secrets:
+  - text: He has been saving the ferry fare in a biscuit tin to take Mina to the mainland cinema once.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_j02
+archetype: young_family
+employment: employed
+years_in_monde: 8

@@ -1,0 +1,106 @@
+# Generated (census-v1) for mb_b04; curated not yet. Edit here.
+id: viggo_mendes
+name: Viggo Mendes
+age: 61
+pronouns: he/him
+kind: resident
+occupation: Fishing-boat crew, mostly steering and knot work on the harbour boats.
+workplace: wharf.harbor_steps
+home: millbrook.home_09
+portrait: lib_m66_072
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: viggo_mendes
+appearance: A tufty jet-black dye sits round a bald crown, matched by a bushy dyed moustache. He wears a
+  midnight-blue velvet jacket and a cream silk scarf, which he insists keeps the spray off.
+look:
+  kind: human
+  skin: 0
+  hair: { style: tufty, colour: 3 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 6, bottom: 13, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 9 }
+  face: { moustache: true }
+backstory: Viggo was born in the terrace above the harbour and went to sea at fifteen on his uncle's crab
+  boat. He has rarely been further than Carrow and says so with pride. Two winters back a line snapped and
+  took his favourite gaff overboard, and he still blames the rope, not himself. He stayed in Monde because the
+  boats needed hands and because Sabine was here. He likes to think the town would fall apart without him.
+personality:
+  traits: [ vain, loyal, stubborn, theatrical ]
+  big5: { open: 45, conscientious: 62, extravert: 70, agreeable: 58, neurotic: 30 }
+values: { prosperity: 0.35, safety: 0.3, spirit: 0.1, charm: 0.25 }
+beliefs:
+  - The rope was always the problem, never the man.
+  - Monde fishermen know the bay better than any chart.
+  - A good scarf keeps a man warm and keeps the gulls off.
+voice:
+  register: Short and weather-first, with a showman's pause before the punchline. He understates everything he
+    cares about and overstates the trivial.
+  tics: [ Fair., Could be worse., Tide's making. ]
+  never_says: [ I'm sorry, I was wrong, I can't ]
+  samples:
+    - Fair. Could be worse, could be Carrow.
+    - Tide's making. Don't stand there looking at it, Sabine.
+    - I'm not vain, I'm well turned out. There's a difference.
+birthday: 12
+likes: [ flat calm at dawn, good rope, smoked fish, his wife's bad jokes, the harbour at dusk ]
+dislikes: [ tangled gear, loud engines, gulls on the catch, being fussed over ]
+fears: [ the boats going quiet for good, losing another hand at sea ]
+dream:
+  text: I want a boat with my name painted on the transom, something I built myself out of Monde timber.
+  stages:
+    - Find a sound hull and haul it to the boathouse.
+    - Raise sixty coins from catches and honest work.
+    - Launch her on Regatta day with the whole harbour watching.
+routine:
+  weekday:
+    - { at: "05:00", do: eat, where: millbrook.home_09 }
+    - { at: "05:40", do: walk, where: wharf.harbor_steps }
+    - { at: "06:00", do: work, where: wharf.harbor_steps }
+    - { at: "12:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "14:00", do: tinker, where: wharf.harbor_steps }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: eat, where: millbrook.home_09 }
+    - { at: "21:30", do: sleep, where: millbrook.home_09 }
+  weekend:
+    - { at: "07:30", do: eat, where: millbrook.home_09 }
+    - { at: "09:00", do: walk, where: commons.picnic_lawn }
+    - { at: "11:00", do: shop, where: market_row.bakery }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "16:00", do: fish, where: millbrook.weir }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_09 }
+chores: [ Mend the blue jacket's torn lining, Split kindling for the range, Oil the boat's tiller ]
+relationships:
+  - {
+      id: sabine_mendes,
+      affinity: 70,
+      trust: 65,
+      tag: spouse,
+      note: Thirty-eight years married and still arguing about the tide.
+    }
+  - {
+      id: caspar_underhill,
+      affinity: 15,
+      trust: 20,
+      tag: friend,
+      note: Sails with him on the crab boat; too loud on deck.
+    }
+  - {
+      id: sander_rennick,
+      affinity: -10,
+      trust: 5,
+      tag: rival,
+      note: "Claims he steers better, which is nonsense."
+    }
+secrets:
+  - text: He cannot swim well and has never told another crew member.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_b04
+archetype: fisher
+employment: employed
+years_in_monde: 61

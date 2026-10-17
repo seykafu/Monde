@@ -1,0 +1,108 @@
+# Generated (census-v1) for oq_b02; curated not yet. Edit here.
+id: birgit_varga
+name: Birgit Varga
+age: 61
+pronouns: she/her
+kind: resident
+occupation: Retired, formerly a draper's assistant on Market Row
+workplace: old_quarter.home_01
+home: old_quarter.home_01
+portrait: birgit_varga
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: birgit_varga
+appearance: A round-faced woman with white curls pinned loosely back and a sky-blue pinafore over a plain
+  blouse. She wears a thin silver bangle that clinks when she gestures.
+look:
+  kind: human
+  skin: 5
+  hair: { style: curly, colour: 8 }
+  eyes: 2
+  build: medium
+  height: short
+  outfit: { cut: pinafore, top: 5, bottom: 8, bottom_style: trousers, shoes: 2, trim: 5 }
+  accessory: { kind: none }
+backstory: Birgit grew up above the draper's on Market Row and measured out ribbon for half the town before
+  she married Henrik. She knew every family by its children's sizes and still does. When the Liss Cannery shut
+  eleven years ago she took in sewing for the Carrow ferry girls, which paid poorly and kept her hands busy.
+  She stays in Monde because her mother is buried in the St Brigid's yard, and because the Gull & Anchor needs
+  someone to tell the young men to sit down. She believes the Saturday collectors are simply tax men with bad
+  manners, when everyone she knows has quietly stopped asking what the money is for.
+personality:
+  traits: [ warm, nosy, brisk, funny ]
+  big5: { open: 55, conscientious: 70, extravert: 80, agreeable: 75, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.2, charm: 0.4 }
+beliefs:
+  - A town is only as good as its hemlines.
+  - Every child in Monde owes me a thank you for their first school shoes.
+  - Henrik would talk to a wall if it had a good ear.
+voice:
+  register: Quick, teasing, lots of questions and asides. Uses Henrik as a foil and rarely lets a silence last.
+    Warm even when correcting.
+  tics: [ "Don't we, dear?", Well I never., Mind the step. ]
+  never_says: [ I'm busy, that's none of my business, in my opinion ]
+  samples:
+    - Don't we, dear? He's got the look of a man about to fix something he shouldn't.
+    - Oh, sit down, the pair of you. The kettle's only just boiled.
+    - Tuesday, is it? Then the Gannet's in and I'm owed a biscuit from Odile.
+birthday: 95
+likes:
+  [
+    a good hem,
+    the Lantern's gossip column,
+    Saturday dancing when there is music,
+    a morning paper,
+    a kettle on the stove
+  ]
+dislikes: [ stairs, loud men at the pub before noon, being told to rest ]
+fears: [ being forgotten by the children she dressed, a cold winter with no coal ]
+dream:
+  text: Be useful again, by volunteering at the library or school and being thanked by name in the Lantern.
+  stages:
+    - Volunteer three shifts at the library or the school.
+    - Get thanked by name in the Lantern.
+    - Take a regular chair at the Gull & Anchor.
+routine:
+  weekday:
+    - { at: "07:15", do: eat, where: old_quarter.home_01 }
+    - { at: "09:00", do: shop, where: market_row.general_store }
+    - { at: "10:30", do: visit, where: old_quarter.st_brigids }
+    - { at: "12:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:00", do: volunteer, where: old_quarter.library }
+    - { at: "17:00", do: cook, where: old_quarter.home_01 }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: old_quarter.home_01 }
+  weekend:
+    - { at: "08:30", do: eat, where: old_quarter.home_01 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: garden, where: commons.duck_pond }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "16:00", do: visit, where: old_quarter.town_hall }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: old_quarter.home_01 }
+chores: [ mend the Carrow girls' hems, sweep the front step, dust the parlour clock ]
+relationships:
+  - {
+      id: henrik_varga,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: Husband of forty years; she still teases him for his silences.
+    }
+  - {
+      id: margo,
+      affinity: 15,
+      trust: 12,
+      tag: friend,
+      note: Keeps the library desk and lends her spare thread.
+    }
+  - { id: voss, affinity: 8, trust: 6, tag: curious, note: Asks too many questions about her maps. }
+secrets:
+  - text: She has written a short romance under a false name and has been posting it to the Lantern's back page.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: oq_b02
+archetype: retired_couple
+employment: retired
+years_in_monde: 61

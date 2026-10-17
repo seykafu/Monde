@@ -1,0 +1,110 @@
+# Generated (census-v1) for oq_b05; curated not yet. Edit here.
+id: honor_hedley
+name: Honor Hedley
+age: 63
+pronouns: she/her
+kind: resident
+occupation: Retired lighthouse keeper, still keeps a weather log.
+workplace: old_quarter.home_17
+home: old_quarter.home_17
+portrait: honor_hedley
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: honor_hedley
+appearance: A broad-built woman with salt-and-pepper curls under a mustard peaked cap, usually in a brown
+  coat. Her cap is always on, even indoors, as if she might be called out to the lamp.
+look:
+  kind: human
+  skin: 8
+  hair: { style: curly, colour: 11 }
+  eyes: 2
+  build: broad
+  height: short
+  outfit: { cut: coat, top: 1, bottom: 15, bottom_style: trousers, shoes: 6 }
+  accessory: { kind: none }
+  headwear: { kind: peaked_cap, colour: 4 }
+backstory: Honor kept the light at Harrow Point for twenty-two years, winding the clockwork and logging the
+  wind every bell. She came to Monde at thirty-one when the Point was automated, and took the rooms on Well
+  Row because the sound of the water reminded her of the lamp room. The Point's lamp was replaced by a machine
+  that never once had to be wound by hand, and she still resents it a little. Her weather log has been kept
+  without a gap for thirty-two years. She stays because Monde is the last town on this stretch of coast that
+  still needs someone to read the sky.
+personality:
+  traits: [ precise, dry, steady, watchful ]
+  big5: { open: 45, conscientious: 88, extravert: 30, agreeable: 52, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.5, spirit: 0.25, charm: 0.15 }
+beliefs:
+  - The lamp should be lit at dusk, whether anyone is looking or not.
+  - Monde's ferry runs late because nobody bothers to check the tide tables.
+  - Kindness is mostly showing up on time.
+voice:
+  register: Laconic and exact. She reports the weather first and the time in bells, and rarely adds more than
+    she needs to. When she is pleased she says less, not more.
+  tics: [ Wind's backing., By the bell., Mm. ]
+  never_says: [ I feel, honestly, you know what I mean, it's not a big deal ]
+  samples:
+    - Wind's backing. Rain by the second bell, I'd say.
+    - Ferry's late. Tide's wrong, or the Gannet is.
+    - Mm. Take the good cup, then. You've earned it.
+birthday: 26
+likes: [ barometers, steady rain, a kettle on a spirit stove, clear nights with a good horizon ]
+dislikes: [ a stuttering foghorn, guessing, sloppy knots, people who ask the weather without looking at it ]
+fears: [ the lamp going dark without anyone noticing, losing count of the log ]
+dream:
+  text: She wants to see the light turn again on the breakwater and stand in the lamp room for the first night's
+    beam.
+  stages:
+    - Climb the breakwater tower with a lantern and inspect the lamp.
+    - Replace the lens bearing with Kasimir's help.
+    - Stand in the lamp room on the first night the beam turns.
+routine:
+  weekday:
+    - { at: "06:00", do: sit, where: old_quarter.home_17 }
+    - { at: "06:30", do: write, where: old_quarter.home_17 }
+    - { at: "08:00", do: shop, where: market_row.general_store }
+    - { at: "10:00", do: walk, where: wharf.breakwater }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: tinker, where: old_quarter.lamplighter_lane }
+    - { at: "18:00", do: eat, where: old_quarter.home_17 }
+    - { at: "21:00", do: write, where: old_quarter.home_17 }
+    - { at: "22:30", do: sleep, where: old_quarter.home_17 }
+  weekend:
+    - { at: "07:00", do: sit, where: old_quarter.home_17 }
+    - { at: "09:00", do: walk, where: commons.duck_pond }
+    - { at: "12:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "14:00", do: visit, where: old_quarter.fountain_square }
+    - { at: "17:00", do: volunteer, where: old_quarter.lantern_office }
+    - { at: "20:00", do: eat, where: old_quarter.home_17 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_17 }
+chores: [ Wind the stove and fill the kettle, Post the weather log to the Lantern, Mend the cap's brim with thread ]
+relationships:
+  - {
+      id: esme_hedley,
+      affinity: 25,
+      trust: 30,
+      tag: spouse,
+      note: Her partner of decades; they argue about tides and never about each other.
+    }
+  - {
+      id: hadley_ashdown,
+      affinity: 8,
+      trust: 10,
+      tag: friend,
+      note: Her weaver neighbour on Well Row; swaps tea for wool.
+    }
+  - {
+      id: augusta,
+      affinity: -5,
+      trust: 12,
+      tag: wary,
+      note: Reyes once told her off for a lamp left burning on the wharf.
+    }
+secrets:
+  - text: She has kept a second, private log of the stars, which she has never shown anyone.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: oq_b05
+archetype: retired_keeper
+employment: retired
+years_in_monde: 32

@@ -1,0 +1,81 @@
+# Generated (census-v1) for sh_l01; curated not yet. Edit here.
+id: ilse_corbett
+name: Ilse Corbett
+age: 42
+pronouns: she/her
+kind: resident
+occupation: full-time carer at home
+workplace: station_hill.home_03
+home: station_hill.home_03
+portrait: ilse_corbett
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: ilse_corbett
+appearance: A woman with auburn hair in a bun and a charcoal shirt.
+look:
+  kind: human
+  skin: 2
+  hair: { style: bun, colour: 9 }
+  eyes: 4
+  build: medium
+  height: tall
+  outfit: { cut: plain, top: 13, bottom: 14, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+backstory: "Ilse was born in Monde and looks after the household full-time. What she wants most is plain
+  enough: a school worth the walk."
+personality:
+  traits: [ proud, warm, dreamy ]
+  big5: { open: 93, conscientious: 66, extravert: 76, agreeable: 83, neurotic: 76 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
+    schedule.
+  tics: [ "Shoes, satchels, sandwiches." ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Shoes, satchels, sandwiches. Three things. We're out by eight.
+    - Who runs the Thursday class? Name and time, please.
+    - They'll settle. I asked them, and they said they'd settle.
+birthday: 43
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: station_hill.home_03 }
+    - { at: "09:30", do: walk, where: commons.picnic_lawn }
+    - { at: "12:00", do: eat, where: station_hill.home_03 }
+    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: eat, where: station_hill.home_03 }
+    - { at: "19:30", do: read, where: station_hill.home_03 }
+    - { at: "21:30", do: sleep, where: station_hill.home_03 }
+  weekend:
+    - { at: "08:00", do: eat, where: station_hill.home_03 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: station_hill.home_03 }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: station_hill.home_03 }
+chores: [ fill the coal scuttle, fold the washing ]
+relationships:
+  - { id: ottilie_verhoeven, affinity: 70, trust: 70, tag: partner, note: Same house. }
+  - { id: remy_corbett, affinity: 70, trust: 70, tag: child, note: Same house. }
+  - { id: iain_corbett, affinity: 70, trust: 70, tag: son, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: sh_l01
+archetype: school_family
+employment: carer
+years_in_monde: 42

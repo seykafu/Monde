@@ -1,0 +1,76 @@
+# Generated (census-v1) for wf_l01; curated not yet. Edit here.
+id: leonie_brodsky
+name: Leonie Brodsky
+age: 8
+pronouns: she/her
+kind: resident
+occupation: pupil at Millbrook School
+workplace: wharf.home_03
+home: wharf.home_03
+portrait: lib_f05_042
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: leonie_brodsky
+appearance: A small girl with copper pigtails tied with sky-blue ribbons and a leaf-green knitted jumper. A
+  gap-toothed, curious look.
+look:
+  kind: human
+  skin: 7
+  hair: { style: pigtails, colour: 4 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 7, bottom: 5, bottom_style: trousers, shoes: 4 }
+  accessory: { kind: none }
+backstory: Leonie was born in Monde and goes to Millbrook School. She likes the ducks on the Commons best.
+personality:
+  traits: [ patient, curious, careful ]
+  big5: { open: 59, conscientious: 33, extravert: 42, agreeable: 80, neurotic: 20 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: "A young voice: questions, then more questions."
+  tics: [ Can we go to the ducks? ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Can we go to the ducks? Just for a minute.
+    - I'm not tired. I'm resting my eyes.
+    - Mr. Amari says my letters lean. They're fine.
+birthday: 32
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the dark on the stairs ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: wharf.home_03 }
+    - { at: "08:30", do: attend, where: millbrook.school }
+    - { at: "15:30", do: wander, where: commons.picnic_lawn }
+    - { at: "17:30", do: eat, where: wharf.home_03 }
+    - { at: "20:00", do: sleep, where: wharf.home_03 }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_03 }
+    - { at: "10:00", do: wander, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: wharf.home_03 }
+    - { at: "14:00", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: wharf.home_03 }
+    - { at: "20:30", do: sleep, where: wharf.home_03 }
+chores: [ beat the doormat, fill the coal scuttle ]
+relationships:
+  - { id: liv_brodsky, affinity: 70, trust: 70, tag: mother, note: Same house. }
+  - { id: thora_brodsky, affinity: 70, trust: 70, tag: mother, note: Same house. }
+  - { id: kester_brodsky, affinity: 70, trust: 70, tag: brother, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: wf_l01
+archetype: school_family
+employment: pupil
+years_in_monde: 8

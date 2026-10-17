@@ -1,0 +1,106 @@
+# Generated (census-v1) for mr_j01; curated not yet. Edit here.
+id: tristan_sandoval
+name: Tristan Sandoval
+age: 33
+pronouns: he/him
+kind: resident
+occupation: Full-time carer at home, looking after Hector and keeping the flat in…
+workplace: market_row.home_12
+home: market_row.home_12
+portrait: lib_m26_049
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: tristan_sandoval
+appearance: A pale young man with jet-black hair swept back and an easy, ironic smile, wearing a camel wool
+  coat a size too big and a teal knitted scarf.
+look:
+  kind: human
+  skin: 4
+  hair: { style: swept, colour: 3 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 15, bottom: 2, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 0 }
+backstory: Tristan came to Monde at six, when his mother took a job at the Liss Cannery before it closed. He
+  grew up on the Wharf and went to the school when it still had a full room. He left for Carrow at nineteen,
+  worked in an office and hated it, and came home to nurse his mother through her last year. Now he runs the
+  flat and minds Hector while Seamus is at the shop. He tells people the town is quieter than it was, and that
+  quiet suits him, though he misses the cannery's noise. He believes the clinic will reopen once someone asks
+  the right person.
+personality:
+  traits: [ wry, patient, observant, tender ]
+  big5: { open: 70, conscientious: 57, extravert: 40, agreeable: 65, neurotic: 45 }
+values: { prosperity: 0.25, safety: 0.35, spirit: 0.17, charm: 0.23 }
+beliefs:
+  - The clinic will reopen if someone writes the right letter.
+  - Children learn best from being left alone with string.
+  - Nobody in Carrow ever answers a letter from Monde.
+voice:
+  register: Dry and amused, talks in complete sentences and drifts off mid-thought. Warm when Hector is in earshot.
+  tics: [ "Well, obviously.", "Hush, you.", "Mm, go on." ]
+  never_says: [ honestly, to be fair, you have to understand ]
+  samples:
+    - Well, obviously he wants the red boots. He's four.
+    - Hush, you. I'm thinking about sandwiches.
+    - Mm, go on, tell me the one about the heron again.
+birthday: 94
+likes:
+  [
+    string and knots,
+    the sound of the wireless at dusk,
+    Hector asking why the clock stopped,
+    hand-me-downs,
+    a gate that latches
+  ]
+dislikes: [ being called a lucky man, Carrow letters with no reply, the smell of the Wharf's bins ]
+fears: [ losing his mother's handwriting from the house, Hector growing up and leaving ]
+dream:
+  text: A Tuesday toddler hour that isn't just the two of us.
+  stages:
+    - Ask Margo if the library's reading corner can host a Tuesday morning.
+    - Find two other households with a small child or grandchild.
+    - Run the first hour with biscuits and one working kettle.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: market_row.home_12 }
+    - { at: "08:00", do: walk, where: wharf.breakwater }
+    - { at: "09:30", do: visit, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.home_12 }
+    - { at: "14:00", do: sit, where: commons.duck_pond }
+    - { at: "17:30", do: cook, where: market_row.home_12 }
+    - { at: "21:00", do: read, where: market_row.home_12 }
+    - { at: "22:00", do: sleep, where: market_row.home_12 }
+  weekend:
+    - { at: "08:30", do: eat, where: market_row.home_12 }
+    - { at: "10:00", do: shop, where: market_row.bakery }
+    - { at: "12:00", do: socialize, where: old_quarter.fountain_square }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:00", do: cook, where: market_row.home_12 }
+    - { at: "22:00", do: sleep, where: market_row.home_12 }
+chores: [ Mend Hector's dungarees, Bake the Sunday loaf, Wind the wireless batteries ]
+relationships:
+  - {
+      id: winifred_gallo,
+      affinity: 14,
+      trust: 12,
+      tag: fond,
+      note: Trades bread for mending across the landing.
+    }
+  - { id: seamus_sandoval, affinity: 30, trust: 25, tag: spouse, note: The one he trusts most in the world. }
+  - {
+      id: lucien_sandoval,
+      affinity: 28,
+      trust: 20,
+      tag: son,
+      note: "His son, and the reason he gets up early."
+    }
+secrets:
+  - text: He has written three letters to the Carrow medical board about the clinic and never posted any of them.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_j01
+archetype: young_family
+employment: carer
+years_in_monde: 27

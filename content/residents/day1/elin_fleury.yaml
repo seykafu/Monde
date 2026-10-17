@@ -1,0 +1,119 @@
+# Generated (census-v1) for wf_a02; curated not yet. Edit here.
+id: elin_fleury
+name: Elin Fleury
+age: 88
+pronouns: she/her
+kind: resident
+occupation: Retired seamstress, mends for neighbours when asked.
+workplace: wharf.home_12
+home: wharf.home_12
+portrait: elin_fleury
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: elin_fleury
+appearance: A small, upright woman with short grey hair and pale skin, wearing a tan shirt with the sleeves
+  rolled to the elbow. Her reading glasses hang from a cord around her neck.
+look:
+  kind: human
+  skin: 6
+  hair: { style: short, colour: 2 }
+  eyes: 6
+  build: medium
+  height: tall
+  outfit: { cut: plain, top: 15, bottom: 14, bottom_style: trousers, shoes: 3 }
+  accessory: { kind: none }
+backstory: Elin sewed hems and christenings for forty years in Hessle Cross, first in a shop with her sister
+  and later from her own front room. When her husband Anders died she found the city too loud to think in, and
+  at seventy she took the ferry to Monde with two suitcases and a sewing box. Shingle Row had a ground-floor
+  room going cheap. She still has the trunk she brought up from the boat, and she has never opened the bottom
+  of it. She says she came for the quiet, which is partly true. The rest was a letter from her sister that she
+  has not answered in eighteen years.
+personality:
+  traits: [ patient, dry, stubborn, warm ]
+  big5: { open: 62, conscientious: 78, extravert: 35, agreeable: 70, neurotic: 40 }
+values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Everyone in Monde knows what the bread costs, and nobody says it aloud.
+  - A proper hem tells you more about a person than their letters do.
+  - The Tollmen will be gone by the autumn fair, one way or another.
+  - Fresh milk was cheaper when I first came here.
+voice:
+  register: Gentle and rambling on purpose, she circles back to earlier points. She quotes old prices and dates
+    without meaning to. Short, warm sentences, with an occasional sharp aside.
+  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  never_says: [ grandma, you young ones, I suppose it's fine ]
+  samples:
+    - Now where was I? Ah, yes, the hem. You'd be amazed what a hem will tell you.
+    - Mind the step on the way out, it's loose since the storm. I keep meaning to see to it.
+    - No, no, I don't need company. Though you could sit a minute, if you've got one to spare.
+birthday: 65
+likes:
+  [
+    knitting by the window,
+    small birds at the sill,
+    being asked for a story,
+    the smell of the harbour in spring,
+    a well-cut collar
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    loud radios on the ferry
+  ]
+fears:
+  [
+    the trunk being opened without her,
+    the Row emptying out around her,
+    her sister's letter ending up in the wrong hands
+  ]
+dream:
+  text: Someone to eat supper with, on a standing night, the way Anders and I always did.
+  stages:
+    - Accept an invitation to supper from a neighbour on Shingle Row.
+    - Return the invitation with a meal of your own at your table.
+    - Set a standing Thursday table and keep it for a month.
+routine:
+  weekday:
+    - { at: "07:30", do: sit, where: wharf.home_12 }
+    - { at: "08:15", do: walk, where: wharf.harbor_steps }
+    - { at: "09:00", do: shop, where: wharf.fish_market }
+    - { at: "10:30", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: wander, where: commons.duck_pond }
+    - { at: "16:30", do: write, where: wharf.home_12 }
+    - { at: "18:00", do: cook, where: wharf.home_12 }
+    - { at: "21:30", do: sleep, where: wharf.home_12 }
+  weekend:
+    - { at: "08:00", do: sit, where: wharf.home_12 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: attend, where: old_quarter.st_brigids }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: wharf.home_12 }
+chores: [ Mends neighbours' buttons and hems, Trims the step and sweeps the Row, Takes in washing on Mondays ]
+relationships:
+  - { id: annick_olsen, affinity: 22, trust: 15, tag: fond, note: Brings her eggs and gossip most mornings. }
+  - {
+      id: dorian_vale,
+      affinity: 12,
+      trust: 10,
+      tag: curious,
+      note: Former draper; they trade opinions on cloth.
+    }
+  - { id: meera_lindgren, affinity: 8, trust: 4, tag: curious, note: Sends her post-lessons to read aloud. }
+secrets:
+  - text: She has a sister in Hessle Cross she has not written to in eighteen years, and her letter lies unopened
+      in the trunk.
+    reveal: { regard_min: 60 }
+  - text: She still sews a small blue stitch into every hem she makes, Anders's mother's pattern, and nobody has
+      ever noticed.
+    reveal: { regard_min: 45 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_a02
+archetype: widowed_elder
+employment: retired
+years_in_monde: 18

@@ -1,0 +1,111 @@
+# Generated (census-v1) for ramaswamy; curated not yet. Edit here.
+id: raman
+name: Raman Ramaswamy
+age: 66
+pronouns: he/him
+kind: resident
+occupation: Retired; formerly a clerk at the Lissworth Mill counting house.
+workplace: millbrook.priya_house
+home: millbrook.priya_house
+portrait: lib_m64_033
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: raman
+appearance: A lean man with short grey hair that was once ginger, and bushy ginger eyebrows that never got the
+  message. He wears a worn brown work jacket over a grey cardigan.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 2 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 1, bottom: 14, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+backstory: Raman was born in the terrace above the mill and spent most of his working life inside its counting
+  house, adding up wages for six hundred people until the gates shut fourteen years ago. He married Lakshmi, a
+  teacher from Carrow, and they raised Priya in a flat near the station. After Lakshmi died he sold the flat
+  and moved back to Weir Road, where his mother had lived, because the house still had her kitchen table. He
+  tells people he came for the quiet. Mostly he came because Monde was where he had been happiest. Priya moved
+  home two years later to look after him, and he has never forgiven himself for needing it.
+personality:
+  traits: [ wry, patient, stubborn, tender ]
+  big5: { open: 55, conscientious: 70, extravert: 30, agreeable: 60, neurotic: 45 }
+values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - The weir path is perfectly safe for a man who knows where the loose stones are.
+  - Priya worries more than the situation calls for.
+  - The mill would have reopened if the men had been asked properly.
+  - A good radio play is worth more than any newspaper.
+voice:
+  register: Slow and dry, with long pauses before the punchline. He names the weather after radio programmes and
+    says less than he means. Short sentences when he is tired, longer ones when he is pleased with himself.
+  tics: [ a Tuesday-play sort of day, "well, there it is", I'll manage ]
+  never_says: [ "I'm fine, love", I need help, my wife would have ]
+  samples:
+    - Cold again. A Tuesday-play sort of day, that.
+    - Priya's gone to see the Hale boy's chest. I'm to sit still and be grateful.
+    - No, I didn't go past the weir. Who's been telling you that?
+birthday: 28
+likes:
+  [
+    the radio serials after supper,
+    mending the back gate,
+    the herons at the fountain,
+    tea stewed a little too long,
+    knitting
+  ]
+dislikes:
+  [
+    being fussed over,
+    the cold in the scullery,
+    bindweed on the Commons,
+    people who talk loudly on the doorstep
+  ]
+fears: [ falling on the weir path where no one would find him, becoming the reason Priya gives up her life ]
+dream:
+  text: He wants someone to eat supper with on a Thursday, without it being charity.
+  stages:
+    - Accept a neighbour's invitation to supper without making a joke of it.
+    - Return the invitation and cook the fish properly this time.
+    - Set a standing Thursday table and leave the second chair out on purpose.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.priya_house }
+    - { at: "08:30", do: walk, where: millbrook.weir }
+    - { at: "10:00", do: read, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:30", do: sit, where: millbrook.priya_house }
+    - { at: "22:00", do: sleep, where: millbrook.priya_house }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.priya_house }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: sit, where: commons.picnic_lawn }
+    - { at: "13:00", do: eat, where: millbrook.priya_house }
+    - { at: "16:00", do: walk, where: commons.duck_pond }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.priya_house }
+chores: [ mends the back gate, winds the kitchen clock, takes in the washing before rain ]
+relationships:
+  - { id: kasimir, affinity: 12, trust: 10, tag: friend, note: Lends him tools and never asks what for. }
+  - {
+      id: priya,
+      affinity: 20,
+      trust: 18,
+      tag: daughter,
+      note: "His daughter, whom he loves and tries not to need."
+    }
+  - { id: felix, affinity: -4, trust: 5, tag: wary, note: Thinks the school should have closed years ago. }
+secrets:
+  - text: He has walked the weir path alone since June and hides the bruises on his shins from Priya.
+    reveal: { regard_min: 60 }
+  - text: He still keeps his wife's reading glasses in his jacket pocket and has never said so.
+    reveal: { regard_min: 70 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: ramaswamy
+archetype: widowed_elder
+employment: retired
+years_in_monde: 66

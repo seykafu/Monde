@@ -1,0 +1,115 @@
+# Generated (census-v1) for oq_a03; curated not yet. Edit here.
+id: maurice_lamont
+name: Maurice Lamont
+age: 80
+pronouns: he/him
+kind: resident
+occupation: Retired lighthouse keeper, still keeps weather notes.
+workplace: old_quarter.home_19
+home: old_quarter.home_19
+portrait: maurice_lamont
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: maurice_lamont
+appearance: A slight, older man with short white hair, half-moon glasses and a mustard coat, usually with his
+  teal peaked cap tucked under one arm.
+look:
+  kind: human
+  skin: 7
+  hair: { style: short, colour: 8 }
+  eyes: 5
+  build: narrow
+  height: short
+  outfit: { cut: coat, top: 4, bottom: 4, bottom_style: trousers, shoes: 11 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
+  headwear: { kind: peaked_cap, colour: 0 }
+backstory: "Maurice kept the light at a rock station off the northern coast for twenty-six years, alone for
+  most of the winters, with a radio that only worked when the wind allowed. He came to Monde at sixty-three
+  because the Monde light was the one he could see from the ferry the first time he crossed, and he wanted to
+  be near a lamp that still turned. He has been wrong about the Monde light for years: he insists the lens
+  bearing is fine and blames the lack of oil, when in truth nobody has tried the mechanism since the keeper's
+  post was sold off."
+personality:
+  traits: [ precise, patient, stubborn, dry ]
+  big5: { open: 40, conscientious: 88, extravert: 22, agreeable: 45, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.5, spirit: 0.25, charm: 0.15 }
+beliefs:
+  - Weather tells the truth and people don't.
+  - The Monde light only needs oil and patience.
+  - Anyone who guesses at the wind is a fool.
+  - The Tollmen should be asked to answer for their collections.
+voice:
+  register: Laconic and precise. Gives the weather first and the time in bells. Short declaratives, rarely more
+    than two clauses, and he will correct a wrong word without apology.
+  tics: [ Wind's backing., "Bells, then.", That'll do. ]
+  never_says: [ I feel, honestly, you know, to be frank ]
+  samples:
+    - Wind's backing. Glass is falling. Bring your coat.
+    - Four bells. Kettle's on if you want it.
+    - The lamp's sound. Nobody's looked at the bearing, that's all.
+birthday: 61
+likes: [ barometers, steady rain, a kettle on a spirit stove, his chair by the fire ]
+dislikes: [ a stuttering foghorn, guessing, sloppy knots, people who call the light quaint ]
+fears: [ the lamp going dark for good, dying in his chair with the log unfinished ]
+dream:
+  text: Climb the lighthouse with a lantern and see the Monde beam turn again.
+  stages:
+    - Climb the lighthouse stairs with a lantern and inspect the lamp.
+    - Replace the lens bearing with help from a Wolanski carpenter's hand.
+    - Stand in the lamp room for the first night's beam.
+routine:
+  weekday:
+    - { at: "06:00", do: wander, where: old_quarter.home_19 }
+    - { at: "06:30", do: tinker, where: old_quarter.home_19 }
+    - { at: "07:30", do: eat, where: market_row.bakery }
+    - { at: "08:30", do: walk, where: wharf.breakwater }
+    - { at: "11:00", do: read, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "18:00", do: eat, where: old_quarter.home_19 }
+    - { at: "21:30", do: sleep, where: old_quarter.home_19 }
+  weekend:
+    - { at: "07:00", do: wander, where: old_quarter.home_19 }
+    - { at: "08:00", do: eat, where: market_row.bakery }
+    - { at: "10:00", do: walk, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: fish, where: wharf.harbor_steps }
+    - { at: "17:30", do: sit, where: commons.duck_pond }
+    - { at: "19:00", do: eat, where: old_quarter.home_19 }
+    - { at: "21:30", do: sleep, where: old_quarter.home_19 }
+chores:
+  [
+    Winds the kitchen clock by the radio time signal,
+    Wipes the glass of the barometer by the door,
+    Carries the washing up to the line on Well Row
+  ]
+relationships:
+  - {
+      id: honor_hedley,
+      affinity: 18,
+      trust: 12,
+      tag: friend,
+      note: Keeps a weather log too; they argue about pressure readings.
+    }
+  - {
+      id: ulla_ferreira,
+      affinity: 6,
+      trust: 8,
+      tag: fond,
+      note: Brings him mended socks and leaves them on the step.
+    }
+  - { id: margo, affinity: 10, trust: 14, tag: curious, note: Asks her for old Admiralty tide tables. }
+secrets:
+  - text: He has kept a private log of the Monde light's lamp hours since he arrived, and it shows the light was
+      last properly trimmed nine…
+    reveal: { regard_min: 55 }
+  - text: He still lights a candle for his late wife on the anniversary of her death, and never tells anyone why
+      he is sitting up late.
+    reveal: { regard_min: 70 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: oq_a03
+archetype: retired_keeper
+employment: retired
+years_in_monde: 17

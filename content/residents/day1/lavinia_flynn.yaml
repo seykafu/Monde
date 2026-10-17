@@ -1,0 +1,106 @@
+# Generated (census-v1) for oq_b04; curated not yet. Edit here.
+id: lavinia_flynn
+name: Lavinia Flynn
+age: 64
+pronouns: she/her
+kind: resident
+occupation: Retired clerk, once kept the ferry manifests by hand.
+workplace: old_quarter.home_06
+home: old_quarter.home_06
+portrait: lib_f76_015
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: lavinia_flynn
+appearance: Short grey curls under a belted teal raincoat with the collar turned up. Heavy dark-framed glasses
+  sit low on her nose, and she peers over them at everything.
+look:
+  kind: human
+  skin: 8
+  hair: { style: curly, colour: 2 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: coat, top: 0, bottom: 6, bottom_style: skirt, shoes: 13 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: Lavinia worked thirty-one years as a clerk at the Carrow ferry office, writing down names and cargo
+  in a ledger that never once balanced on the first try. She came home to Monde when the mill closed and her
+  sister's roof started leaking. She still thinks the ferry timetable is printed wrong. Her one real regret is
+  that she never learned to drive the Gannet's little dinghy, which she has told everyone she was too busy
+  for. She stays because the sea is quiet here and she has finally stopped counting things.
+personality:
+  traits: [ dry, exacting, loyal, observant ]
+  big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 58, neurotic: 35 }
+values: { prosperity: 0.15, safety: 0.4, spirit: 0.15, charm: 0.3 }
+beliefs:
+  - The Lantern gets the tide tables wrong every spring.
+  - A ledger that doesn't balance means someone is lying.
+  - Monde would be fine if people just answered their post.
+voice:
+  register: Precise and a little prim, with short corrections. She says a thing once, clearly, and expects it to
+    be heard.
+  tics: [ "Well, technically", that's not quite right, "hm, yes" ]
+  never_says: [ darling, I feel, whatever you like ]
+  samples:
+    - Well, technically the tide turns at twenty past, not half past. Hm, yes.
+    - Don't we, Winifred? You always did leave the kettle on.
+    - No, I won't come to the pub. I'll sit by the window and watch the gulls fight.
+birthday: 56
+likes: [ a morning paper, a kettle on the stove, strict timetables, the ferry horn at dusk ]
+dislikes: [ stairs, drafts, being managed, rounded numbers ]
+fears: [ running out of tea, her sister getting ill again ]
+dream:
+  text: A bench on the Commons where she can read the paper and count the gulls without anyone interrupting.
+  stages:
+    - Choose a quiet spot on the Commons near the duck pond.
+    - Raise fifteen coins or ask Kasimir Wolanski to build it.
+    - Sit on it with the first neighbour who stops to talk.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.home_06 }
+    - { at: "08:30", do: read, where: market_row.market_street }
+    - { at: "10:00", do: volunteer, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: commons.duck_pond }
+    - { at: "18:30", do: cook, where: old_quarter.home_06 }
+    - { at: "21:30", do: sleep, where: old_quarter.home_06 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_06 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: walk, where: wharf.harbor_steps }
+    - { at: "20:00", do: eat, where: old_quarter.home_06 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_06 }
+chores: [ balance the house accounts, fetch the post, wind the wall clock ]
+relationships:
+  - {
+      id: winifred_flynn,
+      affinity: 20,
+      trust: 25,
+      tag: spouse,
+      note: "Her sister. Argues with her every morning, out of love."
+    }
+  - {
+      id: ulla_ferreira,
+      affinity: 10,
+      trust: 12,
+      tag: friend,
+      note: Trades patterns and gossip over the garden wall.
+    }
+  - {
+      id: margo,
+      affinity: 12,
+      trust: 15,
+      tag: fond,
+      note: Once corrected her catalogue; now they are fast friends.
+    }
+secrets:
+  - text: She keeps a private list of every ferry passenger she ever waved off, and still counts them on bad
+      nights.
+    reveal: { regard_min: 65 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: oq_b04
+archetype: retired_couple
+employment: retired
+years_in_monde: 64

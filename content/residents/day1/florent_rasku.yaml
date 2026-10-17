@@ -1,0 +1,81 @@
+# Generated (census-v1) for oq_d01; curated not yet. Edit here.
+id: florent_rasku
+name: Florent Rasku
+age: 36
+pronouns: he/him
+kind: resident
+occupation: stallholder
+workplace: market_row.market_street
+home: old_quarter.home_16
+portrait: lib_m38_064
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: florent_rasku
+appearance: A man with a sandy-blond beard, a mustard knit cap and a thick grey fisherman's jumper. A
+  short-spoken, weather-first face.
+look:
+  kind: human
+  skin: 6
+  hair: { style: short, colour: 5 }
+  eyes: 1
+  build: broad
+  height: tall
+  outfit: { cut: jumper, top: 14, bottom: 6, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: none }
+  headwear: { kind: knit_cap, colour: 4 }
+  face: { moustache: true, stubble: true }
+backstory: "Florent came to Monde from Hessle Cross 13 years ago and works as stallholder. What he wants most
+  is plain enough: a plot that feeds the street."
+personality:
+  traits: [ particular, careful, cheerful ]
+  big5: { open: 44, conscientious: 38, extravert: 33, agreeable: 67, neurotic: 16 }
+values: { prosperity: 0.2, safety: 0.15, spirit: 0.4, charm: 0.25 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Kind and earthy. Few metaphors, all small. "Give it time."
+  tics: [ Give it time. ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Give it time. Everything's slow in April.
+    - Slugs had the lettuces. Every one. They're clever things.
+    - Rain last night. Good. Good.
+birthday: 84
+likes: [ rain at night, good compost, children who pull carrots ]
+dislikes: [ slugs, bindweed, people who step on beds ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A plot that feeds the street
+  stages:
+    - Clear a bed in the Community Garden
+    - Plant a first row with seed from Teo
+    - Bring the first harvest to market
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.home_16 }
+    - { at: "08:30", do: work, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: market_row.market_street }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: old_quarter.home_16 }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: old_quarter.home_16 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_16 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: old_quarter.home_16 }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: old_quarter.home_16 }
+chores: [ water the window box, fold the washing ]
+relationships:
+  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: oq_d01
+archetype: market_gardener
+employment: employed
+years_in_monde: 13

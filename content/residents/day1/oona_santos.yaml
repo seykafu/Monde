@@ -1,0 +1,103 @@
+# Generated (census-v1) for mr_c01; curated not yet. Edit here.
+id: oona_santos
+name: Oona Santos
+age: 60
+pronouns: she/her
+kind: resident
+occupation: Model-boat builder working from home; sells to collectors on the mainland.
+workplace: market_row.home_09
+home: market_row.home_09
+portrait: oona_santos
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: oona_santos
+appearance: An older woman with salt-and-pepper curls, heavy glasses and a rust-coloured smock stained with
+  varnish. She usually has a pencil behind one ear.
+look:
+  kind: human
+  skin: 3
+  hair: { style: curly, colour: 11 }
+  eyes: 4
+  build: medium
+  height: short
+  outfit: { cut: smock, top: 11, bottom: 4, bottom_style: trousers, shoes: 6 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: Oona trained as a draughtswoman in a shipyard town and came to Monde at twenty-nine after a bad
+  winter and a worse marriage. She rented the flat above Market Row for its north light and has built model
+  ferries, schooners and the Gannet in miniature for thirty-one years. Her boats sell well by post, but she
+  believes the town's children would love them more than collectors do, and she is wrong that she can afford
+  to give them away. Kofi came with her, and she still counts herself lucky he stayed.
+personality:
+  traits: [ exact, wry, private, generous ]
+  big5: { open: 70, conscientious: 88, extravert: 25, agreeable: 60, neurotic: 40 }
+values: { prosperity: 0.3, safety: 0.15, spirit: 0.3, charm: 0.25 }
+beliefs:
+  - A good hull is honest about its weight.
+  - The children here would love the boats more than collectors do.
+  - Nobody in town wants to be asked how they are.
+voice:
+  register: Precise and dry. She names materials and tools, describes weather by what it does to glue and paper,
+    and says less when pleased.
+  tics: [ Mm., That'll hold. ]
+  never_says: [ oh my, as you like ]
+  samples:
+    - Damp got into the sails again. Forty minutes lost.
+    - Mm. The keel's true. Hand me the small clamp.
+    - No, I won't sell the Gannet. The ferry's still in use, bless it.
+birthday: 15
+likes:
+  [
+    north light,
+    the smell of linseed,
+    parcels arriving unbroken,
+    people who ask how it's made,
+    Kofi's bread
+  ]
+dislikes: [ could you do it cheaper, damp materials, the ferry missing a day ]
+fears: [ her hands losing their steadiness, the flat being sold ]
+dream:
+  text: Get a shelf of her boats in the Market Hall beside the best of the town's craft.
+  stages:
+    - Show her samples to the mayor.
+    - Fill a table at one Saturday market.
+    - Win a standing order from a Market Row shop.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: market_row.home_09 }
+    - { at: "08:30", do: tinker, where: market_row.home_09 }
+    - { at: "11:30", do: shop, where: market_row.general_store }
+    - { at: "13:00", do: eat, where: market_row.home_09 }
+    - { at: "14:00", do: tinker, where: market_row.home_09 }
+    - { at: "17:00", do: walk, where: wharf.breakwater }
+    - { at: "19:00", do: read, where: market_row.home_09 }
+    - { at: "22:00", do: sleep, where: market_row.home_09 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_09 }
+    - { at: "09:00", do: shop, where: market_row.market_hall }
+    - { at: "11:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:00", do: read, where: market_row.home_09 }
+    - { at: "21:30", do: sleep, where: market_row.home_09 }
+chores: [ Keeps the workbench clear, Washes the brushes each night, Walks the paper parcels to the post ]
+relationships:
+  - {
+      id: kofi_santos,
+      affinity: 25,
+      trust: 25,
+      tag: spouse,
+      note: Her husband; he keeps her fed and her glasses clean.
+    }
+  - { id: winifred_gallo, affinity: 10, trust: 8, tag: friend, note: Buys rye and argues about salt. }
+  - { id: odile, affinity: 6, trust: 5, tag: wary, note: Thinks the bakery is too proud of its sign. }
+secrets:
+  - text: She still has the first wooden boat she ever carved, which sank in the harbour, and she has never
+      admitted it was hers.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_c01
+archetype: remote_craftsperson
+employment: employed
+years_in_monde: 31

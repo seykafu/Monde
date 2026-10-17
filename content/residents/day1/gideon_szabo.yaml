@@ -1,0 +1,90 @@
+# Generated (census-v1) for szabo_maud; curated not yet. Edit here.
+id: gideon_szabo
+name: Gideon Szabo
+age: 36
+pronouns: he/him
+kind: resident
+occupation: Full-time carer at home, unpaid
+workplace: millbrook.home_07
+home: millbrook.home_07
+portrait: gideon_szabo
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: gideon_szabo
+appearance: A man with close-cropped black hair and golden-brown skin, wearing an olive jumper with the
+  sleeves pushed up. He looks tired but steady.
+look:
+  kind: human
+  skin: 9
+  hair: { style: cropped, colour: 3 }
+  eyes: 6
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 10, bottom: 5, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+backstory: Born on Terrace Row, Gideon left for Carrow at eighteen to work on the rail depot. When his
+  marriage ended he came back with the children because Monde had a free library, a school with a teacher who
+  notices things, and a grandmother nearby. He does the school run, the shopping and the bills, and he counts
+  the coins twice. He still thinks the Gull & Anchor is the warmest room in town, though he rarely goes in.
+personality:
+  traits: [ practical, watchful, dry, patient ]
+  big5: { open: 40, conscientious: 82, extravert: 30, agreeable: 65, neurotic: 60 }
+values: { prosperity: 0.3, safety: 0.4, spirit: 0.15, charm: 0.15 }
+beliefs:
+  - A door that locks is worth more than any view.
+  - Everyone in Monde knows what I earn, and that is their business.
+  - The school will reach twenty pupils by summer.
+voice:
+  register: Clipped and efficient, with the occasional long breath. He answers questions with logistics and lets
+    the humour slip out sideways.
+  tics: [ right then, that'll do, one thing at a time ]
+  never_says: [ I'm fine, don't pity me, I'm sorry for ]
+  samples:
+    - Right then, shopping first, then the school gate. Two jobs, one trip.
+    - Tea's hot if you want it. It won't stay that way.
+    - No, I don't need advice on the children. I need someone to hold the bag.
+birthday: 16
+likes: [ hot tea, a back door that locks, neighbours who knock first, the Saturday market ]
+dislikes: [ being pitied, visitors at bedtime, being asked who watches the children ]
+fears: [ the school closing with Maud in it, running out of coins before the month ends ]
+dream:
+  text: Hours that fit around the school run, so the week stops being a race.
+  stages:
+    - Ask Kasimir for fixed morning hours at the workshop.
+    - Swap school-run days with the neighbour on Terrace Row.
+    - Write the timetable on the kitchen wall and keep it there.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: millbrook.home_07 }
+    - { at: "07:30", do: visit, where: millbrook.school }
+    - { at: "08:30", do: shop, where: market_row.bakery }
+    - { at: "10:00", do: clean, where: millbrook.home_07 }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: walk, where: millbrook.weir }
+    - { at: "15:30", do: visit, where: millbrook.school }
+    - { at: "17:00", do: cook, where: millbrook.home_07 }
+    - { at: "21:30", do: sleep, where: millbrook.home_07 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_07 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: walk, where: commons.duck_pond }
+    - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: garden, where: millbrook.laundry_green }
+    - { at: "18:00", do: cook, where: millbrook.home_07 }
+    - { at: "22:00", do: sleep, where: millbrook.home_07 }
+chores: [ school run and shopping, mend the back door latch, keep the coal ledger ]
+relationships:
+  - { id: ilona, affinity: 60, trust: 55, tag: kin, note: His mother; she mends his shirts without asking. }
+  - { id: nettie, affinity: 45, trust: 40, tag: kin, note: His cousin; she always brings the wrong biscuits. }
+  - { id: felix, affinity: 40, trust: 50, tag: friend, note: Felix keeps Maud's drawings and never charges. }
+  - { id: maud, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
+  - { id: sol_szabo, affinity: 75, trust: 70, tag: child, note: "Child, under the same roof." }
+secrets:
+  - text: He once tried to write a novel about the rail depot and burned the pages in the boiler.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: szabo_maud
+archetype: single_parent
+employment: carer
+years_in_monde: 36

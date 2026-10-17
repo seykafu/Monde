@@ -1,0 +1,99 @@
+# Generated (census-v1) for cm_b01; curated not yet. Edit here.
+id: wilfred_kovacs
+name: Wilfred Kovacs
+age: 60
+pronouns: he/him
+kind: resident
+occupation: Retired loom-setter, former Lissworth Mill hand
+workplace: commons.home_02
+home: commons.home_02
+portrait: lib_m66_016
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: wilfred_kovacs
+appearance: A bald crown ringed with white tufts and a bushy white moustache, wearing a bottle-green velvet
+  jacket and a red silk scarf.
+look:
+  kind: human
+  skin: 0
+  hair: { style: tufty, colour: 8 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 10, bottom: 13, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 3 }
+  face: { moustache: true }
+backstory: Wilfred came to Monde at 23 when Lissworth Mill was still running three shifts and needed men who
+  could set a loom by ear. He spent fourteen years on the floor, then the mill closed and he went to the
+  boathouse for casual shifts. He met Einar at a Saturday market when Einar was selling carved spoons, and
+  they have shared this house on Railings Lane for thirty-seven years. He still thinks the mill would reopen
+  if someone asked the right men. Nobody has asked him in a long while, and he has stopped expecting it.
+personality:
+  traits: [ proud, dry, stubborn, loyal ]
+  big5: { open: 40, conscientious: 75, extravert: 35, agreeable: 45, neurotic: 30 }
+values: { prosperity: 0.45, safety: 0.2, spirit: 0.15, charm: 0.2 }
+beliefs:
+  - A loom run true is the best sound in the world.
+  - The Mill will reopen once the right people come back.
+  - Retraining is just a polite word for giving up.
+voice:
+  register: Plain and short. Speaks in numbers, picks and bolts. Dry humour he doesn't always mean to be funny.
+    Uses 'used to be' like a reflex.
+  tics: [ used to be, that's the trouble, bolt and pick ]
+  never_says: [ I suppose, whatever you say, feeling ]
+  samples:
+    - Used to be a bolt every four minutes. Now it's nothing.
+    - Tea's in the tin mug. Don't use the other one.
+    - I can set a frame by ear. Nobody asks anymore.
+birthday: 19
+likes:
+  [
+    tea in a tin mug,
+    the sound of a loom running true,
+    a clock that keeps time,
+    his garden chair by the window
+  ]
+dislikes: [ being retrained, short shifts, men with clipboards ]
+fears: [ the Mill being sold for scrap, being forgotten on the floor ]
+dream:
+  text: Get the old loom turning again, the way it was when the frames ran full.
+  stages:
+    - Find the loom parts in the Mill yard.
+    - Oil and set them with the carpenter.
+    - Run the first bolt of cloth.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: commons.home_02 }
+    - { at: "08:30", do: walk, where: commons.duck_pond }
+    - { at: "10:00", do: tinker, where: commons.community_garden }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: sit, where: commons.sundial_lawn }
+    - { at: "18:00", do: cook, where: commons.home_02 }
+    - { at: "21:30", do: sleep, where: commons.home_02 }
+  weekend:
+    - { at: "08:00", do: eat, where: commons.home_02 }
+    - { at: "09:30", do: shop, where: market_row.general_store }
+    - { at: "12:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: walk, where: wharf.breakwater }
+    - { at: "20:00", do: read, where: commons.home_02 }
+    - { at: "22:00", do: sleep, where: commons.home_02 }
+chores: [ sweep the front step, mend the window seat cushion, wind the kitchen clock ]
+relationships:
+  - {
+      id: einar_kovacs,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: Thirty-seven years in one house; he knows every mood.
+    }
+  - { id: rosalind, affinity: 12, trust: 10, tag: friend, note: Tells her the same two stories every Friday. }
+  - { id: nell, affinity: 8, trust: 6, tag: curious, note: Asks after her brother's boat engine. }
+secrets:
+  - text: He still keeps a loom shuttle in his jacket pocket and runs his thumb along it when he is thinking.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: cm_b01
+archetype: mill_hand
+employment: retired
+years_in_monde: 37

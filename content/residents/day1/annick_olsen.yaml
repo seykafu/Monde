@@ -1,0 +1,78 @@
+# Generated (census-v1) for wf_c01; curated not yet. Edit here.
+id: annick_olsen
+name: Annick Olsen
+age: 62
+pronouns: she/her
+kind: resident
+occupation: retired
+workplace: wharf.home_13
+home: wharf.home_13
+portrait: annick_olsen
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: annick_olsen
+appearance: An older woman with grey curls and a cream pinafore.
+look:
+  kind: human
+  skin: 9
+  hair: { style: curly, colour: 2 }
+  eyes: 3
+  build: narrow
+  height: short
+  outfit: { cut: pinafore, top: 9, bottom: 0, bottom_style: skirt, shoes: 2, trim: 6 }
+  accessory: { kind: none }
+backstory: "Annick came to Monde from Hessle Cross 14 years ago and is retired now. What she wants most is
+  plain enough: a bench with a view."
+personality:
+  traits: [ restless, dreamy, proud ]
+  big5: { open: 25, conscientious: 35, extravert: 25, agreeable: 84, neurotic: 66 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
+  tics: [ "We take the paper, don't we, dear?" ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - We take the paper, don't we, dear? Both of us. Separately.
+    - He says the tea's stewed. It isn't. He likes it stewed.
+    - Lovely morning. Bit of a draught, but lovely.
+birthday: 96
+likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
+dislikes: [ stairs, drafts, being managed ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A bench with a view
+  stages:
+    - Choose a spot on the Commons
+    - Raise 15 coins or ask Kasimir to build it
+    - Sit on it with the first neighbor who stops
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: wharf.home_13 }
+    - { at: "09:30", do: walk, where: commons.picnic_lawn }
+    - { at: "12:00", do: eat, where: wharf.home_13 }
+    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: eat, where: wharf.home_13 }
+    - { at: "19:30", do: read, where: wharf.home_13 }
+    - { at: "21:30", do: sleep, where: wharf.home_13 }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_13 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: wharf.home_13 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: wharf.home_13 }
+chores: [ sweep the step, black the stove ]
+relationships:
+  - { id: walter_olsen, affinity: 70, trust: 70, tag: spouse, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: wf_c01
+archetype: retired_couple
+employment: retired
+years_in_monde: 14

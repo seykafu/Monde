@@ -1,0 +1,89 @@
+# Generated (census-v1) for mr_d02; curated not yet. Edit here.
+id: winifred_gallo
+name: Winifred Gallo
+age: 58
+pronouns: she/her
+kind: resident
+occupation: Baker at Fournier & Fille, makes the morning loaves and rye.
+workplace: market_row.bakery
+home: market_row.home_10
+portrait: lib_f56_099
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: winifred_gallo
+appearance: A sturdy woman with sun-freckled cheeks and steel-grey hair in a loose plait over one shoulder.
+  She wears navy dungarees over a mustard jumper, with a sprig of rosemary tucked behind one ear.
+look:
+  kind: human
+  skin: 0
+  hair: { style: long, colour: 2 }
+  eyes: 2
+  build: medium
+  height: tall
+  outfit: { cut: dungarees, top: 6, bottom: 6, bottom_style: trousers, shoes: 2, trim: 4 }
+  accessory: { kind: none }
+  face: { freckles: true }
+backstory: Winifred ran a bakery in the back streets of Carrow for nineteen years before the rent doubled and
+  her knees gave up on the early hours. She came to Monde at forty-three after answering a card in the Lantern
+  window about a flat above a shop. Odile hired her within a week, mostly because the bread from her old ovens
+  had been sold in Hessle Cross and someone remembered it. Her one regret is a sourdough starter she left
+  behind in Carrow, which she still thinks about when the rye goes flat.
+personality:
+  traits: [ practical, warm, stubborn, frank ]
+  big5: { open: 45, conscientious: 82, extravert: 55, agreeable: 60, neurotic: 35 }
+values: { prosperity: 0.3, safety: 0.15, spirit: 0.2, charm: 0.35 }
+beliefs:
+  - A kitchen that runs cold is a kitchen that fails.
+  - Monde will fill up again once the ferry timetable improves.
+  - Nobody in this town ever asks for seconds anymore.
+voice:
+  register: Brisk and kind, with kitchen warnings used as pet names. She measures everything in handfuls and
+    rarely raises her voice above the oven fan.
+  tics: [ mind that tray, a handful of this, there's my girl ]
+  never_says: [ I could never, that's not my problem, whatever you like ]
+  samples:
+    - Mind that tray, love, it's hot enough to take the skin off your thumb.
+    - A handful of flour and a bit of patience, that's all the bread wants.
+    - Seconds? Go on then, but you're washing the bowl.
+birthday: 5
+likes: [ a hot oven at dawn, people who ask for seconds, rye flour, the sound of the harbour from the flat ]
+dislikes: [ skimping, cold kitchens, a bit of salt, people who eat standing up ]
+fears: [ the bakery closing, losing her sense of taste ]
+dream:
+  text: Cook a Harvest Supper big enough to fill the Market Hall, the way the town used to do it.
+  stages:
+    - Plan a Harvest Supper menu with Odile and the Market Hall volunteers.
+    - Cook with four volunteers over two long afternoons in the Market Hall kitchen.
+    - Serve the whole supper at the Market Hall to anyone who walks in.
+routine:
+  weekday:
+    - { at: "04:00", do: wander, where: market_row.home_10 }
+    - { at: "04:30", do: work, where: market_row.bakery }
+    - { at: "08:30", do: eat, where: market_row.cafe_liss }
+    - { at: "10:00", do: shop, where: market_row.general_store }
+    - { at: "13:00", do: eat, where: market_row.home_10 }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: market_row.home_10 }
+  weekend:
+    - { at: "07:30", do: eat, where: market_row.home_10 }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: socialize, where: market_row.market_hall }
+    - { at: "13:30", do: walk, where: commons.picnic_lawn }
+    - { at: "16:00", do: read, where: old_quarter.library }
+    - { at: "19:00", do: cook, where: market_row.home_10 }
+    - { at: "22:00", do: sleep, where: market_row.home_10 }
+chores: [ feed the starter each morning, sweep the stair, mend the dungarees ]
+relationships:
+  - { id: odile, affinity: 20, trust: 18, tag: friend, note: Hired her and still checks her loaves. }
+  - { id: weasel, affinity: -12, trust: -8, tag: wary, note: Always listening at her door. }
+  - { id: june, affinity: 14, trust: 10, tag: fond, note: Brings her coffee on the morning shift. }
+secrets:
+  - text: She still keeps the old Carrow sourdough starter alive in a jam jar under the sink, unnamed.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: shopkeeper
+generated_by: model
+household: mr_d02
+archetype: cook_baker
+employment: employed
+years_in_monde: 15

@@ -1,0 +1,105 @@
+# Generated (census-v1) for mb_j01; curated not yet. Edit here.
+id: dorian_rourke
+name: Dorian Rourke
+age: 28
+pronouns: he/him
+kind: resident
+occupation: Commuter in Carrow, weekdays at offmap.city
+workplace: offmap.city
+home: millbrook.home_41
+portrait: dorian_rourke
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: dorian_rourke
+appearance: Close-cropped dark brown hair and a grey jumper with the elbows going thin. He has the slight
+  build of a man who forgets to eat on the boat.
+look:
+  kind: human
+  skin: 9
+  hair: { style: cropped, colour: 0 }
+  eyes: 3
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 14, bottom: 11, bottom_style: trousers, shoes: 1 }
+  accessory: { kind: none }
+backstory: Dorian trained as a cabinet maker in Hessle Cross and got a job in a Carrow office that handles
+  freight paperwork, which pays better than the workshops did. He hates the office and says so only to the
+  ferry. He came to Monde at twenty-seven, when Vera's pregnancy made them want a garden. He was sure the
+  commute would be a few months. It has been a year. He is wrong about how long he can keep this up and wrong
+  that Kasimir's workshop is too busy to take him on at weekends. He would like Kasimir to ask him, not the
+  other way round.
+personality:
+  traits: [ tired, decent, restless, careful ]
+  big5: { open: 62, conscientious: 70, extravert: 44, agreeable: 70, neurotic: 55 }
+values: { prosperity: 0.4, safety: 0.25, spirit: 0.15, charm: 0.2 }
+beliefs:
+  - Carrow is only a ferry ride away.
+  - If I stop commuting we will starve.
+  - The town needs more people who can build things.
+voice:
+  register: Mild and amiable, easy to talk to, trails off when he is worried about money. Uses the ferry as a clock.
+  tics: [ on the boat, fair enough, it's fine ]
+  never_says: [ I love this town, my boss says, you don't understand ]
+  samples:
+    - Boat's at six. I'll be on it, I promise, I'm just finishing this.
+    - Fair enough. The office is fine. It's just a lot of paper with nothing to show.
+    - Kasimir, if you ever need an extra pair of hands on a Saturday, I'm not doing anything.
+birthday: 8
+likes: [ sawdust, the ferry deck in the wind, fresh bread, Vera's terrible jokes, hand-me-downs ]
+dislikes: [ the office, paperwork, people talking about the Tollmen in whispers ]
+fears: [ losing the house, missing Milan's first steps ]
+dream:
+  text: A front door of our own, with a surveyed roof and a house number the whole street can see.
+  stages:
+    - Get the house surveyed by Kasimir or a builder.
+    - Gather three helpers for a paint-and-nail weekend.
+    - Hang the new house number and invite the street.
+routine:
+  weekday:
+    - { at: "05:45", do: sleep, where: millbrook.home_41 }
+    - { at: "06:00", do: walk, where: millbrook.terrace_row }
+    - { at: "06:30", do: eat, where: wharf.harbor_steps }
+    - { at: "08:00", do: work, where: offmap.city }
+    - { at: "13:00", do: eat, where: offmap.city }
+    - { at: "17:30", do: work, where: offmap.city }
+    - { at: "20:00", do: eat, where: offmap.city }
+    - { at: "22:00", do: sleep, where: millbrook.home_41 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_41 }
+    - { at: "09:30", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "12:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: garden, where: millbrook.laundry_green }
+    - { at: "18:00", do: cook, where: millbrook.home_41 }
+    - { at: "21:00", do: sit, where: millbrook.home_41 }
+chores: [ fix the back gate, carry coal in, cook Sunday dinner ]
+relationships:
+  - {
+      id: kasimir,
+      affinity: 20,
+      trust: 18,
+      tag: curious,
+      note: "Would like him to ask for help, not the reverse."
+    }
+  - {
+      id: vera_rourke,
+      affinity: 25,
+      trust: 30,
+      tag: spouse,
+      note: "His wife, who is always right about the gutters."
+    }
+  - {
+      id: selma_rourke,
+      affinity: 45,
+      trust: 30,
+      tag: daughter,
+      note: "His daughter, his favourite person to sit with."
+    }
+secrets:
+  - text: He has been sketching chairs in the office margins every day for a year, and he is good at it.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_j01
+archetype: young_family
+employment: employed
+years_in_monde: 1

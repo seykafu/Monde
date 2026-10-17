@@ -1,0 +1,96 @@
+# Generated (census-v1) for mr_e01; curated not yet. Edit here.
+id: morwenna_vasquez
+name: Morwenna Vasquez
+age: 59
+pronouns: she/her
+kind: resident
+occupation: Retired union steward; keeps the town's lists
+workplace: market_row.home_01
+home: market_row.home_01
+portrait: lib_f48_093
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: morwenna_vasquez
+appearance: A cloud of burgundy curls with one silver streak, round tortoiseshell glasses on a beaded cord,
+  and a chalk-dusted mustard cardigan with a pencil tucked behind one ear.
+look:
+  kind: human
+  skin: 5
+  hair: { style: curly, colour: 9 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: jumper, top: 4, bottom: 6, bottom_style: skirt, shoes: 1 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Morwenna spent twenty-two years as a steward at Lissworth Mill, arguing rota disputes on the
+  factory floor until the frames went quiet. Her lungs gave out before the mill did, and she came home to
+  Monde on a doctor's advice and never left. She was born in the terraces behind Millbrook and knows which
+  doorsteps have been empty longest. Her wife's shop sits under her window, so she hears every complaint about
+  the Tollmen before it reaches the Lantern. She still keeps the union's minute book in a drawer, and she
+  still believes that a town run on lists will hold together.
+personality:
+  traits: [ organised, stubborn, warm, precise ]
+  big5: { open: 40, conscientious: 88, extravert: 62, agreeable: 58, neurotic: 45 }
+values: { prosperity: 0.1, safety: 0.25, spirit: 0.45, charm: 0.2 }
+beliefs:
+  - A town with a rota never falls apart.
+  - Everyone in Monde would volunteer if somebody simply asked them properly.
+  - The mill would have reopened if the men had kept their minutes better.
+voice:
+  register: Brisk and formal, with a warmth she tries to hide under procedure. She numbers her points and makes
+    sure people know when a thing is decided.
+  tics: [ Item one., Right then., Who's putting their name down? ]
+  never_says: [ I suppose, whatever you like, it doesn't matter, not my problem ]
+  samples:
+    - Item one. We need someone for the Saturday bins, and I am looking at you.
+    - No, that's not a complaint, that's a rota. Write it down, it'll help.
+    - Thank you. I mean it. Don't make me say it twice.
+birthday: 23
+likes: [ blank foolscap, being thanked by name, the Lantern going out on time, a gavel she keeps for emergencies ]
+dislikes: [ meetings without minutes, people who don't do committees, cold tea, the Tollmen's Saturday visits ]
+fears: [ the school closing with nine pupils, dying before the rota runs a full week ]
+dream:
+  text: A rota for every task in Monde, run by volunteers who turn up without being chased.
+  stages:
+    - Collect ten volunteers' names at the bakery counter.
+    - Print the rota on the Lantern's press.
+    - Run one full week with no gaps.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: market_row.home_01 }
+    - { at: "08:30", do: shop, where: market_row.bakery }
+    - { at: "10:00", do: write, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: socialize, where: market_row.market_street }
+    - { at: "17:30", do: sit, where: commons.picnic_lawn }
+    - { at: "20:30", do: read, where: market_row.home_01 }
+    - { at: "22:30", do: sleep, where: market_row.home_01 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_01 }
+    - { at: "09:30", do: volunteer, where: market_row.market_hall }
+    - { at: "12:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: attend, where: old_quarter.st_brigids }
+    - { at: "22:30", do: sleep, where: market_row.home_01 }
+chores: [ Pins the rota to the café door, Sorts the Lantern's copy, Keeps the household accounts in pencil ]
+relationships:
+  - {
+      id: pernille_vasquez,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: "Her wife, who runs the books her way."
+    }
+  - { id: rosalind, affinity: 14, trust: 12, tag: friend, note: Minutes every quarter at the back room. }
+  - { id: odile, affinity: 10, trust: 16, tag: fond, note: Knew her mother from the Harvest Supper. }
+secrets:
+  - text: She has been drafting a Harvest Supper committee constitution for six years and has never shown it to
+      anyone.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mr_e01
+archetype: retired_organizer
+employment: unable
+years_in_monde: 59

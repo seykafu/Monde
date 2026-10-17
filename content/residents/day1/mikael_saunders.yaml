@@ -1,0 +1,108 @@
+# Generated (census-v1) for mr_b02; curated not yet. Edit here.
+id: mikael_saunders
+name: Mikael Saunders
+age: 63
+pronouns: he/him
+kind: resident
+occupation: Retired carpenter's mate, now mends the pub's chairs for free.
+workplace: market_row.home_07
+home: market_row.home_07
+portrait: lib_m64_106
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: mikael_saunders
+appearance: A lean man with short faded-ginger hair and bushy ginger eyebrows, wearing a worn olive work
+  jacket over a navy cardigan. He has a dry, heard-it-all look and slight build.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 10 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 10, bottom: 14, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+backstory: "Mikael arrived at nineteen to work the Liss Cannery line, having been turned out of a boarding
+  house in Carrow after a row he still won't describe. He was good with his hands and moved from the cannery
+  to a carpentry crew that built the boats for the Wharf. When the cannery closed he kept a bench in the back
+  of Kasimir's shop and learned joinery properly, though he refuses to call himself a craftsman. He is sure
+  the Tollmen only collect because nobody has asked them to stop, and he is wrong: he has never once asked,
+  and the shopkeepers are waiting for him to be the one who does."
+personality:
+  traits: [ dry, handy, loyal, blunt, wry ]
+  big5: { open: 50, conscientious: 70, extravert: 30, agreeable: 45, neurotic: 55 }
+values: { prosperity: 0.15, safety: 0.3, spirit: 0.25, charm: 0.3 }
+beliefs:
+  - Anything with a joint can be mended if you have patience.
+  - The Gull & Anchor serves better cider than it used to.
+  - People in Monde mean more than they say, mostly.
+voice:
+  register: Short and deadpan, often one clause long. He answers questions with a practical detail rather than
+    an opinion, and lets silences run.
+  tics: [ "Right, then.", Mm. ]
+  never_says: [ I feel, to be honest, absolutely, my dear ]
+  samples:
+    - Chair's wobbly. Leave it with me.
+    - Carrow's a fine city. Shame about the trains.
+    - Fishing rod's in the hall. Don't tell Soren it's for me.
+birthday: 72
+likes: [ a fishing rod, tools that fit the hand, Philippa's cooking, the harbour at dusk, a morning paper ]
+dislikes: [ stairs, drafts, being told how to sit, loud radios ]
+fears: [ his hands going stiff, being found out for old debts ]
+dream:
+  text: A dance in the old hall on a Saturday night, with a gramophone and Soren's hand in his.
+  stages:
+    - Find a hall with a sound floor and space.
+    - Find a gramophone or ask a band to play.
+    - Hold the dance and keep time badly on purpose.
+routine:
+  weekday:
+    - { at: "07:15", do: eat, where: market_row.home_07 }
+    - { at: "08:00", do: tinker, where: market_row.back_alley }
+    - { at: "10:00", do: socialize, where: market_row.general_store }
+    - { at: "12:30", do: eat, where: market_row.home_07 }
+    - { at: "14:00", do: fish, where: wharf.breakwater }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: sit, where: market_row.home_07 }
+    - { at: "22:30", do: sleep, where: market_row.home_07 }
+  weekend:
+    - { at: "08:30", do: eat, where: market_row.home_07 }
+    - { at: "09:30", do: fish, where: wharf.breakwater }
+    - { at: "12:30", do: shop, where: market_row.market_street }
+    - { at: "14:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "16:00", do: wander, where: commons.duck_pond }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: market_row.home_07 }
+chores: [ Mend chairs, Sharpen the saw, Fetch the milk ]
+relationships:
+  - {
+      id: soren_falk,
+      affinity: 25,
+      trust: 28,
+      tag: partner,
+      note: Argues with him over every crossword clue and would not trade a day of it.
+    }
+  - {
+      id: philippa_pascoe,
+      affinity: 14,
+      trust: 10,
+      tag: friend,
+      note: Gives him the pub's broken stools to fix and a plate of something hot after.
+    }
+  - {
+      id: yaa_ennis,
+      affinity: 6,
+      trust: 5,
+      tag: curious,
+      note: Asks about her stall's crates; he asks about her boats.
+    }
+secrets:
+  - text: He kept a small wooden fishing lure carved for a boy who drowned off the breakwater, and he has never
+      told Soren why he fishes…
+    reveal: { regard_min: 65 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mr_b02
+archetype: retired_couple
+employment: retired
+years_in_monde: 44

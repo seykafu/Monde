@@ -1,0 +1,109 @@
+# Generated (census-v1) for mb_c02; curated not yet. Edit here.
+id: anouk_clancy
+name: Anouk Clancy
+age: 60
+pronouns: she/her
+kind: resident
+occupation: Retired draper; still takes in hemming for neighbours when asked.
+workplace: millbrook.home_27
+home: millbrook.home_27
+portrait: anouk_clancy
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: anouk_clancy
+appearance: A broad, sturdy woman with white hair pinned in a bun and half-moon glasses on a cord. She wears a
+  dark brown shirt with the sleeves rolled to the elbow.
+look:
+  kind: human
+  skin: 3
+  hair: { style: bun, colour: 8 }
+  eyes: 3
+  build: broad
+  height: tall
+  outfit: { cut: plain, top: 2, bottom: 1, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: glasses }
+  glasses: halfmoon
+backstory: Anouk ran the drapery counter in Hessle Cross for eleven years and could tell a fake silk from
+  across a room. She came to Monde at thirty-four to visit an aunt and stayed when the shop closed and the
+  aunt left her the house on Mill Lane. Gaspard was the stranger on the ferry who asked her the time and then
+  talked for an hour. She still believes everyone in Monde is honest, which is not quite true, as she has
+  never once checked the change at Dunmore's. Her hands are never still and she is always mending something.
+personality:
+  traits: [ brisk, warm, meddling, practical ]
+  big5: { open: 52, conscientious: 87, extravert: 60, agreeable: 74, neurotic: 35 }
+values: { prosperity: 0.1, safety: 0.3, spirit: 0.2, charm: 0.4 }
+beliefs:
+  - Everyone in Monde is honest.
+  - A good hem can save a whole outfit.
+  - Gossip is only news that hasn't been checked yet.
+voice:
+  register: Quick, fond and direct, with a shopkeeper's habit of pricing things aloud. Teases Gaspard in front
+    of others and is gentler when they are alone.
+  tics: [ "Don't we, dear?", Well I never. ]
+  never_says: [ that's not my business, I don't mind, it's nothing ]
+  samples:
+    - Don't we, dear? Pear drops are not a meal, Gaspard, but I'll allow one.
+    - Hold still and let me look at that hem. Honestly, you'd walk out in rags.
+    - Well I never. Billie's binding another ledger. Somebody in this town is still writing things down.
+birthday: 45
+likes: [ a kettle on the stove, pleasant strangers, fresh bread from Fournier & Fille, the sound of the ferry ]
+dislikes: [ drafts, being managed, bad stitching ]
+fears: [ a long winter alone without Gaspard, the house falling down around them ]
+dream:
+  text: To be useful again, volunteering at the library and getting her name in the Lantern for it.
+  stages:
+    - Volunteer three shifts at the library desk.
+    - Get thanked by name in the Lantern.
+    - Take a regular chair by the window at the pub.
+routine:
+  weekday:
+    - { at: "07:00", do: wander, where: millbrook.home_27 }
+    - { at: "07:45", do: cook, where: millbrook.home_27 }
+    - { at: "09:00", do: shop, where: market_row.bakery }
+    - { at: "10:30", do: volunteer, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: visit, where: millbrook.terrace_row }
+    - { at: "16:30", do: clean, where: millbrook.home_27 }
+    - { at: "18:00", do: cook, where: millbrook.home_27 }
+    - { at: "21:00", do: sleep, where: millbrook.home_27 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_27 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "11:30", do: socialize, where: old_quarter.fountain_square }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: walk, where: wharf.harbor_steps }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_27 }
+chores: [ Bakes the Sunday loaf, Hems neighbours' trousers, Checks the house for drafts ]
+relationships:
+  - {
+      id: gaspard_clancy,
+      affinity: 30,
+      trust: 28,
+      tag: spouse,
+      note: Her husband; she teases him gently and worries when he coughs.
+    }
+  - {
+      id: priya,
+      affinity: 14,
+      trust: 12,
+      tag: fond,
+      note: The nurse who looks in on her husband's chest without charge.
+    }
+  - {
+      id: odile,
+      affinity: 10,
+      trust: 9,
+      tag: friend,
+      note: Buys her bread each morning and trades town news.
+    }
+secrets:
+  - text: She has been quietly keeping a list of every Lantern edition she has ever been in, and it is a short
+      list.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mb_c02
+archetype: retired_couple
+employment: retired
+years_in_monde: 26

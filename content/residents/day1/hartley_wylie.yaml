@@ -1,0 +1,107 @@
+# Generated (census-v1) for mr_e02; curated not yet. Edit here.
+id: hartley_wylie
+name: Hartley Wylie
+age: 58
+pronouns: he/him
+kind: resident
+occupation: Roofer who works from the flat above Market Row, taking jobs across…
+workplace: market_row.home_11
+home: market_row.home_11
+portrait: hartley_wylie
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: hartley_wylie
+appearance: A slight man with close sandy-blond buzz-cut hair and pale skin, wearing a mustard shirt with the
+  sleeves rolled to the elbow. He wears a carpenter's pencil behind one ear.
+look:
+  kind: human
+  skin: 4
+  hair: { style: buzz, colour: 5 }
+  eyes: 5
+  build: narrow
+  height: tall
+  outfit: { cut: plain, top: 4, bottom: 8, bottom_style: trousers, shoes: 11 }
+  accessory: { kind: none }
+  face: { grey_temples: true, stubble: true }
+backstory: Hartley roofed houses in the Carrow suburbs for twenty years before the building boom thinned out
+  and his firm let him go. He came to Monde at forty-one because a letter arrived about a cheap flat and a
+  need for a roofer on the terraces. The first winter he fell through a rotten joist on a Millbrook house and
+  broke two ribs, and the owner still sends him a card every Christmas. He and his husband Corentin bought the
+  lease on Market Row together, and he says the town has the best slate in the county, though he has never
+  proved it.
+personality:
+  traits: [ patient, precise, stubborn, dry ]
+  big5: { open: 40, conscientious: 82, extravert: 30, agreeable: 55, neurotic: 45 }
+values: { prosperity: 0.4, safety: 0.3, spirit: 0.12, charm: 0.18 }
+beliefs:
+  - A roof that leaks is a lie told to the people underneath.
+  - The Tollmen would be less trouble if they fixed their own gutters.
+  - Good slate outlasts any promise made about it.
+voice:
+  register: Slow and measured. Speaks in short, deliberate sentences and says mm while judging something.
+    Reaches for building metaphors and trusts a spirit level over opinion.
+  tics: [ mm, level as a spirit, that'll outlast us ]
+  never_says: [ just trust me, it'll be fine, quick fix ]
+  samples:
+    - Mm. Water's found the gap, so the gap wants filling.
+    - Give it a week and see if the flashing holds. It usually does.
+    - I'll look at it Saturday, once I've had my tea and a think.
+birthday: 1
+likes: [ seasoned timber, a sharp chisel, plain tea, early mornings on the slates ]
+dislikes: [ it'll do, damp, scaffolding that wobbles, people who rush a job ]
+fears: [ a roof coming down on someone, being idle too long ]
+dream:
+  text: Fix the worst roof on a Millbrook terrace so the whole street can see it stand straight.
+  stages:
+    - Survey the worst roof on a Millbrook terrace.
+    - Haul three loads of slate from the Wharf.
+    - Finish it and have the street sign off.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: market_row.home_11 }
+    - { at: "07:00", do: work, where: market_row.home_11 }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: work, where: market_row.home_11 }
+    - { at: "18:00", do: eat, where: market_row.home_11 }
+    - { at: "20:30", do: read, where: market_row.home_11 }
+    - { at: "22:00", do: sleep, where: market_row.home_11 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_11 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: wander, where: wharf.harbor_steps }
+    - { at: "18:30", do: eat, where: market_row.home_11 }
+    - { at: "22:30", do: sleep, where: market_row.home_11 }
+chores: [ mend the flat's guttering, sharpen the chisels, sweep the workbench ]
+relationships:
+  - {
+      id: corentin_wylie,
+      affinity: 28,
+      trust: 25,
+      tag: spouse,
+      note: Husband of nearly thirty years; they finish each other's sentences.
+    }
+  - {
+      id: winifred_gallo,
+      affinity: 12,
+      trust: 10,
+      tag: fond,
+      note: Brings her a fresh roof-slate for the bread oven when asked.
+    }
+  - {
+      id: weasel,
+      affinity: -15,
+      trust: -10,
+      tag: wary,
+      note: Keeps listening at the Market Row doors; Hartley notices.
+    }
+secrets:
+  - text: He still keeps the broken joist from his first winter on the workbench, and talks to it when he thinks
+      nobody hears.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: volunteer
+generated_by: model
+household: mr_e02
+archetype: builder
+employment: employed
+years_in_monde: 17

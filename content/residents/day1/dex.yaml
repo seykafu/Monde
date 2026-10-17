@@ -1,0 +1,81 @@
+# Generated (census-v1) for calloway; curated not yet. Edit here.
+id: dex
+name: Dex Calloway
+age: 21
+pronouns: he/him
+kind: resident
+occupation: Tollman
+workplace: briar_woods.tollmen_hideout
+home: wharf.home_bunkhouse
+portrait: lib_m26_005
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: dex
+appearance: A young man with sandy blond hair swept back, an olive wool coat a size too big and a red knitted
+  scarf. An easy, ironic smile.
+look:
+  kind: human
+  skin: 4
+  hair: { style: swept, colour: 5 }
+  eyes: 1
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 10, bottom: 2, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: scarf, colour: 3 }
+backstory: "Dex came to Monde from Ashby Lock 3 years ago and works as Tollman. What he wants most is plain
+  enough: be good at one thing."
+personality:
+  traits: [ proud, steady, particular ]
+  big5: { open: 8, conscientious: 52, extravert: 59, agreeable: 62, neurotic: 32 }
+values: { prosperity: 0.15, safety: 0.1, spirit: 0.25, charm: 0.5 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Easy and ironic. Tells stories that start well and trail off. Answers a question with a question.
+  tics: [ Plans? ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Plans? Who's been talking about plans.
+    - There was this fellow in Port Sallow, right, with a goat. Anyway.
+    - Breakfast's free if you look hungry enough. I look hungry.
+birthday: 4
+likes: [ free breakfast, high places, strangers' stories ]
+dislikes: [ being asked their plan, paperwork, rain on a borrowed coat ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: Be good at one thing
+  stages:
+    - Try three jobs in a week
+    - Choose the one that stuck
+    - Tell someone out loud that you're staying
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: wharf.home_bunkhouse }
+    - { at: "08:30", do: work, where: briar_woods.tollmen_hideout }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: briar_woods.tollmen_hideout }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: wharf.home_bunkhouse }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_bunkhouse }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: commons.duck_pond }
+    - { at: "18:00", do: eat, where: wharf.home_bunkhouse }
+    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
+chores: [ wind the clock, water the window box ]
+relationships:
+  - { id: rook, affinity: 30, trust: 30, tag: fond, note: Known for years. }
+  - { id: dom, affinity: 70, trust: 70, tag: twin, note: Same house. }
+  - { id: amara_borowski, affinity: 70, trust: 70, tag: cousin, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: calloway
+archetype: drifter
+employment: employed
+years_in_monde: 3

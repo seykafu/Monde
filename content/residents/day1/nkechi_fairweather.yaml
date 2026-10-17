@@ -1,0 +1,78 @@
+# Generated (census-v1) for mb_b07; curated not yet. Edit here.
+id: nkechi_fairweather
+name: Nkechi Fairweather
+age: 68
+pronouns: she/her
+kind: resident
+occupation: retired
+workplace: millbrook.home_22
+home: millbrook.home_22
+portrait: nkechi_fairweather
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: nkechi_fairweather
+appearance: An older woman with grey curls and a cream coat.
+look:
+  kind: human
+  skin: 8
+  hair: { style: curly, colour: 2 }
+  eyes: 0
+  build: medium
+  height: short
+  outfit: { cut: coat, top: 9, bottom: 2, bottom_style: skirt, shoes: 3 }
+  accessory: { kind: none }
+backstory: "Nkechi came to Monde from Ashby Lock 39 years ago and is retired now. What she wants most is plain
+  enough: a bench with a view."
+personality:
+  traits: [ stubborn, curious, restless ]
+  big5: { open: 25, conscientious: 34, extravert: 42, agreeable: 42, neurotic: 51 }
+values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Companionable. They finish each other's sentences and disagree as a form of affection. "Don't we, dear?"
+  tics: [ "We take the paper, don't we, dear?" ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - We take the paper, don't we, dear? Both of us. Separately.
+    - He says the tea's stewed. It isn't. He likes it stewed.
+    - Lovely morning. Bit of a draught, but lovely.
+birthday: 49
+likes: [ a morning paper, a kettle on the stove, pleasant strangers ]
+dislikes: [ stairs, drafts, being managed ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: A bench with a view
+  stages:
+    - Choose a spot on the Commons
+    - Raise 15 coins or ask Kasimir to build it
+    - Sit on it with the first neighbor who stops
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_22 }
+    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
+    - { at: "12:00", do: eat, where: millbrook.home_22 }
+    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
+    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: eat, where: millbrook.home_22 }
+    - { at: "19:30", do: read, where: millbrook.home_22 }
+    - { at: "21:30", do: sleep, where: millbrook.home_22 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_22 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
+    - { at: "18:00", do: eat, where: millbrook.home_22 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: millbrook.home_22 }
+chores: [ beat the doormat, water the window box ]
+relationships:
+  - { id: klara_fairweather, affinity: 70, trust: 70, tag: spouse, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_b07
+archetype: retired_couple
+employment: retired
+years_in_monde: 39

@@ -1,0 +1,80 @@
+# Generated (census-v1) for mr_a01; curated not yet. Edit here.
+id: yaa_ennis
+name: Yaa Ennis
+age: 68
+pronouns: she/her
+kind: resident
+occupation: stallholder
+workplace: market_row.market_hall
+home: market_row.home_06
+portrait: lib_f76_070
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: yaa_ennis
+appearance: An older woman with short curls dyed jet black, heavy dark-framed glasses and a belted brick-red
+  raincoat with the collar up. A shrewd, amused look.
+look:
+  kind: human
+  skin: 8
+  hair: { style: curly, colour: 3 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: coat, top: 3, bottom: 6, bottom_style: skirt, shoes: 13 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: "Yaa came to Monde from Tarn End 46 years ago and works as stallholder. What she wants most is
+  plain enough: redraw Monde from the ground up."
+personality:
+  traits: [ steady, dreamy, practical ]
+  big5: { open: 32, conscientious: 67, extravert: 71, agreeable: 73, neurotic: 22 }
+values: { prosperity: 0.2, safety: 0.15, spirit: 0.2, charm: 0.45 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: Precise and wry. Gives directions as bearings and distances. "As the crow flies, which is unhelpful."
+  tics: [ "Two hundred yards, bearing north-east." ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Two hundred yards, bearing north-east. As the crow flies, which is unhelpful.
+    - Roughly? Nothing's roughly. Everything's somewhere.
+    - Don't fold it. Roll it. Thank you.
+birthday: 24
+likes: [ fresh paper, a sharp pencil, a true compass ]
+dislikes: [ roughly, folded maps, being told it's just up there ]
+fears: [ the last ferry leaving with nobody coming back ]
+dream:
+  text: Redraw Monde from the ground up
+  stages:
+    - Walk each zone with a measuring chain
+    - Compare it with Aurélien's original in the library with Margo
+    - Print one and post it at the station
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: market_row.home_06 }
+    - { at: "08:30", do: work, where: market_row.market_hall }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:30", do: work, where: market_row.market_hall }
+    - { at: "17:30", do: shop, where: market_row.general_store }
+    - { at: "18:30", do: eat, where: market_row.home_06 }
+    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: market_row.home_06 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_06 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "18:00", do: eat, where: market_row.home_06 }
+    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "22:00", do: sleep, where: market_row.home_06 }
+chores: [ mend a sock, wind the clock ]
+relationships:
+  - { id: pell, affinity: 10, trust: 15, tag: curious, note: "The mayor, as long as anyone remembers." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mr_a01
+archetype: cartographer
+employment: employed
+years_in_monde: 46

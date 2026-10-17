@@ -1,0 +1,107 @@
+# Generated (census-v1) for wf_e02; curated not yet. Edit here.
+id: yara_jankowski
+name: Yara Jankowski
+age: 57
+pronouns: she/her
+kind: resident
+occupation: Fishing-boat crew, mending nets and minding the catch on the harbour steps.
+workplace: wharf.harbor_steps
+home: wharf.home_07
+portrait: lib_f56_100
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: yara_jankowski
+appearance: A sturdy, sun-freckled woman with a loose chestnut plait over one shoulder. She wears rust
+  dungarees over a sky-blue jumper and a sprig of rosemary tucked behind one ear.
+look:
+  kind: human
+  skin: 0
+  hair: { style: long, colour: 6 }
+  eyes: 2
+  build: medium
+  height: tall
+  outfit: { cut: dungarees, top: 11, bottom: 11, bottom_style: trousers, shoes: 2, trim: 5 }
+  accessory: { kind: none }
+  face: { freckles: true }
+backstory: Came to Monde at seven when her parents took a cottage above the cannery, and has not left since.
+  She worked the cannery line until it closed eleven years ago, then went back to the boats. Her younger
+  brother went to Hessle Cross for work and writes less each year. She married Piet at twenty-six and has
+  never regretted the cold mornings. She thinks the town will outlast everyone in it.
+personality:
+  traits: [ cheerful, practical, patient, dry ]
+  big5: { open: 52, conscientious: 77, extravert: 63, agreeable: 68, neurotic: 28 }
+values: { prosperity: 0.3, safety: 0.3, spirit: 0.15, charm: 0.25 }
+beliefs:
+  - Rosemary keeps the bad luck off a boat.
+  - The cannery will open again if enough of us ask.
+  - Everyone who leaves Monde wishes they hadn't.
+voice:
+  register: Quick and cheerful with a dry edge. Gives weather reports before greetings. Trails off when she is
+    about to say something soft.
+  tics: [ Fair enough, Tide's making, Squint at the sky first ]
+  never_says: [ I suppose, it's a shame, believe me ]
+  samples:
+    - Morning. Could be worse, could be raining.
+    - Tide's making, you'd best get your boots on.
+    - Piet's cooking again. Brace yourself.
+birthday: 92
+likes: [ flat calm at dawn, good rope, smoked fish, her brother's letters ]
+dislikes: [ tangled gear, loud engines, long meetings ]
+fears: [ the cannery going to rubble, her husband going out in a bad sea ]
+dream:
+  text: Ten signatures on the co-op petition, and the cannery lights back on for a first landing.
+  stages:
+    - Collect signatures at the harbour steps.
+    - Pitch the co-op to Nell at the fish market.
+    - Make the first landing at the cannery.
+routine:
+  weekday:
+    - { at: "04:30", do: eat, where: wharf.home_07 }
+    - { at: "05:00", do: work, where: wharf.harbor_steps }
+    - { at: "10:00", do: tinker, where: wharf.harbor_steps }
+    - { at: "12:30", do: shop, where: wharf.fish_market }
+    - { at: "14:00", do: work, where: wharf.harbor_steps }
+    - { at: "17:00", do: walk, where: wharf.breakwater }
+    - { at: "19:00", do: cook, where: wharf.home_07 }
+    - { at: "22:00", do: read, where: wharf.home_07 }
+    - { at: "22:30", do: sleep, where: wharf.home_07 }
+  weekend:
+    - { at: "07:30", do: eat, where: wharf.home_07 }
+    - { at: "09:00", do: garden, where: wharf.home_07 }
+    - { at: "11:00", do: visit, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: wander, where: commons.duck_pond }
+    - { at: "18:30", do: cook, where: wharf.home_07 }
+    - { at: "21:30", do: sleep, where: wharf.home_07 }
+chores: [ Dries the nets on the line, Keeps the rosemary bed by the door, Writes replies to her brother on Sundays ]
+relationships:
+  - {
+      id: piet_hendry,
+      affinity: 20,
+      trust: 25,
+      tag: partner,
+      note: "Her husband, the only man who can make her laugh before breakfast."
+    }
+  - {
+      id: esme_hedley,
+      affinity: 14,
+      trust: 16,
+      tag: friend,
+      note: Works the same steps and shares gossip over the nets.
+    }
+  - {
+      id: genevieve_corrigan,
+      affinity: 10,
+      trust: 12,
+      tag: fond,
+      note: Brings her spare fish from the market stall.
+    }
+secrets:
+  - text: She has kept every letter from her brother in a tin under the stairs, unopened since last winter.
+    reveal: { regard_min: 65 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_e02
+archetype: fisher
+employment: employed
+years_in_monde: 50

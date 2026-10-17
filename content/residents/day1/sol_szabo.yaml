@@ -1,0 +1,109 @@
+# Generated (census-v1) for szabo_maud; curated not yet. Edit here.
+id: sol_szabo
+name: Sol Szabo
+age: 17
+pronouns: they/them
+kind: resident
+occupation: Teenager doing lessons by post at the library desk
+workplace: millbrook.home_07
+home: millbrook.home_07
+portrait: lib_a15_045
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: sol_szabo
+appearance: A lanky teenager with a sandy-blond mop and a face full of freckles. They wear an olive-green
+  canvas work apron over a brick-red shirt and a tool belt.
+look:
+  kind: human
+  skin: 1
+  hair: { style: tufty, colour: 5 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: apron, top: 3, bottom: 6, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: apron, colour: 10 }
+  face: { freckles: true }
+backstory: Sol was born in Monde and remembers the mill before it closed, when the whole street rang with the
+  frames. Now they study by post at the library desk and attend Felix's Thursday evening class. They help
+  Kasimir on weekends and want to build boats, though the harbour has none left to repair. They are protective
+  of their sister Maud and pretend it is an annoyance. Their mother was Carrow-born, and they sometimes think
+  the rail line will return one day.
+personality:
+  traits: [ eager, sheepish, handy, loyal ]
+  big5: { open: 70, conscientious: 45, extravert: 60, agreeable: 65, neurotic: 40 }
+values: { prosperity: 0.25, safety: 0.25, spirit: 0.35, charm: 0.15 }
+beliefs:
+  - The mill frames could be rebuilt if someone had the nerve.
+  - Kasimir is the only adult in Monde who listens to a plan.
+  - The ferry will be late on Tuesday because it always is.
+voice:
+  register: Bright and quick at first, then trailing off when embarrassed. They ask questions and answer their own.
+  tics: [ "right, so", "no, listen", "sorry, sorry" ]
+  never_says: [ it's hopeless, nobody cares, whatever ]
+  samples:
+    - Right, so the frame needs a new bolt. Kasimir says I can have one.
+    - No, listen, it'd float. I've checked.
+    - Sorry, sorry. I'll keep it down for Maud.
+birthday: 3
+likes:
+  [
+    Kasimir's workshop,
+    the harbour steps,
+    fixing things,
+    tea that stays hot long enough to finish,
+    neighbors who knock before advising
+  ]
+dislikes: [ the Saturday collection, being told they are too young, rain on the boat plans ]
+fears: [ leaving Monde for good, letting Maud down ]
+dream:
+  text: A whole afternoon on the harbour with a boat they built and nothing else to do.
+  stages:
+    - Ask Kasimir for a corner of the workshop.
+    - Take Maud to the duck pond and leave the chores behind.
+    - Sit on the harbour steps and watch the first sail go out.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_07 }
+    - { at: "08:30", do: read, where: old_quarter.library }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "17:00", do: walk, where: wharf.breakwater }
+    - { at: "19:00", do: attend, where: millbrook.school }
+    - { at: "21:00", do: eat, where: millbrook.home_07 }
+    - { at: "22:30", do: sleep, where: millbrook.home_07 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_07 }
+    - { at: "09:30", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "12:30", do: eat, where: market_row.gull_and_anchor }
+    - { at: "14:00", do: fish, where: wharf.harbor_steps }
+    - { at: "17:00", do: visit, where: old_quarter.library }
+    - { at: "19:30", do: cook, where: millbrook.home_07 }
+    - { at: "23:00", do: sleep, where: millbrook.home_07 }
+chores: [ mend the gate, carry the coal, help Maud with her hair ]
+relationships:
+  - {
+      id: nettie,
+      affinity: 75,
+      trust: 70,
+      tag: kin,
+      note: Their cousin; she lends them her slingshot for practice.
+    }
+  - { id: ilona, affinity: 70, trust: 65, tag: kin, note: Their grandmother; she taught them to darn socks. }
+  - {
+      id: kasimir,
+      affinity: 60,
+      trust: 55,
+      tag: friend,
+      note: Kasimir gives them offcuts and lets them argue.
+    }
+  - { id: gideon_szabo, affinity: 75, trust: 70, tag: father, note: "Father, under the same roof." }
+  - { id: maud, affinity: 65, trust: 60, tag: sister, note: "Sister, under the same roof." }
+secrets:
+  - text: They have been sketching a boat called the Sparrow on the back of the school timetable.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: szabo_maud
+archetype: single_parent
+employment: lessons
+years_in_monde: 17

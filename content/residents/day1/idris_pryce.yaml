@@ -1,0 +1,106 @@
+# Generated (census-v1) for sh_e01; curated not yet. Edit here.
+id: idris_pryce
+name: Idris Pryce
+age: 57
+pronouns: he/him
+kind: resident
+occupation: Net mender on the harbour steps, odd jobs when the boats are…
+workplace: wharf.harbor_steps
+home: station_hill.home_05
+portrait: idris_pryce
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: idris_pryce
+appearance: A broad-shouldered man with short salt-and-pepper hair and a faded teal shirt, sleeves rolled to
+  the elbow. Stains of tar on his knuckles from the netting.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 11 }
+  eyes: 7
+  build: medium
+  height: tall
+  outfit: { cut: plain, top: 0, bottom: 3, bottom_style: trousers, shoes: 6 }
+  accessory: { kind: none }
+backstory: Came to Monde at 24 from a weaving town on the mainland, hired to set looms at Lissworth Mill
+  within a month. He ran the floor for nine years before a shift pattern change left him on short hours. When
+  the mill closed fourteen years ago he took whatever work the harbour offered, mostly mending nets for the
+  boats. He stayed because Lotte was here and because the town still felt like a place where a pair of hands
+  counted. He still reckons he could get the loom turning if someone let him.
+personality:
+  traits: [ steady, practical, stubborn, dry ]
+  big5: { open: 40, conscientious: 78, extravert: 35, agreeable: 55, neurotic: 30 }
+values: { prosperity: 0.5, safety: 0.25, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - The Mill will reopen if the right people push for it.
+  - Anyone who wears a clipboard is here to take something.
+  - A net mended properly lasts longer than the boat.
+voice:
+  register: "Plain and short. Counts things: picks, bolts, hours. Says 'used to be' when remembering work and
+    rarely anything else."
+  tics: [ used to be, that's the lot, right then ]
+  never_says: [ I feel, my dream, in my heart ]
+  samples:
+    - Mended forty fathoms this week. Used to do that in a morning.
+    - Tea's stewed. Drink it anyway.
+    - Mill's still got its frames inside. Somebody ought to look.
+birthday: 66
+likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time, a steady tide ]
+dislikes: [ being retrained, short shifts, men with clipboards ]
+fears: [ being idle for too long, the Mill being torn down ]
+dream:
+  text: Get the old loom turning again and see cloth come off it one more time.
+  stages:
+    - Find the loom parts in the Mill yard before the damp gets them.
+    - Oil and set them with Kasimir on a dry morning.
+    - Run the first bolt of cloth and let Lotte see it.
+routine:
+  weekday:
+    - { at: "06:30", do: eat, where: station_hill.home_05 }
+    - { at: "07:00", do: work, where: wharf.harbor_steps }
+    - { at: "12:00", do: eat, where: wharf.harbor_steps }
+    - { at: "12:30", do: work, where: wharf.harbor_steps }
+    - { at: "17:00", do: walk, where: wharf.breakwater }
+    - { at: "18:30", do: eat, where: station_hill.home_05 }
+    - { at: "21:30", do: read, where: station_hill.home_05 }
+    - { at: "22:30", do: sleep, where: station_hill.home_05 }
+  weekend:
+    - { at: "08:00", do: eat, where: station_hill.home_05 }
+    - { at: "09:30", do: walk, where: station_hill.lookout_bench }
+    - { at: "11:00", do: shop, where: market_row.general_store }
+    - { at: "13:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "15:00", do: tinker, where: station_hill.home_05 }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "23:00", do: sleep, where: station_hill.home_05 }
+chores: [ mend the net bag, split kindling, check the back door latch ]
+relationships:
+  - {
+      id: lene_devlin,
+      affinity: 20,
+      trust: 25,
+      tag: partner,
+      note: Thirty-three years married and still argues about the tea.
+    }
+  - {
+      id: caspar_underhill,
+      affinity: 8,
+      trust: 12,
+      tag: friend,
+      note: Shares the harbour steps and the gossip with him.
+    }
+  - {
+      id: yara_jankowski,
+      affinity: 6,
+      trust: 10,
+      tag: curious,
+      note: Quick with a needle; he watches her work.
+    }
+secrets:
+  - text: He keeps a bolt of the last cloth ever woven at Lissworth in the wardrobe, wrapped in brown paper.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: sh_e01
+archetype: mill_hand
+employment: employed
+years_in_monde: 33

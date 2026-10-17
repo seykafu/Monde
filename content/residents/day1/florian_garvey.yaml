@@ -1,0 +1,96 @@
+# Generated (census-v1) for wf_d02; curated not yet. Edit here.
+id: florian_garvey
+name: Florian Garvey
+age: 57
+pronouns: he/him
+kind: resident
+occupation: Crew on a Monde fishing boat, mending nets and minding the catch
+workplace: wharf.harbor_steps
+home: wharf.home_05
+portrait: lib_m58_101
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: florian_garvey
+appearance: A wiry man with jet-black hair in a stubby ponytail, a brass-rimmed magnifying visor pushed up on
+  his forehead and a neat black goatee. He wears a tan work smock full of little pockets, each stuffed with
+  knots of twine.
+look:
+  kind: human
+  skin: 9
+  hair: { style: ponytail, colour: 3 }
+  eyes: 5
+  build: narrow
+  height: tall
+  outfit: { cut: smock, top: 15, bottom: 13, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  glasses: on_head
+  face: { moustache: true }
+backstory: Florian grew up inland repairing clocks and instruments in a workshop that closed when he was
+  thirty-three. He came to Monde at thirty-five for a summer job on the boats and stayed, mostly because the
+  boats needed someone who could fix a fiddly engine part by lamplight. He has never married and says he has
+  no need of a second set of hands in the house. He still thinks the sea is simpler than people, which is only
+  partly true. Since the mill closed he has quietly taken over the mending of half the town's lobster pots,
+  unpaid, and tells people it's for the boats.
+personality:
+  traits: [ fastidious, curious, dry, patient ]
+  big5: { open: 78, conscientious: 70, extravert: 35, agreeable: 60, neurotic: 40 }
+values: { prosperity: 0.3, safety: 0.35, spirit: 0.15, charm: 0.2 }
+beliefs:
+  - The tide tells you more than any person will.
+  - Nobody in Monde reads the weather properly anymore.
+  - A well-tied knot can outlast a bad decade.
+voice:
+  register: Short and weather-first. He trails off when a problem interests him more than the conversation. He
+    is understated and rarely asks direct questions.
+  tics: [ Fair enough., Tide's making., "Hmm, hold on." ]
+  never_says: [ I'm not sure, honestly, you know what ]
+  samples:
+    - Fair. Wind's backing, we'll not get out before noon.
+    - Could be worse. The engine's sound, I've only got it propped up with string.
+    - Tide's making, so I'll leave the pots till you're done with that net.
+birthday: 14
+likes: [ flat calm at dawn, good rope, smoked fish, clock mechanisms left open on the bench ]
+dislikes: [ tangled gear, loud engines, gulls on the catch ]
+fears: [ the boathouse roof coming down in a storm, being asked to take on a crew he can't train ]
+dream:
+  text: I want a boat with my name on it, and I want to bring her round the breakwater myself.
+  stages:
+    - Find a hull that's sound enough to rebuild.
+    - Raise sixty coins from catches and the odd repair job.
+    - Launch her on Regatta day and take her out alone.
+routine:
+  weekday:
+    - { at: "06:00", do: wander, where: wharf.home_05 }
+    - { at: "06:30", do: work, where: wharf.harbor_steps }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: tinker, where: wharf.boathouse }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: read, where: wharf.home_05 }
+    - { at: "22:30", do: sleep, where: wharf.home_05 }
+  weekend:
+    - { at: "07:30", do: eat, where: wharf.home_05 }
+    - { at: "09:00", do: fish, where: wharf.breakwater }
+    - { at: "12:30", do: shop, where: market_row.general_store }
+    - { at: "15:00", do: tinker, where: wharf.home_05 }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: wharf.home_05 }
+chores: [ mend pots on the back step, sharpen the knives, sweep the workbench ]
+relationships:
+  - {
+      id: caspar_underhill,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Shares the harbour watch and his bad jokes.
+    }
+  - { id: moss, affinity: 18, trust: 20, tag: fond, note: Old skipper who taught him to read the bay. }
+  - { id: nell, affinity: 8, trust: 6, tag: curious, note: Buys his smoked fish and asks too many questions. }
+secrets:
+  - text: He still tinkers with a small brass music box he hopes to finish for a child who never visits.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: wf_d02
+archetype: fisher
+employment: employed
+years_in_monde: 22

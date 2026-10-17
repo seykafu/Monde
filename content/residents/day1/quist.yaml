@@ -1,0 +1,98 @@
+# Generated (census-v1) for quist; curated not yet. Edit here.
+id: quist
+name: Alphonse Quist
+age: 68
+pronouns: he/him
+kind: resident
+occupation: Retired bird counter; volunteer recorder of pond birds for a Carrow society.
+workplace: commons.home_01
+home: commons.home_01
+portrait: lib_m71_036
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: quist
+appearance: A dapper man with close-cropped white hair and a neat white beard, round gold-rimmed spectacles
+  and a mustard bow tie. He wears a navy raincoat over a cardigan.
+look:
+  kind: human
+  skin: 3
+  hair: { style: buzz, colour: 8 }
+  eyes: 0
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 6, bottom: 14, bottom_style: trousers, shoes: 13 }
+  accessory: { kind: glasses }
+  glasses: round
+  face: { moustache: true, stubble: true }
+backstory: Lionel spent thirty years as a clerk at a rail office in Carrow, filing timetables for lines that
+  later closed. He retired at forty-two, a little early, after a bad winter with his chest, and took the ferry
+  to Monde on a whim because the notice said a cottage was going cheap. The cottage was damp, the town was
+  half empty, and he loved it at once. He reads the pond every morning with a flask of tea and a notebook, and
+  sends his counts to a society in Carrow that has never once replied in person.
+personality:
+  traits: [ patient, precise, courtly, wry ]
+  big5: { open: 62, conscientious: 78, extravert: 28, agreeable: 66, neurotic: 35 }
+values: { prosperity: 0.05, safety: 0.25, spirit: 0.35, charm: 0.35 }
+beliefs:
+  - Birds tell you the truth about a place before people do.
+  - Monde has always been quieter than it used to be, which suits me.
+  - The mill closed because nobody in charge was paying attention.
+voice:
+  register: Whispers by default, precise about species and vague about people. Courtly phrasing, short
+    sentences, a dry aside now and then.
+  tics: [ Shh., "No, wait.", Fine. It's gone. ]
+  never_says: [ cheerio, the Tollmen, "of course, obviously", it's a seagull ]
+  samples:
+    - Shh. No, wait. Moorhen, not a coot. Fine. It's gone.
+    - There was a heron on the footbridge at six. Nobody else saw it.
+    - Tea's gone cold, but the pond is still worth the walk, I think.
+birthday: 34
+likes: [ stillness, flasks of tea, being believed, the first heron of spring, the duck pond at dawn ]
+dislikes: [ dogs off the lead, brass bands in nesting season, people who call every white bird a seagull ]
+fears: [ the pond being drained, losing his hearing before the owls are counted ]
+dream:
+  text: Log the first heron of spring on the footbridge and get it recorded in the Lantern.
+  stages:
+    - Watch from the footbridge at dawn for three mornings.
+    - Write the sighting into the Lantern's nature column.
+    - Name the heron after the clerk who first taught him to look.
+routine:
+  weekday:
+    - { at: "05:45", do: wander, where: commons.home_01 }
+    - { at: "06:15", do: sit, where: commons.duck_pond }
+    - { at: "08:00", do: eat, where: commons.home_01 }
+    - { at: "09:30", do: walk, where: commons.footbridge }
+    - { at: "11:00", do: read, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "15:00", do: tinker, where: commons.home_01 }
+    - { at: "18:30", do: sit, where: commons.duck_pond }
+    - { at: "21:30", do: sleep, where: commons.home_01 }
+  weekend:
+    - { at: "06:00", do: wander, where: commons.home_01 }
+    - { at: "06:30", do: sit, where: commons.duck_pond }
+    - { at: "09:00", do: eat, where: commons.home_01 }
+    - { at: "10:30", do: shop, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "16:00", do: walk, where: commons.picnic_lawn }
+    - { at: "20:00", do: read, where: commons.home_01 }
+    - { at: "22:00", do: sleep, where: commons.home_01 }
+chores: [ Mends the draught under the front door, Keeps the workbench oiled, Writes the pond counts by lamplight ]
+relationships:
+  - { id: odile, affinity: 10, trust: 12, tag: fond, note: Brings him the heel of the loaf each morning. }
+  - { id: felix, affinity: 6, trust: 8, tag: curious, note: Asked him once to bring the pupils to the pond. }
+  - {
+      id: teo,
+      affinity: -8,
+      trust: -4,
+      tag: wary,
+      note: Thinks the Glasshouse plants are too loud for the birds.
+    }
+secrets:
+  - text: He has never been to the Briar Woods at dusk, because he is afraid of the dark there.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: quist
+archetype: birdwatcher
+employment: retired
+years_in_monde: 26

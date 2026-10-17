@@ -1,0 +1,107 @@
+# Generated (census-v1) for mb_c01; curated not yet. Edit here.
+id: cedric_ortega
+name: Cedric Ortega
+age: 59
+pronouns: he/him
+kind: resident
+occupation: Casual labourer doing odd jobs, net mending and harvest work.
+workplace: millbrook.home_21
+home: millbrook.home_21
+portrait: cedric_ortega
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: cedric_ortega
+appearance: A broad-shouldered man with black hair swept back and a rust shirt rolled at the sleeves. He wears
+  a leather cap when the wind comes off the Liss.
+look:
+  kind: human
+  skin: 8
+  hair: { style: swept, colour: 3 }
+  eyes: 1
+  build: medium
+  height: short
+  outfit: { cut: plain, top: 11, bottom: 14, bottom_style: trousers, shoes: 5 }
+  accessory: { kind: none }
+  face: { grey_temples: true }
+backstory: Cedric spent twenty years on the cranes at a Carrow dock before a bad shoulder ended that work. He
+  and Hamish moved to Monde when a cousin offered them the ground floor of a Loom Street house for almost
+  nothing. He tells people it was for the air. The truth is that he was tired of being the one who got up
+  first and checked the locks. Here he mends nets for the few boats still going out and does harvest work at
+  the Commons plots, which is mostly weeding bindweed. He believes the town will fill again within a few years
+  once word gets out about the cheap houses.
+personality:
+  traits: [ steady, practical, teasing, stubborn ]
+  big5: { open: 40, conscientious: 72, extravert: 58, agreeable: 65, neurotic: 35 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.15, charm: 0.3 }
+beliefs:
+  - Monde will be full again within five years.
+  - A man should mend what he breaks before he buys new.
+  - Hamish worries too much about the rain.
+voice:
+  register: Warm and blunt, with a dockside plainness. He jokes about small things and goes quiet when a subject
+    matters. He rarely finishes a thought he has already said once.
+  tics: [ "Right, then.", That's the lot., Don't fuss. ]
+  never_says: [ I feel, in my opinion, frankly ]
+  samples:
+    - Right, then. Net's mended, so you can stop looking at it.
+    - Hamish says it'll rain. He's wrong, but don't tell him I said so.
+    - I'm not asking for much. Just a bit of quiet and a warm kettle.
+birthday: 76
+likes:
+  [
+    the smell of tar and salt,
+    a good pot of stew,
+    Hamish laughing at his own jokes,
+    a morning paper,
+    a kettle on the stove
+  ]
+dislikes: [ drafts under the door, people who talk over the radio, bindweed ]
+fears: [ being left alone in the house, the mill finally coming down ]
+dream:
+  text: Dancing with Hamish on a Saturday night in a hall full of lamplight and music.
+  stages:
+    - Find a hall with a sound floor and a window.
+    - Find a gramophone or a band willing to play for coins.
+    - Hold the dance on the first warm Saturday of summer.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_21 }
+    - { at: "08:00", do: work, where: millbrook.home_21 }
+    - { at: "12:00", do: eat, where: market_row.bakery }
+    - { at: "13:00", do: garden, where: commons.picnic_lawn }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "19:30", do: cook, where: millbrook.home_21 }
+    - { at: "22:00", do: sleep, where: millbrook.home_21 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_21 }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "13:00", do: walk, where: millbrook.weir }
+    - { at: "16:00", do: socialize, where: commons.duck_pond }
+    - { at: "19:00", do: eat, where: millbrook.home_21 }
+    - { at: "23:00", do: sleep, where: millbrook.home_21 }
+chores: [ Mends nets on the back step, Carries water from the pump, Sweeps the front path ]
+relationships:
+  - {
+      id: hamish_ortega,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: Partner of thirteen years; they argue like brothers.
+    }
+  - {
+      id: tomasz_blaauw,
+      affinity: 12,
+      trust: 10,
+      tag: friend,
+      note: Keeps the minutes at the Loom Street talks; Cedric helps him carry the chairs.
+    }
+  - { id: kasimir, affinity: 14, trust: 18, tag: fond, note: Trades net repairs for timber scraps. }
+secrets:
+  - text: He still sends a postcard each spring to the Carrow dock foreman he used to fight with.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_c01
+archetype: retired_couple
+employment: employed
+years_in_monde: 13

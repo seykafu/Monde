@@ -1,0 +1,77 @@
+# Generated (census-v1) for mb_n01; curated not yet. Edit here.
+id: josef_nesbitt
+name: Josef Nesbitt
+age: 7
+pronouns: he/him
+kind: resident
+occupation: pupil at Millbrook School
+workplace: millbrook.home_38
+home: millbrook.home_38
+portrait: lib_m09_002
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: josef_nesbitt
+appearance: A boy with short black curls, a green school jumper over a white collar and a satchel strap across
+  his chest. Bright, eager eyes.
+look:
+  kind: human
+  skin: 3
+  hair: { style: curly, colour: 3 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 7, bottom: 6, bottom_style: shorts, shoes: 2 }
+  accessory: { kind: none }
+backstory: Josef was born in Monde and goes to Millbrook School. He likes the ducks on the Commons best.
+personality:
+  traits: [ stubborn, warm, kind ]
+  big5: { open: 76, conscientious: 82, extravert: 76, agreeable: 78, neurotic: 39 }
+values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: "A young voice: questions, then more questions."
+  tics: [ Can we go to the ducks? ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Can we go to the ducks? Just for a minute.
+    - I'm not tired. I'm resting my eyes.
+    - Mr. Amari says my letters lean. They're fine.
+birthday: 78
+likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
+dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
+fears: [ the dark on the stairs ]
+dream:
+  text: A school worth the walk
+  stages:
+    - Visit Felix's classroom (Regard ≥ 20 with felix)
+    - Help with a Friday lesson
+    - Sign the enrollment roll in front of the whole class
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_38 }
+    - { at: "08:30", do: attend, where: millbrook.school }
+    - { at: "15:30", do: wander, where: commons.picnic_lawn }
+    - { at: "17:30", do: eat, where: millbrook.home_38 }
+    - { at: "20:00", do: sleep, where: millbrook.home_38 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_38 }
+    - { at: "10:00", do: wander, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: millbrook.home_38 }
+    - { at: "14:00", do: wander, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: millbrook.home_38 }
+    - { at: "20:30", do: sleep, where: millbrook.home_38 }
+chores: [ fill the coal scuttle, sweep the step ]
+relationships:
+  - { id: elke_nesbitt, affinity: 70, trust: 70, tag: mother, note: Same house. }
+  - { id: corin_madsen, affinity: 70, trust: 70, tag: parent, note: Same house. }
+  - { id: leila_nesbitt, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
+  - { id: hanne_nesbitt, affinity: 65, trust: 60, tag: sister, note: "Sister, under the same roof." }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mb_n01
+archetype: school_family
+employment: pupil
+years_in_monde: 7

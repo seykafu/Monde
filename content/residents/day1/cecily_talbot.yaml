@@ -1,0 +1,73 @@
+# Generated (census-v1) for mr_k01; curated not yet. Edit here.
+id: cecily_talbot
+name: Cecily Talbot
+age: 4
+pronouns: she/her
+kind: resident
+occupation: too small for school yet
+workplace: market_row.home_05
+home: market_row.home_05
+portrait: lib_f05_001
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: cecily_talbot
+appearance: A small girl with dark brown pigtails tied with yellow ribbons and a red knitted jumper. A
+  gap-toothed, curious look.
+look:
+  kind: human
+  skin: 7
+  hair: { style: pigtails, colour: 0 }
+  eyes: 0
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 3, bottom: 5, bottom_style: trousers, shoes: 4 }
+  accessory: { kind: none }
+backstory: Cecily was born in Monde and is too small for school yet. She likes the ducks on the Commons best.
+personality:
+  traits: [ careful, restless, steady ]
+  big5: { open: 25, conscientious: 32, extravert: 93, agreeable: 48, neurotic: 57 }
+values: { prosperity: 0.4, safety: 0.25, spirit: 0.2, charm: 0.15 }
+beliefs:
+  - Monde was busier when I was younger, and it will be again.
+  - Nobody on this street notices the empty houses any more.
+voice:
+  register: "A young voice: questions, then more questions."
+  tics: [ Can we go to the ducks? ]
+  never_says: [ no worries, awesome ]
+  samples:
+    - Can we go to the ducks? Just for a minute.
+    - I'm not tired. I'm resting my eyes.
+    - Mr. Amari says my letters lean. They're fine.
+birthday: 18
+likes: [ tea that stays hot long enough to finish, neighbors who knock before advising, a back door that locks ]
+dislikes: [ being pitied, visitors at bedtime, being asked who watches the children ]
+fears: [ the dark on the stairs ]
+dream:
+  text: Hours that fit around the school run
+  stages:
+    - Ask a shop owner for fixed morning hours (Regard ≥ 25)
+    - Swap school-run days with a neighbor (Regard ≥ 20)
+    - Write the timetable on the kitchen wall
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: market_row.home_05 }
+    - { at: "10:00", do: walk, where: commons.duck_pond }
+    - { at: "12:00", do: eat, where: market_row.home_05 }
+    - { at: "13:00", do: nap, where: market_row.home_05 }
+    - { at: "19:00", do: sleep, where: market_row.home_05 }
+  weekend:
+    - { at: "08:00", do: eat, where: market_row.home_05 }
+    - { at: "10:30", do: walk, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: market_row.home_05 }
+    - { at: "13:30", do: nap, where: market_row.home_05 }
+    - { at: "19:00", do: sleep, where: market_row.home_05 }
+chores: [ fill the coal scuttle, beat the doormat ]
+relationships:
+  - { id: linnea_talbot, affinity: 70, trust: 70, tag: mother, note: Same house. }
+secrets: []
+canon_locks: []
+story_role: none
+generated_by: template
+household: mr_k01
+archetype: single_parent
+employment: under_five
+years_in_monde: 4

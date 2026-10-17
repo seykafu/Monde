@@ -1,0 +1,124 @@
+# Generated (census-v1) for wf_a03; curated not yet. Edit here.
+id: solveig_gallagher
+name: Solveig Gallagher
+age: 65
+pronouns: she/her
+kind: resident
+occupation: Retired seamstress, mends neighbours' clothes for coins when asked.
+workplace: wharf.home_09
+home: wharf.home_09
+portrait: solveig_gallagher
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: solveig_gallagher
+appearance: A slight woman with short white hair, round glasses and a rust pinafore with a pincushion pinned
+  at the hip. She keeps her tape measure looped around her neck.
+look:
+  kind: human
+  skin: 0
+  hair: { style: short, colour: 8 }
+  eyes: 2
+  build: narrow
+  height: short
+  outfit: { cut: pinafore, top: 11, bottom: 13, bottom_style: trousers, shoes: 9, trim: 11 }
+  accessory: { kind: glasses }
+  glasses: round
+backstory: Solveig sewed alterations for a department house in Hessle Cross for thirty years, until her
+  husband Tomas died of a stubborn lung infection and the work stopped meaning anything. She sold their flat
+  and took the cheap ground-floor room on Shore Lane because a friend's letter said the sea air helped the
+  nerves. Twenty-seven years on she still finds the ferry timetable on the wall and writes the fares down out
+  of habit. Her one regret is the quilt she started for Tomas's sister and never finished, which she keeps
+  folded at the foot of the bed. She believes the Gull's cider is too sweet and that the tap in her kitchen
+  drips to spite her.
+personality:
+  traits: [ patient, meandering, observant, stubborn, warm ]
+  big5: { open: 55, conscientious: 78, extravert: 35, agreeable: 68, neurotic: 42 }
+values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
+beliefs:
+  - Good cloth outlasts good intentions.
+  - The ferry used to run on time when Moss was younger.
+  - Nobody in Monde notices a stitch dropped.
+  - That tap is deliberately dripping at me.
+voice:
+  register: Gentle and rambling on purpose, circling back to earlier points. She remembers prices from forty
+    years ago and compares everything to them. Speaks in soft, unhurried sentences.
+  tics: [ Now where was I?, "In my day,", that's the thing about cloth ]
+  never_says: [ cool, you're welcome, obviously, going forward ]
+  samples:
+    - Now where was I? Oh yes, the bread used to be four coins a loaf, and now look at it.
+    - That boy on the bicycle has no bell again. I'll say nothing, I'll just listen for him.
+    - Sit down, love, the kettle's nearly there. The tap's been at it all morning, mind.
+birthday: 100
+likes:
+  [
+    knitting,
+    small birds at the window,
+    being asked for a story,
+    warm bread from the bakery,
+    the sound of the harbour at dusk
+  ]
+dislikes:
+  [
+    boys on bicycles with no bells,
+    being called grandma by strangers,
+    a cold stove,
+    sweet cider,
+    loud radio in the morning
+  ]
+fears: [ forgetting the sound of Tomas's voice, the house going quiet for good ]
+dream:
+  text: Finish the quilt she started for Tomas's sister, with scraps gathered from the whole town.
+  stages:
+    - Gather scraps from five residents, each with a story to share.
+    - Sew at the library table through a long afternoon.
+    - Hang the finished quilt at the Harvest Supper for everyone to see.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: wharf.home_09 }
+    - { at: "08:30", do: walk, where: wharf.harbor_steps }
+    - { at: "09:30", do: shop, where: wharf.fish_market }
+    - { at: "11:00", do: read, where: old_quarter.library }
+    - { at: "13:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:30", do: sit, where: commons.duck_pond }
+    - { at: "17:00", do: cook, where: wharf.home_09 }
+    - { at: "21:30", do: sleep, where: wharf.home_09 }
+  weekend:
+    - { at: "08:00", do: eat, where: wharf.home_09 }
+    - { at: "09:00", do: shop, where: market_row.bakery }
+    - { at: "10:30", do: wander, where: market_row.market_street }
+    - { at: "12:30", do: socialize, where: market_row.general_store }
+    - { at: "15:00", do: walk, where: commons.picnic_lawn }
+    - { at: "18:00", do: eat, where: wharf.home_09 }
+    - { at: "22:00", do: sleep, where: wharf.home_09 }
+chores: [ mend neighbours' coats, trim the wick of the bedside lamp, wipe the drips from the kitchen tap ]
+relationships:
+  - {
+      id: anouk_seaton,
+      affinity: 15,
+      trust: 20,
+      tag: friend,
+      note: Fellow former needlewoman down the lane; they trade thread.
+    }
+  - {
+      id: laila_treharne,
+      affinity: 10,
+      trust: 5,
+      tag: curious,
+      note: Small child who waves at her from the step.
+    }
+  - {
+      id: moss,
+      affinity: 8,
+      trust: 10,
+      tag: fond,
+      note: Old skipper who still nods when she passes the slip.
+    }
+secrets:
+  - text: She still keeps Tomas's last letter folded inside her pinafore pocket and reads it at night.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: wf_a03
+archetype: widowed_elder
+employment: retired
+years_in_monde: 27

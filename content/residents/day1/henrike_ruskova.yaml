@@ -1,0 +1,114 @@
+# Generated (census-v1) for mb_e02; curated not yet. Edit here.
+id: henrike_ruskova
+name: Henrike Ruskova
+age: 54
+pronouns: she/her
+kind: resident
+occupation: Former loom-setter and repair hand, now doing odd jobs.
+workplace: millbrook.home_08
+home: millbrook.home_08
+portrait: henrike_ruskova
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: henrike_ruskova
+appearance: A woman with long grey hair, an olive shirt and a slate-blue flat cap pulled low over one brow.
+  Her broad forearms show old oil burns.
+look:
+  kind: human
+  skin: 8
+  hair: { style: long, colour: 2 }
+  eyes: 5
+  build: broad
+  height: short
+  outfit: { cut: plain, top: 10, bottom: 15, bottom_style: trousers, shoes: 14 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 6 }
+backstory: Henrike came to the Mill from the cannery towns on the south coast, where she had mended nets and
+  fixed engines since her teens. She met Anneke on the night shift and they have shared a house ever since.
+  When the cannery on the Wharf closed eleven years ago she took whatever repair work she could find, mostly
+  bicycles and radios for neighbours who paid in eggs and favours. She talks about the Mill's machines as if
+  they were animals she once looked after. She is sure the cannery could run again with two engines and a
+  decent crew.
+personality:
+  traits: [ patient, handy, warm, blunt ]
+  big5: { open: 50, conscientious: 70, extravert: 45, agreeable: 68, neurotic: 35 }
+values: { prosperity: 0.45, safety: 0.25, spirit: 0.15, charm: 0.15 }
+beliefs:
+  - Any engine can be coaxed if you listen to it long enough.
+  - The cannery only needs one honest buyer to start again.
+  - Anneke works too hard and never sleeps.
+voice:
+  register: Slow and kind, with long pauses. She prefers to show rather than tell and will fix something while
+    she talks.
+  tics: [ Hold that for me., "Listen to her, she's fine.", Give it a moment. ]
+  never_says: [ that's terrible, nothing to be done, I suppose, you must understand ]
+  samples:
+    - Hold that for me, would you? Give it a moment and she'll turn over.
+    - Anneke's up before the gulls again. I've told her, she never listens.
+    - No, the bicycle's fine. It just wanted someone to ask nicely.
+birthday: 2
+likes:
+  [
+    a good strong engine,
+    fresh bread from Fournier & Fille,
+    the harbour at dusk,
+    the cat flap Anneke keeps promising to fit,
+    tea in a tin mug
+  ]
+dislikes: [ waste, people who shout at machines, being rushed at the boathouse ]
+fears: [ losing the workbench, seeing Anneke give up ]
+dream:
+  text: Get the old loom turning again, and hear it run true.
+  stages:
+    - Find the loom parts in the Mill yard.
+    - Oil and set them with Kasimir's help.
+    - Run the first bolt of cloth on the loom.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_08 }
+    - { at: "08:00", do: walk, where: millbrook.weir }
+    - { at: "09:30", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "12:00", do: eat, where: market_row.bakery }
+    - { at: "13:00", do: wander, where: wharf.harbor_steps }
+    - { at: "16:00", do: fish, where: wharf.breakwater }
+    - { at: "18:30", do: cook, where: millbrook.home_08 }
+    - { at: "21:30", do: sleep, where: millbrook.home_08 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_08 }
+    - { at: "09:00", do: garden, where: millbrook.laundry_green }
+    - { at: "11:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: millbrook.kasimir_workshop }
+    - { at: "17:00", do: fish, where: wharf.breakwater }
+    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: millbrook.home_08 }
+chores:
+  [
+    Feeds the hens at the back.,
+    Patches the roof tiles after storms.,
+    Sharpens the household knives on Sundays.
+  ]
+relationships:
+  - { id: anneke_moran, affinity: 18, trust: 22, tag: partner, note: "Her partner, who never sleeps enough." }
+  - {
+      id: viggo_mendes,
+      affinity: 14,
+      trust: 12,
+      tag: friend,
+      note: Knows knots and boats; they trade favours on the harbour.
+    }
+  - {
+      id: noor_lombardi,
+      affinity: -5,
+      trust: 6,
+      tag: curious,
+      note: Asks too many questions on the night walk.
+    }
+secrets:
+  - text: She has been quietly rebuilding a bicycle from spare cannery parts for a child she has never met.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_e02
+archetype: mill_hand
+employment: out_of_work
+years_in_monde: 18

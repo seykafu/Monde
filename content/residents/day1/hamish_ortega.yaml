@@ -1,0 +1,113 @@
+# Generated (census-v1) for mb_c01; curated not yet. Edit here.
+id: hamish_ortega
+name: Hamish Ortega
+age: 61
+pronouns: he/him
+kind: resident
+occupation: Retired clerk who keeps the Loom Street accounts ledger by hand.
+workplace: millbrook.home_21
+home: millbrook.home_21
+portrait: hamish_ortega
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: hamish_ortega
+appearance: A neat older man with short white hair, an olive complexion and a trim white moustache. He wears a
+  cream coat over a waistcoat, with a folded tartan rug over one arm.
+look:
+  kind: human
+  skin: 7
+  hair: { style: short, colour: 8 }
+  eyes: 3
+  build: medium
+  height: tall
+  outfit: { cut: coat, top: 9, bottom: 1, bottom_style: trousers, shoes: 10 }
+  accessory: { kind: none }
+  face: { moustache: true }
+backstory: Hamish was a ledger clerk at a Carrow shipping office for thirty-one years and was pleased with
+  every one of them. He met Cedric at a dance hall the year the hall closed. When the office let him go with a
+  clock and a letter of thanks, he found he had nothing to fill his mornings, and Cedric suggested Monde. They
+  took the Loom Street house and Hamish began writing letters to the Lantern about the state of the pavements.
+  The Lantern has printed four of them. He believes that if a town is kept in good order, it will look after
+  itself.
+personality:
+  traits: [ precise, courteous, anxious, sentimental ]
+  big5: { open: 50, conscientious: 85, extravert: 42, agreeable: 70, neurotic: 62 }
+values: { prosperity: 0.12, safety: 0.4, spirit: 0.18, charm: 0.3 }
+beliefs:
+  - A tidy street is a safe street.
+  - The Lantern is the honest voice of Monde.
+  - Cedric is far too casual about the weather.
+voice:
+  register: Measured and polite, with careful consonants. He corrects small errors without meaning harm. He
+    prefers full sentences and apologises before he disagrees.
+  tics: [ "If I may,", "Quite so, dear.", Do you think? ]
+  never_says: [ whatever, to be honest, it doesn't matter ]
+  samples:
+    - If I may, the gutter outside number nine is blocked again.
+    - Quite so, dear. I'll fetch the rug before it turns.
+    - I don't mind the walk. I'm simply not sure we'll get back before dark.
+birthday: 68
+likes:
+  [
+    a well-kept ledger,
+    the morning Lantern on the mat,
+    his tartan rug,
+    a morning paper,
+    a kettle on the stove
+  ]
+dislikes: [ being rushed, loose papers in the wind, anyone who calls him Hammy ]
+fears: [ the house falling into disrepair, losing Cedric to the sea ]
+dream:
+  text: Be useful in Monde, with his name printed in the Lantern and a regular chair at the pub.
+  stages:
+    - Volunteer three shifts at the library desk or the school.
+    - Get thanked by name in the Lantern for the work.
+    - Take a regular chair at the Gull & Anchor by the fire.
+routine:
+  weekday:
+    - { at: "07:30", do: eat, where: millbrook.home_21 }
+    - { at: "08:30", do: write, where: millbrook.home_21 }
+    - { at: "10:00", do: volunteer, where: old_quarter.library }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: read, where: old_quarter.fountain_square }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: sleep, where: millbrook.home_21 }
+  weekend:
+    - { at: "08:00", do: eat, where: millbrook.home_21 }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:30", do: shop, where: market_row.general_store }
+    - { at: "14:00", do: walk, where: commons.picnic_lawn }
+    - { at: "18:30", do: cook, where: millbrook.home_21 }
+    - { at: "22:00", do: sleep, where: millbrook.home_21 }
+chores: [ Writes the household ledger, Sweeps the front step, Airs the bedding on Mondays ]
+relationships:
+  - {
+      id: cedric_ortega,
+      affinity: 25,
+      trust: 28,
+      tag: spouse,
+      note: Partner of thirteen years; keeps him steady.
+    }
+  - {
+      id: margo,
+      affinity: 10,
+      trust: 12,
+      tag: curious,
+      note: Runs the library desk; he is slowly learning her filing system.
+    }
+  - {
+      id: ursula_gorski,
+      affinity: 16,
+      trust: 14,
+      tag: fond,
+      note: Neighbour; she mends his waistcoats for a pot of tea.
+    }
+secrets:
+  - text: He has kept every Lantern since he arrived, bound in a box under the stairs.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_c01
+archetype: retired_couple
+employment: retired
+years_in_monde: 13

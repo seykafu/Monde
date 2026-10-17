@@ -1,0 +1,108 @@
+# Generated (census-v1) for mb_a04; curated not yet. Edit here.
+id: billie_pengelly
+name: Billie Pengelly
+age: 62
+pronouns: they/them
+kind: resident
+occupation: Bookbinder working from home, sewing signatures and making cloth-bound ledgers for the…
+workplace: millbrook.home_25
+home: millbrook.home_25
+portrait: billie_pengelly
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: billie_pengelly
+appearance: Salt-and-pepper hair swept back from a broad forehead, a cream smock dusted with paste, and heavy
+  glasses pushed up on the head when working. Slight build, tan from years on the breakwater steps.
+look:
+  kind: human
+  skin: 2
+  hair: { style: swept, colour: 11 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: smock, top: 9, bottom: 14, bottom_style: trousers, shoes: 5 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: Billie was born in the brick house on Mill Lane and learned to bind from their mother, who did
+  sheet-music covers for the bandstand concerts before the bandstand fell in. Billie went to Carrow at
+  nineteen to train with a commercial bindery, came back after four years when the mill's wages stopped being
+  the only wages worth having, and has been here since. The bindery in Carrow sent a letter asking them back
+  once, and Billie still keeps it in the drawer with the awls. Their own work is slow and sells mostly through
+  the Gull & Anchor noticeboard and the odd parcel on the Tuesday ferry.
+personality:
+  traits: [ patient, dry, exact, private ]
+  big5: { open: 62, conscientious: 82, extravert: 24, agreeable: 58, neurotic: 41 }
+values: { prosperity: 0.22, safety: 0.18, spirit: 0.23, charm: 0.37 }
+beliefs:
+  - A well-made thing outlasts the mood that wanted it.
+  - The town will fill again once people see the work.
+  - Ferry days are the only honest days of the week.
+voice:
+  register: Slow, precise, speaks in process words. Describes weather by what it does to paper and paste. Short
+    sentences, long pauses.
+  tics: [ mind the glue, that'll take a day, "well, it's damp" ]
+  never_says: [ make it quick, it's only a hobby, do it cheaper ]
+  samples:
+    - Paper's swollen this morning. Sea air. It'll dry by four, if it means to.
+    - Ledger? Yes. Quarter-cloth, not the cheap stuff. You'll wait the week.
+    - The ferry's late. No, I'm not cross. I'm just not finished with the spine.
+birthday: 21
+likes:
+  [
+    parcels arriving unbroken,
+    steady north light,
+    people who ask how it's made,
+    the smell of wheat paste,
+    quiet Tuesdays
+  ]
+dislikes: [ could you do it cheaper, damp materials, the ferry missing a day, people who pull books open flat ]
+fears: [ the north window cracking in a gale, being the last one who remembers the old bindery method ]
+dream:
+  text: A shelf in the Market Hall with bound ledgers standing in a row, and a Market Row shop that orders them
+    by the dozen.
+  stages:
+    - Show sample ledgers to Mayor Pell to earn her regard.
+    - Fill a table at one Saturday market before the frost.
+    - Win a standing order from a Market Row shop, the bakery if possible.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: millbrook.home_25 }
+    - { at: "08:00", do: work, where: millbrook.home_25 }
+    - { at: "12:30", do: eat, where: millbrook.home_25 }
+    - { at: "13:30", do: work, where: millbrook.home_25 }
+    - { at: "16:30", do: walk, where: millbrook.weir }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:30", do: read, where: millbrook.home_25 }
+    - { at: "22:30", do: sleep, where: millbrook.home_25 }
+  weekend:
+    - { at: "08:30", do: eat, where: millbrook.home_25 }
+    - { at: "10:00", do: shop, where: market_row.general_store }
+    - { at: "11:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "14:00", do: walk, where: wharf.harbor_steps }
+    - { at: "17:00", do: work, where: millbrook.home_25 }
+    - { at: "20:00", do: cook, where: millbrook.home_25 }
+    - { at: "22:00", do: sleep, where: millbrook.home_25 }
+chores: [ Sweep the paste off the bench, Air the signatures on the rack, Carry the parcel to the Tuesday ferry ]
+relationships:
+  - { id: kasimir, affinity: 12, trust: 18, tag: friend, note: Mends the bench legs whenever they wobble. }
+  - {
+      id: priya,
+      affinity: 8,
+      trust: 22,
+      tag: fond,
+      note: Checks Billie's blood pressure at the door without charge.
+    }
+  - { id: delphine, affinity: 6, trust: 10, tag: curious, note: Asks after the old loom-thread bindings. }
+secrets:
+  - text: Billie keeps a tin bath in the wash-house and still bathes in it on Sundays, out of stubbornness about
+      the new water pipes.
+    reveal: { regard_min: 50 }
+  - text: Billie has bound a private book of every ferry timetable since the Gannet first sailed, and never shown
+      it to anyone.
+    reveal: { regard_min: 65 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: mb_a04
+archetype: remote_craftsperson
+employment: employed
+years_in_monde: 62

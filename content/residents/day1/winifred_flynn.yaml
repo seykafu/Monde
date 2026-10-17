@@ -1,0 +1,101 @@
+# Generated (census-v1) for oq_b04; curated not yet. Edit here.
+id: winifred_flynn
+name: Winifred Flynn
+age: 64
+pronouns: she/her
+kind: resident
+occupation: Retired draper, still sews small repairs for the street.
+workplace: old_quarter.home_06
+home: old_quarter.home_06
+portrait: lib_f68_065
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: winifred_flynn
+appearance: A silver-grey bun pinned up neatly, a rose-pink cardigan buttoned to the throat, and a small
+  brooch at the collar. Her look is dry and patient, as if she has already heard your excuse.
+look:
+  kind: human
+  skin: 1
+  hair: { style: bun, colour: 2 }
+  eyes: 1
+  build: narrow
+  height: short
+  outfit: { cut: jumper, top: 12, bottom: 6, bottom_style: skirt, shoes: 13 }
+  accessory: { kind: none }
+backstory: Winifred ran the drapery counter on Market Row for twenty-six years, measuring cloth for brides and
+  widows alike. When the shop shut she sold her sewing machine and kept only her thimble and a basket of
+  buttons. She moved in with her sister after a bad winter and found she liked the slower days better than she
+  expected. She is certain the bakery's rye is better than anything in Carrow. Her quiet grief is a bolt of
+  blue wool she never cut, which she keeps folded in the wardrobe.
+personality:
+  traits: [ patient, thrifty, warm, stubborn ]
+  big5: { open: 40, conscientious: 75, extravert: 55, agreeable: 73, neurotic: 30 }
+values: { prosperity: 0.12, safety: 0.4, spirit: 0.18, charm: 0.3 }
+beliefs:
+  - Good cloth outlasts everyone who sells it.
+  - Monde's rye is better than anything in Carrow.
+  - Lavinia would rather be right than comfortable.
+voice:
+  register: Warm and unhurried, with a teasing edge. She lets silences sit and often answers a question with
+    another question.
+  tics: [ "Don't we, dear?", "mm, go on then", "well, there we are" ]
+  never_says: [ hurry up, I'm busy, it's not worth it ]
+  samples:
+    - Don't we, dear? She always did keep the good thread for herself.
+    - Mm, go on then, have the last slice. I won't tell the bakery.
+    - I'll mend it. Bring it round after the Saturday market.
+birthday: 54
+likes: [ the Saturday market, good wool, the bakery's rye, afternoon tea on the step, a morning paper ]
+dislikes: [ loud radios, sloppy hems, people who won't sit down ]
+fears: [ the blue wool going to waste, being left alone in the flat ]
+dream:
+  text: A Saturday night dance in a hall with a gramophone, a few old friends and a waltz she has not danced in
+    years.
+  stages:
+    - Find a hall with a floor that will hold the weight.
+    - Find a gramophone or a band willing to play for coins.
+    - Hold the dance and make Lavinia admit she enjoyed it.
+routine:
+  weekday:
+    - { at: "07:15", do: eat, where: old_quarter.home_06 }
+    - { at: "09:00", do: sit, where: old_quarter.home_06 }
+    - { at: "10:30", do: visit, where: market_row.bakery }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: write, where: old_quarter.lantern_office }
+    - { at: "17:00", do: walk, where: old_quarter.lamplighter_lane }
+    - { at: "20:00", do: cook, where: old_quarter.home_06 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_06 }
+  weekend:
+    - { at: "08:30", do: eat, where: old_quarter.home_06 }
+    - { at: "09:30", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: socialize, where: market_row.cafe_liss }
+    - { at: "15:00", do: garden, where: commons.picnic_lawn }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: old_quarter.home_06 }
+chores: [ mend hems and buttons, bake Sunday loaf, feed the cat ]
+relationships:
+  - {
+      id: lavinia_flynn,
+      affinity: 18,
+      trust: 22,
+      tag: spouse,
+      note: Her sister. Wins most arguments by going quiet.
+    }
+  - {
+      id: fenna_renard,
+      affinity: 14,
+      trust: 16,
+      tag: friend,
+      note: Fellow seamstress; they swap patterns and grumble together.
+    }
+  - { id: odile, affinity: 8, trust: 10, tag: fond, note: Trusts her rye and says so loudly. }
+secrets:
+  - text: She still practises the waltz alone in the kitchen when the kettle is on, and counts the steps under her
+      breath.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: oq_b04
+archetype: retired_couple
+employment: retired
+years_in_monde: 64

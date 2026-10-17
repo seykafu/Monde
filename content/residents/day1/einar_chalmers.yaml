@@ -1,0 +1,115 @@
+# Generated (census-v1) for mb_d02; curated not yet. Edit here.
+id: einar_chalmers
+name: Einar Chalmers
+age: 54
+pronouns: he/him
+kind: resident
+occupation: Haulier on the Post round and haulage runs at the crane yard
+workplace: wharf.crane_yard
+home: millbrook.home_35
+portrait: einar_chalmers
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: einar_chalmers
+appearance: A broad man with salt-and-pepper hair swept back, heavy glasses and a rust-coloured shirt with the
+  sleeves rolled to the elbow. He wears a canvas apron over his work trousers.
+look:
+  kind: human
+  skin: 5
+  hair: { style: swept, colour: 11 }
+  eyes: 1
+  build: broad
+  height: short
+  outfit: { cut: plain, top: 11, bottom: 5, bottom_style: trousers, shoes: 8 }
+  accessory: { kind: glasses }
+  glasses: heavy
+backstory: Einar was born on Weir Road and went into Lissworth Mill at sixteen as a loom-setter's boy. He
+  spent twenty-two years on the frames until the mill closed fourteen years ago and took six hundred jobs with
+  it. He tried retraining in Carrow and hated the clipboard men who ran the course, so he came home. Now he
+  hauls post and crates along the wharf and out to the far houses. He keeps his father's tin mug on the hook
+  by the back door and drinks tea from it every morning. He still says the mill will reopen, and he has told
+  the Gannet's skipper so more than once.
+personality:
+  traits: [ steady, blunt, proud, practical ]
+  big5: { open: 35, conscientious: 82, extravert: 30, agreeable: 48, neurotic: 40 }
+values: { prosperity: 0.5, safety: 0.25, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - The Mill will reopen if people just wait long enough.
+  - A day's work should be paid in full, in coin.
+  - Retraining is a way of making working men feel small.
+voice:
+  register: Plain and short. Speaks in numbers and hours and tends to answer a question with a count. Dry,
+    rarely warm in words, warm in deeds.
+  tics: [ Used to be., That's the lot., "Three bolts, two hours." ]
+  never_says: [ I feel, no offence, all things considered ]
+  samples:
+    - Two hundred crates to Dunmore's before noon. Used to be I'd have done it in one.
+    - Tea's in the tin. Help yourself, there's enough for two.
+    - The Mill'll go again. Don't ask me when.
+birthday: 52
+likes:
+  [
+    tea in a tin mug,
+    the sound of a loom running true,
+    a clock that keeps time,
+    early mornings on the wharf,
+    the smell of machine oil
+  ]
+dislikes: [ being retrained, short shifts, men with clipboards, the stopped clocktower ]
+fears: [ the frames being broken up for scrap, growing old with nothing to do ]
+dream:
+  text: Wages for work again, enough to stop borrowing from Raman's tin.
+  stages:
+    - Register at Town Hall for casual work on the wharf.
+    - Do one casual job a day for three days.
+    - Take a shift at the boathouse or a floor job when the Mill reopens.
+routine:
+  weekday:
+    - { at: "06:00", do: sleep, where: millbrook.home_35 }
+    - { at: "06:30", do: eat, where: millbrook.home_35 }
+    - { at: "07:00", do: work, where: wharf.crane_yard }
+    - { at: "12:30", do: eat, where: wharf.harbor_steps }
+    - { at: "13:00", do: work, where: wharf.crane_yard }
+    - { at: "17:30", do: walk, where: millbrook.weir }
+    - { at: "19:00", do: eat, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: read, where: millbrook.home_35 }
+    - { at: "22:30", do: sleep, where: millbrook.home_35 }
+  weekend:
+    - { at: "07:30", do: eat, where: millbrook.home_35 }
+    - { at: "08:30", do: walk, where: millbrook.weir }
+    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: tinker, where: millbrook.mill_yard }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: millbrook.home_35 }
+chores:
+  [
+    Wash the tin mug and set it on the hook,
+    Carry coal in from the yard,
+    Mend his own boots on Sunday evening
+  ]
+relationships:
+  - { id: raman, affinity: 18, trust: 22, tag: fond, note: Neighbour on Weir Road; lends him books and tea. }
+  - {
+      id: rook,
+      affinity: -12,
+      trust: -5,
+      tag: wary,
+      note: Ran the doffers' line; Einar thinks his crew is pointless.
+    }
+  - {
+      id: delphine,
+      affinity: 14,
+      trust: 12,
+      tag: curious,
+      note: Worked the same frames; she still sews from the old patterns.
+    }
+secrets:
+  - text: He keeps a half-finished loom gear in his coat pocket and turns it over at night, unable to throw it out.
+    reveal: { regard_min: 60 }
+canon_locks: []
+story_role: none
+generated_by: model
+household: mb_d02
+archetype: mill_hand
+employment: employed
+years_in_monde: 54

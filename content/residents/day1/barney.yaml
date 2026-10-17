@@ -1,0 +1,113 @@
+# Generated (census-v1) for dunmore_barney; curated not yet. Edit here.
+id: barney
+name: Barnaby "Barney" Dunmore
+age: 51
+pronouns: he/him
+kind: resident
+occupation: Counter clerk at Dunmore's General Store, sorting stock and minding the till.
+workplace: market_row.general_store
+home: market_row.dunmore_flat
+portrait: lib_m53_029
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: barney
+appearance: A broad, stocky man with salt-and-pepper hair under a brown flat cap, a nose set a little crooked,
+  and a grey work cardigan with leather elbow patches.
+look:
+  kind: human
+  skin: 2
+  hair: { style: short, colour: 11 }
+  eyes: 3
+  build: broad
+  height: tall
+  outfit: { cut: jumper, top: 14, bottom: 2, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+  headwear: { kind: flat_cap, colour: 1 }
+  face: { stubble: true }
+backstory: Born in the flat above the shop, Barnaby spent his twenties working on the cannery line on the
+  Wharf until it closed eleven years ago. He came back to the counter when his father's knees gave out and has
+  stayed there since. He lives alone upstairs now, which suits him fine. His sister Nell does the fish and the
+  books, and he does the counting. Something went wrong years ago when he gave a neighbour credit he never
+  recovered, and he has been careful with ledgers ever since. He stays in Monde because the shop needs him and
+  because he has never found a reason to be anywhere else.
+personality:
+  traits: [ dutiful, wry, careful, apologetic ]
+  big5: { open: 35, conscientious: 82, extravert: 30, agreeable: 68, neurotic: 55 }
+values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+beliefs:
+  - The mill will reopen and the town will fill up again.
+  - A shop that keeps proper books never comes to grief.
+  - Nobody notices the man behind the counter.
+voice:
+  register: Quiet and apologetic, often counting change aloud and trailing off. He hedges his opinions and
+    softens bad news with small jokes. Short sentences most of the time.
+  tics: [ "Mm, well.", Let me just count that., "Sorry, sorry." ]
+  never_says: [ I'm sure, no problem at all, trust me ]
+  samples:
+    - Mm, well. That comes to four and six, if you don't mind waiting.
+    - Sorry, sorry. The bread's gone, but Odile might have a loaf left.
+    - Let me just count that again. Nell would have it done in a second.
+birthday: 57
+likes:
+  [
+    a till that rings,
+    the smell of the cold store,
+    Saturday mornings before the shop opens,
+    tea with extra milk,
+    the jam shelf
+  ]
+dislikes:
+  [
+    people who browse and never buy,
+    sticky counters,
+    being hurried at the till,
+    the wind off the breakwater
+  ]
+fears: [ the books not balancing, Nell finding out about something he has kept quiet, the shop closing ]
+dream:
+  text: He wants a proper second pair of hands at the counter so he can finally take a Sunday off.
+  stages:
+    - Post the job on the Lantern's board this week.
+    - Interview two residents who know the counter well.
+    - Hire the one who can count without help.
+routine:
+  weekday:
+    - { at: "07:00", do: sleep, where: market_row.dunmore_flat }
+    - { at: "07:30", do: eat, where: market_row.dunmore_flat }
+    - { at: "08:00", do: work, where: market_row.general_store }
+    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "13:00", do: work, where: market_row.general_store }
+    - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:30", do: read, where: market_row.dunmore_flat }
+    - { at: "22:30", do: sleep, where: market_row.dunmore_flat }
+  weekend:
+    - { at: "08:30", do: eat, where: market_row.dunmore_flat }
+    - { at: "09:30", do: walk, where: commons.duck_pond }
+    - { at: "11:00", do: shop, where: market_row.market_hall }
+    - { at: "13:00", do: eat, where: market_row.bakery }
+    - { at: "15:00", do: sit, where: commons.picnic_lawn }
+    - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:00", do: sleep, where: market_row.dunmore_flat }
+chores: [ Sort the morning delivery of stock, Balance the till at close, Carry the bins down the back alley ]
+relationships:
+  - {
+      id: nell,
+      affinity: 70,
+      trust: 80,
+      tag: kin,
+      note: "His older sister, who runs the books and the fish side."
+    }
+  - { id: bru, affinity: 40, trust: 35, tag: wary, note: Carves birds and never quite meets your eye. }
+  - { id: odile, affinity: 45, trust: 60, tag: friend, note: Keeps him in bread and gossip. }
+secrets:
+  - text: He has been setting aside a little from the till each week for the upkeep of the old lighthouse lamp,
+      and has never told his…
+    reveal: { regard_min: 60 }
+  - text: He once tried to learn the accordion from a book and gave up after a month, too embarrassed to say so.
+    reveal: { regard_min: 50 }
+canon_locks: []
+story_role: shopkeeper
+generated_by: model
+household: dunmore_barney
+archetype: shop_founder
+employment: employed
+years_in_monde: 51

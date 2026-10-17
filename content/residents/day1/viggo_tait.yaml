@@ -1,0 +1,95 @@
+# Generated (census-v1) for oq_c02; curated not yet. Edit here.
+id: viggo_tait
+name: Viggo Tait
+age: 60
+pronouns: he/him
+kind: resident
+occupation: Mason repairing stonework across Monde, working from the Bell Row workshop.
+workplace: old_quarter.home_02
+home: old_quarter.home_02
+portrait: lib_m64_105
+portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
+sprite: viggo_tait
+appearance: A lean man with short white hair that was ginger once and bushy ginger eyebrows, wearing a worn
+  navy work jacket over an oatmeal cardigan. He has a dry, heard-it-all look.
+look:
+  kind: human
+  skin: 4
+  hair: { style: short, colour: 8 }
+  eyes: 1
+  build: narrow
+  height: tall
+  outfit: { cut: coat, top: 6, bottom: 14, bottom_style: trousers, shoes: 2 }
+  accessory: { kind: none }
+backstory: Viggo was born in a quarry village inland and learned to cut stone from his grandfather, who built
+  half the churches on that road. He came to Monde at thirty-nine, when a contract to repoint the breakwater
+  went through and he stayed to fill the gaps the sea kept opening. He met Mikael on a cold job at the harbour
+  and the two of them have been arguing about mortar ever since. He once let a wall fall rather than hurry it,
+  and he still thinks that was the right call. He wants the old men of the Quarter to finally let him lift a
+  stone without a lecture.
+personality:
+  traits: [ dry, grumpy, exacting, loyal ]
+  big5: { open: 30, conscientious: 75, extravert: 28, agreeable: 50, neurotic: 40 }
+values: { prosperity: 0.35, safety: 0.3, spirit: 0.15, charm: 0.2 }
+beliefs:
+  - Stone remembers the hands that cut it.
+  - Anyone who hurries a lime mortar deserves a cold tea.
+  - The breakwater will outlive us all, which is its only virtue.
+voice:
+  register: Dry and clipped, often trailing off into a sigh. He answers questions with questions and enjoys a
+    long silence.
+  tics: [ "well, then", that's stone for you, hm ]
+  never_says: [ quick fix, just slap it on, it's easy ]
+  samples:
+    - Hm. Lime takes its time, and so will I.
+    - Breakwater's older than your grandmother and still standing. Mind you, so am I.
+    - Tell Mikael the wall's fine. He won't believe it till I say it.
+birthday: 7
+likes: [ quarry stone, a slow pipe in the sun, the harbour at dawn, seasoned timber, a sharp chisel ]
+dislikes: [ hurrying mortar, gulls on the scaffolding, fresh paint on old walls ]
+fears: [ a stone wall collapsing unseen, becoming useless to his hands ]
+dream:
+  text: Teach a young hand to set stone so the breakwater has someone to keep it.
+  stages:
+    - Find a keen hand willing to sit through a cold morning.
+    - Teach three joints in lime, then watch them cure.
+    - Hand over the breakwater job and keep your hands in your pockets.
+routine:
+  weekday:
+    - { at: "07:00", do: eat, where: old_quarter.home_02 }
+    - { at: "07:45", do: walk, where: wharf.breakwater }
+    - { at: "08:30", do: work, where: old_quarter.home_02 }
+    - { at: "12:15", do: eat, where: market_row.general_store }
+    - { at: "13:00", do: work, where: old_quarter.home_02 }
+    - { at: "17:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "21:00", do: read, where: old_quarter.home_02 }
+    - { at: "22:00", do: sleep, where: old_quarter.home_02 }
+  weekend:
+    - { at: "08:00", do: eat, where: old_quarter.home_02 }
+    - { at: "09:00", do: fish, where: wharf.harbor_steps }
+    - { at: "12:00", do: eat, where: market_row.cafe_liss }
+    - { at: "14:00", do: wander, where: commons.duck_pond }
+    - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "22:30", do: sleep, where: old_quarter.home_02 }
+chores: [ mix the lime, clean the chisels, cut kindling ]
+relationships:
+  - {
+      id: mikael_tait,
+      affinity: 24,
+      trust: 30,
+      tag: spouse,
+      note: "Partner of twenty-one years; the better bricklayer, he insists."
+    }
+  - { id: pell, affinity: -10, trust: 2, tag: rival, note: Blocked his grant for the breakwater repairs. }
+  - { id: margo, affinity: 14, trust: 18, tag: friend, note: Lends him old survey books from the library. }
+secrets:
+  - text: He still keeps a quarry-cut stone from his grandfather's church in his coat pocket and rubs it when he
+      is worried.
+    reveal: { regard_min: 55 }
+canon_locks: []
+story_role: mentor
+generated_by: model
+household: oq_c02
+archetype: builder
+employment: employed
+years_in_monde: 21
