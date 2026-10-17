@@ -320,6 +320,14 @@ export class ZoneScene extends Phaser.Scene {
   preload(): void { preloadCharacterSheets(this); preloadTownSprites(this); }
 
   create(data: { zone?: string; arrive?: Point; savedPlayer?: SaveGame['player'] } = {}): void {
+    const perfEnabled = import.meta.env.DEV || query.get('perf') === '1';
+    const perfStarted = perfEnabled ? performance.now() : 0;
+    // Subscribe synchronously: the lazy module may arrive after the first rendered frame.
+    const perfFirstFrame = perfEnabled ? new Promise<number>(resolve => {
+      const rendered = () => resolve(performance.now());
+      this.game.events.once('postrender', rendered);
+      this.events.once('shutdown', () => this.game.events.off('postrender', rendered));
+    }) : null;
     this.zone = boards[data.zone ?? 'old_quarter'] ?? zones.old_quarter!;
     this.transitioning = false;
     // Choose the music at once (a room plays softer than the street; the title plays full again).
@@ -481,6 +489,13 @@ export class ZoneScene extends Phaser.Scene {
     this.applyLight(true);
     this.installClockHooks();
     camera.fadeIn(400); // GDD §16.4.
+    if (import.meta.env.DEV || query.get('perf') === '1') {
+      let stopped = false;
+      this.events.once('shutdown', () => { stopped = true; });
+      void import('../perf/harness').then(({ attachPerf }) => {
+        if (!stopped && perfFirstFrame) attachPerf(this, this.residents, this.zone, perfStarted, perfFirstFrame);
+      }).catch(error => console.error('[perf]', error));
+    }
   }
 
   private economy!: EconomyAttachment;
@@ -1064,13 +1079,20 @@ export class ZoneScene extends Phaser.Scene {
     const entering = !talk ? walkingIn(doorLinks, this.zone, this.position, input) : undefined;
     if (entering && !result.edge) { this.goInside(entering); return; }
     if (result.edge) {
-      this.transitioning = true;
       const edge = result.edge;
       // Out of a room through its doorway: the door shuts behind you.
       if (this.zone.interior) playSfx('door_close');
-      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ zone: edge.zone, arrive: edge.arrive }));
-      this.cameras.main.fadeOut(400);
+      this.transitionTo(edge.zone, edge.arrive);
     }
+  }
+
+  /** Shared transition boundary, also used by the opt-in performance tour. */
+  transitionTo(zone: string, arrive?: Point): void {
+    if (this.transitioning || !boards[zone]) return;
+    this.transitioning = true;
+    if (import.meta.env.DEV || query.get('perf') === '1') this.registry.set('perf.transition', { zone, started: performance.now() });
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ zone, arrive }));
+    this.cameras.main.fadeOut(400);
   }
 
   /** Through a building's door into its room (W-03): the same 0.4 s fade as an edge (§16.4), unless it's locked. */
@@ -1081,9 +1103,7 @@ export class ZoneScene extends Phaser.Scene {
       if (this.time.now - this.lockedAt > 4000) { this.lockedAt = this.time.now; this.showToast(locked); }
       return;
     }
-    this.transitioning = true;
     playSfx('door_open');
-    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.scene.restart({ zone: link.interior, arrive: link.inside }));
-    this.cameras.main.fadeOut(400);
+    this.transitionTo(link.interior, link.inside);
   }
 }

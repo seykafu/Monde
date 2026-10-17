@@ -279,6 +279,30 @@ export class ResidentLayer {
     }
   }
 
+  /** Perf-only adapter: the normal actor, placement, animation and drawing routines, without save/sim membership. */
+  perfActors(count: number) {
+    const actors = Array.from({ length: count }, (_, index) => this.makeActor({
+      id: `perf-${index}`, name: `Perf ${index + 1}`, kind: 'resident', index,
+    }));
+    for (const cam of this.camerasToSkip()) for (const a of actors) cam.ignore([a.sprite, a.shadow, a.label, a.bubble]);
+    return {
+      visible: (p: Vec): boolean => {
+        const w = this.toWorld(p), v = this.viewRect();
+        return w.x > v.x + 40 && w.x < v.right - 40 && w.y > v.y + 90 && w.y < v.bottom - 40;
+      },
+      draw: (states: ResidentState[], dt: number): number => {
+        const player = this.lastPlayer ?? { x: -100, y: -100 };
+        actors.forEach((a, i) => { a.state = states[i]!; a.base = a.state.position; });
+        const live = [...this.actors.filter(a => a.base), ...actors];
+        for (const a of actors) this.place(a, live, player, dt / 1000, dt);
+        for (const a of actors) this.draw(a, player, null, dt);
+        const v = this.viewRect();
+        return actors.filter(a => a.sprite.visible && a.alpha > 0.5 && v.contains(a.sprite.x, a.sprite.y)).length;
+      },
+      destroy: (): void => { for (const a of actors) { a.sprite.destroy(); a.shadow.destroy(); a.label.destroy(); a.bubble.destroy(); } },
+    };
+  }
+
   /** Screen-space dev readout (for the UI camera); empty outside dev builds. */
   buildUi(): Phaser.GameObjects.GameObject[] {
     if (!this.dev) return [];
