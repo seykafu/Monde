@@ -4,6 +4,7 @@ import { EventData } from './schema';
 import { TelemetryQueue } from './queue';
 import { readChoice, writeChoice, SurveyGate } from './prefs';
 import { setTelemetrySink } from './emit';
+import { accessibility } from '../accessibility/runtime';
 const store = browserStorage();
 let choice = readChoice(store);
 let installId: string | undefined;
@@ -32,6 +33,8 @@ export const queue = new TelemetryQueue(async (batch, signal) => {
   } finally { clearTimeout(timer); signal.removeEventListener('abort', abort); }
 }, store, () => crypto.randomUUID());
 queue.setEnabled(choice === 'yes'); queue.restore();
+// Offline (Settings) means nothing leaves the machine, telemetry included: events wait in the queue.
+queue.holdWhile = () => accessibility().offline;
 export const surveyGate = new SurveyGate(store);
 export const telemetryChoice = () => choice;
 export function chooseTelemetry(yes: boolean): void {

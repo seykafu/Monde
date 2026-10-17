@@ -3,7 +3,7 @@ import { TelemetryQueue, QUEUE_LIMIT } from '../queue';
 import { readChoice, SurveyGate } from '../prefs';
 const uuid = () => crypto.randomUUID();
 function store() { const data = new Map<string,string>(); return { getItem: (k: string) => data.get(k) ?? null, setItem: (k: string,v: string) => { data.set(k,v); } }; }
-describe('anonymous telemetry queue', () => {
+describe('the telemetry queue', () => {
   it('is off by default; caps, batches, persists, and retries only three times', async () => {
     const send = vi.fn(async (_items: unknown) => false), storage = store();
     const q = new TelemetryQueue(send,storage,uuid);
@@ -41,5 +41,18 @@ describe('anonymous telemetry queue', () => {
     expect(gate.claim('day7',true,7)).toBe(true); expect(gate.claim('day7',true,7)).toBe(false);
     expect(new SurveyGate(storage).claim('day7',true,7)).toBe(false);
     expect(gate.claim('spring',true,25)).toBe(false); expect(gate.claim('spring',true,26)).toBe(true);
+  });
+});
+
+describe('the Offline setting', () => {
+  it('holds events in the queue without sending or spending retries, then sends once lifted', async () => {
+    const send = vi.fn(async (_items: unknown) => true);
+    const q = new TelemetryQueue(send, store(), uuid); q.setEnabled(true);
+    let offline = true; q.holdWhile = () => offline;
+    q.add({ type: 'day_reached', day: 3 });
+    await q.flush(); await q.flush(); await q.flush(); await q.flush();
+    expect(send).not.toHaveBeenCalled(); expect(q.size).toBe(1);
+    offline = false; await q.flush();
+    expect(send).toHaveBeenCalledTimes(1); expect(q.size).toBe(0);
   });
 });

@@ -118,7 +118,7 @@ class SaveMenuBase extends Phaser.Scene {
    */
   /** Q-06: off unless the player says yes; Esc keeps it off. Asked once per install. */
   private askSharing(then: () => void): void {
-    this.message.setText('Share anonymous play events and optional surveys? No name, invite code, or dialogue is sent. Only the optional survey note sends typed text. Change this in Settings anytime.');
+    this.message.setText('Share play events and optional surveys? They carry a random ID for this install, never your name, invite code or dialogue. Only the optional survey note sends typed text. Nothing is sent in Offline mode. Change this in Settings anytime.');
     this.show([{ text: 'Keep sharing off', run: () => { chooseTelemetry(false); then(); } },
       { text: 'Yes, help improve Monde', run: () => { chooseTelemetry(true); then(); } }], () => { chooseTelemetry(false); then(); });
   }
@@ -137,7 +137,7 @@ class SaveMenuBase extends Phaser.Scene {
       { text: `Reduced motion: ${prefs.motion === 'system' ? 'Follow OS' : prefs.motion === 'on' ? 'On' : 'Off'}`, run: () => toggle({ motion: prefs.motion === 'system' ? 'on' : prefs.motion === 'on' ? 'off' : 'system' }) },
       { text: `Choices only: ${prefs.choicesOnly ? 'On' : 'Off'}`, run: () => toggle({ choicesOnly: !prefs.choicesOnly }) },
       { text: `Offline: ${prefs.offline ? 'On' : 'Off'}`, run: () => { mind.setOffline(!prefs.offline); toggle({ offline: !prefs.offline }); } },
-      { text: `Anonymous gameplay sharing: ${telemetryChoice() === 'yes' ? 'On' : 'Off'}`, run: () => { chooseTelemetry(telemetryChoice() !== 'yes'); this.settings(); } },
+      { text: `Share play events and surveys: ${telemetryChoice() === 'yes' ? 'On' : 'Off'}`, run: () => { chooseTelemetry(telemetryChoice() !== 'yes'); this.settings(); } },
       { text: `Invite code: ${maskInvite(mind.invite)}`, run: () => this.askInvite() },
       ...(mind.invite ? [{ text: 'Clear invite code', run: async () => { await mind.setInvite(null); this.settings(); } }] : []),
       ...(retry ? [{ text: 'Try to reconnect', run: async () => { this.message.setText('Trying the town…'); await mind.reconnect(); this.settings(); } }] : []),

@@ -34,8 +34,10 @@ export class TelemetryQueue {
   }
   get size(): number { return this.pending.length; }
   private persist(): void { try { this.store?.setItem('monde.telemetry.queue', JSON.stringify(this.pending)); } catch { /* bounded memory queue still works */ } }
+  /** While this holds (the Offline setting), events stay queued and nothing is sent; they go once it lifts. */
+  holdWhile: () => boolean = () => false;
   async flush(): Promise<void> {
-    if (!this.enabled || this.running || !this.pending.length) return;
+    if (!this.enabled || this.running || !this.pending.length || this.holdWhile()) return;
     this.running = true;
     const generation = this.generation;
     const world = this.pending[0]!.world;
