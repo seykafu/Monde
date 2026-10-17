@@ -3,11 +3,12 @@
 // six attempts on these), the adjustments it reports, idempotency, and a passing reply coming back untouched.
 import { describe, expect, it } from "vitest";
 import {
-  ROUTINE_PLACES, SeededRng, VERBS, censusOrder, clockTime, coinsFor, countWords, currencyHit, drawHousehold, nativeDrawFor, nativeTemplateHousehold,
-  nativeValidationContext, nudgeBig5, pronounsOf, relationTagOf, repairHousehold, routineVerbFor, storyRoleOf, templateHousehold, trimToWords,
-  validateHousehold, verbOf, type ArrivalHouseholdOutput, type HouseholdDraw, type SkeletonHousehold, type ValidationContext,
+  ROUTINE_PLACES, SeededRng, VERBS, cardsFromHousehold, censusOrder, clockTime, coinsFor, countWords, currencyHit, drawHousehold, nativeDrawFor, nativeTemplateHousehold,
+  nativeValidationContext, nudgeBig5, oneQuestion, plainWordsFor, pronounsOf, readsAsStatement, relationTagOf, repairHousehold, routineVerbFor,
+  storyRoleOf, templateHousehold, trimToWords, validateHousehold, verbOf, withAttireWord, type ArrivalHouseholdOutput, type HouseholdDraw,
+  type SkeletonHousehold, type ValidationContext,
 } from "../index";
-import { censusInput, household, modelAnswer } from "./censusFixtures";
+import { censusInput, handCards, household, modelAnswer } from "./censusFixtures";
 
 const codes = (v: ReturnType<typeof validateHousehold>) => (v.ok ? [] : v.errors);
 const rules = (v: ReturnType<typeof validateHousehold>) => [...new Set(codes(v).map(e => e.split(" ")[0]))].sort();
@@ -23,6 +24,29 @@ const repair = (out: unknown, draw: HouseholdDraw, vctx: ValidationContext) => {
   return { ...r, card: r.output as ArrivalHouseholdOutput };
 };
 const big5 = (open: number, conscientious: number, extravert: number, agreeable: number, neurotic: number) => ({ open, conscientious, extravert, agreeable, neurotic });
+
+/**
+ * server/src/mind/filters.ts STYLE (§12.1's banned vocabulary), as V16 runs it: the server and tools/gen-residents.ts
+ * pass lexicalHits through ctx.banned. Copied here because shared can't import the server; keep the two in step.
+ */
+const STYLE = [
+  "community", "communities", "journey", "resilien(?:ce|t)", "heart of the town", "special place", "vibrant",
+  "tapestry", "healing", "closure", "stakeholders?", "revitali[sz](?:e|es|ed|ing|ation)", "give back",
+  "safe space", "i'?d rather not say", "a story for another day", "here'?s the thing", "at the end of the day",
+  "i want you to know that", "how can i help", "great question",
+  "it'?s not (?:a |an |the )?[\\p{L}' -]{1,30}[,;:—-]+ ?(?:it'?s|that'?s)",
+  "it isn'?t (?:a |an |the )?[\\p{L}' -]{1,30}[.,;:—-]+ ?it'?s",
+  "not (?:a|an|the) [\\p{L}' -]{1,30}[,;—-]+ ?but (?:a|an|the) [\\p{L}]+",
+];
+const STYLE_RE = new RegExp(`(?<![\\p{L}\\p{N}])(?:${STYLE.join("|")})(?![\\p{L}\\p{N}])`, "iu");
+/** V16 as the census run wires it: the style group and the money matcher. */
+const lexical = (t: string): string[] => [...(STYLE_RE.test(t.replace(/[’‘]/g, "'")) ? ["style"] : []), ...(currencyHit(t) ? ["money"] : [])];
+const withLexical = (vctx: ValidationContext): ValidationContext => ({ ...vctx, banned: lexical });
+/** The hand-written cast as ctx.neighbours (where they live and work), less the household's own people. */
+const withNeighbours = (vctx: ValidationContext, draw: HouseholdDraw): ValidationContext => {
+  const own = new Set([...draw.members.map(m => m.native?.pinned?.id), ...(draw.native?.housemates ?? []).map(h => h.id)]);
+  return { ...vctx, neighbours: handCards.filter(c => c.kind !== "animal" && !own.has(c.id)).map(c => ({ id: c.id, zone: c.home.split(".")[0]!, workplace: c.workplace })) };
+};
 
 /** What the trial's replies looked like: a summary of 27-30 words (25 at most), a backstory of 140-146 (120 at most). */
 const BARNEY_SUMMARY = "Barney has kept the till at Dunmore's for thirty years and lives in the flat above it. His sister Nell runs the fish market and visits on Sundays after chapel.";
@@ -360,8 +384,10 @@ describe("the whole repair", () => {
     const input = censusInput();
     for (const h of censusOrder(input.skeleton, input.homes, input.pins) as SkeletonHousehold[]) {
       const draw = nativeDrawFor(input, h);
-      const vctx = nativeValidationContext(input, h, draw);
-      for (const out of [modelAnswer(input, h, draw), nativeTemplateHousehold(draw, vctx, input.skeleton.seed)]) {
+      const plain = nativeValidationContext(input, h, draw);
+      // With V16's style and money matchers and a neighbour list too: the census run's own context, every fallback armed.
+      for (const vctx of [plain, withNeighbours(withLexical(plain), draw)]) for (const out of [modelAnswer(input, h, draw), nativeTemplateHousehold(draw, vctx, input.skeleton.seed)]) {
+        expect(codes(validateHousehold(out, draw, vctx)), h.id).toEqual([]);
         const r = repairHousehold(out, draw, vctx);
         expect(r.adjustments, h.id).toEqual([]);
         expect(r.output, h.id).toEqual(out);
@@ -423,6 +449,26 @@ describe("an arrival household (the server's profile: ±30 outside, one like fro
     expect(r.adjustments).toEqual([
       'V13 members[0].routine.weekday[1].do "stroll" → "walk"', 'V13 members[0].routine.weekday: added "23:00" sleep at home.own (the day ends at home)',
     ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+  });
+
+  it("an arrival tied to nobody in Monde gets the tie assembly adds; with no job, work away from home.own is a visit", () => {
+    const out = answer();
+    const [a] = out.members;
+    a!.relationships = [{ id: "old_tom", affinity: 20, trust: 20, tag: "friend", note: "A pal from Port Sallow." }];
+    a!.routine.weekday[3] = at("14:00", "work", "old_quarter.fountain_square");
+    a!.routine.weekday[6] = at("19:30", "work", "home.own");
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([
+      'V13 members[0].routine.weekday: work at "old_quarter.fountain_square" is not their workplace', 'V14 members[0].relationships: "old_tom" is not a resident or a household slot',
+    ]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V13 members[0].routine.weekday[3].do "work" → "visit" (at old_quarter.fountain_square; they have no job)',
+      'V14 members[0].relationships: dropped the tie to "old_tom" (not a resident or a household slot)',
+      'V14 members[0].relationships: added "m2" (engine-added: the household tie)',
+    ]);
+    expect(r.card.members[0]!.relationships).toEqual([{ id: "m2", affinity: 70, trust: 70, tag: "kin", note: "Came over on the same boat." }]);
     expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
     expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
   });
@@ -721,11 +767,387 @@ describe("the census run's failures together", () => {
     expect(twice.output).toEqual(r.output);
   });
 
-  it("leaves content to the retry: samples that need a contraction (V10)", () => {
+  it("leaves content to the retry: samples a contraction short with no pair to contract (V10)", () => {
     const { draw, vctx, out } = native("calloway");
     out.members[0]!.voice.samples = ["The tide is in.", "We will see.", "Come along now."];
     const r = repair(out, draw, vctx);
     expect(r.adjustments).toEqual([]);
     expect(codes(validateHousehold(r.output, draw, vctx))).toEqual(["V10 members[0].voice.samples: at least two need a contraction"]);
+  });
+});
+
+// ── The census run after two rounds of repairs: 15 of 107 households still fell back to the template on these ────────
+
+describe("the style list (V16)", () => {
+  it("swaps each word the matcher flags for a plain one, by context (the table next to the repair)", () => {
+    for (const [from, to] of [
+      ["She gave her life to the community.", "She gave her life to the town."], ["Community spirit, he calls it.", "Neighbourliness, he calls it."],
+      ["A real sense of community on Terrace Row.", "A real sense of neighbourliness on Terrace Row."], ["The members of the community chipped in.", "The neighbours chipped in."],
+      ["Weeds the Community Garden on Sundays.", "Weeds the garden plots on Sundays."], ["Does community work when the tide's out.", "Does work for the town when the tide's out."],
+      ["Fishing communities never forget.", "Fishing towns never forget."], ["COMMUNITY HALL", "TOWN HALL"],
+      ["Her journey here took two ferries.", "Her road here took two ferries."], ["The journey from Carrow was rough.", "The trip from Carrow was rough."],
+      ["Resilience, the mayor calls it.", "Staying power, the mayor calls it."], ["Resilient as a limpet.", "Hardy as a limpet."],
+      ["The bakery is the heart of the town.", "The bakery is the middle of town."], ["Monde is a special place.", "Monde is a good place."],
+      ["A vibrant tapestry of stalls.", "A lively patchwork of stalls."], ["The healing took years.", "The mending took years."],
+      ["The closure of the mill took six hundred jobs.", "The closing of the mill took six hundred jobs."],
+      ["After the cannery's closure he never got closure.", "After the cannery's closing he never got an ending."],
+      ["She wants a closure.", "She wants an ending."], ["No closure, just the tide.", "No ending, just the tide."],
+      ["The stakeholders met at the hall.", "The people with a say met at the hall."], ["Every stakeholder had a view.", "Every person with a say had a view."],
+      ["They mean to revitalise the Wharf.", "They mean to bring back the Wharf."], ["The revitalization of Market Row.", "The revival of Market Row."],
+      ["He wants to give back to the town.", "He wants to help out the town."], ["She'd like to give back to them.", "She'd like to help them out."],
+      ["Give back the ladder, Bru.", "Return the ladder, Bru."], ["It's time to give back.", "It's time to help out."],
+      ["The snug is her safe space.", "The snug is her quiet corner."],
+    ] as const) {
+      expect(plainWordsFor(from, lexical)?.text, from).toBe(to);
+      expect(lexical(to), to).toEqual([]);
+    }
+    expect(plainWordsFor("Monde is a special place, the heart of the town.", lexical)?.swaps).toEqual([["special place", "good place"], ["heart of the town", "middle of town"]]);
+  });
+
+  it("leaves a text the matcher passes, or one the swaps wouldn't clear (a stock phrase has no plain swap)", () => {
+    for (const t of ["The town hall clock stopped at 4:17.", "Journeys end at the slip.", "A healer of nets.", "Here's the thing: the community.", "At the end of the day, it's a vibrant town."])
+      expect(plainWordsFor(t, lexical), t).toBeNull();
+  });
+
+  it("repairs every text V16 scans but the name, and the household passes", () => {
+    const { draw, vctx: plain, out } = native("dunmore_barney");
+    const vctx = withLexical(plain);
+    const m = out.members[0]!;
+    out.household.summary = "Barney has kept the till at Dunmore's since the mill's closure.";
+    m.backstory = `${m.backstory} He wants to give back to the community that kept the shop open.`;
+    m.beliefs[0] = "Monde is a special place, whatever the Lantern says.";
+    m.voice.samples[2] = "Margins, mostly. And a vibrant window.";
+    m.relationships[0]!.note = "His sister; the healing took years.";
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual(["V16 members[0]: banned language (style)", "V16 household.summary: banned language"]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V16 household.summary "closure" → "closing"',
+      'V16 members[0].backstory "give back to" → "help out", "community" → "town"',
+      'V16 members[0].beliefs[0] "special place" → "good place"',
+      'V16 members[0].voice.samples[2] "vibrant" → "lively"',
+      'V16 members[0].relationships[0].note "healing" → "mending"',
+    ]);
+    expect(r.card.members[0]!.backstory.endsWith("He wants to help out the town that kept the shop open.")).toBe(true);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+    // With no matcher (ctx.banned unset), V16 has nothing to fail and the repair changes nothing.
+    expect(repair(out, draw, plain).adjustments).toEqual([]);
+  });
+
+  it("skips A.2's own dream stage (V16 does), and swaps the model's paraphrase of it", () => {
+    const { draw, vctx: plain, out } = native("wf_d01");
+    const vctx = withLexical(plain);
+    const stages = out.members[0]!.dream.stages;
+    expect(stages[1]).toBe("Raise 60 coins from catches and community work");
+    expect(repair(out, draw, vctx).adjustments).toEqual([]);
+    stages[1] = "Raise sixty coins from community work";
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual(['V16 members[0].dream.stages[1] "community work" → "work for the town"']);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+  });
+
+  it("leaves a text with a stock phrase for V16 and the retry", () => {
+    const { draw, vctx: plain, out } = native("dunmore_barney");
+    const vctx = withLexical(plain);
+    out.members[0]!.beliefs[0] = "Here's the thing: the community will come back.";
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual(["V16 members[0]: banned language (style)"]);
+  });
+});
+
+describe("ties to people who aren't in Monde (V14)", () => {
+  const stranger = (id: string) => ({ id, affinity: 20, trust: 20, tag: "friend" as const, note: "An old pal from the mill." });
+
+  it("drops them, and keeps the required ties", () => {
+    const { draw, vctx, out } = native("dunmore_barney");
+    out.members[0]!.relationships.push(stranger("old_tom"), stranger("the_vicar"));
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([
+      'V14 members[0].relationships: "old_tom" is not a resident or a household slot', 'V14 members[0].relationships: "the_vicar" is not a resident or a household slot',
+    ]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V14 members[0].relationships: dropped the tie to "old_tom" (not a resident or a household slot)',
+      'V14 members[0].relationships: dropped the tie to "the_vicar" (not a resident or a household slot)',
+    ]);
+    expect(r.card.members[0]!.relationships.map(x => x.id)).toEqual(["nell", "bru"]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+  });
+
+  it("a member left with none gets their household tie, the one assembly adds (engine-added)", () => {
+    // Raman (m2) lives with his daughter Priya (m1), whose card exists.
+    const { draw, vctx, out, h } = native("ramaswamy");
+    out.members[0]!.relationships = [stranger("old_tom")];
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V14 members[0].relationships: dropped the tie to "old_tom" (not a resident or a household slot)',
+      'V14 members[0].relationships: added "priya" (engine-added: the household tie (daughter))',
+    ]);
+    expect(r.card.members[0]!.relationships).toEqual([{ id: "priya", affinity: 75, trust: 70, tag: "kin", note: "Daughter, under the same roof." }]);
+    const v = validateHousehold(r.output, draw, vctx);
+    expect(codes(v)).toEqual([]);
+    // The card is the one assembly builds when the model leaves the household tie out.
+    const built = (o: ArrivalHouseholdOutput) => cardsFromHousehold(o, draw, new Set(), h.home, { profile: "native" })[0]!.card.relationships.find(x => x.id === "priya");
+    const toPell = { ...out, members: [{ ...out.members[0]!, relationships: [{ id: "pell", affinity: 10, trust: 15, tag: "curious" as const, note: "The mayor." }] }] };
+    expect(built(r.card)).toEqual({ id: "priya", affinity: 75, trust: 70, tag: "daughter", note: "Daughter, under the same roof." });
+    expect(built(r.card)).toEqual(built(toPell));
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+    // Two members written together: the tie is to the other's slot.
+    const two = native("oq_b02");
+    two.out.members[0]!.relationships = [stranger("old_tom")];
+    const t = repair(two.out, two.draw, two.vctx);
+    expect(t.adjustments[1]).toMatch(/^V14 members\[0\]\.relationships: added "m2" \(engine-added: the household tie \((?:spouse|partner)\)\)$/);
+    expect(t.card.members[0]!.relationships).toEqual([{ id: "m2", affinity: 70, trust: 75, tag: "kin", note: expect.stringMatching(/^(?:Spouse|Partner), under the same roof\.$/) }]);
+    expect(codes(validateHousehold(t.output, two.draw, two.vctx))).toEqual([]);
+  });
+
+  it("with nobody at home: a neutral tie to the first neighbour in their zone or at their work (ctx.neighbours), else left for V14", () => {
+    const lone = native("mb_a02");
+    lone.out.members[0]!.relationships = [stranger("old_tom")];
+    // No neighbours in the context: nothing to tie to, so the tie stays and V14 names it.
+    const left = repair(lone.out, lone.draw, { ...lone.vctx, neighbours: [] });
+    expect(left.adjustments).toEqual([]);
+    expect(codes(validateHousehold(left.output, lone.draw, lone.vctx))).toEqual(['V14 members[0].relationships: "old_tom" is not a resident or a household slot']);
+    // Someone who isn't a resident yet is passed over, and so is a neighbour in another zone with other work.
+    const vctx: ValidationContext = { ...lone.vctx, neighbours: [
+      { id: "nobody_yet", zone: "millbrook", workplace: null }, { id: "odile", zone: "market_row", workplace: "market_row.bakery" },
+      { id: "kasimir", zone: "millbrook", workplace: "millbrook.kasimir_workshop" }, { id: "felix", zone: "millbrook", workplace: "millbrook.school" },
+    ] };
+    const r = repair(lone.out, lone.draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V14 members[0].relationships: dropped the tie to "old_tom" (not a resident or a household slot)',
+      'V14 members[0].relationships: added "kasimir" (engine-added: a neutral tie to a neighbour in millbrook)',
+    ]);
+    expect(r.card.members[0]!.relationships).toEqual([{ id: "kasimir", affinity: 20, trust: 20, tag: "friend", note: "A neighbour." }]);
+    expect(codes(validateHousehold(r.output, lone.draw, vctx))).toEqual([]);
+    expect(repair(r.output, lone.draw, vctx).adjustments).toEqual([]);
+    // At their work: a Wharf hand who lives in the Old Quarter.
+    const hand = native("oq_d02");
+    hand.out.members[0]!.relationships = [stranger("old_tom")];
+    const w = repair(hand.out, hand.draw, { ...hand.vctx, neighbours: [{ id: "kasimir", zone: "millbrook", workplace: "millbrook.kasimir_workshop" }, { id: "moss", zone: "wharf", workplace: "wharf.boathouse" }] });
+    expect(w.adjustments[1]).toBe('V14 members[0].relationships: added "moss" (engine-added: a neutral tie to a neighbour at wharf.boathouse)');
+  });
+});
+
+describe("contractions and questions in the samples (V10)", () => {
+  const samples = (id: string, lines: string[], k = 0) => {
+    const t = native(id);
+    t.out.members[k]!.voice.samples = lines;
+    return t;
+  };
+
+  it("contracts a common pair in the samples without one until two have one", () => {
+    const { draw, vctx, out } = samples("calloway", ["It is the tide again.", "I do not mind the wind.", "Come along now."]);
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual(["V10 members[0].voice.samples: at least two need a contraction"]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual(['V10 members[0].voice.samples[0] "It is" → "It\'s"', 'V10 members[0].voice.samples[1] "do not" → "don\'t"']);
+    expect(r.card.members[0]!.voice.samples).toEqual(["It's the tide again.", "I don't mind the wind.", "Come along now."]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+  });
+
+  it("keeps capitals and the sample's apostrophe, never ends a clause on one, and 'I will not' is 'I won't'", () => {
+    const one = samples("calloway", ["I know who you are.", "That is it, then.", "I will not."]);
+    expect(repair(one.out, one.draw, one.vctx).card.members[0]!.voice.samples).toEqual(["I know who you are.", "That's it, then.", "I won't."]);
+    const two = samples("calloway", ["IT IS COLD.", "I am fond of the gulls’ racket.", "Come along now."]);
+    const r = repair(two.out, two.draw, two.vctx);
+    expect(r.adjustments).toEqual([`V10 members[0].voice.samples[0] "IT IS" → "IT'S"`, 'V10 members[0].voice.samples[1] "I am" → "I’m"']);
+    expect(codes(validateHousehold(r.output, two.draw, two.vctx))).toEqual([]);
+    // "I would rather not say" would make the style list's phrase: that pair is passed over.
+    const style = samples("calloway", ["I would rather not say.", "It is the tide.", "We are early."]);
+    const s = repair(style.out, style.draw, withLexical(style.vctx));
+    expect(s.card.members[0]!.voice.samples).toEqual(["I would rather not say.", "It's the tide.", "We're early."]);
+  });
+
+  it("leaves the samples alone when two can't get one, and a child's (V10 asks no contraction of them)", () => {
+    const short = samples("calloway", ["It is the tide.", "We will see.", "Come along now."]);
+    const r = repair(short.out, short.draw, short.vctx);
+    expect(r.adjustments).toEqual([]);
+    expect(codes(validateHousehold(r.output, short.draw, short.vctx))).toEqual(["V10 members[0].voice.samples: at least two need a contraction"]);
+    // szabo_maud's m2 is nine.
+    const child = samples("szabo_maud", ["Can we go to the ducks?", "I am not tired.", "It is a duck."], 1);
+    expect(repair(child.out, child.draw, child.vctx).adjustments).toEqual([]);
+    expect(codes(validateHousehold(child.out, child.draw, child.vctx))).toEqual([]);
+  });
+
+  it("keeps a sample's first question and ends a later one in a full stop when it reads as a statement", () => {
+    for (const [from, to] of [
+      ["Is that the ferry? You'll be wanting tea?", "Is that the ferry? You'll be wanting tea."], ["You came back? You came back on the Gannet?", "You came back? You came back on the Gannet."],
+      ["What? He sold the boat?", "What? He sold the boat."], ["Where's Nell? Did she go out?", null], ["Tea? Biscuit? Go on.", null], ["Right? Who asked you?", null],
+      ["Cold, isn't it? Bitter, isn't it?", null], ["Is it?! Really? No.", null], ["So? And where were you?", null], ["You did? You did what?", null], ["One question? Fine.", null],
+    ] as const) expect(oneQuestion(from), from).toBe(to);
+    expect([readsAsStatement("You'll be wanting tea"), readsAsStatement("And how was Carrow"), readsAsStatement("Anyone home")]).toEqual([true, false, false]);
+    const { draw, vctx, out } = samples("calloway", ["Is that the ferry? You'll be wanting tea?", "There was this fellow in Port Sallow, right, with a goat. Anyway.", "Breakfast's free if you look hungry enough. I look hungry."]);
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([`V10 members[0].voice.samples has more than one question in "Is that the ferry? You'll be wanting tea?"`]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([`V10 members[0].voice.samples[0] "Is that the ferry? You'll be wanting tea?" → "Is that the ferry? You'll be wanting tea." (one question)`]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+    // Two real questions: V10's, for the retry.
+    out.members[0]!.voice.samples[0] = "Where's Nell? Did she go out?";
+    expect(repair(out, draw, vctx).adjustments).toEqual([]);
+  });
+});
+
+describe("a Millbrook day on an open board (V13n)", () => {
+  const MILLBROOK_DAY = (home: string) => [
+    at("07:30", "eat", home), at("09:30", "sit", "millbrook.laundry_green"), at("11:00", "walk", "millbrook.weir"), at("12:30", "eat", home),
+    at("15:00", "visit", "millbrook.terrace_row"), at("18:00", "eat", home), at("21:30", "sleep", home),
+  ];
+
+  it("moves the most suitable block to the open-board place for its verb, keeping its time, on either day", () => {
+    const { draw, vctx, out, h } = native("mb_a02");
+    const m = out.members[0]!;
+    m.routine.weekday = MILLBROOK_DAY(h.home);
+    m.routine.weekend = MILLBROOK_DAY(h.home);
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([
+      "V13n members[0].routine.weekday needs at least one block on an open board (old_quarter, market_row, wharf, commons)",
+      "V13n members[0].routine.weekend needs at least one block on an open board (old_quarter, market_row, wharf, commons)",
+    ]);
+    const r = repair(out, draw, vctx);
+    // The walk has a place of its own on the boards; the sit before it only has the street.
+    expect(r.adjustments).toEqual([
+      'V13n members[0].routine.weekday[2].where "millbrook.weir" → "commons.duck_pond" (walk; their day needs a block on an open board)',
+      'V13n members[0].routine.weekend[2].where "millbrook.weir" → "commons.duck_pond" (walk; their day needs a block on an open board)',
+    ]);
+    expect(r.card.members[0]!.routine.weekday[2]).toEqual(at("11:00", "walk", "commons.duck_pond"));
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+  });
+
+  it("each verb's place is a registered open-board place", () => {
+    for (const [verb, place] of [
+      ["shop", "market_row.general_store"], ["eat", "market_row.cafe_liss"], ["walk", "commons.duck_pond"], ["wander", "commons.duck_pond"],
+      ["socialize", "market_row.gull_and_anchor"], ["read", "old_quarter.library"], ["pray", "old_quarter.st_brigids"], ["attend", "old_quarter.town_hall"],
+      ["visit", "market_row.market_street"], ["sit", "market_row.market_street"],
+    ] as const) {
+      const { draw, vctx, out, h } = native("mb_a02");
+      out.members[0]!.routine.weekday = [at("07:30", "eat", h.home), at("10:00", verb, "millbrook.weir"), at("12:30", "eat", h.home), at("18:00", "eat", h.home), at("21:30", "sleep", h.home)];
+      const r = repair(out, draw, vctx);
+      expect(r.card.members[0]!.routine.weekday[1], verb).toEqual(at("10:00", verb, place));
+      expect(codes(validateHousehold(r.output, draw, vctx)), verb).toEqual([]);
+    }
+  });
+
+  it("leaves a day with nothing to move for V13n, and never moves the housebound's", () => {
+    const { draw, vctx, out, h } = native("mb_a02");
+    out.members[0]!.routine.weekday = [at("07:30", "eat", h.home), at("10:00", "garden", "millbrook.laundry_green"), at("12:30", "eat", h.home), at("14:00", "fish", "millbrook.weir"), at("18:00", "eat", h.home), at("21:30", "sleep", h.home)];
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual(["V13n members[0].routine.weekday needs at least one block on an open board (old_quarter, market_row, wharf, commons)"]);
+    // mb_a05's m1 is 88: housebound (HOUSEBOUND_AGE), so V13n doesn't ask.
+    const old = native("mb_a05");
+    old.out.members[0]!.routine.weekday = MILLBROOK_DAY(old.h.home);
+    expect(repair(old.out, old.draw, old.vctx).adjustments).toEqual([]);
+    expect(codes(validateHousehold(old.out, old.draw, old.vctx))).toEqual([]);
+  });
+});
+
+describe("the appearance names what the portrait wears (V06)", () => {
+  it("adds the first attire tag to the first sentence when the cap allows", () => {
+    const { draw, vctx, out } = native("dunmore_barney");
+    out.members[0]!.appearance = "Broad and grey at the temples. Ink on his thumb from the price cards.";
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual(["V06 members[0].appearance must mention something the portrait wears (cardigan, flat_cap, work_jacket)"]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V06 members[0].appearance "Broad and grey at the temples. Ink on his thumb from the price cards." → "Broad and grey at the temples, in a cardigan. Ink on his thumb from the price cards." (names what the portrait wears)',
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+  });
+
+  it("wears or carries it, and leaves an appearance the cap can't take or a portrait with nothing in the table", () => {
+    expect(withAttireWord("Tall and stooped", { attire: ["satchel", "coat"] })).toBe("Tall and stooped, with a satchel");
+    expect(withAttireWord("Round-faced and quick. Flour to the elbow.", { attire: ["apron"] })).toBe("Round-faced and quick, in an apron. Flour to the elbow.");
+    expect(withAttireWord("Small; quick.", { attire: ["nurse_watch", "glasses"] })).toBe("Small; quick, in glasses.");
+    expect(withAttireWord(Array(39).fill("word").join(" "), { attire: ["coat"] })).toBeNull();
+    expect(withAttireWord("Small and quick.", { attire: ["nurse_watch"] })).toBeNull();
+  });
+});
+
+describe("work with no job (V13)", () => {
+  it("is a visit away from home, and housework at home (a carer's too)", () => {
+    const { draw, vctx, out, h } = native("quist");
+    const day = out.members[0]!.routine.weekday;
+    day[3] = at("14:00", "work", "old_quarter.fountain_square");
+    day[6] = at("19:30", "work", h.home);
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([
+      'V13 members[0].routine.weekday: work at "old_quarter.fountain_square", but they have no job', `V13 members[0].routine.weekday: work at "${h.home}", but they have no job`,
+    ]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V13 members[0].routine.weekday[3].do "work" → "visit" (at old_quarter.fountain_square; they have no job)',
+      `V13 members[0].routine.weekday[6].do "work" → "clean" (at ${h.home}; they have no job)`,
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+    // szabo_maud's m1 is a full-time carer at home (no job).
+    const carer = native("szabo_maud");
+    carer.out.members[0]!.routine.weekday[6] = at("19:30", "work", carer.h.home);
+    const c = repair(carer.out, carer.draw, carer.vctx);
+    expect(c.adjustments).toEqual([`V13 members[0].routine.weekday[6].do "work" → "clean" (at ${carer.h.home}; they have no job)`]);
+    expect(codes(validateHousehold(c.output, carer.draw, carer.vctx))).toEqual([]);
+  });
+});
+
+describe("one strong trait (V08)", () => {
+  it("moves the closer of the highest and the lowest to 70 or 30 (a tie raises)", () => {
+    for (const [scores, line] of [
+      [big5(64, 50, 45, 55, 38), "open 64 → 70"], [big5(60, 50, 45, 55, 33), "neurotic 33 → 30"], [big5(65, 50, 50, 50, 35), "open 65 → 70"], [big5(50, 60, 60, 50, 40), "conscientious 60 → 70"],
+    ] as const) {
+      const { draw, vctx, out } = native("dunmore_barney");
+      out.members[0]!.personality.big5 = { ...scores };
+      expect(codes(validateHousehold(out, draw, vctx))).toEqual(["V08 members[0].personality.big5 needs one trait at 70+ or 30-"]);
+      const r = repair(out, draw, vctx);
+      expect(r.adjustments).toEqual([`V08 members[0].personality.big5.${line} (one trait at 70+ or 30-)`]);
+      expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+      expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+    }
+  });
+
+  it("together with the rest of the second run's failures: repaired in order, then passing, then left alone", () => {
+    const t = native("mb_e02");
+    const vctx = withLexical(t.vctx);
+    const [a, b] = t.out.members;
+    a!.backstory = `${a!.backstory} The mill's closure hit the community hard.`;
+    a!.voice.samples = ["It is the damp, mostly.", "I do not go up the hill now.", "Come along."];
+    a!.routine.weekday = [
+      at("07:30", "eat", t.h.home), at("09:30", "work", "millbrook.mill_yard"), at("11:00", "wander", "millbrook.weir"), at("12:30", "eat", t.h.home),
+      at("18:00", "eat", t.h.home), at("21:30", "sleep", t.h.home),
+    ];
+    a!.relationships = [{ id: "old_tom", affinity: 20, trust: 20, tag: "friend", note: "Worked the looms with him." }];
+    a!.personality.big5 = { ...a!.personality.big5, open: 50, conscientious: 50, extravert: 50, agreeable: 64, neurotic: 45 };
+    b!.appearance = "Thin, with a long patient face.";
+    b!.voice.samples[0] = "Is that the ferry? You'll be wanting tea?";
+    expect(rules(validateHousehold(t.out, t.draw, vctx))).toEqual(["V06", "V08", "V10", "V13", "V13n", "V14", "V16"]);
+    const r = repair(t.out, t.draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V16 members[0].backstory "closure" → "closing", "community" → "town"',
+      `V10 members[0].voice.samples[0] "It is" → "It's"`,
+      `V10 members[0].voice.samples[1] "do not" → "don't"`,
+      'V13 members[0].routine.weekday[1].do "work" → "visit" (at millbrook.mill_yard; they have no job)',
+      'V13n members[0].routine.weekday[2].where "millbrook.weir" → "commons.duck_pond" (wander; their day needs a block on an open board)',
+      'V14 members[0].relationships: dropped the tie to "old_tom" (not a resident or a household slot)',
+      'V14 members[0].relationships: added "m2" (engine-added: the household tie (partner))',
+      'V06 members[1].appearance "Thin, with a long patient face." → "Thin, with a long patient face, in a flat cap." (names what the portrait wears)',
+      `V10 members[1].voice.samples[0] "Is that the ferry? You'll be wanting tea?" → "Is that the ferry? You'll be wanting tea." (one question)`,
+      "V08 members[0].personality.big5.agreeable 64 → 70 (one trait at 70+ or 30-)",
+    ]);
+    expect(codes(validateHousehold(r.output, t.draw, vctx))).toEqual([]);
+    const twice = repair(r.output, t.draw, vctx);
+    expect(twice.adjustments).toEqual([]);
+    expect(twice.output).toEqual(r.output);
+  });
+
+  it("comes before the nudge apart, which keeps the new strong trait", () => {
+    const { draw, vctx, out } = native("oq_b02");
+    out.members[0]!.personality.big5 = big5(50, 50, 50, 50, 50);
+    out.members[1]!.personality.big5 = big5(50, 50, 50, 50, 50);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments.slice(0, 2)).toEqual(["V08 members[0].personality.big5.open 50 → 70 (one trait at 70+ or 30-)", "V08 members[1].personality.big5.open 50 → 70 (one trait at 70+ or 30-)"]);
+    expect(r.adjustments[2]).toMatch(/^V08 members\[1\]\.personality\.big5 nudged apart from members\[0\]: /);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
   });
 });

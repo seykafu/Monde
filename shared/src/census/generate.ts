@@ -255,9 +255,13 @@ export function nativeValidationContext(input: CensusInput, h: SkeletonHousehold
   const own = new Set([h.surname, ...h.members.map(m => m.surname)].filter((x): x is string => !!x));
   const otherSurnames = [...new Set(input.skeleton.households.filter(x => x.id !== h.id).flatMap(x => [x.surname, ...x.members.map(m => m.surname)])
     .filter((x): x is string => !!x && !own.has(x) && !kinSurnames.has(x)))];
+  // Who a lone resident could plausibly know when every tie the model wrote names nobody (repair.ts): the written and
+  // hand-written cards, by the zone of their home and their workplace.
+  const neighbours = [...input.cards, ...input.written.values()].filter(c => c.household !== h.id)
+    .map(c => ({ id: c.id, zone: c.home ? c.home.slice(0, c.home.indexOf(".")) || null : null, workplace: c.workplace ?? null }));
   return {
     places: input.places, residents, home: h.home, profile: "native", giftTags: input.giftTags, recentBackstories: recent,
-    requiredLinks: required, kinSurnames: [...kinSurnames], otherSurnames, ...(input.banned ? { banned: input.banned } : {}),
+    requiredLinks: required, kinSurnames: [...kinSurnames], otherSurnames, neighbours, ...(input.banned ? { banned: input.banned } : {}),
   };
 }
 

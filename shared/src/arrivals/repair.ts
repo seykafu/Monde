@@ -6,17 +6,23 @@
 // apart. A full census run (2026-10-17) then still fell back to the template for 35 of 107 households, on more slips of
 // the same kind: elders reminiscing in pennies (V16's money), a verb the engine doesn't have, ten routine blocks, a
 // block past 26:00 or out of order, a day that doesn't start or end at home, a work block away from the workplace.
+// After two rounds of those, 15 households still fell back, on the World Bible's banned words (V16 style), ties to
+// people who don't exist (V14), samples a contraction short (V10), a Millbrook day that never reaches an open board
+// (V13n), an appearance that names nothing the portrait wears (V06), work with no job (V13) and a Big Five with no
+// strong trait (V08): the engine fixes those too, each with the smallest change its rule needs.
 // repairHousehold fixes those deterministically and lists each change; validateHousehold then judges what is left, and
 // only that goes back to the model on a retry. Names, canon, novelty and the rest of banned language (V02, V03,
-// V15–V19) stay with the validator and the retry loop, and so does anything that needs new content (V10's
-// contractions). Pure: no I/O, and the input is never mutated.
+// V15–V19) stay with the validator and the retry loop, and so does anything that needs new content. Pure: no I/O, and
+// the input is never mutated.
 import { OPEN_BOARDS } from "../census/day1Tables";
 import { VERBS, type Verb } from "../verbs";
 import {
-  APPEARANCE_SENTENCES, BIG5_APART, BIG5_KEYS, DAY_END_MINUTES, HOME_TOKEN, LENGTH_CAPS, LIKES_RANGE, PRONOUNS, RELATION_TAGS, ROUTINE_BLOCKS,
-  ROUTINE_TIME, STORY_ROLES, assignedWorkplace, big5Apart, countSentences, countWords, hasEngineRoutine, isCommuter, isTollmenRound, likeRule,
-  memberArchetype, memberTags, mentionsAttire, routineClock, tieLimit, type Big5Key, type ValidationContext,
+  APPEARANCE_SENTENCES, ARRIVAL_HOUSEHOLD_TIE, BIG5_APART, BIG5_KEYS, CONTRACTION, DAY_END_MINUTES, HOME_TOKEN, HOUSEBOUND_AGE, LENGTH_CAPS, LIKES_RANGE,
+  NOT_X_BUT_Y, PRONOUNS, RELATION_TAGS, ROUTINE_BLOCKS, ROUTINE_TIME, STORY_ROLES, TIES_RANGE, assignedWorkplace, big5Apart, countSentences, countWords,
+  hasEngineRoutine, householdIds, householdTieFor, isCommuter, isTollmenRound, likeRule, memberArchetype, memberTags, mentionsAttire, routineClock,
+  surnameOfName, tieLimit, type Big5Key, type TieEnd, type ValidationContext,
 } from "./card";
+import type { PortraitTags } from "../census/portraitPlan";
 import type { HouseholdDraw } from "./draw";
 import { currencyHit, currencySpans, foldApostrophes } from "./money";
 import { SeededRng } from "./rng";
@@ -404,6 +410,198 @@ export function coinsFor(text: string): { text: string; swaps: [string, string][
   return { text: out, swaps: edits.map(e => [text.slice(e.start, e.end), inCase(text.slice(e.start, e.end), e.to)]) };
 }
 
+// ── V16: the style list ─────────────────────────────────────────────────────
+
+const WORD_START = "(?<![\\p{L}\\p{N}])", WORD_END = "(?![\\p{L}\\p{N}])";
+type Swap = readonly [RegExp, string | ((m: RegExpExecArray) => string)];
+/** A whole-word, case-blind pattern, bounded the way server/src/mind/filters.ts bounds its lists. */
+const wordSwap = (src: string, to: Swap[1]): Swap => [new RegExp(`${WORD_START}(?:${src})${WORD_END}`, "giu"), to];
+const POSSESSOR = "(?:my|his|her|their|our|your|own|life['’]s)";
+const DETERMINER = "(?:the|its|his|her|their|our|my|your|this|that|whose|\\p{L}+['’]s)";
+const GIVE_BACK_OBJECT = "(?:the|a|an|his|her|their|my|your|our|its|what|every|some|that|this|those|these|it)";
+
+/**
+ * §12.1's style list as the World Bible gives it (community, journey, resilience, heart of the town, special place,
+ * vibrant, tapestry, healing, closure, stakeholders, revitalize, give back, safe space; server/src/mind/filters.ts
+ * STYLE, which V16 runs through ctx.banned), each in the plain words that say the same thing. Context picks the word: a
+ * mill's "closure" is its closing, a person's "closure" an ending; "her journey" is her road, "the journey" a trip;
+ * "give back the ladder" returns it. Earlier rows win where two overlap. The rest of the list (the stock phrases, "Not
+ * X, Y") has no plain swap: a text with one is left for V16 and the retry.
+ */
+const STYLE_SWAPS: readonly Swap[] = [
+  wordSwap("community spirit", "neighbourliness"),
+  wordSwap("sense of community", "sense of neighbourliness"),
+  wordSwap("(?:members|folk|people) of the community", "neighbours"),
+  wordSwap("community garden", "garden plots"),
+  wordSwap("community work", "work for the town"),
+  wordSwap("communities", "towns"),
+  wordSwap("community", "town"),
+  wordSwap(`(?<=${POSSESSOR}\\s)journey`, "road"),
+  wordSwap("journey", "trip"),
+  wordSwap("resilience", "staying power"),
+  wordSwap("resilient", "hardy"),
+  wordSwap("heart of the town", "middle of town"),
+  wordSwap("special place", "good place"),
+  wordSwap("vibrant", "lively"),
+  wordSwap("tapestry", "patchwork"),
+  wordSwap("healing", "mending"),
+  wordSwap("an? closure", "an ending"),
+  wordSwap(`(?<=${DETERMINER}\\s)closure`, "closing"),
+  wordSwap("(?<=(?:some|any|no)\\s)closure", "ending"),
+  wordSwap("closure", "an ending"),
+  wordSwap("stakeholders", "people with a say"),
+  wordSwap("stakeholder", "person with a say"),
+  wordSwap("revitali[sz]e", "bring back"),
+  wordSwap("revitali[sz]es", "brings back"),
+  wordSwap("revitali[sz]ed", "brought back"),
+  wordSwap("revitali[sz]ing", "bringing back"),
+  wordSwap("revitali[sz]ation", "revival"),
+  wordSwap("give back to (him|her|them|us|me|you)", m => `help ${m[1]!.toLowerCase()} out`),
+  wordSwap("give back to", "help out"),
+  wordSwap(`give back(?=\\s+${GIVE_BACK_OBJECT}${WORD_END})`, "return"),
+  wordSwap("give back", "help out"),
+  wordSwap("safe space", "quiet corner"),
+];
+
+/** Does `text` end where a sentence starts (nothing yet, or a sentence end, a space and perhaps an opening quote)? */
+const atSentenceStart = (before: string): boolean => /^\s*["'“‘(]?$/u.test(before) || /[.!?…]["'”’)\]]?\s+["'“‘(]?$/u.test(before);
+/** `to` in `from`'s case at that point of a text: capitals stay capitals; a capital that starts a sentence stays. */
+const caseAt = (before: string, from: string, to: string): string => {
+  const letters = from.replace(/[^\p{L}]/gu, "");
+  if (letters.length > 1 && letters === letters.toUpperCase()) return to.toUpperCase();
+  return /^\p{Lu}/u.test(from) && atSentenceStart(before) ? `${to.charAt(0).toUpperCase()}${to.slice(1)}` : to;
+};
+
+/**
+ * `text` with the style list's words in plain words (STYLE_SWAPS), and each swap made, left to right; null unless
+ * `banned` (the validator's own matcher, ctx.banned) flags the text as style and passes it after the swaps without a
+ * group it didn't flag before. Anything else is left for V16 and the retry.
+ */
+export function plainWordsFor(text: string, banned: (text: string) => readonly string[]): { text: string; swaps: [string, string][] } | null {
+  const before = banned(text);
+  if (!before.includes("style")) return null;
+  const edits: { start: number; end: number; to: string }[] = [];
+  for (const [re, to] of STYLE_SWAPS) for (const m of text.matchAll(re)) {
+    const start = m.index, end = m.index + m[0].length;
+    if (edits.every(e => end <= e.start || start >= e.end)) edits.push({ start, end, to: caseAt(text.slice(0, start), m[0], typeof to === "string" ? to : to(m)) });
+  }
+  if (!edits.length) return null;
+  edits.sort((a, b) => a.start - b.start);
+  let out = text;
+  for (const e of [...edits].reverse()) out = `${out.slice(0, e.start)}${e.to}${out.slice(e.end)}`;
+  const after = banned(out);
+  if (after.includes("style") || after.some(g => !before.includes(g))) return null;
+  return { text: out, swaps: edits.map(e => [text.slice(e.start, e.end), e.to]) };
+}
+
+// ── V10: voice samples ──────────────────────────────────────────────────────
+
+/**
+ * V10's common pairs and their contractions (an "I" keeps its capital). Most can't end a clause ("who you are", never
+ * "who you're"), so they need a word after them; "I have to" and "let us in" aren't contractions, and "I will not" is
+ * "I won't".
+ */
+const CONTRACTION_PAIRS: readonly (readonly [pair: string, to: string, needsWord?: boolean])[] = [
+  ["i am", "I'm", true], ["it is", "it's", true], ["do not", "don't"], ["does not", "doesn't"], ["did not", "didn't"], ["is not", "isn't"],
+  ["are not", "aren't"], ["was not", "wasn't"], ["i will(?!\\s+not\\b)", "I'll", true], ["you are", "you're", true], ["that is", "that's", true],
+  ["there is", "there's", true], ["i have(?!\\s+to\\b)", "I've", true], ["we are", "we're", true], ["cannot", "can't"], ["will not", "won't"],
+  ["would not", "wouldn't"], ["could not", "couldn't"], ["should not", "shouldn't"],
+  ["let us(?!\\s+(?:in|out|through|past|off|down|up|over|by|know|alone|be|pass|stay)\\b)", "let's", true], ["i would(?!\\s+not\\b)", "I'd", true],
+  ["they are", "they're", true],
+];
+const CONTRACTIONS: readonly (readonly [RegExp, string])[] = CONTRACTION_PAIRS.map(([pair, to, needsWord]) =>
+  [new RegExp(`(?<![\\p{L}\\p{N}'’])${pair.replace(/ /g, "\\s+")}(?![\\p{L}\\p{N}'’])${needsWord ? "(?=\\s+\\p{L})" : ""}`, "giu"), to] as const);
+
+/** The places in a sample a pair contracts, left to right: the pair and its contraction, in the sample's case and apostrophe. */
+function contractionsIn(sample: string): { start: number; end: number; from: string; to: string }[] {
+  const apostrophe = sample.includes("’") ? "’" : "'";
+  const out = CONTRACTIONS.flatMap(([re, to]) => [...sample.matchAll(re)].map(m => {
+    const form = to.replace("'", apostrophe);
+    const letters = m[0].replace(/[^\p{L}]/gu, "");
+    const cased = letters.length > 1 && letters === letters.toUpperCase() ? form.toUpperCase() : /^\p{Lu}/u.test(m[0]) ? `${form.charAt(0).toUpperCase()}${form.slice(1)}` : form;
+    return { start: m.index, end: m.index + m[0].length, from: m[0], to: cased };
+  }));
+  return out.sort((a, b) => a.start - b.start || b.end - a.end);
+}
+
+/** Words that make a sentence a question when they lead it (or, for the first set, end it). */
+const ASKING = new Set(["who", "whom", "whose", "what", "which", "when", "where", "why", "how"]);
+const ASKING_LEAD = new Set([
+  ...ASKING, "am", "is", "are", "was", "were", "do", "does", "did", "have", "has", "had", "can", "could", "will", "would", "shall", "should", "may",
+  "might", "must", "isn't", "aren't", "wasn't", "weren't", "don't", "doesn't", "didn't", "haven't", "hasn't", "hadn't", "can't", "couldn't", "won't",
+  "wouldn't", "shan't", "shouldn't", "mightn't", "mustn't", "ain't", "want", "fancy", "know", "got", "seen", "heard", "anyone", "anybody", "anything",
+  "any", "eh", "sorry", "pardon",
+]);
+/** Words that open a sentence without deciding what it is ("And where were you?"). */
+const LEADING = new Set(["and", "but", "so", "then", "well", "oh", "now", "or", "ah", "look", "listen", "right", "still", "anyway"]);
+const TAG_QUESTION = /,\s*(?:\p{L}+n['’]t|is|are|was|were|do|does|did|will|would|can|could|shall|should|have|has|had|am)\s+(?:it|he|she|they|you|we|i|there|that|this)\s*$|,\s*(?:right|eh|yes|no|okay|ok|aye|innit|see|mind)\s*$/iu;
+
+/** Would this sentence (its "?" taken off) read as a statement with a full stop: two words or more, not led or ended by a question word, no tag? */
+export function readsAsStatement(sentence: string): boolean {
+  const words = foldApostrophes(sentence).toLowerCase().replace(/[^\p{L}'\s-]+/gu, " ").split(/\s+/).filter(Boolean);
+  let k = 0;
+  while (k < words.length - 1 && LEADING.has(words[k]!)) k++;
+  const rest = words.slice(k);
+  return rest.length >= 2 && !ASKING_LEAD.has(rest[0]!) && !ASKING.has(rest.at(-1)!) && !TAG_QUESTION.test(sentence.trim());
+}
+
+/**
+ * A sample with more than one question (V10) kept as it is up to its first "?", and each later question a statement:
+ * its "?" a "." when the sentence reads as one (readsAsStatement). Null when any later one doesn't, or a "?" sits in a
+ * run of marks ("?!", "??").
+ */
+export function oneQuestion(sample: string): string | null {
+  const marks = [...sample.matchAll(/\?/g)].map(m => m.index);
+  if (marks.length < 2) return null;
+  let out = sample;
+  for (const q of marks.slice(1)) {
+    if (/[.!?…]/.test(sample[q - 1] ?? "") || /[.!?…]/.test(sample[q + 1] ?? "")) return null;
+    const start = Math.max(...[...sample.slice(0, q).matchAll(/[.!?…]/g)].map(m => m.index)) + 1;
+    if (!readsAsStatement(sample.slice(start, q).replace(/^[\s"'“‘(—–-]+/u, ""))) return null;
+    out = `${out.slice(0, q)}.${out.slice(q + 1)}`;
+  }
+  return out;
+}
+
+// ── V06: what the portrait wears ────────────────────────────────────────────
+
+/**
+ * V06: an appearance that names nothing the portrait wears takes the first attire tag this table has, after its first
+ * sentence: worn ("in a cardigan") or carried ("with a satchel"). Each names the word mentionsAttire looks for.
+ */
+const WEARING: Readonly<Record<string, string>> = {
+  coat: "in a coat", work_jacket: "in a work jacket", cardigan: "in a cardigan", raincoat: "in a raincoat", jumper: "in a jumper",
+  school_jumper: "in a school jumper", navy_jumper: "in a navy jumper", apron: "in an apron", blazer: "in a blazer", velvet_jacket: "in a velvet jacket",
+  peaked_cap: "in a peaked cap", flat_cap: "in a flat cap", knit_cap: "in a knit cap", pinafore: "in a pinafore", oilskin: "in an oilskin",
+  glasses: "in glasses", smock: "in a smock", shirt: "in a shirt", checked: "in a checked shirt", scarf: "in a scarf", dungarees: "in dungarees",
+  skirt: "in a skirt", boots: "in boots", neckerchief: "in a neckerchief", satchel: "with a satchel", tote: "with a tote", brooch: "with a brooch",
+  tape_measure: "with a tape measure", tool_belt: "with a tool belt", badge: "with a badge", pencil: "with a pencil", binoculars: "with binoculars",
+};
+
+/** `appearance` with ", in <the first attire tag>" at the end of its first sentence, if V06's cap allows it; else null. */
+export function withAttireWord(appearance: string, tags: Pick<PortraitTags, "attire">): string | null {
+  const body = appearance.trim();
+  const phrase = tags.attire.map(t => WEARING[t]).find((p): p is string => !!p && mentionsAttire(p, tags));
+  if (!body || !phrase) return null;
+  const end = /[.!?…]["'”’)\]]?(?=\s|$)/u.exec(body);
+  const at = end ? end.index : body.length;
+  const out = `${body.slice(0, at).replace(/[\s,;:—–-]+$/u, "")}, ${phrase}${body.slice(at)}`;
+  return countWords(out) <= LENGTH_CAPS.appearance && countSentences(out) <= APPEARANCE_SENTENCES && mentionsAttire(out, tags) ? out : null;
+}
+
+// ── V13n: a day on an open board ────────────────────────────────────────────
+
+/**
+ * V13n: an open-board place for a block's verb (content/places/places.yaml), the street for any other verb. Verbs tied
+ * to their own place (sleep, nap, garden, fish, cook, clean) and work never move.
+ */
+const BOARD_PLACE: Readonly<Partial<Record<Verb, string>>> = {
+  shop: "market_row.general_store", eat: "market_row.cafe_liss", walk: "commons.duck_pond", wander: "commons.duck_pond",
+  socialize: "market_row.gull_and_anchor", read: "old_quarter.library", pray: "old_quarter.st_brigids", attend: "old_quarter.town_hall",
+};
+const BOARD_STREET = "market_row.market_street";
+const STAYS_PUT: ReadonlySet<string> = new Set<Verb>(["work", "sleep", "nap", "garden", "fish", "cook", "clean"]);
+
 // ── V08: Big Five ───────────────────────────────────────────────────────────
 
 type Big5 = Record<Big5Key, number>;
@@ -445,24 +643,34 @@ export function nudgeBig5(me: Big5, earlier: readonly Big5[], rng: SeededRng): B
 
 /**
  * Repair a parsed household reply (anything parseJsonObject returned) against its draw, before validateHousehold:
- *  0. V16: money words in every text V16 scans (all but the name) become coins (coinsFor). Before the trims: "sixpence"
- *     is two words as "six coins".
+ *  0. V16: money words in every text V16 scans (all but the name) become coins (coinsFor); then, where ctx.banned
+ *     flags a text as style, the style list's words become plain ones (plainWordsFor). Before the trims: "sixpence" is
+ *     two words as "six coins".
  *  1. V06/V07 lengths over their caps are trimmed (trimToWords); an appearance keeps its attire word or is left alone.
+ *     V06: an appearance that names nothing the portrait wears gains ", in <its first attire>" in its first sentence,
+ *     if the cap allows (withAttireWord).
  *  2. Enums: relationship tags through the synonym table (an unknown tag with positive affinity becomes "fond"; with
  *     none, the tie is dropped unless it is required or the member's last); pronouns and story roles in another
  *     spelling; a routine verb in another spelling or through its synonym table, else "wander" (routineVerbFor). A
  *     required tie takes the tag the engine requires (kin).
+ *     V10: a sample with two questions keeps its first, and a later one that reads as a statement ends in a full stop
+ *     (oneQuestion); when fewer than two samples have a contraction, the ones without contract a common pair
+ *     (CONTRACTIONS) until two do. Each edit is re-checked with V10's and V16's matchers.
  *  3. V13: a bare local place id takes its zone when exactly one place has it. Each day's routine takes V13's shape
  *     (repairDay: times, order, at most nine blocks, starting and ending at home), unless the engine writes that
  *     member's day (pupils, under-fives). A work block away from the workplace becomes a visit when the workplace is on
  *     an open board and the block isn't at home (a Tollman's Saturday round is work: isTollmenRound); otherwise V13
- *     judges it.
- *  4. V14: ties to the member themself (slot or id) and second ties to one person are dropped; a housemate's slot
- *     becomes their id (the others' slots stay: assembly resolves them to the household tie); affinity and trust are
- *     rounded and held to tieLimit's range (±100 for the household and required ties, which keep their numbers).
+ *     judges it. Someone with no job works nowhere: a work block is a visit (housework at home, natives). V13n: a
+ *     Millbrook or Station Hill day with no block on an open board moves its most suitable block to one (BOARD_PLACE).
+ *  4. V14: ties to the member themself (slot or id), ties to anyone who isn't a resident or in the household, and
+ *     second ties to one person are dropped; a housemate's slot becomes their id (the others' slots stay: assembly
+ *     resolves them to the household tie); affinity and trust are rounded and held to tieLimit's range (±100 for the
+ *     household and required ties, which keep their numbers). A member left with no tie gets the one assembly would
+ *     add to a housemate, else (ctx.neighbours) a neutral one to a neighbour; with neither, the unknown ties stay for V14.
  *  5. V11: too few qualifying likes → the archetype's likes are added until enough qualify; the model's last
  *     non-qualifying likes go if the list would pass five.
- *  6. V08: Big Five rounded into 0–100, and a member too close to an earlier one nudged just apart (nudgeBig5).
+ *  6. V08: Big Five rounded into 0–100; a member with no trait at 70+ or 30− has the closer of their highest and lowest
+ *     moved to it; a member too close to an earlier one is nudged just apart (nudgeBig5).
  * Deterministic and idempotent: a repaired reply repairs to itself, and a reply that passes comes back equal.
  */
 export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: ValidationContext): HouseholdRepair {
@@ -491,22 +699,37 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
   const trimAll = (list: unknown, max: number, path: string) => {
     if (Array.isArray(list)) list.forEach((_, k) => trim(list as unknown as Rec, k, max, `${path}[${k}]`));
   };
-  const coins = (holder: unknown, key: string | number, path: string) => {
+  type TextFix = (holder: unknown, key: string | number, path: string) => void;
+  /** A V16 fix for one text: the swaps it makes, each `"from" → "to"`. */
+  const v16Fix = (fix: (s: string) => { text: string; swaps: [string, string][] } | null): TextFix => (holder, key, path) => {
     if (!isRec(holder) && !Array.isArray(holder)) return;
     const h = holder as Rec;
     const v = h[key];
     if (!isStr(v)) return;
-    const fixed = coinsFor(v);
+    const fixed = fix(v);
     if (!fixed) return;
     h[key] = fixed.text;
     note(`V16 ${path} ${fixed.swaps.map(([from, to]) => `${show(from)} → ${show(to)}`).join(", ")}`);
   };
-  const coinsAll = (list: unknown, path: string, skip: (s: unknown) => boolean = () => false) => {
-    if (Array.isArray(list)) list.forEach((x, k) => { if (!skip(x)) coins(list, k, `${path}[${k}]`); });
+  const coins = v16Fix(coinsFor);
+  const banned = ctx.banned;
+  const plain = banned ? v16Fix(s => plainWordsFor(s, banned)) : null;
+  /** Every text V16 scans on a member but the name, in the validator's order (a dream stage copied from A.2 is skipped). */
+  const eachV16Text = (m: Rec, at: string, authored: ReadonlySet<string>, fix: TextFix) => {
+    const all = (list: unknown, path: string, skip: (s: unknown) => boolean = () => false) => {
+      if (Array.isArray(list)) list.forEach((x, k) => { if (!skip(x)) fix(list, k, `${path}[${k}]`); });
+    };
+    for (const key of ["occupation", "appearance", "backstory"]) fix(m, key, `${at}.${key}`);
+    for (const key of ["beliefs", "likes", "dislikes", "fears", "chores"]) all(m[key], `${at}.${key}`);
+    if (isRec(m.voice)) { fix(m.voice, "register", `${at}.voice.register`); all(m.voice.tics, `${at}.voice.tics`); all(m.voice.samples, `${at}.voice.samples`); }
+    if (isRec(m.dream)) { fix(m.dream, "text", `${at}.dream.text`); all(m.dream.stages, `${at}.dream.stages`, x => isStr(x) && authored.has(x)); }
+    if (Array.isArray(m.relationships)) m.relationships.forEach((r: unknown, k) => fix(r, "note", `${at}.relationships[${k}].note`));
+    if (Array.isArray(m.secrets)) m.secrets.forEach((x: unknown, k) => fix(x, "text", `${at}.secrets[${k}].text`));
   };
 
   if (isRec(out.household)) {
     coins(out.household, "summary", "household.summary");
+    plain?.(out.household, "summary", "household.summary");
     trim(out.household, "summary", LENGTH_CAPS.summary, "household.summary");
   }
   const members = Array.isArray(out.members) ? out.members : [];
@@ -514,21 +737,21 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
     if (!isRec(m)) return;
     const d = draw.members[i];
     const at = `members[${i}]`;
-    // 0. Money, in every text V16 scans but the name (and a dream stage copied from the archetype, which it skips).
-    const authored = new Set(d ? memberArchetype(d, draw).dreams.flatMap(x => x.stages) : []);
-    for (const key of ["occupation", "appearance", "backstory"]) coins(m, key, `${at}.${key}`);
-    for (const key of ["beliefs", "likes", "dislikes", "fears", "chores"]) coinsAll(m[key], `${at}.${key}`);
-    if (isRec(m.voice)) { coins(m.voice, "register", `${at}.voice.register`); coinsAll(m.voice.tics, `${at}.voice.tics`); coinsAll(m.voice.samples, `${at}.voice.samples`); }
-    if (isRec(m.dream)) { coins(m.dream, "text", `${at}.dream.text`); coinsAll(m.dream.stages, `${at}.dream.stages`, x => isStr(x) && authored.has(x)); }
-    if (Array.isArray(m.relationships)) m.relationships.forEach((r: unknown, k) => coins(r, "note", `${at}.relationships[${k}].note`));
-    if (Array.isArray(m.secrets)) m.secrets.forEach((x: unknown, k) => coins(x, "text", `${at}.secrets[${k}].text`));
-    // 1. Lengths.
+    // 0. Money, then the style list, in every text V16 scans but the name (and a dream stage copied from the archetype,
+    // which it skips).
+    const archetype = d ? memberArchetype(d, draw) : null;
+    const authored = new Set(archetype ? archetype.dreams.flatMap(x => x.stages) : []);
+    eachV16Text(m, at, authored, coins);
+    if (plain) eachV16Text(m, at, authored, plain);
+    // 1. Lengths, and the appearance naming what the portrait wears.
     trim(m, "occupation", LENGTH_CAPS.occupation, `${at}.occupation`);
     trim(m, "backstory", LENGTH_CAPS.backstory, `${at}.backstory`);
     if (isStr(m.appearance)) {
       const tags = d ? memberTags(d) : null;
       const attire = tags !== null && mentionsAttire(m.appearance, tags);
       trim(m, "appearance", LENGTH_CAPS.appearance, `${at}.appearance`, "V06", s => countSentences(s) <= APPEARANCE_SENTENCES && (!attire || mentionsAttire(s, tags!)));
+      const dressed = tags && !attire ? withAttireWord(m.appearance as string, tags) : null;
+      if (dressed) { note(`V06 ${at}.appearance ${show(m.appearance)} → ${show(dressed)} (names what the portrait wears)`); m.appearance = dressed; }
     }
     if (isRec(m.voice)) { trim(m.voice, "register", LENGTH_CAPS.register, `${at}.voice.register`); trimAll(m.voice.samples, LENGTH_CAPS.sample, `${at}.voice.samples`); }
     if (isRec(m.dream)) { trim(m.dream, "text", LENGTH_CAPS.dreamText, `${at}.dream.text`); trimAll(m.dream.stages, LENGTH_CAPS.stage, `${at}.dream.stages`); }
@@ -543,6 +766,37 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
       const role = storyRoleOf(m.story_role);
       note(`V18 ${at}.story_role ${show(m.story_role)} → ${show(role)}`);
       m.story_role = role;
+    }
+
+    // 2b. Voice samples (V10): one question each, and two with a contraction.
+    if (d && archetype && isRec(m.voice) && Array.isArray(m.voice.samples) && m.voice.samples.every(isStr)) {
+      const samples = m.voice.samples as string[];
+      const neverSays = Array.isArray(m.voice.never_says) ? m.voice.never_says.filter(isStr).filter(x => x.trim()) : [];
+      const problems = (s: string): string[] => [
+        ...neverSays.filter(n => s.toLowerCase().includes(n.toLowerCase())).map(n => `never_says ${n}`),
+        ...(NOT_X_BUT_Y.test(s) ? ["not X, but Y"] : []), ...(banned ? banned(s) : []),
+      ];
+      /** An edit V10 or V16 would fail on something the sample didn't have before is no edit. */
+      const clean = (before: string, after: string) => { const was = new Set(problems(before)); return problems(after).every(p => was.has(p)); };
+      samples.forEach((s, k) => {
+        const fixed = oneQuestion(s);
+        if (fixed === null || !clean(s, fixed)) return;
+        note(`V10 ${at}.voice.samples[${k}] ${show(s)} → ${show(fixed)} (one question)`);
+        samples[k] = fixed;
+      });
+      // GDD-GAP: A.3.7 V10 fails samples a contraction short; the engine contracts the model's own words instead.
+      const need = 2 - samples.filter(s => CONTRACTION.test(s)).length;
+      if (!archetype.formal && d.band !== "child" && need > 0) {
+        const edits: { k: number; from: string; to: string; text: string }[] = [];
+        for (let k = 0; k < samples.length && edits.length < need; k++) {
+          const s = samples[k]!;
+          if (CONTRACTION.test(s)) continue;
+          const edit = contractionsIn(s).map(c => ({ ...c, text: `${s.slice(0, c.start)}${c.to}${s.slice(c.end)}` })).find(c => clean(s, c.text) && CONTRACTION.test(c.text));
+          if (edit) edits.push({ k, from: edit.from, to: edit.to, text: edit.text });
+        }
+        // Only when it gets V10 there: a sample changed for nothing is a change the retry has to read past.
+        if (edits.length >= need) for (const e of edits) { note(`V10 ${at}.voice.samples[${e.k}] ${show(e.from)} → ${show(e.to)}`); samples[e.k] = e.text; }
+      }
     }
 
     // 3. Places, and the routine's verbs and shape.
@@ -583,10 +837,42 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
         note(`V13 ${path}[${k}].do "work" → "visit" (at ${e.where}; their work is at ${workplace})`);
         e.do = "visit";
       });
+      // No job, so no work: a visit, or (a native at home, which V13 fails too) the housework.
+      // GDD-GAP: V13 fails work with no job; a carer's or a homemaker's work at home is the house's, so it's "clean".
+      const jobless = native ? workplace === null : m.workplace === null;
+      if (jobless) shaped.forEach((e, k) => {
+        if (!isRec(e) || e.do !== "work" || !isStr(e.where)) return;
+        const atHome = homes.has(e.where) && e.where !== "offmap.city";
+        if (atHome && !native) return;
+        const verb = atHome ? "clean" : "visit";
+        note(`V13 ${path}[${k}].do "work" → ${show(verb)} (at ${e.where}; they have no job)`);
+        e.do = verb;
+      });
+      // V13n: a Millbrook or Station Hill day (13 and over, not housebound, not a commuter's weekday) on an open board.
+      const zone = draw.native?.zone;
+      const board = (where: unknown) => isStr(where) && (OPEN_BOARDS as readonly string[]).includes(zoneOf(where === HOME_TOKEN ? home : where));
+      if (native && (zone === "millbrook" || zone === "station_hill") && d.age >= 13 && d.age < HOUSEBOUND_AGE && !away && !shaped.some(e => isRec(e) && board(e.where))) {
+        const target = (e: Rec): string | null => {
+          const p = BOARD_PLACE[e.do as Verb] ?? BOARD_STREET;
+          return ctx.places.has(p) && board(p) ? p : null;
+        };
+        const movable = shaped.map((e, k) => [e, k] as const).filter((x): x is readonly [Rec, number] => {
+          const e = x[0];
+          return isRec(e) && isStr(e.do) && isStr(e.where) && !homes.has(e.where) && !STAYS_PUT.has(e.do) && target(e) !== null;
+        });
+        // The most suitable: the first whose verb has a place of its own on the boards, else the first that moves at all.
+        const pick = movable.find(([x]) => BOARD_PLACE[x.do as Verb]) ?? movable[0];
+        if (pick) {
+          const [e, k] = pick;
+          const to = target(e)!;
+          note(`V13n ${path}[${k}].where ${show(e.where)} → ${show(to)} (${e.do as string}; their day needs a block on an open board)`);
+          e.where = to;
+        }
+      }
     }
 
     // 4. Relationships.
-    if (d && Array.isArray(m.relationships)) m.relationships = repairTies(m.relationships, d.slot, d.native?.pinned?.id ?? null, `${at}.relationships`);
+    if (d && Array.isArray(m.relationships)) m.relationships = repairTies(m.relationships, i, m, `${at}.relationships`);
 
     // 5. Likes.
     if (d && Array.isArray(m.likes) && m.likes.every(isStr)) {
@@ -627,6 +913,15 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
     }
     return b as Big5;
   });
+  // V08's one trait at 70+ or 30-: the highest up to 70 or the lowest down to 30, whichever is the smaller move (a tie
+  // raises; the first such trait in the contract's order).
+  scores.forEach((b, i) => {
+    if (!b || extreme(b)) return;
+    const hi = BIG5_KEYS.reduce((a, k) => (b[k] > b[a] ? k : a)), lo = BIG5_KEYS.reduce((a, k) => (b[k] < b[a] ? k : a));
+    const [k, to] = 70 - b[hi] <= b[lo] - 30 ? [hi, 70] : [lo, 30];
+    note(`V08 members[${i}].personality.big5.${k} ${b[k]} → ${to} (one trait at 70+ or 30-)`);
+    b[k] = to;
+  });
   scores.forEach((me, j) => {
     if (!me || j === 0) return;
     const earlier = scores.slice(0, j).map((b, i) => [b, i] as const).filter((x): x is readonly [Big5, number] => !!x[0]);
@@ -640,9 +935,54 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
   });
   return { output: out, adjustments };
 
+  /** A member as a household tie's end (cardsFromHousehold's: the canon name when pinned, the census age when native). */
+  function tieEnd(j: number): TieEnd {
+    const dj = draw.members[j]!, mj = members[j];
+    const p = isRec(mj) && isStr(mj.pronouns) ? ((PRONOUNS as readonly string[]).includes(mj.pronouns) ? mj.pronouns : pronounsOf(mj.pronouns)) : null;
+    const name = dj.native?.pinned?.name ?? (isRec(mj) && isStr(mj.name) ? mj.name : "");
+    const age = native ? dj.age : isRec(mj) && typeof mj.age === "number" ? mj.age : dj.age;
+    return { slot: dj.slot, role: dj.role, pronouns: p ?? dj.pronoun_default, age, surname: surnameOfName(name) };
+  }
+
+  /**
+   * V14's floor for member `i` when no tie of theirs names anyone in Monde: the tie assembly adds to the first housemate
+   * by slot (a member written now, by slot; a carded housemate, by id), else a neutral tie to the first of
+   * ctx.neighbours in their zone or at their workplace. Null: neither (V14 then names the ties).
+   * GDD-GAP: A.3.7 V14 fails a tie to an unknown id and fails a card with none. A.3.4 rule 2 gives everyone their
+   * household's ties, so that one is no invention; a lone member's neighbour tie (friend, 20/20, "A neighbour.") is
+   * the engine's smallest claim, and its adjustment says so.
+   */
+  function floorTie(i: number, m: Rec): { tie: Rec; why: string } | null {
+    const d = draw.members[i]!;
+    const others = [
+      ...draw.members.map((o, j) => ({ slot: o.slot, id: o.slot, end: () => tieEnd(j) })).filter(o => o.slot !== d.slot),
+      ...(draw.native?.housemates ?? []).map(h => ({ slot: h.slot, id: h.id, end: (): TieEnd => ({ slot: h.slot, role: h.role, pronouns: h.pronouns, age: h.age, surname: surnameOfName(h.name) }) })),
+    ].sort((a, b) => a.slot.localeCompare(b.slot, "en", { numeric: true }));
+    const mate = others[0];
+    if (mate && !native) return { tie: { id: mate.id, ...ARRIVAL_HOUSEHOLD_TIE }, why: "the household tie" };
+    if (mate) {
+      const word = draw.native?.ties.find(t => (t.a === d.slot && t.b === mate.slot) || (t.b === d.slot && t.a === mate.slot))?.word;
+      const t = householdTieFor(tieEnd(i), mate.end(), word);
+      return { tie: { id: mate.id, affinity: t.affinity, trust: t.trust, tag: t.word === "flatmate" ? "friend" : "kin", note: t.note }, why: `the household tie (${t.word})` };
+    }
+    const zone = draw.native?.zone ?? (ctx.home && ctx.home !== HOME_TOKEN ? zoneOf(ctx.home) : null);
+    const wp = native ? assignedWorkplace(d, home) : isStr(m.workplace) ? m.workplace : null;
+    const work = wp && wp !== home && wp !== HOME_TOKEN && wp !== "offmap.city" ? wp : null;
+    const inside = householdIds(draw);
+    const n = (ctx.neighbours ?? []).find(x => ctx.residents.has(x.id) && !inside.has(x.id) && ((zone !== null && x.zone === zone) || (work !== null && x.workplace === work)));
+    if (!n) return null;
+    return { tie: { id: n.id, affinity: 20, trust: 20, tag: "friend", note: "A neighbour." }, why: `a neutral tie to a neighbour ${n.zone === zone ? `in ${zone}` : `at ${work}`}` };
+  }
+
   /** Step 4 for one member's ties (and their tags, step 2). */
-  function repairTies(list: unknown[], ownSlot: string, ownId: string | null, path: string): unknown[] {
-    const unique: unknown[] = [];
+  function repairTies(list: unknown[], i: number, m: Rec, path: string): unknown[] {
+    const ownSlot = draw.members[i]!.slot, ownId = draw.members[i]!.native?.pinned?.id ?? null;
+    const required = native ? (ctx.requiredLinks ?? []).filter(l => l.slot === ownSlot) : [];
+    // V14's own test (a household slot or a resident), and the household's and the required ties, which always stay.
+    const inside = householdIds(draw);
+    const known = (id: string) => slots.has(id) || ctx.residents.has(id) || inside.has(id) || required.some(l => l.id === id);
+    let unique: unknown[] = [];
+    const unknown: Rec[] = [];
     const seen = new Set<string>();
     for (const r of list) {
       if (!isRec(r) || !isStr(r.id)) { unique.push(r); continue; }
@@ -653,12 +993,25 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
       if (mate) id = mate;
       if (id !== before) { note(`V14 ${path} ${show(before)} → ${show(id)}${mate ? " (a housemate's slot)" : ""}`); r.id = id; }
       if (id === ownSlot || id === ownId) { note(`V14 ${path}: dropped the tie to themself (${show(before)})`); continue; }
-      const who = pinnedBySlot.get(id) ?? id;
-      if (seen.has(who)) { note(`V14 ${path}: dropped a second tie to ${show(id)}`); continue; }
-      seen.add(who);
+      if (!known(id)) unknown.push(r);
+      else {
+        const who = pinnedBySlot.get(id) ?? id;
+        if (seen.has(who)) { note(`V14 ${path}: dropped a second tie to ${show(id)}`); continue; }
+        seen.add(who);
+      }
       unique.push(r);
     }
-    const required = native ? (ctx.requiredLinks ?? []).filter(l => l.slot === ownSlot) : [];
+    // Ties to nobody in Monde go when the member keeps one (or gets V14's floor); otherwise they stay for V14 to name.
+    const rest = unique.filter(r => !unknown.includes(r as Rec));
+    const floor = rest.length < TIES_RANGE[0] ? floorTie(i, m) : null;
+    if (unknown.length && (floor || rest.length >= TIES_RANGE[0])) {
+      for (const r of unknown) note(`V14 ${path}: dropped the tie to ${show(r.id)} (not a resident or a household slot)`);
+      unique = rest;
+    }
+    if (floor && unique.length < TIES_RANGE[0]) {
+      note(`V14 ${path}: added ${show(floor.tie.id)} (engine-added: ${floor.why})`);
+      unique.push(floor.tie);
+    }
     const kept: unknown[] = [];
     let left = unique.length;
     for (const r of unique) {

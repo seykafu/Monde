@@ -309,6 +309,11 @@ export interface ValidationContext {
   kinSurnames?: readonly string[];
   /** Native V03: the surnames the census gave other households (not yet written, so not in `residents`). */
   otherSurnames?: readonly string[];
+  /**
+   * The repair's fallback tie (V14): residents the household might know, with the zone they live in and where they
+   * work, in the order the prompt lists them (A.3.6 "people they might know"). Unset, the repair adds no such tie.
+   */
+  neighbours?: readonly { id: string; zone: string | null; workplace: string | null }[];
 }
 
 /** A tie the engine requires (native V14): from a member (`slot`) to a resident id, with the tag a kin tie must carry. */
@@ -334,6 +339,8 @@ export const LENGTH_CAPS = { summary: 25, occupation: 12, appearance: 40, backst
 export const APPEARANCE_SENTENCES = 2;
 /** V11: 3–5 likes. */
 export const LIKES_RANGE = [3, 5] as const;
+/** V14: 1–3 ties (native: besides the required ones). */
+export const TIES_RANGE = [1, 3] as const;
 /** V08: the Big Five, in the contract's order; two members of a household differ by 15+ on at least two of them. */
 export const BIG5_KEYS = ["open", "conscientious", "extravert", "agreeable", "neurotic"] as const;
 export type Big5Key = (typeof BIG5_KEYS)[number];
@@ -401,8 +408,9 @@ const VERB_STOP = new Set(["the", "a", "an", "my", "his", "her", "their", "our",
 const BANNED_SECRETS = /\b(tollm[ae]n|vane|greyline|loan|option|charter|consolidated)\b/i;
 const CRIME = /\b(stole|steal|theft|murder|kill|prison|jail|drunk|drugs?|gun|knife|blood|affair|kiss(?:ed|ing)?)\b/i;
 const EMOJI = /\p{Extended_Pictographic}/u;
-const NOT_X_BUT_Y = /\bnot (?:a |an |the )?[\p{L}' -]{1,30}[,;—-]+ ?but\b|\bit isn'?t [\p{L}' -]{1,30}[.,;—-]+ ?it'?s\b/iu;
-const CONTRACTION = /\b\p{L}+['’](?:s|t|re|ve|ll|d|m)\b/iu;
+/** V10's matchers (the repair re-checks its sample edits with them). */
+export const NOT_X_BUT_Y = /\bnot (?:a |an |the )?[\p{L}' -]{1,30}[,;—-]+ ?but\b|\bit isn'?t [\p{L}' -]{1,30}[.,;—-]+ ?it'?s\b/iu;
+export const CONTRACTION = /\b\p{L}+['’](?:s|t|re|ve|ll|d|m)\b/iu;
 /** V06: words that contradict a portrait's hair, by the hair word's family. */
 const HAIR_FAMILIES: readonly (readonly [RegExp, RegExp])[] = [
   [/white|grey|gray|silver/, /\b(dark|black|blond|blonde|brown|red|ginger|auburn|chestnut|sandy)[- ]haired\b|\b(black|blond|blonde|auburn|ginger|chestnut|sandy|brown|red|dark) hair\b/i],
@@ -644,7 +652,7 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
     const required = native ? (ctx.requiredLinks ?? []).filter(l => l.slot === m.slot) : [];
     // GDD-GAP (native V14): the ties the engine requires don't count toward A.3.7's three.
     const extra = m.relationships.filter(r => !required.some(q => q.id === r.id)).length;
-    if (m.relationships.length < 1 || extra > 3) errors.push(`V14 ${at}.relationships must have 1-3 entries${required.length ? ` besides the required ${required.map(q => q.id).join(", ")}` : ""}`);
+    if (m.relationships.length < TIES_RANGE[0] || extra > TIES_RANGE[1]) errors.push(`V14 ${at}.relationships must have 1-3 entries${required.length ? ` besides the required ${required.map(q => q.id).join(", ")}` : ""}`);
     for (const q of required) {
       const tie = m.relationships.find(r => r.id === q.id);
       if (!tie) errors.push(`V14 ${at}.relationships must include ${q.id} (${q.name}): ${q.hint}`);
@@ -788,9 +796,9 @@ export interface CardOptions {
 }
 
 /** Someone a household tie runs between: a member being written, or a housemate whose card exists. */
-interface TieEnd { slot: string; role: string; pronouns: string; age: number; surname: string }
+export interface TieEnd { slot: string; role: string; pronouns: string; age: number; surname: string }
 
-const surnameOfName = (name: string): string => name.replace(/"[^"]*"\s*/g, "").trim().split(/\s+/).at(-1) ?? "";
+export const surnameOfName = (name: string): string => name.replace(/"[^"]*"\s*/g, "").trim().split(/\s+/).at(-1) ?? "";
 const gendered = (pronouns: string, f: string, m: string, a: string): string => (pronouns.startsWith("she") ? f : pronouns.startsWith("he") ? m : a);
 
 /**
@@ -832,6 +840,18 @@ const TIE_NUMBERS: readonly [RegExp, number, number][] = [
 ];
 const tieNumbers = (tag: string): [number, number] => { const row = TIE_NUMBERS.find(([re]) => re.test(tag)); return row ? [row[1], row[2]] : [60, 60]; };
 
+/**
+ * The tie a native card gets to someone under the same roof when the model left it out (A.3.4 rule 2): the family word
+ * (householdTag), its numbers and its note. Assembly adds it; the repair writes the same tie when V14 needs one.
+ */
+export function householdTieFor(from: TieEnd, to: TieEnd, word?: string): { word: string; affinity: number; trust: number; note: string } {
+  const tag = householdTag(from, to, word);
+  const [affinity, trust] = tieNumbers(tag);
+  return { word: tag, affinity, trust, note: tag === "flatmate" ? "Shares the house." : `${cap(tag)}, under the same roof.` };
+}
+/** An arrival's tie to a member of their household when the model left it out (assembly and the repair). */
+export const ARRIVAL_HOUSEHOLD_TIE = { affinity: 70, trust: 70, tag: "kin", note: "Came over on the same boat." } as const;
+
 /** The household's PersonaCards (A.3.1 step 7: ids, portrait, sprite, look, home and the household's own ties). */
 export function cardsFromHousehold(out: ArrivalHouseholdOutput, draw: HouseholdDraw, taken: ReadonlySet<string>, home = HOME_TOKEN, options: CardOptions = {}): BuiltResident[] {
   const native = options.profile === "native";
@@ -868,11 +888,10 @@ export function cardsFromHousehold(out: ArrivalHouseholdOutput, draw: HouseholdD
     // Household members always know each other (A.3.4 rule 2): add the tie the model left out.
     if (native) {
       for (const e of ends.values()) if (e.slot !== m.slot && !relationships.some(r => r.id === e.id)) {
-        const tag = tagFor(e.slot);
-        const [affinity, trust] = tieNumbers(tag);
-        relationships.push({ id: e.id, affinity, trust, tag, note: tag === "flatmate" ? "Shares the house." : `${cap(tag)}, under the same roof.` });
+        const tie = householdTieFor(me, e, words.get(`${m.slot}|${e.slot}`));
+        relationships.push({ id: e.id, affinity: tie.affinity, trust: tie.trust, tag: tie.word, note: tie.note });
       }
-    } else for (const [slot, id] of bySlot) if (slot !== m.slot && !relationships.some(r => r.id === id)) relationships.push({ id, affinity: 70, trust: 70, tag: "kin", note: "Came over on the same boat." });
+    } else for (const [slot, id] of bySlot) if (slot !== m.slot && !relationships.some(r => r.id === id)) relationships.push({ id, ...ARRIVAL_HOUSEHOLD_TIE });
     const n = d.native;
     const card: PersonaCard = {
       id: ids[i]!, name: m.name.trim(), age: m.age, pronouns: m.pronouns, kind: native ? "resident" : "arrival", occupation: m.occupation,
