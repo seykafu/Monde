@@ -8,7 +8,7 @@ import { ResidentId } from "../ids";
 import type { PersonaCard } from "../persona";
 import type { Archetype } from "./archetypes";
 import {
-  ARRIVAL_SYSTEM_PROMPT, CHORES, GRID, HOME_TOKEN, NEVER_SAYS, OUTSIDE_PLACES, RELATION_TAGS, ROUTINE_PLACES, TRAITS, agelessCaption,
+  ARRIVAL_SYSTEM_PROMPT, CHORES, GRID, HOME_TOKEN, NATIVE_TIE_LIMIT, NEVER_SAYS, OUTSIDE_PLACES, RELATION_TAGS, ROUTINE_PLACES, TIE_RANGE, TRAITS, agelessCaption,
   archetypeLines, arrivalContract, arrivalMaxTokens, assignedWorkplace, hasEngineRoutine, isCommuter, memberArchetype, memberTags,
   pronounForms, tagLine, templateRoutine, townLines, type ArrivalHouseholdOutput, type ArrivalMember, type PromptTown, type RequiredLink,
   type ValidationContext,
@@ -386,10 +386,11 @@ const minutesOf = (at: string): number => { const t = /^(\d{1,2}):(\d{2})$/.exec
 
 /**
  * A.3.7's checks that read only the card (no household, roster or model output): V02 (unless canon-named), V06, V07,
- * V08, V09, V10, V11, V12, V13's counts and times, V14's numbers (within ±60 outside the household), V15. The linter
- * adds the roster checks (ids, places, homes, the skeleton) and V16's filters.
+ * V08, V09, V10, V11, V12, V13's counts and times, V14's numbers (within ±60 outside the household and the `required`
+ * ties, as the native validator has it), V15. The linter adds the roster checks (ids, places, homes, the skeleton) and
+ * V16's filters.
  */
-export function cardProblems(card: PersonaCard, opts: { canonName?: boolean; household?: ReadonlySet<string> } = {}): string[] {
+export function cardProblems(card: PersonaCard, opts: { canonName?: boolean; household?: ReadonlySet<string>; required?: ReadonlySet<string> } = {}): string[] {
   const out: string[] = [];
   const tokens = card.name.trim().split(/\s+/);
   if (!opts.canonName && (tokens.length < 2 || tokens.length > 3 || card.name.length > 28 || tokens.some(t => !NAME_PART.test(t)))) out.push(`V02 name "${card.name}"`);
@@ -432,7 +433,7 @@ export function cardProblems(card: PersonaCard, opts: { canonName?: boolean; hou
   }
   if (card.relationships.length < 1) out.push("V14 relationships: at least one");
   for (const r of card.relationships) {
-    const lim = opts.household?.has(r.id) ? 100 : 60;
+    const lim = opts.household?.has(r.id) || opts.required?.has(r.id) ? TIE_RANGE : NATIVE_TIE_LIMIT;
     if (Math.abs(r.affinity) > lim || Math.abs(r.trust) > lim) out.push(`V14 relationships "${r.id}": within ±${lim}`);
   }
   if (card.secrets.length > 2) out.push("V15 secrets: at most 2");

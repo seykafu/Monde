@@ -326,6 +326,18 @@ export const NOVELTY_MAX_OVERLAP = 0.35;
 export const NOVELTY_WINDOW = 30;
 /** GDD-GAP: native V14 lets ties outside the household run to ±60 (old neighbours; A.3.7's ±30 is a stranger's). */
 export const NATIVE_TIE_LIMIT = 60;
+/** V14: a tie's affinity and trust run −100..100; within ±30 for anyone outside the household (A.3.7). */
+export const TIE_RANGE = 100;
+export const ARRIVAL_TIE_LIMIT = 30;
+/** A.3.7's word caps: V07's lengths, V06's appearance (1–2 sentences), and the contract's secret text. */
+export const LENGTH_CAPS = { summary: 25, occupation: 12, appearance: 40, backstory: 120, register: 40, dreamText: 25, stage: 18, sample: 25, secret: 25 } as const;
+export const APPEARANCE_SENTENCES = 2;
+/** V11: 3–5 likes. */
+export const LIKES_RANGE = [3, 5] as const;
+/** V08: the Big Five, in the contract's order; two members of a household differ by 15+ on at least two of them. */
+export const BIG5_KEYS = ["open", "conscientious", "extravert", "agreeable", "neurotic"] as const;
+export type Big5Key = (typeof BIG5_KEYS)[number];
+export const BIG5_APART = 15;
 /** GDD-GAP: V13n exempts the housebound from the open-board rule; the skeleton has no flag, so 85 and over. */
 export const HOUSEBOUND_AGE = 85;
 const VACANT = /\.vacant_house_\d+$/;
@@ -366,8 +378,11 @@ const normalizeLike = (s: string) => ` ${s.toLowerCase().replace(/[^\p{L}\p{N}]+
 
 export type Validation = { ok: true; output: ArrivalHouseholdOutput; warnings: string[] } | { ok: false; errors: string[] };
 
-const words = (s: string): number => s.trim().split(/\s+/).filter(Boolean).length;
-const sentences = (s: string): number => s.split(/(?<=[.!?])\s+/).filter(x => x.trim()).length;
+/** V06/V07's counts: whitespace-separated words, and sentences split after . ! or ? (the repair counts the same way). */
+export const countWords = (s: string): number => s.trim().split(/\s+/).filter(Boolean).length;
+export const countSentences = (s: string): number => s.split(/(?<=[.!?])\s+/).filter(x => x.trim()).length;
+const words = countWords;
+const sentences = countSentences;
 const TITLES = /^(mr|mrs|ms|miss|dr|doctor|captain|capt|sir|lady|lord|rev|father|sister|mx)\.?$/i;
 const NAME_TOKEN = /^[\p{L}][\p{L}'’-]*$/u;
 const VERB_STOP = new Set(["the", "a", "an", "my", "his", "her", "their", "our", "your", "i", "we", "it", "this", "that", "one", "some"]);
@@ -401,6 +416,46 @@ const ATTIRE_WORDS: Readonly<Record<string, readonly string[]>> = {
   raincoat: ["raincoat", "coat", "mac"], velvet_jacket: ["velvet", "jacket"],
 };
 
+/** V06: the readable words for a bust's attire tags; the appearance must mention one. */
+export const attireWords = (p: Pick<PortraitTags, "attire">): string[] => p.attire.flatMap(t => ATTIRE_WORDS[t] ?? [t.replace(/_/g, " ")]);
+export const mentionsAttire = (text: string, p: Pick<PortraitTags, "attire">): boolean => attireWords(p).some(w => text.toLowerCase().includes(w));
+
+/** V08: two members' Big Five (in BIG5_KEYS order) differ by 15+ on at least two traits. */
+export const big5Apart = (a: readonly number[], b: readonly number[]): boolean => a.filter((v, k) => Math.abs(v - b[k]!) >= BIG5_APART).length >= 2;
+
+/**
+ * V11's like rule for a member's archetype: how many likes must qualify, and what qualifies. Native: A.3.7's own (two
+ * from the archetype's list or the gift catalog). Arrival: GDD-GAP, one from the archetype's list (see the validator).
+ */
+export function likeRule(a: Pick<Archetype, "likes">, ctx: Pick<ValidationContext, "profile" | "giftTags">): { need: number; qualifies: (like: string) => boolean } {
+  const list = a.likes.map(l => l.toLowerCase());
+  const fromList = (l: string) => list.some(x => x.includes(l.toLowerCase()) || l.toLowerCase().includes(x));
+  if (ctx.profile !== "native") return { need: 1, qualifies: fromList };
+  const gifts = (ctx.giftTags ?? []).map(normalizeLike);
+  return { need: 2, qualifies: l => fromList(l) || gifts.some(g => normalizeLike(l).includes(g)) };
+}
+
+/** Who is inside the household for V14's ±100: the members' slots, a named member's pinned id, a housemate's id. */
+export function householdIds(draw: Pick<HouseholdDraw, "members" | "native">): Set<string> {
+  return new Set([
+    ...draw.members.map(m => m.slot),
+    ...draw.members.map(m => m.native?.pinned?.id).filter((x): x is string => !!x),
+    ...(draw.native?.housemates ?? []).map(h => h.id),
+  ]);
+}
+
+/**
+ * V14's bound on a tie's affinity and trust from member `slot` to `id`: ±100 inside the household and (native) for a
+ * tie the engine requires, else ±60 for a Day-1 resident and A.3.7's ±30 for an arrival.
+ * GDD-GAP (native V14): a required tie returns a hand-written card's numbers (Nell's card has Barney at 70), so the
+ * engine's ±60 doesn't cap it.
+ */
+export function tieLimit(id: string, slot: string, draw: Pick<HouseholdDraw, "members" | "native">, ctx: Pick<ValidationContext, "profile" | "requiredLinks">): number {
+  if (householdIds(draw).has(id)) return TIE_RANGE;
+  if (ctx.profile !== "native") return ARRIVAL_TIE_LIMIT;
+  return (ctx.requiredLinks ?? []).some(q => q.slot === slot && q.id === id) ? TIE_RANGE : NATIVE_TIE_LIMIT;
+}
+
 /** V07: over by under 10% → cut at the last sentence break; otherwise an error. */
 function fitWords(text: string, max: number, field: string, errors: string[]): string {
   const n = words(text);
@@ -427,7 +482,7 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
   // V01: one card per member, slots echoed in order.
   if (out.members.length !== draw.members.length) errors.push(`V01 members has ${out.members.length} entries; the household is ${draw.members.length}`);
   out.members.forEach((m, i) => { if (m.slot !== draw.members[i]?.slot) errors.push(`V01 members[${i}].slot is "${m.slot}"; expected ${draw.members[i]?.slot}`); });
-  out.household.summary = fitWords(out.household.summary, 25, "household.summary", errors);
+  out.household.summary = fitWords(out.household.summary, LENGTH_CAPS.summary, "household.summary", errors);
 
   const reserved = new Set([...RESERVED_FIRST_NAMES.map(foldName)]);
   const reservedFamily = new Set(RESERVED_FAMILY_NAMES.map(foldName));
@@ -480,24 +535,23 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
     if (!PRONOUNS.includes(m.pronouns)) errors.push(`V05 ${at}.pronouns "${m.pronouns}"`);
     else if (PRONOUN_WORDS[m.pronouns].test(m.appearance)) errors.push(`V05 ${at}.appearance uses pronouns other than ${m.pronouns}`);
     // V06 appearance.
-    if (words(m.appearance) > 40 || sentences(m.appearance) > 2) errors.push(`V06 ${at}.appearance must be 1-2 sentences of at most 40 words`);
+    if (words(m.appearance) > LENGTH_CAPS.appearance || sentences(m.appearance) > APPEARANCE_SENTENCES) errors.push(`V06 ${at}.appearance must be 1-2 sentences of at most 40 words`);
     const hairRule = HAIR_FAMILIES.find(([fam]) => fam.test(p.hair_word));
     if (hairRule && hairRule[1].test(m.appearance)) errors.push(`V06 ${at}.appearance contradicts the portrait's ${p.hair_word} hair`);
     if (p.band === "elder" && ELDER_WORDS.test(m.appearance)) errors.push(`V06 ${at}.appearance calls an elder young`);
     if ((p.band === "child" || p.band === "teen") && CHILD_WORDS.test(m.appearance)) errors.push(`V06 ${at}.appearance makes a child sound old`);
-    const attire = p.attire.flatMap(t => ATTIRE_WORDS[t] ?? [t.replace(/_/g, " ")]);
-    if (!attire.some(w => m.appearance.toLowerCase().includes(w))) errors.push(`V06 ${at}.appearance must mention something the portrait wears (${p.attire.join(", ")})`);
+    if (!mentionsAttire(m.appearance, p)) errors.push(`V06 ${at}.appearance must mention something the portrait wears (${p.attire.join(", ")})`);
     // V07 lengths.
-    m.backstory = fitWords(m.backstory, 120, `${at}.backstory`, errors);
-    m.voice.register = fitWords(m.voice.register, 40, `${at}.voice.register`, errors);
-    m.dream.text = fitWords(m.dream.text, 25, `${at}.dream.text`, errors);
-    m.occupation = fitWords(m.occupation, 12, `${at}.occupation`, errors);
-    m.dream.stages = m.dream.stages.map((s, k) => fitWords(s, 18, `${at}.dream.stages[${k}]`, errors));
-    m.voice.samples = m.voice.samples.map((s, k) => fitWords(s, 25, `${at}.voice.samples[${k}]`, errors));
+    m.backstory = fitWords(m.backstory, LENGTH_CAPS.backstory, `${at}.backstory`, errors);
+    m.voice.register = fitWords(m.voice.register, LENGTH_CAPS.register, `${at}.voice.register`, errors);
+    m.dream.text = fitWords(m.dream.text, LENGTH_CAPS.dreamText, `${at}.dream.text`, errors);
+    m.occupation = fitWords(m.occupation, LENGTH_CAPS.occupation, `${at}.occupation`, errors);
+    m.dream.stages = m.dream.stages.map((s, k) => fitWords(s, LENGTH_CAPS.stage, `${at}.dream.stages[${k}]`, errors));
+    m.voice.samples = m.voice.samples.map((s, k) => fitWords(s, LENGTH_CAPS.sample, `${at}.voice.samples[${k}]`, errors));
     // V08 traits and Big Five.
     if (m.personality.traits.length < 3 || m.personality.traits.length > 5 || m.personality.traits.some(t => /\s/.test(t.trim())))
       errors.push(`V08 ${at}.personality.traits must be 3-5 single words`);
-    const b5 = Object.values(m.personality.big5);
+    const b5 = BIG5_KEYS.map(k => m.personality.big5[k]);
     if (b5.some(v => !Number.isInteger(v) || v < 0 || v > 100)) errors.push(`V08 ${at}.personality.big5 values must be integers 0-100`);
     else if (!b5.some(v => v >= 70 || v <= 30)) errors.push(`V08 ${at}.personality.big5 needs one trait at 70+ or 30-`);
     bigFive.push(b5);
@@ -537,16 +591,13 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
     if (!a.formal && d.band !== "child" && vo.samples.filter(s => CONTRACTION.test(s)).length < 2) errors.push(`V10 ${at}.voice.samples: at least two need a contraction`);
     // V11 lists.
     const n = (list: readonly string[], lo: number, hi: number, field: string) => { if (list.length < lo || list.length > hi) errors.push(`V11 ${at}.${field} must have ${lo}-${hi} entries`); };
-    n(m.likes, 3, 5, "likes"); n(m.dislikes, 3, 5, "dislikes"); n(m.fears, 1, 3, "fears"); n(m.chores, 2, 4, "chores");
-    const archetypeLikes = a.likes.map(l => l.toLowerCase());
-    const gifts = (ctx.giftTags ?? []).map(normalizeLike);
-    const fromList = (l: string) => archetypeLikes.some(x => x.includes(l.toLowerCase()) || l.toLowerCase().includes(x));
-    const fromCatalog = (l: string) => gifts.some(g => normalizeLike(l).includes(g));
+    n(m.likes, LIKES_RANGE[0], LIKES_RANGE[1], "likes"); n(m.dislikes, 3, 5, "dislikes"); n(m.fears, 1, 3, "fears"); n(m.chores, 2, 4, "chores");
+    const likes = likeRule(a, ctx);
     if (native) {
       // Native V11 is A.3.7's own: two likes from the archetype's list or the gift catalog (content/items.yaml's tags).
-      if (m.likes.filter(l => fromList(l) || fromCatalog(l)).length < 2)
+      if (m.likes.filter(likes.qualifies).length < likes.need)
         errors.push(`V11 ${at}.likes: at least two must come from the archetype's list (${a.likes.join("; ")}) or name a gift (bread, tea, fish, rope…)`);
-    } else if (m.likes.filter(fromList).length < 1) {
+    } else if (m.likes.filter(likes.qualifies).length < likes.need) {
       // GDD-GAP: V11 asks for two likes from the archetype list or the gift catalog; the catalog lives client-side, so the
       // server checks the archetype list and asks for one.
       errors.push(`V11 ${at}.likes: at least one must come from the archetype's list (${a.likes.join("; ")})`);
@@ -591,7 +642,8 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
       const inside = slots.has(r.id);
       if (!inside && !ctx.residents.has(r.id)) errors.push(`V14 ${at}.relationships: "${r.id}" is not a resident or a household slot`);
       if (r.id === m.slot) errors.push(`V14 ${at}.relationships: a member can't relate to themself`);
-      const lim = inside ? 100 : native ? NATIVE_TIE_LIMIT : 30;
+      // ±100 inside the household (a housemate's or named member's id too) and for a required tie; else ±60 or ±30.
+      const lim = tieLimit(r.id, m.slot, draw, ctx);
       if (!Number.isInteger(r.affinity) || !Number.isInteger(r.trust) || Math.abs(r.affinity) > lim || Math.abs(r.trust) > lim)
         errors.push(`V14 ${at}.relationships "${r.id}": affinity and trust must be integers within ±${lim}`);
     }
@@ -600,7 +652,7 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
     for (const s of m.secrets) {
       if (s.reveal.regard_min < 40 || s.reveal.regard_min > 80) errors.push(`V15 ${at}.secrets: regard_min ${s.reveal.regard_min} must be 40-80`);
       if (BANNED_SECRETS.test(s.text) || CRIME.test(s.text)) errors.push(`V15 ${at}.secrets: "${s.text.slice(0, 40)}…" touches the town's affairs or harm`);
-      s.text = fitWords(s.text, 25, `${at}.secrets.text`, errors);
+      s.text = fitWords(s.text, LENGTH_CAPS.secret, `${at}.secrets.text`, errors);
     }
     // V16 banned content, across every text the card carries.
     if (ctx.banned) {
@@ -620,7 +672,7 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
   });
   // V08: household members differ by 15+ on at least two Big Five traits.
   for (let i = 0; i < bigFive.length; i++) for (let j = i + 1; j < bigFive.length; j++) {
-    if (bigFive[i]!.filter((v, k) => Math.abs(v - bigFive[j]![k]!) >= 15).length < 2) errors.push(`V08 members[${i}] and members[${j}] have too-similar Big Five scores`);
+    if (!big5Apart(bigFive[i]!, bigFive[j]!)) errors.push(`V08 members[${i}] and members[${j}] have too-similar Big Five scores`);
   }
   if (ctx.banned && ctx.banned(out.household.summary).length) errors.push("V16 household.summary: banned language");
   if (errors.length) return { ok: false, errors: [...new Set(errors)].slice(0, 20) };

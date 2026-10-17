@@ -3,8 +3,9 @@
 // dry run's estimate. The writer is a fake mind; nothing touches content/.
 import { describe, expect, it } from "vitest";
 import {
-  CENSUS_ATTEMPTS_PER_ROUND, CENSUS_ROUNDS, DEFAULT_CENSUS_PRICES, PersonaCard, WHIMS, censusInputHash, censusOrder, runCensus, stringifyGeneratedCard,
-  type CensusInput, type CensusStore, type CensusWriter, type CensusWriterResult, type NativePromptContext, type HouseholdDraw,
+  BIG5_KEYS, CENSUS_ATTEMPTS_PER_ROUND, CENSUS_ROUNDS, DEFAULT_CENSUS_PRICES, PersonaCard, WHIMS, censusInputHash, censusOrder, countWords, nativeValidationContext,
+  runCensus, stringifyGeneratedCard, validateHousehold, type ArrivalHouseholdOutput, type CensusInput, type CensusStore, type CensusWriter, type CensusWriterResult,
+  type NativePromptContext, type HouseholdDraw,
 } from "../index";
 import YAML from "yaml";
 import { censusInput, household, modelAnswer } from "./censusFixtures";
@@ -46,6 +47,33 @@ const setup = () => {
   mem.bind(input.written);
   return { input, ...mem };
 };
+
+const HENRIK_BACKSTORY = "Henrik grew up two doors down from his mother's old house on Terrace Row and has lived on it ever since, apart from four years driving a bread van out of Hessle Cross. He came back when Maud was born and took the ground floor at number fifteen because the stairs at his mother's were too steep for a pram. He mends bicycles in the yard for whoever asks and takes payment in eggs. Jo does most of the cooking now and pretends not to. He is sure the school will close by Christmas, and he has already worked out which bus Maud would take into Carrow. He has not told her. He wants his mother to stop sending round soup, and he has never said so. The van's old route map is still pinned up inside the coal cupboard door.";
+
+/**
+ * Maud Szabo's household (three members, required kin ties) the way the 2026-10-17 staging trial's replies failed:
+ * a 30-word summary, a 141-word backstory, ties tagged "mother", "daughter", "cousin" and "neighbour", a tie to
+ * oneself, a routine at "market_street", Nettie's tie at her card's 90, likes off the list, and Jo's Big Five three
+ * points from his father's on every trait.
+ */
+function asTheTrialWrote(input: CensusInput, draw: HouseholdDraw): ArrivalHouseholdOutput {
+  const out = modelAnswer(input, household(input, draw.id), draw, "trial");
+  const [henrik, maud, jo] = out.members as [ArrivalHouseholdOutput["members"][number], ArrivalHouseholdOutput["members"][number], ArrivalHouseholdOutput["members"][number]];
+  out.household.summary = "Henrik Szabo raises Maud and Jo on Terrace Row, a short street away from his mother Ilona. Cousin Nettie is round most evenings, and nobody remembers ever inviting her in.";
+  henrik.backstory = HENRIK_BACKSTORY;
+  henrik.relationships = [
+    ...henrik.relationships.map(r => (r.id === "ilona" ? { ...r, tag: "mother" as never } : r.id === "m2" ? { ...r, tag: "daughter" as never } : r)),
+    { id: "m1", affinity: 60, trust: 60, tag: "kin", note: "Same roof." },
+  ];
+  const street = henrik.routine.weekend.findIndex(e => e.where === "market_row.market_street");
+  henrik.routine.weekend[street]!.where = "market_street";
+  henrik.likes = ["pigeons", "crosswords", "the wireless at night"];
+  maud.relationships = maud.relationships.map(r =>
+    r.id === "nettie" ? { ...r, affinity: 90, trust: 85, tag: "cousin" as never } : r.id === "bru" ? { ...r, affinity: 65, trust: 50, tag: "neighbour" as never } : r);
+  // Away from 50 by three: the same strong traits, and no two apart.
+  jo.personality.big5 = Object.fromEntries(BIG5_KEYS.map(k => { const v = henrik.personality.big5[k]; return [k, v >= 50 ? Math.min(100, v + 3) : Math.max(0, v - 3)]; })) as typeof jo.personality.big5;
+  return out;
+}
 
 describe("the census run (M-03 step 2)", () => {
   it("writes the named people's households first, then zone by zone and street by street", () => {
@@ -132,6 +160,59 @@ describe("the census run (M-03 step 2)", () => {
     expect(mind.calls[3]!.ctx.validatorErrors).toBeUndefined();
     expect(new Set(mind.calls.map(c => c.ctx.whim)).size).toBeGreaterThan(1);
     expect(household(input, a!).generation?.attempts).toBe(4);
+  });
+
+  it("accepts on the first attempt a reply that failed only on what the engine repairs (the staging trial's faults)", async () => {
+    const { input, store, log, files } = setup();
+    const seen: { before?: ReturnType<typeof validateHousehold>; retagged?: ReturnType<typeof validateHousehold> } = {};
+    const mind = fakeMind(input, draw => {
+      if (draw.id !== "szabo_maud") return null;
+      const reply = asTheTrialWrote(input, draw);
+      const vctx = nativeValidationContext(input, household(input, draw.id), draw);
+      seen.before = validateHousehold(reply, draw, vctx);
+      // With the tags fixed by hand the contract parses, and the validator lists the rest.
+      const tags = structuredClone(reply);
+      for (const m of tags.members) for (const r of m.relationships) if (!["fond", "wary", "curious", "rival", "kin", "friend"].includes(r.tag)) r.tag = r.id === "bru" ? "friend" : "kin";
+      seen.retagged = validateHousehold(tags, draw, vctx);
+      return { kind: "text", text: JSON.stringify(reply), stop_reason: "end_turn", usage, cost_usd: 0.0011 };
+    });
+    const order = censusOrder(input.skeleton, input.homes, input.pins).map(h => h.id);
+    const r = await runCensus(input, { writer: mind.writer, store, limit: order.indexOf("szabo_maud") + 1, concurrency: 1 });
+    // Without the repair this reply failed every attempt (the trial's six), and the household got the template.
+    expect(seen.before).toMatchObject({ ok: false, errors: [expect.stringMatching(/^V01 not the contract: members\.0\.relationships\.\d+\.tag/)] });
+    const left = seen.retagged && !seen.retagged.ok ? seen.retagged.errors : [];
+    expect([...new Set(left.map(e => e.split(" ")[0]))].sort()).toEqual(["V07", "V08", "V11", "V13", "V14"]);
+    expect(r.written.find(w => w.id === "szabo_maud")).toMatchObject({ source: "model", attempts: 1 });
+    expect(mind.calls.filter(c => c.id === "szabo_maud")).toHaveLength(1);
+    const line = log.find(l => l.startsWith("szabo_maud attempt 1: "))!;
+    expect(line).toMatch(/^szabo_maud attempt 1: \d+ repairs \(V07 household\.summary trimmed from 30 to \d+ words \| V07 members\[0\]\.backstory trimmed from 141 to \d+ words \| /);
+    for (const rule of ["V13 members[0].routine.weekend", "V14 members[0].relationships: dropped the tie to themself", 'V01 members[0].relationships "ilona".tag "mother" → "kin"', 'V01 members[1].relationships "bru".tag "neighbour" → "friend"', "V11 members[0].likes: added", "V08 members[2].personality.big5 nudged"])
+      expect(line).toContain(rule);
+    // Nettie's tie keeps her card's numbers; the backstory is within its cap.
+    const cards = [...files.values()].map(f => PersonaCard.parse(YAML.parse(f))).filter(c => c.household === "szabo_maud");
+    expect(cards.find(c => c.id === "maud")!.relationships.find(t => t.id === "nettie")).toMatchObject({ affinity: 90, trust: 85, tag: "kin" });
+    expect(countWords(cards.find(c => c.backstory.startsWith("Henrik grew up"))!.backstory)).toBeLessThanOrEqual(120);
+    expect(countWords(HENRIK_BACKSTORY)).toBe(141);
+  });
+
+  it("feeds back only what the repair couldn't fix", async () => {
+    const { input, store } = setup();
+    const [a] = censusOrder(input.skeleton, input.homes, input.pins).map(h => h.id);
+    const mind = fakeMind(input, (draw, _ctx, n) => {
+      if (n !== 1) return null;
+      const out = modelAnswer(input, household(input, draw.id), draw);
+      // A bare place id, a 141-word backstory and a stray tag (repaired), and another household's surname (V03: not).
+      out.members[0]!.backstory = HENRIK_BACKSTORY;
+      out.members[0]!.relationships[0]!.tag = "neighbour" as never;
+      const street = out.members[0]!.routine.weekend.find(e => e.where === "market_row.market_street");
+      expect(street).toBeDefined();
+      street!.where = "market_street";
+      out.members[0]!.name = `${out.members[0]!.name.split(" ")[0]} Fournier`;
+      return { kind: "text", text: JSON.stringify(out), stop_reason: "end_turn", usage, cost_usd: 0.001 };
+    });
+    const r = await runCensus(input, { writer: mind.writer, store, limit: 1 });
+    expect(r.written).toEqual([expect.objectContaining({ id: a, source: "model", attempts: 2 })]);
+    expect(mind.calls[1]!.ctx.validatorErrors).toEqual([expect.stringMatching(/^V03 members\[0\]\.name: the surname "Fournier" belongs to another household$/)]);
   });
 
   it("falls back to the template card after six failed attempts (A.3.8)", async () => {

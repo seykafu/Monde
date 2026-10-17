@@ -4,10 +4,10 @@ import { budgetMind } from "./budget.js";
  *
  * The client's town engine decides how many households the ferry brings (§6.4) and posts the count with the night
  * (`arrivals`). This module decides who they are and writes them:
- *   - the buffer (§9.2): a few households per world are drawn and written ahead by Haiku (A.3.6, one structured-output
- *     call per household at effort "low", validated against A.3.7 and the content filters, two retries with the errors
- *     fed back), with `home.own` for a home, so a ferry day never waits on the model. It's refilled after each night,
- *     in the background;
+ *   - the buffer (§9.2): a few households per world are drawn and written ahead by Haiku (A.3.6, one call per
+ *     household at effort "low", repaired where the engine can (shared arrivals/repair.ts), validated against A.3.7
+ *     and the content filters, two retries with the remaining errors fed back), with `home.own` for a home, so a ferry
+ *     day never waits on the model. It's refilled after each night, in the background;
  *   - the commit, inside the night: each slot takes the buffered household that best fits the roll (its lean, the
  *     gates on today's town, a free home with enough beds) or, if none does, a template household written on the spot
  *     (A.3.8). The residents are inserted (tier Ambient, §9.8), their home bound, the household's own ties written, an
@@ -23,7 +23,7 @@ import { z } from "zod";
 import {
   ARCHETYPES, ARRIVAL_SYSTEM_PROMPT, ArrivalHousehold, HOME_TOKEN, PersonaCard, RESERVED_FIRST_NAMES, ResidentState,
   arrivalMaxTokens, arrivalUserMessage, bindHome, cardsFromHousehold, drawHousehold, hashParts, HOUSEHOLD_JSON_BLOCK, parseJsonObject,
-  templateHousehold, validateHousehold, whimFor, ArrivalHouseholdOutput, type ArrivalFacts, type HouseholdDraw, type PromptContext,
+  repairHousehold, templateHousehold, validateHousehold, whimFor, ArrivalHouseholdOutput, type ArrivalFacts, type HouseholdDraw, type PromptContext,
   type RecentHousehold,
 } from "@monde/shared";
 import { aiLog, arrivals, events, favors, memories, plans, relationships, residents, worlds } from "../db/schema.js";
@@ -172,9 +172,15 @@ export async function writeHousehold(deps: ArrivalDeps, worldId: string, draw: H
     const call = await callModel(budgetMind(deps.db, deps.mind, worldId, null, "arrival", request.day), arrivalRequest(draw, ctx), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
     let verdict: ReturnType<typeof validateHousehold> | null = null;
     if (call.ok) {
-      let raw: unknown = null;
-      raw = parseJsonObject(call.text); // undefined → V01 below
-      verdict = raw === null ? { ok: false, errors: ["V01 not one JSON object"] } : validateHousehold(raw, draw, vctx);
+      const raw = parseJsonObject(call.text);
+      if (raw === undefined) verdict = { ok: false, errors: ["V01 not one JSON object"] };
+      else {
+        // The engine fixes what it can (lengths, tags, place ids, tie numbers, likes, Big Five); the validator judges
+        // the rest, and only that is fed back on a retry.
+        const repaired = repairHousehold(raw, draw, vctx);
+        if (repaired.adjustments.length) deps.log.info({ worldId, household: draw.id, attempt, adjustments: repaired.adjustments }, "arrival card repaired");
+        verdict = validateHousehold(repaired.output, draw, vctx);
+      }
     }
     if (call.call) {
       await deps.db.insert(aiLog).values(aiLogRow({

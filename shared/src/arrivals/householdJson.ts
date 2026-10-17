@@ -1,8 +1,9 @@
 /**
  * The household card contract as text (A.3.6). Strict structured output (output_config.format) can't carry this schema:
  * the API refuses it ("The compiled grammar is too large", 400 invalid_request; staging, 2026-10-17), so arrivals and
- * the Day-1 census ask for the JSON in a byte-stable, cached system block instead, parse it tolerantly, and let
- * validateHousehold (V01: one JSON object) and the retry loop with the validator's errors do what the grammar would have.
+ * the Day-1 census ask for the JSON in a byte-stable, cached system block instead, parse it tolerantly, let
+ * repairHousehold (repair.ts) fix what the engine can, and let validateHousehold (V01: one JSON object) and the retry
+ * loop with the validator's remaining errors do what the grammar would have.
  */
 import { modelOutputFormat } from "../modelSchema";
 import { ArrivalHouseholdOutput } from "./card";

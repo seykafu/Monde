@@ -8,11 +8,13 @@ import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
 import {
+  censusLinks,
   ItemCatalog, COMMUNITY_TASKS, HOMED, HOMES_BY_ZONE, PORTRAIT_SET, PersonaCard, STANDARD_EXPRESSIONS, bandOf, cardLookProblems, cardProblems,
   compileScenes, evaluate, fillReply, isVacantHome, parseHomes, parsePins, portraitById, registryFromContent, type Day1Skeleton, type HomeRegistry,
   type PersonaCard as Card
 } from "@monde/shared";
 import { firstName, parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
+import { loadCensusInput } from "./census-inputs.ts";
 import {
   SPRING_SCENE_ID, aiOpenCues, exchangePaths, fillScripted, parseScriptedLibrary, scriptedKey, type ScriptedLibrary
 } from "../client/src/mind/scripted.ts";
@@ -117,6 +119,9 @@ const day1 = new Map<string, Card>();
 const censusPins = parsePins(YAML.parse(fs.readFileSync(path.join(root, "content/census/pins.yaml"), "utf8")));
 const skeleton = YAML.parse(fs.readFileSync(path.join(root, "content/census/day1.yaml"), "utf8")) as Day1Skeleton;
 const householdOf = new Map(skeleton.households.flatMap(h => h.members.filter(m => m.id).map(m => [m.id!, h] as const)));
+let censusInputCache: ReturnType<typeof loadCensusInput> | null = null;
+/** The census's inputs, loaded once and only when Day-1 cards exist (for their required ties). */
+const censusInputFor = () => (censusInputCache ??= loadCensusInput());
 for (const file of fs.existsSync(day1Dir) ? fs.readdirSync(day1Dir).filter((f) => f.endsWith(".yaml")).sort() : []) {
   const where = `residents/day1/${file}`;
   const parsed = PersonaCard.safeParse(YAML.parse(fs.readFileSync(path.join(day1Dir, file), "utf8")));
@@ -138,7 +143,10 @@ for (const file of fs.existsSync(day1Dir) ? fs.readdirSync(day1Dir).filter((f) =
   if (!c.look) err(`${where}: no look`);
   for (const e of PORTRAIT_SET) if (!c.portrait_expressions.includes(e)) err(`${where}: portrait_expressions missing '${e}'`);
   const mates = new Set(householdOf.get(c.id)?.members.map(m => m.id).filter((x): x is string => !!x) ?? []);
-  for (const problem of cardProblems(c, { canonName: c.id in censusPins.people, household: mates })) err(`${where}: ${problem}`);
+  // The engine's required ties (pins, kin, mirrors of hand-written cards) keep their numbers past the ±60 cap (V14).
+  const home = householdOf.get(c.id), slot = home?.members.find(m => m.id === c.id)?.slot;
+  const required = new Set(home && slot ? censusLinks(censusInputFor(), home).required.filter(l => l.slot === slot).map(l => l.id) : []);
+  for (const problem of cardProblems(c, { canonName: c.id in censusPins.people, household: mates, required })) err(`${where}: ${problem}`);
   if (c.voice.mode !== "narrated_action") {
     const texts = [c.name, c.occupation, c.appearance, c.backstory, ...c.beliefs, c.voice.register, ...c.voice.tics, ...c.voice.samples, ...c.likes, ...c.dislikes,
       ...c.fears, c.dream.text, ...c.chores, ...c.relationships.map(r => r.note), ...c.secrets.map(x => x.text)];

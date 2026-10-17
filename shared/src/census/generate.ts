@@ -1,8 +1,8 @@
 // Writing the Day-1 residents' cards (MVP M-03 step 2; GDD Appendix A.1.5, A.3.6–A.3.8): one call per household with
-// MODE: native, validated with the census's profile, retried with the errors fed back, and the template card when the
-// model can't get there. Pure and I/O-free: the writer (the model, through the server's census endpoint or in process)
-// and the store (the files) are injected, so tools/gen-residents.ts runs it for real and censusGenerate.test.ts runs it
-// with a fake mind.
+// MODE: native, repaired where the engine can (arrivals/repair.ts), validated with the census's profile, retried with
+// the errors that remain fed back, and the template card when the model can't get there. Pure and I/O-free: the
+// writer (the model, through the server's census endpoint or in process) and the store (the files) are injected, so
+// tools/gen-residents.ts runs it for real and censusGenerate.test.ts runs it with a fake mind.
 //
 // Order (Kasey, M-03): the named people's and pinned households first (A.1.5, §12.4), then zone by zone (the open boards
 // first) and street by street, four households at a time. Idempotent: a household whose cards exist, or whose status
@@ -19,6 +19,7 @@ import { portraitById, tagsOfEntry } from "../arrivals/library";
 import { NATIVE_PROMPT_VERSION, NATIVE_SYSTEM_BLOCKS, nativeMaxTokens, nativeTemplateHousehold, nativeUserMessage, type NativePromptContext } from "../arrivals/native";
 import { RESERVED_FIRST_NAMES } from "../arrivals/names";
 import { parseJsonObject } from "../arrivals/householdJson";
+import { repairHousehold } from "../arrivals/repair";
 import { hashParts } from "../arrivals/rng";
 import { whimFor } from "../arrivals/whims";
 import { FAMILY_TAGS } from "../friendship";
@@ -451,10 +452,15 @@ export async function runCensus(input: CensusInput, options: CensusRunOptions): 
 
   const lock = mutex();
   let consecutiveErrors = 0;
-  /** Validate against the roster as it is now, then write the cards and the skeleton's record. */
+  /**
+   * Repair a model's reply and validate it against the roster as it is now, then write the cards and the skeleton's
+   * record. The errors are what the repair couldn't fix: only those go back on a retry.
+   */
   const commit = (h: SkeletonHousehold, draw: HouseholdDraw, raw: unknown, source: "model" | "template", attempts: number, cost: number) => lock(async () => {
     const vctx = nativeValidationContext(input, h, draw, { novelty: source === "model" });
-    const v = validateHousehold(raw, draw, vctx);
+    const repaired = source === "model" ? repairHousehold(raw, draw, vctx) : { output: raw, adjustments: [] };
+    if (repaired.adjustments.length) store.log(`${h.id} attempt ${attempts}: ${repaired.adjustments.length} repairs (${repaired.adjustments.join(" | ")})`);
+    const v = validateHousehold(repaired.output, draw, vctx);
     if (!v.ok) return { ok: false as const, errors: v.errors };
     const built = cardsFromHousehold(v.output as ArrivalHouseholdOutput, draw, takenIds(input), h.home, { profile: "native", generatedBy: source });
     const cards = built.map(b => b.card);
