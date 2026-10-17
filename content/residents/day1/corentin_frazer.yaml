@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_b05; curated not yet. Edit here.
+# Generated (census-v1) for mb_b05; curated by hand (MVP M-03). Edit here.
 id: corentin_frazer
 name: Corentin Frazer
 age: 60
 pronouns: he/him
 kind: resident
-occupation: night watchman
+occupation: Night watchman at Lissworth Mill; former loom-setter's mate
 workplace: millbrook.mill
 home: millbrook.home_16
 portrait: corentin_frazer
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: corentin_frazer
-appearance: An older man with grey hair swept back, a rose jumper and a moustache.
+appearance: >
+  A tall man with grey hair swept back off the forehead, a neat grey moustache and a rose jumper darned at both
+  elbows.
 look:
   kind: human
   skin: 7
@@ -21,58 +23,73 @@ look:
   outfit: { cut: jumper, top: 12, bottom: 4, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
   face: { moustache: true }
-backstory: "Corentin was born in Monde and works as night watchman. What he wants most is plain enough: wages
-  for work again."
+backstory: >
+  Corentin went into Lissworth at sixteen as a bobbin boy and was a loom-setter's mate by thirty. When the gates
+  shut the owners kept one wage, a man to walk the building at night, and he took it because he could not
+  picture another man in there. He winds the gatehouse clock, oils the Number Six loom, and chalks "quiet" on
+  the slate by the door at dawn. He has found every part of Number Six but the shuttle. He has not told Signe,
+  who has not set foot in the mill since the last shift, because then she would have to come and look. He wants
+  her to.
 personality:
-  traits: [ stubborn, dreamy, proud ]
-  big5: { open: 25, conscientious: 12, extravert: 42, agreeable: 43, neurotic: 25 }
-values: { prosperity: 0.6, safety: 0.15, spirit: 0.1, charm: 0.15 }
+  traits: [ dreamy, patient, stubborn, gentle ]
+  big5: { open: 70, conscientious: 35, extravert: 30, agreeable: 68, neurotic: 28 }
+values: { prosperity: 0.50, safety: 0.15, spirit: 0.15, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - "Signe can't bear the sight of the mill and must never be asked to look at it."   # wrong: she carries her loom's shuttle in her blazer
+  - The owners will send for the loom parts one day, so they had better be oiled.
+  - The half-past-five supper is the one hour still kept on the Lissworth timetable.
 voice:
-  register: 'Plain and short. Knows the numbers: picks, bolts, hours. "Used to be."'
-  tics: [ Used to be eight hundred picks a minute. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Slow and soft, ending on the number or the name of a part. Mill nouns: pick, beam, reed, heddle, shuttle,
+    bobbin, race. Wanders mid-sentence toward the loom he is picturing and comes back apologising.
+  tics: [ "Slate says quiet.", "That'd be Number Six.", "Not yet." ]
+  never_says: [ minute book, the mill is dead, it's only a loom ]
   samples:
-    - Used to be eight hundred picks a minute. Used to be.
-    - Short shift. Short pay. Tea's the same.
-    - Clock's three minutes fast. Somebody should see to it.
+    - "Slate says quiet. It's always quiet. I wind the gate clock at nine and it's slow again by the time I'm at the yard."
+    - "That'd be Number Six. Only loom left with her heddles strung. Come by in daylight, if you're passing, and I'll show you the beam."
+    - "Half past five, supper, Signe across the table. It's the one hour that's still on the Lissworth timetable. Don't tell her I said."
 birthday: 23
-likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time ]
-dislikes: [ being retrained, short shifts, men with clipboards ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ the sound of a loom running true, a clock that keeps time, porridge at half past six, the smell of machine oil ]
+dislikes: [ being retrained, men with clipboards, a door left on the latch, the gate lamp that flickers ]
+fears: [ the owners' men arriving by daylight with a lorry and a list, Number Six's last warp rotting before he finds the shuttle ]
 dream:
-  text: Wages for work again
+  text: One bolt of cloth off Number Six, with Signe holding the far end of the warp.
   stages:
-    - Register at Town Hall
-    - Do one casual job a day for three days
-    - Take a shift at the boathouse, or a floor job when the Mill reopens
+    - "Find the shuttle missing from Number Six (Favor: help him rake the mill yard race)"
+    - "Oil and set the loom with Kasimir (Regard ≥ 30)"
+    - "Run the first bolt with Signe at the beam, and her through the gate"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: millbrook.home_16 }
-    - { at: "08:30", do: work, where: millbrook.mill }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: millbrook.mill }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: millbrook.home_16 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_16 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_16 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_16 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_16 }
-chores: [ black the stove, sweep the step ]
+    - { at: "07:00", do: eat, where: millbrook.home_16, with: [ signe_starling ] }
+    - { at: "08:00", do: nap, where: millbrook.home_16 }
+    - { at: "14:00", do: shop, where: market_row.general_store }
+    - { at: "15:30", do: visit, where: wharf.boathouse }
+    - { at: "17:30", do: eat, where: millbrook.home_16, with: [ signe_starling ] }
+    - { at: "19:45", do: walk, where: millbrook.mill_yard }
+    - { at: "20:00", do: work, where: millbrook.mill }
+    - { at: "01:30", do: sleep, where: millbrook.home_16 }
+  weekend:                       # the watch runs seven nights; Saturday he buys lamp oil at the market first
+    - { at: "07:00", do: eat, where: millbrook.home_16, with: [ signe_starling ] }
+    - { at: "08:00", do: nap, where: millbrook.home_16 }
+    - { at: "13:00", do: shop, where: market_row.market_hall }
+    - { at: "15:00", do: wander, where: commons.duck_pond }
+    - { at: "17:30", do: eat, where: millbrook.home_16, with: [ signe_starling ] }
+    - { at: "19:45", do: walk, where: millbrook.mill_yard }
+    - { at: "20:00", do: work, where: millbrook.mill }
+    - { at: "01:30", do: sleep, where: millbrook.home_16 }
+chores: [ wind the gatehouse clock at nine, chalk the night's report on the slate, oil the Number Six heddles, black the stove before he leaves ]
 relationships:
-  - { id: signe_starling, affinity: 70, trust: 70, tag: partner, note: Same house. }
-secrets: []
+  - { id: signe_starling, affinity: 80, trust: 75, tag: partner, note: "Sets two places at half past five and has never asked what he does till dawn. Wants her to walk through the gate once, in daylight." }
+  - { id: thora_lombardi, affinity: 40, trust: 55, tag: friend, note: "Walks the cannery and the mill yard while he keeps the building; they pass a flask at the yard gate at midnight. Wants her to say whether the mill sounds different at two in the morning, or whether that is only him." }
+  - { id: kasimir, affinity: 20, trust: 35, tag: curious, note: "Has not asked him to look at a loom yet. Wants him to see the picking stick and not ask why it is oiled." }
+  - { id: leila_nesbitt, affinity: 15, trust: 25, tag: wary, note: "Asks monthly for the canteen's forty-quart pots and gets 'Not yet.' Wants her to stop before he says yes by mistake." }
+secrets:
+  - text: "He saved the floor committee's minute book on the last night. It's in the gatehouse tin; Signe thinks it burned."
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_b05
 archetype: mill_hand
 employment: employed

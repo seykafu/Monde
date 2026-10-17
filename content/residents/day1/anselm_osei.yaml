@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n02; curated not yet. Edit here.
+# Generated (census-v1) for mb_n02; curated by hand (MVP M-03). Edit here.
 id: anselm_osei
 name: Anselm Osei
 age: 40
 pronouns: he/him
 kind: resident
-occupation: cook-caretaker
+occupation: Cook-caretaker at Millbrook School; feeds the nine pupils
 workplace: millbrook.school
 home: millbrook.home_39
 portrait: anselm_osei
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: anselm_osei
-appearance: A man with short dark brown hair, a plum jumper and a moustache.
+appearance: >
+  A short, neat man with short dark brown hair, a moustache and a plum jumper, sleeves pushed up and a tea towel
+  over one shoulder.
 look:
   kind: human
   skin: 0
@@ -21,62 +23,75 @@ look:
   outfit: { cut: jumper, top: 8, bottom: 12, bottom_style: trousers, shoes: 14 }
   accessory: { kind: none }
   face: { moustache: true, stubble: true }
-backstory: "Anselm came to Monde from Ashby Lock 20 years ago and works as cook-caretaker. What he wants most
-  is plain enough: a school worth the walk."
+backstory: >
+  Anselm has fed the school's nine pupils at twelve for eleven years: soup, bread, and a Friday pudding Felix
+  calls structured. He is the caretaker too, so he knows which window sticks, where the stove smokes and the
+  depth of the draught on the desk beside it. A tally by the larder door counts the pupils, and he has not said
+  what he will do on the first day of the new term if the school has shut. He wants Leila Nesbitt to stop
+  inspecting his gravy, or at least to tell him what is wrong with it.
 personality:
-  traits: [ dreamy, warm, stubborn ]
-  big5: { open: 93, conscientious: 71, extravert: 25, agreeable: 77, neurotic: 22 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ careful, gentle, apologetic, dutiful ]
+  big5: { open: 48, conscientious: 82, extravert: 30, agreeable: 78, neurotic: 62 }
+values: { prosperity: 0.15, safety: 0.35, spirit: 0.30, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Leila can taste what is wrong with the gravy and is being kind.
+  - A stove that draws is worth ten that blaze.
+  - Families choose a school by the smell of its kitchen.   # wrong: they choose by the walk home in the dark
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Soft, careful and apologetic about salt. Kitchen and building nouns: ladle, stock, draught, latch, stove,
+    the pass. Reports the pupils' appetites like weather.
+  tics: [ "A pinch less, I think.", "Draught from the left.", "Latch it behind you." ]
+  never_says: [ tenth bowl, the school is finished, it's only gravy ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "A pinch less, I think. Leila says so. She's usually right, which is why I haven't asked her what she means."
+    - "Nine for soup, nine for bread, and one pudding Felix calls structured. Alun says it's custard. It's definitely custard."
+    - "Draught from the left, so the stove desk gets it first. Latch it behind you, and don't let it slam. The stove hates a slam."
 birthday: 6
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a lunch box packed right, a bench by the school gate, fresh bread, a stove that draws ]
+dislikes: [ a closed school, slammed doors, unlatched windows, being told his gravy is thin ]
+fears: [ the stove going cold on a morning with nine at the desks, a first Monday of next term with nobody to cook for ]
 dream:
-  text: A school worth the walk
+  text: "A school worth the walk: twenty bowls on the long table and a hot dinner for every one."
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Ask each pupil's family what their child won't eat (Favors)"
+    - "Get Leila to write down what is wrong with his gravy"
+    - "Serve twenty bowls on the first day of the new term"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: millbrook.home_39 }
-    - { at: "08:30", do: work, where: millbrook.school }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: millbrook.school }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: millbrook.home_39 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_39 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_39 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: millbrook.home_39 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_39 }
-chores: [ beat the doormat, fold the washing ]
+    - { at: "05:45", do: eat, where: millbrook.home_39 }
+    - { at: "06:30", do: work, where: millbrook.school }
+    - { at: "10:00", do: cook, where: millbrook.school }
+    - { at: "12:00", do: eat, where: millbrook.school }
+    - { at: "13:00", do: clean, where: millbrook.school }
+    - { at: "15:30", do: work, where: millbrook.school }
+    - { at: "16:30", do: shop, where: market_row.bakery }
+    - { at: "18:00", do: cook, where: millbrook.home_39 }
+    - { at: "21:00", do: sleep, where: millbrook.home_39 }
+  weekend:                       # Saturday he mends whatever stuck all week; Sunday the stove rests
+    - { at: "07:30", do: eat, where: millbrook.home_39 }
+    - { at: "09:00", do: work, where: millbrook.school }
+    - { at: "11:00", do: shop, where: market_row.market_hall }
+    - { at: "12:30", do: eat, where: millbrook.home_39 }
+    - { at: "14:00", do: walk, where: millbrook.weir, with: [ tilde_osei ] }
+    - { at: "17:30", do: cook, where: millbrook.home_39 }
+    - { at: "21:30", do: sleep, where: millbrook.home_39 }
+chores: [ black the school stove, tally the pupils by the larder door, oil the latch, save a tenth bowl ]
 relationships:
-  - { id: dmitri_osei, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-  - { id: tilde_osei, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: elodie_osei, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: alun_osei, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
-secrets: []
+  - { id: dmitri_osei, affinity: 90, trust: 85, tag: spouse, note: "Eats the lunch box by nine and sings it back. Wants him to hear himself, kindly." }
+  - { id: tilde_osei, affinity: 70, trust: 65, tag: family, note: "His husband's mother, who orders his pantry shelves by label unasked. Wants her to taste the soup before she corrects the shelf." }
+  - { id: elodie_osei, affinity: 80, trust: 65, tag: daughter, note: "Quiet, with sawdust in her plait. He has guessed what she is after and wants her to tell him herself." }
+  - { id: alun_osei, affinity: 85, trust: 70, tag: son, note: "Eats the school's dinner while his father watches from the pass." }
+  - { id: leila_nesbitt, affinity: 20, trust: 30, tag: rival, note: "Inspects his gravy from the school gate at eleven. Wants her to say what is wrong with it." }
+  - { id: felix, affinity: 55, trust: 60, tag: fond, note: "Calls the pudding structured and eats two. Wants him to say the number when the roll is signed." }
+  - { id: sinead_rios, affinity: 30, trust: 40, tag: friend, note: "Kept a notebook of every child's allergies for twenty-eight years. Wants to borrow it for a week." }
+secrets:
+  - text: "He cooks a tenth bowl every day in case a new pupil arrives, and carries it home to Tilde when none does."
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n02
 archetype: school_family
 employment: employed

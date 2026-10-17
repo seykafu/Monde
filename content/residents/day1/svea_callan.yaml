@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n03; curated not yet. Edit here.
+# Generated (census-v1) for mb_n03; curated by hand (MVP M-03). Edit here.
 id: svea_callan
 name: Svea Callan
 age: 15
 pronouns: she/her
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Lessons by post; Saturday hand in Kasimir's workshop
 workplace: millbrook.kasimir_workshop
 home: millbrook.home_34
 portrait: svea_callan
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: svea_callan
-appearance: A girl with black braids and a mustard pinafore.
+appearance: >
+  A short, sturdy girl of fifteen with black braids and a mustard pinafore, a curl of sawdust caught in the
+  plaits.
 look:
   kind: human
   skin: 3
@@ -20,58 +22,71 @@ look:
   height: short
   outfit: { cut: pinafore, top: 4, bottom: 5, bottom_style: skirt, shoes: 2, trim: 5 }
   accessory: { kind: none }
-backstory: Svea was born in Monde and does lessons by post at the library desk. She likes the ducks on the Commons best.
+backstory: >
+  Svea sweeps and sands at Kasimir's workshop on Saturdays and says it is for the money. A long piece of oak
+  lives under a cloth in the back. She needs Kasimir to say the dovetails are true, and he says "Hm. Could be,"
+  which she has been turning over for three weeks. At home she measures everything: the table, the stairs, the
+  doorframe. Paloma notices and writes none of it in the book.
 personality:
-  traits: [ careful, steady, kind ]
-  big5: { open: 25, conscientious: 38, extravert: 76, agreeable: 76, neurotic: 27 }
-values: { prosperity: 0.45, safety: 0.1, spirit: 0.2, charm: 0.25 }
+  traits: [ cheerful, blunt, handy, secretive ]
+  big5: { open: 52, conscientious: 30, extravert: 76, agreeable: 68, neurotic: 22 }
+values: { prosperity: 0.35, safety: 0.10, spirit: 0.30, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A joint that gaps is a joint that lied.
+  - Kasimir's "Hm. Could be." means he is deciding whether to say yes.   # wrong: it is as near as he comes to saying it
+  - Paloma writes everything in the book except the things that matter.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Cheerful and dusty, loud with a tool in hand. Workshop nouns: dovetail, offcut, grain, clamp, shim. Says
+    "true" for good. Finishes other people's sentences with a measurement.
+  tics: [ "One more clamp.", "Grain first.", "Don't peek." ]
+  never_says: [ it's for Gran's birthday, good enough, kid ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - "One more clamp, then we leave it overnight. Don't peek at the back table. It's only a stool. It's a very ordinary stool."
+    - "Kasimir says grain first, always, or it splits. He says it like a verdict. Then he goes quiet and pretends to measure something."
+    - "I'm sixteen coins short of the brass screws. Paloma would find that in the book in a minute, so it isn't in the book."
 birthday: 44
-likes: [ tools that fit the hand, a proper job, the smell of the workshop ]
-dislikes: [ sweeping as the whole job, being called kid, praise for nothing ]
-fears: [ the dark on the stairs ]
+likes: [ tools that fit the hand, the smell of the workshop, oak offcuts, hot tea from Kasimir's flask ]
+dislikes: [ sweeping as the whole job, being called kid, a joint that gaps, Paloma's column ]
+fears: [ a dovetail gapping in front of Kasimir, Gran asking what the sawdust is for ]
 dream:
-  text: Get good at something still needed
+  text: Enter a joint at the Bloom Fair craft table that nobody can find the seam in.
   stages:
-    - Get a trial day with a master (Regard ≥ 20 with them)
-    - Finish a first piece
-    - Hear the master say again
+    - "Get Kasimir to say a dovetail is true (Regard ≥ 20 with Kasimir)"
+    - "Enter the craft table at Bloom Fair"
+    - "Take a straight critique from a rival and pin the ribbon above her workbench"
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_34 }
     - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: millbrook.home_34 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: market_row.market_street }
+    - { at: "14:00", do: write, where: old_quarter.library }
+    - { at: "16:30", do: visit, where: millbrook.kasimir_workshop }
     - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "21:30", do: sleep, where: millbrook.home_34 }
-  weekend:
+    - { at: "20:00", do: read, where: millbrook.home_34 }
+    - { at: "22:00", do: sleep, where: millbrook.home_34 }
+  weekend:                       # Saturday: the workshop from nine, and a sandwich on the market-day crates
     - { at: "08:00", do: eat, where: millbrook.home_34 }
     - { at: "09:00", do: work, where: millbrook.kasimir_workshop }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
+    - { at: "12:30", do: eat, where: market_row.market_street }
+    - { at: "13:30", do: work, where: millbrook.kasimir_workshop }
+    - { at: "16:30", do: walk, where: millbrook.weir, with: [ dagny_callan ] }
     - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
     - { at: "22:00", do: sleep, where: millbrook.home_34 }
-chores: [ water the window box, black the stove ]
+chores: [ sweep the sawdust off the back step, sharpen Paloma's pencils, hold the stair rail for Gran, wind the workshop clock ]
 relationships:
-  - { id: pilar_callan, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: orla_goddard, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: dagny_callan, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: paloma_callan, affinity: 65, trust: 60, tag: sister, note: "Sister, under the same roof." }
-secrets: []
+  - { id: pilar_callan, affinity: 85, trust: 65, tag: mother, note: "Sits in the window and asks what she's building. Gets 'a stool'." }
+  - { id: orla_goddard, affinity: 80, trust: 60, tag: mother, note: "Cuts patterns and shows her how a notch lines up. Wants her to see the dovetail before Friday." }
+  - { id: dagny_callan, affinity: 85, trust: 70, tag: grandmother, note: "Reads the weir standing up. Wants to see her read it sitting." }
+  - { id: paloma_callan, affinity: 65, trust: 50, tag: sister, note: "Seventeen, ledger-keeping, notices everything. Svea would like her not to notice this." }
+  - { id: kasimir, affinity: 55, trust: 55, tag: fond, note: "Pays her in tea and offcuts and says 'Could be'. Wants him to say 'True'." }
+secrets:
+  - text: "The cloth hides a bench for Dagny's birthday. She has paid Kasimir for the oak in sweeping, and he has never asked what for."
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n03
 archetype: apprentice
 employment: lessons

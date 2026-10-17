@@ -1,16 +1,17 @@
-# Generated (census-v1) for mb_n03; curated not yet. Edit here.
+# Generated (census-v1) for mb_n03; curated by hand (MVP M-03). Edit here.
 id: paloma_callan
 name: Paloma Callan
 age: 17
 pronouns: she/her
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Lessons by post at the library desk; keeps the household book
 workplace: millbrook.home_34
 home: millbrook.home_34
 portrait: paloma_callan
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: paloma_callan
-appearance: A girl with a dark brown bob and a plum shirt, and a skirt.
+appearance: >
+  A short, narrow girl of seventeen with a dark brown bob, a plum shirt and a skirt, a smear of ink on one cuff.
 look:
   kind: human
   skin: 3
@@ -20,59 +21,73 @@ look:
   height: short
   outfit: { cut: plain, top: 8, bottom: 11, bottom_style: skirt, shoes: 5 }
   accessory: { kind: none }
-backstory: Paloma was born in Monde and does lessons by post at the library desk. She likes the ducks on the
-  Commons best.
+backstory: >
+  Paloma keeps the household book, a ruled ledger with a green spine: every coin in, every coin out, because
+  Orla is in Carrow Tuesday to Friday and Pilar has no breath to spare for sums. It comes up one coin short
+  every month. She suspects Dagny's candle money and has never asked. What she cannot enter in any column is
+  Pilar's chest. She wants Priya to teach her to take a pulse, so there is one number in the book she can trust,
+  and has asked once, in the lane, and run before the answer.
 personality:
-  traits: [ wry, dreamy, stubborn ]
-  big5: { open: 76, conscientious: 55, extravert: 59, agreeable: 56, neurotic: 32 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ exact, dry, loyal, worried ]
+  big5: { open: 70, conscientious: 72, extravert: 28, agreeable: 45, neurotic: 62 }
+values: { prosperity: 0.25, safety: 0.25, spirit: 0.25, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Priya is too busy to show a girl of seventeen how to count a pulse.   # wrong: Priya has been waiting to be asked properly
+  - A column that balances means a house that's well.
+  - Svea hasn't noticed the missing coin either.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Exact, dry and a little tired. Ledger nouns: column, balance, carried, a coin short. Understated; speaks in
+    totals, and says what she has checked before she says what she is feeling.
+  tics: [ "A coin short.", "Check the column.", "In the book." ]
+  never_says: [ P. column, it doesn't matter, I'm fine ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - "A coin short, same as every month. I've stopped minding. I've started to think whoever takes it needs it more than the book does."
+    - "Check the column. Orla's boat money, Dagny's bread, Svea's glue. It balances, so we're fine. It always balances. That's what worries me."
+    - "I asked Priya once, in the lane, and ran off. In the book it says 'asked,' with a tick. The tick's lying."
 birthday: 67
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes: [ a teacher who remembers names, strong tea, a column that balances, quiet at the library desk ]
+dislikes: [ a coin short, being asked how her mother is by someone who isn't looking at her, ink that blots on the carry, the word brave ]
+fears: [ entering a number in her mother's column that she can't take back, being the one who knows ]
 dream:
-  text: A school worth the walk
+  text: Learn to count a pulse as well as Priya does, and write Pilar's in the household book every morning.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Ask Priya to show her a pulse on a quiet day (Regard ≥ 20 with Priya)"
+    - "Count Pilar's for a full minute without losing the count"
+    - "Write it in the household book, beside the milk"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_34 }
+    - { at: "07:00", do: cook, where: millbrook.home_34 }
     - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: millbrook.home_34 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
-    - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "21:30", do: sleep, where: millbrook.home_34 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_34 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "12:30", do: eat, where: old_quarter.fountain_square }
+    - { at: "13:30", do: write, where: old_quarter.library }
+    - { at: "16:30", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: cook, where: millbrook.home_34 }
+    - { at: "20:00", do: write, where: millbrook.home_34 }
     - { at: "22:00", do: sleep, where: millbrook.home_34 }
-chores: [ water the window box, fold the washing ]
+  weekend:                       # Sunday night she balances the week; Friday night Orla's money goes in the first column
+    - { at: "08:00", do: eat, where: millbrook.home_34 }
+    - { at: "10:00", do: shop, where: market_row.market_hall }
+    - { at: "12:30", do: eat, where: millbrook.home_34 }
+    - { at: "14:30", do: walk, where: millbrook.weir, with: [ svea_callan ] }
+    - { at: "17:30", do: cook, where: millbrook.home_34 }
+    - { at: "20:00", do: write, where: millbrook.home_34 }
+    - { at: "22:00", do: sleep, where: millbrook.home_34 }
+chores: [ balance the household book on Sunday night, count the milk jugs, iron Orla's Friday collar ]
 relationships:
-  - { id: pilar_callan, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: orla_goddard, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: dagny_callan, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: svea_callan, affinity: 65, trust: 60, tag: sister, note: "Sister, under the same roof." }
-secrets: []
+  - { id: pilar_callan, affinity: 85, trust: 70, tag: mother, note: "Sits in the window and answers 'fine'. Wants her to say the real number once, out loud." }
+  - { id: orla_goddard, affinity: 75, trust: 60, tag: mother, note: "Hands the week's money across the table on Fridays and watches it go into the first column. Wants her home on a Wednesday." }
+  - { id: dagny_callan, affinity: 75, trust: 60, tag: grandmother, note: "Runs the kitchen and takes one coin for candles. Wants her to say so." }
+  - { id: svea_callan, affinity: 60, trust: 45, tag: sister, note: "Fifteen, smells of oak, and logs nothing. Wants her to put the glue in the book." }
+  - { id: priya, affinity: 25, trust: 35, tag: curious, note: "Two doors up with the bag. Wants her to say yes without making her ask twice." }
+  - { id: margo, affinity: 40, trust: 50, tag: fond, note: "Sets her lessons at the desk and leaves the good pencils out. Wants her to ask for a Saturday." }
+secrets:
+  - text: "In the back of the ledger she keeps a pencil column headed P., with a tick for every good morning."
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n03
 archetype: school_family
 employment: lessons

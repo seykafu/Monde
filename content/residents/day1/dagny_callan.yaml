@@ -1,16 +1,17 @@
-# Generated (census-v1) for mb_n03; curated not yet. Edit here.
+# Generated (census-v1) for mb_n03; curated by hand (MVP M-03). Edit here.
 id: dagny_callan
 name: Dagny Callan
 age: 68
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired; reads the weir and runs the Weir Road kitchen
 workplace: millbrook.home_34
 home: millbrook.home_34
 portrait: dagny_callan
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: dagny_callan
-appearance: An older woman with white hair in a bun, a charcoal jumper and a cream scarf.
+appearance: >
+  A short, square older woman with white hair in a bun, a charcoal jumper and a cream scarf pinned at the neck.
 look:
   kind: human
   skin: 9
@@ -20,68 +21,73 @@ look:
   height: short
   outfit: { cut: jumper, top: 13, bottom: 6, bottom_style: skirt, shoes: 7 }
   accessory: { kind: scarf, colour: 9 }
-backstory: "Dagny came to Monde from Marrow Quay 23 years ago and is retired now. What she wants most is plain
-  enough: a school worth the walk."
+backstory: >
+  Dagny came to Monde at forty-five with a daughter and a mill contract, and worked the Lissworth laundry
+  mangles until the gates shut. The weir is under her window, and she has read it for twenty-three years: low
+  and sulky means rain by Thursday, a clean white lip means the ferry will run. She says she is right nine times
+  in ten. She wants a bench at the weir where she can read it sitting down, and has asked Kasimir twice. He
+  says, "Give it a day." Svea, at his bench on Saturdays, has said nothing at all.
 personality:
-  traits: [ patient, stubborn, curious ]
-  big5: { open: 93, conscientious: 53, extravert: 25, agreeable: 63, neurotic: 80 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ flat, practical, proud, tender ]
+  big5: { open: 28, conscientious: 66, extravert: 40, agreeable: 60, neurotic: 66 }
+values: { prosperity: 0.10, safety: 0.40, spirit: 0.30, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The weir tells rain three days ahead.   # wrong: it is right six times in ten, and she remembers the nine
+  - Odile's rye is the only bread that has ever been baked.
+  - Pilar's chest is better on the stairs than she lets on.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Flat and weatherly: river first, then people. Weir nouns: lip, sulk, spate, white water, low water, the
+    sill. Never raises her voice. Tells you the day by the sound of the water, and the time by the kettle.
+  tics: [ "Weir says.", "Low and sulky.", "Rain by Thursday." ]
+  never_says: [ my surprised face, whatever you think, the weir is just water ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Weir says rain by Thursday. Low and sulky, can you hear it? Nine times in ten I'm right. The tenth I don't count."
+    - "Odile's rye on the sill, Carrow's loaf on the shelf. The rye goes first. Nobody asked the loaf."
+    - "I'd like a bench down there. Sat down, I could read the whole lip. Kasimir says give it a day. It's been a week."
 birthday: 87
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ Odile's rye bread, a lunch box packed right, white water over the lip, a stool at the kitchen window ]
+dislikes: [ Carrow bread, a sulking weir, being asked how she is, forecasts from people who haven't looked ]
+fears: [ the weir going silent, Pilar on the stairs in a spate ]
 dream:
-  text: A school worth the walk
+  text: A bench at the weir where she can read the water sitting down.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Pick a spot on the weir path, one flat stone from the lip"
+    - "Raise fifteen coins, or get Kasimir to say yes (Regard ≥ 20 with Kasimir)"
+    - "Sit on it with the first neighbour who stops"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_34 }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
+    - { at: "06:00", do: cook, where: millbrook.home_34 }
+    - { at: "08:00", do: walk, where: millbrook.weir }
+    - { at: "10:00", do: shop, where: market_row.bakery }
     - { at: "12:00", do: eat, where: millbrook.home_34 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "14:00", do: sit, where: millbrook.weir }
+    - { at: "16:00", do: cook, where: millbrook.home_34 }
     - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "19:30", do: read, where: millbrook.home_34 }
-    - { at: "21:30", do: sleep, where: millbrook.home_34 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_34 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_34 }
-chores: [ fill the coal scuttle, mend a sock ]
+    - { at: "21:00", do: sleep, where: millbrook.home_34 }
+  weekend:                       # Sunday chapel, then the market on Pilar's arm; the weir at three whatever the weather
+    - { at: "07:00", do: cook, where: millbrook.home_34 }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:30", do: shop, where: market_row.market_hall, with: [ pilar_callan ] }
+    - { at: "13:00", do: eat, where: millbrook.home_34 }
+    - { at: "15:00", do: walk, where: millbrook.weir }
+    - { at: "17:30", do: cook, where: millbrook.home_34 }
+    - { at: "21:00", do: sleep, where: millbrook.home_34 }
+chores: [ read the weir at eight and again at four, leave the kitchen window open an inch, put Carrow's loaf on the high shelf, scrub the stairs on Fridays ]
 relationships:
-  - { id: pilar_callan, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: orla_goddard, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: paloma_callan, affinity: 70, trust: 70, tag: granddaughter, note: Same house. }
-  - {
-      id: svea_callan,
-      affinity: 70,
-      trust: 70,
-      tag: granddaughter,
-      note: "Granddaughter, under the same roof."
-    }
-secrets: []
+  - { id: pilar_callan, affinity: 85, trust: 70, tag: daughter, note: "Brought her to Monde at sixteen to the carding room. Wants her to say what the stairs cost her." }
+  - { id: orla_goddard, affinity: 70, trust: 60, tag: family, note: "Took her in at seventeen. Brings a Carrow loaf Dagny will not cut. Wants her to bring rye." }
+  - { id: paloma_callan, affinity: 70, trust: 50, tag: granddaughter, note: "Keeps the household book, and the one coin short is Dagny's. Wants her to leave the coin." }
+  - { id: svea_callan, affinity: 80, trust: 60, tag: granddaughter, note: "Smells of oak on Saturdays and says it's the workshop. Wants her to say what she is making." }
+  - { id: kasimir, affinity: 15, trust: 30, tag: curious, note: "Says 'Give it a day' to a bench by the weir. Wants him to say how many days." }
+  - { id: raman, affinity: 40, trust: 45, tag: friend, note: "Walks the weir path past the window at ten and listens to the water's mood. Wants him to stop and listen to the weir with her, once." }
+secrets:
+  - text: "She has guessed what Svea builds on Saturdays at Kasimir's and is practising her surprised face for her birthday."
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n03
 archetype: school_family
 employment: retired

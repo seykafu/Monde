@@ -1,17 +1,18 @@
-# Generated (census-v1) for wf_n01; curated not yet. Edit here.
+# Generated (census-v1) for wf_n01; curated by hand (MVP M-03). Edit here.
 id: marthe_demir
 name: Marthe Demir
 age: 41
 pronouns: she/her
 kind: resident
-occupation: clerk
+occupation: Town Hall clerk; keeps the council's registers
 workplace: old_quarter.town_hall
 home: wharf.home_14
 portrait: lib_f39_086
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: marthe_demir
-appearance: A woman with salt-and-pepper hair in a neat low bun, a dark plum coat with rolled sleeves over a
-  white collar, and a nurse's watch pinned upside down on her lapel. Calm eyes that have seen worse.
+appearance: >
+  A tall woman with salt-and-pepper hair in a neat low bun, a dark plum coat with the sleeves rolled over a
+  white collar, and a small watch pinned upside down on the lapel.
 look:
   kind: human
   skin: 3
@@ -21,62 +22,75 @@ look:
   height: tall
   outfit: { cut: coat, top: 8, bottom: 13, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
-backstory: "Marthe came to Monde from Port Sallow 20 years ago and works as clerk. What she wants most is
-  plain enough: a school worth the walk."
+backstory: >
+  Marthe's mother was a ward sister in Carrow and pinned her watch upside down to read it while she took a
+  pulse. Marthe wears the watch the same way and has never taken a pulse in her life. She keeps the Town Hall
+  registers with a steel nib, and has sat at the next desk to the Mayor for nine years and knows her lunch at
+  Café Liss to the minute: eleven minutes, a ledger propped against the teapot. She wants Mayor Pell to sit
+  through a whole hour: a plate, a chair, no ledger. Mei says she should take the hour herself. Marthe says she
+  has a register.
 personality:
-  traits: [ wry, brisk, cheerful ]
-  big5: { open: 76, conscientious: 85, extravert: 8, agreeable: 72, neurotic: 52 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ calm, exact, wry, steady ]
+  big5: { open: 45, conscientious: 85, extravert: 40, agreeable: 58, neurotic: 22 }
+values: { prosperity: 0.15, safety: 0.40, spirit: 0.25, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Nobody in the Town Hall will take a lunch hour unless somebody shames them into it.
+  - Pell thinks the cup of tea on her blotter comes from Gaspard.   # wrong: Pell has known for years who it is and drinks it anyway
+  - A watch worn upside down is read more carefully.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Calm and level, a clerk's economy: dates, entry numbers, the plain verb. Register nouns: entry, folio, nib,
+    blotter, seal. Never hurries and lets a silence do the asking.
+  tics: [ "Entered.", "Sit a minute.", "Nib's wet." ]
+  never_says: [ I'm a nurse, I leave the tea, I'm busy ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Entered, with the date. Sit a minute, the ink's wet. The Mayor's at the window with her tea, gone cold."
+    - "My mother pinned it upside down so she could read it while she counted. I wear it that way. I've never counted anything but pages."
+    - "Eleven minutes, her lunch. Nine years I've timed it. I put a plate down Tuesday at the desk and she moved it for a ledger."
 birthday: 90
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ strong tea, a lunch box packed right, a nib that doesn't spit, a blotter with a clean corner ]
+dislikes: [ unsigned entries, being asked if she's a nurse, the Town Hall lamp that flickers at three, walking home in the dark ]
+fears: [ Pell collapsing at the desk one afternoon, a blank folio on the day it matters ]
 dream:
-  text: A school worth the walk
+  text: Sit across from Pell at Café Liss for one whole lunch hour, plates and all.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Book Pell the window table at Café Liss for a full hour, under another name"
+    - "Walk her there before she can find a ledger"
+    - "Sit with her through one whole plate"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: wharf.home_14 }
+    - { at: "06:45", do: eat, where: wharf.home_14 }
+    - { at: "07:45", do: walk, where: market_row.market_street }
     - { at: "08:30", do: work, where: old_quarter.town_hall }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "12:30", do: eat, where: old_quarter.town_hall }
     - { at: "13:30", do: work, where: old_quarter.town_hall }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_14 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: wharf.home_14 }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_14 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: wharf.home_14 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: wharf.home_14 }
-chores: [ black the stove, beat the doormat ]
+    - { at: "17:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: cook, where: wharf.home_14 }
+    - { at: "21:30", do: sleep, where: wharf.home_14 }
+  weekend:                       # Friday night Bram is home; the whole house goes to the breakwater on Sunday
+    - { at: "07:30", do: eat, where: wharf.home_14 }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "11:30", do: shop, where: market_row.market_hall }
+    - { at: "13:00", do: eat, where: wharf.home_14 }
+    - { at: "15:00", do: walk, where: wharf.breakwater, with: [ olav_lindgren, meera_lindgren ] }
+    - { at: "18:00", do: cook, where: wharf.home_14 }
+    - { at: "21:30", do: sleep, where: wharf.home_14 }
+chores: [ wind her mother's watch on Sundays, blot the register before closing, lay out Olav's school things, put the kettle on at a quarter to eleven ]
 relationships:
-  - { id: bram_lindgren, affinity: 70, trust: 70, tag: partner, note: Same house. }
-  - { id: mei_lindgren, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: olav_lindgren, affinity: 70, trust: 70, tag: son, note: Same house. }
-  - { id: meera_lindgren, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
-secrets: []
+  - { id: bram_lindgren, affinity: 85, trust: 80, tag: partner, note: "Home Fridays with a paper bag and a rope joke. Wants him to take one Tuesday off." }
+  - { id: mei_lindgren, affinity: 65, trust: 55, tag: family, note: "Taps SALT, ENOUGH and a third word Marthe does not know. Wants her to translate it." }
+  - { id: olav_lindgren, affinity: 85, trust: 70, tag: son, note: "Ten, with a notebook of questions. Wants him to ask one she can answer." }
+  - { id: meera_lindgren, affinity: 90, trust: 75, tag: daughter, note: "Five and a half, wears one sock lower, eats what she hates." }
+  - { id: pell, affinity: 45, trust: 50, tag: fond, note: "Eats lunch in eleven minutes with a ledger against the teapot. Wants her to sit through a full hour." }
+  - { id: gaspard_ueda, affinity: 40, trust: 50, tag: friend, note: "The Hall's caretaker, who gets credit for the cup of tea on the blotter. Wants him to go on taking it." }
+  - { id: frye, affinity: 30, trust: 45, tag: fond, note: "Signs entries in a hand she envies. Wants him to lend her the good pen, once." }
+secrets:
+  - text: "She leaves a cup of tea on Pell's blotter at eleven every day and lets her think Gaspard Ueda does it."
+    reveal: { regard_min: 45 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_n01
 archetype: school_family
 employment: employed

@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n02; curated not yet. Edit here.
+# Generated (census-v1) for mb_n02; curated by hand (MVP M-03). Edit here.
 id: tilde_osei
 name: Tilde Osei
 age: 70
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired cannery hand; redraws the Liss label from memory
 workplace: millbrook.home_39
 home: millbrook.home_39
 portrait: tilde_osei
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: tilde_osei
-appearance: An older woman with short white hair, a mustard jumper and a dark brown scarf.
+appearance: >
+  An older woman with short white hair, a mustard jumper and a dark brown scarf knotted at the throat, a pencil
+  behind one ear.
 look:
   kind: human
   skin: 5
@@ -20,62 +22,73 @@ look:
   height: tall
   outfit: { cut: jumper, top: 4, bottom: 12, bottom_style: trousers, shoes: 5 }
   accessory: { kind: scarf, colour: 2 }
-backstory: "Tilde came to Monde from Port Sallow 20 years ago and is retired now. What she wants most is plain
-  enough: a school worth the walk."
+backstory: >
+  Tilde came to Monde at fifty with Dmitri and the quick hands of a woman who could paste three hundred labels
+  an hour, and worked the cannery line until the doors shut. The Liss label was a herring in a blue wave. She
+  has redrawn it from memory forty times since, on the backs of Anselm's menus. She wants Nell to look at it and
+  say it is right, because a co-op will need a label and Tilde has the only copy that is not on a tin. Nell says
+  she will come and see it. She has said so for two springs.
 personality:
-  traits: [ patient, curious, shy ]
-  big5: { open: 42, conscientious: 74, extravert: 59, agreeable: 44, neurotic: 62 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ wry, exact, unhurried, stubborn ]
+  big5: { open: 30, conscientious: 70, extravert: 45, agreeable: 40, neurotic: 50 }
+values: { prosperity: 0.20, safety: 0.40, spirit: 0.15, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Nobody who didn't paste a label can say whether the blue is right.
+  - The cannery will open again the year somebody draws the label properly.   # wrong: the doors want a co-op, a boiler and ten signatures
+  - A tin without a label is a tin nobody trusts.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Wry and unhurried, with a cannery hand's nouns: seam, lid, paste, flat, the line, a gross. Counts in grosses
+    and dozens and corrects the colours of things. Never raises her voice at a crooked label, only her eyebrow.
+  tics: [ "By the gross.", "The wave was blue.", "Paste it straight." ]
+  never_says: [ good enough, close enough, a bit of green ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "The wave was blue. Always blue. Forty times I've drawn it, and every time Dmitri says it looks fine."
+    - "By the gross, that's how we labelled them, a hundred and forty-four to the crate. You've not seen a straight label until you've seen mine."
+    - "Anselm cooks, Dmitri drives, the girl wants a key and the boy wants a horn. I want a label. We're a very modest house."
 birthday: 80
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ strong tea, smoked fish on a Sunday, a pencil that holds a point, paste that sets clean ]
+dislikes: [ green where blue should be, crooked labels, tins stacked label-in, being told to rest ]
+fears: [ the old label dying with her, Nell saying it's the wrong blue ]
 dream:
-  text: A school worth the walk
+  text: See her redrawn Liss label printed on the first tin of Nell's cannery co-op.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Show Nell the redrawn label (Regard ≥ 20 with Nell)"
+    - "Print a trial sheet at the Lantern press with Sable"
+    - "Paste the first label on the first co-op tin, straight"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_39 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: millbrook.home_39 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "06:30", do: eat, where: millbrook.home_39 }
+    - { at: "08:00", do: write, where: millbrook.home_39 }
+    - { at: "10:30", do: walk, where: millbrook.weir }
+    - { at: "12:30", do: eat, where: millbrook.home_39 }
+    - { at: "14:00", do: sit, where: wharf.cannery }
+    - { at: "16:30", do: shop, where: market_row.general_store }
     - { at: "18:00", do: eat, where: millbrook.home_39 }
-    - { at: "19:30", do: read, where: millbrook.home_39 }
-    - { at: "21:30", do: sleep, where: millbrook.home_39 }
-  weekend:
+    - { at: "21:00", do: sleep, where: millbrook.home_39 }
+  weekend:                       # Sunday after chapel she takes the label down to Nell's market and is told to come back Tuesday
     - { at: "08:00", do: eat, where: millbrook.home_39 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "12:00", do: eat, where: millbrook.home_39 }
+    - { at: "14:00", do: visit, where: wharf.fish_market }
+    - { at: "16:00", do: sit, where: commons.old_elm }
     - { at: "18:00", do: eat, where: millbrook.home_39 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_39 }
-chores: [ water the window box, wind the clock ]
+    - { at: "21:00", do: sleep, where: millbrook.home_39 }
+chores: [ sharpen six pencils on Sunday, press the week's drawings flat under the dresser, trim the paste brush, check the labels on Anselm's pantry tins ]
 relationships:
-  - { id: dmitri_osei, affinity: 70, trust: 70, tag: son, note: Same house. }
-  - { id: anselm_osei, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: elodie_osei, affinity: 70, trust: 70, tag: granddaughter, note: Same house. }
-  - { id: alun_osei, affinity: 70, trust: 70, tag: grandson, note: "Grandson, under the same roof." }
-secrets: []
+  - { id: dmitri_osei, affinity: 80, trust: 75, tag: son, note: "Came with her at sixteen and sings to engines. Wants him to say the label looks wrong, once, so she can fix it." }
+  - { id: anselm_osei, affinity: 65, trust: 60, tag: family, note: "Orders his pantry shelves by label without being asked. Wants him to let her label the school's stock jars." }
+  - { id: elodie_osei, affinity: 70, trust: 55, tag: granddaughter, note: "Sits still to be drawn and never says what she wants. Wants her to ask for the key at the supper table." }
+  - { id: alun_osei, affinity: 75, trust: 60, tag: grandson, note: "Wants the horn. She has told him she will allow it the day the label is printed." }
+  - { id: nell, affinity: 25, trust: 30, tag: curious, note: "Loud, fair, and always about to look. Wants her to look." }
+  - { id: sable, affinity: 15, trust: 20, tag: curious, note: "Owns the only press in town. Wants her to say what a trial sheet of blue would cost." }
+secrets:
+  - text: "She keeps a list of the cannery hands who left Monde and writes each a card at Lantern Night, signed 'from the line'."
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n02
 archetype: school_family
 employment: retired

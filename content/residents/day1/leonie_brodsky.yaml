@@ -1,17 +1,18 @@
-# Generated (census-v1) for wf_l01; curated not yet. Edit here.
+# Generated (census-v1) for wf_l01; curated by hand (MVP M-03). Edit here.
 id: leonie_brodsky
 name: Leonie Brodsky
 age: 8
 pronouns: she/her
 kind: resident
-occupation: pupil at Millbrook School
+occupation: Pupil at Millbrook School; walks in from the Wharf
 workplace: wharf.home_03
 home: wharf.home_03
 portrait: lib_f05_042
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: leonie_brodsky
-appearance: A small girl with copper pigtails tied with sky-blue ribbons and a leaf-green knitted jumper. A
-  gap-toothed, curious look.
+appearance: >
+  A small girl with copper pigtails tied in sky-blue ribbons and a leaf-green knitted jumper. She has a gap in
+  her front teeth and a pencil stub behind one ear.
 look:
   kind: human
   skin: 7
@@ -21,55 +22,69 @@ look:
   height: short
   outfit: { cut: jumper, top: 7, bottom: 5, bottom_style: trousers, shoes: 4 }
   accessory: { kind: none }
-backstory: Leonie was born in Monde and goes to Millbrook School. She likes the ducks on the Commons best.
+backstory: >
+  Leonie was born in the front room on Quay Street in a gale and has been getting up for the Gannet ever since.
+  She chalks the ferry days on her own slate and corrects the board at the ticket booth. Mam, who is Thora, is
+  away Tuesday to Friday and comes home on the boat that is always late. Moss rings the Gannet's bell when the
+  boat docks. Leonie has asked to ring it for Mam, and he says a bell is not a toy. She practises on the fence
+  post with a spoon.
 personality:
-  traits: [ patient, curious, careful ]
-  big5: { open: 59, conscientious: 33, extravert: 42, agreeable: 80, neurotic: 20 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ curious, chatty, stubborn, sunny ]
+  big5: { open: 82, conscientious: 35, extravert: 70, agreeable: 66, neurotic: 30 }
+values: { prosperity: 0.10, safety: 0.25, spirit: 0.35, charm: 0.30 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The Gannet comes in faster if somebody rings the bell.   # wrong: the tide decides, and Moss
+  - Mum's board knows everything, and the kitchen door knows the rest.
+  - Tib can count anything, but I can count the ferries best.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ Can we go to the ducks? ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Fast and wondering: questions stacked on questions, then the answer she already had. Counts days on her
+    fingers. Says "Mum" for Liv and "Mam" for Thora, and never mixes them up.
+  tics: [ "Guess how many.", "Nearly Friday.", "Can I ring it?" ]
+  never_says: [ come home, boring, I hate the ferry ]
   samples:
-    - Can we go to the ducks? Just for a minute.
-    - I'm not tired. I'm resting my eyes.
-    - Mr. Amari says my letters lean. They're fine.
+    - "Guess how many days till Friday. No, three. You always say four. Mam's boat is the one that's late, so I count it twice."
+    - "Moss won't let me ring the bell. He says it isn't a toy. I've got a spoon and a fence post. It's nearly the same."
+    - "Mum chalks the board and I rub out the wrong bits. She says I'm quicker than the sponge. It's just that I like the squeak."
 birthday: 32
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes: [ a lunch box packed right, chalk dust, the Gannet's bell, honey on a warm bun ]
+dislikes: [ wet socks, a late boat, porridge with lumps, being told it's nearly time ]
+fears: [ the dark stairs at night, Mam's boat missing the tide ]
 dream:
-  text: A school worth the walk
+  text: Ring the Gannet's bell herself on the Friday Mam comes home.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Ask Moss, politely, three Fridays running (Regard ≥ 15 with Moss)"
+    - "Learn the bell's rhythm from Ada at the booth"
+    - "Ring it once, loud, when Mam steps onto the slip"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: wharf.home_03 }
+    - { at: "07:00", do: eat, where: wharf.home_03 }
     - { at: "08:30", do: attend, where: millbrook.school }
-    - { at: "15:30", do: wander, where: commons.picnic_lawn }
+    - { at: "15:30", do: walk, where: wharf.harbor_steps }
+    - { at: "16:30", do: visit, where: wharf.ticket_booth }
     - { at: "17:30", do: eat, where: wharf.home_03 }
     - { at: "20:00", do: sleep, where: wharf.home_03 }
   weekend:
     - { at: "08:00", do: eat, where: wharf.home_03 }
-    - { at: "10:00", do: wander, where: commons.duck_pond }
+    - { at: "09:30", do: visit, where: wharf.ticket_booth }
     - { at: "12:30", do: eat, where: wharf.home_03 }
-    - { at: "14:00", do: wander, where: commons.picnic_lawn }
+    - { at: "14:30", do: walk, where: wharf.breakwater, with: [ thora_brodsky, liv_brodsky ] }
     - { at: "18:00", do: eat, where: wharf.home_03 }
     - { at: "20:30", do: sleep, where: wharf.home_03 }
-chores: [ beat the doormat, fill the coal scuttle ]
+chores: [ rub out the wrong bits on the board, beat the doormat, feed the spoon its fence post ]
 relationships:
-  - { id: liv_brodsky, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: thora_brodsky, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: kester_brodsky, affinity: 70, trust: 70, tag: brother, note: Same house. }
-secrets: []
+  - { id: liv_brodsky, affinity: 90, trust: 85, tag: mother, note: "Mum, who chalks the board and knows the whole Wharf by its post." }
+  - { id: thora_brodsky, affinity: 95, trust: 80, tag: mother, note: "Mam, who comes on the late boat with a drawing of a cat that looks like a loaf." }
+  - { id: kester_brodsky, affinity: 70, trust: 60, tag: brother, note: "Tall, says 'dunno', and brings the heel of yesterday's loaf for her on Saturdays." }
+  - { id: moss, affinity: 10, trust: 20, tag: curious, note: "The Gannet's skipper, who has the bell. Wants him to let her ring it, once, for Mam." }
+  - { id: ada, affinity: 40, trust: 40, tag: fond, note: "Sells the tickets and keeps a tin of torn stubs. Wants her to give up a stub for the tin on her slate." }
+secrets:
+  - text: "She has written 'come home' in chalk on the underside of the kitchen table, where Liv will never look."
+    reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_l01
 archetype: school_family
 employment: pupil

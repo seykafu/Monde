@@ -1,16 +1,18 @@
-# Generated (census-v1) for wf_n01; curated not yet. Edit here.
+# Generated (census-v1) for wf_n01; curated by hand (MVP M-03). Edit here.
 id: bram_lindgren
 name: Bram Lindgren
 age: 47
 pronouns: he/him
 kind: resident
-occupation: works in Carrow
+occupation: Rigger at a Carrow boatyard; home on Friday's boat
 workplace: offmap.city
 home: wharf.home_14
 portrait: bram_lindgren
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: bram_lindgren
-appearance: A man with tufty auburn hair, a grey jumper, a slate-blue scarf and a moustache.
+appearance: >
+  A broad, short man with tufty auburn hair, a moustache, a grey jumper and a slate-blue scarf looped once round
+  his neck.
 look:
   kind: human
   skin: 6
@@ -21,60 +23,73 @@ look:
   outfit: { cut: jumper, top: 14, bottom: 10, bottom_style: trousers, shoes: 4 }
   accessory: { kind: scarf, colour: 6 }
   face: { moustache: true }
-backstory: "Bram came to Monde from Ashby Lock 20 years ago and works as a commuter to Carrow. What he wants
-  most is plain enough: a school worth the walk."
+backstory: >
+  Bram came to Monde at twenty-seven to splice rigging for the cannery boats, and when the cannery shut he took
+  his rope to Carrow, where the yards still hire. He leaves on Tuesday's boat and comes back Friday with a paper
+  bag of aniseed twists for Meera, who hates aniseed and has eaten two years of them to be polite. He wants
+  Hollis, who writes every Gannet landing in a book as late, to enter one as on time. Hollis has not yet found a
+  boat that merited it.
 personality:
-  traits: [ restless, patient, kind ]
-  big5: { open: 93, conscientious: 59, extravert: 93, agreeable: 76, neurotic: 29 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ jolly, handy, sentimental, stubborn ]
+  big5: { open: 50, conscientious: 40, extravert: 80, agreeable: 72, neurotic: 30 }
+values: { prosperity: 0.25, safety: 0.25, spirit: 0.30, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Meera loves aniseed.   # wrong: she hates it and eats one for him every Friday
+  - A rope that's spliced well will outlast the boat it's rigged to.
+  - Hollis will come round on the Gannet, in time.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Big and cheerful, a man who laughs at his own bad news. Rigging nouns: splice, shackle, block, lanyard,
+    fathom. Brings a paper bag into every sentence. Keeps the dull part for Carrow and his best voice for
+    Friday.
+  tics: [ "Friday bag.", "Splice it.", "Near enough on time." ]
+  never_says: [ she hates aniseed, I hate Carrow, give up ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Friday bag's got aniseed again. Meera loves them. She eats one with her whole face every Friday, without being asked."
+    - "Splice it, don't knot it. A knot weakens the rope by half. Don't ask me how I know. Ask my left thumb."
+    - "Tuesday's boat leaves near enough on time and Friday's comes in near enough on time. Hollis writes 'late' both ways. I'd love one 'on time.'"
 birthday: 17
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ hot tea from a flask, a bench by the school gate, a rope that runs true, the Friday boat's lamp coming in ]
+dislikes: [ a frayed lanyard, an empty harbour on a Tuesday, songs without a second verse, being left off the Friday boat ]
+fears: [ a Friday the boat doesn't come, Olav's questions running out before his own answers ]
 dream:
-  text: A school worth the walk
+  text: See Hollis write "on time" beside the Gannet, in his own book, in ink.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Bring Hollis the current Carrow timetable page, folded (Regard ≥ 20 with Hollis)"
+    - "Help Moss get the Gannet off the slip within ten minutes of the tide"
+    - "Stand with Hollis on a Friday and watch the log get its first \"on time\""
 routine:
-  weekday:
-    - { at: "06:30", do: eat, where: wharf.home_14 }
+  weekday:                       # away Tuesday to Friday: the Tuesday boat out, the Friday boat home
+    - { at: "05:30", do: eat, where: wharf.home_14 }
+    - { at: "06:30", do: walk, where: wharf.ferry_slip }
     - { at: "07:30", do: work, where: offmap.city }
     - { at: "12:30", do: eat, where: offmap.city }
     - { at: "13:30", do: work, where: offmap.city }
     - { at: "19:00", do: eat, where: offmap.city }
     - { at: "22:00", do: sleep, where: offmap.city }
   weekend:
-    - { at: "08:00", do: eat, where: wharf.home_14 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: wharf.home_14 }
-    - { at: "19:30", do: read, where: wharf.home_14 }
-    - { at: "22:00", do: sleep, where: wharf.home_14 }
-chores: [ sweep the step, water the window box ]
+    - { at: "07:30", do: eat, where: wharf.home_14, with: [ marthe_demir, mei_lindgren, olav_lindgren, meera_lindgren ] }
+    - { at: "09:00", do: walk, where: wharf.breakwater, with: [ olav_lindgren, meera_lindgren ] }
+    - { at: "11:30", do: sit, where: wharf.harbor_steps }
+    - { at: "13:00", do: eat, where: wharf.home_14 }
+    - { at: "15:00", do: visit, where: wharf.boathouse }
+    - { at: "18:00", do: cook, where: wharf.home_14 }
+    - { at: "21:30", do: sleep, where: wharf.home_14 }
+chores: [ splice the clothesline eye, bring the Friday bag, set Meera's boots by the door, wind the clock Mei keeps stopping ]
 relationships:
-  - { id: marthe_demir, affinity: 70, trust: 70, tag: partner, note: Same house. }
-  - { id: mei_lindgren, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: olav_lindgren, affinity: 70, trust: 70, tag: son, note: Same house. }
-  - { id: meera_lindgren, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
-secrets: []
+  - { id: marthe_demir, affinity: 85, trust: 80, tag: partner, note: "Clerks at the Town Hall and keeps the registers as if he were one of them. Wants her to laugh at his rope jokes before the second verse." }
+  - { id: mei_lindgren, affinity: 75, trust: 60, tag: mother, note: "Taps ENOUGH when he hums and he thinks it's time-keeping. Wants her to tell him what she really taps." }
+  - { id: olav_lindgren, affinity: 85, trust: 70, tag: son, note: "Asks seven questions before the bag is open. Bram answers six and says 'ask your mother' for the seventh." }
+  - { id: meera_lindgren, affinity: 95, trust: 80, tag: daughter, note: "Five and a half, eats the aniseed with her whole face, and so he keeps bringing it." }
+  - { id: hollis, affinity: 10, trust: 20, tag: curious, note: "Logs every Gannet landing as late. Wants one 'on time' entered in ink." }
+  - { id: moss, affinity: 35, trust: 40, tag: friend, note: "Holds the plank for his bag and tells him the tide before the hour. Wants him to hold the Friday boat for the lamp." }
+secrets:
+  - text: "He sings one verse over the quay wall at Carrow every Tuesday dawn, facing Monde. He believes the tide carries it."
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_n01
 archetype: school_family
 employment: employed

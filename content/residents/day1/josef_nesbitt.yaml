@@ -1,17 +1,18 @@
-# Generated (census-v1) for mb_n01; curated not yet. Edit here.
+# Generated (census-v1) for mb_n01; curated by hand (MVP M-03). Edit here.
 id: josef_nesbitt
 name: Josef Nesbitt
 age: 7
 pronouns: he/him
 kind: resident
-occupation: pupil at Millbrook School
+occupation: Pupil at Millbrook School; knows every footstep on School Lane
 workplace: millbrook.home_38
 home: millbrook.home_38
 portrait: lib_m09_002
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: josef_nesbitt
-appearance: A boy with short black curls, a green school jumper over a white collar and a satchel strap across
-  his chest. Bright, eager eyes.
+appearance: >
+  A boy with short black curls, a green school jumper over a white collar, shorts, and a satchel strap across
+  his chest. His eyes are bright and eager.
 look:
   kind: human
   skin: 3
@@ -21,56 +22,71 @@ look:
   height: short
   outfit: { cut: jumper, top: 7, bottom: 6, bottom_style: shorts, shoes: 2 }
   accessory: { kind: none }
-backstory: Josef was born in Monde and goes to Millbrook School. He likes the ducks on the Commons best.
+backstory: >
+  Josef was born upstairs and has never lived anywhere with fewer than nineteen stairs, so he knows a house by
+  its feet. He can tell Hanne, who skips the eleventh, from Gran, who holds the rail, from Corin, who counts,
+  from the postman, who does neither. Mum's postcard comes every Wednesday with a door on it, and he keeps them
+  in a biscuit tin under the bed, in order. He wants Felix, who lives at the top of the lane, to admit which
+  step of his creaks. Felix says "Let's see."
 personality:
-  traits: [ stubborn, warm, kind ]
-  big5: { open: 76, conscientious: 82, extravert: 76, agreeable: 78, neurotic: 39 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ loud, certain, nosy, sunny ]
+  big5: { open: 62, conscientious: 20, extravert: 85, agreeable: 76, neurotic: 35 }
+values: { prosperity: 0.10, safety: 0.30, spirit: 0.40, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everybody has exactly one footstep, and it can't be changed.
+  - Felix creaks on the third step and is pretending he doesn't.
+  - Hanne skips the eleventh stair out of habit.   # wrong: she does it on purpose, to fool him
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ Can we go to the ducks? ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Loud, quick and certain. Reports who has come in from the sound of them and is wrong one time in five.
+    Counts stairs, doors and postcards. Door nouns: latch, step, landing, hinge, rail.
+  tics: [ "That's Hanne.", "Shh, listen.", "Wrong foot." ]
+  never_says: [ I'm scared, boring, I don't know whose step that is ]
   samples:
-    - Can we go to the ducks? Just for a minute.
-    - I'm not tired. I'm resting my eyes.
-    - Mr. Amari says my letters lean. They're fine.
+    - "Shh, listen. That's Gran, she holds the rail. Hanne skips the eleventh. Mum's the one who runs and then stops."
+    - "I've got twenty-six doors in the tin. Mum says Carrow has more. I said I'd like them all, but I'd need a bigger tin."
+    - "Felix has a creaky step. I heard it Tuesday. He said let's see. That means yes."
 birthday: 78
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes: [ a lunch box packed right, a teacher who remembers names, biscuit tins, the sound of Mum's boots on the stairs ]
+dislikes: [ being told to be quiet, the eleventh stair in the dark, wrong guesses, bedtime before the footsteps stop ]
+fears: [ a footstep he can't name, the school door being shut ]
 dream:
-  text: A school worth the walk
+  text: Name every door on School Lane by its step with his eyes shut, and be right four times running.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Learn Felix's step and the Ogdens' from the landing window"
+    - "Guess five visitors right in a row, Gran judging"
+    - "Do it with his eyes shut on the lane, Felix walking"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_38 }
+    - { at: "07:00", do: eat, where: millbrook.home_38 }
     - { at: "08:30", do: attend, where: millbrook.school }
-    - { at: "15:30", do: wander, where: commons.picnic_lawn }
+    - { at: "15:30", do: wander, where: millbrook.laundry_green }
+    - { at: "16:30", do: sit, where: millbrook.home_38 }
     - { at: "17:30", do: eat, where: millbrook.home_38 }
+    - { at: "19:30", do: read, where: millbrook.home_38 }
     - { at: "20:00", do: sleep, where: millbrook.home_38 }
   weekend:
     - { at: "08:00", do: eat, where: millbrook.home_38 }
     - { at: "10:00", do: wander, where: commons.duck_pond }
     - { at: "12:30", do: eat, where: millbrook.home_38 }
-    - { at: "14:00", do: wander, where: commons.picnic_lawn }
+    - { at: "14:00", do: wander, where: commons.picnic_lawn, with: [ hanne_nesbitt ] }
     - { at: "18:00", do: eat, where: millbrook.home_38 }
-    - { at: "20:30", do: sleep, where: millbrook.home_38 }
-chores: [ fill the coal scuttle, sweep the step ]
+    - { at: "20:00", do: sleep, where: millbrook.home_38 }
+chores: [ count the stairs up and down, keep the biscuit tin of doors in order, tell Gran who is at the bottom ]
 relationships:
-  - { id: elke_nesbitt, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: corin_madsen, affinity: 70, trust: 70, tag: parent, note: Same house. }
-  - { id: leila_nesbitt, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: hanne_nesbitt, affinity: 65, trust: 60, tag: sister, note: "Sister, under the same roof." }
-secrets: []
+  - { id: elke_nesbitt, affinity: 90, trust: 85, tag: mother, note: "Mum, who runs and then stops, and posts a door every Wednesday." }
+  - { id: corin_madsen, affinity: 85, trust: 80, tag: parent, note: "Counts the stairs with him and lets him have the landing lamp." }
+  - { id: leila_nesbitt, affinity: 80, trust: 70, tag: grandmother, note: "Gran, who holds the rail and lies about her knees." }
+  - { id: hanne_nesbitt, affinity: 65, trust: 40, tag: sister, note: "Skips the eleventh stair and pretends it's habit. He knows it isn't." }
+  - { id: felix, affinity: 40, trust: 45, tag: fond, note: "His teacher and the top of the lane. Wants him to admit the creaking step." }
+  - { id: alun_osei, affinity: 50, trust: 45, tag: friend, note: "Two doors along, bigger, and carries him when it rains. Wants him to tell him how the lorry sounds before it turns the corner." }
+secrets:
+  - text: "Some nights he sits on the eleventh stair in his nightshirt to hear who comes home. Corin knows, and leaves the landing lamp lit."
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n01
 archetype: school_family
 employment: pupil

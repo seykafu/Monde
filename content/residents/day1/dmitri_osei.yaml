@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n02; curated not yet. Edit here.
+# Generated (census-v1) for mb_n02; curated by hand (MVP M-03). Edit here.
 id: dmitri_osei
 name: Dmitri Osei
 age: 36
 pronouns: he/him
 kind: resident
-occupation: haulier
+occupation: Haulier on the post round and haulage; the crane yard lorry
 workplace: wharf.crane_yard
 home: millbrook.home_39
 portrait: dmitri_osei
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: dmitri_osei
-appearance: A man with close-cropped black hair and a rust coat.
+appearance: >
+  A tall man with close-cropped black hair, a day's stubble and a rust coat, one sleeve shiny from the lorry
+  door.
 look:
   kind: human
   skin: 9
@@ -21,62 +23,73 @@ look:
   outfit: { cut: coat, top: 11, bottom: 14, bottom_style: trousers, shoes: 10 }
   accessory: { kind: none }
   face: { stubble: true }
-backstory: "Dmitri came to Monde from Ashby Lock 20 years ago and works as haulier. What he wants most is
-  plain enough: a school worth the walk."
+backstory: >
+  Dmitri came to Monde at sixteen with his mother and a cannery job, and a few years on held a ladder for Anselm
+  at the school and never quite let go of it. He drives the haulage lorry out of the crane yard: three runs a
+  day, the post on the front seat. He sings to the engine, badly, and Anselm packs him a lunch box he has eaten
+  by nine. He wants to teach Elodie to drive before she is eighteen. She wants a boathouse key. They have
+  discussed the lorry at length and the key not at all.
 personality:
-  traits: [ particular, stubborn, practical ]
-  big5: { open: 76, conscientious: 48, extravert: 8, agreeable: 78, neurotic: 50 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ easygoing, loud, loyal, sentimental ]
+  big5: { open: 55, conscientious: 40, extravert: 80, agreeable: 68, neurotic: 25 }
+values: { prosperity: 0.30, safety: 0.25, spirit: 0.25, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A lorry is only as good as its driver's singing.
+  - Elodie wants to learn to drive.   # wrong: she wants a boathouse key and has said so only to Ruth
+  - Anselm worries too much about the stove.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Big, easy and warm, always half in a song; jokes first, then the job. Lorry nouns: clutch, gearbox, run,
+    load, crane yard, the hill. Gives directions by turn and by gradient.
+  tics: [ "Load's on.", "Hold the ladder.", "Three runs, one lunch." ]
+  never_says: [ songbook, I hate the yard, no singing in the cab ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Load's on, post's on the seat, and the lunch box is empty already. Anselm will have words. He packs it like it's going to Carrow."
+    - "Hold the ladder, I said, and he's been holding it ever since. Best job anyone ever gave me, and it pays nothing."
+    - "Elodie wants the boathouse key and I want her behind the wheel. Anselm says we'll both lose. He's usually right, which is annoying."
 birthday: 47
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a lunch box packed right, hot tea from a flask, singing with the window down, a full tank on Monday ]
+dislikes: [ a flat tyre on the wharf road, silence in the cab, cold tea, a lunch box with no note in it ]
+fears: [ the crane yard closing and the lorry with it, Elodie leaving by the Friday boat ]
 dream:
-  text: A school worth the walk
+  text: Teach Elodie to drive the lorry up the wharf road and back before she turns eighteen.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Get Elodie behind the wheel in the yard on a quiet Sunday"
+    - "Take her on a post run and let her work the gears"
+    - "Let her park at the crane yard without a word from him"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: millbrook.home_39 }
-    - { at: "08:30", do: work, where: wharf.crane_yard }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "05:30", do: eat, where: millbrook.home_39 }
+    - { at: "06:30", do: work, where: wharf.crane_yard }
+    - { at: "10:00", do: walk, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: wharf.crane_yard }
     - { at: "13:30", do: work, where: wharf.crane_yard }
     - { at: "17:30", do: shop, where: market_row.general_store }
     - { at: "18:30", do: eat, where: millbrook.home_39 }
-    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_39 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_39 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "21:30", do: sleep, where: millbrook.home_39 }
+  weekend:                       # Saturday is a short run; he drops Elodie's dinner at the boathouse on the way home
+    - { at: "06:30", do: eat, where: millbrook.home_39 }
+    - { at: "08:30", do: work, where: wharf.crane_yard }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: millbrook.home_39 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_39 }
-chores: [ sweep the step, wind the clock ]
+    - { at: "14:00", do: walk, where: millbrook.weir }
+    - { at: "16:00", do: visit, where: wharf.boathouse }
+    - { at: "18:30", do: eat, where: millbrook.home_39 }
+    - { at: "21:30", do: sleep, where: millbrook.home_39 }
+chores: [ check the tyres on Sundays, sing the engine awake, refill the flask, return Anselm's lunch box washed ]
 relationships:
-  - { id: anselm_osei, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-  - { id: tilde_osei, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: elodie_osei, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: alun_osei, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
-secrets: []
+  - { id: anselm_osei, affinity: 90, trust: 85, tag: spouse, note: "Packs the lunch box, leaves the note in it and pretends he hasn't. Wants him to eat his own cooking sitting down." }
+  - { id: tilde_osei, affinity: 75, trust: 70, tag: mother, note: "Came here with him at fifty and redraws a label at the kitchen table. Wants her to eat first and draw after." }
+  - { id: elodie_osei, affinity: 80, trust: 60, tag: daughter, note: "Seventeen and quiet about what she wants. Wants her to say the key out loud." }
+  - { id: alun_osei, affinity: 85, trust: 70, tag: son, note: "Wants the horn. Gets the answer 'what for?', every Saturday, in the cab." }
+  - { id: einar_chalmers, affinity: 30, trust: 40, tag: friend, note: "Hauls the other half of the wharf round from his father's tin mug. Wants him to stop saying the mill will reopen before the load is on." }
+  - { id: ottilie_verhoeven, affinity: 35, trust: 40, tag: friend, note: "Takes the post sacks he drops at the booth. Wants her to hum along so he can stop singing alone." }
+secrets:
+  - text: "He is learning to read music from the chapel's songbook, to sing a harmony with Anselm at the Harvest Supper."
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n02
 archetype: school_family
 employment: employed

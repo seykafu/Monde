@@ -1,17 +1,18 @@
-# Generated (census-v1) for wf_n01; curated not yet. Edit here.
+# Generated (census-v1) for wf_n01; curated by hand (MVP M-03). Edit here.
 id: olav_lindgren
 name: Olav Lindgren
 age: 10
 pronouns: he/him
 kind: resident
-occupation: pupil at Millbrook School
+occupation: Pupil at Millbrook School; walks in from Shingle Row
 workplace: wharf.home_14
 home: wharf.home_14
 portrait: lib_m09_043
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: olav_lindgren
-appearance: A boy with short honey-brown curls, a mustard school jumper over a white collar and a satchel
-  strap across his chest. Bright, eager eyes.
+appearance: >
+  A boy of ten with short honey-brown curls, a mustard school jumper over a white collar, shorts and a satchel
+  strap across his chest. His eyes are bright and eager.
 look:
   kind: human
   skin: 3
@@ -21,56 +22,71 @@ look:
   height: short
   outfit: { cut: jumper, top: 4, bottom: 6, bottom_style: shorts, shoes: 2 }
   accessory: { kind: none }
-backstory: Olav was born in Monde and goes to Millbrook School. He likes the ducks on the Commons best.
+backstory: >
+  Olav asks questions the way other boys throw stones. He keeps them in a notebook with a pencil on a string,
+  and on Fridays he takes them to Maurice Lamont, who kept a lighthouse for twenty-six years and answers in
+  numbers. The lamp at Point Lumière has been dark all Olav's life. He can see it from Shingle Row and counts
+  the nights it stays dark. He wants Maurice to give him the barometer from his window. Maurice says a barometer
+  belongs to whoever reads it every day for a year.
 personality:
-  traits: [ stubborn, particular, kind ]
-  big5: { open: 25, conscientious: 20, extravert: 42, agreeable: 45, neurotic: 48 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ inquisitive, earnest, stubborn, funny ]
+  big5: { open: 78, conscientious: 30, extravert: 62, agreeable: 62, neurotic: 58 }
+values: { prosperity: 0.15, safety: 0.25, spirit: 0.40, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Every question has an answer and a number to go with it.
+  - Maurice would give him the barometer if he read it for a year.   # wrong: Maurice is waiting for him to ask a better question
+  - The lamp at Point Lumière is only waiting for somebody to climb up.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ Can we go to the ducks? ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Eager and exact, with questions that come in sevens. Weather and lamp nouns: barometer, inches, lens,
+    bearing, tide. Writes down what you say, then reads it back.
+  tics: [ "Seven questions.", "Is that official?", "Write it in the book." ]
+  never_says: [ I don't want to know, boring, I knock on the lighthouse ]
   samples:
-    - Can we go to the ducks? Just for a minute.
-    - I'm not tired. I'm resting my eyes.
-    - Mr. Amari says my letters lean. They're fine.
+    - "Seven questions, and I've got the book. One: the lamp's been dark three thousand six hundred nights, near enough. Is that official?"
+    - "Maurice says a barometer is for whoever reads it every day for a year. I've read it eleven Fridays. That's a start."
+    - "Gran taps the table when she's cross. S-A-L-T. Meera knows. I'm learning. It's mostly dots."
 birthday: 73
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes: [ a teacher who remembers names, a lighthouse lens, a pencil on a string, glass barometers ]
+dislikes: [ a dark lamp, questions left over, being told it's not for children, wet satchel straps ]
+fears: [ the lamp staying dark, forgetting what Maurice said ]
 dream:
-  text: A school worth the walk
+  text: Be given Maurice's barometer, and read it every day.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Learn three cloud names from Maurice on a Friday (Regard ≥ 20 with Maurice)"
+    - "Read the barometer at Maurice's window every Friday for a term"
+    - "Carry it home to Shingle Row with Maurice's blessing"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: wharf.home_14 }
+    - { at: "07:00", do: eat, where: wharf.home_14 }
     - { at: "08:30", do: attend, where: millbrook.school }
-    - { at: "15:30", do: wander, where: commons.duck_pond }
+    - { at: "15:45", do: wander, where: wharf.breakwater }
     - { at: "17:30", do: eat, where: wharf.home_14 }
-    - { at: "20:00", do: sleep, where: wharf.home_14 }
-  weekend:
+    - { at: "19:30", do: write, where: wharf.home_14 }
+    - { at: "20:30", do: sleep, where: wharf.home_14 }
+  weekend:                       # Sunday dusk he walks to the end of the breakwater and checks the lamp
     - { at: "08:00", do: eat, where: wharf.home_14 }
-    - { at: "10:00", do: wander, where: commons.duck_pond }
+    - { at: "10:00", do: walk, where: wharf.harbor_steps, with: [ mei_lindgren ] }
     - { at: "12:30", do: eat, where: wharf.home_14 }
-    - { at: "14:00", do: wander, where: commons.duck_pond }
+    - { at: "14:00", do: wander, where: wharf.breakwater }
+    - { at: "17:00", do: sit, where: wharf.breakwater }
     - { at: "18:00", do: eat, where: wharf.home_14 }
     - { at: "20:30", do: sleep, where: wharf.home_14 }
-chores: [ sweep the step, wind the clock ]
+chores: [ wind the clock, sharpen Gran's pencils, log the sky in the notebook ]
 relationships:
-  - { id: bram_lindgren, affinity: 70, trust: 70, tag: father, note: Same house. }
-  - { id: marthe_demir, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: mei_lindgren, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: meera_lindgren, affinity: 65, trust: 60, tag: sister, note: "Sister, under the same roof." }
-secrets: []
+  - { id: bram_lindgren, affinity: 85, trust: 70, tag: father, note: "Home Fridays, with a bag and a rope joke. Answers six of seven questions." }
+  - { id: marthe_demir, affinity: 85, trust: 70, tag: mother, note: "Takes the seventh question and has the plate out before he asks it." }
+  - { id: mei_lindgren, affinity: 80, trust: 65, tag: grandmother, note: "Gran, who says it in ten words. He tries." }
+  - { id: meera_lindgren, affinity: 60, trust: 45, tag: sister, note: "Five and a half, hates aniseed, and answers every question with 'forty-one'." }
+  - { id: maurice_lamont, affinity: 50, trust: 50, tag: fond, note: "Kept a light for twenty-six years and answers in numbers. Wants him to hand over the barometer." }
+  - { id: tib, affinity: 40, trust: 35, tag: friend, note: "Counts steps and plaques at school; Olav counts nights. Wants to know how many alleys he has." }
+secrets:
+  - text: "He walks the breakwater at dusk on Sundays and knocks once on the lighthouse door, in case."
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_n01
 archetype: school_family
 employment: pupil

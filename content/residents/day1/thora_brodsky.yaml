@@ -1,16 +1,18 @@
-# Generated (census-v1) for wf_l01; curated not yet. Edit here.
+# Generated (census-v1) for wf_l01; curated by hand (MVP M-03). Edit here.
 id: thora_brodsky
 name: Thora Brodsky
 age: 44
 pronouns: she/her
 kind: resident
-occupation: works in Hessle Cross
+occupation: Wages clerk at a rope-walk in Hessle Cross; home Fridays
 workplace: offmap.city
 home: wharf.home_03
 portrait: thora_brodsky
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: thora_brodsky
-appearance: A woman with black hair in a ponytail and a plum coat.
+appearance: >
+  A tall, slight woman in her forties with black hair in a tight ponytail and a plum coat buttoned to the
+  throat, an ink stain on one thumb.
 look:
   kind: human
   skin: 3
@@ -20,59 +22,71 @@ look:
   height: tall
   outfit: { cut: coat, top: 8, bottom: 12, bottom_style: trousers, shoes: 14 }
   accessory: { kind: none }
-backstory: "Thora came to Monde from Hessle Cross 42 years ago and works as a commuter to Hessle Cross. What
-  she wants most is plain enough: a school worth the walk."
+backstory: >
+  Thora and Liv sat at the same desk in the old Wharf school and have not been apart for a month since, until
+  the rope-walk in Hessle Cross offered wages the Wharf could not. She takes Tuesday's ferry out and Friday's
+  back, counts three hundred pay packets on Thursdays, and writes Leonie every Wednesday, a letter that rides
+  home on the same boat as she does. If the cannery ever opens as Nell's co-op it will need a clerk. Thora has
+  said so over the fence for two springs, and Nell has only said, "Look."
 personality:
-  traits: [ particular, careful, restless ]
-  big5: { open: 25, conscientious: 50, extravert: 8, agreeable: 49, neurotic: 28 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ dry, exact, loyal, homesick ]
+  big5: { open: 35, conscientious: 90, extravert: 28, agreeable: 42, neurotic: 38 }
+values: { prosperity: 0.30, safety: 0.35, spirit: 0.20, charm: 0.15 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Leonie doesn't mind the Tuesdays, because the Board has a square for each day.   # wrong: Leonie has drawn a ferry in every square
+  - A wage that lands every Friday is worth a Wednesday spent away.
+  - Nell will give her the co-op books if she asks a third spring.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Dry and exact, like a pay slip read aloud. Numbers, days and the ferry's hours first. Counts in threes. Wry
+    about the mainland and the rope-walk, and soft only on Fridays.
+  tics: [ "Per the ledger.", "Friday, if the tide agrees.", "Copy to Liv." ]
+  never_says: [ foreman's desk, I love it there, it's only a Wednesday ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Per the ledger, that's three coins owing and one in credit. I'll carry it to Friday, if the tide agrees."
+    - "Three hundred packets on Thursday, each counted twice. It's restful, honestly. Nobody asks me anything except whether the sum's right."
+    - "I wrote Leonie a letter with the rope-walk cat in it. It looks like a loaf with ears. She'll say it looks like a loaf."
 birthday: 50
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a lunch box packed right, strong tea, a column that adds up first time, the Friday boat's lamp coming round the breakwater ]
+dislikes: [ a closed school, ferry delays on a Friday, pay packets short by a coin, the rope-walk's whistle ]
+fears: [ Leonie growing used to Wednesdays without her, the Tuesday boat in a gale ]
 dream:
-  text: A school worth the walk
+  text: Count Wharf coins instead of rope-walk coins, and be home for supper on a Wednesday.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Ask Nell about the co-op's books (Regard ≥ 25 with Nell)"
+    - "Do a trial week of sums for the fish market"
+    - "Hand in her notice at the rope-walk by Friday's boat"
 routine:
-  weekday:
-    - { at: "06:30", do: eat, where: wharf.home_03 }
+  weekday:                       # away Tuesday to Friday: the Tuesday boat out, the Friday boat home
+    - { at: "05:30", do: eat, where: wharf.home_03 }
+    - { at: "06:30", do: walk, where: wharf.ferry_slip }
     - { at: "07:30", do: work, where: offmap.city }
     - { at: "12:30", do: eat, where: offmap.city }
     - { at: "13:30", do: work, where: offmap.city }
     - { at: "19:00", do: eat, where: offmap.city }
     - { at: "22:00", do: sleep, where: offmap.city }
   weekend:
-    - { at: "08:00", do: eat, where: wharf.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: wharf.home_03 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: wharf.home_03 }
-chores: [ sweep the step, fold the washing ]
+    - { at: "07:30", do: eat, where: wharf.home_03, with: [ liv_brodsky, leonie_brodsky, kester_brodsky ] }
+    - { at: "09:30", do: walk, where: wharf.breakwater, with: [ leonie_brodsky ] }
+    - { at: "12:30", do: eat, where: wharf.home_03 }
+    - { at: "14:00", do: read, where: wharf.home_03 }
+    - { at: "16:00", do: visit, where: wharf.fish_market }
+    - { at: "18:00", do: cook, where: wharf.home_03, with: [ liv_brodsky ] }
+    - { at: "21:30", do: sleep, where: wharf.home_03 }
+chores: [ check Leonie's sums at the kitchen table, post the Wednesday letter, mend the cuff of the plum coat, wind the Friday clock ]
 relationships:
-  - { id: liv_brodsky, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-  - { id: leonie_brodsky, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: kester_brodsky, affinity: 70, trust: 70, tag: son, note: Same house. }
-secrets: []
+  - { id: liv_brodsky, affinity: 90, trust: 85, tag: spouse, note: "Writes her lists on the kitchen door and pencils a heart into the corner of Fridays. Wants Liv to ask her to stay, outright." }
+  - { id: leonie_brodsky, affinity: 90, trust: 75, tag: daughter, note: "Waits on the slip every Friday with chalk on her coat. Wants her to stop counting Wednesdays on her fingers." }
+  - { id: kester_brodsky, affinity: 80, trust: 60, tag: son, note: "Says 'dunno' to Carrow and 'maybe' to everything else. Wants him to read the pamphlets she leaves on the kitchen table on Fridays, and not decide." }
+  - { id: nell, affinity: 35, trust: 40, tag: fond, note: "Next door; they talk over the fence on Sunday mornings while Nell scowls at the cannery sheet. Wants her to say yes to a clerk for the co-op." }
+  - { id: moss, affinity: 30, trust: 40, tag: friend, note: "Has signed his 'More ferry' letter three winters running. Wants to be the second name on the daily-boat sheet." }
+secrets:
+  - text: "She has not told Liv the rope-walk offered her the foreman's desk and a house in Hessle Cross. The letter sits unanswered."
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_l01
 archetype: school_family
 employment: employed

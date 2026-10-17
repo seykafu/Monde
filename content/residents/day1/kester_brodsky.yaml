@@ -1,18 +1,18 @@
-# Generated (census-v1) for wf_l01; curated not yet. Edit here.
+# Generated (census-v1) for wf_l01; curated by hand (MVP M-03). Edit here.
 id: kester_brodsky
 name: Kester Brodsky
 age: 17
 pronouns: he/him
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Lessons by post; Saturday hand at Fournier & Fille
 workplace: market_row.bakery
 home: wharf.home_03
 portrait: lib_m16_078
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: kester_brodsky
-appearance: A lanky lad with dark auburn hair flopping into his eyes, ears that stick out, a bottle-green
-  duffel coat over a grey jumper and a long blue-and-cream striped scarf wound twice round his neck. A shy,
-  sidelong, trying-to-look-bored look.
+appearance: >
+  A lanky lad with dark auburn hair flopping into his eyes, ears that stick out, a bottle-green duffel coat over
+  a grey jumper and a long blue-and-cream striped scarf wound twice round his neck.
 look:
   kind: human
   skin: 9
@@ -22,58 +22,72 @@ look:
   height: tall
   outfit: { cut: coat, top: 10, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 5 }
-backstory: Kester was born in Monde and does lessons by post at the library desk. He likes the ducks on the
-  Commons best.
+backstory: >
+  Kester sits his post lessons at Margo's library desk and on Saturdays scrubs trays at Fournier & Fille. He
+  weighs, sweeps and says "not hungry" through a mouthful of crust. Odile has never told him he is doing
+  anything right. She says "Hm." He has decided that means no. What he wants is to hear "again", which is what
+  she says to a loaf she means to keep. His mothers think he is saving for Carrow. He is saving for a cane
+  proving basket.
 personality:
-  traits: [ proud, careful, steady ]
-  big5: { open: 93, conscientious: 69, extravert: 93, agreeable: 78, neurotic: 37 }
-values: { prosperity: 0.45, safety: 0.1, spirit: 0.2, charm: 0.25 }
+  traits: [ shy, hungry, observant, dry ]
+  big5: { open: 60, conscientious: 52, extravert: 22, agreeable: 58, neurotic: 74 }
+values: { prosperity: 0.35, safety: 0.15, spirit: 0.30, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Odile's "Hm." means no.   # wrong: it is the nearest she comes to yes
+  - Whatever you're best at, somebody else is better at it in Carrow.
+  - Nobody notices a boy in a long scarf, which is why he wears it.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Mumbled and sidelong, trying to sound bored. Answers a question with a shrug and a fact. Bakery and tide
+    nouns: tray, proof, crumb, scoring, the slip. Gets more words the moment bread is mentioned.
+  tics: [ "Not hungry.", "Dunno, maybe.", "Suppose so." ]
+  never_says: [ I draw the loaves, I love it here, good morning ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - "Not hungry. Well. Maybe the heel. It's yesterday's anyway, Odile says, so it's not taking anything from anyone."
+    - "It's fine. I swept it twice. She said 'Hm,' which is either good or the worst thing, depending on the day."
+    - "Dunno, maybe Carrow. Mam thinks so. Mum thinks the other thing. I think I need a proving basket, and they cost eleven coins."
 birthday: 33
-likes: [ tools that fit the hand, a proper job, the smell of the workshop ]
-dislikes: [ sweeping as the whole job, being called kid, praise for nothing ]
-fears: [ the dark on the stairs ]
+likes: [ a proper job, rye flour, the smell of the oven at six, a long scarf in a draught ]
+dislikes: [ being called kid, sweeping as the whole job, people asking what he'll be, cold crusts ]
+fears: [ being sent to Carrow before he is good at something, saying the wrong thing to Odile ]
 dream:
-  text: Get good at something still needed
+  text: Hear Odile say "again" about a loaf of his.
   stages:
-    - Get a trial day with a master (Regard ≥ 20 with them)
-    - Finish a first piece
-    - Hear the master say again
+    - "Weigh and shape forty rolls without a second glance from Odile"
+    - "Score a loaf of his own and set it on the cooling rack"
+    - "Hear her say \"again\", and not \"Hm.\""
 routine:
   weekday:
     - { at: "07:30", do: eat, where: wharf.home_03 }
     - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: wharf.home_03 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
+    - { at: "12:30", do: shop, where: market_row.bakery }
+    - { at: "14:00", do: write, where: old_quarter.library }
+    - { at: "16:30", do: walk, where: wharf.harbor_steps }
     - { at: "18:00", do: eat, where: wharf.home_03 }
     - { at: "21:30", do: sleep, where: wharf.home_03 }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_03 }
-    - { at: "09:00", do: work, where: market_row.bakery }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
+  weekend:                       # Saturday market day: the bakery, trays and rolls, from half past six
+    - { at: "05:30", do: eat, where: wharf.home_03 }
+    - { at: "06:30", do: work, where: market_row.bakery }
+    - { at: "11:30", do: eat, where: market_row.bakery }
+    - { at: "12:30", do: work, where: market_row.bakery }
+    - { at: "15:00", do: sit, where: wharf.breakwater }
     - { at: "18:00", do: eat, where: wharf.home_03 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "20:00", do: write, where: wharf.home_03 }
     - { at: "22:00", do: sleep, where: wharf.home_03 }
-chores: [ water the window box, beat the doormat ]
+chores: [ fetch the day-old heel from the bakery, wipe the Saturday square on the Board, peel the potatoes for Thora's Friday supper ]
 relationships:
-  - { id: liv_brodsky, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: thora_brodsky, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: leonie_brodsky, affinity: 70, trust: 70, tag: sister, note: Same house. }
-secrets: []
+  - { id: liv_brodsky, affinity: 85, trust: 70, tag: mother, note: "Mum, who pencils his Saturdays on the door and has not asked about Carrow." }
+  - { id: thora_brodsky, affinity: 80, trust: 55, tag: mother, note: "Mam, who leaves a pamphlet on the table each Friday. He has read none and kept them all." }
+  - { id: leonie_brodsky, affinity: 65, trust: 60, tag: sister, note: "Eight and loud, and the only one who asks what he draws in the back of his book." }
+  - { id: odile, affinity: 35, trust: 20, tag: curious, note: "His Saturday master. Gives him trays, a broom and a heel, and no words. Wants her to say 'again.'" }
+  - { id: margo, affinity: 40, trust: 45, tag: fond, note: "Keeps his lesson book at the library desk and says nothing about the loaves drawn in the back." }
+secrets:
+  - text: "In the back of his lesson book he draws every loaf Odile scores, and marks which cuts she repeats."
+    reveal: { regard_min: 45 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_l01
 archetype: apprentice
 employment: lessons

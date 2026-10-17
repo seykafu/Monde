@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n02; curated not yet. Edit here.
+# Generated (census-v1) for mb_n02; curated by hand (MVP M-03). Edit here.
 id: elodie_osei
 name: Elodie Osei
 age: 17
 pronouns: she/her
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Lessons by post; Saturday hand at the boathouse
 workplace: wharf.boathouse
 home: millbrook.home_39
 portrait: elodie_osei
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: elodie_osei
-appearance: A girl with long black hair and a mustard jumper.
+appearance: >
+  A short, sturdy girl of seventeen with long black hair and a mustard jumper, shavings caught in the wool at
+  the elbows.
 look:
   kind: human
   skin: 3
@@ -20,59 +22,73 @@ look:
   height: short
   outfit: { cut: jumper, top: 4, bottom: 10, bottom_style: trousers, shoes: 10 }
   accessory: { kind: none }
-backstory: Elodie was born in Monde and does lessons by post at the library desk. She likes the ducks on the
-  Commons best.
+backstory: >
+  Elodie has lived on School Lane all her life and goes to the boathouse on Saturdays to hold planks for Signe
+  Starling and Ruth Doherty, which she does with confidence and, Signe says, wrongly. She does her post lessons
+  at the library desk and her real lessons on the slip. She wants a boathouse key on a nail with her name over
+  it, the way Ruth has hers. Ruth says keys are for people who come on Tuesdays. Elodie has been counting
+  Tuesdays. Her dads think she wants to sail. She wants to build, and has not said so in case they cheer.
 personality:
-  traits: [ kind, proud, cheerful ]
-  big5: { open: 25, conscientious: 79, extravert: 42, agreeable: 80, neurotic: 22 }
-values: { prosperity: 0.45, safety: 0.1, spirit: 0.2, charm: 0.25 }
+  traits: [ hands-on, private, stubborn, funny ]
+  big5: { open: 75, conscientious: 55, extravert: 55, agreeable: 45, neurotic: 72 }
+values: { prosperity: 0.45, safety: 0.10, spirit: 0.20, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Ruth gives keys only to people who have caulked a whole seam unwatched.   # wrong: Ruth is waiting to be asked
+  - When Signe says "wrongly" she means "again".
+  - Alun will be the sailor in the family, and she will build the boat.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Fast and practical, a teenager who hides enthusiasm under shop talk. Boatshed nouns: plank, caulk, rib,
+    slip, bevel, winch. Corrects herself mid-sentence. Goes quiet when the family says "sailor".
+  tics: [ "Hold that.", "Bevel first.", "Ask me Tuesday." ]
+  never_says: [ I'm going to sail, my initials, it's only a boat ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - "Hold that. No, the other end. Signe says I hold it wrongly, which means I'm nearly holding it right."
+    - "Bevel first, then the seam, then you can look at it. If you look first it moves. Don't ask me why."
+    - "Dad thinks I want to sail. I want to build the thing. If I tell them, they'll make a banner."
 birthday: 88
-likes: [ tools that fit the hand, a proper job, the smell of the workshop ]
-dislikes: [ sweeping as the whole job, being called kid, praise for nothing ]
-fears: [ the dark on the stairs ]
+likes: [ tools that fit the hand, the smell of the workshop, a slip at low tide, a key on a nail ]
+dislikes: [ sweeping as the whole job, being called kid, a plank that won't take the curve, the word sailor ]
+fears: [ never being handed the boathouse key, her dads making a banner ]
 dream:
-  text: Get good at something still needed
+  text: A boathouse key on a nail, with her name above it.
   stages:
-    - Get a trial day with a master (Regard ≥ 20 with them)
-    - Finish a first piece
-    - Hear the master say again
+    - "Save forty coins from Saturdays for a proper chisel set"
+    - "Hold the slip rope on launch day, unasked, without letting go"
+    - "Cut her copy of the boathouse key and hang it on the nail"
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_39 }
     - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: millbrook.home_39 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: old_quarter.fountain_square }
+    - { at: "14:00", do: write, where: old_quarter.library }
+    - { at: "16:00", do: visit, where: wharf.boathouse }
     - { at: "18:00", do: eat, where: millbrook.home_39 }
-    - { at: "21:30", do: sleep, where: millbrook.home_39 }
-  weekend:
+    - { at: "20:00", do: read, where: millbrook.home_39 }
+    - { at: "22:00", do: sleep, where: millbrook.home_39 }
+  weekend:                       # Saturday: the boathouse from nine, planks and the slip rope
     - { at: "08:00", do: eat, where: millbrook.home_39 }
     - { at: "09:00", do: work, where: wharf.boathouse }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: millbrook.home_39 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
+    - { at: "12:30", do: eat, where: wharf.boathouse }
+    - { at: "13:30", do: work, where: wharf.boathouse }
+    - { at: "16:00", do: walk, where: wharf.breakwater }
+    - { at: "18:30", do: eat, where: millbrook.home_39 }
     - { at: "22:00", do: sleep, where: millbrook.home_39 }
-chores: [ mend a sock, sweep the step ]
+chores: [ sharpen the kitchen knives on Sundays, wash the tea towels, keep the plank offcuts dry in the shed ]
 relationships:
-  - { id: dmitri_osei, affinity: 70, trust: 70, tag: father, note: Same house. }
-  - { id: anselm_osei, affinity: 70, trust: 70, tag: father, note: Same house. }
-  - { id: tilde_osei, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: alun_osei, affinity: 65, trust: 60, tag: brother, note: "Brother, under the same roof." }
-secrets: []
+  - { id: dmitri_osei, affinity: 80, trust: 60, tag: father, note: "Wants to put her behind the wheel of the lorry. Wants her to say yes. She says 'Ask me Tuesday.'" }
+  - { id: anselm_osei, affinity: 85, trust: 75, tag: father, note: "Packs a second sandwich in the lunch box for the boathouse and says nothing when she brings it back eaten." }
+  - { id: tilde_osei, affinity: 70, trust: 55, tag: grandmother, note: "Draws her at the kitchen table with a pencil behind one ear. Elodie holds still because Gran needs the practice." }
+  - { id: alun_osei, affinity: 65, trust: 50, tag: brother, note: "Keeps asking to sound the lorry horn and to see the boathouse. Gets neither." }
+  - { id: signe_starling, affinity: 50, trust: 50, tag: fond, note: "Teaches her the seam and says 'wrongly' about everything she holds. Wants her to say 'again' and not 'wrongly'." }
+  - { id: ruth_doherty, affinity: 40, trust: 40, tag: curious, note: "Keeps the keys on a nail. Wants her to say whether a key is for Tuesdays or for good." }
+secrets:
+  - text: "She has carved her initials inside the keel of every hull she's helped patch, where nobody turns one over."
+    reveal: { regard_min: 45 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n02
 archetype: apprentice
 employment: lessons

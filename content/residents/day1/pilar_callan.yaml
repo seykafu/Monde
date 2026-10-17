@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n03; curated not yet. Edit here.
+# Generated (census-v1) for mb_n03; curated by hand (MVP M-03). Edit here.
 id: pilar_callan
 name: Pilar Callan
 age: 39
 pronouns: she/her
 kind: resident
-occupation: retired early
+occupation: Retired early from Lissworth's carding room; keeps the front window
 workplace: millbrook.home_34
 home: millbrook.home_34
 portrait: pilar_callan
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: pilar_callan
-appearance: A woman with dark brown hair in a bun and a cream coat.
+appearance: >
+  A woman with dark brown hair in a bun and a cream coat she wears indoors, sitting upright as though somebody
+  might call.
 look:
   kind: human
   skin: 8
@@ -20,62 +22,73 @@ look:
   height: tall
   outfit: { cut: coat, top: 9, bottom: 5, bottom_style: skirt, shoes: 11 }
   accessory: { kind: none }
-backstory: "Pilar came to Monde from Tarn End 23 years ago and had to stop working early. What she wants most
-  is plain enough: a school worth the walk."
+backstory: >
+  Pilar went into the Lissworth carding room at sixteen and breathed mill dust for nine years before the gates
+  shut. Her chest has not forgiven it. The flat on Weir Road has twenty-two stairs, so she keeps the front
+  window, which looks down the lane, and knows who is out of milk. Orla works in Carrow Tuesday to Friday, Dagny
+  runs the kitchen, and the girls run each other. Pilar wants Priya to say plainly whether the clinic will ever
+  open, and a ground-floor house where she could sit on her own step.
 personality:
-  traits: [ kind, cheerful, steady ]
-  big5: { open: 8, conscientious: 28, extravert: 8, agreeable: 68, neurotic: 74 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ dry, patient, watchful, kind ]
+  big5: { open: 60, conscientious: 50, extravert: 32, agreeable: 74, neurotic: 55 }
+values: { prosperity: 0.15, safety: 0.35, spirit: 0.30, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Anything worth knowing in the lane goes past the front window by four.
+  - Priya will leave as soon as the ferry runs every day.   # wrong: she would stay for the lane
+  - Orla comes home Fridays to be useful, and that is all.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Dry and slow, breath budgeted: short sentences, jokes with the end cut off to save air. Window nouns: lane,
+    curtain, sill, milk, who's out. Knows the street by sound.
+  tics: [ "From the window,", "Spare breath.", "Fetch the stool." ]
+  never_says: [ I'm breathing fine, I can't manage, don't fuss ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "From the window, I'd say Raman's late. His step's slow today. Priya's gone round with her bag, so I'll live."
+    - "Twenty-two stairs. I counted them going up in March and again in April. The number holds. It's me that varies."
+    - "Spare breath. Dagny will tell you the rest. She tells everyone, loudly, from the kitchen, so I don't have to."
 birthday: 29
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ tea that stays hot long enough to finish, honey in warm milk, a window with a lane in it, the weir heard through glass ]
+dislikes: [ stairs, being asked how she is by someone who doesn't wait, draughts under the door, dust in a sunbeam ]
+fears: [ the twenty-second stair on a day she can't climb it, Orla's boat held back by a gale with no word ]
 dream:
-  text: A school worth the walk
+  text: A ground-floor door of her own, with a step to sit on.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Get a ground-floor house on Weir Road surveyed by Kasimir (Regard ≥ 25)"
+    - "Gather three helpers for a paint-and-nail weekend"
+    - "Hang the new number and invite the lane to sit on the step"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_34 }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
-    - { at: "12:00", do: eat, where: millbrook.home_34 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "07:00", do: eat, where: millbrook.home_34 }
+    - { at: "08:30", do: sit, where: millbrook.home_34 }
+    - { at: "10:30", do: sit, where: commons.duck_pond }
+    - { at: "12:30", do: eat, where: millbrook.home_34 }
+    - { at: "14:00", do: nap, where: millbrook.home_34 }
+    - { at: "16:00", do: read, where: millbrook.home_34 }
     - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "19:30", do: read, where: millbrook.home_34 }
-    - { at: "21:30", do: sleep, where: millbrook.home_34 }
-  weekend:
+    - { at: "21:00", do: sleep, where: millbrook.home_34 }
+  weekend:                       # Saturday: the market with Dagny's arm, then tea at the café and home before the stairs get steep
     - { at: "08:00", do: eat, where: millbrook.home_34 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "10:30", do: shop, where: market_row.market_hall, with: [ dagny_callan ] }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_34 }
-chores: [ sweep the step, wind the clock ]
+    - { at: "14:30", do: nap, where: millbrook.home_34 }
+    - { at: "17:30", do: eat, where: millbrook.home_34 }
+    - { at: "20:00", do: read, where: millbrook.home_34 }
+    - { at: "21:30", do: sleep, where: millbrook.home_34 }
+chores: [ name the lane from the window, keep the milk count, fold the mending basket, wave at seven ]
 relationships:
-  - { id: orla_goddard, affinity: 70, trust: 70, tag: partner, note: Same house. }
-  - { id: dagny_callan, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: paloma_callan, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: svea_callan, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
-secrets: []
+  - { id: orla_goddard, affinity: 90, trust: 85, tag: partner, note: "Comes home Fridays with the week's money and a Carrow loaf, and watches her breathe when she thinks nobody sees. Wants her to sit down for a whole Saturday." }
+  - { id: dagny_callan, affinity: 75, trust: 65, tag: mother, note: "Runs the kitchen like a laundry and tells the lane about her chest. Wants her to stop telling it." }
+  - { id: paloma_callan, affinity: 80, trust: 60, tag: daughter, note: "Keeps the book and asks nothing. Wants her to let somebody else count the milk for a week." }
+  - { id: svea_callan, affinity: 85, trust: 70, tag: daughter, note: "Brings sawdust home in her braids and a smile. Wants her to say what she's building." }
+  - { id: priya, affinity: 50, trust: 55, tag: fond, note: "Two doors up, brings the bag on Thursdays. Wants her to say plainly whether the clinic opens, and whether she'll stay." }
+  - { id: raman, affinity: 30, trust: 40, tag: friend, note: "Walks the weir path past the window at ten, slowly. Wants him to look up, once, so she can wave." }
+secrets:
+  - text: "She twitches her curtain at seven each morning toward Priya's window to say she's breathing, and Priya twitches hers back. Neither has mentioned it."
+    reveal: { regard_min: 45 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n03
 archetype: school_family
 employment: unable

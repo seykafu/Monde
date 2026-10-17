@@ -1,18 +1,18 @@
-# Generated (census-v1) for mb_b05; curated not yet. Edit here.
+# Generated (census-v1) for mb_b05; curated by hand (MVP M-03). Edit here.
 id: signe_starling
 name: Signe Starling
 age: 65
 pronouns: she/her
 kind: resident
-occupation: boat repairer
+occupation: Boat repairer at the boathouse; chaired Lissworth's floor committee
 workplace: wharf.boathouse
 home: millbrook.home_16
 portrait: lib_f62_104
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: signe_starling
-appearance: A brisk woman with close-cropped hair dyed copper, reading glasses pushed up on her head and a
-  teal blazer with a round enamel committee badge on the lapel. A no-nonsense, already-counting-volunteers
-  look.
+appearance: >
+  Short and brisk, with close-cropped copper-dyed hair, reading glasses pushed up on her head and a teal blazer
+  with a round enamel committee badge on the lapel. Linseed oil has stained her cuffs.
 look:
   kind: human
   skin: 3
@@ -23,58 +23,75 @@ look:
   outfit: { cut: coat, top: 0, bottom: 13, bottom_style: skirt, shoes: 13 }
   accessory: { kind: none }
   glasses: on_head
-backstory: "Signe was born in Monde and works as boat repairer. What she wants most is plain enough: wages for
-  work again."
+backstory: >
+  Signe wove on the second floor at Lissworth for thirty-one years and chaired the floor committee for the last
+  nine, which is where the enamel badge came from. After the gates shut she mended boats beside Ruth Doherty,
+  because a seam wants the same patience as a selvage. She has not walked through the mill gates since the last
+  shift. Corentin walks them every night, and she has never asked what for. She wants him on the day side at the
+  boathouse, where she can see him, and has kept the bench beside hers clear for two winters.
 personality:
-  traits: [ careful, practical, kind ]
-  big5: { open: 8, conscientious: 33, extravert: 59, agreeable: 52, neurotic: 37 }
-values: { prosperity: 0.6, safety: 0.15, spirit: 0.1, charm: 0.15 }
+  traits: [ brisk, stubborn, orderly, loyal ]
+  big5: { open: 40, conscientious: 88, extravert: 62, agreeable: 50, neurotic: 45 }
+values: { prosperity: 0.45, safety: 0.25, spirit: 0.20, charm: 0.10 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A committee that keeps its minutes can't be cheated.
+  - "Corentin sits out the night in the watch hut with the wireless and a cold flask."   # wrong: he oils Number Six and winds the gate clock
+  - Anyone who says the Mill will reopen has never sat the last shift.
 voice:
-  register: 'Plain and short. Knows the numbers: picks, bolts, hours. "Used to be."'
-  tics: [ Used to be eight hundred picks a minute. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Plain and short, a committee chair's habit of calling for hands. Counts out loud. Loom and hull nouns: pick,
+    warp, selvage, seam, caulk, plank. Numbers first, feelings never, and she tidies the room while she talks.
+  tics: [ "Hands up, then.", "Count it again.", "Plank by plank." ]
+  never_says: [ it'll sort itself out, whatever you like, my shuttle ]
   samples:
-    - Used to be eight hundred picks a minute. Used to be.
-    - Short shift. Short pay. Tea's the same.
-    - Clock's three minutes fast. Somebody should see to it.
+    - "Hands up, then: who's seen the caulking iron? It was on the bench Tuesday, and Ruth swears she never touched it."
+    - "Forty picks to the inch, that was Lissworth's standard. A hull's looser. Nobody here counts the strokes, and it shows in the seams."
+    - "He's out at the mill again. I haven't asked and I won't. Supper's half past five, and he'll be in the door for it."
 birthday: 17
-likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time ]
-dislikes: [ being retrained, short shifts, men with clipboards ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ tea in a tin mug, a clock that keeps time, linseed oil on a warm plank, agendas with an end time ]
+dislikes: [ being retrained, short shifts, tea made from a bag, other people's minutes ]
+fears: [ walking in and finding the floor smaller than she remembered, Corentin's flask going cold on a night she didn't ask ]
 dream:
-  text: Wages for work again
+  text: Be asked her opinion on something that matters before it is decided without her.
   stages:
-    - Register at Town Hall
-    - Do one casual job a day for three days
-    - Take a shift at the boathouse, or a floor job when the Mill reopens
+    - "Teach Elodie Osei to caulk a whole seam before the Regatta"
+    - "Give the Wharf a safety talk on the slipway before launch day"
+    - "Sit on Nell's Regatta committee, with Tomasz taking the minutes"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: millbrook.home_16 }
-    - { at: "08:30", do: work, where: wharf.boathouse }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "06:30", do: eat, where: millbrook.home_16 }
+    - { at: "07:45", do: walk, where: wharf.harbor_steps }
+    - { at: "08:15", do: work, where: wharf.boathouse }
+    - { at: "12:30", do: eat, where: wharf.boathouse }
     - { at: "13:30", do: work, where: wharf.boathouse }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: millbrook.home_16 }
-    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_16 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_16 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: millbrook.home_16 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_16 }
-chores: [ sweep the step, mend a sock ]
+    - { at: "17:00", do: shop, where: market_row.general_store }
+    - { at: "17:30", do: eat, where: millbrook.home_16, with: [ corentin_frazer ] }
+    - { at: "19:30", do: read, where: millbrook.home_16 }
+    - { at: "21:30", do: sleep, where: millbrook.home_16 }
+  weekend:                       # Saturday: Elodie Osei comes to the boathouse at nine and holds the plank the wrong way
+    - { at: "07:30", do: eat, where: millbrook.home_16 }
+    - { at: "09:00", do: work, where: wharf.boathouse }
+    - { at: "12:30", do: eat, where: market_row.market_hall }
+    - { at: "13:30", do: volunteer, where: market_row.market_hall }
+    - { at: "16:00", do: walk, where: millbrook.weir }
+    - { at: "17:30", do: eat, where: millbrook.home_16, with: [ corentin_frazer ] }
+    - { at: "19:30", do: read, where: millbrook.home_16 }
+    - { at: "21:30", do: sleep, where: millbrook.home_16 }
+chores: [ oil the steam-box hinges, keep the committee tin, scrub the doorstep on Thursdays, tick Corentin's "quiet" on the slate and write the supper under it ]
 relationships:
-  - { id: corentin_frazer, affinity: 70, trust: 70, tag: partner, note: Same house. }
-secrets: []
+  - { id: corentin_frazer, affinity: 80, trust: 70, tag: partner, note: "Thirty years of supper at half past five, and she sets two places on the nights he says he'll be late. Wants him on days, beside her, where she can count him." }
+  - { id: ruth_doherty, affinity: 50, trust: 55, tag: friend, note: "Caulks beside her and shares the tea tin. Wants her to say whether the second bench is for a mate or an apprentice." }
+  - { id: tomasz_blaauw, affinity: -10, trust: 20, tag: rival, note: "At No. 1 Loom Street, keeps minutes of everything she says. Wants him to let one meeting close without a second Item." }
+  - { id: elodie_osei, affinity: 40, trust: 45, tag: fond, note: "Comes Saturdays and holds the plank wrong with total confidence. Wants to watch her finish a seam alone." }
+secrets:
+  - text: "She took her loom's shuttle on the last night and keeps it in her blazer. Corentin has searched the mill yard for one."
+    reveal: { regard_min: 55 }
+  - text: "She cried behind the water butt in the mill yard on the last day and told the others it was dust."
+    reveal: { regard_min: 70 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_b05
 archetype: mill_hand
 employment: employed

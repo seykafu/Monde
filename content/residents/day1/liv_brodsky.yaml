@@ -1,17 +1,18 @@
-# Generated (census-v1) for wf_l01; curated not yet. Edit here.
+# Generated (census-v1) for wf_l01; curated by hand (MVP M-03). Edit here.
 id: liv_brodsky
 name: Liv Brodsky
 age: 42
 pronouns: she/her
 kind: resident
-occupation: post round
+occupation: Post round and the ticket booth chalkboard on the Wharf
 workplace: wharf.ticket_booth
 home: wharf.home_03
 portrait: lib_f48_027
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: liv_brodsky
-appearance: A woman with a cloud of black curls and a single silver streak at the front, round tortoiseshell
-  glasses on a beaded cord and a chalk-dusted teal cardigan. A warm, no-running-in-the-corridor look.
+appearance: >
+  A tall woman in her forties with a cloud of black curls and one silver streak at the front, round
+  tortoiseshell glasses on a beaded cord and a teal cardigan white with chalk at the cuffs.
 look:
   kind: human
   skin: 5
@@ -22,61 +23,74 @@ look:
   outfit: { cut: jumper, top: 0, bottom: 6, bottom_style: skirt, shoes: 1 }
   accessory: { kind: glasses }
   glasses: round
-backstory: "Liv was born in Monde and works as post round. What she wants most is plain enough: a school worth
-  the walk."
+backstory: >
+  Liv has carried the Wharf's post for eleven years, since the post office shut, and keeps the chalk board at
+  the ticket booth: the Gannet's days, the parcels waiting, whose letter has come. She says she has never read
+  one. Thora takes Tuesday's ferry to Hessle Cross and comes home Friday, so the house runs on the Board, Liv's
+  lists pinned to the kitchen door and amended by Leonie in pencil. Liv wants Moss to name one time for the
+  Friday boat and hold it. She has chalked "about two" beside it for six winters, and she is running out of
+  board.
 personality:
-  traits: [ warm, stubborn, dreamy ]
-  big5: { open: 8, conscientious: 54, extravert: 76, agreeable: 62, neurotic: 77 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ organizing, warm, dry, tired ]
+  big5: { open: 50, conscientious: 78, extravert: 62, agreeable: 74, neurotic: 55 }
+values: { prosperity: 0.15, safety: 0.30, spirit: 0.35, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A list on the door is a promise the whole house can see.
+  - Thora is happy enough at the rope-walk to stay another year.   # wrong: she counts the Fridays
+  - Moss could keep a time if anyone chalked it where he could see.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Brisk, warm and list-making: things come in threes and end on a time. Post-and-ticket nouns: round, parcel,
+    hatch, stub, manifest, the board. Chalk dust on whatever she touches, including your sleeve.
+  tics: [ "Three things:", "Pencil it in.", "Chalk's on the sill." ]
+  never_says: [ I read them, it's only a letter, Moss is reliable ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Three things: your parcel's in, Friday's boat is about two, and you've got chalk on your sleeve. I put it there."
+    - "I don't read them. I know the hand, that's all. Ilona knows it better. Letters are out at ten, and Saturday's double."
+    - "Thora's boat is in at two, or half past, or whenever Moss says. Leonie's got her coat on already. Where's that pencil?"
 birthday: 7
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a lunch box packed right, chalk that doesn't squeak, strong tea, a board with nothing left to add ]
+dislikes: [ a parcel with no name on it, the Friday boat landing after dark, pencils without a rubber, being told the children will adapt ]
+fears: [ Thora's boat landing after the lamps, the school roll stopping at nine ]
 dream:
-  text: A school worth the walk
+  text: A school worth the long walk from the Wharf, with one Friday lesson taught from the ticket booth board.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Visit Felix's classroom with the board under her arm (Regard ≥ 20 with Felix)"
+    - "Teach a Friday lesson on the ferry days, with stubs and rope for props"
+    - "Walk the Wharf children in together on the day the roll is signed"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: wharf.home_03 }
-    - { at: "08:30", do: work, where: wharf.ticket_booth }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "06:00", do: eat, where: wharf.home_03 }
+    - { at: "07:30", do: work, where: wharf.ticket_booth }
+    - { at: "09:30", do: walk, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: wharf.ticket_booth }
     - { at: "13:30", do: work, where: wharf.ticket_booth }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_03 }
-    - { at: "20:00", do: read, where: wharf.home_03 }
-    - { at: "22:00", do: sleep, where: wharf.home_03 }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_03 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: wharf.home_03 }
-    - { at: "19:30", do: read, where: wharf.home_03 }
-    - { at: "22:00", do: sleep, where: wharf.home_03 }
-chores: [ black the stove, fold the washing ]
+    - { at: "17:00", do: shop, where: market_row.general_store }
+    - { at: "18:00", do: cook, where: wharf.home_03 }
+    - { at: "21:30", do: sleep, where: wharf.home_03 }
+  weekend:                       # Saturday the sacks are double; Friday evening and Saturday morning Thora is home
+    - { at: "07:30", do: eat, where: wharf.home_03, with: [ thora_brodsky, leonie_brodsky, kester_brodsky ] }
+    - { at: "09:00", do: work, where: wharf.ticket_booth }
+    - { at: "12:30", do: eat, where: wharf.home_03 }
+    - { at: "14:30", do: walk, where: wharf.breakwater, with: [ thora_brodsky, leonie_brodsky ] }
+    - { at: "17:00", do: shop, where: market_row.market_street }
+    - { at: "18:00", do: cook, where: wharf.home_03, with: [ thora_brodsky ] }
+    - { at: "21:30", do: sleep, where: wharf.home_03 }
+chores: [ chalk the Gannet's days on the board, pencil the week onto the kitchen door, count the parcels twice, trim the booth lamp ]
 relationships:
-  - { id: thora_brodsky, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-  - { id: leonie_brodsky, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: kester_brodsky, affinity: 70, trust: 70, tag: son, note: Same house. }
-secrets: []
+  - { id: thora_brodsky, affinity: 90, trust: 85, tag: spouse, note: "Shared a desk with her at the old Wharf school, and was not apart from her for a month until the rope-walk. Wants her home on a Wednesday." }
+  - { id: leonie_brodsky, affinity: 90, trust: 80, tag: daughter, note: "Rubs out the wrong bits on the board and writes in the right ones in a hand all her own." }
+  - { id: kester_brodsky, affinity: 85, trust: 70, tag: son, note: "Eats like a boy who isn't hungry. She suspects Carrow and hasn't asked." }
+  - { id: ada, affinity: 55, trust: 60, tag: friend, note: "Sells the tickets while Liv sorts the sacks behind her. Wants to know, too, what Moss chalks on the wheelhouse beam." }
+  - { id: moss, affinity: -10, trust: 15, tag: wary, note: "Skippers the Gannet by the tide and calls it a timetable. Wants him to name one Friday time and keep it." }
+  - { id: nell, affinity: 40, trust: 45, tag: fond, note: "Next door at 53A, and shouts across the fence at half past four. Liv stopped hearing it years ago and sleeps through the rest." }
+secrets:
+  - text: "She takes Thora's Wednesday letter off the Friday boat before Thora reaches the plank, and reads the envelope twice. The hand is getting smaller."
+    reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_l01
 archetype: school_family
 employment: employed

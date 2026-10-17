@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n01; curated not yet. Edit here.
+# Generated (census-v1) for mb_n01; curated by hand (MVP M-03). Edit here.
 id: leila_nesbitt
 name: Leila Nesbitt
 age: 73
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired; cooked Lissworth Mill's canteen for three hundred
 workplace: millbrook.home_38
 home: millbrook.home_38
 portrait: leila_nesbitt
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: leila_nesbitt
-appearance: An older woman with salt-and-pepper hair in a bun and a plum jumper.
+appearance: >
+  A tall, solid older woman with salt-and-pepper hair in a bun and a plum jumper, the sleeves pushed to the
+  elbow as though a pot were about to arrive.
 look:
   kind: human
   skin: 4
@@ -20,62 +22,73 @@ look:
   height: tall
   outfit: { cut: jumper, top: 8, bottom: 3, bottom_style: skirt, shoes: 2 }
   accessory: { kind: none }
-backstory: "Leila came to Monde from Hessle Cross 41 years ago and is retired now. What she wants most is
-  plain enough: a school worth the walk."
+backstory: >
+  Leila came to Monde forty-one years ago, three months before Elke, to cook the Lissworth canteen: three
+  hundred dinners by a quarter past twelve, from two stoves and a sack of potatoes. She has not stopped counting
+  portions since. The canteen's forty-quart pots are still in the mill's back kitchen. She wants Corentin Frazer
+  to unlock the door and let her fetch them for the Harvest Supper, and he says "Not yet." The flat on School
+  Lane has nineteen stairs, and her knees have counted every one.
 personality:
-  traits: [ warm, patient, dreamy ]
-  big5: { open: 25, conscientious: 67, extravert: 25, agreeable: 71, neurotic: 13 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ brisk, generous, dry, proud ]
+  big5: { open: 25, conscientious: 78, extravert: 70, agreeable: 40, neurotic: 45 }
+values: { prosperity: 0.15, safety: 0.40, spirit: 0.25, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Her knees are fine on the stairs.   # wrong: Corin put up the rail and walks one step behind her
+  - Forty minutes for three hundred, if the potatoes are peeled by eleven.
+  - The Harvest Supper has to be cooked in the mill's own pots or it isn't the town's supper.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Brisk and generous; figures first, orders as kindness. Canteen nouns: tureen, ladle, sack, urn, forty-quart,
+    seconds. Counts the table before she sits. Dry, and never apologises for gravy.
+  tics: [ "Pass your plate.", "Forty-quart.", "Seconds are free." ]
+  never_says: [ tally slip, I'm too old for that, a bit of salt ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Pass your plate. Three hundred in forty minutes we did, and nobody ever called the gravy thin. Don't start."
+    - "Corentin's got the key and a face like a shut door. Three forty-quart pots in that kitchen, and all he'll say is not yet."
+    - "My knees know all nineteen. I don't need the rail. Corin put it up anyway, and I hold it, and that's the end of it."
 birthday: 57
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ a lunch box packed right, strong tea, forty-quart pots, a clean ladle on its hook ]
+dislikes: [ thin gravy, being helped up the stairs, Carrow bread, cold plates ]
+fears: [ the pots rusting in the dark, her knees going on the nineteenth stair ]
 dream:
-  text: A school worth the walk
+  text: Cook the Harvest Supper for the whole town in the mill's own forty-quart pots.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Plan the menu and collect potatoes from three households (Favors)"
+    - "Get Corentin to unlock the canteen kitchen and carry the pots out"
+    - "Serve the Harvest Supper from the Market Hall with four volunteers"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_38 }
-    - { at: "09:30", do: walk, where: old_quarter.fountain_square }
-    - { at: "12:00", do: eat, where: millbrook.home_38 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
+    - { at: "06:30", do: cook, where: millbrook.home_38 }
+    - { at: "09:00", do: shop, where: market_row.market_street }
+    - { at: "11:00", do: visit, where: millbrook.school }
+    - { at: "12:30", do: eat, where: millbrook.home_38 }
+    - { at: "14:00", do: sit, where: millbrook.laundry_green }
+    - { at: "16:00", do: cook, where: millbrook.home_38 }
     - { at: "18:00", do: eat, where: millbrook.home_38 }
-    - { at: "19:30", do: read, where: millbrook.home_38 }
-    - { at: "21:30", do: sleep, where: millbrook.home_38 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_38 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: millbrook.home_38 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: millbrook.home_38 }
-chores: [ mend a sock, beat the doormat ]
+    - { at: "21:00", do: sleep, where: millbrook.home_38 }
+  weekend:                       # Sunday dinner for six, and Elke's boat is in on Friday night
+    - { at: "07:30", do: cook, where: millbrook.home_38 }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "12:00", do: eat, where: millbrook.home_38, with: [ elke_nesbitt, corin_madsen, hanne_nesbitt, josef_nesbitt ] }
+    - { at: "14:30", do: sit, where: commons.picnic_lawn }
+    - { at: "17:30", do: cook, where: millbrook.home_38 }
+    - { at: "21:00", do: sleep, where: millbrook.home_38 }
+chores: [ scald the big pot on Saturdays, count the table before sitting, salt the stairs in frost, keep the tally slip dry ]
 relationships:
-  - { id: elke_nesbitt, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: corin_madsen, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: hanne_nesbitt, affinity: 70, trust: 70, tag: granddaughter, note: Same house. }
-  - { id: josef_nesbitt, affinity: 70, trust: 70, tag: grandson, note: "Grandson, under the same roof." }
-secrets: []
+  - { id: elke_nesbitt, affinity: 80, trust: 60, tag: daughter, note: "Born three months into the canteen job; types wills on the mainland. Wants her to eat a whole plate sitting down." }
+  - { id: corin_madsen, affinity: 65, trust: 55, tag: family, note: "Keeps her stairs, her stove and her pride. Wants them to stop standing one step behind her." }
+  - { id: hanne_nesbitt, affinity: 70, trust: 50, tag: granddaughter, note: "Sets her homework out in capitals. Wants her to taste the gravy and say nothing." }
+  - { id: josef_nesbitt, affinity: 85, trust: 70, tag: grandson, note: "Counts potatoes and stairs with her. Wants him to eat the crust." }
+  - { id: corentin_frazer, affinity: 15, trust: 20, tag: wary, note: "Holds the mill key and says 'Not yet.' Wants him to open the canteen door, even once, for the pots." }
+  - { id: anselm_osei, affinity: 20, trust: 30, tag: rival, note: "Cooks the school's soup and her grandson's dinner. Wants him to ask her about the salt." }
+  - { id: sinead_rios, affinity: 45, trust: 50, tag: friend, note: "The only other cook in the Row who knows what a forty-quart pot weighs. Wants her to bake for the Supper." }
+secrets:
+  - text: "She keeps the canteen's last tally slip, three hundred and eleven dinners, folded in her recipe tin. It was the closing day."
+    reveal: { regard_min: 50 }
 canon_locks: []
-story_role: none
+story_role: volunteer
 generated_by: template
+curated: true
 household: mb_n01
 archetype: school_family
 employment: retired

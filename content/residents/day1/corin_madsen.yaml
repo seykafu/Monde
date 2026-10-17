@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n01; curated not yet. Edit here.
+# Generated (census-v1) for mb_n01; curated by hand (MVP M-03). Edit here.
 id: corin_madsen
 name: Corin Madsen
 age: 38
 pronouns: they/them
 kind: resident
-occupation: full-time carer at home
+occupation: Full-time carer at home; grows beans on every windowsill
 workplace: millbrook.home_38
 home: millbrook.home_38
 portrait: corin_madsen
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: corin_madsen
-appearance: A person with close-cropped blue-black hair and a dark brown shirt.
+appearance: >
+  A tall, narrow person with close-cropped blue-black hair, a dark brown shirt buttoned to the wrist and a
+  pencil stub behind one ear.
 look:
   kind: human
   skin: 5
@@ -20,62 +22,73 @@ look:
   height: tall
   outfit: { cut: plain, top: 2, bottom: 13, bottom_style: trousers, shoes: 12 }
   accessory: { kind: none }
-backstory: "Corin was born in Monde and looks after the household full-time. What they want most is plain
-  enough: a school worth the walk."
+backstory: >
+  Corin was in the Lissworth pay office at nineteen and has not drawn a wage since the gates shut. They have
+  been home since Josef was born, and the flat on School Lane has nineteen stairs and no garden, so there are
+  beans in jam jars on every sill, in four stages, labelled in pencil. They want Teo Petrescu to give them a
+  corner of the Glasshouse, or even a bed on the Commons, and Teo says "Sorry, that's, the fern is-" and goes
+  quiet. Corin has begun leaving jars on the Glasshouse step.
 personality:
-  traits: [ steady, wry, proud ]
-  big5: { open: 59, conscientious: 47, extravert: 42, agreeable: 75, neurotic: 76 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ patient, dry, tidy, stubborn ]
+  big5: { open: 72, conscientious: 55, extravert: 28, agreeable: 70, neurotic: 30 }
+values: { prosperity: 0.10, safety: 0.30, spirit: 0.30, charm: 0.30 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Everything that grows in a jam jar wants to be outdoors by Bloom Fair.
+  - Hanne's set jaw is a phase.   # wrong: she is counting the Saturdays Remy has the Lantern job
+  - Leila is better on the stairs than she lets on, and a rail is only a rail.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Quiet, dry and hands-first: talks while tying string to a bean cane. Garden and house nouns: sill, jar,
+    cane, tendril, the landing. Counts heads on the stairs. Never explains a plant twice.
+  tics: [ "Jar's on the sill.", "Water first.", "One, two, Leila." ]
+  never_says: [ sparrows, easy for you, it's only a bean ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Jar's on the sill. Third from the left, the one with the tendril leaning. It leans toward Josef's window. I've stopped fighting it."
+    - "Nineteen stairs, Leila, and the rail's yours to hold. I put it up. It's not a suggestion."
+    - "Teo says the fern is something. Then nothing. I'll take it as a yes and leave a jar."
 birthday: 20
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ seeds in paper packets, a lunch box packed right, rain on the sill, a stair that doesn't creak ]
+dislikes: [ damp bedrooms, slugs, stairs without a rail, being called brave for staying ]
+fears: [ the jars all freezing in one night, Leila taking a fall on the nineteenth stair ]
 dream:
-  text: A school worth the walk
+  text: A bed of their own on the Commons, planted by Bloom Fair with beans from every sill.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Clear a bed in the garden plots (two days; Favor: bring a spade)"
+    - "Get seed and a corner from Teo (Regard ≥ 25 with Teo)"
+    - "Plant it before the next Saturday market"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_38 }
-    - { at: "09:30", do: walk, where: commons.picnic_lawn }
-    - { at: "12:00", do: eat, where: millbrook.home_38 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: millbrook.home_38 }
-    - { at: "19:30", do: read, where: millbrook.home_38 }
+    - { at: "06:30", do: cook, where: millbrook.home_38 }
+    - { at: "07:45", do: walk, where: millbrook.school, with: [ josef_nesbitt ] }
+    - { at: "09:30", do: garden, where: commons.community_garden }
+    - { at: "12:30", do: eat, where: millbrook.home_38 }
+    - { at: "14:00", do: shop, where: market_row.general_store }
+    - { at: "15:30", do: walk, where: millbrook.school }
+    - { at: "17:30", do: cook, where: millbrook.home_38 }
     - { at: "21:30", do: sleep, where: millbrook.home_38 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_38 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: millbrook.home_38 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: millbrook.home_38 }
-chores: [ mend a sock, fill the coal scuttle ]
+  weekend:                       # Saturday: seed swap at the market, then the plots
+    - { at: "07:30", do: cook, where: millbrook.home_38 }
+    - { at: "09:30", do: shop, where: market_row.market_hall }
+    - { at: "12:00", do: eat, where: millbrook.home_38 }
+    - { at: "14:00", do: garden, where: commons.community_garden }
+    - { at: "17:30", do: cook, where: millbrook.home_38 }
+    - { at: "20:00", do: sit, where: millbrook.home_38 }
+    - { at: "21:30", do: sleep, where: millbrook.home_38 }
+chores: [ turn the jars toward the window, water first and always, chalk the stair rota on the landing wall, count heads on the stairs ]
 relationships:
-  - { id: elke_nesbitt, affinity: 70, trust: 70, tag: partner, note: Same house. }
-  - { id: leila_nesbitt, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: hanne_nesbitt, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: josef_nesbitt, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
-secrets: []
+  - { id: elke_nesbitt, affinity: 85, trust: 80, tag: partner, note: "Home Friday, smelling of coal smoke and carbon. Wants her to say what the Carrow door of the week looks like from inside." }
+  - { id: leila_nesbitt, affinity: 65, trust: 55, tag: family, note: "Argues about salt and the stove, and holds the rail after all. Wants her to let someone carry the shopping up." }
+  - { id: hanne_nesbitt, affinity: 70, trust: 50, tag: daughter, note: "Fifteen, silent in capitals. Wants her to say what she sets her jaw about at the print room window." }
+  - { id: josef_nesbitt, affinity: 85, trust: 80, tag: son, note: "Counts the stairs aloud and knows each by name. Keeps a list of footsteps that they pretend not to read." }
+  - { id: teo, affinity: 25, trust: 20, tag: curious, note: "Never says yes or no, only 'Sorry, that's, the fern is-'. Wants him to take one jar, and hasn't been refused." }
+  - { id: emrys_eze, affinity: 40, trust: 45, tag: fond, note: "Lends a spade and a rule for bean rows. Wants him to say when the last frost is, in writing." }
+secrets:
+  - text: "They tip the best bean of every jar out on the sill for the sparrows, and tell Josef it's rent."
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n01
 archetype: school_family
 employment: carer

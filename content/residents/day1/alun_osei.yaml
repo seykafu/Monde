@@ -1,16 +1,17 @@
-# Generated (census-v1) for mb_n02; curated not yet. Edit here.
+# Generated (census-v1) for mb_n02; curated by hand (MVP M-03). Edit here.
 id: alun_osei
 name: Alun Osei
 age: 10
 pronouns: he/him
 kind: resident
-occupation: pupil at Millbrook School
+occupation: Pupil at Millbrook School; Dad's co-driver on Saturdays
 workplace: millbrook.home_39
 home: millbrook.home_39
 portrait: alun_osei
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: alun_osei
-appearance: A small boy with short black hair, a cream shirt and a brick-red scarf.
+appearance: >
+  A small boy of ten with short black hair, a cream shirt and a brick-red scarf, shorts and scuffed knees.
 look:
   kind: human
   skin: 9
@@ -20,56 +21,71 @@ look:
   height: short
   outfit: { cut: plain, top: 9, bottom: 8, bottom_style: shorts, shoes: 15 }
   accessory: { kind: scarf, colour: 3 }
-backstory: Alun was born in Monde and goes to Millbrook School. He likes the ducks on the Commons best.
+backstory: >
+  Alun is ten, the youngest at the Osei table and the loudest, and he eats Anselm's school dinner while Anselm
+  watches him from the pass. He knows the lorry's engine by ear and the post round by its stops. He has asked
+  his father for three years to be allowed to sound the horn, once, and Dmitri says a horn is for emergencies.
+  Alun wants Einar Chalmers, the other haulier, to say yes instead. Einar has a tin mug and no opinions about
+  horns.
 personality:
-  traits: [ stubborn, brisk, warm ]
-  big5: { open: 8, conscientious: 72, extravert: 93, agreeable: 60, neurotic: 29 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ loud, daring, cheerful, restless ]
+  big5: { open: 80, conscientious: 25, extravert: 72, agreeable: 60, neurotic: 35 }
+values: { prosperity: 0.10, safety: 0.25, spirit: 0.35, charm: 0.30 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A horn is for emergencies, and a Friday is an emergency.
+  - Einar says yes to things.   # wrong: Einar says yes to the post and no to boys
+  - Elodie knows how to drive already and won't tell.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ Can we go to the ducks? ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Loud, quick and braggy, then sorry. Lorry nouns: horn, clutch, run, crates, the yard. Speaks in dares.
+    Counts the post round's stops on his fingers and loses the count at the school.
+  tics: [ "Dare you.", "Once. Just once.", "Not my fault." ]
+  never_says: [ horn button, I give up, boring ]
   samples:
-    - Can we go to the ducks? Just for a minute.
-    - I'm not tired. I'm resting my eyes.
-    - Mr. Amari says my letters lean. They're fine.
+    - "Dare you to sound the horn. Just once. Dad says a horn is for emergencies. I say a Friday is an emergency."
+    - "I've got fourteen stops by heart. Pump, bakery, school, the Wharf, the ferry. Don't ask me to say them backwards."
+    - "It's not my fault the custard looked at me. Dad made the lunch box. Pa made the custard."
 birthday: 99
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes: [ a lunch box packed right, a teacher who remembers names, the lorry's horn, honey on a hot bun ]
+dislikes: [ being left at the crane yard gate, bedtime before the engine stops ticking, peas, being told he's too small for the cab ]
+fears: [ the horn jamming, Elodie leaving on the Friday boat ]
 dream:
-  text: A school worth the walk
+  text: Ride the whole post round in the lorry's cab and sound the horn once, outside the school.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Ask Einar to take him on a run when Dad says no"
+    - "Learn the post round's stops in order by heart"
+    - "Sound the horn once outside Millbrook School, with Felix watching"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: millbrook.home_39 }
+    - { at: "07:00", do: eat, where: millbrook.home_39 }
     - { at: "08:30", do: attend, where: millbrook.school }
-    - { at: "15:30", do: wander, where: commons.picnic_lawn }
+    - { at: "15:30", do: wander, where: millbrook.weir }
     - { at: "17:30", do: eat, where: millbrook.home_39 }
+    - { at: "19:00", do: sit, where: millbrook.home_39, with: [ anselm_osei ] }
     - { at: "20:00", do: sleep, where: millbrook.home_39 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_39 }
-    - { at: "10:00", do: wander, where: commons.duck_pond }
+  weekend:                       # Saturday: rides along as far as the crane yard and is returned at noon
+    - { at: "07:00", do: eat, where: millbrook.home_39 }
+    - { at: "09:00", do: visit, where: wharf.crane_yard }
     - { at: "12:30", do: eat, where: millbrook.home_39 }
     - { at: "14:00", do: wander, where: commons.picnic_lawn }
     - { at: "18:00", do: eat, where: millbrook.home_39 }
     - { at: "20:30", do: sleep, where: millbrook.home_39 }
-chores: [ water the window box, wind the clock ]
+chores: [ wipe the cab mirror on Saturdays, wind the kitchen clock ]
 relationships:
-  - { id: dmitri_osei, affinity: 70, trust: 70, tag: father, note: Same house. }
-  - { id: anselm_osei, affinity: 70, trust: 70, tag: father, note: Same house. }
-  - { id: tilde_osei, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: elodie_osei, affinity: 65, trust: 60, tag: sister, note: "Sister, under the same roof." }
-secrets: []
+  - { id: dmitri_osei, affinity: 90, trust: 75, tag: father, note: "Dad, who sings to the engine and says no to the horn." }
+  - { id: anselm_osei, affinity: 85, trust: 80, tag: father, note: "Pa, who makes the custard and writes notes in the lunch box." }
+  - { id: tilde_osei, affinity: 75, trust: 65, tag: grandmother, note: "Gran, who says yes to the horn the day the label is printed." }
+  - { id: elodie_osei, affinity: 60, trust: 45, tag: sister, note: "Seventeen, close-mouthed about the boathouse and a key. Wants her to take him down to see the slip." }
+  - { id: einar_chalmers, affinity: 40, trust: 35, tag: fond, note: "Hauls with Dad and drinks from a tin mug. Wants him to say yes to a ride." }
+  - { id: josef_nesbitt, affinity: 45, trust: 40, tag: friend, note: "Two doors along; can name the lorry by its sound and wants a ride." }
+  - { id: tib, affinity: 15, trust: 15, tag: rival, note: "Eleven, counts everything, and counted Alun's dares aloud at school." }
+secrets:
+  - text: "He keeps a brass horn button, taken from a scrapped cab, under his pillow and presses it in the dark."
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n02
 archetype: school_family
 employment: pupil

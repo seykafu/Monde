@@ -1,16 +1,17 @@
-# Generated (census-v1) for mb_n03; curated not yet. Edit here.
+# Generated (census-v1) for mb_n03; curated by hand (MVP M-03). Edit here.
 id: orla_goddard
 name: Orla Goddard
 age: 36
 pronouns: she/her
 kind: resident
-occupation: works in Carrow
+occupation: Pattern cutter at a Carrow tailor's; home Friday nights
 workplace: offmap.city
 home: millbrook.home_34
 portrait: orla_goddard
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: orla_goddard
-appearance: A woman with black hair in a bun and a brown jumper.
+appearance: >
+  A tall woman with black hair in a tight bun and a brown jumper, a stub of tailor's chalk always in one hand.
 look:
   kind: human
   skin: 3
@@ -20,60 +21,71 @@ look:
   height: tall
   outfit: { cut: jumper, top: 1, bottom: 14, bottom_style: trousers, shoes: 8 }
   accessory: { kind: none }
-backstory: "Orla came to Monde from Tarn End 23 years ago and works as a commuter to Carrow. What she wants
-  most is plain enough: a school worth the walk."
+backstory: >
+  Orla came to Monde at thirteen when her father took work on the Wharf, and stayed when he took the family back
+  to Tarn End four years later: Dagny made up the bed. She cuts patterns at a Carrow tailor's from Tuesday to
+  Friday and comes home on the late boat with the week's money and a loaf Dagny refuses to cut. She wants Priya
+  to tell her plainly what Pilar's chest is doing. Priya says ask Pilar. Pilar says ask the stairs.
 personality:
-  traits: [ wry, warm, steady ]
-  big5: { open: 59, conscientious: 87, extravert: 93, agreeable: 67, neurotic: 61 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ exact, loyal, dry, tired ]
+  big5: { open: 38, conscientious: 82, extravert: 60, agreeable: 52, neurotic: 40 }
+values: { prosperity: 0.30, safety: 0.30, spirit: 0.20, charm: 0.20 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Pilar is better than she says, because Priya has not frowned.   # wrong: Priya frowns only when Orla is out of the room
+  - A thing measured twice is a thing that fits.
+  - Dagny will cut the Carrow loaf eventually.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Quick and exact, a pattern cutter's habit of measuring twice and saying once. Tailor's nouns: chalk, notch,
+    dart, cutting table, shears, the pattern. Dry and loving, in short measurements.
+  tics: [ "Chalk it.", "Notch it.", "Friday loaf." ]
+  never_says: [ measurements, I'm fine, it's only a coat ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Measure twice, cut once, home on the late boat Friday. That's my week. It fits on a pattern slip."
+    - "I brought the loaf. Dagny hasn't cut it. It's sitting beside Odile's rye like a visitor who knows nobody."
+    - "Pilar's chest is better, she says. Priya says ask Pilar. I've decided to ask the stairs."
 birthday: 49
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ strong tea, a bench by the school gate, a sharp pair of shears, the Friday boat's lamp coming in ]
+dislikes: [ blunt shears, the Carrow bakery's queue, ferry delays on a Friday, a bag too heavy for the stairs ]
+fears: [ the Friday boat held back by a gale, coming home to a window with nobody in it ]
 dream:
-  text: A school worth the walk
+  text: A cutting table of her own on Market Row, so Friday's boat brings her home for good.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Set up a trial cutting table at the Saturday market"
+    - "Win a standing order for aprons from Odile or Hester"
+    - "Put her name on an empty storefront's window glass"
 routine:
-  weekday:
-    - { at: "06:30", do: eat, where: millbrook.home_34 }
+  weekday:                       # away Tuesday to Friday: the Tuesday boat out, the late Friday boat home
+    - { at: "05:30", do: eat, where: millbrook.home_34 }
+    - { at: "06:30", do: walk, where: wharf.ferry_slip }
     - { at: "07:30", do: work, where: offmap.city }
     - { at: "12:30", do: eat, where: offmap.city }
     - { at: "13:30", do: work, where: offmap.city }
     - { at: "19:00", do: eat, where: offmap.city }
     - { at: "22:00", do: sleep, where: offmap.city }
   weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_34 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
+    - { at: "07:30", do: eat, where: millbrook.home_34, with: [ pilar_callan, dagny_callan, paloma_callan, svea_callan ] }
+    - { at: "09:30", do: shop, where: market_row.market_street }
     - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: wharf.breakwater }
-    - { at: "18:00", do: eat, where: millbrook.home_34 }
-    - { at: "19:30", do: read, where: millbrook.home_34 }
+    - { at: "14:30", do: walk, where: millbrook.weir, with: [ pilar_callan ] }
+    - { at: "17:30", do: cook, where: millbrook.home_34 }
+    - { at: "20:00", do: read, where: millbrook.home_34 }
     - { at: "22:00", do: sleep, where: millbrook.home_34 }
-chores: [ black the stove, sweep the step ]
+chores: [ chalk the notch marks on a paper pattern, iron the Friday collar, measure the window for a heavier curtain, check the wool shelf at the market ]
 relationships:
-  - { id: pilar_callan, affinity: 70, trust: 70, tag: partner, note: Same house. }
-  - { id: dagny_callan, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: paloma_callan, affinity: 70, trust: 70, tag: daughter, note: Same house. }
-  - { id: svea_callan, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
-secrets: []
+  - { id: pilar_callan, affinity: 90, trust: 85, tag: partner, note: "Twitches her curtain at seven and believes nobody sees her breathe. Wants her to say, once, that she'd like to go outside." }
+  - { id: dagny_callan, affinity: 75, trust: 70, tag: family, note: "Took her in at seventeen and has not cut the Carrow loaf in all these years. Wants her to try one slice." }
+  - { id: paloma_callan, affinity: 70, trust: 50, tag: daughter, note: "Keeps the book to the coin. Wants her to write Orla's name in the margin sometimes, not only in the first column." }
+  - { id: svea_callan, affinity: 75, trust: 60, tag: daughter, note: "Shows her a notch and gets shown a dovetail. Wants her to put down the tools at supper." }
+  - { id: priya, affinity: 20, trust: 30, tag: curious, note: "Answers every question about Pilar's chest with 'ask Pilar'. Wants a number, a day, a straight answer." }
+  - { id: odile, affinity: 15, trust: 20, tag: curious, note: "Sells the rye that outranks Carrow's loaf. Wants to cut her an apron she can't refuse." }
+secrets:
+  - text: "She keeps Pilar's measurements in her purse, taken in secret over six years, in case the right wool comes up on the ferry."
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n03
 archetype: school_family
 employment: employed

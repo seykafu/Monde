@@ -1,17 +1,18 @@
-# Generated (census-v1) for wf_e03; curated not yet. Edit here.
+# Generated (census-v1) for wf_e03; curated by hand (MVP M-03). Edit here.
 id: ebba_forsyth
 name: Ebba Forsyth
 age: 38
 pronouns: she/her
 kind: resident
-occupation: fishing-boat crew
+occupation: Crew on a harbour fishing boat; cooks the galley stew
 workplace: wharf.harbor_steps
 home: wharf.home_01
 portrait: lib_f42_057
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: ebba_forsyth
-appearance: A woman with honey-blonde hair in a messy bun, a red checked shirt with rolled sleeves and a clean
-  white apron. Bossy-kind eyes.
+appearance: >
+  A tall woman with honey-blonde hair in a messy bun, a red checked shirt with the sleeves rolled and a white
+  oilcloth apron scrubbed clean. Her eyes are bossy and kind at once.
 look:
   kind: human
   skin: 0
@@ -21,58 +22,72 @@ look:
   height: tall
   outfit: { cut: apron, top: 3, bottom: 2, bottom_style: trousers, shoes: 13 }
   accessory: { kind: apron, colour: 9 }
-backstory: "Ebba was born in Monde and works as fishing-boat crew. What she wants most is plain enough: a boat
-  with my name on it."
+backstory: >
+  Ebba went aboard at sixteen as galley hand and has cooked the crew's fish stew every working morning since,
+  apron on, in all weathers. She married Rohan on the cannery bunkhouse steps the spring the cannery shut. They
+  have saved toward a boat for nine years, and she has bought one coil of good rope every spring, so the shed
+  holds forty fathoms and no hull. There is a stripped hull on the boathouse rack. She wants Ruth Doherty to
+  hold it for her until Regatta week, and to say nothing to Rohan.
 personality:
-  traits: [ particular, cheerful, wry ]
-  big5: { open: 8, conscientious: 18, extravert: 8, agreeable: 59, neurotic: 31 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+  traits: [ bossy, warm, loud, stubborn ]
+  big5: { open: 55, conscientious: 72, extravert: 82, agreeable: 60, neurotic: 30 }
+values: { prosperity: 0.30, safety: 0.30, spirit: 0.15, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Rohan stays on the quay because Nell needs him there.   # wrong: he is sick on anything that floats
+  - Good rope is never wasted, only early.
+  - The tide will turn before the kettle boils, this time.
 voice:
-  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
-  tics: [ Fair. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Bossy-kind and loud over engines; orders come out as affection. Galley and deck nouns: ladle, creel, bait,
+    hook, the pot. Counts heads at every landing. Bets a cup of tea on the tide and pays up.
+  tics: [ "Tea's riding on it.", "Count heads.", "Bowls first." ]
+  never_says: [ calm down, it's only a fish, twelve coins ]
   samples:
-    - Fair. Wind's backing.
-    - Could be worse. Could be raining.
-    - Tide's making. I'll be off.
+    - "Tea's riding on it. Tide turns before the kettle boils, Hartley, and I'll take the milk from you as well."
+    - "Sit down, you've gone grey. Bowls first. Stew's four coins if you're not crew and free if you are."
+    - "Rohan's on the slab, I'm on the boat, and we pass at the quay at six like two ferries. Eleven years. I'd fetch a chair."
 birthday: 35
-likes: [ flat calm at dawn, good rope, smoked fish ]
-dislikes: [ tangled gear, loud engines, gulls on the catch ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ flat calm at dawn, good rope, smoked fish, a pot of stew with the lid rattling ]
+dislikes: [ tangled gear, loud engines, gulls on the catch, a bowl left unscraped ]
+fears: [ the dark water under the quay at night, spending the boat money on anything but the boat ]
 dream:
-  text: A boat with my name on it
+  text: A hull of her own on the boathouse slip, launched on Regatta day with both their names on the stern.
   stages:
-    - Find a hull and bring it to the boathouse
-    - Raise 60 coins from catches and community work
-    - Launch on Regatta day
+    - "Get the stripped hull moved to the boathouse slip (Favor: ask Ruth for the trestles)"
+    - "Raise sixty coins from catches and odd jobs"
+    - "Launch on Regatta day with Rohan standing on the slip"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: wharf.home_01 }
-    - { at: "08:30", do: work, where: wharf.harbor_steps }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: wharf.harbor_steps }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_01 }
-    - { at: "20:00", do: read, where: wharf.home_01 }
-    - { at: "22:00", do: sleep, where: wharf.home_01 }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_01 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.picnic_lawn }
-    - { at: "18:00", do: eat, where: wharf.home_01 }
-    - { at: "19:30", do: read, where: wharf.home_01 }
-    - { at: "22:00", do: sleep, where: wharf.home_01 }
-chores: [ sweep the step, beat the doormat ]
+    - { at: "04:15", do: eat, where: wharf.home_01 }
+    - { at: "05:00", do: fish, where: wharf.harbor_steps }
+    - { at: "10:30", do: work, where: wharf.harbor_steps }
+    - { at: "13:00", do: eat, where: wharf.harbor_steps }
+    - { at: "14:30", do: work, where: wharf.harbor_steps }
+    - { at: "16:30", do: visit, where: wharf.boathouse }
+    - { at: "18:00", do: sit, where: wharf.harbor_steps, with: [ rohan_forsyth ] }
+    - { at: "19:00", do: cook, where: wharf.home_01 }
+    - { at: "21:00", do: sleep, where: wharf.home_01 }
+  weekend:                       # Saturday is a short trip; she is back by ten and spends the afternoon at the market and the slip
+    - { at: "05:00", do: eat, where: wharf.home_01 }
+    - { at: "06:00", do: fish, where: wharf.harbor_steps }
+    - { at: "10:00", do: work, where: wharf.harbor_steps }
+    - { at: "12:30", do: eat, where: wharf.harbor_steps }
+    - { at: "14:00", do: shop, where: market_row.general_store }
+    - { at: "16:00", do: visit, where: wharf.boathouse }
+    - { at: "18:00", do: cook, where: wharf.home_01, with: [ rohan_forsyth ] }
+    - { at: "20:30", do: sleep, where: wharf.home_01 }
+chores: [ scrub the apron with salt, count heads on the landing, coil the new rope, set the stew to soak on Sunday night ]
 relationships:
-  - { id: rohan_forsyth, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - { id: rohan_forsyth, affinity: 85, trust: 80, tag: spouse, note: "Meets her on the harbour steps at six every evening and says the weather first. Wants him to say, once, that he'd come aboard." }
+  - { id: hartley_radford, affinity: 50, trust: 60, tag: friend, note: "Her mate on the boat; every morning she bets him a cup of tea on the tide and loses. Wants to win once before Regatta." }
+  - { id: ruth_doherty, affinity: 35, trust: 45, tag: curious, note: "Keeps the stripped hull on the rack and has taken twelve coins without a word. Wants her to keep the hull and keep quiet." }
+secrets:
+  - text: "She has paid Ruth Doherty twelve coins toward a stripped hull on the boathouse rack and has told Rohan the tin is untouched."
+    reveal: { regard_min: 45 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_e03
 archetype: fisher
 employment: employed

@@ -1,17 +1,18 @@
-# Generated (census-v1) for wf_n01; curated not yet. Edit here.
+# Generated (census-v1) for wf_n01; curated by hand (MVP M-03). Edit here.
 id: mei_lindgren
 name: Mei Lindgren
 age: 78
 pronouns: she/her
 kind: resident
-occupation: retired
+occupation: Retired telegraph operator, Carrow office, thirty years
 workplace: wharf.home_14
 home: wharf.home_14
 portrait: lib_f76_069
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: mei_lindgren
-appearance: An older woman with short white curls, heavy dark-framed glasses and a belted mustard raincoat
-  with the collar up. A shrewd, amused look.
+appearance: >
+  A small, narrow older woman with short white curls, heavy dark-framed glasses and a belted mustard raincoat
+  with the collar turned up.
 look:
   kind: human
   skin: 8
@@ -22,68 +23,74 @@ look:
   outfit: { cut: coat, top: 4, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: glasses }
   glasses: heavy
-backstory: "Mei came to Monde from Marrow Quay 20 years ago and is retired now. What she wants most is plain
-  enough: a school worth the walk."
+backstory: >
+  Mei took telegrams at the Carrow office for thirty years and can still hear a name in dots and dashes. She
+  taps it on the table when she is cross, and the children translate. She came to Shingle Row at fifty-eight
+  when Bram and Marthe took the house and asked her along, and has refused to live anywhere else since. The
+  signal box on Station Hill still has its key and its wire. She wants Hollis to let her sit at it for ten
+  minutes. He says it is not on the timetable.
 personality:
-  traits: [ wry, cheerful, warm ]
-  big5: { open: 8, conscientious: 39, extravert: 59, agreeable: 74, neurotic: 64 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ shrewd, amused, economical, stubborn ]
+  big5: { open: 72, conscientious: 55, extravert: 55, agreeable: 36, neurotic: 40 }
+values: { prosperity: 0.10, safety: 0.30, spirit: 0.30, charm: 0.30 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Every telegram worth sending fit in twelve words.
+  - Hollis keeps the signal box locked out of spite.   # wrong: he can't bear to hear it silent
+  - Meera understands the taps better than she lets on.
 voice:
-  register: Brisk and organizing. Speaks in lists of three and asks questions like a form. Ends sentences on the
-    schedule.
-  tics: [ "Shoes, satchels, sandwiches." ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Dry, amused and economical: prices things by the word. Telegraph nouns: dot, dash, stop, the key, the
+    sounder, collect. Taps the table when cross, and lets the family translate.
+  tics: [ "Twelve words.", "Collect.", "Say it in ten." ]
+  never_says: [ long story short, speak up, I'm too old for that ]
   samples:
-    - Shoes, satchels, sandwiches. Three things. We're out by eight.
-    - Who runs the Thursday class? Name and time, please.
-    - They'll settle. I asked them, and they said they'd settle.
+    - "Say it in ten. Every word cost a coin once, and nobody ever missed the other fifty. I don't, and I've read the lot."
+    - "That's me tapping SALT. Meera knows. She's passed me the cellar before the third tap, the monkey."
+    - "Hollis has a key and a wire and won't lend me ten minutes. It's not on his timetable. My whole life was off somebody's."
 birthday: 77
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ strong tea, an old brass key, a short letter, crosswords in pencil ]
+dislikes: [ long letters, wasted words, a closed signal box, being asked to speak up ]
+fears: [ the wire going dead before she has tapped one more name, Meera never learning to read the table ]
 dream:
-  text: A school worth the walk
+  text: Have Meera tap her own name back across the supper table without a mistake.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Tap the alphabet to Meera at supper, one letter a night"
+    - "Borrow Hollis's old telegraph key for a Sunday (Regard ≥ 30 with Hollis)"
+    - "Send Meera across the room with a message in taps and watch it arrive"
 routine:
   weekday:
-    - { at: "07:30", do: eat, where: wharf.home_14 }
-    - { at: "09:30", do: walk, where: commons.duck_pond }
-    - { at: "12:00", do: eat, where: wharf.home_14 }
-    - { at: "14:00", do: sit, where: old_quarter.fountain_square }
-    - { at: "16:00", do: shop, where: market_row.general_store }
-    - { at: "18:00", do: eat, where: wharf.home_14 }
-    - { at: "19:30", do: read, where: wharf.home_14 }
-    - { at: "21:30", do: sleep, where: wharf.home_14 }
+    - { at: "06:30", do: eat, where: wharf.home_14 }
+    - { at: "08:00", do: sit, where: wharf.harbor_steps }
+    - { at: "10:30", do: visit, where: station_hill.platform }
+    - { at: "12:30", do: eat, where: wharf.home_14 }
+    - { at: "14:00", do: nap, where: wharf.home_14 }
+    - { at: "15:30", do: sit, where: wharf.ferry_slip }
+    - { at: "17:30", do: read, where: wharf.home_14 }
+    - { at: "19:00", do: eat, where: wharf.home_14 }
+    - { at: "21:00", do: sleep, where: wharf.home_14 }
   weekend:
-    - { at: "08:00", do: eat, where: wharf.home_14 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
+    - { at: "07:30", do: eat, where: wharf.home_14 }
+    - { at: "09:30", do: attend, where: old_quarter.st_brigids }
+    - { at: "12:00", do: eat, where: wharf.home_14 }
+    - { at: "14:00", do: sit, where: wharf.harbor_steps }
+    - { at: "16:00", do: sit, where: wharf.breakwater, with: [ meera_lindgren ] }
     - { at: "18:00", do: eat, where: wharf.home_14 }
-    - { at: "19:30", do: read, where: wharf.home_14 }
-    - { at: "22:00", do: sleep, where: wharf.home_14 }
-chores: [ black the stove, sweep the step ]
+    - { at: "21:00", do: sleep, where: wharf.home_14 }
+chores: [ tap the one word of supper on the table, sharpen Olav's pencils to a nib, polish the brass doorplate on Sundays, set the clock by the wireless ]
 relationships:
-  - { id: bram_lindgren, affinity: 70, trust: 70, tag: son, note: Same house. }
-  - { id: marthe_demir, affinity: 70, trust: 70, tag: family, note: Same house. }
-  - { id: olav_lindgren, affinity: 70, trust: 70, tag: grandson, note: Same house. }
-  - {
-      id: meera_lindgren,
-      affinity: 70,
-      trust: 70,
-      tag: granddaughter,
-      note: "Granddaughter, under the same roof."
-    }
-secrets: []
+  - { id: bram_lindgren, affinity: 75, trust: 55, tag: son, note: "Hums while he splices and while he washes up. Wants him to learn what ENOUGH means." }
+  - { id: marthe_demir, affinity: 65, trust: 60, tag: family, note: "Has a register of everything and a watch pinned upside down. Wants her to take her own lunch hour." }
+  - { id: olav_lindgren, affinity: 80, trust: 65, tag: grandson, note: "Writes down what she says, then reads it back. Wants him to ask in ten words." }
+  - { id: meera_lindgren, affinity: 90, trust: 70, tag: granddaughter, note: "Answers her taps on the table. Wants her to spell her own name in them." }
+  - { id: hollis, affinity: 10, trust: 20, tag: curious, note: "Has the signal box key and a wire and is on a timetable. Wants ten minutes at the sounder." }
+  - { id: edmund_mcbride, affinity: 20, trust: 35, tag: rival, note: "Next door at No. 1, does the crossword in ink. Wants him to try it in pencil, once." }
+secrets:
+  - text: "She has been tapping ENOUGH at Bram's humming for twenty years. He thinks she is keeping time."
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_n01
 archetype: school_family
 employment: retired

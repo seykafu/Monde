@@ -1,16 +1,17 @@
-# Generated (census-v1) for wf_n01; curated not yet. Edit here.
+# Generated (census-v1) for wf_n01; curated by hand (MVP M-03). Edit here.
 id: meera_lindgren
 name: Meera Lindgren
 age: 5
 pronouns: she/her
 kind: resident
-occupation: pupil at Millbrook School
+occupation: Pupil at Millbrook School; youngest of the nine
 workplace: wharf.home_14
 home: wharf.home_14
 portrait: meera_lindgren
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: meera_lindgren
-appearance: A small girl with a dark brown bob and a rose shirt.
+appearance: >
+  A small girl with a dark brown bob and a rose shirt, one sock always lower than the other.
 look:
   kind: human
   skin: 1
@@ -20,56 +21,69 @@ look:
   height: short
   outfit: { cut: plain, top: 12, bottom: 8, bottom_style: trousers, shoes: 9 }
   accessory: { kind: none }
-backstory: Meera was born in Monde and goes to Millbrook School. She likes the ducks on the Commons best.
+backstory: >
+  Meera is five and a half and the youngest of Felix's nine. She can write M, E and the first R. She hates
+  aniseed twists and eats one every Friday from the paper bag Dad brings off the boat, because he is watching.
+  She reads Gran's taps on the table better than anyone has noticed. What she wants most is to hold Bastien, the
+  baker's cat, while she counts to a hundred. He lets her get to forty.
 personality:
-  traits: [ particular, curious, restless ]
-  big5: { open: 59, conscientious: 77, extravert: 25, agreeable: 72, neurotic: 60 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ small, certain, sweet, stubborn ]
+  big5: { open: 60, conscientious: 20, extravert: 90, agreeable: 80, neurotic: 70 }
+values: { prosperity: 0.10, safety: 0.35, spirit: 0.30, charm: 0.25 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Dad likes it when she eats the black sweets.
+  - Bastien would stay for a hundred if she counted quieter.   # wrong: he leaves at forty-one when the sun moves off the step
+  - Gran's taps are a secret language only Gran and she speak.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ Can we go to the ducks? ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Small and certain. Short sentences, wrong words said firmly. Counts out loud and loses the number. Tells you
+    what she hates first.
+  tics: [ "Forty-one.", "I'm five and a half.", "Not the black ones." ]
+  never_says: [ boring, I hate Dad, I feed the gulls ]
   samples:
-    - Can we go to the ducks? Just for a minute.
-    - I'm not tired. I'm resting my eyes.
-    - Mr. Amari says my letters lean. They're fine.
+    - "I'm five and a half. I can write M and E. The R is coming. Gran says it's slow, like a boat."
+    - "Dad brings sweets. They're black. I eat them. He looks happy when I eat them, so I say mm."
+    - "Bastien went to forty-one. Then he got up. He's a cat, he didn't say sorry."
 birthday: 24
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes: [ a lunch box packed right, honey on a bun, the baker's cat, counting out loud ]
+dislikes: [ black aniseed twists, wet socks, scratchy collars, being carried ]
+fears: [ the dark corner behind the door, Bastien walking away at forty-one ]
 dream:
-  text: A school worth the walk
+  text: Hold Bastien while she counts to a hundred.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Sit on the bakery step every Saturday without moving (Regard ≥ 15 with Odile)"
+    - "Count to fifty with Bastien on her knee"
+    - "Count to a hundred, and get all of it right"
 routine:
   weekday:
     - { at: "07:30", do: eat, where: wharf.home_14 }
     - { at: "08:30", do: attend, where: millbrook.school }
     - { at: "15:30", do: wander, where: wharf.breakwater }
+    - { at: "16:45", do: sit, where: wharf.harbor_steps, with: [ mei_lindgren ] }
     - { at: "17:30", do: eat, where: wharf.home_14 }
     - { at: "20:00", do: sleep, where: wharf.home_14 }
-  weekend:
+  weekend:                       # Saturday: the bakery step with Mum, to see whether the cat is in
     - { at: "08:00", do: eat, where: wharf.home_14 }
-    - { at: "10:00", do: wander, where: commons.duck_pond }
+    - { at: "09:30", do: visit, where: market_row.bakery, with: [ marthe_demir ] }
     - { at: "12:30", do: eat, where: wharf.home_14 }
     - { at: "14:00", do: wander, where: wharf.breakwater }
     - { at: "18:00", do: eat, where: wharf.home_14 }
-    - { at: "20:30", do: sleep, where: wharf.home_14 }
-chores: [ wind the clock, beat the doormat ]
+    - { at: "20:00", do: sleep, where: wharf.home_14 }
+chores: [ put her boots by the door, count the spoons at supper ]
 relationships:
-  - { id: bram_lindgren, affinity: 70, trust: 70, tag: father, note: Same house. }
-  - { id: marthe_demir, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: mei_lindgren, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: olav_lindgren, affinity: 65, trust: 60, tag: brother, note: "Brother, under the same roof." }
-secrets: []
+  - { id: bram_lindgren, affinity: 95, trust: 80, tag: father, note: "Dad, who comes on the late boat with a paper bag. She eats what is in it." }
+  - { id: marthe_demir, affinity: 90, trust: 75, tag: mother, note: "Mum, who takes her to the bakery step on Saturdays and says 'sit a minute'." }
+  - { id: mei_lindgren, affinity: 90, trust: 70, tag: grandmother, note: "Gran, who taps and gets taps back." }
+  - { id: olav_lindgren, affinity: 60, trust: 45, tag: brother, note: "Ten, asks too many questions, shares his pencil on a string." }
+  - { id: bastien, affinity: 55, trust: 20, tag: fond, note: "The baker's cat, who lets her count to forty and then goes." }
+  - { id: odile, affinity: 10, trust: 20, tag: curious, note: "Gives her the crust and says 'Hm.' Wants her to say 'stay' to the cat." }
+secrets:
+  - text: "She feeds the aniseed twists to the gulls on the breakwater on Saturdays, and tells Dad the bag emptied itself."
+    reveal: { regard_min: 40 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_n01
 archetype: school_family
 employment: pupil

@@ -1,16 +1,18 @@
-# Generated (census-v1) for mb_n01; curated not yet. Edit here.
+# Generated (census-v1) for mb_n01; curated by hand (MVP M-03). Edit here.
 id: hanne_nesbitt
 name: Hanne Nesbitt
 age: 15
 pronouns: she/her
 kind: resident
-occupation: lessons by post at the library desk
+occupation: Lessons by post at the library desk; Thursday evening class
 workplace: millbrook.home_38
 home: millbrook.home_38
 portrait: hanne_nesbitt
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: hanne_nesbitt
-appearance: A girl with dark brown braids and a brick-red jumper.
+appearance: >
+  A short, narrow girl of fifteen with dark brown braids and a brick-red jumper, ink on the middle finger of her
+  right hand.
 look:
   kind: human
   skin: 1
@@ -20,59 +22,74 @@ look:
   height: short
   outfit: { cut: jumper, top: 3, bottom: 5, bottom_style: trousers, shoes: 12 }
   accessory: { kind: none }
-backstory: Hanne was born in Monde and does lessons by post at the library desk. She likes the ducks on the
-  Commons best.
+backstory: >
+  Hanne has set her own lessons since she was twelve, at Margo's desk, because nobody else was free to. She
+  writes her answers in printer's capitals, practising for The Lantern. She wants Sable to let her set one line
+  of type, and Sable says "On the record?" and nothing else. Remy Corbett already has the Saturday job there.
+  Hanne says she does not mind. She walks past the print room window twice a day to check. Josef puts her
+  pencils in rainbow order, and she lets him, in return for silence.
 personality:
-  traits: [ shy, wry, particular ]
-  big5: { open: 93, conscientious: 79, extravert: 8, agreeable: 36, neurotic: 54 }
-values: { prosperity: 0.2, safety: 0.35, spirit: 0.25, charm: 0.2 }
+  traits: [ precise, guarded, ambitious, dry ]
+  big5: { open: 80, conscientious: 40, extravert: 22, agreeable: 48, neurotic: 70 }
+values: { prosperity: 0.15, safety: 0.20, spirit: 0.35, charm: 0.30 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - Remy got the Lantern job because he was quiet, and she was loud once in front of Sable.   # wrong: Sable asked Remy because he was at the door at five
+  - A line of type can't be taken back, which is why it is worth setting.
+  - Josef spies on her for Corin.
 voice:
-  register: "A young voice: questions, then more questions."
-  tics: [ It's fine. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Dry and clipped, a teenager's deadpan with sudden precision about type: capitals, kern, galley, slug. Won't
+    ask for what she wants and says she does not mind. Sentences end like full stops hitting a desk.
+  tics: [ "I don't mind.", "Set it in capitals.", "Put it in writing." ]
+  never_says: [ lead H, please pick me, I do mind ]
   samples:
-    - It's fine. It's a town. There's a pub. Can't go in it.
-    - Did you see the lighthouse? It's not even on.
-    - I'll do the lessons later. Probably.
+    - "I don't mind. It's only a Saturday job. I just happen to walk past the print room twice a day, that's all."
+    - "Set it in capitals, then nobody can say they misread it. Margo says poems don't work like that. I said I wasn't writing a poem."
+    - "Josef put my pencils in rainbow order again. I'm writing it down in capitals, for the record."
 birthday: 97
-likes: [ a lunch box packed right, a teacher who remembers names, a bench by the school gate ]
-dislikes: [ a closed school, walking home in the dark, being told the children will adapt ]
-fears: [ the dark on the stairs ]
+likes: [ a teacher who remembers names, old books from the library desk, ink that dries before it smudges, a clean galley of type ]
+dislikes: [ being told she's quiet, pencils in the wrong order, a smudged line, a coat on the Lantern's hook that isn't hers ]
+fears: [ never being asked, the library desk closing ]
 dream:
-  text: A school worth the walk
+  text: Set one line of type for The Lantern with her own hands.
   stages:
-    - Visit Felix's classroom (Regard ≥ 20 with felix)
-    - Help with a Friday lesson
-    - Sign the enrollment roll in front of the whole class
+    - "Bring Sable a clean page of capitals she can't fault (Regard ≥ 15 with Sable)"
+    - "Ask Margo to speak for her at the Lantern's door"
+    - "Set a line of the Friday page and see it printed"
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_38 }
     - { at: "09:00", do: read, where: old_quarter.library }
-    - { at: "13:00", do: eat, where: millbrook.home_38 }
-    - { at: "15:00", do: wander, where: market_row.market_street }
+    - { at: "12:30", do: eat, where: old_quarter.fountain_square }
+    - { at: "13:30", do: write, where: old_quarter.library }
+    - { at: "16:00", do: wander, where: old_quarter.lantern_office }
     - { at: "18:00", do: eat, where: millbrook.home_38 }
-    - { at: "21:30", do: sleep, where: millbrook.home_38 }
-  weekend:
-    - { at: "08:00", do: eat, where: millbrook.home_38 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: millbrook.home_38 }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "20:00", do: write, where: millbrook.home_38 }
     - { at: "22:00", do: sleep, where: millbrook.home_38 }
-chores: [ beat the doormat, fill the coal scuttle ]
+  weekend:                       # Saturday: the Lantern's print day, and she walks the long way round
+    - { at: "08:30", do: eat, where: millbrook.home_38 }
+    - { at: "10:00", do: wander, where: old_quarter.lantern_office }
+    - { at: "12:30", do: eat, where: millbrook.home_38 }
+    - { at: "14:30", do: walk, where: commons.footbridge, with: [ josef_nesbitt ] }
+    - { at: "18:00", do: eat, where: millbrook.home_38 }
+    - { at: "20:30", do: write, where: millbrook.home_38 }
+    - { at: "22:00", do: sleep, where: millbrook.home_38 }
+chores: [ put Josef's marbles back in their jar, copy the week's notices onto the door in capitals, carry the library books back on Fridays ]
 relationships:
-  - { id: elke_nesbitt, affinity: 70, trust: 70, tag: mother, note: Same house. }
-  - { id: corin_madsen, affinity: 70, trust: 70, tag: parent, note: Same house. }
-  - { id: leila_nesbitt, affinity: 70, trust: 70, tag: grandmother, note: Same house. }
-  - { id: josef_nesbitt, affinity: 65, trust: 60, tag: brother, note: "Brother, under the same roof." }
-secrets: []
+  - { id: elke_nesbitt, affinity: 65, trust: 40, tag: mother, note: "Home Fridays, with a Carrow door on a card for Josef and nothing for her. Wants her to stay past Saturday just once." }
+  - { id: corin_madsen, affinity: 70, trust: 50, tag: parent, note: "Notices everything and says nothing, which she respects. Wants them to stop leaving the landing lamp lit." }
+  - { id: leila_nesbitt, affinity: 70, trust: 55, tag: grandmother, note: "Cooks for the lane and prods her to eat. Wants her to read the notices on the door out loud." }
+  - { id: josef_nesbitt, affinity: 60, trust: 40, tag: brother, note: "Seven, loud, and organises her pencils by colour. Wants him to stop; has not said so." }
+  - { id: sable, affinity: 15, trust: 20, tag: curious, note: "Says 'On the record?' and nothing else. Wants her to say yes or no to a line of type." }
+  - { id: remy_corbett, affinity: -10, trust: 10, tag: rival, note: "Has the Lantern's Saturday job and the hook for his coat. Wants the hook, and says she doesn't." }
+  - { id: margo, affinity: 45, trust: 50, tag: fond, note: "Sets her lessons and corrects her capitals. Wants her to put in a word at the Lantern door." }
+secrets:
+  - text: "She keeps one spilled letter of type, a lead H, in her coat pocket and turns it over when she's pretending not to mind."
+    reveal: { regard_min: 45 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: mb_n01
 archetype: school_family
 employment: lessons

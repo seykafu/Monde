@@ -1,17 +1,18 @@
-# Generated (census-v1) for wf_e03; curated not yet. Edit here.
+# Generated (census-v1) for wf_e03; curated by hand (MVP M-03). Edit here.
 id: rohan_forsyth
 name: Rohan Forsyth
 age: 38
 pronouns: he/him
 kind: resident
-occupation: fish-market hand
+occupation: Fish-market hand at Nell's; ice and the slab
 workplace: wharf.fish_market
 home: wharf.home_01
 portrait: lib_m38_063
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: rohan_forsyth
-appearance: A man with a black beard, a brick-red knit cap and a thick navy fisherman's jumper. A
-  short-spoken, weather-first face.
+appearance: >
+  A broad, tall man with a black beard, a brick-red knit cap and a thick navy fisherman's jumper. His face looks
+  like it has already checked the weather.
 look:
   kind: human
   skin: 6
@@ -23,58 +24,72 @@ look:
   accessory: { kind: none }
   headwear: { kind: knit_cap, colour: 3 }
   face: { moustache: true, stubble: true }
-backstory: "Rohan was born in Monde and works as fish-market hand. What he wants most is plain enough: a boat
-  with my name on it."
+backstory: >
+  Rohan gutted on the cannery line from sixteen until the doors shut, and has stood at Nell's slab since: ice by
+  five, scales at eight, the slab scrubbed by half past four. He says the weather first and the rest when
+  someone makes him. He and Ebba pass on the harbour steps at six every evening, and have for eleven years. He
+  wants Nell to hand him the co-op sheet first, not last, because the cannery was the only place anyone ever
+  asked him first. Nell asks the loud ones first. He is not loud.
 personality:
-  traits: [ stubborn, brisk, proud ]
-  big5: { open: 93, conscientious: 64, extravert: 25, agreeable: 80, neurotic: 25 }
-values: { prosperity: 0.45, safety: 0.3, spirit: 0.1, charm: 0.15 }
+  traits: [ quiet, steady, wry, proud ]
+  big5: { open: 30, conscientious: 62, extravert: 25, agreeable: 55, neurotic: 62 }
+values: { prosperity: 0.45, safety: 0.35, spirit: 0.05, charm: 0.15 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - A fish handled twice is a fish halved.
+  - If Ebba knew he turns green on the slip, she would sell the rope and say nothing.   # wrong: she'd laugh, then put him on the harbour steps with the ladle
+  - Nell asks the loud ones first and the quiet ones when the sheet is full.
 voice:
-  register: Short, weather first, understated. "Fair." "Could be worse." "Tide's making."
-  tics: [ Fair. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Short, weather first, then the job. Market nouns: ice, scales, slab, crates, the knife, the drain. Says half
+    what he means and the other half by lifting a crate. Dry, and never explains a joke.
+  tics: [ "Wind's northerly.", "Ice by five.", "Ask Ebba." ]
+  never_says: [ seasick, I'd rather not come, lovely day ]
   samples:
-    - Fair. Wind's backing.
-    - Could be worse. Could be raining.
-    - Tide's making. I'll be off.
+    - "Wind's northerly. Boats'll be late, ice'll be early. Cod's four coins, haddock's three, same as Nell says."
+    - "Slab's wet. Boots will soak. Nell wants the herring on the left and I want a sit-down, so it's the left."
+    - "Ebba's on the water, I'm on the slab. Six o'clock, the harbour steps, same bench, same nod. Eleven years and it hasn't got old."
 birthday: 54
-likes: [ flat calm at dawn, good rope, smoked fish ]
-dislikes: [ tangled gear, loud engines, gulls on the catch ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ flat calm at dawn, smoked fish, the first cold bucket of ice, Ebba's stew on the steps ]
+dislikes: [ gulls on the catch, boats that rock at the slip, being asked out for the day, tangled gear ]
+fears: [ the cannery doors never opening again, turning green in front of the crew ]
 dream:
-  text: A boat with my name on it
+  text: See the cannery lit again, and his name among the first ten on Nell's co-op sheet.
   stages:
-    - Find a hull and bring it to the boathouse
-    - Raise 60 coins from catches and community work
-    - Launch on Regatta day
+    - "Get Nell to hand him the co-op sheet first, not last (Regard ≥ 30 with Nell)"
+    - "Carry the sheet down the Wharf to ten names"
+    - "Land the first co-op box through the cannery doors"
 routine:
   weekday:
-    - { at: "07:00", do: eat, where: wharf.home_01 }
-    - { at: "08:30", do: work, where: wharf.fish_market }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "13:30", do: work, where: wharf.fish_market }
-    - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_01 }
-    - { at: "20:00", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: wharf.home_01 }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_01 }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: commons.duck_pond }
-    - { at: "18:00", do: eat, where: wharf.home_01 }
-    - { at: "19:30", do: socialize, where: market_row.cafe_liss }
-    - { at: "22:00", do: sleep, where: wharf.home_01 }
-chores: [ mend a sock, water the window box ]
+    - { at: "04:30", do: eat, where: wharf.home_01 }
+    - { at: "05:00", do: work, where: wharf.fish_market }
+    - { at: "12:00", do: eat, where: wharf.fish_market }
+    - { at: "12:45", do: work, where: wharf.fish_market }
+    - { at: "16:30", do: clean, where: wharf.fish_market }
+    - { at: "18:00", do: sit, where: wharf.harbor_steps, with: [ ebba_forsyth ] }
+    - { at: "19:00", do: eat, where: wharf.home_01, with: [ ebba_forsyth ] }
+    - { at: "21:00", do: sleep, where: wharf.home_01 }
+  weekend:                       # Saturday is market day; the slab opens an hour early
+    - { at: "05:00", do: eat, where: wharf.home_01 }
+    - { at: "06:00", do: work, where: wharf.fish_market }
+    - { at: "12:00", do: eat, where: wharf.fish_market }
+    - { at: "13:00", do: work, where: wharf.fish_market }
+    - { at: "16:00", do: sit, where: wharf.breakwater }
+    - { at: "18:00", do: sit, where: wharf.harbor_steps, with: [ ebba_forsyth ] }
+    - { at: "19:00", do: eat, where: wharf.home_01, with: [ ebba_forsyth ] }
+    - { at: "21:00", do: sleep, where: wharf.home_01 }
+chores: [ scrub the slab before the lamp goes, sharpen the gutting knife on Sunday, carry the ice sacks in, keep the forty-fathom rope out of the hall ]
 relationships:
-  - { id: ebba_forsyth, affinity: 70, trust: 70, tag: spouse, note: Same house. }
-secrets: []
+  - { id: ebba_forsyth, affinity: 85, trust: 80, tag: spouse, note: "Brings the weather home at six and takes it off him. Wants her to stop saying 'when we've a crew' as if he were not in the house." }
+  - { id: nell, affinity: 45, trust: 55, tag: fond, note: "His boss and the loudest voice on the Wharf, who gives orders in four words. Wants her to ask him first about the cannery, not last." }
+  - { id: genevieve_corrigan, affinity: 40, trust: 45, tag: fond, note: "Counts his crates aloud on mornings and gets them right. Wants her to stop blaming Moss's Tuesday crossing for the damp." }
+  - { id: moss, affinity: 20, trust: 35, tag: wary, note: "Asks every Regatta whether he'll come aboard for the fish fry. Wants him to stop asking in front of Ebba." }
+secrets:
+  - text: "He is seasick on anything that floats, the Gannet at the slip included, and tells Ebba the market needs him on Regatta day."
+    reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: wf_e03
 archetype: fisher
 employment: employed
