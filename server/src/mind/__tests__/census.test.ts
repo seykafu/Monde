@@ -10,7 +10,8 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { eq } from "drizzle-orm";
 import YAML from "yaml";
 import {
-  ARRIVAL_SYSTEM_PROMPT, ItemCatalog, MONDE_DAY1_BLOCK, NATIVE_SYSTEM_BLOCKS, PersonaCard, WHIMS, censusOrder, censusProgressReset, modelOutputFormat,
+  HOUSEHOLD_JSON_BLOCK,
+  ARRIVAL_SYSTEM_PROMPT, ItemCatalog, MONDE_DAY1_BLOCK, NATIVE_SYSTEM_BLOCKS, PersonaCard, WHIMS, censusOrder, censusProgressReset,
   nativeContextFor, nativeDrawFor, nativeTemplateHousehold, nativeValidationContext, parseHomes, parsePins, runCensus, ArrivalHouseholdOutput,
   type CensusInput, type CensusStore, type CensusWriter, type Day1Skeleton, type HouseholdDraw, type NativePromptContext,
 } from "@monde/shared";
@@ -110,9 +111,10 @@ describe("POST /admin/census/write (M-03 step 2)", () => {
       expect(sent.max_tokens).toBe(900 + 750);
       for (const key of ["temperature", "top_p", "top_k", "thinking"]) expect(sent).not.toHaveProperty(key);
       expect(sent.messages.at(-1)!.role).toBe("user");
-      expect(sent.system).toEqual(NATIVE_SYSTEM_BLOCKS.map(text => ({ type: "text", text, cache_control: { type: "ephemeral" } })));
+      // A.3.6's prompt, MONDE ON DAY 1, then the card contract; one cache breakpoint at the end.
+      expect(sent.system).toEqual([...NATIVE_SYSTEM_BLOCKS.map(text => ({ type: "text", text })), { type: "text", text: HOUSEHOLD_JSON_BLOCK, cache_control: { type: "ephemeral" } }]);
+      expect(sent.output_config).toEqual({ effort: "low" });
       expect(NATIVE_SYSTEM_BLOCKS).toEqual([ARRIVAL_SYSTEM_PROMPT, MONDE_DAY1_BLOCK]);
-      expect((sent as unknown as { output_config: unknown }).output_config).toEqual({ effort: "low", format: modelOutputFormat(ArrivalHouseholdOutput) });
       expect(String(sent.messages[0]!.content)).toContain("MODE: native");
       const [log] = await database.db.select().from(aiLog).where(eq(aiLog.kind, "census"));
       expect(log).toMatchObject({ worldId: CENSUS_WORLD_ID, residentId: "dunmore_barney", promptVersion: "census-v1", validation: "ok", fallback: false });

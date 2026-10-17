@@ -18,6 +18,7 @@ import type { HouseholdDraw, MemberDraw } from "../arrivals/draw";
 import { portraitById, tagsOfEntry } from "../arrivals/library";
 import { NATIVE_PROMPT_VERSION, NATIVE_SYSTEM_BLOCKS, nativeMaxTokens, nativeTemplateHousehold, nativeUserMessage, type NativePromptContext } from "../arrivals/native";
 import { RESERVED_FIRST_NAMES } from "../arrivals/names";
+import { parseJsonObject } from "../arrivals/householdJson";
 import { hashParts } from "../arrivals/rng";
 import { whimFor } from "../arrivals/whims";
 import { FAMILY_TAGS } from "../friendship";
@@ -497,7 +498,8 @@ export async function runCensus(input: CensusInput, options: CensusRunOptions): 
           continue;
         }
         let raw: unknown = null;
-        try { raw = JSON.parse(res.text); } catch { errors = ["V01 not one JSON object"]; continue; }
+        raw = parseJsonObject(res.text);
+        if (raw === undefined) { errors = ["V01 not one JSON object"]; continue; }
         const done = await commit(h, draw, raw, "model", attempts, cost);
         if (done.ok) { result.written.push({ id: h.id, source: "model", attempts, cost_usd: cost }); store.log(`${h.id}: written (attempt ${attempts})`); return; }
         errors = done.errors;

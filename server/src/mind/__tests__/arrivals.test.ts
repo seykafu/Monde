@@ -86,8 +86,11 @@ describe("the arrival buffer (§9.2, A.3.6–A.3.8)", () => {
     for (const body of mind.bodies) {
       expect(body.model).toBe("claude-haiku-5-5");
       for (const key of ["temperature", "top_p", "top_k", "thinking"]) expect(body).not.toHaveProperty(key);
-      expect(body.output_config).toMatchObject({ effort: "low", format: { type: "json_schema" } });
-      expect((body.system as Anthropic.TextBlockParam[])[0]).toMatchObject({ text: ARRIVAL_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } });
+      // The contract is in the cached system prompt; the strict format's grammar is too large for the API.
+      expect(body.output_config).toEqual({ effort: "low" });
+      expect(JSON.stringify(body.system)).toContain("REPLY FORMAT");
+      expect((body.system as Anthropic.TextBlockParam[])[0]).toMatchObject({ text: ARRIVAL_SYSTEM_PROMPT });
+      expect((body.system as Anthropic.TextBlockParam[]).at(-1)).toMatchObject({ cache_control: { type: "ephemeral" } });
       expect(body.messages.every(m => m.role === "user")).toBe(true); // no assistant prefill
       // §9.17's whim seed, from the 500-entry list.
       expect(WHIMS).toContain(/WHIM: (.+)/.exec(String(body.messages.at(-1)!.content))![1]);

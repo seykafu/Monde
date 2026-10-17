@@ -10,3 +10,4 @@ export * from "./nativeDraw";
 export * from "./native";
 export * from "./whims";
 export * from "./people";
+export * from "./householdJson";

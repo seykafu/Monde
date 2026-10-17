@@ -21,7 +21,7 @@ import { eq, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 import {
-  ArrivalHouseholdOutput, NATIVE_PROMPT_VERSION, NATIVE_SYSTEM_BLOCKS, NativeDrawSchema, NativePromptContextSchema, modelOutputFormat,
+  HOUSEHOLD_JSON_BLOCK, NATIVE_PROMPT_VERSION, NATIVE_SYSTEM_BLOCKS, NativeDrawSchema, NativePromptContextSchema,
   nativeMaxTokens, nativeUserMessage, type HouseholdDraw, type NativePromptContext,
 } from "@monde/shared";
 import type { Config } from "../config.js";
@@ -47,9 +47,11 @@ export function censusRequest(draw: HouseholdDraw, ctx: NativePromptContext): An
   return {
     model: MIND_MODEL,
     max_tokens: nativeMaxTokens(draw.members.length),
-    system: NATIVE_SYSTEM_BLOCKS.map(text => ({ type: "text" as const, text, cache_control: { type: "ephemeral" as const } })),
+    // The card contract rides in the cached system blocks, not output_config.format (householdJson.ts: the grammar is
+    // too large for strict structured output). One breakpoint at the end caches all three.
+    system: [...NATIVE_SYSTEM_BLOCKS, HOUSEHOLD_JSON_BLOCK].map((text, i, all) => ({ type: "text" as const, text, ...(i === all.length - 1 ? { cache_control: { type: "ephemeral" as const } } : {}) })),
     messages: [{ role: "user", content: nativeUserMessage(draw, ctx) }],
-    output_config: { effort: "low", format: modelOutputFormat(ArrivalHouseholdOutput) },
+    output_config: { effort: "low" },
   };
 }
 

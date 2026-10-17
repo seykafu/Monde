@@ -22,7 +22,7 @@ import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   ARCHETYPES, ARRIVAL_SYSTEM_PROMPT, ArrivalHousehold, HOME_TOKEN, PersonaCard, RESERVED_FIRST_NAMES, ResidentState,
-  arrivalMaxTokens, arrivalUserMessage, bindHome, cardsFromHousehold, drawHousehold, hashParts, modelOutputFormat,
+  arrivalMaxTokens, arrivalUserMessage, bindHome, cardsFromHousehold, drawHousehold, hashParts, HOUSEHOLD_JSON_BLOCK, parseJsonObject,
   templateHousehold, validateHousehold, whimFor, ArrivalHouseholdOutput, type ArrivalFacts, type HouseholdDraw, type PromptContext,
   type RecentHousehold,
 } from "@monde/shared";
@@ -131,9 +131,11 @@ async function validationContext(db: Database, worldId: string, day: number) {
 export function arrivalRequest(draw: HouseholdDraw, ctx: PromptContext) {
   return {
     model: MIND_MODEL, max_tokens: arrivalMaxTokens(draw.members.length),
-    system: [{ type: "text" as const, text: ARRIVAL_SYSTEM_PROMPT, cache_control: { type: "ephemeral" as const } }],
+    // The card contract rides in the cached system prompt, not output_config.format (shared householdJson.ts: the API
+    // rejects this schema's compiled grammar as too large, so the strict format failed every call).
+    system: [{ type: "text" as const, text: ARRIVAL_SYSTEM_PROMPT }, { type: "text" as const, text: HOUSEHOLD_JSON_BLOCK, cache_control: { type: "ephemeral" as const } }],
     messages: [{ role: "user" as const, content: arrivalUserMessage(draw, ctx) }],
-    output_config: { effort: "low" as const, format: modelOutputFormat(ArrivalHouseholdOutput) },
+    output_config: { effort: "low" as const },
   };
 }
 
@@ -169,7 +171,7 @@ export async function writeHousehold(deps: ArrivalDeps, worldId: string, draw: H
     let verdict: ReturnType<typeof validateHousehold> | null = null;
     if (call.ok) {
       let raw: unknown = null;
-      try { raw = JSON.parse(call.text); } catch { /* V01 below. */ }
+      raw = parseJsonObject(call.text); // undefined → V01 below
       verdict = raw === null ? { ok: false, errors: ["V01 not one JSON object"] } : validateHousehold(raw, draw, vctx);
     }
     if (call.call) {
