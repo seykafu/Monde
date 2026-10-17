@@ -96,7 +96,7 @@ relationships:
       note: Knows knots and boats; they trade favours on the harbour.
     }
   - {
-      id: noor_lombardi,
+      id: thora_lombardi,
       affinity: -5,
       trust: 6,
       tag: curious,

@@ -90,7 +90,7 @@ relationships:
       note: Argues about who really fixed the stall roof.
     }
   - {
-      id: noor_lombardi,
+      id: thora_lombardi,
       affinity: 15,
       trust: 14,
       tag: friend,

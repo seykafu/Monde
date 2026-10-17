@@ -7,7 +7,7 @@
 // difference is marked GDD-GAP where it is made).
 import { z } from "zod";
 import type { PortraitTags } from "../census/portraitPlan";
-import { COMMUTER_ROW, OPEN_BOARDS } from "../census/day1Tables";
+import { COMMUTER_ROW, OPEN_BOARDS, TOLLMEN_ROW } from "../census/day1Tables";
 import { PORTRAIT_SET, PersonaCard, type Values } from "../persona";
 import { PILLARS, type Pillar } from "../script/types";
 import { Verb } from "../verbs";
@@ -338,6 +338,9 @@ export const LIKES_RANGE = [3, 5] as const;
 export const BIG5_KEYS = ["open", "conscientious", "extravert", "agreeable", "neurotic"] as const;
 export type Big5Key = (typeof BIG5_KEYS)[number];
 export const BIG5_APART = 15;
+/** V13: 5–9 routine blocks a day, timed from 00:00 to 26:00 (past midnight runs on as 24:30, 25:00). */
+export const ROUTINE_BLOCKS = [5, 9] as const;
+export const DAY_END_MINUTES = 26 * 60;
 /** GDD-GAP: V13n exempts the housebound from the open-board rule; the skeleton has no flag, so 85 and over. */
 export const HOUSEBOUND_AGE = 85;
 const VACANT = /\.vacant_house_\d+$/;
@@ -374,6 +377,15 @@ export const isCommuter = (m: Pick<MemberDraw, "native">): boolean => m.native?.
 /** Pupils and under-fives get the engine's routine (the school day); the model writes only their prose. */
 export const hasEngineRoutine = (m: Pick<MemberDraw, "native">): boolean => m.native?.minor === "pupil" || m.native?.minor === "under_five";
 const zoneOfPlace = (p: string): string => p.slice(0, p.indexOf("."));
+
+/**
+ * GDD-GAP (native V13): A.1.4 row 23's Tollmen work at briar_woods.tollmen_hideout, but their Saturday round of the six
+ * open shops (§2.4; MONDE ON DAY 1: "Every Saturday a crew who call themselves the Tollmen go round the six open shops")
+ * is their work too. A card has one weekend routine for Saturday and Sunday, so a Tollman's weekend work block on Market
+ * Row is their collection, and V13 accepts it.
+ */
+export const isTollmenRound = (d: Pick<MemberDraw, "native">, day: "weekday" | "weekend", where: string): boolean =>
+  d.native?.job?.row === TOLLMEN_ROW && day === "weekend" && where.startsWith("market_row.");
 const normalizeLike = (s: string) => ` ${s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim()} `;
 
 export type Validation = { ok: true; output: ArrivalHouseholdOutput; warnings: string[] } | { ok: false; errors: string[] };
@@ -619,7 +631,7 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
       if (m.workplace !== null && !workplaces.has(m.workplace)) errors.push(`V13 ${at}.workplace "${m.workplace}" is not in the workplace options`);
       for (const day of ["weekday", "weekend"] as const) {
         const list = m.routine[day];
-        if (list.length < 5 || list.length > 9) errors.push(`V13 ${at}.routine.${day} has ${list.length} entries; 5-9`);
+        if (list.length < ROUTINE_BLOCKS[0] || list.length > ROUTINE_BLOCKS[1]) errors.push(`V13 ${at}.routine.${day} has ${list.length} entries; 5-9`);
         routineTimes(list, `${at}.routine.${day}`, errors);
         for (const e of list) {
           if (!places.has(e.where)) errors.push(`V13 ${at}.routine.${day}: "${e.where}" is not a place id`);
@@ -687,24 +699,36 @@ export function validateHousehold(raw: unknown, draw: HouseholdDraw, ctx: Valida
   return { ok: true, output: out, warnings };
 }
 
+/** V13's time form: H:MM or HH:MM (the hours run on past 23 after midnight). */
+export const ROUTINE_TIME = /^(\d{1,2}):(\d{2})$/;
+
+/**
+ * V13's clock over a day's `at`s: each in minutes from midnight, with the one wrap past midnight V13 allows ("00:30"
+ * after "23:00" is 24:30); null for a time that is unparseable, out of order or past 26:00 (the repair reads it too).
+ */
+export function routineClock(ats: readonly unknown[]): (number | null)[] {
+  let prev = -1, wrapped = false;
+  return ats.map(at => {
+    const t = typeof at === "string" ? ROUTINE_TIME.exec(at) : null;
+    let min = t ? Number(t[1]) * 60 + Number(t[2]) : NaN;
+    if (Number.isFinite(min) && min < prev && !wrapped && min + 1440 <= DAY_END_MINUTES) { min += 1440; wrapped = true; }
+    if (!Number.isFinite(min) || min < prev || min > DAY_END_MINUTES) return null;
+    prev = min;
+    return min;
+  });
+}
+
 /** V13's times: `at` ascending within 00:00–26:00 (one wrap past midnight allowed). */
 function routineTimes(list: readonly { at: string }[], where: string, errors: string[]): void {
-  let prev = -1, wrapped = false;
-  for (const e of list) {
-    const t = /^(\d{1,2}):(\d{2})$/.exec(e.at);
-    let min = t ? Number(t[1]) * 60 + Number(t[2]) : NaN;
-    if (Number.isFinite(min) && min < prev && !wrapped && min + 1440 <= 26 * 60) { min += 1440; wrapped = true; }
-    if (!Number.isFinite(min) || min < prev || min > 26 * 60) errors.push(`V13 ${where}: "${e.at}" is out of order or past 26:00`);
-    else prev = min;
-  }
+  routineClock(list.map(e => e.at)).forEach((min, k) => { if (min === null) errors.push(`V13 ${where}: "${list[k]!.at}" is out of order or past 26:00`); });
 }
 
 /**
  * Native V13 (GDD-GAP, each rule the census's): the workplace is the one A.1.4 assigned (or none); work happens only
  * there; a commuter's weekdays are at offmap.city (they may start and end there); nobody else goes to offmap.city or a
- * vacant house. V13n: a Millbrook or Station Hill resident aged 13 or more (not housebound) spends at least one weekday
- * block and one weekend block on an open board, so the player meets them. Pupils and under-fives are skipped: the
- * engine writes their day.
+ * vacant house (a Tollman's weekend round on Market Row is work too: isTollmenRound). V13n: a Millbrook or Station Hill
+ * resident aged 13 or more (not housebound) spends at least one weekday block and one weekend block on an open board, so
+ * the player meets them. Pupils and under-fives are skipped: the engine writes their day.
  */
 function validateNativeRoutine(m: ArrivalMember, d: MemberDraw, draw: HouseholdDraw, places: ReadonlySet<string>, home: string, at: string, errors: string[]): void {
   const assigned = assignedWorkplace(d, home);
@@ -716,14 +740,14 @@ function validateNativeRoutine(m: ArrivalMember, d: MemberDraw, draw: HouseholdD
   for (const day of ["weekday", "weekend"] as const) {
     const list = m.routine[day].map(e => (e.where === HOME_TOKEN ? { ...e, where: home } : e));
     m.routine[day] = list;
-    if (list.length < 5 || list.length > 9) errors.push(`V13 ${at}.routine.${day} has ${list.length} entries; 5-9`);
+    if (list.length < ROUTINE_BLOCKS[0] || list.length > ROUTINE_BLOCKS[1]) errors.push(`V13 ${at}.routine.${day} has ${list.length} entries; 5-9`);
     routineTimes(list, `${at}.routine.${day}`, errors);
     const away = commuter && day === "weekday";
     for (const e of list) {
       if (!places.has(e.where)) errors.push(`V13 ${at}.routine.${day}: "${e.where}" is not a place id`);
       else if (VACANT.test(e.where)) errors.push(`V13 ${at}.routine.${day}: "${e.where}" is an empty house`);
       else if (e.where === "offmap.city" && !away) errors.push(`V13 ${at}.routine.${day}: only a commuter's weekdays go to offmap.city`);
-      if (e.do === "work" && e.where !== assigned) errors.push(`V13 ${at}.routine.${day}: work at "${e.where}"${assigned ? `; their work is at ${assigned}` : ", but they have no job"}`);
+      if (e.do === "work" && e.where !== assigned && !isTollmenRound(d, day, e.where)) errors.push(`V13 ${at}.routine.${day}: work at "${e.where}"${assigned ? `; their work is at ${assigned}` : ", but they have no job"}`);
     }
     const ends = away ? [home, "offmap.city"] : [home];
     if (list.length && (!ends.includes(list[0]!.where) || !ends.includes(list.at(-1)!.where))) errors.push(`V13 ${at}.routine.${day} must start and end at ${ends.join(" or ")}`);

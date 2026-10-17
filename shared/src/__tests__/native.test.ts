@@ -57,6 +57,8 @@ describe("the native prompt (A.3.6, MODE: native)", () => {
     await expect(MONDE_DAY1_BLOCK).toMatchFileSnapshot("./__snapshots__/monde-day1-block.txt");
     for (const fact of ["14 years ago", "11 years ago", "9 years ago", "4:17", "every Saturday", "26 years"]) expect(MONDE_DAY1_BLOCK.toLowerCase()).toContain(fact.toLowerCase());
     expect(MONDE_DAY1_BLOCK).not.toMatch(/option|loan|greyline|charter|vane/i);
+    // The full run's elders reminisced in pennies (V16): the block says money is coins in memories too.
+    expect(MONDE_DAY1_BLOCK).toContain("Money is coins, even in memories: never pennies, pence, shillings or pounds.");
     // About 400 tokens (a token is about four characters of English).
     expect(MONDE_DAY1_BLOCK.length / 4).toBeLessThan(560);
   });

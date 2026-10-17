@@ -171,7 +171,7 @@ export function nativeDrawFor(input: CensusInput, h: SkeletonHousehold): Househo
       archetype: (m.archetype ?? h.archetype) as ArchetypeId,
       native: {
         kind: m.kind === "named" ? "named" : "anonymous",
-        pinned: named && m.id ? { id: m.id, name: named.name } : null,
+        pinned: m.id && (named || (m.name_fixed && m.name)) ? { id: m.id, name: named ? named.name : m.name! } : null,
         employment: m.employment, job: m.job ? { row: m.job.row, title: m.job.title, workplace: m.job.workplace } : null,
         saturday_job: m.saturday_job, minor: m.minor, years_in_monde: Math.min(m.age, Math.max(0, years)),
         first_names: [...m.first_names], surname: m.surname ?? h.surname ?? "", birthday: m.birthday, seed,
@@ -413,10 +413,11 @@ export async function runCensus(input: CensusInput, options: CensusRunOptions): 
     if (!options.dryRun) {
       await store.removeCards(h.id);
       for (const [id, c] of input.written) if (c.household === h.id) input.written.delete(id);
-      for (const m of h.members) if (m.kind === "anonymous") { m.id = null; m.name = null; }
+      // The same people, written again: their ids and names stay (cards elsewhere tie to them by id), as fixed names.
+      for (const m of h.members) if (m.kind === "anonymous" && m.id && m.name) m.name_fixed = true;
       h.status = pinnedIds.has(h.id) ? "pinned" : "skeleton";
       h.generation = blankGeneration();
-      store.log(`regen ${h.id}: its cards were removed; any card that named them now names nobody`);
+      store.log(`regen ${h.id}: its cards were removed; its people keep their names and ids`);
     }
   }
   const withCards = store.householdsWithCards();

@@ -3,15 +3,22 @@
 // household six times on things the engine can put right without inventing anything: a summary or backstory a little
 // over its cap, a tie tagged "brother" or "neighbour", a routine at "market_street", a required tie at the hand-written
 // card's 70, a member tied to their own slot, likes that miss the archetype's list, two members' Big Five a few points
-// apart. repairHousehold fixes those deterministically and lists each change; validateHousehold then judges what is
-// left, and only that goes back to the model on a retry. Names, canon, novelty and banned language (V02, V03, V15–V19)
-// stay with the validator and the retry loop. Pure: no I/O, and the input is never mutated.
+// apart. A full census run (2026-10-17) then still fell back to the template for 35 of 107 households, on more slips of
+// the same kind: elders reminiscing in pennies (V16's money), a verb the engine doesn't have, ten routine blocks, a
+// block past 26:00 or out of order, a day that doesn't start or end at home, a work block away from the workplace.
+// repairHousehold fixes those deterministically and lists each change; validateHousehold then judges what is left, and
+// only that goes back to the model on a retry. Names, canon, novelty and the rest of banned language (V02, V03,
+// V15–V19) stay with the validator and the retry loop, and so does anything that needs new content (V10's
+// contractions). Pure: no I/O, and the input is never mutated.
+import { OPEN_BOARDS } from "../census/day1Tables";
 import { VERBS, type Verb } from "../verbs";
 import {
-  APPEARANCE_SENTENCES, BIG5_APART, BIG5_KEYS, HOME_TOKEN, LENGTH_CAPS, LIKES_RANGE, PRONOUNS, RELATION_TAGS, STORY_ROLES, big5Apart,
-  countSentences, countWords, likeRule, memberArchetype, memberTags, mentionsAttire, tieLimit, type Big5Key, type ValidationContext,
+  APPEARANCE_SENTENCES, BIG5_APART, BIG5_KEYS, DAY_END_MINUTES, HOME_TOKEN, LENGTH_CAPS, LIKES_RANGE, PRONOUNS, RELATION_TAGS, ROUTINE_BLOCKS,
+  ROUTINE_TIME, STORY_ROLES, assignedWorkplace, big5Apart, countSentences, countWords, hasEngineRoutine, isCommuter, isTollmenRound, likeRule,
+  memberArchetype, memberTags, mentionsAttire, routineClock, tieLimit, type Big5Key, type ValidationContext,
 } from "./card";
 import type { HouseholdDraw } from "./draw";
+import { currencyHit, currencySpans, foldApostrophes } from "./money";
 import { SeededRng } from "./rng";
 
 export interface HouseholdRepair {
@@ -95,6 +102,83 @@ export function verbOf(v: string): Verb | null {
   return options.length === 1 ? (options[0] as Verb) : null;
 }
 
+/**
+ * GDD-GAP: A.3.7 V01 fails a routine verb outside §9.7's list. These words name an activity plainly enough to take the
+ * closest verb (the model's "chat", "stroll", "knit", "bake", "chapel"). WORK_WORDS are work at the member's workplace
+ * and the verb given elsewhere (a lesson somewhere else is attended). Any other word is a wander.
+ */
+const VERB_WORDS: Readonly<Partial<Record<Verb, readonly string[]>>> = {
+  socialize: ["chat", "gossip", "talk", "natter", "mingle", "meet", "converse", "banter", "greet", "catch_up", "company", "cards", "darts", "dominoes", "pint", "pub"],
+  walk: ["stroll", "amble", "ramble", "hike", "saunter", "promenade", "constitutional", "dog", "dog_walk"],
+  tinker: ["knit", "sew", "mend", "repair", "darn", "fix", "patch", "whittle", "carve", "craft", "build", "make", "weave", "embroider", "paint", "sketch", "draw", "woodwork", "carpentry"],
+  clean: ["wash", "washing", "laundry", "launder", "scrub", "sweep", "dust", "tidy", "iron", "polish", "mop", "chores", "housework"],
+  cook: ["bake", "brew", "roast", "boil", "prepare", "kitchen"],
+  eat: ["breakfast", "lunch", "dinner", "supper", "tea", "meal", "dine", "snack", "elevenses", "picnic"],
+  pray: ["worship", "chapel", "church", "mass", "service", "vespers", "evensong", "devotions", "hymns"],
+  sleep: ["sleep_in", "lie_in", "bed", "bedtime", "turn_in"],
+  nap: ["doze", "snooze", "siesta", "rest", "lie_down", "kip"],
+  read: ["study", "paper", "newspaper", "book", "library"],
+  write: ["letter", "letters", "journal", "diary", "correspondence", "ledger", "accounts"],
+  garden: ["weed", "plant", "prune", "hoe", "dig", "allotment", "greenhouse"],
+  fish: ["angle", "angling", "crab", "crabbing"],
+  play_music: ["music", "sing", "song", "choir", "fiddle", "piano", "violin", "accordion", "concertina", "guitar"],
+  shop: ["buy", "errand", "errands", "market", "groceries", "browse", "shops"],
+  visit: ["call", "call_on", "drop_in", "see"],
+  attend: ["meeting", "council", "lecture"],
+  exercise: ["swim", "run", "jog", "cycle", "bike", "row", "stretch", "train", "dip", "sea_swim"],
+  sit: ["relax", "bench", "sunbathe", "wait", "think", "ponder", "daydream", "idle"],
+  volunteer: ["help", "help_out", "charity"],
+  wander: ["potter", "explore", "roam", "mooch", "loiter", "dawdle", "beachcomb"],
+};
+const WORK_WORDS: ReadonlyMap<string, Verb> = new Map([
+  ...["teach", "lesson", "tutor", "class", "school"].map(w => [w, "attend"] as const),
+  ...["serve", "serving"].map(w => [w, "volunteer"] as const),
+  ...["watch", "guard"].map(w => [w, "sit"] as const),
+  ...["shift", "job", "labour", "labor", "duty", "deliver", "delivery", "round", "patrol", "collect", "collection"].map(w => [w, "wander"] as const),
+]);
+const VERB_OF_WORD = new Map<string, Verb>(
+  (Object.entries(VERB_WORDS) as [Verb, readonly string[]][]).flatMap(([verb, list]) => list.map(w => [w, verb] as const)),
+);
+const VERB_STOP = new Set([
+  "a", "an", "the", "at", "to", "with", "and", "of", "on", "in", "for", "by", "out", "up", "around", "about", "some", "go", "goes", "going",
+  "have", "has", "having", "do", "does", "doing", "get", "gets", "his", "her", "their", "my", "own", "early", "late", "quick", "long", "bit", "time",
+]);
+/** A word's plainer forms: "chatting" → chat, "strolls" → stroll, "baked" → bake. */
+const wordForms = (w: string): string[] => {
+  const out = [w];
+  const base = (stem: string) => out.push(stem, `${stem}e`, stem.replace(/(.)\1$/, "$1"));
+  if (w.endsWith("ing")) base(w.slice(0, -3));
+  if (w.endsWith("ed")) base(w.slice(0, -2));
+  if (w.endsWith("ies")) out.push(`${w.slice(0, -3)}y`);
+  if (w.endsWith("es")) out.push(w.slice(0, -2));
+  if (w.endsWith("s")) out.push(w.slice(0, -1));
+  return [...new Set(out)];
+};
+
+/**
+ * The routine verb for whatever the model wrote in `do`: an inflection of a verb (verbOf), else the synonym table (the
+ * whole phrase, then its words from the first: "go for a stroll" → walk), with `atWork` deciding the work words; else
+ * wander. `known` is false for the wander nothing pointed to.
+ */
+export function routineVerbFor(v: string, atWork: boolean): { verb: Verb; known: boolean } {
+  const exact = verbOf(v);
+  if (exact) return { verb: exact, known: true };
+  const verbs = VERBS as readonly string[];
+  const lookup = (w: string): Verb | null => {
+    for (const f of wordForms(w)) {
+      if (verbs.includes(f)) return f as Verb;
+      const mapped = VERB_OF_WORD.get(f);
+      if (mapped) return mapped;
+      const work = WORK_WORDS.get(f);
+      if (work) return atWork ? "work" : work;
+    }
+    return null;
+  };
+  const tokens = foldApostrophes(v).toLowerCase().replace(/[^\p{L}\s_-]+/gu, " ").split(/[\s_-]+/).filter(Boolean);
+  const verb = (tokens.length ? lookup(tokens.join("_")) : null) ?? tokens.filter(t => !VERB_STOP.has(t)).map(lookup).find(x => x !== null) ?? null;
+  return verb ? { verb, known: true } : { verb: "wander", known: false };
+}
+
 /** GDD-GAP: A.3.7 V01 fails a tag outside the six; these words name one of them plainly enough to map. */
 const TAG_WORDS: Readonly<Record<RelationTag, readonly string[]>> = {
   kin: [
@@ -159,6 +243,167 @@ function placeFixer(ctx: ValidationContext, home: string): (v: string) => string
   };
 }
 
+// ── V13: a day's shape ──────────────────────────────────────────────────────
+
+/** Minutes from midnight → "HH:MM", the hours running on past 23 (24:30, 26:00). */
+export const clockTime = (min: number): string => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
+/** The earliest a day's added first block at home starts. */
+const EARLIEST_START = 5 * 60;
+/** The latest time that can be past midnight (V13 runs to 26:00), and the hour after which a small time is. */
+const WRAP_LIMIT = DAY_END_MINUTES - 1440;
+const NOON = 12 * 60;
+const blockLine = (e: unknown): string => (isRec(e) ? `${show(e.at)} ${isStr(e.do) ? e.do : show(e.do)} at ${isStr(e.where) ? e.where : show(e.where)}` : show(e));
+const zoneOf = (place: string): string => (place.includes(".") ? place.slice(0, place.indexOf(".")) : place);
+
+/**
+ * V13's shape for one day of a routine, in order:
+ *  1. blocks with no readable time go;
+ *  2. if V13's clock fails, the blocks are sorted by time (a time up to 02:00 that follows a block from noon on is past
+ *     midnight, and is written on: "00:30" → "24:30"), and any block past 26:00 goes;
+ *  3. while the day is over nine blocks (counting the home blocks step 4 will add), the shortest block away from home
+ *     and not work goes (a tie: the later one);
+ *  4. a day that doesn't start at home starts with a meal there 30 minutes before its first block (not before 05:00; if
+ *     that isn't before the first block, at the first block's time), and a day that doesn't end at home ends with sleep
+ *     there an hour after its last (by 26:00): each only if the day stays within nine.
+ * `homes` are the places a day may start and end (the home, home.own; offmap.city for a commuter's weekday); added
+ * blocks are at `home`. A day that already has V13's shape comes back as it is.
+ */
+function repairDay(list: readonly unknown[], path: string, homes: ReadonlySet<string>, home: string, note: (line: string) => void): unknown[] {
+  let day = list.filter(e => {
+    if (isRec(e) && isStr(e.at) && ROUTINE_TIME.test(e.at)) return true;
+    note(`V13 ${path}: dropped ${blockLine(e)} (not a time)`);
+    return false;
+  }) as Rec[];
+  if (routineClock(day.map(e => e.at)).some(m => m === null)) {
+    let late = false;
+    const timed = day.map((e, k) => {
+      const [, h, mm] = ROUTINE_TIME.exec(e.at as string)!;
+      let min = Number(h) * 60 + Number(mm);
+      if (late && min <= WRAP_LIMIT) min += 1440;
+      if (min >= NOON) late = true;
+      return { e, min, k };
+    }).sort((a, b) => a.min - b.min || a.k - b.k);
+    const before = day.map(e => e.at as string);
+    for (const t of timed) if (t.min >= 1440 && t.min <= DAY_END_MINUTES) t.e.at = clockTime(t.min);
+    day = timed.map(t => t.e);
+    const after = day.map(e => e.at as string);
+    if (timed.some((t, i) => t.k !== i) || after.some((a, i) => a !== before[i]))
+      note(`V13 ${path} sorted by time: ${show(before.join(", "))} → ${show(after.join(", "))}`);
+    day = day.filter((e, i) => {
+      if (timed[i]!.min <= DAY_END_MINUTES) return true;
+      note(`V13 ${path}: dropped ${blockLine(e)} (past 26:00)`);
+      return false;
+    });
+  }
+  const isHome = (e: Rec | undefined) => !!e && isStr(e.where) && homes.has(e.where);
+  const toAdd = () => (day.length ? Number(!isHome(day[0])) + Number(!isHome(day.at(-1))) : 0);
+  const max = ROUTINE_BLOCKS[1];
+  while (day.length + toAdd() > max) {
+    const mins = routineClock(day.map(e => e.at)) as number[];
+    let pick = -1, best = Infinity;
+    day.forEach((e, i) => {
+      if (isHome(e) || e.do === "work") return;
+      const length = (mins[i + 1] ?? DAY_END_MINUTES) - mins[i]!;
+      if (length <= best) { best = length; pick = i; }
+    });
+    if (pick < 0) break;
+    const adding = toAdd();
+    note(`V13 ${path}: dropped ${blockLine(day[pick])} (${day.length} blocks${adding ? ` and ${adding} to add at home` : ""}; at most ${max})`);
+    day.splice(pick, 1);
+  }
+  if (day.length && !isHome(day[0]) && day.length < max) {
+    const first = routineClock([day[0]!.at])[0]!;
+    let at = Math.max(first - 30, EARLIEST_START);
+    if (at >= first) at = first;
+    day.unshift({ at: clockTime(at), do: "eat", where: home });
+    note(`V13 ${path}: added ${blockLine(day[0])} (the day starts at home)`);
+  }
+  if (day.length && !isHome(day.at(-1)) && day.length < max) {
+    const last = (routineClock(day.map(e => e.at)) as number[]).at(-1)!;
+    day.push({ at: clockTime(Math.min(last + 60, DAY_END_MINUTES)), do: "sleep", where: home });
+    note(`V13 ${path}: added ${blockLine(day.at(-1))} (the day ends at home)`);
+  }
+  return day;
+}
+
+// ── V16: money is coins ─────────────────────────────────────────────────────
+
+/**
+ * The World Bible: "Money is coins, never pounds or shillings" (server/src/mind/prompts/world_bible.md; MONDE ON DAY 1
+ * says it for memories too). The census's elders still reminisce in pennies ("A penny, it was"), and V16 fails the card
+ * on money.ts's currencyHit. The engine swaps the money word for coins, keeping the number: only what that matcher
+ * flags changes, so "penny whistle", "the penny dropped" and "a pound of flour" stay. An old-money sum with a flagged
+ * word in it ("four and sixpence", "two shillings and six") is "a few coins"; a bare "four and six" passes V16 and stays.
+ * Each entry: the money word, and its coins after "a", "an" or "one" (single) or otherwise.
+ */
+const COINS: readonly (readonly [RegExp, (single: boolean) => string])[] = [
+  [/^tuppence$/i, single => (single ? "coin" : "two coins")],
+  [/^(?:thruppence|threepence)$/i, single => (single ? "coin" : "three coins")],
+  [/^sixpence$/i, single => (single ? "coin" : "six coins")],
+  [/^(?:shilling|penny|ha'?penny|halfpenny|farthing|dollar|euro|franc|guinea)$/i, () => "coin"],
+  [/^(?:shillings|pence|pennies|ha'?pennies|halfpennies|farthings|dollars|cents|euros|francs|guineas|sixpences|threepences|quid)$/i, single => (single ? "coin" : "coins")],
+];
+/** The matcher's count + pound(s) ("five pounds", "a pound"; a note or coin after it goes too). */
+const COUNTED_POUNDS = /^(.+?)\s+pounds?$/iu;
+/** "pounds a week", "pound notes", "every cent": the money word becomes coin(s), the rest stays. */
+const POUNDS_A = /^(pounds?)(\s+(?:a|per)\s+\S+)$/iu;
+const POUND_NOTES = /^pound\s+(?:notes?|coins?)$/iu;
+const A_CENT = /^(.+\s)cent$/iu;
+const AMOUNT = "(?:\\d+|a|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)";
+const SMALL_COIN = "(?:\\p{L}*pence|pennies|penny(?![\\s-]*(?:whistles?|farthings?|dropped|drops))|ha'?penn(?:y|ies)|halfpenn(?:y|ies)|farthings?|sixpences?|threepences?)";
+/** An old-money sum with a word V16 flags: "two shillings and sixpence", "two shillings and six", "four and six pence". */
+const OLD_MONEY = new RegExp(`(?<![\\p{L}\\p{N}])(?:${AMOUNT}\\s+shillings?(?:,?\\s+and|,)?\\s+(?:${AMOUNT}\\s+)?${SMALL_COIN}|${AMOUNT}\\s+shillings?\\s+and\\s+${AMOUNT}|${AMOUNT}\\s+and\\s+(?:${AMOUNT}\\s+)?${SMALL_COIN})(?![\\p{L}\\p{N}])`, "giu");
+/** The bicycle: V16 reads its "farthing" as money. */
+const PENNY_FARTHING = /(?<![\p{L}\p{N}])penny[\s-]*farthing(s?)(?![\p{L}\p{N}])/giu;
+const SINGLE_BEFORE = /(?<![\p{L}\p{N}])(?:an?|one|1)\s+$/iu;
+const AFTER_POUND = /^\s+(?:notes?|coins?)(?![\p{L}\p{N}])/iu;
+const SIGN_AMOUNT = /^[£$€]\s?(\d[\d,]*(?:\.\d+)?)/u;
+
+/** `to` in `from`'s case: all capitals, a capital first letter, or as it is. */
+const inCase = (from: string, to: string): string => {
+  const letters = from.replace(/[^\p{L}]/gu, "");
+  if (letters.length > 1 && letters === letters.toUpperCase()) return to.toUpperCase();
+  return /^\p{Lu}/u.test(from) ? `${to.charAt(0).toUpperCase()}${to.slice(1)}` : to;
+};
+
+/**
+ * `text` with its money in coins (the COINS table), and each swap made, left to right; null when the text has no money
+ * V16 flags, or when the swaps wouldn't clear it (the text is then left for V16 and the retry).
+ */
+export function coinsFor(text: string): { text: string; swaps: [string, string][] } | null {
+  if (!currencyHit(text)) return null;
+  const folded = foldApostrophes(text);
+  const edits: { start: number; end: number; to: string }[] = [];
+  const free = (start: number, end: number) => edits.every(e => end <= e.start || start >= e.end);
+  for (const m of folded.matchAll(PENNY_FARTHING)) edits.push({ start: m.index, end: m.index + m[0].length, to: `high-wheeler${m[1]}` });
+  for (const m of folded.matchAll(OLD_MONEY)) if (free(m.index, m.index + m[0].length)) edits.push({ start: m.index, end: m.index + m[0].length, to: "a few coins" });
+  for (const span of currencySpans(text)) {
+    const start = span.index;
+    let end = start + span.text.length;
+    if (!free(start, end)) continue;
+    const word = foldApostrophes(span.text);
+    const single = SINGLE_BEFORE.test(text.slice(0, start));
+    let to: string | null = null, m: RegExpExecArray | null;
+    if (span.sign) {
+      const amount = SIGN_AMOUNT.exec(text.slice(start))!;
+      end = start + amount[0].length;
+      to = `${amount[1]} ${amount[1] === "1" ? "coin" : "coins"}`;
+    } else if ((m = COUNTED_POUNDS.exec(word))) {
+      end += AFTER_POUND.exec(folded.slice(end))?.[0].length ?? 0;
+      to = `${span.text.slice(0, m[1]!.length)} ${/^(?:an?|one|1|half an?)$/i.test(m[1]!) ? "coin" : "coins"}`;
+    } else if ((m = POUNDS_A.exec(word))) to = `${/s$/i.test(m[1]!) ? "coins" : "coin"}${span.text.slice(m[1]!.length)}`;
+    else if (POUND_NOTES.test(word)) to = /s$/i.test(word) ? "coins" : "coin";
+    else if ((m = A_CENT.exec(word))) to = `${span.text.slice(0, m[1]!.length)}coin`;
+    else to = COINS.find(([re]) => re.test(word))?.[1](single) ?? null;
+    if (to !== null) edits.push({ start, end, to });
+  }
+  edits.sort((a, b) => a.start - b.start);
+  let out = text;
+  for (const e of [...edits].reverse()) out = `${out.slice(0, e.start)}${inCase(text.slice(e.start, e.end), e.to)}${out.slice(e.end)}`;
+  if (!edits.length || currencyHit(out)) return null;
+  return { text: out, swaps: edits.map(e => [text.slice(e.start, e.end), inCase(text.slice(e.start, e.end), e.to)]) };
+}
+
 // ── V08: Big Five ───────────────────────────────────────────────────────────
 
 type Big5 = Record<Big5Key, number>;
@@ -200,11 +445,18 @@ export function nudgeBig5(me: Big5, earlier: readonly Big5[], rng: SeededRng): B
 
 /**
  * Repair a parsed household reply (anything parseJsonObject returned) against its draw, before validateHousehold:
+ *  0. V16: money words in every text V16 scans (all but the name) become coins (coinsFor). Before the trims: "sixpence"
+ *     is two words as "six coins".
  *  1. V06/V07 lengths over their caps are trimmed (trimToWords); an appearance keeps its attire word or is left alone.
  *  2. Enums: relationship tags through the synonym table (an unknown tag with positive affinity becomes "fond"; with
- *     none, the tie is dropped unless it is required or the member's last); pronouns, story roles and routine verbs in
- *     another spelling. A required tie takes the tag the engine requires (kin).
- *  3. V13: a bare local place id takes its zone when exactly one place has it.
+ *     none, the tie is dropped unless it is required or the member's last); pronouns and story roles in another
+ *     spelling; a routine verb in another spelling or through its synonym table, else "wander" (routineVerbFor). A
+ *     required tie takes the tag the engine requires (kin).
+ *  3. V13: a bare local place id takes its zone when exactly one place has it. Each day's routine takes V13's shape
+ *     (repairDay: times, order, at most nine blocks, starting and ending at home), unless the engine writes that
+ *     member's day (pupils, under-fives). A work block away from the workplace becomes a visit when the workplace is on
+ *     an open board and the block isn't at home (a Tollman's Saturday round is work: isTollmenRound); otherwise V13
+ *     judges it.
  *  4. V14: ties to the member themself (slot or id) and second ties to one person are dropped; a housemate's slot
  *     becomes their id (the others' slots stay: assembly resolves them to the household tie); affinity and trust are
  *     rounded and held to tieLimit's range (±100 for the household and required ties, which keep their numbers).
@@ -219,6 +471,8 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
   const out = structuredClone(raw);
   const note = (line: string) => { adjustments.push(line); };
   const native = ctx.profile === "native";
+  // The household's home: the draw's (a Day-1 household), else the context's (home.own for an arrival in the buffer).
+  const home = draw.native?.home.id ?? ctx.home ?? HOME_TOKEN;
   const place = placeFixer(ctx, ctx.home ?? HOME_TOKEN);
   const housemateBySlot = new Map((draw.native?.housemates ?? []).map(h => [h.slot, h.id]));
   const pinnedBySlot = new Map(draw.members.flatMap(m => (m.native?.pinned ? [[m.slot, m.native.pinned.id] as const] : [])));
@@ -237,13 +491,37 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
   const trimAll = (list: unknown, max: number, path: string) => {
     if (Array.isArray(list)) list.forEach((_, k) => trim(list as unknown as Rec, k, max, `${path}[${k}]`));
   };
+  const coins = (holder: unknown, key: string | number, path: string) => {
+    if (!isRec(holder) && !Array.isArray(holder)) return;
+    const h = holder as Rec;
+    const v = h[key];
+    if (!isStr(v)) return;
+    const fixed = coinsFor(v);
+    if (!fixed) return;
+    h[key] = fixed.text;
+    note(`V16 ${path} ${fixed.swaps.map(([from, to]) => `${show(from)} → ${show(to)}`).join(", ")}`);
+  };
+  const coinsAll = (list: unknown, path: string, skip: (s: unknown) => boolean = () => false) => {
+    if (Array.isArray(list)) list.forEach((x, k) => { if (!skip(x)) coins(list, k, `${path}[${k}]`); });
+  };
 
-  if (isRec(out.household)) trim(out.household, "summary", LENGTH_CAPS.summary, "household.summary");
+  if (isRec(out.household)) {
+    coins(out.household, "summary", "household.summary");
+    trim(out.household, "summary", LENGTH_CAPS.summary, "household.summary");
+  }
   const members = Array.isArray(out.members) ? out.members : [];
   members.forEach((m: unknown, i) => {
     if (!isRec(m)) return;
     const d = draw.members[i];
     const at = `members[${i}]`;
+    // 0. Money, in every text V16 scans but the name (and a dream stage copied from the archetype, which it skips).
+    const authored = new Set(d ? memberArchetype(d, draw).dreams.flatMap(x => x.stages) : []);
+    for (const key of ["occupation", "appearance", "backstory"]) coins(m, key, `${at}.${key}`);
+    for (const key of ["beliefs", "likes", "dislikes", "fears", "chores"]) coinsAll(m[key], `${at}.${key}`);
+    if (isRec(m.voice)) { coins(m.voice, "register", `${at}.voice.register`); coinsAll(m.voice.tics, `${at}.voice.tics`); coinsAll(m.voice.samples, `${at}.voice.samples`); }
+    if (isRec(m.dream)) { coins(m.dream, "text", `${at}.dream.text`); coinsAll(m.dream.stages, `${at}.dream.stages`, x => isStr(x) && authored.has(x)); }
+    if (Array.isArray(m.relationships)) m.relationships.forEach((r: unknown, k) => coins(r, "note", `${at}.relationships[${k}].note`));
+    if (Array.isArray(m.secrets)) m.secrets.forEach((x: unknown, k) => coins(x, "text", `${at}.secrets[${k}].text`));
     // 1. Lengths.
     trim(m, "occupation", LENGTH_CAPS.occupation, `${at}.occupation`);
     trim(m, "backstory", LENGTH_CAPS.backstory, `${at}.backstory`);
@@ -267,24 +545,43 @@ export function repairHousehold(raw: unknown, draw: HouseholdDraw, ctx: Validati
       m.story_role = role;
     }
 
-    // 3. Places.
+    // 3. Places, and the routine's verbs and shape.
     if (isStr(m.workplace)) {
       const w = place(m.workplace);
       if (w !== m.workplace) { note(`V13 ${at}.workplace ${show(m.workplace)} → ${show(w)}`); m.workplace = w; }
     }
+    // Where the member works: the census's assignment (native), or the card's own (an arrival; home.own is home).
+    const workplace = native ? (d ? assignedWorkplace(d, home) : null) : isStr(m.workplace) ? m.workplace : null;
+    const atWork = (day: "weekday" | "weekend", where: unknown) =>
+      isStr(where) && ((native && where === HOME_TOKEN ? home : where) === workplace || (!!d && isTollmenRound(d, day, where)));
     if (isRec(m.routine)) for (const day of ["weekday", "weekend"] as const) {
       const list = m.routine[day];
       if (!Array.isArray(list)) continue;
+      const path = `${at}.routine.${day}`;
       list.forEach((e: unknown, k) => {
         if (!isRec(e)) return;
         if (isStr(e.where)) {
           const w = place(e.where);
-          if (w !== e.where) { note(`V13 ${at}.routine.${day}[${k}].where ${show(e.where)} → ${show(w)}`); e.where = w; }
+          if (w !== e.where) { note(`V13 ${path}[${k}].where ${show(e.where)} → ${show(w)}`); e.where = w; }
         }
         if (isStr(e.do) && !(VERBS as readonly string[]).includes(e.do)) {
-          const v = verbOf(e.do);
-          if (v) { note(`V13 ${at}.routine.${day}[${k}].do ${show(e.do)} → ${show(v)}`); e.do = v; }
+          const { verb, known } = routineVerbFor(e.do, atWork(day, e.where));
+          note(`V13 ${path}[${k}].do ${show(e.do)} → ${show(verb)}${known ? "" : " (not a verb the engine has)"}`);
+          e.do = verb;
         }
+      });
+      // The engine writes a pupil's or an under-five's day (native), and V13 reads no member past the draw's.
+      if (!d || (native && hasEngineRoutine(d))) continue;
+      const away = native && isCommuter(d) && day === "weekday";
+      const homes = new Set(native ? [home, HOME_TOKEN, ...(away ? ["offmap.city"] : [])] : [HOME_TOKEN]);
+      const shaped = repairDay(list, path, homes, native ? home : HOME_TOKEN, note);
+      m.routine[day] = shaped;
+      // Work away from the workplace: there, but not working.
+      const onBoard = workplace !== null && (OPEN_BOARDS as readonly string[]).includes(zoneOf(workplace));
+      shaped.forEach((e, k) => {
+        if (!onBoard || !isRec(e) || e.do !== "work" || !isStr(e.where) || homes.has(e.where) || atWork(day, e.where)) return;
+        note(`V13 ${path}[${k}].do "work" → "visit" (at ${e.where}; their work is at ${workplace})`);
+        e.do = "visit";
       });
     }
 

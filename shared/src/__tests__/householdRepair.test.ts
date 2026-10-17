@@ -3,9 +3,9 @@
 // six attempts on these), the adjustments it reports, idempotency, and a passing reply coming back untouched.
 import { describe, expect, it } from "vitest";
 import {
-  ROUTINE_PLACES, SeededRng, censusOrder, countWords, drawHousehold, nativeDrawFor, nativeTemplateHousehold, nativeValidationContext, nudgeBig5,
-  pronounsOf, relationTagOf, repairHousehold, storyRoleOf, templateHousehold, trimToWords, validateHousehold, verbOf,
-  type ArrivalHouseholdOutput, type HouseholdDraw, type SkeletonHousehold, type ValidationContext,
+  ROUTINE_PLACES, SeededRng, VERBS, censusOrder, clockTime, coinsFor, countWords, currencyHit, drawHousehold, nativeDrawFor, nativeTemplateHousehold,
+  nativeValidationContext, nudgeBig5, pronounsOf, relationTagOf, repairHousehold, routineVerbFor, storyRoleOf, templateHousehold, trimToWords,
+  validateHousehold, verbOf, type ArrivalHouseholdOutput, type HouseholdDraw, type SkeletonHousehold, type ValidationContext,
 } from "../index";
 import { censusInput, household, modelAnswer } from "./censusFixtures";
 
@@ -411,5 +411,321 @@ describe("an arrival household (the server's profile: ±30 outside, one like fro
     ]);
     expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
     expect(rules(validateHousehold({ ...r.card, household: { ...r.card.household, summary: out.household.summary } }, draw, vctx))).toEqual(["V07"]);
+  });
+
+  it("gives an arrival's day V13's shape at home.own, and maps its verbs", () => {
+    const out = answer();
+    const day = out.members[0]!.routine.weekday;
+    day[day.length - 1] = { at: "22:00", do: "socialize", where: "market_row.gull_and_anchor" };
+    day[1]!.do = "stroll" as never;
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([expect.stringMatching(/^V01 not the contract: members\.0\.routine\.weekday\.1\.do/)]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V13 members[0].routine.weekday[1].do "stroll" → "walk"', 'V13 members[0].routine.weekday: added "23:00" sleep at home.own (the day ends at home)',
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+  });
+});
+
+// ── The full census run (2026-10-17): 35 of 107 households fell back to the template on these ─────────────────────
+
+/** V16 as the server and the census tool wire it: the lexical filters (none of these trip them) and the money matcher. */
+const withMoney = (vctx: ValidationContext): ValidationContext => ({ ...vctx, banned: (t: string) => (currencyHit(t) ? ["money"] : []) });
+const at = (time: string, verb: string, where: string) => ({ at: time, do: verb as never, where });
+
+describe("money is coins (V16)", () => {
+  it("swaps each money word for coins, keeping the number (the table next to the repair)", () => {
+    for (const [from, to] of [
+      ["Now where was I? The bread. A penny, it was. A penny.", "Now where was I? The bread. A coin, it was. A coin."],
+      ["One penny, and he wanted change.", "One coin, and he wanted change."],
+      ["Ten pence the loaf.", "Ten coins the loaf."], ["Twelve ha'pennies for the lot.", "Twelve coins for the lot."], ["Three pennies in the jar.", "Three coins in the jar."],
+      ["Pennies, all of it.", "Coins, all of it."], ["PENNIES!", "COINS!"], ["a few pence", "a few coins"],
+      ["Not worth a ha’penny.", "Not worth a coin."], ["A farthing a day, my mother said.", "A coin a day, my mother said."],
+      ["Tuppence for the paper.", "Two coins for the paper."], ["Sixpence, and not a penny more.", "Six coins, and not a coin more."], ["A sixpence under the pillow.", "A coin under the pillow."],
+      ["Every shilling went on coal.", "Every coin went on coal."], ["the last few shillings", "the last few coins"],
+      // Old-money sums with a flagged word in them.
+      ["Four and sixpence, the boots were.", "A few coins, the boots were."], ["Two shillings and sixpence a week.", "A few coins a week."],
+      ["Two shillings and six, and we called it dear.", "A few coins, and we called it dear."], ["one and a ha'penny for the bun", "a few coins for the bun"],
+      // The rest of the matcher: pounds as money, dollars, quid, cents, a money sign.
+      ["Five pounds, dear.", "Five coins, dear."], ["A pound a week, the Tollmen want.", "A coin a week, the Tollmen want."], ["A pound note in his hat.", "A coin in his hat."],
+      ["Fifty quid, he said.", "Fifty coins, he said."], ["Not a cent from the Fund.", "Not a coin from the Fund."], ["It's £5 at the hatch.", "It's 5 coins at the hatch."],
+      ["He rode a penny-farthing to school.", "He rode a high-wheeler to school."],
+    ] as const) {
+      expect(coinsFor(from)?.text, from).toBe(to);
+      expect(currencyHit(to), to).toBeNull();
+    }
+    expect(coinsFor("Sixpence, and not a penny more.")?.swaps).toEqual([["Sixpence", "Six coins"], ["penny", "coin"]]);
+  });
+
+  it("touches only what V16 flags: the penny whistle, the penny dropping, a pound of flour, a bare old-money sum", () => {
+    for (const t of ["June's penny whistle.", "Then the penny dropped.", "A pound of rye flour.", "The guinea fowl got out.", "Four and six, it was.", "Rye's two coins."])
+      expect(coinsFor(t), t).toBeNull();
+    expect(coinsFor("June's penny whistle cost a penny. Then the penny dropped.")?.text).toBe("June's penny whistle cost a coin. Then the penny dropped.");
+    expect(coinsFor("A pound of flour and two pennies.")?.text).toBe("A pound of flour and two coins.");
+    expect(coinsFor("Four and six, not a penny less.")?.text).toBe("Four and six, not a coin less.");
+  });
+
+  it("repairs every text V16 scans, and the household passes V16", () => {
+    const { draw, vctx: plain, out } = native("dunmore_barney");
+    const vctx = withMoney(plain);
+    const m = out.members[0]!;
+    out.household.summary = "Barney keeps the till at Dunmore's and has never been paid more than ten shillings a week.";
+    m.backstory = `${m.backstory} He still counts the float in pennies and ha'pennies.`;
+    m.beliefs[0] = "Bread was four and sixpence a loaf when the mill shut.";
+    m.voice.samples[2] = "Now where was I? The bread. A penny, it was. A penny.";
+    m.relationships[0]!.note = "His sister; still owes him tuppence.";
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual(["V16 members[0]: banned language (money)", "V16 household.summary: banned language"]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V16 household.summary "shillings" → "coins"',
+      `V16 members[0].backstory "pennies" → "coins", "ha'pennies" → "coins"`,
+      'V16 members[0].beliefs[0] "four and sixpence" → "a few coins"',
+      'V16 members[0].voice.samples[2] "penny" → "coin", "penny" → "coin"',
+      'V16 members[0].relationships[0].note "tuppence" → "two coins"',
+    ]);
+    const card = r.card.members[0]!;
+    expect(card.voice.samples[2]).toBe("Now where was I? The bread. A coin, it was. A coin.");
+    expect(card.beliefs[0]).toBe("Bread was a few coins a loaf when the mill shut.");
+    expect(card.backstory.endsWith("He still counts the float in coins and coins.")).toBe(true);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    expect(repair(r.output, draw, vctx).adjustments).toEqual([]);
+    // The name is the validator's (V02/V03) and the retry's: never rewritten.
+    expect(card.name).toBe(m.name);
+  });
+});
+
+describe("routine verbs (V01)", () => {
+  it("maps a word the engine doesn't have to the closest verb, and anything else to wander", () => {
+    for (const [word, verb] of [
+      ["chat", "socialize"], ["gossiping", "socialize"], ["Talk", "socialize"], ["play cards", "socialize"], ["stroll", "walk"], ["amble", "walk"], ["walk the dog", "walk"],
+      ["knit", "tinker"], ["sewing", "tinker"], ["mend nets", "tinker"], ["repair", "tinker"], ["do the washing", "clean"], ["sweep", "clean"],
+      ["bake", "cook"], ["baking bread", "cook"], ["have tea", "eat"], ["worship", "pray"], ["chapel", "pray"], ["sleep-ins", "sleep"], ["lie in", "sleep"],
+      ["doze", "nap"], ["go fishing", "fish"], ["read paper", "read"], ["write letters", "write"], ["sing", "play_music"], ["swim", "exercise"],
+    ] as const) expect(routineVerbFor(word, false), word).toEqual({ verb, known: true });
+    // Teaching is work at the workplace and a lesson attended anywhere else.
+    expect([routineVerbFor("teach", true), routineVerbFor("teach", false), routineVerbFor("lessons", false)].map(x => x.verb)).toEqual(["work", "attend", "attend"]);
+    expect([routineVerbFor("night watch", true), routineVerbFor("watch the boats", false)].map(x => x.verb)).toEqual(["work", "sit"]);
+    expect(routineVerbFor("juggle", false)).toEqual({ verb: "wander", known: false });
+    expect(routineVerbFor("Working", false)).toEqual({ verb: "work", known: true });
+    for (const w of ["chat", "juggle", "lessons", "sleep-ins"]) expect(VERBS).toContain(routineVerbFor(w, false).verb);
+  });
+
+  it("fixes the trial's V01 (members.0.routine.weekday.4.do) and says which words it didn't know", () => {
+    const { draw, vctx, out } = native("dunmore_barney");
+    const m = out.members[0]!;
+    m.routine.weekday[4]!.do = "chat" as never;
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([expect.stringMatching(/^V01 not the contract: members\.0\.routine\.weekday\.4\.do Invalid option: expected one of "work"\|"eat"/)]);
+    m.routine.weekday[1]!.do = "teach" as never;
+    m.routine.weekend[1]!.do = "lessons" as never;
+    m.routine.weekend[3]!.do = "juggle" as never;
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V13 members[0].routine.weekday[1].do "teach" → "work"', 'V13 members[0].routine.weekday[4].do "chat" → "socialize"',
+      'V13 members[0].routine.weekend[1].do "lessons" → "attend"', 'V13 members[0].routine.weekend[3].do "juggle" → "wander" (not a verb the engine has)',
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+  });
+});
+
+describe("a day's shape (V13)", () => {
+  const barney = () => native("dunmore_barney");
+  const FLAT = "market_row.dunmore_flat";
+
+  it("over nine blocks: drops the shortest away from home and not work (the trial's 10 entries)", () => {
+    const { draw, vctx, out } = barney();
+    const day = out.members[0]!.routine.weekday;
+    day.splice(2, 0, at("12:00", "walk", "commons.duck_pond"));
+    day.splice(5, 0, at("17:00", "shop", "market_row.bakery"));
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual(["V13 members[0].routine.weekday has 10 entries; 5-9"]);
+    const r = repair(out, draw, vctx);
+    // 12:00 and 17:00 are both half an hour: the later goes.
+    expect(r.adjustments).toEqual(['V13 members[0].routine.weekday: dropped "17:00" shop at market_row.bakery (10 blocks; at most 9)']);
+    expect(r.card.members[0]!.routine.weekday.map(e => e.at)).toEqual(["07:00", "08:30", "12:00", "12:30", "13:30", "17:30", "18:30", "20:00", "22:00"]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+  });
+
+  it("drops a block past 26:00 (the trial's 27:00) and one with no readable time", () => {
+    const { draw, vctx, out } = barney();
+    const m = out.members[0]!;
+    m.routine.weekday[7]!.at = "27:00";
+    m.routine.weekend[2]!.at = "noon";
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([
+      'V13 members[0].routine.weekday: "27:00" is out of order or past 26:00', 'V13 members[0].routine.weekend: "noon" is out of order or past 26:00',
+    ]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      `V13 members[0].routine.weekday: dropped "27:00" sleep at ${FLAT} (past 26:00)`,
+      'V13 members[0].routine.weekend: dropped "noon" eat at market_row.cafe_liss (not a time)',
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+  });
+
+  it("sorts a block out of order (the trial's 06:00), and the day then starts at home", () => {
+    const { draw, vctx, out } = barney();
+    out.members[0]!.routine.weekend.push(at("06:00", "walk", "wharf.breakwater"));
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([
+      'V13 members[0].routine.weekend: "06:00" is out of order or past 26:00', `V13 members[0].routine.weekend must start and end at ${FLAT}`,
+    ]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V13 members[0].routine.weekend sorted by time: "08:00, 10:00, 12:30, 14:30, 18:00, 19:30, 22:00, 06:00" → "06:00, 08:00, 10:00, 12:30, 14:30, 18:00, 19:30, 22:00"',
+      `V13 members[0].routine.weekend: added "05:30" eat at ${FLAT} (the day starts at home)`,
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+  });
+
+  it("writes past-midnight blocks on (00:30 after 22:00 is 24:30)", () => {
+    const { draw, vctx, out } = barney();
+    const day = out.members[0]!.routine.weekend;
+    day.splice(6, 1, at("22:00", "socialize", "market_row.gull_and_anchor"), at("00:30", "walk", "wharf.breakwater"), at("01:00", "sleep", FLAT));
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual(['V13 members[0].routine.weekend: "01:00" is out of order or past 26:00']);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V13 members[0].routine.weekend sorted by time: "08:00, 10:00, 12:30, 14:30, 18:00, 19:30, 22:00, 00:30, 01:00" → "08:00, 10:00, 12:30, 14:30, 18:00, 19:30, 22:00, 24:30, 25:00"',
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    // One wrap is V13's own rule: a day that ends "22:00, 00:30" already passes and is left alone.
+    const one = barney();
+    one.out.members[0]!.routine.weekend.splice(6, 1, at("22:00", "socialize", "market_row.gull_and_anchor"), at("00:30", "sleep", FLAT));
+    expect(repair(one.out, one.draw, one.vctx).adjustments).toEqual([]);
+  });
+
+  it("starts and ends the day at home (the trial's wharf.home_bunkhouse), 30 minutes before and an hour after", () => {
+    const { draw, vctx, out } = native("calloway");
+    const HOME = "wharf.home_bunkhouse";
+    const day = out.members[0]!.routine.weekend;
+    day[0] = at("07:00", "walk", "wharf.harbor_steps");
+    day.pop();
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([`V13 members[0].routine.weekend must start and end at ${HOME}`]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      `V13 members[0].routine.weekend: added "06:30" eat at ${HOME} (the day starts at home)`,
+      `V13 members[0].routine.weekend: added "20:30" sleep at ${HOME} (the day ends at home)`,
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    // Not before 05:00; at the first block's own time when 05:00 isn't before it; never past 26:00.
+    const times = (first: string, last: string) => {
+      const t = native("calloway");
+      const d = t.out.members[0]!.routine.weekend;
+      d[0] = at(first, "fish", "wharf.harbor_steps");
+      d[d.length - 1] = at(last, "socialize", "market_row.gull_and_anchor");
+      const days = repair(t.out, t.draw, t.vctx).card.members[0]!.routine.weekend;
+      expect(codes(validateHousehold({ ...t.out, members: t.out.members.map((m, i) => (i ? m : { ...m, routine: { ...m.routine, weekend: days } })) }, t.draw, t.vctx))).toEqual([]);
+      return [days[0]!.at, days.at(-1)!.at];
+    };
+    expect(times("05:15", "25:30")).toEqual(["05:00", "26:00"]);
+    expect(times("04:40", "23:00")).toEqual(["04:40", "24:00"]);
+    expect(clockTime(26 * 60)).toBe("26:00");
+  });
+
+  it("lets a commuter's weekday start and end at offmap.city, and leaves a pupil's day to the engine", () => {
+    const q = native("quill");
+    const commuter = q.out.members[1]!.routine.weekday;
+    expect([commuter[0]!.where, commuter.at(-1)!.where]).toEqual(["old_quarter.home_03", "offmap.city"]);
+    commuter[0]!.where = "offmap.city";
+    expect(repair(q.out, q.draw, q.vctx).adjustments).toEqual([]);
+    const maud = native("szabo_maud");
+    // m2 is a pupil: whatever the model writes, the engine's school day replaces it.
+    const pupil = maud.out.members[1]!.routine;
+    pupil.weekday = [...pupil.weekday, ...pupil.weekday].reverse();
+    const r = repair(maud.out, maud.draw, maud.vctx);
+    expect(r.adjustments).toEqual([]);
+    expect(codes(validateHousehold(r.output, maud.draw, maud.vctx))).toEqual([]);
+  });
+});
+
+describe("work away from the workplace (V13)", () => {
+  it("is a visit when the workplace is on an open board", () => {
+    const { draw, vctx, out } = native("dunmore_barney");
+    out.members[0]!.routine.weekend[1] = at("10:00", "work", "market_row.market_street");
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual(['V13 members[0].routine.weekend: work at "market_row.market_street"; their work is at market_row.general_store']);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual(['V13 members[0].routine.weekend[1].do "work" → "visit" (at market_row.market_street; their work is at market_row.general_store)']);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+  });
+
+  it("is left for V13 at home, or when the workplace is off the open boards", () => {
+    const home = native("dunmore_barney");
+    home.out.members[0]!.routine.weekday[6] = at("20:00", "work", "market_row.dunmore_flat");
+    const h = repair(home.out, home.draw, home.vctx);
+    expect(h.adjustments).toEqual([]);
+    expect(codes(validateHousehold(h.output, home.draw, home.vctx))).toEqual(['V13 members[0].routine.weekday: work at "market_row.dunmore_flat"; their work is at market_row.general_store']);
+    // mb_b05's m2 is the mill's night watchman (millbrook.mill: Millbrook isn't an open board).
+    const watch = native("mb_b05");
+    watch.out.members[1]!.routine.weekday[3] = at("13:30", "work", "market_row.cafe_liss");
+    const w = repair(watch.out, watch.draw, watch.vctx);
+    expect(w.adjustments).toEqual([]);
+    expect(codes(validateHousehold(w.output, watch.draw, watch.vctx))).toEqual(['V13 members[1].routine.weekday: work at "market_row.cafe_liss"; their work is at millbrook.mill']);
+  });
+
+  it("a Tollman's weekend work on Market Row is the Saturday round: V13 accepts it and the repair leaves it", () => {
+    const { draw, vctx, out } = native("calloway");
+    // m1 Dex and m2 Dom are Tollmen (A.1.4 row 23, briar_woods.tollmen_hideout); m3 works the fish market.
+    out.members[0]!.routine.weekend[1] = at("10:00", "work", "market_row.market_street");
+    out.members[1]!.routine.weekend[1] = at("10:00", "work", "market_row.bakery");
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([]);
+    expect(repair(out, draw, vctx).adjustments).toEqual([]);
+    // On a weekday, or for anyone else, it isn't: the Tollman's stays for V13 (their workplace is off the boards), the
+    // fish-market hand's is a visit.
+    out.members[0]!.routine.weekday[3] = at("13:30", "work", "market_row.market_street");
+    out.members[2]!.routine.weekend[1] = at("10:00", "work", "market_row.market_street");
+    expect(codes(validateHousehold(out, draw, vctx))).toEqual([
+      'V13 members[0].routine.weekday: work at "market_row.market_street"; their work is at briar_woods.tollmen_hideout',
+      'V13 members[2].routine.weekend: work at "market_row.market_street"; their work is at wharf.fish_market',
+    ]);
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual(['V13 members[2].routine.weekend[1].do "work" → "visit" (at market_row.market_street; their work is at wharf.fish_market)']);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual(['V13 members[0].routine.weekday: work at "market_row.market_street"; their work is at briar_woods.tollmen_hideout']);
+  });
+});
+
+describe("the census run's failures together", () => {
+  /** Calloway (the trial's wharf.home_bunkhouse) written with every slip the full run failed on. */
+  const callowayAsRunWrote = () => {
+    const t = native("calloway");
+    const [dex, , nell] = t.out.members;
+    // (Dex's other samples have one contraction between them: V10 wants two, so this line keeps one.)
+    dex!.voice.samples[2] = "Now where was I? The bread. A penny, it was. A penny, and that's dear.";
+    dex!.routine.weekday[4]!.do = "chat" as never;
+    dex!.routine.weekend[0] = at("07:00", "walk", "wharf.harbor_steps");
+    dex!.routine.weekend[1] = at("10:00", "work", "market_row.market_street");
+    dex!.routine.weekend.pop();
+    nell!.routine.weekday.splice(2, 0, at("12:00", "walk", "commons.duck_pond"), at("12:15", "sit", "wharf.harbor_steps"));
+    nell!.routine.weekday[9]!.at = "27:00";
+    nell!.routine.weekend[1] = at("10:00", "work", "wharf.harbor_steps");
+    nell!.routine.weekend.push(at("06:00", "walk", "wharf.breakwater"));
+    return t;
+  };
+
+  it("repairs each, in order, and the household passes; a second repair changes nothing", () => {
+    const { draw, vctx: plain, out } = callowayAsRunWrote();
+    const vctx = withMoney(plain);
+    expect(validateHousehold(out, draw, vctx)).toMatchObject({ ok: false, errors: [expect.stringMatching(/^V01 not the contract: members\.0\.routine\.weekday\.4\.do/)] });
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([
+      'V16 members[0].voice.samples[2] "penny" → "coin", "penny" → "coin"',
+      'V13 members[0].routine.weekday[4].do "chat" → "socialize"',
+      'V13 members[0].routine.weekend: added "06:30" eat at wharf.home_bunkhouse (the day starts at home)',
+      'V13 members[0].routine.weekend: added "20:30" sleep at wharf.home_bunkhouse (the day ends at home)',
+      'V13 members[2].routine.weekday: dropped "27:00" sleep at wharf.home_bunkhouse (past 26:00)',
+      'V13 members[2].routine.weekday: dropped "12:15" sit at wharf.harbor_steps (9 blocks and 1 to add at home; at most 9)',
+      'V13 members[2].routine.weekday: added "21:00" sleep at wharf.home_bunkhouse (the day ends at home)',
+      'V13 members[2].routine.weekend sorted by time: "08:00, 10:00, 12:30, 14:30, 18:00, 19:30, 22:00, 06:00" → "06:00, 08:00, 10:00, 12:30, 14:30, 18:00, 19:30, 22:00"',
+      'V13 members[2].routine.weekend: added "05:30" eat at wharf.home_bunkhouse (the day starts at home)',
+      'V13 members[2].routine.weekend[3].do "work" → "visit" (at wharf.harbor_steps; their work is at wharf.fish_market)',
+    ]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual([]);
+    const twice = repair(r.output, draw, vctx);
+    expect(twice.adjustments).toEqual([]);
+    expect(twice.output).toEqual(r.output);
+  });
+
+  it("leaves content to the retry: samples that need a contraction (V10)", () => {
+    const { draw, vctx, out } = native("calloway");
+    out.members[0]!.voice.samples = ["The tide is in.", "We will see.", "Come along now."];
+    const r = repair(out, draw, vctx);
+    expect(r.adjustments).toEqual([]);
+    expect(codes(validateHousehold(r.output, draw, vctx))).toEqual(["V10 members[0].voice.samples: at least two need a contraction"]);
   });
 });

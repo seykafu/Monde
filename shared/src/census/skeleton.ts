@@ -40,6 +40,8 @@ export interface SkeletonMember {
   /** Pinned people's ids; null until the card is written. */
   id: string | null;
   name: string | null;
+  /** --regen kept this member's id and name (cards elsewhere tie to them): written as fixed, like a named person's. */
+  name_fixed?: boolean;
   kind: MemberKind;
   role: CensusRole;
   band: AgeBand;

@@ -45,7 +45,7 @@ Everyone written in MODE: native has lived in Monde for years or was born here, 
 - Every Saturday a crew who call themselves the Tollmen go round the six open shops and collect a fee. People pay, look away and talk about it quietly; why the Tollmen do it, and for whom, nobody in town knows.
 - Edwina Pell has been mayor for 26 years. The Lantern, a one-page paper set by hand, is on doorsteps by six.
 - The Commons is overgrown: the bandstand has collapsed, the Glasshouse has broken panes, the garden plots are bindweed. The lighthouse on the breakwater has been dark for years.
-- Money is coins. People read, sew, fish, garden, listen to the wireless, write letters and talk on the doorstep.`;
+- Money is coins, even in memories: never pennies, pence, shillings or pounds. People read, sew, fish, garden, listen to the wireless, write letters and talk on the doorstep.`;
 
 /** The census request's two cached system blocks, in order: A.3.6's exact system prompt, then MONDE ON DAY 1. */
 export const NATIVE_SYSTEM_BLOCKS: readonly string[] = [ARRIVAL_SYSTEM_PROMPT, MONDE_DAY1_BLOCK];

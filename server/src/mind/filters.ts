@@ -108,30 +108,7 @@ export function completeWords(text: string): string {
 }
 
 /**
- * Money that isn't Monde's (MVP Q-01; World Bible "Money is coins"). Whole words, case-insensitive. Weight and
- * idiom are left alone: "a pound of rye", "it weighs two pounds", "pound cake", "per cent", "penny whistle", "the
- * penny dropped", "guinea fowl".
+ * Money that isn't Monde's (MVP Q-01; World Bible "Money is coins"): the matcher lives in shared
+ * (shared/src/arrivals/money.ts) so the card repair and V16 share it; re-exported here unchanged.
  */
-const NUMBER = "(?:\\d[\\d,.]*|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|few|several|many|half a|a few|a hundred|a thousand)";
-const POUND_NOT_MONEY = "(?!\\s*(?:of|heavier|lighter|in weight|weight|cake|cakes|loaf|loaves|bag|bags|sack|sacks|tin|tins)\\b)";
-export const CURRENCY: readonly string[] = [
-  "shillings?", "pence", "sixpences?", "threepences?", "thruppence", "tuppence", "ha'?pennies", "ha'?penny", "halfpenn(?:y|ies)",
-  "farthings?", "dollars?", "quid(?!\\s+pro\\s+quo)", "cents", "euros?", "francs?", "guineas?(?!\\s+(?:pigs?|fowl|hens?))",
-  "pennies", "penny(?![\\s-]*(?:whistles?|farthings?|dropped|drops))",
-  "(?:every|a|one|not\\s+a|single)\\s+cent",
-  // "Five pounds, dear", "a pound a week", "pound notes" (never "a pound of flour" or "weighs two pounds").
-  `(?<!weigh\\w*\\s+(?:about\\s+|nearly\\s+|near\\s+|over\\s+|under\\s+|maybe\\s+)?)${NUMBER}\\s+pounds?${POUND_NOT_MONEY}`,
-  "pounds?\\s+(?:a|per)\\s+(?:week|day|month|year|head|loaf|go)", "pound\\s+(?:notes?|coins?)",
-];
-const CURRENCY_PATTERN = words(CURRENCY);
-const MONEY_SIGN = /[£$€]\s?\d/u;
-
-/** The first non-Monde money word in the text, as it appeared, or null. */
-export function currencyHit(text: string): string | null {
-  const folded = fold(text);
-  const sign = MONEY_SIGN.exec(folded);
-  if (sign) return sign[0];
-  const match = CURRENCY_PATTERN.exec(folded);
-  return match ? match[0] : null;
-}
-
+export { CURRENCY, currencyHit } from "@monde/shared";
