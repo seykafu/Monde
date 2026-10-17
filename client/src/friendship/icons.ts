@@ -37,7 +37,7 @@ const STONE = { light: 0xc2c6d0, base: 0x969cab, shade: 0x6d7383 } as const;
 const HEART_LINE = 0x2a1418;
 const CRACK_LINE = 0x262932;
 
-export function heartIcon(kind: HeartIcon): IconArt {
+export function heartIcon(kind: HeartIcon, accessible = false): IconArt {
   const f = new Frame(HEART_CELL.w, HEART_CELL.h);
   const m = heartMask();
   const edge = { line: kind === 'cracked' ? CRACK_LINE : HEART_LINE, inner: kind === 'cracked' ? CRACK_LINE : HEART_LINE };
@@ -51,6 +51,14 @@ export function heartIcon(kind: HeartIcon): IconArt {
   }
   if (kind === 'full' || kind === 'half') f.dot(3, 3, 0xffd6dc);
   if (kind === 'cracked') for (const [x, y] of [[5, 2], [4, 3], [5, 4], [6, 5], [5, 6], [5, 7]] as const) f.dot(x, y, m.has(x, y) ? CRACK_LINE : -1);
+  if (accessible) {
+    // GDD-GAP: §18 gives no palette. Ink/cream preserves the silhouettes without hue cues.
+    for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) if (m.has(x, y)) {
+      const filled = kind === 'full' || (kind === 'half' && x <= 5);
+      f.dot(x, y, filled ? 0xfff4dc : 0x252525);
+    }
+    if (kind === 'cracked') for (const [x, y] of [[5, 2], [4, 3], [5, 4], [6, 5], [5, 6], [5, 7]]) f.dot(x!, y!, 0xfff4dc);
+  }
   return toArt(f);
 }
 
@@ -84,10 +92,10 @@ function emoteMask(id: EmoteIcon): Mask {
   }
 }
 
-export function emoteIcon(id: EmoteIcon): IconArt {
+export function emoteIcon(id: EmoteIcon, accessible = false): IconArt {
   const f = new Frame(EMOTE_CELL, EMOTE_CELL);
   const m = emoteMask(id);
-  const { tones, line } = EMOTE_COLOURS[id];
+  const { tones, line } = accessible ? { tones: { light: 0x252525, base: 0x252525, shade: 0x252525 }, line: 0x252525 } : EMOTE_COLOURS[id];
   f.paint(dilate(dilate(m)), HALO);
   f.paint(m, lit(m, tones, { top: 1, left: 1, right: 1, bottom: 1 }), { line, inner: line });
   if (id === 'heart') f.dot(4, 5, 0xffd6dc);

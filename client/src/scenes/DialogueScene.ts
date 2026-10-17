@@ -1,3 +1,5 @@
+import { choiceViewport } from '../ui/choiceViewport';
+import { textSize, accessibility } from '../accessibility/runtime';
 import { telemetry } from '../telemetry/emit';
 import { JoinedChatter } from './zone/joinChatter';
 import type { ChatterJoin } from './zone/chatter';
@@ -130,7 +132,7 @@ const BODY_Y = PANEL_Y + 40;
 const BODY_W = PANEL_W - PAD * 2 - 60;
 const BODY_FONT = 22;
 const BODY_SPACING = 8;
-const BODY_MAX_LINES = maxLinesFor(BODY_FONT, BODY_SPACING, PANEL_H - 40 - 30);
+const BODY_MAX_LINES = () => maxLinesFor(textSize(BODY_FONT), BODY_SPACING, PANEL_H - 40 - 30);
 const PORTRAIT_X = PANEL_X + 22;
 const PORTRAIT_Y = PANEL_Y - PORTRAIT_H + 4;
 const PLATE_X = PANEL_X + 18;
@@ -192,7 +194,7 @@ class PanelButton {
     readonly onClick: () => void, private readonly opts: { center?: boolean; muted?: boolean; size?: number; minH?: number } = {}) {
     const size = opts.size ?? 18;
     this.label = scene.add.text(0, 0, text, {
-      fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
       wordWrap: { width: w - 28 }, lineSpacing: 2, align: opts.center ? 'center' : 'left'
     }).setDepth(41);
     this.h = Math.max(opts.minH ?? 40, Math.ceil(this.label.height) + 16);
@@ -288,6 +290,7 @@ export class DialogueScene extends Phaser.Scene {
   /** Mouse-only buttons (Gift, until it does something). */
   private extraButtons: PanelButton[] = [];
   private focus = 0;
+  private scrollChoices: (index: number) => void = () => undefined;
   private menu: Phaser.GameObjects.GameObject[] = [];
   private say: { input: HTMLInputElement; hint: Phaser.GameObjects.Text } | null = null;
   /** The name plate's hearts (§9.11.1), and a turn's Regard feedback waiting for the reply to be read (§9.11.2). */
@@ -403,12 +406,12 @@ export class DialogueScene extends Phaser.Scene {
     this.youPlate = this.add.container(PANEL_X + PANEL_W - 130 - youW / 2, PLATE_Y, [youBg, you]).setDepth(10).setAlpha(0);
 
     const bodyStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontFamily: FAMILY_BODY, fontSize: `${BODY_FONT}px`, color: '#f3ecd9', lineSpacing: BODY_SPACING,
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(BODY_FONT)}px`, color: '#f3ecd9', lineSpacing: BODY_SPACING,
       wordWrap: { width: BODY_W }, resolution: RENDER_SCALE
     };
     this.body = this.add.text(PANEL_X + PAD, BODY_Y, '', bodyStyle);
     const measure = this.add.text(0, 0, '', bodyStyle).setVisible(false);
-    this.reader = new DialogueReader(text => paginateBody(measure, text, BODY_MAX_LINES));
+    this.reader = new DialogueReader(text => paginateBody(measure, text, BODY_MAX_LINES()));
     this.echo = this.add.text(PLATE_X + this.plateW + 18, PANEL_Y + 10, '', {
       fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE,
       wordWrap: { width: PANEL_X + PANEL_W - 120 - (PLATE_X + this.plateW + 18) }, maxLines: 1
@@ -425,7 +428,7 @@ export class DialogueScene extends Phaser.Scene {
     }).setOrigin(1, 0);
     // Small notes ("Thanks. That line has been noted.") along the panel's foot, clear of the choices.
     this.toastText = this.add.text(PANEL_X + PANEL_W / 2, PANEL_Y + PANEL_H - 22, '', {
-      fontFamily: FAMILY_BODY, fontSize: '16px', color: CREAM, backgroundColor: '#28372d', padding: { x: 12, y: 6 }, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(16)}px`, wordWrap: { width: PANEL_W - 48 }, color: CREAM, backgroundColor: '#28372d', padding: { x: 12, y: 6 }, resolution: RENDER_SCALE
     }).setOrigin(0.5).setDepth(60).setAlpha(0);
 
     // "⋯": Report line and the text speed.
@@ -469,7 +472,7 @@ export class DialogueScene extends Phaser.Scene {
       }
       this.endPlayerLine();
     }
-    const typed = this.reader.tick(delta, MS_PER_CHAR[this.speed]);
+    const typed = this.reader.tick(delta, MS_PER_CHAR[loadTextSpeed(browserStorage())]);
     if (typed) this.blip(typed, time);
     const text = this.reader.hasText ? this.reader.visible : this.thinking ?? '';
     if (text !== this.shownBody) {
@@ -777,10 +780,10 @@ export class DialogueScene extends Phaser.Scene {
     const row: PanelButton[] = [];
     let say: PanelButton | null = null;
     if (!turn.wrap_up) {
-      say = new PanelButton(this, CHOICE_X, 0, 214, 'Say something…', () => this.openSay(), { center: true, size: 17 });
+      if (!accessibility().choicesOnly) say = new PanelButton(this, CHOICE_X, 0, 214, 'Say something…', () => this.openSay(), { center: true, size: 17 });
       // Gift values are engine-owned; the next live turn supplies only the reaction line.
       const gift = new PanelButton(this, CHOICE_X + 222, 0, 100, 'Bag', () => this.openGift(), { center: true, size: 17 });
-      row.push(say, gift);
+      row.push(...(say ? [say] : []), gift);
       this.extraButtons.push(gift);
     }
     const leaveW = turn.wrap_up ? CHOICE_W : CHOICE_W - 330;
@@ -791,6 +794,7 @@ export class DialogueScene extends Phaser.Scene {
     for (const b of row) b.moveTo(y);
     for (let i = rows.length - 1; i >= 0; i--) { y -= rows[i]!.h + CHOICE_GAP; rows[i]!.moveTo(y); }
     this.buttons = [...rows, ...(say ? [say] : []), ...this.extraButtons, leave];
+    this.scrollChoices = choiceViewport(this, this.buttons, PANEL_Y - 30);
     this.focus = 0;
     this.buttons.forEach((b, i) => b.setFocus(i === 0));
   }
@@ -825,6 +829,7 @@ export class DialogueScene extends Phaser.Scene {
   private moveFocus(step: number): void {
     if (!this.buttons.length) return;
     this.focus = (this.focus + step + this.buttons.length) % this.buttons.length;
+    this.scrollChoices(this.focus);
     this.buttons.forEach((b, i) => b.setFocus(i === this.focus));
     playSfx('hover');
   }
@@ -880,7 +885,7 @@ export class DialogueScene extends Phaser.Scene {
   // ── Say something… ────────────────────────────────────────────────────────
 
   private openSay(): void {
-    if (this.say || this.generating || !this.choicesShown) return;
+    if (accessibility().choicesOnly || this.say || this.generating || !this.choicesShown) return;
     this.hideChoices();
     const input = document.createElement('input');
     input.type = 'text';

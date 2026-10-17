@@ -1,3 +1,12 @@
+import { reducedMotion as districtReducedMotion } from '../accessibility/runtime';
+import { districtGrade, easeRestoration, gradeMatrix, gradeTint, restorationShare } from '../render/districtGrade';
+import { PROJECTS } from '../projects/catalog';
+import { projectsOf, flagsOf } from '../projects/runtime';
+import { directoryFromCards, isOccupied } from '../town/occupancy';
+import { townHomeKeys } from '../world/townHomes';
+import { personaCards } from '../world/residents';
+import { ambienceMix, chimeDue, chimeLevel, type ChimeTime } from '../audio/ambienceDirector';
+import { textSize, watchAccessibility } from '../accessibility/runtime';
 import { optionClosesPlace } from '../town/optionClause';
 import { attachTelemetry } from '../telemetry/attach';
 import { attachScuffles, attachScuffleClock, scuffleInteraction, recoverScuffle } from '../scuffles/interaction';
@@ -14,7 +23,7 @@ import Phaser from 'phaser';
 import { Grid } from '../combat/Grid';
 import { buildDiorama, type DioramaResult } from '../render/diorama/Diorama';
 import { TownBoard, preloadTownSprites } from '../render/town/TownBoard';
-import { TownLife, reducedMotion } from '../render/town/TownLife';
+import { TownLife, reducedMotion } from '../accessibility/townLife';
 import type { TownLook } from '../world/townSprites';
 import type { TownFlag } from '../town/pillars';
 import { addTorchGlow } from '../render/diorama/Lighting';
@@ -348,13 +357,13 @@ export class ZoneScene extends Phaser.Scene {
     if (this.zone.town) {
       // The town (zone format v2): baked ground, animated water, the buildings and props from their sprites.
       const start = this.projection.tileToWorld({ x: this.position.x - 0.5, y: this.position.y - 0.5 });
-      const reduced = reducedMotion();
-      this.town = new TownBoard(this, { zone: this.zone, projection: this.projection, seed: 42, look: this.townLook(), focus: start, reduced });
+      const motion = { get reduced() { return reducedMotion(); } };
+      this.town = new TownBoard(this, { zone: this.zone, projection: this.projection, seed: 42, look: this.townLook(), focus: start, get reduced() { return motion.reduced; } });
       this.lampGlows = [...this.town.lampGlows];
       this.lamps = this.town.lights.map(({ x, y, radius }) => ({ x, y, radius }));
       // Indoors: the room's windows and daylight; no birds, butterflies or smoke.
       if (this.zone.interior) this.room = new InteriorRoom(this, this.zone);
-      else this.life = new TownLife(this, this.town, { reduced, seaside: this.zone.tiles.some(t => t.kind === 'sea') });
+      else this.life = new TownLife(this, this.town, { reduced: motion.reduced, seaside: this.zone.tiles.some(t => t.kind === 'sea') });
       // Place names fade in as you near the door, readable over the night (a room's own name is its title).
       this.placeLabels = this.zone.places.filter(place => place.id !== this.zone.interior?.building).map(place => {
         const p = this.projection.tileToWorld({ x: place.door[0], y: place.door[1] });
@@ -421,6 +430,17 @@ export class ZoneScene extends Phaser.Scene {
     const perspective = attachPostPipeline(camera, this.game, PERSPECTIVE_PIPELINE, PerspectivePipeline);
     if (perspective) perspective.k = DIORAMA_PERSPECTIVE_K;
     attachPostPipeline(camera, this.game, BLOOM_PIPELINE, BloomPipeline);
+    // Phaser 3.90 built-in color matrix: one fixed-cost full-screen grade, after the existing lighting.
+    // Use the registered FX key: Phaser 3.90's runtime exports `FX.ColorMatrix`, while its declarations
+    // call that class `ColorMatrixFXPipeline`. Looking it up by key works with both and with FX disabled.
+    const gradeKey = String(Phaser.FX.COLOR_MATRIX);
+    if (this.game.renderer.type === Phaser.WEBGL &&
+      (this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer).pipelines.postPipelineClasses.has(gradeKey)) {
+      camera.setPostPipeline(gradeKey);
+      const grade = camera.getPostPipeline(gradeKey);
+      this.districtFx = Array.isArray(grade) ? grade[grade.length - 1] : grade;
+    }
+    this.events.once('shutdown', () => getMusic(this).setAmbience({}));
     const ui = this.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT);
     ui.ignore(world);
     // Drawn closer indoors: the world's words (name tags, speech bubbles, place names) render sharp at the zoom.
@@ -429,9 +449,10 @@ export class ZoneScene extends Phaser.Scene {
     const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  I: bag  ·  L: ledger  ·  J: journal', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
     const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
+    this.events.once('shutdown', watchAccessibility(() => this.toast?.setFontSize(textSize(17))));
     this.prompt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 50, '', { fontFamily: FAMILY_BODY, fontSize: '22px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 12, y: 6 } }).setOrigin(0.5);
     // Above the E prompt: the gentle toasts (a scene's window about to close).
-    this.toast = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 84, '', { fontFamily: FAMILY_BODY, fontSize: '17px', fontStyle: 'italic', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 14, y: 7 }, resolution: RENDER_SCALE })
+    this.toast = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 84, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(17)}px`, wordWrap: { width: GAME_WIDTH - 120 }, fontStyle: 'italic', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 14, y: 7 }, resolution: RENDER_SCALE })
       .setOrigin(0.5, 1).setAlpha(0);
     camera.ignore([title, controls, devHelp, this.prompt, this.toast, ...this.buildHud(), ...this.residents.buildUi()]);
     this.economy = attachEconomy(this, this.clock, text => this.showToast(text), () => {
@@ -519,6 +540,8 @@ export class ZoneScene extends Phaser.Scene {
   }
 
   private resetLight(): void {
+    this.audioCheckedAt = -Infinity; this.appliedRestoration = NaN;
+    this.restoration = NaN; this.districtCheckedAt = -Infinity; this.districtFx = undefined;
     this.town = undefined; this.life = undefined; this.room = undefined; this.placeLabels = []; this.lookAt = 0;
     this.lamps = []; this.sunCasts = []; this.lampCasts = []; this.lampGlows = []; this.windowGlows = []; this.fog = [];
     this.lampLevel = 0; this.lightKey = NaN; this.shadowDirty = true; this.aimedFor = undefined; this.hudIcon = '';
@@ -680,6 +703,7 @@ export class ZoneScene extends Phaser.Scene {
     const weather = mixColor(0xffffff, WEATHER_GRADE[kind], intensity * (1 - 0.5 * dark) * (indoor ? 0.45 : 1));
     const warm = mixColor(0xffffff, minute < SOLAR_NOON ? DAWN_GRADE : DUSK_GRADE, (indoor ? 0.35 : 0.6) * twilightGlow(day, minute));
     const grade = indoor ? mulColor(mulColor(weather, warm), indoor.grade) : mulColor(weather, warm);
+    this.weatherTint = grade;
     this.gradeLayer.setTint(grade).setVisible(grade !== 0xffffff);
     this.applyWeather(force);
     this.updateHud(dark, override !== undefined && override !== 'auto');
@@ -907,6 +931,60 @@ export class ZoneScene extends Phaser.Scene {
   }
   /** When the town last chose its music (ms of scene time); checked about once a second. */
   private musicCheckedAt = -Infinity;
+  private restoration = NaN;
+  private restorationTarget = 0;
+  private districtCheckedAt = -Infinity;
+  private districtFx?: Phaser.Renderer.WebGL.Pipelines.FX.ColorMatrixFXPipeline;
+  private weatherTint = 0xffffff;
+  private audioCheckedAt = -Infinity;
+  private appliedRestoration = NaN;
+
+  private updateDistrict(time: number, delta: number): void {
+    if (time - this.districtCheckedAt >= 250) {
+      this.districtCheckedAt = time;
+      const district = districtOf(this.zone), flags = flagsOf(this.registry), state = projectsOf(this.registry);
+      const landmarks = PROJECTS.filter(p => p.zone === district && !p.repeatable).map(p =>
+        state.projects[p.id]?.opened != null || flags.has(`project_${p.id}_done`));
+      const directory = directoryFromCards(personaCards);
+      const homes = townHomeKeys(zones, directory).filter(h => h.startsWith(`${district}.`));
+      this.restorationTarget = restorationShare(landmarks, homes.map(h => isOccupied(h, directory, { flag: f => flags.has(f) })));
+    }
+    this.restoration = Number.isNaN(this.restoration) ? this.restorationTarget :
+      easeRestoration(this.restoration, this.restorationTarget, delta, districtReducedMotion());
+    // Stable WebGL grades need no uniform/matrix writes. Canvas must recomposite after a light update.
+    if (this.districtFx && Math.abs(this.appliedRestoration - this.restoration) < 0.0001) return;
+    this.appliedRestoration = this.restoration;
+    const grade = districtGrade(this.restoration, !!this.zone.interior);
+    if (this.districtFx) this.districtFx.colorMatrix.set(gradeMatrix(grade));
+    else {
+      const tint = mulColor(this.weatherTint, gradeTint(grade));
+      this.gradeLayer.setTint(tint).setVisible(tint !== 0xffffff);
+    }
+  }
+
+  private updateTownAudio(time: number): void {
+    if (time - this.audioCheckedAt < 250) return;
+    this.audioCheckedAt = time;
+    const now = { day: this.clock.day, minute: this.clock.exactMinute };
+    // Loads and New Game replace the shared Clock. Never carry a previous world's chime cursor into them.
+    if (this.registry.get('monde:chimeClock') !== this.clock) {
+      this.registry.set('monde:chimeClock', this.clock);
+      this.registry.set('monde:chimeTime', now);
+      this.registry.remove('monde:lastChime');
+    }
+    const previous = this.registry.get('monde:chimeTime') as ChimeTime | undefined;
+    const flags = flagsOf(this.registry), held = musicHeld(this), district = districtOf(this.zone);
+    const slot = now.day * 1440 + (now.minute < 1080 ? 360 : 1080);
+    const last = (this.registry.get('monde:lastChime') as number | undefined) ?? -Infinity;
+    if (slot > last && chimeDue(previous, now, flags.has('clock_running') || flags.has('project_clocktower_done'), held)) {
+      this.registry.set('monde:lastChime', slot);
+      playSfx('clock_chime', { level: chimeLevel(district, !!this.zone.interior) });
+    }
+    this.registry.set('monde:chimeTime', now);
+    getMusic(this).holdAmbience(held);
+    getMusic(this).setAmbience(ambienceMix(district, now.minute, getTown(this.registry)?.census ?? 0,
+      !!this.zone.interior, this.now.kind === 'rain'));
+  }
 
   /** The town's background music: district by day, morning for the first hour, night after dark. */
   private updateMusic(time: number): void {
@@ -926,6 +1004,8 @@ export class ZoneScene extends Phaser.Scene {
     const dt = Math.min(delta, 250);
     this.clock.advance(dt);
     this.applyLight();
+    this.updateDistrict(time, dt);
+    this.updateTownAudio(time);
     this.driftFog(dt);
     this.residents.update(dt, this.position);
     this.projects.update(dt);

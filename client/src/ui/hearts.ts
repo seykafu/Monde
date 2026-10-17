@@ -1,3 +1,4 @@
+import { accessibility, reducedMotion, watchAccessibility } from '../accessibility/runtime';
 // Hearts and emote icons on screen (GDD §9.11.1, §16.5): textures from the pixel art in friendship/icons.ts, and
 // the ten-heart row the dialogue name plate and the People page draw.
 import Phaser from 'phaser';
@@ -18,8 +19,8 @@ export function iconTexture(scene: Phaser.Scene, key: string, art: () => IconArt
   return key;
 }
 
-export const heartTexture = (scene: Phaser.Scene, kind: HeartIcon): string => iconTexture(scene, `heart-${kind}`, () => heartIcon(kind));
-export const emoteTexture = (scene: Phaser.Scene, id: EmoteIcon): string => iconTexture(scene, `pair-emote-${id}`, () => emoteIcon(id));
+export const heartTexture = (scene: Phaser.Scene, kind: HeartIcon): string => iconTexture(scene, `heart-${kind}-${accessibility().colorblind}`, () => heartIcon(kind, accessibility().colorblind));
+export const emoteTexture = (scene: Phaser.Scene, id: EmoteIcon): string => iconTexture(scene, `pair-emote-${id}-${accessibility().colorblind}`, () => emoteIcon(id, accessibility().colorblind));
 export { EMOTE_CELL, HEART_CELL };
 
 /** Ten hearts in a row, one per 10 Regard with halves at 5, or one cracked heart below 0 (§9.11.1). */
@@ -38,6 +39,11 @@ export class HeartRowView {
     this.images = Array.from({ length: 10 }, (_, i) =>
       scene.add.image(i * step + (HEART_CELL.w * scale) / 2, 0, heartTexture(scene, 'empty')).setScale(scale));
     this.container = scene.add.container(x, y, this.images);
+    const stop = watchAccessibility(() => this.images.forEach((img, i) => {
+      const kind = this.icons[i] as HeartIcon | undefined;
+      if (kind) img.setTexture(heartTexture(scene, kind));
+    }));
+    this.container.once('destroy', stop);
   }
 
   setRegard(regard: number, pop = false): void { this.set(heartRow(regard), pop); }
@@ -49,7 +55,7 @@ export class HeartRowView {
       const icon = icons[i];
       if (!icon) { img.setVisible(false); return; }
       img.setVisible(true).setTexture(heartTexture(this.scene, icon));
-      if (pop && this.icons[i] !== icon) {
+      if (pop && !reducedMotion() && this.icons[i] !== icon) {
         this.scene.tweens.killTweensOf(img);
         this.scene.tweens.add({ targets: img, scale: { from: this.scale * 1.45, to: this.scale }, duration: 220, ease: 'Back.easeOut' });
       }

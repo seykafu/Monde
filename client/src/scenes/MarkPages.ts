@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 import type Phaser from 'phaser';
 import { SPRING_RIDDLES } from '@monde/shared';
 import type { Clock } from '../sim/clock';
@@ -18,7 +19,7 @@ export class MarkPages {
     e.preventDefault(); this.redraw(); return true;
   }
   private text(x: number, y: number, value: string, size = 17, width = 440): Phaser.GameObjects.Text {
-    const t = this.scene.add.text(x, y, value, { fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: '#2b2219', wordWrap: { width }, resolution: RENDER_SCALE }); this.content.add(t); return t;
+    const t = this.scene.add.text(x, y, value, { fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color: '#2b2219', wordWrap: { width }, resolution: RENDER_SCALE }); this.content.add(t); return t;
   }
   private button(x: number, y: number, label: string, action: () => void): void { this.text(x, y, label, 17).setInteractive({ useHandCursor: true }).on('pointerdown', action); }
   private submit(): void {

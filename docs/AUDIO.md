@@ -152,3 +152,27 @@ roar, fair cheer.
 
 Suno music is AI-generated content made before release. It goes in the store disclosure (GDD §9.13) next
 to the GPT-6 art.
+
+## Drop-in ambience beds (A-10)
+
+Put these optional MP3s in `client/public/audio/ambience/`. The manifest and district/day/night mapping live in
+`client/src/audio/ambienceDirector.ts`; missing or invalid files are silent, with no placeholder. Reload after adding
+files. Beds crossfade when walking between districts, soften indoors, and duck with dialogue. Master, music and SFX
+sliders all affect beds; town bells follow master/SFX. Music holds suppress automatic town bells and fade beds out,
+leaving S07a/S07b's scripted chime alone. GDD §17 specifies the C–E–A–G–D–C motif at **06:00 and 18:00** once restored.
+
+For every prompt: **soundscape only**, 60–90 seconds, seamless loop, steady texture, no intro/outro or fade,
+no melody, no intelligible speech, no sudden loud foreground events. Aim for **−24 LUFS integrated**, peaks below
+**−6 dBTP**; the game applies an additional bed gain of 0.22 to sit below the music. These lengths, loudness targets,
+gains, 3-second crossfade, 06–18 day band and indoor attenuation (0.3) are **GDD-GAP** production tuning.
+Population density currently uses town census / 420 (clamped), with a 0.15 floor for environmental sound and none for
+crowds; §17 requests zone population but a complete district census is not yet available.
+
+- **`gulls.mp3`** · Style: `distant sparse seaside gull calls, small sheltered harbour, airy spring morning, soft natural field recording, no close squawks`.
+- **`surf.mp3`** · Style: `gentle harbour water lapping stone steps, slow small waves, calm sheltered bay, soft natural field recording, no storm`.
+- **`rigging.mp3`** · Style: `wooden fishing boats gently creaking, loose ropes brushing timber, occasional soft rigging taps, quiet coastal breeze, no bells`.
+- **`rain_on_tin.mp3`** · Style: `steady gentle spring rain on an old tin awning, soft rounded patter, cozy sheltered street, no thunder or gutter crashes`.
+- **`weir.mp3`** · Style: `small village weir, gentle continuous fresh water spilling over low stones, leafy riverbank, soft natural field recording`.
+- **`station_wind.mp3`** · Style: `light spring wind through grass on a quiet station hill, airy soft rustle, distant open landscape, no trains or whistles`.
+- **`pub_murmur.mp3`** · Style: `distant small cozy pub crowd behind a doorway, indistinct warm conversation wash, very occasional soft crockery, no intelligible words or music`.
+- **`market_chatter.mp3`** · Style: `small seaside village market at a distance, indistinct friendly chatter, light footsteps on cobbles, gentle cloth rustle, no intelligible words or music`.

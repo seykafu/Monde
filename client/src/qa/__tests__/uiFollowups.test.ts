@@ -85,3 +85,21 @@ it('world name tags and emotes step aside during a Project beat', async () => {
   expect(Reflect.get(label, 'visible')).toBe(false); expect(Reflect.get(bubble, 'visible')).toBe(false);
   vi.unstubAllGlobals();
 });
+
+it('Choices only hides free text, retains replies and Bag, and guards the typing shortcut', async () => {
+  const { setAccessibility } = await import('../../accessibility/runtime');
+  const h = harness(), clock = new Clock({ day: 2, minute: 600 });
+  const panel = new DialogueScene();
+  Object.assign(panel, h.raw, { card: { id: 'margo' }, open: { clock }, turn: { choices: [{ id: 'a', text: 'Hello there.', intent: 'kind' }], wrap_up: false }, context: {} });
+  const methods = panel as unknown as { showChoices(): void; openSay(): void };
+  try {
+    setAccessibility({ choicesOnly: true }); methods.showChoices();
+    expect(h.nodes.some(n => !n.destroyed && n.text === 'Say something…')).toBe(false);
+    expect(h.nodes.some(n => !n.destroyed && n.text.includes('Hello there.'))).toBe(true);
+    expect(h.nodes.some(n => !n.destroyed && n.text === 'Bag')).toBe(true);
+    // No DOM exists in Node: the keyboard path must return before creating an input.
+    expect(() => methods.openSay()).not.toThrow();
+    setAccessibility({ choicesOnly: false }); methods.showChoices();
+    expect(h.nodes.some(n => !n.destroyed && n.text === 'Say something…')).toBe(true);
+  } finally { setAccessibility({ choicesOnly: false }); }
+});

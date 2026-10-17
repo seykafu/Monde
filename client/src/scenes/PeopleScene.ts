@@ -1,3 +1,5 @@
+import { accessiblePages } from '../ui/accessiblePages';
+import { textSize, accessibility } from '../accessibility/runtime';
 import { openPaper } from "./DawnReportScene";
 import { favorBook } from "../friendship/favors";
 import { MarkPages } from './MarkPages';
@@ -118,6 +120,7 @@ export class PeopleScene extends Phaser.Scene {
     if (this.open.tab) marks(this.registry).tab = this.open.tab;
     this.drawBook();
     this.content = this.add.container(0, 0);
+    accessiblePages(this, this.content);
     this.markPages = new MarkPages(this, this.open.clock, this.content, () => this.refresh());
     this.ids = peopleIds(metResidents(getFriendship(this.registry)), this.registry.get('monde.town') as TownState | undefined, this.open.clock.day);
     const keep = lastPicked ? this.ids.indexOf(lastPicked) : -1;
@@ -129,7 +132,7 @@ export class PeopleScene extends Phaser.Scene {
     this.registry.events.on(`changedata-${FRIENDSHIP_KEY}`, onChange);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.registry.events.off(`changedata-${FRIENDSHIP_KEY}`, onChange));
     this.input.keyboard!.on('keydown', (e: KeyboardEvent) => this.onKey(e));
-    this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => this.scroll(Math.sign(dy)));
+    this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => { if (accessibility().textSize === 'normal') this.scroll(Math.sign(dy)); });
 
     this.cameras.main.setAlpha(0);
     this.tweens.add({ targets: this.cameras.main, alpha: 1, duration: 140 });
@@ -137,6 +140,7 @@ export class PeopleScene extends Phaser.Scene {
 
   private onKey(e: KeyboardEvent): void {
     if (this.closed || this.seenKeys.has(e)) return;
+    if (accessibility().textSize !== 'normal' && ['PageUp', 'PageDown'].includes(e.key)) return;
     this.seenKeys.add(e);
     if (marks(this.registry).tab === 'Marks' && this.markPages.key(e)) return;
     if (e.key === 'Escape') { this.close(); return; }
@@ -193,7 +197,7 @@ export class PeopleScene extends Phaser.Scene {
 
   private text(x: number, y: number, s: string, size: number, opts: { color?: string; family?: string; italic?: boolean; bold?: boolean; wrap?: number; origin?: [number, number] } = {}): Phaser.GameObjects.Text {
     const t = this.add.text(x, y, s, {
-      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${size}px`, color: opts.color ?? INK_CSS,
+      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${!opts.family || opts.family === FAMILY_BODY ? textSize(size) : size}px`, color: opts.color ?? INK_CSS,
       fontStyle: [opts.italic ? 'italic' : '', opts.bold ? 'bold' : ''].join(' ').trim() || 'normal',
       resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap } } : {})
     }).setOrigin(...(opts.origin ?? [0, 0]));
@@ -265,6 +269,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
       p.root.setScale(0.205);
       p.setExpression('neutral', true);
       this.portraits.push(p);
+      if (accessibility().textSize !== 'normal') this.content.add(p.root);
       const regard = regardFor(this.registry, id);
       const fresh = this.newFace(id);
       this.text(LX + 62, y + 12, displayName(card.name), 20, { family: FAMILY_HEADING });
@@ -272,6 +277,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
       const hearts = new HeartRowView(this, LX + LW - 175, y + ROW_H / 2, 1.5, 1);
       hearts.setRegard(regard);
       this.hearts.push(hearts);
+      if (accessibility().textSize !== 'normal') this.content.add(hearts.container);
       const hit = this.add.rectangle(LX - 8, y + 2, LW + 16, ROW_H - 4, 0xffffff, 0).setOrigin(0).setInteractive({ useHandCursor: true });
       hit.on('pointerup', () => this.time.delayedCall(0, () => this.pick(i)));
       this.content.add(hit);
@@ -290,6 +296,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
     p.root.setScale(0.6);
     p.setExpression(regard >= 40 ? 'warm' : regard < 0 ? 'worried' : 'neutral', true);
     this.portraits.push(p);
+    if (accessibility().textSize !== 'normal') this.content.add(p.root);
     const cx = RX + 160;
     this.text(cx, BY + 46, displayName(card.name), 30, { family: FAMILY_HEADING });
     const trade = this.text(cx, BY + 84, card.occupation, 15, { italic: true, color: MUTED, wrap: RW - 160 });
@@ -298,6 +305,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
     const hearts = new HeartRowView(this, cx, hy, 2, 1);
     hearts.setRegard(regard);
     this.hearts.push(hearts);
+    if (accessibility().textSize !== 'normal') this.content.add(hearts.container);
     this.text(cx, hy + 16, regardTier(regard), 17, { family: FAMILY_UI, bold: true });
     const arrived = livingArrivals((this.registry.get('monde.town') as TownState | undefined)?.people).find(r => r.card.id === id);
     const facts = [birthdayOf(card) ? `Birthday: ${birthdayOf(card)}` : null,

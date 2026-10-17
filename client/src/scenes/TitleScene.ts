@@ -1,3 +1,8 @@
+import { accessibility, setAccessibility } from '../accessibility/runtime';
+import { TEXT_SIZES } from '../accessibility/preferences';
+import { loadTextSpeed, saveTextSpeed } from '../mind/prefs';
+import { TEXT_SPEEDS } from '../mind/reader';
+import { browserStorage } from '../mind/api';
 import { chooseTelemetry, telemetryChoice } from '../telemetry/runtime';
 import Phaser from 'phaser';
 import { FAMILY_BODY, GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from '../util/constants';
@@ -35,7 +40,7 @@ class SaveMenuBase extends Phaser.Scene {
       const status = this.add.text(GAME_WIDTH - 70, 58, '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#705740', align: 'right', wordWrap: { width: 360 } }).setOrigin(1, 0);
       const refresh = () => {
         const s = getMind().status;
-        status.setText(`${s === 'online' ? '● Live residents' : s === 'connecting' ? '◌ Joining the town…' : '○ Offline: written lines'}${s === 'no_invite' ? '\nAdd an invite code in Settings' : ''}`)
+        status.setText(`${s === 'online' ? '● Live residents' : s === 'connecting' ? '◌ Joining the town…' : s === 'offline' ? '○ Offline by choice: written lines' : '○ Offline: written lines'}${s === 'no_invite' ? '\nAdd an invite code in Settings' : ''}`)
           .setColor(s === 'online' ? '#3f6b46' : '#92542e');
       };
       refresh();
@@ -122,7 +127,16 @@ class SaveMenuBase extends Phaser.Scene {
     const mind = getMind();
     this.message.setText(statusDetail(mind.status));
     const retry = mind.status === 'unreachable' || mind.status === 'connecting';
+    const prefs = accessibility();
+    const toggle = (patch: Parameters<typeof setAccessibility>[0]) => { const focus = this.focus; setAccessibility(patch); this.settings(); this.focus = focus; this.highlight(); };
+    const speed = loadTextSpeed(browserStorage());
     this.show([
+      { text: `Text size: ${prefs.textSize}`, run: () => toggle({ textSize: TEXT_SIZES[(TEXT_SIZES.indexOf(prefs.textSize) + 1) % TEXT_SIZES.length]! }) },
+      { text: `Typewriter speed: ${speed}`, run: () => { const focus = this.focus; saveTextSpeed(browserStorage(), TEXT_SPEEDS[(TEXT_SPEEDS.indexOf(speed) + 1) % TEXT_SPEEDS.length]!); this.settings(); this.focus = focus; this.highlight(); } },
+      { text: `Colorblind emotes: ${prefs.colorblind ? 'On' : 'Off'}`, run: () => toggle({ colorblind: !prefs.colorblind }) },
+      { text: `Reduced motion: ${prefs.motion === 'system' ? 'Follow OS' : prefs.motion === 'on' ? 'On' : 'Off'}`, run: () => toggle({ motion: prefs.motion === 'system' ? 'on' : prefs.motion === 'on' ? 'off' : 'system' }) },
+      { text: `Choices only: ${prefs.choicesOnly ? 'On' : 'Off'}`, run: () => toggle({ choicesOnly: !prefs.choicesOnly }) },
+      { text: `Offline: ${prefs.offline ? 'On' : 'Off'}`, run: () => { mind.setOffline(!prefs.offline); toggle({ offline: !prefs.offline }); } },
       { text: `Anonymous gameplay sharing: ${telemetryChoice() === 'yes' ? 'On' : 'Off'}`, run: () => { chooseTelemetry(telemetryChoice() !== 'yes'); this.settings(); } },
       { text: `Invite code: ${maskInvite(mind.invite)}`, run: () => this.askInvite() },
       ...(mind.invite ? [{ text: 'Clear invite code', run: async () => { await mind.setInvite(null); this.settings(); } }] : []),

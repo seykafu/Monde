@@ -1,3 +1,5 @@
+import { AmbienceManager } from './AmbienceManager';
+import type { Bed } from './ambienceDirector';
 import { getAudioSettings, subscribeAudioSettings } from './audioSettings';
 import { TRACK_KEYS, resolveMusicCue, trackFiles, type TrackFile, type TrackKey } from './musicTracks';
 import { generateNoteSchedule, placeholderDuration, schedulePlaceholderNote } from './placeholderMusic';
@@ -10,6 +12,7 @@ export async function probeMusicFile(url: string, signal?: AbortSignal): Promise
     const head = await fetch(url, { method: 'HEAD', signal });
     if (valid(head)) return true;
   } catch { /* try a small GET */ }
+  if (signal?.aborted) return false;
   try {
     const response = await fetch(url, { headers: { Range: 'bytes=0-0' }, signal });
     const exists = valid(response);
@@ -18,6 +21,12 @@ export async function probeMusicFile(url: string, signal?: AbortSignal): Promise
   } catch { return false; }
 }
 export class MusicManager {
+  private ambience: AmbienceManager | null = null;
+  private ambienceMix: Partial<Record<Bed, number>> = {};
+  private ambienceHeld = false;
+  setAmbience(mix: Partial<Record<Bed, number>>): void { this.ambienceMix = mix; this.updateAmbience(); }
+  holdAmbience(held: boolean): void { this.ambienceHeld = held; this.updateAmbience(); }
+  private updateAmbience(): void { this.ambience?.mix(this.ambienceHeld ? {} : this.ambienceMix); }
   private context: AudioContext | null = null;
   private output: GainNode | null = null;
   private voices: Voice[] = [];
@@ -58,7 +67,7 @@ export class MusicManager {
   private unlock = (): void => {
     if (this.disposed || document.hidden) return;
     this.context ??= new AudioContext();
-    if (!this.output) { this.output = this.context.createGain(); this.output.connect(this.context.destination); this.updateVolume(); }
+    if (!this.output) { this.output = this.context.createGain(); this.output.connect(this.context.destination); this.updateVolume(); this.ambience = new AmbienceManager(this.context, this.output); this.updateAmbience(); }
     void this.context.resume().then(() => {
       if (this.disposed) return;
       if (document.hidden) { void this.context?.suspend(); return; }
@@ -153,6 +162,7 @@ export class MusicManager {
   private tick(): void {
     const ctx = this.context;
     if (!ctx || ctx.state !== 'running') return;
+    this.updateAmbience();
     this.voices = this.voices.filter(voice => {
       if (ctx.currentTime >= voice.retireAt) { this.destroyVoice(voice); return false; }
       voice.tick(Math.min(ctx.currentTime + 0.35, voice.retireAt)); return true;
@@ -168,6 +178,7 @@ export class MusicManager {
     this.active = null;
   }
   dispose(): void {
+    this.ambience?.dispose();
     this.disposed = true; ++this.request; this.abort.abort(); clearInterval(this.timer); this.unsubscribe();
     document.removeEventListener('pointerdown', this.unlock); document.removeEventListener('keydown', this.unlock);
     document.removeEventListener('visibilitychange', this.visibility);

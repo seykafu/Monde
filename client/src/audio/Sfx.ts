@@ -398,7 +398,7 @@ export const sfxCineCannon = (): void => {
   tone({ freq: 2400, freqEnd: 700, duration: 0.7, type: "sine", vol: 0.012, at: 0.12, send: 0.5 });
 };
 
-export interface SfxOptions { resident?: string; frequency?: number; type?: OscillatorType }
+export interface SfxOptions { level?: number; resident?: string; frequency?: number; type?: OscillatorType }
 const crowd = (duration: number, vol: number, freq: number, pulses = 4): void => {
   for (let i = 0; i < pulses; i++) noise({ duration: duration / 2, vol, freq, freqEnd: freq * 0.7,
     filterType: 'bandpass', q: 0.6, attack: duration / 12, at: i * duration / pulses, send: 0.15 });
@@ -427,7 +427,7 @@ const effects = {
   coin: () => metal(1600, 0.3, 0.025), paper_rustle: sfxPageTurn,
   stamp_thud: () => thump(220, 75, 0.1, 0.08), bell: () => metal(523.25, 1.8, 0.045),
   clock_tick: () => { noise({ duration: 0.025, vol: 0.04, freq: 2000 }); tone({ freq: 1100, duration: 0.025, vol: 0.025 }); },
-  clock_chime: () => [60, 64, 69, 67, 62, 60].forEach((midi, i) => metal(440 * 2 ** ((midi - 69) / 12), 1.8, 0.045, i * 0.45)),
+  clock_chime: (opts: SfxOptions = {}) => [60, 64, 69, 67, 62, 60].forEach((midi, i) => metal(440 * 2 ** ((midi - 69) / 12), 1.8, 0.045 * Math.max(0, Math.min(1, opts.level ?? 1)), i * 0.45)),
   splash: () => noise({ duration: 0.5, vol: 0.1, freq: 3600, freqEnd: 400, attack: 0.015 }),
   crate_scrape: () => noise({ duration: 0.65, vol: 0.07, freq: 600, freqEnd: 1400, filterType: 'bandpass' }),
   brakes_squeal: () => { tone({ freq: 2100, freqEnd: 900, duration: 0.7, vol: 0.025, type: 'triangle', attack: 0.1 }); noise({ duration: 0.7, vol: 0.035, freq: 2800, filterType: 'bandpass' }); },

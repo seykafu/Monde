@@ -247,3 +247,32 @@ describe('prewarm', () => {
     expect(gate.allow('pell', 2, 400)).toBe(true); // the dev keys moved the clock back
   });
 });
+
+describe('Settings Offline switch', () => {
+  it('keeps the invite and session while blocking every request entry point, then resumes', async () => {
+    const net = fakeFetch(() => json({ world_id: WORLD, token: TOKEN }));
+    const c = client({ fetch: net.fetch });
+    await c.ensureWorld();
+    const invite = c.invite, world = c.worldId, calls = net.calls.length;
+    c.setOffline(true);
+    expect(c.status).toBe('offline'); expect(c.online).toBe(false); expect(c.enabled).toBe(false);
+    await c.reconnect(); await c.ensureWorld(); await c.prewarm('pell'); await c.getDawn(2); await c.postEvents([]);
+    await c.reportTurn('conversation', 0); await c.createSnapshot(1, 600, 'test');
+    await c.closeTalk('pell', 'conversation', 1, 600);
+    const turn = await c.talk(request, { fallback: () => quietTurn });
+    expect(turn?.source).toBe('quiet'); expect(net.calls).toHaveLength(calls);
+    expect(c.invite).toBe(invite); expect(c.worldId).toBe(world);
+    c.setOffline(false); expect(c.status).toBe('online');
+    await c.reconnect(); expect(net.calls.length).toBeGreaterThan(calls);
+  });
+  it('loads persisted Offline before any world request and aborts active requests', async () => {
+    const storage = new MemoryStorage(); storage.setItem('monde.accessibility', JSON.stringify({ offline: true }));
+    const net = fakeFetch(() => json({ world_id: WORLD, token: TOKEN }));
+    const c = client({ storage, fetch: net.fetch });
+    expect(await c.ensureWorld()).toBeNull(); expect(net.calls).toHaveLength(0);
+    c.setOffline(false); await c.ensureWorld();
+    const signal = net.calls[0]!.init.signal!;
+    c.setOffline(true); expect(signal.aborted).toBe(true);
+    expect(c.invite).toBe('SPRING');
+  });
+});

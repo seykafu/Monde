@@ -1,3 +1,4 @@
+import { accessibility, reducedMotion } from '../../accessibility/runtime';
 import { PROJECT_BEAT } from '../../projects/BeatScene';
 import { Chatter, type ChatterActor } from './chatter';
 import { Greetings } from './greetings';
@@ -146,13 +147,17 @@ const lookFor = (profile: ResidentProfile, colour: number): Look => {
 function ensureEmote(scene: Phaser.Scene, verb: string): string | null {
   const draw = EMOTES[verb];
   if (!draw) return null;
-  const key = `emote-${verb}`;
+  const key = `emote-${verb}-${accessibility().colorblind}`;
   if (scene.textures.exists(key)) return key;
   const g = scene.make.graphics({ x: 0, y: 0 }, false);
   g.fillStyle(0xfff8e6).fillRoundedRect(0, 0, 20, 15, 5).fillTriangle(5, 14, 10, 14, 4, 19);
   g.lineStyle(1, 0x6b5a45, 0.7).strokeRoundedRect(0.5, 0.5, 19, 14, 5);
   g.translateCanvas(1, 1);
   draw(g);
+  if (accessibility().colorblind) {
+    // The existing verb-specific silhouettes already encode activity; raise contrast without changing meaning.
+    g.lineStyle(1, 0x252525, 1).strokeRoundedRect(-0.5, -0.5, 19, 14, 5);
+  }
   g.generateTexture(key, 20, 20);
   g.destroy();
   return key;
@@ -160,25 +165,26 @@ function ensureEmote(scene: Phaser.Scene, verb: string): string | null {
 
 type Draw = (g: Phaser.GameObjects.Graphics) => void;
 const INK = 0x4a3b2c;
-const zzz: Draw = g => { g.lineStyle(1.6, 0x5a6aa8).beginPath().moveTo(4, 4).lineTo(9, 4).lineTo(4, 10).lineTo(9, 10).strokePath().beginPath().moveTo(11, 2).lineTo(15, 2).lineTo(11, 6).lineTo(15, 6).strokePath(); };
+const emoteInk = (colour: number): number => accessibility().colorblind && colour !== 0xfff8e6 ? 0x252525 : colour;
+const zzz: Draw = g => { g.lineStyle(1.6, emoteInk(0x5a6aa8)).beginPath().moveTo(4, 4).lineTo(9, 4).lineTo(4, 10).lineTo(9, 10).strokePath().beginPath().moveTo(11, 2).lineTo(15, 2).lineTo(11, 6).lineTo(15, 6).strokePath(); };
 const EMOTES: Readonly<Record<string, Draw>> = {
-  work: g => { g.fillStyle(INK).fillRect(8, 2, 8, 4); g.lineStyle(2, 0x8a6a45).lineBetween(11, 5, 5, 11); },
-  eat: g => { g.fillStyle(0x8a6a45).fillCircle(9, 6, 5); g.fillStyle(0xfff8e6).fillRect(3, 1, 13, 5); g.lineStyle(1.2, 0x9aa3ad).lineBetween(7, 4, 8, 1).lineBetween(11, 4, 12, 1); },
-  cook: g => { g.fillStyle(INK).fillRect(4, 5, 11, 6); g.lineStyle(1.5, INK).lineBetween(2, 5, 17, 5); g.lineStyle(1.2, 0x9aa3ad).lineBetween(8, 3, 9, 0).lineBetween(12, 3, 13, 0); },
-  read: g => { g.fillStyle(0x7b4b2a).fillRect(3, 3, 6, 8).fillRect(10, 3, 6, 8); g.fillStyle(0xfff8e6).fillRect(4, 4, 4, 6).fillRect(11, 4, 4, 6); },
-  write: g => { g.lineStyle(2.5, 0xd9a93a).lineBetween(4, 10, 13, 2); g.fillStyle(INK).fillTriangle(3, 12, 4, 9, 6, 11); },
-  sit: g => { g.fillStyle(0x8a6a45).fillRect(5, 1, 2, 9).fillRect(5, 7, 9, 2).fillRect(12, 7, 2, 5).fillRect(5, 9, 2, 3); },
+  work: g => { g.fillStyle(INK).fillRect(8, 2, 8, 4); g.lineStyle(2, emoteInk(0x8a6a45)).lineBetween(11, 5, 5, 11); },
+  eat: g => { g.fillStyle(emoteInk(0x8a6a45)).fillCircle(9, 6, 5); g.fillStyle(emoteInk(0xfff8e6)).fillRect(3, 1, 13, 5); g.lineStyle(1.2, emoteInk(0x9aa3ad)).lineBetween(7, 4, 8, 1).lineBetween(11, 4, 12, 1); },
+  cook: g => { g.fillStyle(INK).fillRect(4, 5, 11, 6); g.lineStyle(1.5, INK).lineBetween(2, 5, 17, 5); g.lineStyle(1.2, emoteInk(0x9aa3ad)).lineBetween(8, 3, 9, 0).lineBetween(12, 3, 13, 0); },
+  read: g => { g.fillStyle(emoteInk(0x7b4b2a)).fillRect(3, 3, 6, 8).fillRect(10, 3, 6, 8); g.fillStyle(emoteInk(0xfff8e6)).fillRect(4, 4, 4, 6).fillRect(11, 4, 4, 6); },
+  write: g => { g.lineStyle(2.5, emoteInk(0xd9a93a)).lineBetween(4, 10, 13, 2); g.fillStyle(INK).fillTriangle(3, 12, 4, 9, 6, 11); },
+  sit: g => { g.fillStyle(emoteInk(0x8a6a45)).fillRect(5, 1, 2, 9).fillRect(5, 7, 9, 2).fillRect(12, 7, 2, 5).fillRect(5, 9, 2, 3); },
   socialize: g => { g.fillStyle(INK).fillCircle(5, 6, 1.6).fillCircle(9, 6, 1.6).fillCircle(13, 6, 1.6); },
-  shop: g => { g.fillStyle(0xb5563c).fillRect(4, 5, 10, 7); g.lineStyle(1.4, INK).strokeCircle(9, 5, 2.6); },
-  garden: g => { g.lineStyle(1.6, 0x4f8a3a).lineBetween(9, 12, 9, 5); g.fillStyle(0x5fa344).fillEllipse(6, 5, 6, 3).fillEllipse(12, 4, 6, 3); },
-  fish: g => { g.fillStyle(0x4f7fb0).fillEllipse(8, 6, 10, 5).fillTriangle(12, 6, 17, 2, 17, 10); },
+  shop: g => { g.fillStyle(emoteInk(0xb5563c)).fillRect(4, 5, 10, 7); g.lineStyle(1.4, INK).strokeCircle(9, 5, 2.6); },
+  garden: g => { g.lineStyle(1.6, emoteInk(0x4f8a3a)).lineBetween(9, 12, 9, 5); g.fillStyle(emoteInk(0x5fa344)).fillEllipse(6, 5, 6, 3).fillEllipse(12, 4, 6, 3); },
+  fish: g => { g.fillStyle(emoteInk(0x4f7fb0)).fillEllipse(8, 6, 10, 5).fillTriangle(12, 6, 17, 2, 17, 10); },
   play_music: g => { g.fillStyle(INK).fillCircle(7, 9, 2.4); g.lineStyle(1.5, INK).lineBetween(9, 9, 9, 2).lineBetween(9, 2, 14, 4); },
-  clean: g => { g.lineStyle(1.6, 0x8a6a45).lineBetween(5, 1, 11, 8); g.fillStyle(0xd9b45a).fillTriangle(9, 7, 15, 9, 11, 12); },
-  tinker: g => { g.fillStyle(INK).fillCircle(9, 6, 4.5).fillRect(8, 0, 2, 12).fillRect(3, 5, 12, 2); g.fillStyle(0xfff8e6).fillCircle(9, 6, 1.8); },
-  pray: g => { g.lineStyle(1.6, 0xc9a24a).lineBetween(9, 1, 9, 11).lineBetween(5, 4, 13, 4); },
-  attend: g => { g.lineStyle(1.6, 0xc9a24a).lineBetween(9, 1, 9, 11).lineBetween(5, 4, 13, 4); },
-  volunteer: g => { g.fillStyle(0xc0504d).fillCircle(7, 5, 2.6).fillCircle(11, 5, 2.6).fillTriangle(4.6, 6, 13.4, 6, 9, 11); },
-  beg: g => { g.fillStyle(0xc0504d).fillCircle(7, 5, 2.6).fillCircle(11, 5, 2.6).fillTriangle(4.6, 6, 13.4, 6, 9, 11); },
+  clean: g => { g.lineStyle(1.6, emoteInk(0x8a6a45)).lineBetween(5, 1, 11, 8); g.fillStyle(emoteInk(0xd9b45a)).fillTriangle(9, 7, 15, 9, 11, 12); },
+  tinker: g => { g.fillStyle(INK).fillCircle(9, 6, 4.5).fillRect(8, 0, 2, 12).fillRect(3, 5, 12, 2); g.fillStyle(emoteInk(0xfff8e6)).fillCircle(9, 6, 1.8); },
+  pray: g => { g.lineStyle(1.6, emoteInk(0xc9a24a)).lineBetween(9, 1, 9, 11).lineBetween(5, 4, 13, 4); },
+  attend: g => { g.lineStyle(1.6, emoteInk(0xc9a24a)).lineBetween(9, 1, 9, 11).lineBetween(5, 4, 13, 4); },
+  volunteer: g => { g.fillStyle(emoteInk(0xc0504d)).fillCircle(7, 5, 2.6).fillCircle(11, 5, 2.6).fillTriangle(4.6, 6, 13.4, 6, 9, 11); },
+  beg: g => { g.fillStyle(emoteInk(0xc0504d)).fillCircle(7, 5, 2.6).fillCircle(11, 5, 2.6).fillTriangle(4.6, 6, 13.4, 6, 9, 11); },
   sleep: zzz,
   nap: zzz,
   talk: g => { g.fillStyle(INK).fillCircle(5, 6, 1.6).fillCircle(9, 6, 1.6).fillCircle(13, 6, 1.6); }
@@ -214,7 +220,7 @@ export class ResidentLayer {
   private near = new Set<string>();
   /** Tie emotes over residents who meet (§9.11.3): a pool made up front (so it belongs to the world camera). */
   private readonly emotePool: Phaser.GameObjects.Image[];
-  private floating: { img: Phaser.GameObjects.Image; pair: Actor[]; ms: number }[] = [];
+  private floating: { img: Phaser.GameObjects.Image; pair: Actor[]; ms: number; id: EmoteIcon }[] = [];
   private readonly emoteThrottle = new PairEmoteThrottle();
   private emoteClock = 0;
   private emoteCheck = 0;
@@ -438,7 +444,7 @@ export class ResidentLayer {
     const img = this.emotePool.find(i => !i.visible && !this.floating.some(f => f.img === i));
     if (!img) return;
     img.setTexture(emoteTexture(this.scene, id)).setAlpha(0).setScale(0.4).setVisible(true);
-    this.floating.push({ img, pair, ms: 0 });
+    this.floating.push({ img, pair, ms: 0, id });
   }
 
   /** The top of what's drawn over a resident's head: the name tag, else the activity bubble, else the head. */
@@ -452,13 +458,14 @@ export class ResidentLayer {
   private driftEmotes(dtMs: number): void {
     const show = PAIR_EMOTE_RULES.showMs;
     this.floating = this.floating.filter(f => {
+      f.img.setTexture(emoteTexture(this.scene, f.id));
       f.ms += dtMs;
       if (f.ms >= show || f.pair.some(a => !a.sprite.visible || this.speaking(a.profile.id))) { f.img.setVisible(false); return false; }
       const t = f.ms / show, pop = Math.min(1, f.ms / 160);
       const x = f.pair.reduce((s, a) => s + a.sprite.x, 0) / f.pair.length;
       const top = Math.min(...f.pair.map(a => this.headTop(a))) - 3;
-      f.img.setPosition(x, top - 10 * Math.sin((t * Math.PI) / 2))
-        .setScale(0.4 + 0.6 * (1 - (1 - pop) ** 3) + (pop < 1 ? 0.15 * Math.sin(pop * Math.PI) : 0))
+      f.img.setPosition(x, top - (reducedMotion() ? 0 : 10 * Math.sin((t * Math.PI) / 2)))
+        .setScale(reducedMotion() ? 1 : 0.4 + 0.6 * (1 - (1 - pop) ** 3) + (pop < 1 ? 0.15 * Math.sin(pop * Math.PI) : 0))
         .setAlpha(Math.min(...f.pair.map(a => a.alpha)) * Math.min(1, f.ms / 120, (show - f.ms) / 420));
       return true;
     });

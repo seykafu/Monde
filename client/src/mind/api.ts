@@ -1,3 +1,4 @@
+import { loadAccessibility } from '../accessibility/preferences';
 import { ChatReply, type ChatBody } from '@monde/shared';
 // monde-mind client (GDD §9.10, §9.14, §19.4; MVP M-05). No Phaser; the network and storage are injected so
 // the bootstrap and the stream run under vitest with fakes.
@@ -130,6 +131,19 @@ export class MindClient {
   private session: Session | null = null;
   private pending: Promise<Session | null> | null = null;
   private offlineUntil = 0;
+  private chosenOffline = false;
+  get offline(): boolean { return !!this.opts.offline || this.chosenOffline; }
+  private networkGate = new AbortController();
+  setOffline(value: boolean): void {
+    this.chosenOffline = value;
+    if (value) this.networkGate.abort();
+    else if (this.networkGate.signal.aborted) this.networkGate = new AbortController();
+  }
+  private requestFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+    if (this.offline) return Promise.reject(new Error('Offline by choice'));
+    const signal = init.signal ? AbortSignal.any([init.signal, this.networkGate.signal]) : this.networkGate.signal;
+    return this.opts.fetch(input, { ...init, signal });
+  }
   private inviteRejected = false;
   private profile: PlayerProfile | null = null;
   private profileSynced = true;
@@ -137,6 +151,7 @@ export class MindClient {
   private readonly now: () => number;
 
   constructor(private readonly opts: MindOptions) {
+    this.chosenOffline = loadAccessibility(opts.storage ?? null).offline;
     this.baseUrl = opts.baseUrl.replace(/\/+$/, '');
     this.now = opts.now ?? (() => Date.now());
     this.deviceId = this.read(STORAGE_KEYS.device) ?? opts.randomUUID();
@@ -172,9 +187,9 @@ export class MindClient {
   }
 
   /** The server will be tried for the next turn (a session exists and the client isn't cooling off). */
-  get online(): boolean { return !this.opts.offline && this.session !== null && this.now() >= this.offlineUntil; }
+  get online(): boolean { return !this.offline && this.session !== null && this.now() >= this.offlineUntil; }
   /** Could the client reach a world at all (offline flag, no invite and no session mean never). */
-  get enabled(): boolean { return !this.opts.offline && (this.session !== null || (this.inviteCode !== null && !this.inviteRejected)); }
+  get enabled(): boolean { return !this.offline && (this.session !== null || (this.inviteCode !== null && !this.inviteRejected)); }
   get worldId(): string | null { return this.session?.world_id ?? null; }
   /** What Quiet Mode lines call the player. */
   get playerName(): string { return this.profile?.name ?? DEFAULT_PLAYER_NAME; }
@@ -186,9 +201,10 @@ export class MindClient {
   /** Where things stand with the server, for the HUD dot and Settings (mind/connection.ts). */
   private budgetQuiet = false;
   get status(): MindStatus {
+    if (this.offline) return 'offline';
     if (this.budgetQuiet) return 'budget';
     return mindStatus({
-      offline: !!this.opts.offline, hasSession: this.session !== null, hasInvite: this.inviteCode !== null,
+      offline: !!this.offline, hasSession: this.session !== null, hasInvite: this.inviteCode !== null,
       inviteRejected: this.inviteRejected, coolingOff: this.now() < this.offlineUntil
     });
   }
@@ -206,7 +222,7 @@ export class MindClient {
     this.inviteCode = given;
     this.inviteRejected = false;
     this.offlineUntil = 0;
-    if (given && !this.session && !this.opts.offline) {
+    if (given && !this.session && !this.offline) {
       await this.ensureWorld();
       if (this.session && !this.profileSynced) void this.syncPlayer();
     }
@@ -215,7 +231,7 @@ export class MindClient {
 
   /** Try the server now instead of waiting out the cooldown (the HUD's gentle retry). Never rejects. */
   async reconnect(): Promise<MindStatus> {
-    if (this.opts.offline) return this.status;
+    if (this.offline) return this.status;
     this.offlineUntil = 0;
     if (!this.session) {
       await this.ensureWorld();
@@ -234,7 +250,7 @@ export class MindClient {
 
   /** The session, creating the world on first run. Null means Quiet Mode. Never rejects. */
   ensureWorld(): Promise<Session | null> {
-    if (this.opts.offline) return Promise.resolve(null);
+    if (this.offline) return Promise.resolve(null);
     if (this.session) return Promise.resolve(this.session);
     if (!this.inviteCode || this.inviteRejected || this.now() < this.offlineUntil) return Promise.resolve(null);
     this.pending ??= this.createWorld().finally(() => { this.pending = null; });
@@ -258,7 +274,7 @@ export class MindClient {
    */
   syncPlayer(): Promise<boolean> {
     if (this.profileSynced || !this.profile) return Promise.resolve(this.profileSynced);
-    if (this.opts.offline) return Promise.resolve(false);
+    if (this.offline) return Promise.resolve(false);
     this.syncing ??= this.sendPlayer().finally(() => { this.syncing = null; });
     return this.syncing;
   }
@@ -307,7 +323,7 @@ export class MindClient {
   }
 
   async restoreSnapshot(link: { world_id: string | null; snapshot_id: string | null }): Promise<boolean> {
-    if (this.opts.offline || !this.session || !link.world_id || !link.snapshot_id) return false;
+    if (this.offline || !this.session || !link.world_id || !link.snapshot_id) return false;
     try {
       const res = await this.fetchWithin(`${this.baseUrl}/v1/worlds/${encodeURIComponent(link.world_id)}/snapshots/${encodeURIComponent(link.snapshot_id)}/restore`, {
         method: 'POST', headers: { authorization: `Bearer ${this.session.token}`, 'content-type': 'application/json' }, body: '{}'
@@ -410,7 +426,7 @@ export class MindClient {
   async talk(request: TalkRequest, h: TalkHandlers): Promise<TalkResult | null> {
     const quiet = (reason: string): TalkResult => ({ turn: h.fallback(), source: 'quiet', reason });
     if (h.signal?.aborted) return null;
-    if (!this.online && !(await this.ensureWorld())) return quiet(this.opts.offline ? 'offline' : 'no world');
+    if (!this.online && !(await this.ensureWorld())) return quiet(this.offline ? 'offline' : 'no world');
     if (this.now() < this.offlineUntil) return quiet('cooling off after a network failure');
 
     const controller = new AbortController();
@@ -507,10 +523,10 @@ export class MindClient {
   private async authed(path: string, init: RequestInit, timeoutMs?: number): Promise<Response | null> {
     for (let attempt = 0; attempt < 2; attempt++) {
       const session = await this.ensureWorld();
-      if (!session) return null;
+      if (!session || this.offline) return null;
       const headers = { ...(init.headers as Record<string, string> | undefined), 'content-type': 'application/json', authorization: `Bearer ${session.token}` };
       const url = `${this.baseUrl}/v1/worlds/${session.world_id}${path}`;
-      const res = timeoutMs ? await this.fetchWithin(url, { ...init, headers }, timeoutMs) : await this.opts.fetch(url, { ...init, headers });
+      const res = timeoutMs ? await this.fetchWithin(url, { ...init, headers }, timeoutMs) : await this.requestFetch(url, { ...init, headers });
       if (res.status !== 401 || attempt > 0) return res;
       this.log('warn', `world ${session.world_id} was refused (401); starting a new one`);
       this.session = null;
@@ -520,13 +536,14 @@ export class MindClient {
   }
 
   private async fetchWithin(url: string, init: RequestInit, ms: number): Promise<Response> {
+    if (this.offline) throw new Error('Offline by choice');
     const controller = new AbortController();
     const outer = init.signal;
     const onAbort = () => controller.abort();
     outer?.addEventListener('abort', onAbort, { once: true });
     const timer = setTimeout(() => controller.abort(), ms);
     try {
-      return await this.opts.fetch(url, { ...init, signal: controller.signal });
+      return await this.requestFetch(url, { ...init, signal: controller.signal });
     } finally {
       clearTimeout(timer);
       outer?.removeEventListener('abort', onAbort);
@@ -534,7 +551,7 @@ export class MindClient {
   }
 
   private wentOffline(what: string, error: unknown): void {
-    if (error instanceof AbortedByCaller) return;
+    if (error instanceof AbortedByCaller || this.offline) return;
     this.offlineUntil = this.now() + OFFLINE_COOLDOWN_MS;
     this.log('warn', `${what}: server unreachable; Quiet Mode for ${OFFLINE_COOLDOWN_MS / 1000} s`, error instanceof Error ? error.message : error);
   }

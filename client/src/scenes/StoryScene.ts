@@ -1,3 +1,4 @@
+import { choiceViewport } from '../ui/choiceViewport';
 import type { Outcome as ScuffleOutcome } from '../combat/scuffle/engine';
 import { SCUFFLE_SCENE, openScuffle } from '../scuffles/ScuffleScene';
 import { openPuzzle } from '../puzzles/scenes/PuzzleScene';
@@ -146,6 +147,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   private reading = false;
   private buttons: PanelButton[] = [];
   private focus = 0;
+  private scrollChoices: (index: number) => void = () => undefined;
   private answer: ((index: number) => void) | null = null;
   private waitDone: (() => void) | null = null;
   /** A canned {ai_open} line is on show: reading it on resolves this instead of asking the director for more. */
@@ -231,6 +233,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   update(time: number, delta: number): void {
     if (this.closed || !this.line || !this.typing) return;
     const pageText = this.pages[this.page] ?? '';
+    this.speed = loadTextSpeed(browserStorage());
     const ms = MS_PER_CHAR[this.speed];
     const before = Math.floor(this.shown);
     this.shown = ms <= 0 ? pageText.length : Math.min(pageText.length, this.shown + delta / ms);
@@ -307,7 +310,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     }
     if (this.echoLines > 0 && --this.echoLines === 0) this.echo.setText('');
     this.measure.setFontStyle(this.body.style.fontStyle);
-    this.pages = paginateBody(this.measure, text, BODY_MAX_LINES);
+    this.pages = paginateBody(this.measure, text, BODY_MAX_LINES());
     this.page = 0;
     this.startPage();
     this.reading = true;
@@ -417,6 +420,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
       this.buttons = options.map((text, i) => new PanelButton(this, CHOICE_X, 0, CHOICE_W, numbered ? `${i + 1}   ${text}` : text, () => this.pick(i)));
       let y = PANEL_Y - 30;
       for (let i = this.buttons.length - 1; i >= 0; i--) { y -= this.buttons[i]!.h + (i === this.buttons.length - 1 ? 0 : CHOICE_GAP); this.buttons[i]!.moveTo(y); }
+      this.scrollChoices = choiceViewport(this, this.buttons, PANEL_Y - 30);
       this.focus = 0;
       this.buttons.forEach((b, i) => b.setFocus(i === 0));
       this.answer = resolve;
@@ -454,6 +458,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   private moveFocus(step: number): void {
     if (!this.buttons.length) return;
     this.focus = (this.focus + step + this.buttons.length) % this.buttons.length;
+    this.scrollChoices(this.focus);
     this.buttons.forEach((b, i) => b.setFocus(i === this.focus));
     playSfx('hover');
   }

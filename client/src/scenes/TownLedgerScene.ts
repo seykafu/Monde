@@ -1,3 +1,5 @@
+import { accessiblePages } from '../ui/accessiblePages';
+import { textSize } from '../accessibility/runtime';
 import { livingArrivals } from '@monde/shared';
 import { applyOptionRegard, emptyFriendship, type FriendshipState } from '../friendship/state';
 import { personaCards } from '../world/residents';
@@ -155,7 +157,7 @@ export class PillarStrip {
     bg.lineStyle(2, 0xe4c77f, 0.55).strokeRoundedRect(x, y, w, h, 8);
     const icons = scene.add.graphics();
     const style = (size: number, color: string): Phaser.Types.GameObjects.Text.TextStyle =>
-      ({ fontFamily: FAMILY_UI, fontSize: `${size}px`, color, resolution: RENDER_SCALE });
+      ({ fontFamily: FAMILY_UI, fontSize: `${textSize(size)}px`, color, resolution: RENDER_SCALE });
     PILLARS.forEach((p, i) => {
       const cx = x + cell * i + 16;
       drawPillarIcon(icons, p, cx, y + h / 2, 7.5, PILLAR_COLOR[p], 0x28372d);
@@ -262,6 +264,7 @@ export class TownLedgerScene extends Phaser.Scene {
     this.drawPaper();
     this.tabs = this.add.container(0, 0);
     this.content = this.add.container(0, 0);
+    accessiblePages(this, this.content);
     this.refresh();
 
     const onChange = () => this.refresh();
@@ -315,7 +318,7 @@ export class TownLedgerScene extends Phaser.Scene {
 
   private text(x: number, y: number, s: string, size: number, opts: { color?: string; family?: string; italic?: boolean; bold?: boolean; align?: 'left' | 'right' | 'center'; wrap?: number } = {}): Phaser.GameObjects.Text {
     const t = this.add.text(x, y, s, {
-      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${size}px`, color: opts.color ?? INK_CSS,
+      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${textSize(size)}px`, color: opts.color ?? INK_CSS,
       fontStyle: [opts.italic ? 'italic' : '', opts.bold ? 'bold' : ''].join(' ').trim() || 'normal',
       resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap } } : {})
     }).setOrigin(opts.align === 'right' ? 1 : opts.align === 'center' ? 0.5 : 0, 0);

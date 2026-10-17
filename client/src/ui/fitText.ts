@@ -1,4 +1,5 @@
-import Phaser from "phaser";
+import type Phaser from "phaser";
+import { pageLines } from "../accessibility/preferences";
 
 // Paginate a dialogue body into fixed-font pages that each fit the box.
 //
@@ -48,4 +49,4 @@ export const maxLinesFor = (
   fontSize: number,
   lineSpacing: number,
   maxHeight: number
-): number => Math.max(1, Math.floor(maxHeight / (fontSize * 1.2 + lineSpacing)));
+): number => pageLines(fontSize, lineSpacing, maxHeight);

@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 // The VN panel's shared look (GDD §18 Dialogue): layout in design pixels, the HUD palette, the focusable
 // button, the panel frame and name plates. StoryScene draws with these. They match DialogueScene's own
 // constants and PanelButton exactly, so a scripted scene and a live conversation look like one panel.
@@ -20,7 +21,7 @@ export const BODY_Y = PANEL_Y + 40;
 export const BODY_W = PANEL_W - PAD * 2 - 60;
 export const BODY_FONT = 22;
 export const BODY_SPACING = 8;
-export const BODY_MAX_LINES = maxLinesFor(BODY_FONT, BODY_SPACING, PANEL_H - 40 - 30);
+export const BODY_MAX_LINES = () => maxLinesFor(textSize(BODY_FONT), BODY_SPACING, PANEL_H - 40 - 30);
 export const PORTRAIT_X = PANEL_X + 22;
 export const PORTRAIT_Y = PANEL_Y - PORTRAIT_H + 4;
 export const PLATE_X = PANEL_X + 18;
@@ -47,7 +48,7 @@ export const rosterColour = (index: number): number =>
   Phaser.Display.Color.HSLToColor(((index * 137.508) % 360) / 360, 0.52, 0.56).color;
 
 export const bodyStyle = (): Phaser.Types.GameObjects.Text.TextStyle => ({
-  fontFamily: FAMILY_BODY, fontSize: `${BODY_FONT}px`, color: BODY_COLOUR, lineSpacing: BODY_SPACING,
+  fontFamily: FAMILY_BODY, fontSize: `${textSize(BODY_FONT)}px`, color: BODY_COLOUR, lineSpacing: BODY_SPACING,
   wordWrap: { width: BODY_W }, resolution: RENDER_SCALE
 });
 
@@ -106,7 +107,7 @@ export class PanelButton {
     readonly onClick: () => void, private readonly opts: { center?: boolean; muted?: boolean; size?: number; minH?: number } = {}) {
     const size = opts.size ?? 18;
     this.label = scene.add.text(0, 0, text, {
-      fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
       wordWrap: { width: w - 28 }, lineSpacing: 2, align: opts.center ? 'center' : 'left'
     }).setDepth(41);
     this.h = Math.max(opts.minH ?? 40, Math.ceil(this.label.height) + 16);
