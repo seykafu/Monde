@@ -254,6 +254,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         conversationLines: conversation.filter((t) => t.speaker === "resident").map((t) => t.text),
         samples: voice.mode === "narrated_action" ? [] : voice.samples,
         vocabulary: cardVocabulary(prefix.card),
+        tics: voice.tics,
         neverSays: voice.mode === "narrated_action" ? [] : voice.never_says,
         fellow: { name: player.name, pronouns: player.pronouns },
         exitOnly: exitOnlyTics(prefix.card),

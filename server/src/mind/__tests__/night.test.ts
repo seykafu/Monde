@@ -262,7 +262,8 @@ describe("POST /v1/worlds/:w/night", () => {
   });
 
   it("refuses a night the world has already passed, and validates the body", async () => {
-    const env = await setup(fake());
+    // Not a budget test: a generous budget, so a loaded machine still finishes each night inside the request.
+    const env = await setup(fake(), { budgetMs: 10_000 });
     expect((await night(env, { day: 1 })).statusCode).toBe(200);
     expect((await night(env, { day: 2 })).json()).toMatchObject({ day: 2, next_day: 3, complete: true });
     const stale = await night(env, { day: 1 });
@@ -275,7 +276,7 @@ describe("POST /v1/worlds/:w/night", () => {
     expect((await night(env, { day: 6 })).statusCode).toBe(200);
     const [world] = await database.db.select().from(worlds).where(eq(worlds.id, env.worldId));
     expect(world!.day).toBe(7);
-  }, 20_000); // three nights, each up to the 2 s budget: more than the 5 s default on a loaded machine
+  }, 40_000); // three nights inside the request: more than the 5 s default on a loaded machine
 });
 
 describe("GET /v1/worlds/:w/dawn/:day", () => {

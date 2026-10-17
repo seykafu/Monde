@@ -1,8 +1,8 @@
 <!--
 Block 4 for the nightly reflection (GDD §9.6, §9.7, §9.17), run at effort "low" or through the Batch API.
 Yesterday's beliefs, relationships and stances are in block 3. Slots: day, resident_name, memories, emotion,
-valence, energy, stress, regard, regard_tier, fellow (dropped when empty), dream, dream_stage, dream_notes, town_now,
-town, favor_templates.
+valence, energy, stress, regard, regard_tier, fellow (dropped when empty), dream, dream_stage, dream_notes, town_now
+(dropped when empty), town, favor_templates.
 -->
 <reflect_request>
 It is night on Day {{day}}. Reflect as {{resident_name}} on today.

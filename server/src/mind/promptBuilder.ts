@@ -26,7 +26,7 @@ import {
   type FavorTemplate, type Memory, type PersonaCard, type ResidentState, type Verb,
 } from "@monde/shared";
 import { promptExpressions } from "./expressions.js";
-import { addressFor, fellowLine, pronounRule, type FellowView } from "./naming.js";
+import { addressFor, fellowLine, pronounNote, type FellowView } from "./naming.js";
 import { townNowBlock } from "./townState.js";
 import { borrowedFor, borrowedLine, phraseKey, type RosterVoice } from "./voice.js";
 
@@ -112,7 +112,7 @@ type Templates = Readonly<Record<TemplateName, string>>;
  * Bump when the code-side serialization below changes in a way the template files don't show (list formats,
  * field order), so the logged prompt version still changes.
  */
-const SERIALIZER_VERSION = "q01.2";
+const SERIALIZER_VERSION = "q01.3";
 
 /**
  * Where the templates live. Source runs read them next to this file. The bundled server (tsup → server/dist)
@@ -631,8 +631,7 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     stress: String(round(state.mood.stress)),
     doing: input.doing ? clause(input.doing) : "nothing in particular",
     player_name: playerName,
-    player_pronouns: speech(player.pronouns),
-    pronoun_rule: pronounRule(player.pronouns),
+    player_pronouns: speech(pronounNote(player.pronouns)),
     town_now: trusted(townNowBlock(flags)),
     regard_tier: regardTier(state.regard),
     player_background: clause(player.background),

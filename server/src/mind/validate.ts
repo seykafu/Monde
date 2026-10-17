@@ -24,13 +24,18 @@
  *                  cents, "five pounds" (filters.ts currencyHit)                              (soft: "currency")
  *      borrowed    nor another resident's signature phrase (voice.ts)                         (soft: "borrowed")
  *      tic_repeat  nor one of the resident's own a second time in this conversation          (soft: "tic_repeat")
- *   9. samples     no line may echo one of the resident's own card samples: trigram overlap
- *                  above 0.35, a run of six or more words lifted from one, a distinctive run
- *                  of four or five (two distinctive words, no price or count), or most of a
- *                  line's distinctive words taken from one sample                             (soft: "sample_echo")
+ *   9. samples     no line may echo one of the resident's own card samples: a whole sample
+ *                  sentence of four words or more, verbatim or but for one word (prices and
+ *                  counts included), trigram overlap above 0.35, a run of six or more words
+ *                  lifted from one, a distinctive run of four or five (two distinctive words,
+ *                  no price or count), or most of a line's distinctive words from one sample  (soft: "sample_echo")
  *  10. exit_tic    a tic the card saves for leaving (June's "Anyway.") outside the turn that
  *                  sees the Fellow off: stripped in step 2 where it stands as a sentence of
  *                  its own and the line survives; anything left is a soft failure              (soft: "exit_tic")
+ *
+ * Every soft slip a turn has is collected (`slips`), so the one regeneration's note names them all (softNote), and
+ * the note always sends the retry back to answering the Fellow's line first. When the retry slips too, the attempt
+ * with fewer slips is kept (dialogue.ts).
  *
  * Step 2 also turns *asterisk* stage business into the house style's (parentheses) (adjusts).
  *
@@ -50,6 +55,8 @@ import { borrowedHits, stripTics, type Signature } from "./voice.js";
 export type ValidationCategory = "schema" | `lexical:${FilterGroup}` | "riddle" | "echo" | SoftCategory;
 /** Checks that regenerate once and then accept (dialogue.ts), never fall back. */
 export type SoftCategory = "misgender" | "never_says" | "currency" | "borrowed" | "tic_repeat" | "sample_echo" | "exit_tic";
+/** One soft check a turn failed, with what tripped it. */
+export interface Slip { category: SoftCategory; detail: string }
 
 export interface ValidationContext {
   /** The name fills `{name}` in padded replies; kind keeps an animal's own expressions. */
@@ -73,6 +80,8 @@ export interface ValidationContext {
   samples?: readonly string[];
   /** The resident's own words (cardVocabulary), which never make a sample lift distinctive (step 9). */
   vocabulary?: readonly string[];
+  /** The resident's own tics: a sample sentence that is one of them ("I never shoot at people.") may be said (step 9). */
+  tics?: readonly string[];
   /** The card's never_says: words and phrases this resident never uses (step 8). */
   neverSays?: readonly string[];
   /** Who the Fellow is, from the Fellowship form (step 8, misgender). */
@@ -89,8 +98,11 @@ export type ValidationResult =
   | { ok: true; output: DialogueTurnOutput; adjustments: string[] }
   | {
     ok: false; category: ValidationCategory; detail: string;
-    /** Set when only a soft check failed: the otherwise valid turn, to keep if the regeneration fails too. */
-    soft?: { output: DialogueTurnOutput; adjustments: string[] };
+    /**
+     * Set when only soft checks failed: the otherwise valid turn, to keep if the regeneration fails too, and every
+     * slip it has (`category` and `detail` are the first).
+     */
+    soft?: { output: DialogueTurnOutput; adjustments: string[]; slips: Slip[] };
   };
 
 /** §9.10 "Echo check": above this overlap with a recent line, regenerate. */
@@ -165,6 +177,16 @@ export function sharedRun(line: string, other: string): number {
  * not a quotation; `cardVocabulary`).
  */
 export const SAMPLE_DISTINCT_RUN = 4;
+/**
+ * GDD-GAP: §9.10 doesn't say how much of a sample may come back. The blind A/B eval (2026-10-16) caught Odile opening
+ * with two whole sample sentences ("Rye's two coins, white's three. Today it's rye."; "Eat something, you look like
+ * a coat on a hook."), so a sample sentence of SAMPLE_SENTENCE_WORDS or more is a hit whatever prices or counts it
+ * holds: verbatim, or (from SAMPLE_SENTENCE_SLACK_WORDS up) with one word added, dropped or changed. Shorter price
+ * fragments ("Rye. Two coins.") still pass, and so does a sample sentence that is mostly the resident's own tic
+ * ("May I be frank, Fellow?" is Vane's tic and a name).
+ */
+export const SAMPLE_SENTENCE_WORDS = 4;
+export const SAMPLE_SENTENCE_SLACK_WORDS = 7;
 export const SAMPLE_WORD_SHARE = 0.5;
 export const SAMPLE_WORDS_SHARED = 3;
 
@@ -179,7 +201,7 @@ const STOPWORDS: ReadonlySet<string> = new Set((
   + "oh ah well yes yeah now one ones get got go going gone come came say said see saw know like way thing things "
   + "fellow petit petite friend dear pet"
 ).split(" "));
-/** Prices, counts, days and "time": facts a resident may repeat in their own words (World Bible: "rye's two, white's three"). */
+/** Prices, counts, days and "time": facts a resident may repeat in their own words (World Bible: "two coins a loaf"). */
 const COUNT_WORDS: ReadonlySet<string> = new Set((
   "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen "
   + "eighteen nineteen twenty thirty forty fifty sixty seventy eighty ninety hundred thousand half quarter dozen "
@@ -207,6 +229,40 @@ export function cardVocabulary(card: Pick<PersonaCard, "voice" | "chores" | "lik
   return [...new Set(normalizeWords(text).filter(isContent).map(stem))].sort();
 }
 
+/** Word-level edit distance (insert, delete, substitute), for near-verbatim sentences. */
+function editDistance(a: readonly string[], b: readonly string[]): number {
+  let previous = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const row = [i];
+    for (let j = 1; j <= b.length; j++) {
+      row[j] = Math.min(previous[j]! + 1, row[j - 1]! + 1, previous[j - 1]! + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+    previous = row;
+  }
+  return previous[b.length]!;
+}
+
+/**
+ * The first sentence of `sample` (SAMPLE_SENTENCE_WORDS or more, and more than the resident's own tics) that the
+ * line reproduces: verbatim, or but for one word once the sentence has SAMPLE_SENTENCE_SLACK_WORDS. Null if none.
+ */
+export function sampleSentenceHit(line: string, sample: string, tics: readonly string[] = []): string | null {
+  const words = normalizeWords(line);
+  const ticWords = new Set(tics.flatMap((tic) => normalizeWords(tic)));
+  // Sentence ends, but not "Mr." or "St." inside one.
+  for (const sentence of sample.replace(/[’‘]/g, "'").split(/(?<=[.!?…])(?<!\b(?:Mr|Mrs|Ms|Dr|St)\.)\s+/)) {
+    const target = normalizeWords(sentence);
+    if (target.length < SAMPLE_SENTENCE_WORDS || target.filter((word) => !ticWords.has(word)).length < 2) continue;
+    const slack = target.length >= SAMPLE_SENTENCE_SLACK_WORDS ? 1 : 0;
+    for (let size = target.length - slack; size <= target.length + slack; size++) {
+      for (let i = 0; i + size <= words.length; i++) {
+        if (editDistance(words.slice(i, i + size), target) <= slack) return sentence.trim().replace(/^[^\p{L}\p{N}(]+/u, "");
+      }
+    }
+  }
+  return null;
+}
+
 /** Every maximal run (three words or more) of `line` that also appears in `other`, as word lists. */
 export function sharedRuns(line: string, other: string): string[][] {
   const words = normalizeWords(line);
@@ -223,23 +279,52 @@ export function sharedRuns(line: string, other: string): string[][] {
   return runs;
 }
 
+const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 /**
- * The first of `samples` a line echoes (step 9), with why, or null. `vocabulary` is the resident's own words
- * (`cardVocabulary`), which never make a lift distinctive.
+ * `sample` without the resident's own tics, which are theirs to say even where a sample holds one (Nettie's "I never
+ * shoot at people." opens her sample). A tic of two words or more goes wherever it appears; a one-word tic only where
+ * it stands as a sentence ("Hm.").
  */
-export function sampleEcho(line: string, samples: readonly string[], vocabulary: readonly string[] = []): string | null {
+function withoutTics(sample: string, tics: readonly string[]): string {
+  let out = sample.replace(/[’‘]/g, "'");
+  for (const tic of tics) {
+    const words = normalizeWords(tic).map(escapeRegex);
+    if (words.length === 0) continue;
+    const body = words.join("[^\\p{L}\\p{N}']+");
+    const pattern = words.length > 1
+      ? new RegExp(`(?<![\\p{L}\\p{N}'])${body}(?![\\p{L}\\p{N}'])[.!?…]*`, "giu")
+      : new RegExp(`(?<=^|[.!?…)]\\s*)\\s*${body}\\s*[.!?…]+`, "giu");
+    out = out.replace(pattern, " ");
+  }
+  return out;
+}
+
+/**
+ * The first of `samples` a line echoes (step 9), with why, or null; the detail opens with the lifted words in quotes
+ * when there are some to name. `vocabulary` is the resident's own words (`cardVocabulary`), which never make a lift
+ * distinctive; `tics` are theirs to say even where a sample holds one.
+ */
+export function sampleEcho(
+  line: string, samples: readonly string[], vocabulary: readonly string[] = [], tics: readonly string[] = [],
+): string | null {
   const own = new Set(vocabulary);
-  for (const sample of samples) {
-    const overlap = echoOverlap(line, [sample]);
-    const run = sharedRun(line, sample);
+  const compared = samples.map((sample) => ({ sample, text: withoutTics(sample, tics) }));
+  for (const { sample, text } of compared) {
+    const sentence = sampleSentenceHit(line, text, tics);
+    if (sentence) return `"${sentence}" (a whole sample sentence): ${sample}`;
+  }
+  for (const { sample, text: compare } of compared) {
+    const overlap = echoOverlap(line, [compare]);
+    const run = sharedRun(line, compare);
     if (overlap > ECHO_THRESHOLD || run >= SAMPLE_RUN_WORDS) return `${overlap.toFixed(2)}/${run} words: ${sample}`;
     const named = new Set([...names(line), ...names(sample)]);
     const distinctive = (word: string): boolean => isContent(word) && !own.has(stem(word)) && !named.has(stem(word));
-    const lifted = sharedRuns(line, sample).find((words) => words.length >= SAMPLE_DISTINCT_RUN
+    const lifted = sharedRuns(line, compare).find((words) => words.length >= SAMPLE_DISTINCT_RUN
       && !words.some(isCount) && words.filter(distinctive).length >= 2);
     if (lifted) return `"${lifted.join(" ")}": ${sample}`;
     const mine = [...new Set(normalizeWords(line).filter(distinctive).map(stem))];
-    const theirs = new Set(normalizeWords(sample).filter(distinctive).map(stem));
+    const theirs = new Set(normalizeWords(compare).filter(distinctive).map(stem));
     const shared = mine.filter((word) => theirs.has(word));
     if (shared.length >= SAMPLE_WORDS_SHARED && shared.length / mine.length >= SAMPLE_WORD_SHARE) {
       return `${shared.length}/${mine.length} words (${shared.join(", ")}): ${sample}`;
@@ -371,84 +456,86 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
   }
 
   // 8-10. Soft voice checks: the Fellow's pronouns, the card's never_says, Monde's money, another resident's
-  // catchphrase, the resident's own twice, a card sample quoted back, a leaving tic too early.
-  const soft = (category: SoftCategory, detail: string): ValidationResult =>
-    ({ ok: false, category, detail, soft: { output: out, adjustments } });
-  if (ctx.fellow) {
-    for (const line of out.lines) {
+  // catchphrase, the resident's own twice, a card sample quoted back, a leaving tic too early. Every one is
+  // collected, so the regeneration's note can name them all.
+  const slips: Slip[] = [];
+  const slip = (category: SoftCategory, detail: string | null | undefined): void => {
+    if (detail && !slips.some((s) => s.category === category)) slips.push({ category, detail });
+  };
+  for (const line of out.lines) {
+    if (ctx.fellow) {
       const hit = misgenderHit(line.text, ctx.fellow);
-      if (hit) return soft("misgender", `"${hit}" (${ctx.fellow.pronouns})`);
+      if (hit) slip("misgender", `"${hit}" (${ctx.fellow.pronouns})`);
     }
-  }
-  for (const line of out.lines) {
-    const hit = neverSaysHit(line.text, ctx.neverSays ?? []);
-    if (hit) return soft("never_says", `"${hit}"`);
-  }
-  for (const line of out.lines) {
-    const hit = currencyHit(line.text);
-    if (hit) return soft("currency", `"${hit}"`);
-  }
-  for (const line of out.lines) {
+    const never = neverSaysHit(line.text, ctx.neverSays ?? []);
+    if (never) slip("never_says", `"${never}"`);
+    const money = currencyHit(line.text);
+    if (money) slip("currency", `"${money}"`);
     const borrowed = borrowedHits(line.text, ctx.borrowed ?? [])[0];
-    if (borrowed) return soft("borrowed", `"${borrowed.phrase}" (${borrowed.owner})`);
+    if (borrowed) slip("borrowed", `"${borrowed.phrase}" (${borrowed.owner})`);
   }
   const said = [...(ctx.conversationLines ?? [])];
   for (const line of out.lines) {
     const again = borrowedHits(line.text, ctx.own ?? []).find((s) => said.some((earlier) => borrowedHits(earlier, [s]).length > 0));
-    if (again) return soft("tic_repeat", `"${again.phrase}"`);
+    if (again) slip("tic_repeat", `"${again.phrase}"`);
     said.push(line.text);
   }
-  for (const line of out.lines) {
-    const echo = sampleEcho(line.text, ctx.samples ?? [], ctx.vocabulary ?? []);
-    if (echo) return soft("sample_echo", echo);
-  }
+  for (const line of out.lines) slip("sample_echo", sampleEcho(line.text, ctx.samples ?? [], ctx.vocabulary ?? [], ctx.tics ?? []));
   for (const line of out.lines) {
     const early = borrowedHits(line.text, exitTics)[0];
-    if (early) return soft("exit_tic", `"${early.phrase}"`);
+    if (early) slip("exit_tic", `"${early.phrase}"`);
+  }
+  if (slips.length > 0) {
+    return { ok: false, category: slips[0]!.category, detail: slips[0]!.detail, soft: { output: out, adjustments, slips } };
   }
 
   return { ok: true, output: out, adjustments };
 }
 
+/** What one soft slip needs fixing, as a sentence for the regeneration's note. */
+function slipSentence({ category, detail }: Slip): string {
+  const what = /^"[^"]*"/.exec(detail)?.[0];
+  switch (category) {
+    case "misgender": {
+      const pronouns = /\(([^)]+)\)\s*$/.exec(detail)?.[1];
+      return `${what ?? "A word"} gets the Fellow wrong.${pronouns ? ` ${pronounRule(pronouns)}` : ""}`;
+    }
+    case "never_says": return `You never say ${what ?? "that"}: it's on your card's never-says list.`;
+    case "currency": return `${what ?? "That"} isn't Monde money: money here is coins ("two coins", "every coin").`;
+    case "borrowed": return `${what ?? "That phrase"} is another resident's catchphrase, not yours.`;
+    case "tic_repeat": return `You've already said ${what ?? "that"} in this conversation; it's a habit for once a conversation.`;
+    case "sample_echo": return what
+      ? `${what} comes from your card's samples, which only show your tone: keep any facts, in new words.`
+      : "That repeats one of your card's samples nearly word for word; they only show your tone.";
+    case "exit_tic": return `${what ?? "That phrase"} is how you leave a conversation, and you aren't leaving yet.`;
+  }
+}
+
+/**
+ * The note for a regeneration after soft slips: every slip, then the same instruction every time, so the retry
+ * still answers the Fellow's line first and changes only the words that slipped (a note that just said "say
+ * something new" sent retries off the subject).
+ */
+export function softNote(slips: readonly Slip[]): string {
+  const fix = slips.length > 1 ? "those words" : "that";
+  return `${slips.map(slipSentence).join(" ")} Reply again: answer what the Fellow just said first, as before, and change only ${fix}.`;
+}
+
 /**
  * The one-line instruction appended (as an extra user-message text block, never a prefill) when a turn is
- * regenerated. Blocks 1-3 stay untouched so the retry still reads the cache.
+ * regenerated. Blocks 1-3 stay untouched so the retry still reads the cache. Soft categories go through softNote.
  */
 export function correctiveNote(category: ValidationCategory, detail = ""): string {
-  if (category === "borrowed") {
-    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "that phrase";
-    return `${what} is another resident's catchphrase, not yours. Say it again in your own voice, with your own words.`;
+  switch (category) {
+    case "misgender": case "never_says": case "currency": case "borrowed": case "tic_repeat": case "sample_echo": case "exit_tic":
+      return softNote([{ category, detail }]);
+    case "schema":
+      return "Your last reply didn't match the schema. Reply again with JSON only: one to three lines and two or three choices.";
+    case "riddle":
+      return "Your last reply came too close to the answer of the founder's riddle. Give only the hints in <hints>, in your own words, or say you're stumped.";
+    case "echo":
+      return "You've said almost exactly that before. Reply again: answer what the Fellow just said first, in different words.";
+    default:
+      return "Your last reply used words that don't belong in Monde: rough language, modern things, brands, talk of games or players, or the banned words in your voice rules. Reply again, in-world: answer what the Fellow just said first.";
   }
-  if (category === "tic_repeat") {
-    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "that phrase";
-    return `You've already said ${what} in this conversation. It's a habit for once a conversation: say something else.`;
-  }
-  if (category === "sample_echo") {
-    return "That repeats one of your card's samples nearly word for word. The samples only show your tone: say something new, in your own words.";
-  }
-  if (category === "misgender") {
-    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That";
-    const pronouns = /\(([^)]+)\)\s*$/.exec(detail)?.[1];
-    return `${what} gets the Fellow wrong.${pronouns ? ` ${pronounRule(pronouns)}` : ""} Say it again.`;
-  }
-  if (category === "never_says") {
-    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That phrase";
-    return `You never say ${what}: it's on your card's never-says list. Say it again without it, in your own words.`;
-  }
-  if (category === "currency") {
-    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That";
-    return `${what} isn't Monde money. Money here is coins: "two coins", "every coin". Say it again.`;
-  }
-  if (category === "exit_tic") {
-    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That phrase";
-    return `${what} is how you leave a conversation, and you aren't leaving yet. Say it again without it.`;
-  }
-  if (category === "schema") {
-    return "Your last reply didn't match the schema. Reply again with JSON only: one to three lines and two or three choices.";
-  }
-  if (category === "riddle") {
-    return "Your last reply came too close to the answer of the founder's riddle. Give only the hints in <hints>, in your own words, or say you're stumped.";
-  }
-  if (category === "echo") return "You've said almost exactly that before. Say it differently.";
-  return "Your last reply used words that don't belong in Monde: rough language, modern things, brands, talk of games or players, or the banned words in your voice rules. Say it again, in-world.";
 }

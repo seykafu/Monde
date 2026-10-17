@@ -30,7 +30,7 @@ import { misgenderHit } from "./naming.js";
 import { borrowedHits, stripTics } from "./voice.js";
 import { LineTextExtractor } from "./partialJson.js";
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
-import { correctiveNote, neverSaysHit, validateTurn, type ValidationContext } from "./validate.js";
+import { correctiveNote, neverSaysHit, softNote, validateTurn, type ValidationContext } from "./validate.js";
 import { prefixSystemBlocks, type ResidentPrefix } from "./context.js";
 import { salvageTurn } from "./salvage.js";
 
@@ -359,10 +359,10 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
   const thinkingTimer = setTimeout(() => {
     if (!visible && !finished) options.onThinking?.();
   }, timings.thinkingMs);
-  // A first attempt that failed only a soft check: kept if the regeneration can't do better (validate.ts 8-10).
-  let spare: { output: DialogueTurnOutput; rawOutput: string; adjustments: string[] } | null = null;
+  // A first attempt that failed only soft checks: kept if the regeneration can't do better (validate.ts 8-10).
+  let spare: { output: DialogueTurnOutput; rawOutput: string; adjustments: string[]; slips: number } | null = null;
   const fail = (code: TurnFailureCode): GenerateResult => (spare
-    ? { ...spare, failure: null, calls, salvaged: false }
+    ? { output: spare.output, rawOutput: spare.rawOutput, adjustments: spare.adjustments, failure: null, calls, salvaged: false }
     : { output: null, failure: failure(code), calls, adjustments: [], salvaged: false });
 
   try {
@@ -446,17 +446,21 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
       }
       if (validated.soft) {
         const kept = {
-          output: validated.soft.output, rawOutput: textOf(message),
-          adjustments: [...validated.soft.adjustments, `kept despite ${validated.category}: ${validated.detail}`],
+          output: validated.soft.output, rawOutput: textOf(message), slips: validated.soft.slips.length,
+          adjustments: [...validated.soft.adjustments, `kept despite ${validated.soft.slips.map((s) => `${s.category}: ${s.detail}`).join("; ")}`],
         };
         if (attempt === 2) {
-          record(tokens, stopReason, `kept:${validated.category}`);
-          return { ...kept, failure: null, calls, salvaged: false };
+          // The regeneration slipped too: keep whichever attempt slipped less (the regeneration on a tie).
+          const first = spare && spare.slips < kept.slips ? spare : null;
+          record(tokens, stopReason, first ? validated.category : `kept:${validated.category}`);
+          const chosen = first ?? kept;
+          return { output: chosen.output, rawOutput: chosen.rawOutput, adjustments: chosen.adjustments, failure: null, calls, salvaged: false };
         }
         spare = kept;
       }
       record(tokens, stopReason, validated.category);
-      corrective = correctiveNote(validated.category, validated.detail);
+      // Every soft slip in one note, which still sends the retry back to the Fellow's line first.
+      corrective = validated.soft ? softNote(validated.soft.slips) : correctiveNote(validated.category, validated.detail);
     }
     return fail("invalid_output");
   } finally {

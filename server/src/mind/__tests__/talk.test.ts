@@ -143,7 +143,7 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect(request).toMatchObject({ model: "claude-haiku-5-5", max_tokens: DIALOGUE_MAX_TOKENS, thinking: { type: "disabled" } });
     expect(request.output_config?.format?.type).toBe("json_schema");
     expect(request.system).toHaveLength(3);
-    expect(userBlocks(request)[0]).toContain("Name: Fellow (they/them)");
+    expect(userBlocks(request)[0]).toContain("Name: Fellow (they/them; never \"he\", \"she\", \"a man\" or \"a woman\")");
     expect(userBlocks(request)[0]).toContain("Day 4 (Fri, spring), 17:30, old_quarter.fountain_square");
   });
 
@@ -410,6 +410,20 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect((await logs(env.worldId)).map((l) => [l.validation, l.fallback])).toEqual([["borrowed", false], ["kept:borrowed", false]]);
   });
 
+  it("checks an opener (input kind open) for whole sample sentences too, and the retry note keeps the Fellow first", async () => {
+    // The blind A/B eval's Odile opener (2026-10-16): two of her card's sample sentences, prices and all.
+    const sampled = good(["Rye's two coins, white's three. Today it's rye.", "Eat something, you look like a coat on a hook."], { regard_delta: 0 });
+    const fresh = good(["(Dusts flour off her hands.) You're early. The first tray's still on the rack."], { regard_delta: 0 });
+    const mind = new FakeMind([{ output: sampled, chunk: 6 }, { output: fresh }]);
+    const env = await setup(mind);
+    const events = sse((await talk(env, payload({ resident_id: "odile", input: { kind: "open" }, context: { place: "market_row.bakery" } }))).payload);
+    expect(finalTurn(events)).toMatchObject({ fallback: false, lines: fresh.lines });
+    const note = userBlocks(mind.streams[1]!).at(-1)!;
+    expect(note).toMatch(/^"Rye's two coins, white's three\." comes from your card's samples/);
+    expect(note).toMatch(/Reply again: answer what the Fellow just said first, as before, and change only that\.$/);
+    expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["sample_echo", "ok"]);
+  });
+
   it("forces wrap_up on the sixth exchange and carries exact earlier turns", async () => {
     const replies = ["Lamps first.", "Then tea.", "Then the Fund.", "Then Bertrand.", "Then the ferry.", "Off you go."];
     const mind = new FakeMind(replies.map(line => ({ output: good([line]) })));
@@ -534,7 +548,7 @@ describe("PATCH /v1/worlds/:w/player", () => {
     expect(renamed.json().player).toMatchObject({ name: "Ada Lune", pronouns: "xe/xem/xyr", background: "tinkerer" });
 
     await talk(env, payload());
-    expect(userBlocks(mind.streams[0]!)[0]).toContain("Name: Ada Lune (xe/xem/xyr)");
+    expect(userBlocks(mind.streams[0]!)[0]).toContain("Name: Ada Lune (xe/xem/xyr; never \"he\", \"she\", \"a man\" or \"a woman\")");
     expect(userBlocks(mind.streams[0]!)[0]).toContain("Tinkerer: fixes things. Came to help. Loves old books.");
   });
 });

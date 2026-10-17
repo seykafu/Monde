@@ -175,7 +175,7 @@ describe("naming: what each resident calls the Fellow (GDD §12.1)", () => {
     const stranger = buildDialogueRequest(input(5));
     const friend = buildDialogueRequest(input(45));
     const user = (req: ReturnType<typeof buildDialogueRequest>) => req.messages.at(-1)!.content as string;
-    expect(user(stranger)).toMatch(/<player> Name: Wren \(she\/her\)\. Words for her are "she" and "her": never "he", "him", "his", "a man", "lad" or "sir"\. Your regard: Stranger\. Background: Tinkerer\. Call her "Fellow" \("dear" now and then\), not "Wren"/);
+    expect(user(stranger)).toMatch(/<player> Name: Wren \(she\/her; never "he", "him", "a man" or "lad"\)\. Your regard: Stranger\. Background: Tinkerer\. Call her "Fellow" \("dear" now and then\), not "Wren"/);
     expect(user(friend)).toContain('Call her "Wren" when it\'s just the two of you');
     expect(JSON.stringify(friend.system)).toBe(JSON.stringify(stranger.system));
     expect(JSON.stringify(stranger.system)).not.toContain('Call her');
@@ -300,7 +300,7 @@ describe("validator: soft voice checks", () => {
     const quote = "Rye, two coins. White's for people who haven't been here before. Eat something, petite, you look like a coat on a hook.";
     expect(check([quote], vctx("odile"))).toMatchObject({ ok: false, category: "sample_echo" });
     expect(check(["Oven's been hot since four. Sit or don't."], vctx("odile"))).toMatchObject({ ok: false, category: "sample_echo" });
-    expect(check(["(Slides a loaf over.) Rye's two coins, white's three, and the heel's going spare."], vctx("odile"))).toMatchObject({ ok: true });
+    expect(check(["(Slides a loaf over.) Rye's two coins today, and the heel's going spare."], vctx("odile"))).toMatchObject({ ok: true });
     expect(sharedRun("you look like a coat on a hook", "Eat something, petit, you look like a coat on a hook.")).toBe(8);
     expect(sharedRun("one two", "one two")).toBe(0);
     expect(SAMPLE_RUN_WORDS).toBe(6);

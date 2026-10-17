@@ -1,7 +1,7 @@
 <!--
 Block 4 for tomorrow's plan (GDD §9.7, §9.17), run at effort "low". Your beliefs and people are in block 3,
 so they are not repeated here. Slots: resident_name, day, weekday, season, routine_kind, routine, needs,
-forecast, town_now, events, intentions, places, verbs, fellow (dropped when empty).
+forecast, town_now (dropped when empty), events, intentions, places, verbs, fellow (dropped when empty).
 -->
 <plan_request>
 Plan tomorrow for {{resident_name}}: Day {{day}} ({{weekday}}, {{season}}).

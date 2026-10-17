@@ -12,9 +12,9 @@
  *   - Vane: first names from the second meeting.
  *   - Everyone else: "Fellow" until they're introduced or have met, then the name or "Fellow".
  *
- * The Fellow's pronouns come from the signed Fellowship form (§11.1; "they/them" before it's signed). `pronounRule`
- * is the one plain sentence every prompt that may speak of the Fellow carries (dialogue's <player> line, and the
- * plan, reflection and gossip requests), always in block 4. `misgenderHit` is the validator's check (validate.ts):
+ * The Fellow's pronouns come from the signed Fellowship form (§11.1; "they/them" before it's signed). The dialogue's
+ * <player> line carries them with the wrong words in the name's parentheses (`pronounNote`); the plan, reflection and
+ * gossip requests carry `pronounRule`, one plain sentence; both always in block 4. `misgenderHit` is the validator's check (validate.ts):
  * only wrong-gendered words tied to "you" (a vocative, "you're a good lad", "a man like you", "Mr. Wren"), since a
  * resident talking to the Fellow says "he" and "she" about everyone else.
  */
@@ -136,6 +136,17 @@ export function pronounRule(pronouns: string): string {
   const words = gender === "she" ? `"she" and "her"` : gender === "he" ? `"he", "him" and "his"`
     : [...new Set([set.subject, set.object, set.possessive])].map((w) => `"${w}"`).join(", ").replace(/, ([^,]+)$/, " and $1");
   return `Words for ${set.object} are ${words}: never ${NEVER_WORDS[gender]}.`;
+}
+
+/**
+ * The short form for the dialogue's <player> line, inside the name's parentheses: `she/her; never "he", "him", "a
+ * man" or "lad"`. Kept short so the Fellow's words, not the pronoun rule, are what the turn answers.
+ */
+export function pronounNote(pronouns: string): string {
+  const never: Record<Gender, string> = {
+    she: '"he", "him", "a man" or "lad"', he: '"she", "her", "a woman" or "lass"', neutral: '"he", "she", "a man" or "a woman"',
+  };
+  return `${pronouns.trim().toLowerCase()}; never ${never[genderOf(pronouns)]}`;
 }
 
 /** For prompts outside a conversation (plan, reflection, gossip): who the Fellow is and how to speak of them. */

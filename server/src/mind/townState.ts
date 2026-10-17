@@ -1,16 +1,17 @@
 /**
  * How the town stands today (MVP Q-01): the World Bible facts that story flags overturn, for block 4.
  *
- * The World Bible (block 1) describes Monde on the first day of spring and must stay identical for every world, so
- * it can't say the fountain runs again or the clocktower strikes. Canon locks (block 2) carry each resident's own
- * flag-dependent facts. The town-wide ones live here and reach every resident request as one `<town_now>` line in
- * the dynamic block (dialogue, plan, reflection, gossip), built from the world's story flags (synced by the client,
- * M-06), so blocks 1-3 never change when a flag does.
+ * The World Bible (block 1) describes Monde on the first day of spring, the stopped clocktower included, and must
+ * stay identical for every world. Canon locks (block 2) carry each resident's own flag-dependent facts. The
+ * town-wide facts that have changed since that first day live here and reach every resident request as one
+ * `<town_now>` line in the dynamic block (dialogue, plan, reflection, gossip), built from the world's story flags
+ * (synced by the client, M-06), so blocks 1-3 never change when a flag does.
  *
- * The clocktower is always stated, stopped or not: it is the town's most-talked-about object, and "the oldest thing
- * that still tells the time" (eval 2026-10-16) shows the World Bible's "(stopped at 4:17)" alone isn't enough. Every
- * other fact appears only once its flag is set, so the default prompt stays short. Facts and wording come from the
- * GDD story-flag table (§12.2), the Project summaries (content/projects.yaml) and the S07 scenes.
+ * Only what differs from the first day of spring is listed, and the line is framed as background to bring up only
+ * if the conversation comes to it. With nothing changed there is no line at all. (An always-on clocktower line
+ * made residents drag the clock into answers about trains and goodbyes: blind A/B eval, 2026-10-16.) Facts and
+ * wording come from the GDD story-flag table (§12.2), the Project summaries (content/projects.yaml) and the S07
+ * scenes.
  */
 
 /** A town fact that applies while `when` holds for the world's flags (names without the `flag.` prefix). */
@@ -23,7 +24,7 @@ const has = (...names: string[]) => (flags: ReadonlySet<string>) => names.some((
 
 const CLOCK_RUNNING = has("clock_running", "project_clocktower_done");
 
-/** In this order in the prompt. */
+/** In this order in the prompt. The first day of spring (the clock stopped at 4:17) is the World Bible's. */
 const FACTS: readonly TownFact[] = [
   // S07a with PZ-15 solved (clock_running), or the clocktower Project's completion.
   { when: CLOCK_RUNNING, text: "The clocktower runs again: it keeps the time and strikes the hour." },
@@ -31,10 +32,6 @@ const FACTS: readonly TownFact[] = [
   {
     when: (f) => !CLOCK_RUNNING(f) && f.has("clock_chimed"),
     text: "The clocktower struck once at the Quarter Chime, then stopped again at 4:18. It doesn't keep the time yet.",
-  },
-  {
-    when: (f) => !CLOCK_RUNNING(f) && !f.has("clock_chimed"),
-    text: "The clocktower is stopped at 4:17, as it has been for fourteen years. It doesn't tell the time.",
   },
   { when: has("project_fountain_done"), text: "The fountain in Fountain Square runs again." },
   { when: has("project_streetlights_done"), text: "The streetlamps from the Town Hall to Bell Row are lit again." },
@@ -58,7 +55,10 @@ export function townFacts(flags: Iterable<string>): string[] {
   return FACTS.filter((fact) => fact.when(set)).map((fact) => fact.text);
 }
 
-/** The `<town_now>` element for block 4. */
+/** The `<town_now>` element for block 4, or "" (the template drops the line) when nothing has changed. */
 export function townNowBlock(flags: Iterable<string>): string {
-  return `<town_now> ${townFacts(flags).join(" ")} </town_now>`;
+  const facts = townFacts(flags);
+  return facts.length
+    ? `<town_now> Since the first day of spring (background: bring it up only if the talk comes to it): ${facts.join(" ")} </town_now>`
+    : "";
 }

@@ -17,7 +17,7 @@ import {
 import { currencyHit, lexicalHits } from "../filters.js";
 import { validateLiveGossip } from "../liveGossip.js";
 import type { ResidentPrefix } from "../context.js";
-import { fellowLine, misgenderHit, pronounRule } from "../naming.js";
+import { fellowLine, misgenderHit, pronounNote, pronounRule } from "../naming.js";
 import {
   buildDialogueRequest, buildGossipRequest, buildPlanRequest, buildReflectRequest, personaBlock, worldBible, type DialogueInput,
 } from "../promptBuilder.js";
@@ -25,7 +25,8 @@ import { loadRiddleLeads, riddleHintText, riddleLeadIn, trailsOff } from "../rid
 import { RIDDLES } from "../riddles.js";
 import { townFacts } from "../townState.js";
 import {
-  cardVocabulary, correctiveNote, neverSaysHit, sampleEcho, sharedRuns, validateTurn, type ValidationContext,
+  cardVocabulary, correctiveNote, neverSaysHit, sampleEcho, sampleSentenceHit, sharedRuns, softNote, validateTurn,
+  type ValidationContext,
 } from "../validate.js";
 import { borrowedFor, borrowedHits, exitOnlyTics, ownSignatures, stripTics, type RosterVoice } from "../voice.js";
 import { FakeMind } from "./fakeMind.js";
@@ -55,7 +56,7 @@ const vctx = (id: string, extra: Partial<ValidationContext> = {}): ValidationCon
   return {
     card: c, emotion: "content", revealable: new Set(), riddle: null, recentLines: [],
     borrowed: borrowedFor(c, roster), own: ownSignatures(c, roster),
-    samples: c.voice.mode === "narrated_action" ? [] : c.voice.samples, vocabulary: cardVocabulary(c),
+    samples: c.voice.mode === "narrated_action" ? [] : c.voice.samples, vocabulary: cardVocabulary(c), tics: c.voice.tics,
     neverSays: c.voice.mode === "narrated_action" ? [] : c.voice.never_says,
     fellow: WREN, exitOnly: exitOnlyTics(c), exit: false, ...extra,
   };
@@ -91,16 +92,20 @@ describe("the Fellow's pronouns", () => {
     expect(pronounRule("xe/xem/xyr")).toBe('Words for xem are "xe", "xem" and "xyr": never "he", "she", "a man", "a woman", "lad" or "lass".');
     expect(fellowLine(WREN)).toBe(`The Fellow is Wren. ${pronounRule("she/her")}`);
     expect(fellowLine({ name: "Fellow", pronouns: "they/them" })).toMatch(/^The Fellow hasn't given a name yet\. Words for them/);
+    // The dialogue's short form, inside the name's parentheses.
+    expect(pronounNote("she/her")).toBe('she/her; never "he", "him", "a man" or "lad"');
+    expect(pronounNote("he/him")).toBe('he/him; never "she", "her", "a woman" or "lass"');
+    expect(pronounNote("xe/xem/xyr")).toBe('xe/xem/xyr; never "he", "she", "a man" or "a woman"');
   });
 
   it("reach the dialogue's <player> line, never blocks 1-3", () => {
     const odile = card("odile");
     const she = buildDialogueRequest(dialogueInput(odile));
     const he = buildDialogueRequest(dialogueInput(odile, { player: { name: "Wren", pronouns: "he/him", background: "Tinkerer: fixes things" } }));
-    expect(userText(she)).toContain(`<player> Name: Wren (she/her). ${pronounRule("she/her")} Your regard:`);
-    expect(userText(he)).toContain(pronounRule("he/him"));
+    expect(userText(she)).toContain(`<player> Name: Wren (${pronounNote("she/her")}). Your regard:`);
+    expect(userText(he)).toContain(`<player> Name: Wren (${pronounNote("he/him")}). Your regard:`);
     expect(JSON.stringify(he.system)).toBe(JSON.stringify(she.system));
-    expect(JSON.stringify(she.system)).not.toContain("Words for her");
+    expect(JSON.stringify(she.system)).not.toContain('never "he", "him"');
     expect(worldBible()).toContain("or guessed pronouns: call the Fellow what <player> says");
   });
 
@@ -162,9 +167,53 @@ describe("the Fellow's pronouns", () => {
     expect(result.output!.lines[0]!.text).toBe(right.lines[0]!.text);
     expect(result.calls.map((c) => c.validation)).toEqual(["misgender", "ok"]);
     const note = (mind.streams[1]!.messages.at(-1)!.content as { text: string }[]).at(-1)!.text;
-    expect(note).toBe(correctiveNote("misgender", '"petit" (she/her)'));
+    expect(note).toBe(softNote([{ category: "misgender", detail: '"petit" (she/her)' }]));
     expect(note).toContain(pronounRule("she/her"));
+    expect(note).toMatch(/Reply again: answer what the Fellow just said first, as before, and change only that\.$/);
     expect(streamed.some((t) => /\bpetit\b/.test(t))).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------------
+// Soft slips, together
+// ---------------------------------------------------------------------------------------------------------------
+
+describe("soft slips: one note for all of them, and the attempt that slipped less", () => {
+  const request = { system: [], messages: [{ role: "user" as const, content: "<player_said> (walks up to you) </player_said>" }], output_config: { format: modelOutputFormat(DialogueTurnOutput) } };
+  // The eval's opener: "petit" for Wren (she/her) and a whole sample sentence, in one line.
+  const both = turn(["Eat something, petit, you look like a coat on a hook."]);
+  const sampleOnly = turn(["Eat something, you look like a coat on a hook."]);
+  const clean = turn(["(Dusts flour off her hands.) You're early. The first tray's still on the rack."]);
+
+  it("names every slip in the regeneration's note, which still answers the Fellow first", async () => {
+    const result = validateTurn(JSON.stringify(both), vctx("odile"));
+    expect(result).toMatchObject({ ok: false, category: "misgender" });
+    if (result.ok || !result.soft) throw new Error("expected a soft failure");
+    expect(result.soft.slips.map((s) => s.category)).toEqual(["misgender", "sample_echo"]);
+    const mind = new FakeMind([{ output: both }, { output: clean }]);
+    const out = await generateTurn({ mind, request, validation: vctx("odile") });
+    expect(out.output!.lines[0]!.text).toBe(clean.lines[0]!.text);
+    const note = (mind.streams[1]!.messages.at(-1)!.content as { text: string }[]).at(-1)!.text;
+    expect(note).toBe(softNote(result.soft.slips));
+    expect(note).toContain('"petit" gets the Fellow wrong.');
+    expect(note).toContain("comes from your card's samples");
+    expect(note).toMatch(/and change only those words\.$/);
+  });
+
+  it("keeps the attempt with fewer slips when the regeneration slips too (the regeneration on a tie)", async () => {
+    const fewer = await generateTurn({ mind: new FakeMind([{ output: both }, { output: sampleOnly }]), request, validation: vctx("odile") });
+    expect(fewer.output!.lines[0]!.text).toBe(sampleOnly.lines[0]!.text);
+    expect(fewer.calls.map((c) => c.validation)).toEqual(["misgender", "kept:sample_echo"]);
+    const worse = await generateTurn({ mind: new FakeMind([{ output: sampleOnly }, { output: both }]), request, validation: vctx("odile") });
+    expect(worse.output!.lines[0]!.text).toBe(sampleOnly.lines[0]!.text);
+    expect(worse.calls.map((c) => c.validation)).toEqual(["sample_echo", "misgender"]);
+    expect(worse.adjustments.at(-1)).toMatch(/^kept despite sample_echo/);
+  });
+
+  it("words every regeneration note to answer the Fellow's line first", () => {
+    for (const category of ["misgender", "never_says", "currency", "borrowed", "tic_repeat", "sample_echo", "exit_tic", "echo", "lexical:style"] as const) {
+      expect(correctiveNote(category, '"x" (she/her)'), category).toMatch(/answer what the Fellow just said first/);
+    }
   });
 });
 
@@ -193,7 +242,7 @@ describe("Monde's money is coins", () => {
   it("regenerates once with a coins note (Pell's 'every shilling'), and the World Bible says so", () => {
     expect(check(["Heavens. Every shilling of it goes on the lamps. Now. Lamplighter Lane."], vctx("pell")))
       .toMatchObject({ ok: false, category: "currency", detail: '"shilling"' });
-    expect(correctiveNote("currency", '"shilling"')).toBe('"shilling" isn\'t Monde money. Money here is coins: "two coins", "every coin". Say it again.');
+    expect(correctiveNote("currency", '"shilling"')).toBe('"shilling" isn\'t Monde money: money here is coins ("two coins", "every coin"). Reply again: answer what the Fellow just said first, as before, and change only that.');
     expect(worldBible()).toContain("Money is coins, never pounds or shillings.");
   });
 });
@@ -203,42 +252,70 @@ describe("Monde's money is coins", () => {
 // ---------------------------------------------------------------------------------------------------------------
 
 describe("the town now (story flags)", () => {
-  it("always says whether the clocktower is stopped, chimed once or running", () => {
-    expect(townFacts([])).toEqual(["The clocktower is stopped at 4:17, as it has been for fourteen years. It doesn't tell the time."]);
-    expect(townFacts(["clock_chimed", "clock_pending_pinion"])[0]).toMatch(/^The clocktower struck once at the Quarter Chime, then stopped again at 4:18/);
+  it("says nothing on the first day of spring: the stopped clocktower is the World Bible's", () => {
+    expect(townFacts([])).toEqual([]);
+    expect(townFacts(["met_pell", "s01a_done", "fountain_started"])).toEqual([]);
+    expect(worldBible()).toContain("the clocktower (stopped at 4:17 for fourteen years; it tells no time)");
+  });
+
+  it("lists the clocktower once it has chimed or runs, and a World Bible fact once a flag overturns it", () => {
+    expect(townFacts(["clock_chimed", "clock_pending_pinion"])).toEqual([
+      "The clocktower struck once at the Quarter Chime, then stopped again at 4:18. It doesn't keep the time yet.",
+    ]);
     expect(townFacts(["clock_chimed", "clock_running"])).toEqual(["The clocktower runs again: it keeps the time and strikes the hour."]);
     expect(townFacts(["flag.clock_running"])[0]).toMatch(/runs again/);
     expect(townFacts(["project_clocktower_done"])[0]).toMatch(/runs again/);
-  });
-
-  it("adds a World Bible fact only once a flag overturns it", () => {
     expect(townFacts(["project_fountain_done", "project_lighthouse_done"])).toEqual([
-      "The clocktower is stopped at 4:17, as it has been for fourteen years. It doesn't tell the time.",
       "The fountain in Fountain Square runs again.", "Point Lumière is lit again; its beam turns at night.",
     ]);
-    expect(townFacts(["met_pell", "s01a_done"])).toHaveLength(1);
   });
 
-  it("reaches every resident request in block 4, so blocks 1-3 don't change with the clock", () => {
+  it("is background in block 4, below the Fellow's words, so blocks 1-3 don't change with a flag", () => {
     const odile = card("odile");
-    const stopped = buildDialogueRequest(dialogueInput(odile));
     const running = buildDialogueRequest(dialogueInput(odile, { flags: ["clock_chimed", "clock_running"] }));
-    expect(userText(stopped)).toContain("<town_now> The clocktower is stopped at 4:17");
-    expect(userText(running)).toContain("<town_now> The clocktower runs again");
-    expect(userText(stopped).indexOf("<town_now>")).toBeGreaterThan(userText(stopped).indexOf("</scene>"));
-    // Odile has no clock canon lock, so nothing else about her prompt prefix moves.
-    expect(JSON.stringify(running.system)).toBe(JSON.stringify(stopped.system));
+    const text = userText(running);
+    expect(text).toContain("<town_now> Since the first day of spring (background: bring it up only if the talk comes to it): The clocktower runs again");
+    expect(text.indexOf("<town_now>")).toBeGreaterThan(text.indexOf("<memories>"));
+    expect(text.indexOf("<town_now>")).toBeGreaterThan(text.indexOf("</player>"));
+    // Odile has no clock canon lock, so nothing about her prompt prefix moves.
+    expect(JSON.stringify(running.system)).toBe(JSON.stringify(buildDialogueRequest(dialogueInput(odile)).system));
     const plan = buildPlanRequest({ card: odile, state: state(odile), relationships: [], flags: ["clock_running"], day: 2,
       tomorrowWeekday: "Thu", forecast: "fair", events: [], intentions: [], openPlaces: [] });
-    expect(String(plan.messages[0]!.content)).toContain("<town_now> The clocktower runs again");
-    const gossip = buildGossipRequest({ a: { card: odile, view: null, news: [] }, b: { card: card("june"), view: null, news: [] },
-      flags: [], day: 2, weekday: "Wed", minute: 600, place: "market_row.bakery", mode: "live" });
-    expect(String(gossip.messages[0]!.content)).toContain("<town_now> The clocktower is stopped at 4:17");
+    expect(String(plan.messages[0]!.content)).toContain("The clocktower runs again");
     expect(worldBible()).toContain("Where <town_now>, <canon>, your memories or the request say something newer, they win.");
   });
 
-  it("keeps Margo's lantern-pinion lock for when it comes up", () => {
-    expect(personaBlock(card("margo"), { flags: [], day: 2, voices: roster })).toContain("does not know what the lantern pinion is, and says so if it comes up");
+  // Regression (blind A/B eval, 2026-10-16): an always-on clocktower line pulled the clock into answers about trains,
+  // goodbyes and ledgers. On the first day of spring nothing outside block 1 mentions it, unless a card's own canon
+  // does (Bertrand, Hollis, Margo: block 2).
+  it("puts no clocktower in a default (no flags) prompt outside block 1", () => {
+    const clock = /clock ?tower|4:17|\btower\b|\bclock\b/i;
+    const fellow = { name: "Wren", pronouns: "she/her", background: "Tinkerer: fixes things. Came to help. Loves tea" };
+    for (const c of cards) {
+      const dialogue = buildDialogueRequest(dialogueInput(c, { player: fellow, playerSaid: "When did the last train run?" }));
+      expect(JSON.stringify(dialogue.messages), `${c.id} dialogue block 4`).not.toMatch(clock);
+      expect(userText(dialogue)).not.toContain("<town_now>");
+      // Blocks 2 and 3 come from the card (its canon, its starting beliefs): they mention the clock only if it does.
+      if (!clock.test(JSON.stringify(c))) {
+        expect(personaBlock(c, { flags: [], day: 2, voices: roster }), `${c.id} block 2`).not.toMatch(clock);
+        expect(dialogue.system[2]!.text, `${c.id} block 3`).not.toMatch(clock);
+      }
+      const base = { card: c, state: state(c), relationships: [], flags: [], voices: roster, day: 2 };
+      const plan = buildPlanRequest({ ...base, tomorrowWeekday: "Thu", forecast: "fair", events: [], intentions: [], openPlaces: [] });
+      const reflect = buildReflectRequest({ ...base, memoriesToday: [], town: { pillars: { prosperity: 20, safety: 20, spirit: 20, charm: 20 }, census: 200, events: [] } });
+      // A plan or reflection carries the card's routine and dream, so it's the same test: only the card may bring it.
+      if (!clock.test(JSON.stringify(c))) {
+        for (const req of [plan, reflect]) expect(JSON.stringify(req.messages), `${c.id} plan/reflect block 4`).not.toMatch(clock);
+      }
+    }
+    const gossip = buildGossipRequest({ a: { card: card("odile"), view: null, news: [] }, b: { card: card("june"), view: null, news: [] },
+      flags: [], day: 2, weekday: "Wed", minute: 600, place: "market_row.bakery", mode: "live" });
+    expect(JSON.stringify(gossip.messages)).not.toMatch(clock);
+  });
+
+  it("keeps Margo's lantern-pinion lock for when the clock comes up", () => {
+    expect(personaBlock(card("margo"), { flags: [], day: 2, voices: roster }))
+      .toContain("Only if the clocktower or the lantern pinion comes up: she knows the lantern stamp");
   });
 });
 
@@ -256,10 +333,27 @@ describe("sample echo: near-verbatim lifts", () => {
     expect(sharedRuns("Sit, petite, if you're staying. Don't block the door.", samples[0]!)).toEqual([["don't", "block", "the", "door"]]);
   });
 
-  it("lets prices, counts and ordinary phrases recur", () => {
+  it("catches a whole sample sentence, prices and counts included (the eval's Odile opener)", () => {
+    const samples = samplesOf("odile");
+    expect(sampleEcho("Rye's two coins, white's three. Today it's rye.", samples)).toBe(`"Rye's two coins, white's three." (a whole sample sentence): ${samples[1]}`);
+    expect(sampleEcho("Eat something, you look like a coat on a hook.", samples, cardVocabulary(card("odile")), card("odile").voice.tics))
+      .toMatch(/^"petit, you look like a coat on a hook\." \(a whole sample sentence\)/);
+    expect(sampleEcho("(Slides a loaf over.) Rye's two coins, white's three, and the heel's going spare.", samples)).toMatch(/a whole sample sentence/);
+    for (const opener of ["Rye's two coins, white's three. Today it's rye.", "Eat something, you look like a coat on a hook."]) {
+      expect(check([opener], vctx("odile"))).toMatchObject({ ok: false, category: "sample_echo" });
+    }
+    // A sentence that is mostly the resident's own tic may be said: Vane's "May I be frank?", Nettie's tic.
+    expect(sampleSentenceHit("May I be frank, Fellow?", samplesOf("vane")[0]!, card("vane").voice.tics)).toBeNull();
+    expect(sampleEcho("I never shoot at people. Off you go.", samplesOf("nettie"), cardVocabulary(card("nettie")), card("nettie").voice.tics)).toBeNull();
+    // From seven words a sentence counts with one word changed; shorter ones only verbatim.
+    expect(sampleSentenceHit("Mind the third stair. It strikes a flat G.", samplesOf("bertrand").find((x) => x.includes("third stair"))!)).not.toBeNull();
+    expect(sampleSentenceHit("Rye's two coins, white's four.", samples[1]!)).toBeNull();
+  });
+
+  it("lets short price fragments, counts and ordinary phrases recur", () => {
     const samples = samplesOf("odile");
     for (const line of [
-      "Rye. Two coins.", "(Slides a loaf over.) Rye's two coins, white's three, and the heel's going spare.",
+      "Rye. Two coins.", "(Slides a loaf over.) Rye's two coins today, and the heel's going spare.", "Rye's two, white's three.",
       "Sit, then. Kettle's on.", "Hm. The rye sells out by nine.", "Rook was here at seven. I said nothing.",
     ]) expect(sampleEcho(line, samples), line).toBeNull();
     const pell = samplesOf("pell");
@@ -416,7 +510,7 @@ describe("never_says", () => {
     expect(check(["I'm leaving on the Friday boat."], vctx("priya"))).toMatchObject({ ok: false, category: "never_says" });
     expect(check(["(Takes the jar.) Hm. Eat something, petite."], vctx("odile"))).toMatchObject({ ok: true });
     expect(neverSaysHit("Round the back, 07:12 sharp.", ["around"])).toBeNull();
-    expect(correctiveNote("never_says", '"around"')).toBe('You never say "around": it\'s on your card\'s never-says list. Say it again without it, in your own words.');
+    expect(correctiveNote("never_says", '"around"')).toBe('You never say "around": it\'s on your card\'s never-says list. Reply again: answer what the Fellow just said first, as before, and change only that.');
   });
 
   it("is never broken by an authored line the server can serve any resident", () => {

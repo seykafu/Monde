@@ -2,8 +2,8 @@
 Block 4 for an NPC-to-NPC exchange (GDD §9.11, §9.17). Two residents, so the system prompt is the World Bible
 alone (block 1, cached); each resident appears here as a short sketch with their live canon facts.
 In summary mode this is an encounter in the night pass (G-13): no lines, only how it went.
-Slots: mode, a_id, b_id, a_name, b_name, place, time, day, weekday, town_now, a_sketch, b_sketch, a_to_b, b_to_a,
-a_news, b_news, fellow (dropped when empty).
+Slots: mode, a_id, b_id, a_name, b_name, place, time, day, weekday, town_now (dropped when empty), a_sketch, b_sketch,
+a_to_b, b_to_a, a_news, b_news, fellow (dropped when empty).
 -->
 <gossip mode="{{mode}}">
 {{a_name}} (a) and {{b_name}} (b) meet at {{place}}, {{time}} on Day {{day}} ({{weekday}}).

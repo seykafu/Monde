@@ -1051,30 +1051,39 @@ characters) is available and on by default. It passes a cheap moderation check f
   not use another hand-written resident's signature phrase (§12.1 Monde rule 12; the persona block lists
   them, drawn from the other cards' tics minus everyday words), may not repeat the resident's own
   signature phrase within one conversation, and may not quote one of the resident's own card samples
-  (trigram overlap above 0.35; a run of six or more words lifted from a sample; a distinctive run of four
-  or five, meaning two words that aren't function words, prices, counts, names or the resident's own
-  vocabulary; or most of a line's distinctive words taken from one sample; samples are tone, not
-  script). A tic the card saves for leaving (`exit_only`, June's "Anyway.") is stripped from any turn
-  before the goodbye or the conversation's last line where it stands as a sentence of its own, and is
-  a soft failure otherwise. Each regenerates once with a note naming the slip; a second slip is
-  accepted, and if the regeneration fails outright the first reply is kept. A slip in voice beats an
-  authored line in no voice, so these never fall back. A line with a borrowed phrase, a wrong gender, a
-  never-says word or foreign money is also held back from the stream until the regeneration.
+  (a whole sample sentence of four words or more, verbatim or, from seven words, but for one word,
+  prices and counts included; trigram overlap above 0.35; a run of six or more words lifted from a
+  sample; a distinctive run of four or five, meaning two words that aren't function words, prices,
+  counts, names or the resident's own vocabulary; or most of a line's distinctive words taken from one
+  sample; the resident's own tics never count; samples are tone, not script). These run on every turn,
+  the opener included. A tic the card saves for leaving (`exit_only`, June's "Anyway.") is stripped from
+  any turn before the goodbye or the conversation's last line where it stands as a sentence of its own,
+  and is a soft failure otherwise. Every slip a turn has is collected, and the one regeneration's note
+  names them all and ends the same way each time: answer what the Fellow just said first, as before,
+  and change only those words (a note that said "say something new" sent retries off the subject). If
+  the regeneration slips too, the attempt with fewer slips is kept (the regeneration on a tie), and if
+  it fails outright the first reply is kept. A slip in voice beats an authored line in no voice, so these
+  never fall back. A line with a borrowed phrase, a wrong gender, a never-says word or foreign money is
+  also held back from the stream until the regeneration.
 - **Authored lines keep the voice rules too (MVP Q-01):** every fallback pool, gift reaction and riddle
   lead-in serves a resident only lines without their `never_says` words or another resident's catchphrase
   (Odile's gift reaction never thanks in words; Nettie never stalls with "sorry"), and a test sweeps every
   card against every authored line it can be served.
 - **Naming (MVP Q-01):** the dynamic block carries one line saying what this resident calls the Fellow at
   the current Regard and met state (§12.1 Monde rule 13), and authored fallbacks use the same term. The
-  `<player>` line also names the right and wrong words for the Fellow from the Fellowship form's pronouns
-  ("Words for her are "she" and "her": never "he", "him", "his", "a man", "lad" or "sir".); plans,
-  reflections and live gossip carry the same sentence, always in block 4.
-- **The town now (MVP Q-01):** the World Bible describes Monde on the first day of spring, and canon locks
-  carry each resident's own facts. Town-wide facts that story flags overturn reach every resident request
-  as one `<town_now>` line in block 4: the clocktower always (stopped at 4:17; struck once at the Quarter
-  Chime and stopped again at 4:18 after `clock_chimed`; running after `clock_running`), and the fountain,
+  `<player>` line also carries the Fellowship form's pronouns with the words never to use, kept short so
+  the Fellow's words stay what the turn answers ("Name: Wren (she/her; never "he", "him", "a man" or
+  "lad")."); plans, reflections and live gossip carry one plain sentence ("Words for her are "she" and
+  "her": never …"), always in block 4.
+- **The town now (MVP Q-01):** the World Bible describes Monde on the first day of spring (the clocktower
+  "stopped at 4:17 for fourteen years; it tells no time"), and canon locks carry each resident's own facts.
+  Town-wide facts that story flags have changed since then reach every resident request as one
+  `<town_now>` line in block 4, framed as background to bring up only if the talk comes to it and placed
+  below the Fellow's words and the memories: the clocktower once it has chimed (struck once at the
+  Quarter Chime and stopped again at 4:18, `clock_chimed`) or runs (`clock_running`), and the fountain,
   streetlamps, Market Hall, garden, bakery ovens, lighthouse and later Projects once their flags are set.
-  Blocks 1-3 never change with a flag this way.
+  With nothing changed there is no line. Blocks 1-3 never change with a flag this way. (An always-on
+  clocktower line made residents pull the clock into unrelated answers: blind A/B eval, 2026-10-16.)
 - **Residents start things too:** `seek_player` intents make residents walk up and open a conversation.
   Reflections can write **letters** that arrive in the player's mailbox the next morning: thank-you
   notes, invitations (the engine creates the event), complaints, gossip.
@@ -1086,7 +1095,7 @@ characters) is available and on by default. It passes a cheap moderation check f
 | 1 | **World Bible** (setting, era rules, tone, rating rules, voice bible digest §12.1, anti-patterns, output contract). Identical for every world and resident. | ~2,500 | Per release | Breakpoint 1 (hit almost always, shared by all players) |
 | 2 | **Persona Card** (§9.3) with canon locks evaluated, plus the other residents' catchphrases never to borrow (§12.1 Monde rule 12, ~250 tokens) | ~1,000–1,500 | Rarely | Breakpoint 2 |
 | 3 | **Beliefs + relationship summary** (top 8 relationships as one-liners) | ~300–500 | Nightly | Breakpoint 3 |
-| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: `<player_said>` first, with one line saying what to do with it ("Respond to this first…"), then a compact scene and mood line, `<town_now>` (the town-wide facts story flags have changed, the clocktower always), the player (with their pronouns spelled out and what this resident calls them, §12.1 Monde rule 13), memories (retrieved on the Fellow's words and the line they answer), topics (opener or lull only), Favors, secrets and hints. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
+| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: `<player_said>` first, with one line saying what to do with it ("Respond to this first…"), then a compact scene and mood line, the player (with their pronouns and the words never to use, and what this resident calls them, §12.1 Monde rule 13), memories (retrieved on the Fellow's words and the line they answer), topics (opener or lull only), `<town_now>` (only what story flags have changed since the first day of spring, as background; absent when nothing has), Favors, secrets and hints. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
 
 Haiku 5.5's minimum cacheable prefix is 512 tokens, so every breakpoint above qualifies. Byte-stable
 serialization is mandatory (sorted keys, no timestamps in blocks 1–3), or caching silently stops working.
@@ -2422,7 +2431,7 @@ secrets:
     reveal: { day: 18 }
 canon_locks:
   - { while: "!flag.charter_half", fact: "Margo has catalogued the Marks and believes they lead to a hidden Commons Charter. She has no proof and has never held a fragment." }
-  - { while: "!flag.pinion_found", fact: "She knows the lantern stamp is cut on the clocktower's escapement cover. She does not know what the lantern pinion is, and says so if it comes up." }
+  - { while: "!flag.pinion_found", fact: "Only if the clocktower or the lantern pinion comes up: she knows the lantern stamp is cut on the clocktower's escapement cover, and she does not know what the lantern pinion is, and says so." }
   - { while: "!flag.clock_chimed", fact: "She and Bertrand have argued every Saturday for six years over who owns Aurélien's story. Neither has stopped coming." }
   - { while: "flag.charter_found", fact: "The Charter hangs in the reading room. Margo will not take credit and tells visitors the Fellow found it." }
 story_role: Act I ally and Marks guide. D2 "Monde's Marks," tutor for the riddle system, Charter fragment curator. The player's best source of dates.
