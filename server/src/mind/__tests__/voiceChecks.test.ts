@@ -653,3 +653,20 @@ describe('Odile\'s petit / petite', () => {
     expect(agreeAddress('A petit four for the fair.', she)).toBe('A petit four for the fair.');
   });
 });
+
+describe("memory framing (eval 2026-10-17)", () => {
+  it("frames earlier conversations as the resident's own memory (one block for live turns and the prewarm)", async () => {
+    const { historyBlock } = await import("../promptBuilder.js");
+    const block = historyBlock("Day 2: I spoke with the Fellow about clocks.");
+    expect(block).toContain("Your own memory of earlier conversations with the Fellow");
+    expect(block).toContain("Day 2: I spoke with the Fellow about clocks.");
+    expect(historyBlock("")).toBe("<history_with_player>\n</history_with_player>");
+  });
+
+  it("never leaves stage business in double parentheses", async () => {
+    const { parenthesizeStageBusiness } = await import("../validate.js");
+    expect(parenthesizeStageBusiness("((Slides a heel across.)) Hm.")).toBe("(Slides a heel across.) Hm.");
+    expect(parenthesizeStageBusiness("(*Slides a heel across.*) Hm.")).toBe("(Slides a heel across.) Hm.");
+    expect(parenthesizeStageBusiness("*Taps the crust.* Rye.")).toBe("(Taps the crust.) Rye.");
+  });
+});

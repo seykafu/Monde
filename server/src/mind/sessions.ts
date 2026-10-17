@@ -24,7 +24,7 @@ export async function historyFor(db: WorldDatabase, worldId: string, residentId:
     if (!turns.length) continue;
     entries.push({ day: session.lastDay, minute: session.lastMinute, text: templateSummary(turns).summary });
   }
-  return [digest?.digest ?? '', ...entries.sort((a, b) => a.day - b.day || a.minute - b.minute).slice(-RECENT_SUMMARIES).map(s => s.text)].filter(Boolean).join('\n');
+  return [digest?.digest ?? '', ...entries.sort((a, b) => a.day - b.day || a.minute - b.minute).slice(-RECENT_SUMMARIES).map(s => `Day ${s.day}: ${s.text}`)].filter(Boolean).join('\n');
 }
 
 export async function selectSession(db: WorldDatabase, args: {

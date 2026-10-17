@@ -619,7 +619,9 @@ describe('D18 conversation sessions', () => {
       expect((JSON.stringify(current).match(/"cache_control"/g) ?? [])).toHaveLength(4);
     }
     const stored = await turnsOf(env.worldId);
-    expect(text(mind.streams[7]!.messages[14]!)).toBe(stored[6]!.rawOutput);
+    // An earlier turn replays the lines the player saw, not the raw output with its offered replies.
+    expect(text(mind.streams[7]!.messages[14]!)).toBe(JSON.stringify({ lines: stored[6]!.output.lines }));
+    expect(text(mind.streams[7]!.messages[14]!)).not.toContain('"choices"');
     expect(mind.streams[7]!.messages.filter(m => m.role === 'assistant')).toHaveLength(7);
     const next = finalTurn(sse((await talk(env, payload({ context: { minute: 1055 } }))).payload));
     expect(next.resumed).toBe(false);

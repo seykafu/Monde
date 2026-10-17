@@ -238,7 +238,9 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         openFavors,
         riddle: riddleState ? riddleTopic(riddleState.record, riddleState.allowed) : null,
         conversation,
-        earlierTurns: turns.map(t => ({ user: t.promptUser ?? `<player_said>${t.playerInput ?? '(walks up to you)'}</player_said>`, assistant: t.rawOutput ?? JSON.stringify(t.output) })),
+        // Earlier turns replay what the resident said, as the player saw it: the replies it offered and didn't hear back
+        // came back as things said ("putty", "the bandstand": eval 2026-10-17), and effects are the engine's business.
+        earlierTurns: turns.map(t => ({ user: t.promptUser ?? `<player_said>${t.playerInput ?? '(walks up to you)'}</player_said>`, assistant: JSON.stringify({ lines: t.output.lines }) })),
         playerSaid: args.playerSaid,
         focus,
         whimSeed: null,

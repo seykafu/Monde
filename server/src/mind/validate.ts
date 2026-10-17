@@ -347,7 +347,8 @@ export function neverSaysHit(text: string, phrases: readonly string[]): string |
 
 /** *Stage business in asterisks* becomes the house style's (stage business in parentheses). */
 export function parenthesizeStageBusiness(text: string): string {
-  return text.replace(/\*([^*\n]+)\*/g, (_match, inner: string) => `(${inner.trim()})`);
+  // "*Slides a heel.*" and "(*Slides a heel.*)" both end as one pair of parentheses, never "((…))".
+  return text.replace(/\*([^*\n]+)\*/g, (_match, inner: string) => `(${inner.trim()})`).replace(/\(\(([^()]*)\)\)/g, "($1)");
 }
 
 /** Text the player will see (and that a riddle answer could leak through). */

@@ -24,7 +24,7 @@ import { BudgetError } from "./budget.js";
  */
 import type Anthropic from "@anthropic-ai/sdk";
 import { DialogueTurnOutput, LIMITS, fitText, modelOutputFormat, splitLine } from "@monde/shared";
-import { apiParams, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
+import { apiParams, historyBlock, requestSettings, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
 import { completeWords, currencyHit, lexicalHits } from "./filters.js";
 import { agreeAddress, misgenderHit } from "./naming.js";
@@ -166,7 +166,7 @@ export function prewarmParams(prefix: ResidentPrefix, day: number, history = "")
     max_tokens: 1,
     ...(settings.thinking ? { thinking: settings.thinking } : {}),
     system: prefixSystemBlocks(prefix, day),
-    messages: [{ role: 'user', content: [{ type: 'text', text: `<history_with_player>\n${speech(history)}\n</history_with_player>`, cache_control: { type: 'ephemeral' } }] }, { role: 'user', content: 'warmup' }],
+    messages: [{ role: 'user', content: [{ type: 'text', text: historyBlock(history), cache_control: { type: 'ephemeral' } }] }, { role: 'user', content: 'warmup' }],
     output_config: { format: modelOutputFormat(DialogueTurnOutput) },
   } as Anthropic.MessageCreateParamsNonStreaming;
 }

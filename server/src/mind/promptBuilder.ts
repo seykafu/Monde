@@ -582,14 +582,26 @@ export function turnFocus(text: string | null | undefined, intent?: string | nul
 /** The line under `<player_said>`: what to do with it, first. */
 export const FOCUS_DIRECTIVES: Readonly<Record<TurnFocus, string>> = {
   open: "The Fellow has just walked up to you. Open the conversation: a remark about something in front of you or one of the topics below.",
-  reply: "Respond to this first: answer what the Fellow asked, react to what they told you, or follow on from the reply they picked. Add something of your own after that only if it comes naturally.",
+  reply: "Respond to this first: answer what the Fellow asked, react to what they told you, or follow on from the reply they picked. Add something of your own after that only if it comes naturally. Anything you bring back from earlier, keep as it was said; don't add details to it.",
   lull: "Respond to this first. It gives you little to answer, so then pick up a thread from this conversation or one of the topics below.",
   bye: "Respond to this first: the Fellow is taking their leave. See them off in a line or two and set wrap_up to true.",
   gift: "Respond to this first: react to it in your own way.",
 };
 
+/**
+ * Earlier conversations with the Fellow, as the resident remembers them (sessions.ts historyFor). Framed as their own
+ * memory: without it the model read the summaries as hearsay ("I heard that from Bru") about things the Fellow had told
+ * them in person (eval 2026-10-17). The prewarm (dialogue.ts prewarmParams) sends the same bytes, so the cache matches.
+ */
+export function historyBlock(history: string): string {
+  const text = speech(history).trim();
+  return text
+    ? `<history_with_player>\nYour own memory of earlier conversations with the Fellow. What the Fellow said there, they said to you in person.\n${text}\n</history_with_player>`
+    : `<history_with_player>\n</history_with_player>`;
+}
+
 export function dialogueMessages(input: DialogueInput, user: string): Anthropic.MessageParam[] {
-  const history = `<history_with_player>\n${speech(input.sessionHistory ?? '')}\n</history_with_player>`;
+  const history = historyBlock(input.sessionHistory ?? '');
   const messages: Anthropic.MessageParam[] = [{ role: 'user', content: history }];
   for (const turn of (input.earlierTurns ?? []).slice(0, MAX_SESSION_EXCHANGES)) {
     messages.push({ role: 'user', content: turn.user }, { role: 'assistant', content: turn.assistant });
