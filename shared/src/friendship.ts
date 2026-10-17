@@ -390,7 +390,7 @@ export const encounterRoll = (worldSeed: number | string, day: number, a: string
   seededUnit("encounter", worldSeed, day, pairKey(a, b));
 
 // ---------------------------------------------------------------------------------------------------------------
-// Romance rules (§9.11.3 "Feelings and the ladder"; the ladder itself is G-12)
+// Romance rules (§9.11.3 "Feelings and the ladder"; the ladder itself is romance.ts, G-12)
 // ---------------------------------------------------------------------------------------------------------------
 
 /** §9.11.3: both residents are adults. */
@@ -408,9 +408,10 @@ export const FAMILY_TAGS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * Romance stages kept as per-resident flags `<stage>:<partner id>` (e.g. "courting:kasimir" on Priya).
- * GDD-GAP: the ladder (Crush → Courting → Together → Wedding) is G-12's; Crush is a feeling, not a flag, and a
- * wedding leaves the pair "married". These are the flag names G-12 should set.
+ * Romance stages kept as per-resident flags `<stage>:<partner id>` (e.g. "courting:kasimir" on Priya), on both of the
+ * pair. The ladder (Crush → Courting → Together → Wedding) is romance.ts's: Crush is a feeling, not a flag
+ * (romance.ts hasCrush), Courting is set by the night pass (G-12), and a wedding leaves the pair "married".
+ * Day-1 couples start `married:` / `together:` (server createWorld romanceFlagsOf).
  */
 export const ROMANCE_STAGES = ["courting", "together", "married"] as const;
 export type RomanceStage = (typeof ROMANCE_STAGES)[number];
@@ -439,9 +440,10 @@ export type RomanceCard = Pick<PersonaCard, "id" | "age" | "kind" | "relationshi
 export interface RomanceCandidate { card: RomanceCard; flags: readonly string[] }
 export type RomanceBlock = "same" | "minor" | "animal" | "opted_out" | "family" | "taken";
 
-/** Are these two the same family? Either card naming the other with a family tag is enough. */
+/** Are these two the same family? Either card naming the other with a family tag (or `kin`) is enough. */
 export function areFamily(a: RomanceCard, b: RomanceCard): boolean {
-  const kin = (from: RomanceCard, to: string) => from.relationships.some((r) => r.id === to && FAMILY_TAGS.has(r.tag.toLowerCase()));
+  const kin = (from: RomanceCard, to: string) => from.relationships.some((r) => r.id === to
+    && (FAMILY_TAGS.has(r.tag.toLowerCase()) || (r.kin !== undefined && FAMILY_TAGS.has(r.kin.toLowerCase()))));
   return kin(a, b.id) || kin(b, a.id);
 }
 
@@ -475,6 +477,8 @@ export interface TieView {
   label: Exclude<PairLabel, "strangers">;
   /** From the residents' flags; null when they aren't courting. */
   romance: RomanceStage | null;
+  /** Which of the two is at the ladder's Crush stage toward the other (romance.ts hasCrush): 0, 1 or 2 ids. */
+  crush?: string[];
 }
 
 /** A label change recorded on the night of `day`. */

@@ -39,6 +39,7 @@ voice:
   tics: ["slow blink", "tail wrapped round his front paws"]
   never_says: ["any spoken line"]
   action_verbs: [sleeps, wanders, sits, follows, eats]   # engine verbs: sleep, wander, sit, eat; "follows" is wander with a person as target
+birthday: 81   # Winter 6 (§3.2)
 likes: [warm windowsills, fish heads, Odile's doorstep, Tib's lap when Tib is busy, the fish market scales]
 dislikes: [gulls, closed doors, the grey van's exhaust, being carried]
 fears: [the bath, the weir in flood]

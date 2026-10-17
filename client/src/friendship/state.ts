@@ -17,7 +17,7 @@ import {
 } from '@monde/shared';
 import type { DawnPackage } from '../mind/dawn';
 import { learnTies, tieIndex } from './knownTies';
-import { printedMilestones, romanceNews, dawnLines, type RomanceNews } from './milestones';
+import { crushNews, printedMilestones, romanceNews, dawnLines, type CrushNews, type RomanceNews } from './milestones';
 
 export type FriendshipState = SavedFriendship;
 export { emptyFriendship };
@@ -120,6 +120,8 @@ export interface DawnApplied {
   lines: string[];
   printed: TieMilestoneData[];
   romance: RomanceNews[];
+  /** Crushes noticed since the last dawn (G-12). */
+  crushes: CrushNews[];
 }
 
 const byId = <T extends { id: string }>(xs: readonly T[]): T[] => [...new Map(xs.map(x => [x.id, x])).values()];
@@ -134,7 +136,8 @@ export function applyDawn(state: FriendshipState, pkg: DawnPackage, opts: { name
   const tiers = Object.fromEntries(pkg.plans.map(p => [p.resident_id, p.tier]));
   const printed = printedMilestones(pkg.ties.milestones, tiers);
   const romance = state.ties ? romanceNews(state.ties.pairs, pkg.ties.pairs) : [];
-  const lines = dawnLines(printed, romance, opts.names);
+  const crushes = state.ties ? crushNews(state.ties.pairs, pkg.ties.pairs, tiers) : [];
+  const lines = dawnLines(printed, romance, opts.names, crushes);
   const milestones = [...state.milestones.filter(m => !pkg.ties.milestones.some(n => n.day === m.day && pairKey(n.a, n.b) === pairKey(m.a, m.b))), ...pkg.ties.milestones]
     .filter(m => m.day > day - MILESTONE_DAYS);
   const letters: DawnLetterData[] = byId([...state.letters, ...pkg.letters]).slice(-LETTERS_KEPT);
@@ -145,8 +148,8 @@ export function applyDawn(state: FriendshipState, pkg: DawnPackage, opts: { name
     report: { day, lines }
   }, pkg.regard);
   const index = tieIndex(pkg.ties.pairs);
-  next = learnTies(next, [...printed.map(m => [m.a, m.b] as const), ...romance.map(r => [r.a, r.b] as const)], day, 'read', index);
-  return { state: next, lines, printed, romance };
+  next = learnTies(next, [...printed.map(m => [m.a, m.b] as const), ...romance.map(r => [r.a, r.b] as const), ...crushes.map(c => [c.a, c.b] as const)], day, 'read', index);
+  return { state: next, lines, printed, romance, crushes };
 }
 
 /** §6.5 targets Nell and current fishers' Regard toward Pell, never their Regard toward the Fellow. */

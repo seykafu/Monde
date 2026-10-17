@@ -47,6 +47,7 @@ voice:
     - "You'll want to hold still, Fellow. A sleeve is a matter of five minutes, if the arm cooperates."
     - "I'm quite well, thank you. It's the weather. It was the weather last winter, too."
     - "Hem's good at a quarter inch. Gil said a Mercer could do it by feel. Roland could, once. Mind the pins."
+birthday: 64   # Autumn 14 (§3.2)
 likes: [good thread, supper at six, Odile's rye on the doorstep, Gil's old lamp in the window]
 dislikes: [pity, "the word 'frail'", being looked at in the lane, loose threads]
 fears: [Roland arrested, dying in the chair, Roland finding her ill]
@@ -76,7 +77,7 @@ routine:
     - { at: "21:00", do: sleep, where: millbrook.mercer_house }
 chores: [press the hems, wash the mill cap she keeps on the hook, polish Gil's lamp, wind the kitchen clock]
 relationships:
-  - { id: rook, affinity: 65, trust: -45, tag: estranged, note: "Wants him home for supper, honest. Won't ask while he does what he does." }
+  - { id: rook, affinity: 65, trust: -45, tag: estranged, kin: son, note: "Wants him home for supper, honest. Won't ask while he does what he does." }
   - { id: odile, affinity: 50, trust: 55, tag: old_friend, note: "Knows who leaves the loaf. Accepts it by not opening the door until Odile has gone." }
   - { id: priya, affinity: 30, trust: 10, tag: wary, note: "Won't be examined by a girl who knows her son. Has noticed Priya noticing." }
 secrets:

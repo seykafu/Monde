@@ -2,21 +2,23 @@
  * The friendship side of the night pass and the dawn (GDD §9.11.2-9.11.3; MVP G-13):
  *   prepareFriendship  before tonight's reflections: load Day N's plans and the town's ties, apply neglect to the
  *                      player's Regard (§9.11.2) and weekly drift to pairs that won't meet tonight, and choose
- *                      tonight's encounters (encounters.ts);
+ *                      tonight's encounters (encounters.ts), the engine's outings of the day (a café date, a birthday
+ *                      party; G-12) among them as planned time together;
  *   recordMilestones   after every job: compare each pair's label with the night's start and record the changes
  *                      that matter (became Friends / Close friends / Rivals / Enemies, made up);
- *   buildDawnTies      the dawn package's `ties`: every pair's label, romance stage, and last night's milestones.
+ *   buildDawnTies      the dawn package's `ties`: every pair's label, romance stage and crushes (G-12), and last
+ *                      night's milestones.
  */
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, inArray, lte } from "drizzle-orm";
 import {
-  ResidentState, encounterRoll, applyAffinity, driftDelta, neglectDelta, orderedPair, pairKey, pairLabel, romanceEligible,
+  ResidentState, encounterRoll, applyAffinity, driftDelta, hasCrush, neglectDelta, orderedPair, pairKey, pairLabel, romanceEligible,
   romanceStageOf, tieMilestone, type DawnTies, type PairLabel, type PersonaCard, type TieMilestoneView, type TieView,
 } from "@monde/shared";
-import { memories, plans, relationships, residents, tieMilestones, worlds } from "../db/schema.js";
+import { events, memories, plans, relationships, residents, tieMilestones, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import {
-  NEWS_IMPORTANCE, NEWS_PER_SIDE, encounterMemoryId, chooseEncounters, findMeetings, meanOf, relationshipView,
-  type Encounter, type EncounterContext, type EncounterSide,
+  NEWS_IMPORTANCE, NEWS_PER_SIDE, encounterMemoryId, chooseEncounters, findMeetings, meanOf, mergeMeetings, relationshipView,
+  scheduledMeetings, type Encounter, type EncounterContext, type EncounterSide,
 } from "./encounters.js";
 import { templatePlan } from "./templatePlan.js";
 import type { Tier } from "./tiers.js";
@@ -66,7 +68,7 @@ export interface PrepareOptions {
 
 export async function prepareFriendship(db: WorldDatabase, options: PrepareOptions): Promise<FriendshipNight> {
   const { worldId, day } = options;
-  const [[world], rows, edges, planRows, newsRows, metRows] = await Promise.all([
+  const [[world], rows, edges, planRows, newsRows, metRows, outings] = await Promise.all([
     db.select({ seed: worlds.seed }).from(worlds).where(eq(worlds.id, worldId)),
     db.select({ id: residents.id, card: residents.card, state: residents.state }).from(residents).where(eq(residents.worldId, worldId)),
     db.select().from(relationships).where(eq(relationships.worldId, worldId)),
@@ -77,6 +79,9 @@ export async function prepareFriendship(db: WorldDatabase, options: PrepareOptio
       gte(memories.importance, NEWS_IMPORTANCE),
     )),
     db.select({ id: memories.id }).from(memories).where(and(eq(memories.worldId, worldId), eq(memories.day, day), eq(memories.kind, "did"))),
+    // G-12: the engine's outings today (a courting pair's café date, a birthday party).
+    db.select({ type: events.type, minute: events.minute, wherePlace: events.wherePlace, who: events.who }).from(events)
+      .where(and(eq(events.worldId, worldId), eq(events.day, day), inArray(events.type, ["date", "birthday_party"]))),
   ]);
   const met = new Set(metRows.map(m => m.id));
   const cards = new Map<string, PersonaCard>(rows.map((r) => [r.id, r.card]));
@@ -88,7 +93,8 @@ export async function prepareFriendship(db: WorldDatabase, options: PrepareOptio
   // Day N as the residents lived it: last night's plan, or the routine the client ran.
   const planFor = new Map(planRows.map((p) => [p.residentId, p.plan]));
   const dayPlans = rows.map((r) => ({ residentId: r.id, blocks: (planFor.get(r.id) ?? templatePlan(r.card, day)).blocks }));
-  const encounters = chooseEncounters(findMeetings(dayPlans).filter(m => !met.has(encounterMemoryId(day, m.a, m.b, m.a))), {
+  const meetings = mergeMeetings(findMeetings(dayPlans), scheduledMeetings(outings, residentIds));
+  const encounters = chooseEncounters(meetings.filter(m => !met.has(encounterMemoryId(day, m.a, m.b, m.a))), {
     seed: world?.seed ?? 0, day, mean: (a, b) => meanOf(byEdge, a, b),
     tier: (id) => options.tiers.get(id) ?? "ambient", modelEnabled: options.modelEnabled,
   });
@@ -209,20 +215,28 @@ export async function recordMilestones(db: WorldDatabase, worldId: string, day: 
 // The dawn
 // ---------------------------------------------------------------------------------------------------------------
 
-/** The dawn package's `ties` for `day`: every pair that has met, and the milestones of the night before. */
+/**
+ * The dawn package's `ties` for `day`: every pair that has met (label, romance stage, who is at Crush toward the
+ * other, G-12), and the milestones of the night before.
+ */
 export async function buildDawnTies(db: WorldDatabase, worldId: string, day: number): Promise<DawnTies> {
   const [rows, edges, recorded] = await Promise.all([
     db.select({ id: residents.id, state: residents.state }).from(residents).where(eq(residents.worldId, worldId)),
-    db.select({ fromId: relationships.fromId, toId: relationships.toId, affinity: relationships.affinity })
-      .from(relationships).where(eq(relationships.worldId, worldId)),
+    db.select({
+      fromId: relationships.fromId, toId: relationships.toId, affinity: relationships.affinity,
+      feelingKind: relationships.feelingKind, feelingIntensity: relationships.feelingIntensity,
+    }).from(relationships).where(eq(relationships.worldId, worldId)),
     db.select().from(tieMilestones).where(and(eq(tieMilestones.worldId, worldId), eq(tieMilestones.day, day - 1))),
   ]);
   const flags = new Map(rows.map((r) => [r.id, r.state.flags]));
+  const byEdge = new Map(edges.map((e) => [edgeKey(e.fromId, e.toId), e]));
+  const crushOn = (from: string, to: string) => { const e = byEdge.get(edgeKey(from, to)); return !!e && hasCrush(e); };
   const pairs: TieView[] = [];
   for (const [key, label] of [...labelsOf(edges, new Set(flags.keys()))].sort(([x], [y]) => (x < y ? -1 : 1))) {
     if (label === "strangers") continue;
     const [a, b] = key.split("+") as [string, string];
-    pairs.push({ a, b, label, romance: romanceStageOf(a, flags.get(a) ?? [], b, flags.get(b) ?? []) });
+    const crush = [...(crushOn(a, b) ? [a] : []), ...(crushOn(b, a) ? [b] : [])];
+    pairs.push({ a, b, label, romance: romanceStageOf(a, flags.get(a) ?? [], b, flags.get(b) ?? []), ...(crush.length ? { crush } : {}) });
   }
   const milestones = recorded
     .map((m) => ({ day: m.day, a: m.aId, b: m.bId, kind: m.kind, from: m.fromLabel, to: m.toLabel }) as TieMilestoneView)

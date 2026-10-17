@@ -3,7 +3,7 @@ import { aiLogRow } from "./effects.js";
 import { readFile } from 'node:fs/promises';
 import { parse } from 'yaml';
 import { and, eq, gte, lt } from 'drizzle-orm';
-import { Press, PressCopy, fallbackPress, rankPressEvents, modelOutputFormat, type HeadlineTemplate } from '@monde/shared';
+import { Press, PressCopy, birthdayNotice, fallbackPress, rankPressEvents, modelOutputFormat, type HeadlineTemplate } from '@monde/shared';
 import { events, letters, memories, aiLog, tieMilestones, residents } from '../db/schema.js';
 import type { NightJobDeps, NightWorld } from './nightJob.js';
 import type { WorldDatabase } from '../worlds/createWorld.js';
@@ -25,6 +25,13 @@ export async function readPress(db: WorldDatabase, worldId: string, day: number)
   const [row] = await db.select().from(letters).where(and(eq(letters.worldId, worldId), eq(letters.id, `press_${day}`), eq(letters.toId, '@press')));
   try { return row ? Press.parse(JSON.parse(row.text)) : null; } catch { return null; }
 }
+/**
+ * G-12: a courtship and a café date are the couple's own news. The Lantern prints the courtship as a notice in the
+ * engine's words (§12.3 "the Dawn Report prints a line about it") and lists the date among the day's events; neither
+ * is ranked for a story the model would write.
+ */
+export const NOTICE_ONLY_TYPES: ReadonlySet<string> = new Set(['courting', 'date']);
+
 export async function runPress(deps: NightJobDeps, world: NightWorld, fund?: number): Promise<void> {
   if (await readPress(deps.db, world.worldId, world.day + 1)) return;
   const [rows, mail, milestones, people] = await Promise.all([
@@ -35,12 +42,16 @@ export async function runPress(deps: NightJobDeps, world: NightWorld, fund?: num
   ]);
   const witnesses = await deps.db.select({ source: memories.sourceEvent, resident: memories.residentId }).from(memories).where(and(eq(memories.worldId,world.worldId),eq(memories.day,world.day)));
   const byId = new Map(people.map(p => [p.id,p]));
-  const friendship = milestones.filter(m => !['became_friends','became_close_friends'].includes(m.kind) || byId.get(m.aId)?.tier === 'core' && byId.get(m.bId)?.tier === 'core').map(m => ({
+  // G-12: a pair who started courting tonight is that news, not "close friends".
+  const courtingTonight = new Set(rows.filter(e => e.type === 'courting' && e.day === world.day).map(e => [...e.who].sort().join('+')));
+  const warming = (m: { kind: string }) => ['became_friends','became_close_friends'].includes(m.kind);
+  const friendship = milestones.filter(m => !warming(m) || byId.get(m.aId)?.tier === 'core' && byId.get(m.bId)?.tier === 'core')
+    .filter(m => !(warming(m) && courtingTonight.has(`${m.aId}+${m.bId}`))).map(m => ({
     id:`tie_${world.day}_${m.aId}_${m.bId}`,day:world.day,minute:1560,type:'friendship',who:[m.aId,m.bId],
     // GDD-GAP: friendship press importance is 3 until the town-event table supplies a value.
     importance:3,summary:`${byId.get(m.aId)?.card.name ?? m.aId} and ${byId.get(m.bId)?.card.name ?? m.bId}: ${m.toLabel.replaceAll('_',' ')}.`,
   }));
-  const ranked = rankPressEvents([...friendship,...rows].map(e => ({ ...e,known: new Set(witnesses.filter(m => m.source === e.id).map(m => m.resident)).size })), world.day, rows.filter(e => e.day < world.day).map(e => e.type));
+  const ranked = rankPressEvents([...friendship,...rows.filter(e => !NOTICE_ONLY_TYPES.has(e.type))].map(e => ({ ...e,known: new Set(witnesses.filter(m => m.source === e.id).map(m => m.resident)).size })), world.day, rows.filter(e => e.day < world.day).map(e => e.type));
   const templates = parse(await readFile(new URL(import.meta.url.includes('/src/') ? '../../../content/lines/headlines.yaml' : '../../content/lines/headlines.yaml', import.meta.url), 'utf8')) as { headlines: HeadlineTemplate[] };
   let paper = fallbackPress(world.day + 1, ranked, templates.headlines, fund === undefined ? {} : { coins: fund });
   if (deps.mind.enabled) {
@@ -51,7 +62,10 @@ export async function runPress(deps: NightJobDeps, world: NightWorld, fund?: num
     else deps.log.warn({ worldId: world.worldId, day: world.day }, 'press used templates');
   }
   paper.letters = mail.filter(l => !lexicalHits(l.text).length).slice(0,2).map(l => ({ from: l.fromId, text: l.text, id: l.id }));
-  paper.notices = [...world.eventsTomorrow];
+  // G-12: last night's courtships and today's birthdays, then today's scheduled events (a party or a café date among them).
+  const courting = rows.filter(e => e.type === 'courting' && e.day === world.day).sort((a, b) => a.id.localeCompare(b.id)).map(e => e.summary);
+  const birthdays = birthdayNotice(people.map(p => p.card), world.day + 1);
+  paper.notices = [...courting, ...(birthdays ? [birthdays] : []), ...world.eventsTomorrow];
   const movements = rows.filter(e => e.day === world.day && ['arrival', 'departure', 'returnee'].includes(e.type));
   paper.movements = movements.map(e => e.summary);
   paper.movement_residents = [...new Set(movements.flatMap(e => e.who).filter(id => byId.has(id)))];

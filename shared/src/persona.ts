@@ -55,6 +55,11 @@ export const Relationship = z.object({
   trust: z.number().int().min(-100).max(100),
   tag: z.string(),
   note: z.string(),
+  /**
+   * The family word (mother, son…) when the tag says how they get on instead (Rook and Delphine are `estranged`).
+   * Romance never runs between family (§9.11.3; friendship.ts areFamily reads the tag and this).
+   */
+  kin: z.string().optional(),
 });
 
 export const Reveal = z

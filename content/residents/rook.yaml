@@ -51,6 +51,7 @@ voice:
     - "You're standing in my light, Fellow. Everyone's got somewhere to be. Mine's here."
     - "Twenty coins. It's a loaf and a half. Nobody's bleeding over a loaf and a half."
     - "Don't ask about home. That's all I've got on that."
+birthday: 56   # Autumn 6 (§3.2)
 likes: [the sound of a frame running true, cold mornings in the mill yard, Nettie's slingshot practice, Odile's heel of rye]
 dislikes: [being pitied, the grey van's engine, Vane's name, anyone who says 'your father']
 fears: [his mother dying with the door shut, the crew getting hurt on his say-so, being asked why]
@@ -81,7 +82,7 @@ routine:                         # sleeps at the hideout, not the nominal home
 chores: [oil the hideout's lock, check Nettie's lookout rota, count the Saturday take twice, wind the shift whistle's lanyard]
 relationships:
   - { id: vane, affinity: -35, trust: 10, tag: paymaster, note: "Met him once, on the crane yard in the rain. Hates being grateful to him." }
-  - { id: delphine, affinity: 75, trust: 30, tag: estranged, note: "Watches the house from the laundry green on Sundays. Wants her to open the door first." }
+  - { id: delphine, affinity: 75, trust: 30, tag: estranged, kin: mother, note: "Watches the house from the laundry green on Sundays. Wants her to open the door first." }
   - { id: nell, affinity: -15, trust: 25, tag: respects, note: "She spat at his boots in the first year and he has respected it since. Doesn't press her." }
   - { id: odile, affinity: 35, trust: 10, tag: ashamed, note: "She fed him at the back door when he was nine and hungry. Hates taking her twenty." }
   - { id: augusta, affinity: -30, trust: -10, tag: adversary, note: "She let him off with a warning at seventeen. He hasn't forgotten it and hasn't thanked her." }

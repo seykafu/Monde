@@ -756,6 +756,9 @@
           },
           "note": {
             "type": "string"
+          },
+          "kin": {
+            "type": "string"
           }
         },
         "required": [

@@ -19,6 +19,8 @@ export const TieData = z.object({
   a: z.string(), b: z.string(),
   label: z.enum(PAIR_LABELS).exclude(["strangers"]),
   romance: z.enum(ROMANCE_STAGES).nullable(),
+  /** Who of the two is at Crush toward the other (G-12); absent from older servers and saves. */
+  crush: z.array(z.string()).optional(),
 });
 export type TieData = z.infer<typeof TieData>;
 

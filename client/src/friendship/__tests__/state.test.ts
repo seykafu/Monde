@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pairKey, type PlanOutput, type TieData, type TieMilestoneData, type TurnRegard } from '@monde/shared';
 import { applyDawn, applyRegardSnapshot, cardTies, emptyFriendship, meet, metResidents, recordTurn, regardOf, seedRegard } from '../state';
-import { dawnLines, printedMilestones, romanceNews } from '../milestones';
+import { crushLine, crushNews, dawnLines, printedMilestones, romanceNews } from '../milestones';
 import type { DawnPackage } from '../../mind/dawn';
 import { loadCards } from '../../sim/__tests__/content';
 
@@ -19,7 +19,7 @@ const pkg = (over: Partial<DawnPackage> = {}): DawnPackage => ({
   day: 5, weekday: 'Sat', plans: [{ resident_id: 'odile', tier: 'core', source: 'model', plan }, { resident_id: 'moss', tier: 'ambient', source: 'template', plan: {} }],
   letters: [], favors: [], ties: { pairs: [], milestones: [] }, pending: 0, complete: true, ...over
 });
-const NAMES = { odile: 'Odile', june: 'June', moss: 'Old Moss', hollis: 'Hollis', rook: 'Rook', priya: 'Priya', kasimir: 'Kasimir' };
+const NAMES = { odile: 'Odile', june: 'June', moss: 'Old Moss', hollis: 'Hollis', rook: 'Rook', priya: 'Priya', kasimir: 'Kasimir', teo: 'Teo', ines: 'Ines', augusta: 'Augusta', rosalind: 'Roz' };
 
 describe('mirrored Regard (§9.11.1)', () => {
   it('seeds from the Background start, else 0', () => {
@@ -119,6 +119,30 @@ describe('the dawn package folded in', () => {
     const out = applyDawn({ ...emptyFriendship(), ties: { day: 4, pairs: before } }, pkg({ ties: { pairs: after, milestones: [] } }), { names: NAMES, plans: {} });
     expect(out.lines).toEqual(['Kasimir and Priya are courting.']);
     expect(out.state.known_ties['kasimir+priya']?.how).toBe('read');
+  });
+
+  it('notices a crush between Core residents (G-12), until the pair is courting', () => {
+    const before = [tie('ines', 'teo', 'acquaintances'), { ...tie('augusta', 'rosalind', 'friends'), crush: ['augusta'] }, tie('kasimir', 'priya', 'close_friends')];
+    const after = [
+      { ...tie('ines', 'teo', 'friends'), crush: ['teo'] },
+      { ...tie('augusta', 'rosalind', 'close_friends'), crush: ['augusta', 'rosalind'] },
+      { ...tie('kasimir', 'priya', 'close_friends', 'courting'), crush: ['kasimir', 'priya'] },
+      { ...tie('moss', 'odile', 'friends'), crush: ['moss'] }
+    ];
+    const news = crushNews(before, after, { moss: 'ambient' });
+    expect(news).toEqual([{ a: 'ines', b: 'teo', who: ['teo'] }, { a: 'augusta', b: 'rosalind', who: ['rosalind'] }]);
+    expect(news.map(c => crushLine(c, NAMES))).toEqual(['Teo seems sweet on Ines.', 'Roz seems sweet on Augusta.']);
+    expect(crushLine({ a: 'augusta', b: 'rosalind', who: ['augusta', 'rosalind'] }, NAMES)).toBe('Augusta and Roz seem sweet on each other.');
+    expect(crushNews(after, after)).toEqual([]);
+    // The night they start courting they're usually Close friends too: the courtship is the news.
+    expect(dawnLines([milestone('kasimir', 'priya', 'became_close_friends'), milestone('june', 'odile', 'became_friends')], [{ a: 'kasimir', b: 'priya', stage: 'courting' }], NAMES))
+      .toEqual(['Kasimir and Priya are courting.', 'June and Odile have become friends.']);
+    // Older saves and servers have no `crush`.
+    expect(crushNews([tie('ines', 'teo', 'friends')], [tie('ines', 'teo', 'friends')])).toEqual([]);
+    const out = applyDawn({ ...emptyFriendship(), ties: { day: 4, pairs: before } }, pkg({ ties: { pairs: after, milestones: [] } }), { names: NAMES, plans: {} });
+    expect(out.lines).toEqual(['Kasimir and Priya are courting.', 'Teo seems sweet on Ines.', 'Roz seems sweet on Augusta.']);
+    expect(out.crushes).toHaveLength(2);
+    expect(out.state.known_ties['ines+teo']?.how).toBe('read');
   });
 
   it('keeps two weeks of milestones', () => {

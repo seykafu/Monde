@@ -12,7 +12,8 @@ import { ensureStrawPoll, withStrawPoll } from "../finale/take";
 import { REPORT_DAY } from "../finale/state";
 import YAML from "yaml";
 import headlineText from "../../../content/lines/headlines.yaml?raw";
-import { fallbackPress, type Press, type PressEvent, type HeadlineTemplate } from "@monde/shared";
+import { birthdayNotice, datingFlags, fallbackPress, type Press, type PressEvent, type HeadlineTemplate } from "@monde/shared";
+import { storySession } from "../puzzles/runtime";
 import { stampGenerated } from "../press/report";
 // Friendship's Phaser side (GDD §9.11; MVP G-13 client): the registry's FriendshipState and the dawn package.
 //
@@ -22,8 +23,10 @@ import { stampGenerated } from "../press/report";
 //   online   hold the clock ("dawn"), POST the night of yesterday, GET today's package (polling briefly while the
 //            night is still working), then fold it in: the model plans replace templates (ResidentSim reads them
 //            from here), the ties, milestones, letters and Favors are kept, and this morning's friendship lines go
-//            to `monde.dawnTies` for the Ledger's dawn line and the Dawn Report (M-10);
-//   offline  template routines and Favors, and the ties the client last knew.
+//            to `monde.dawnTies` for the Ledger's dawn line and the Dawn Report (M-10); a seeded romance that has reached
+//            Courting sets its story flag (G-12, setDatingFlags);
+//   offline  template routines and Favors, and the ties the client last knew (no night pass: the romance ladder
+//            waits for the next online night); the Lantern names the day's birthdays from the cards.
 // A game loaded mid-day whose save has no plans for that day asks for the day's package again (no night).
 import type Phaser from 'phaser';
 import type { PlanOutput, RegardSnapshot, TieData, TieMilestoneData, TurnRegard } from '@monde/shared';
@@ -113,6 +116,29 @@ export function regardMap(registry: Registry, ids: readonly string[]): Record<st
   const out: Record<string, number> = {};
   for (const id of ids) out[id] = Math.max(-100, Math.min(100, regardOf(friendship, id, seedRegard(background, id)) + (queued.get(id) ?? 0)));
   return out;
+}
+
+/** SaveGame.story_flags in the registry (save/runtime.ts; story/host.ts encodeStory). */
+const STORY_FLAGS_KEY = 'monde.story.flags';
+
+/**
+ * G-12: the seeded romances' story flags (§13.6 `kasimir_priya_dating`…) follow the dawn's ties, so the canon locks and
+ * scripts see them, and the client's flag snapshots (M-06), which replace the server's set, keep what the night set.
+ * Only ever adds a flag (a courtship isn't undone by a dawn that came without ties).
+ */
+export function setDatingFlags(registry: Registry, pairs: readonly TieData[]): string[] {
+  const wanted = datingFlags(pairs);
+  if (!wanted.length) return [];
+  const session = storySession(registry);
+  const have = session ? session.flags.snapshot()
+    : new Set(Object.entries((registry.get(STORY_FLAGS_KEY) ?? {}) as Record<string, unknown>).filter(([k, v]) => v === true && !k.startsWith('$')).map(([k]) => k));
+  const missing = wanted.filter(f => !have.has(f));
+  if (!missing.length) return [];
+  if (session) {
+    for (const f of missing) { try { session.flags.set(f); } catch { /* undeclared: content/flags.yaml declares all three */ } }
+    registry.set(STORY_FLAGS_KEY, session.snapshot());
+  } else registry.set(STORY_FLAGS_KEY, { ...((registry.get(STORY_FLAGS_KEY) ?? {}) as object), ...Object.fromEntries(missing.map(f => [f, true])) });
+  return missing;
 }
 
 /** The server's Regard for the whole town (an events reply, the night's ingestion, the dawn): replace the mirror. */
@@ -217,7 +243,9 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
       if (finale) edition = withStrawPoll(edition, finale, day, id => townNames()[id] ?? id);
     }
     const town = getTown(registry);
-    edition.notices = [...new Set([...edition.notices, ...(isMarketDay(day) ? ['Saturday market on Market Row.'] : []), ...(isFerryDay(day,town?.flags) ? ['The ferry sails today from the Wharf.'] : []), 'Meals and gifts at the general store.'])];
+    // G-12: the server's paper names today's birthdays itself (press.ts); a paper set here (Quiet Mode) does it from the cards.
+    const birthdays = paper ? null : birthdayNotice([...personaCards, ...generatedCards()], day);
+    edition.notices = [...new Set([...(birthdays ? [birthdays] : []), ...edition.notices, ...(isMarketDay(day) ? ['Saturday market on Market Row.'] : []), ...(isFerryDay(day,town?.flags) ? ['The ferry sails today from the Wharf.'] : []), 'Meals and gifts at the general store.'])];
     if (!paper) edition.letters = getFriendship(registry).letters.filter(l => l.to === 'lantern' && l.day === day).slice(0,2).map(l => ({ from:l.from,text:l.text,id:l.id }));
     // G-02 (§6.6): comings and goings from the town's own roster: this morning's boat in, and anyone leaving on it.
     const moves = paperMovements(registry, day);
@@ -254,6 +282,7 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
       adoptDawnArrivals(registry, result.pkg);
       const applied = applyDawn(getFriendship(registry), result.pkg, { names: townNames(), plans });
       registry.set(FRIENDSHIP_KEY, { ...applied.state, papers: getFriendship(registry).papers });
+      setDatingFlags(registry, result.pkg.ties.pairs);
       publish(day,result.pkg.press);
       registry.set(DAWN_TIES_KEY, {
         day, lines: applied.lines, milestones: applied.printed, romance: applied.romance, status: result.status

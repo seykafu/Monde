@@ -14,6 +14,7 @@ export * from './save';
 export * from "./replies";
 export * from "./friendship";
 export * from "./friendshipData";
+export * from "./romance";
 export * from "./look";
 export * from "./player";
 export * from "./events";

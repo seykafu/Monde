@@ -1,4 +1,4 @@
-import { SPRING_RIDDLES, normalizeRiddleAnswer } from '@monde/shared';
+import { FAMILY_TAGS, SPRING_RIDDLES, normalizeRiddleAnswer } from '@monde/shared';
 /**
  * Content linter (GDD §20.4): persona cards (with their `look`), place registry, declared flags, the Quiet Mode line library
  * (Appendix B) with its authored replies, and the scripted {ai_open} exchanges (content/lines/scripted.yaml).
@@ -83,6 +83,10 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".yaml")).sort()
   const c = parsed.data;
   if (`${c.id}.yaml` !== file) err(`${where}: id '${c.id}' does not match file name`);
   cards.set(c.id, c);
+  // §9.11.3: every resident has a birthday (the census's come from content/census/day1.yaml).
+  if (c.birthday === undefined) err(`${where}: no birthday (a day of the 100-day year, 1-100)`);
+  for (const r of c.relationships)
+    if (r.kin !== undefined && !FAMILY_TAGS.has(r.kin.toLowerCase())) err(`${where}: tie to ${r.id}: kin '${r.kin}' isn't a family word`);
 
   for (const [label, p] of [["workplace", c.workplace], ["home", c.home]] as const)
     if (!placeOk(p)) err(`${where}: ${label} '${p}' is not in the place registry`);

@@ -23,7 +23,9 @@ import { ArrivalRequest, NoticeIn, adoptHouseholds, commitArrivals, departReside
  *      Before any of them, the friendship pass (G-13, §9.11; ties.ts, encounters.ts): neglect, weekly drift and
  *      tonight's encounters from Day N's plans. Encounter calls queue first, each at the priority of its better-
  *      detailed side (Core first), and a resident's reflection waits for their own encounters so it can mention
- *      them. When every job is done, label changes are recorded as tie milestones for the dawn;
+ *      them. When every job is done, the romance ladder runs (G-12, romance.ts: feelings from time together, who
+ *      starts courting) and label changes are recorded as tie milestones for the dawn. Tomorrow's birthday parties
+ *      (birthdays.ts) are scheduled before any of it, so tonight's plans see them;
  *   4. answers when everything is done or after 4 s, whichever comes first (§9.8 night pass budget, §19.7).
  *      Whatever isn't finished keeps running in the background and is still persisted; the response says how
  *      many residents are done and how many are pending. Until a plan lands, the dawn package serves the
@@ -46,6 +48,8 @@ import { reflectResident } from "./reflect.js";
 import { WorldSemaphores } from "./semaphore.js";
 import { DAY_START } from "./templatePlan.js";
 import { prepareFriendship, recordMilestones, type FriendshipNight } from "./ties.js";
+import { runRomance } from "./romance.js";
+import { scheduleBirthdayParties } from "./birthdays.js";
 import { countTiers, recomputeTiers, type Tier, type TierCounts } from "./tiers.js";
 
 /** §9.8, §19.7: the night transition shows for at most 4 seconds. */
@@ -373,6 +377,9 @@ export class NightRunner {
     }
     const tiers = await recomputeTiers(db, worldId, day);
     run.tiers = countTiers(tiers);
+    // G-12: tomorrow's birthday parties, before the town's events are read, so tonight's plans and the Lantern see them.
+    await scheduleBirthdayParties(db, worldId, day)
+      .catch((error: unknown) => { this.log.error({ err: error, worldId, day }, "scheduling birthday parties failed"); });
 
     const [registry, ids, tops, stored] = await Promise.all([
       loadPlaceRegistry(this.options.contentDir),
@@ -435,6 +442,10 @@ export class NightRunner {
     })];
     await Promise.all([...encounters, ...jobs.map((job) => this.runJob(run, world, job, waits.get(job.residentId) ?? []))]);
 
+    // G-12: the romance ladder reads tonight's encounters and reflections; the Lantern below prints who is courting.
+    await runRomance(db, worldId, day)
+      .then((romance) => { if (romance.courting.length) this.log.info({ worldId, day, courting: romance.courting.map((c) => `${c.a}+${c.b}`) }, "residents started courting"); })
+      .catch((error: unknown) => { this.log.error({ err: error, worldId, day }, "romance ladder failed"); });
     if (friendship) {
       await recordMilestones(db, worldId, day, friendship.before)
         .catch((error: unknown) => { this.log.error({ err: error, worldId, day }, "recording tie milestones failed"); });

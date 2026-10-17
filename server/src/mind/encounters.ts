@@ -16,7 +16,7 @@ import { budgetMind } from "./budget.js";
  */
 import { and, eq, inArray, sql } from "drizzle-orm";
 import {
-  AFFINITY_SOURCES, GossipOutput, ROMANTIC_FEELINGS, ambientEncounterDelta, applyAffinity, clamp, clampGossip,
+  AFFINITY_SOURCES, BIRTHDAY_PARTY, CAFE_DATE, GossipOutput, ROMANTIC_FEELINGS, ambientEncounterDelta, applyAffinity, clamp, clampGossip,
   encounterChance, encounterRoll, orderedPair, pairKey, pairMean, pairLabel, tieMilestone,
   type PersonaCard, type PlanOutput, type ResidentState,
 } from "@monde/shared";
@@ -115,6 +115,48 @@ export function findMeetings(plans: readonly DayPlan[], minOverlap = MIN_OVERLAP
   return [...best.values()]
     .filter((m) => m.planned || m.overlap >= minOverlap)
     .sort((x, y) => (pairKey(x.a, x.b) < pairKey(y.a, y.b) ? -1 : 1));
+}
+
+/** A scheduled outing as the night reads it: a town event of type `date` (a pair) or `birthday_party` (host first). */
+export interface ScheduledOuting { type: string; minute: number; wherePlace: string; who: readonly string[] }
+
+/**
+ * Engine-scheduled time together on the day (G-12): a courting pair's café date (shared romance.ts CAFE_DATE) and a
+ * birthday party, host with each guest (BIRTHDAY_PARTY). The engine put them there, so they are planned meetings
+ * whatever the plans say. Residents not in town are left out.
+ */
+export function scheduledMeetings(outings: readonly ScheduledOuting[], present: ReadonlySet<string>): Meeting[] {
+  const out: Meeting[] = [];
+  // A café date first: a couple at a birthday party the same day still met at the café (mergeMeetings keeps the first).
+  const order = [...outings].sort((x, y) => Number(y.type === "date") - Number(x.type === "date") || x.minute - y.minute);
+  for (const o of order) {
+    const minutes = o.type === "date" ? CAFE_DATE.minutes : o.type === "birthday_party" ? BIRTHDAY_PARTY.minutes : 0;
+    const [host, ...guests] = o.who;
+    if (!minutes || !host || !present.has(host)) continue;
+    for (const guest of o.type === "date" ? guests.slice(0, 1) : guests) {
+      if (guest === host || !present.has(guest)) continue;
+      const [a, b] = orderedPair(host, guest);
+      out.push({ a, b, place: o.wherePlace, minute: o.minute, overlap: minutes, planned: true });
+    }
+  }
+  return out;
+}
+
+/**
+ * The day's meetings with the scheduled ones folded in: one per pair. A scheduled outing takes the pair's meeting
+ * unless the plans already had a better one (planned, longer, earlier); between two outings, the first listed.
+ */
+export function mergeMeetings(found: readonly Meeting[], scheduled: readonly Meeting[]): Meeting[] {
+  const best = new Map(found.map((m) => [pairKey(m.a, m.b), m]));
+  const outing = new Set<string>();
+  for (const m of scheduled) {
+    const key = pairKey(m.a, m.b);
+    const seen = best.get(key);
+    if (outing.has(key) || (seen && !better(m, seen))) continue;
+    best.set(key, m);
+    outing.add(key);
+  }
+  return [...best.values()].sort((x, y) => (pairKey(x.a, x.b) < pairKey(y.a, y.b) ? -1 : 1));
 }
 
 export interface Encounter extends Meeting {

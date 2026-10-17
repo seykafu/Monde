@@ -15,7 +15,7 @@ import { marks } from './riddles';
 import Phaser from 'phaser';
 import { PAIR_LABEL_NAMES, regardTier, type PersonaCard, type RomanceStage, type TieSource } from '@monde/shared';
 import { FAMILY_BODY, FAMILY_DISPLAY, FAMILY_HEADING, FAMILY_UI, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
-import type { Clock } from '../sim/clock';
+import { SEASON_NAMES, dayOfSeason, seasonOf, type Clock } from '../sim/clock';
 import { livingArrivals } from '@monde/shared';
 import { rosterEntry } from '../world/roster';
 import { homeName } from '../world/townHomes';
@@ -79,11 +79,9 @@ const ROMANCE_TEXT: Readonly<Record<RomanceStage, string>> = { courting: 'Courti
 export const tieText = (t: Pick<KnownTie, 'label' | 'romance' | 'other'>, name: string): string =>
   t.romance ? `${ROMANCE_TEXT[t.romance]} ${name}` : `${PAIR_LABEL_NAMES[t.label]} with ${name}`;
 
-/** GDD-GAP: persona cards have no birthday field yet (§9.11.3 life events); the page shows one if a card gains it. */
-const birthdayOf = (card: PersonaCard): string | null => {
-  const b = (card as PersonaCard & { birthday?: unknown }).birthday;
-  return typeof b === 'number' ? `Day ${b}` : null;
-};
+/** §9.11.3: the People page lists each resident's birthday, on the calendar as the clock shows it ("Spring 12"). */
+const birthdayOf = (card: PersonaCard): string | null =>
+  card.birthday === undefined ? null : `${SEASON_NAMES[seasonOf(card.birthday)]} ${dayOfSeason(card.birthday)}`;
 
 let lastPicked: string | null = null;
 

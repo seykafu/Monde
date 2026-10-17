@@ -48,7 +48,7 @@ const residentRow = (card: PersonaCard, worldId: string) => {
   return { worldId, id: card.id, card, state, tier: state.tier };
 };
 const tieRows = (cards: readonly PersonaCard[], worldId: string, keep: (from: string, to: string) => boolean = () => true) =>
-  cards.flatMap((card) => card.relationships.filter((r) => keep(card.id, r.id)).map(({ id, ...relationship }) => ({
+  cards.flatMap((card) => card.relationships.filter((r) => keep(card.id, r.id)).map(({ id, kin: _kin, ...relationship }) => ({
     worldId, fromId: card.id, toId: id, ...relationship,
   })));
 
