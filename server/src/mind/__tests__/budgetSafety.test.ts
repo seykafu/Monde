@@ -138,3 +138,13 @@ it('lets ordinary town talk through the local rules', () => {
     'Is the paint fire retardant?', 'Who was president of the Regatta committee?', 'Can I sit with you a minute?',
   ]) expect(localPrecheck(text), text).toBe('fine');
 });
+
+it('leaves hard feelings to the resident: a model-only self_harm verdict passes, an explicit phrase gets the care line', async () => {
+  const w = await world(), mind = new FakeMind(); configureBudget(database.db, parseConfig({}));
+  mind.createMessage = async () => message('{"ok":false,"category":"self_harm"}');
+  expect(await precheck(database.db, mind, w.id, 'priya', 'Thanks. What do you do when you feel like that?')).toBe('fine');
+  expect(await precheck(database.db, mind, w.id, 'priya', 'Some days I want to die.')).toBe('self_harm');
+  // Priya is the help the line points to; she doesn't send the Fellow to herself.
+  expect(safetyLine('self_harm', 'x', 'priya')).not.toContain('find Priya');
+  expect(safetyLine('self_harm', 'x', 'odile')).toMatch(/Priya/);
+});

@@ -276,7 +276,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
             failure = { code: safety === 'budget' ? 'budget' : 'safety', message: 'The resident answers with a written line.' };
             output = fallbackFor(ctx);
             if (safety !== 'budget') {
-              output.lines = [{ text: safetyLine(safety, body.input.kind === 'say' ? body.input.text : ''), expr: 'worried' }];
+              output.lines = [{ text: safetyLine(safety, body.input.kind === 'say' ? body.input.text : '', body.resident_id), expr: 'worried' }];
               // GDD-GAP: §9.13 calls for a small rude-input Regard cost; use -1.
               output.effects.regard_delta = safety === 'rude' || safety === 'abusive' ? -1 : 0;
             }
