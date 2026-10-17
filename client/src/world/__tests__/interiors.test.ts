@@ -11,9 +11,10 @@ import { IndoorView } from '../indoorResidents';
 import { movePlayer } from '../player';
 import { homeRegistry, placeRegistry } from '../places';
 import { personaCards } from '../residents';
+import { loadFullRoster } from '../../sim/__tests__/content';
 import { ZoneGraph, findPath } from '../nav';
 import { ResidentSim } from '../../sim/residentSim';
-import { RoutineExecutor } from '../../sim/routineExecutor';
+import { RoutineExecutor, type ResidentState } from '../../sim/routineExecutor';
 import { placeAt } from '../../story/host';
 import { ambientMusic, INDOOR_LEVEL, QUIET_LEVEL } from '../../audio/musicDirector';
 import { doorLocked, indoorLight, INDOOR } from '../../scenes/zone/indoors';
@@ -280,6 +281,27 @@ describe('residents indoors (world/indoorResidents.ts)', () => {
       expect(new Set(cells).size, cells.join(' ')).toBe(cells.length);
       expect(standing.length).toBeGreaterThan(2); // the pub of an evening
     }
+  });
+
+  it('show a full room\'s free spots taken and nobody else (the whole Day-1 town, MVP M-03), until one comes free', async () => {
+    const town = new ResidentSim(await loadFullRoster(), { zones, graph: new ZoneGraph(zones), registry: placeRegistry, homes: homeRegistry });
+    const room = interiors.gull_and_anchor_interior!;
+    const free = room.interior!.spots.filter(s => !s.who.length).length;
+    const posted = new Set(room.interior!.spots.flatMap(s => s.who));
+    // Customers (nobody with a post of their own here, like Roz at the bar), far more than the room has free spots.
+    const crowd = [...new Set(town.tick(DAY, at(19)).map(s => s.id))].filter(id => !posted.has(id)).slice(0, free + 12);
+    const states: ResidentState[] = crowd.map(id => ({ ...town.sample(id, DAY, at(19))!, id, zone: 'market_row', place: 'market_row.gull_and_anchor', moving: false, traveling: null, activity: 'socialize' }));
+    const v = new IndoorView(room, town.executor, (id) => states.find(s => s.id === id) ?? null);
+    v.roster(() => states, at(19), 0);
+    const shown = crowd.map(id => v.stateAt(id, DAY, at(19))).filter(s => s && !s.moving);
+    const cells = shown.map(s => `${s!.position!.x},${s!.position!.y}`);
+    expect(new Set(cells).size).toBe(cells.length);
+    expect(shown.length).toBe(free);
+    // One leaves: the next in line gets the spot.
+    const gone = shown[0]!.id;
+    v.keep(new Set(crowd.filter(id => id !== gone)));
+    const waiting = crowd.find(id => !shown.some(s => s!.id === id))!;
+    expect(v.stateAt(waiting, DAY, at(19))).not.toBeNull();
   });
 });
 

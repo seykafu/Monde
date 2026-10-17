@@ -8,7 +8,17 @@ export default defineConfig({
   build: {
     target: "es2022",
     sourcemap: true,
-    rollupOptions: { output: { manualChunks: { phaser: ["phaser"] } } },
+    rollupOptions: {
+      output: {
+        // Phaser (and the one package it brings) in one chunk; the resident roster (residents.gen.json, 212 cards once
+        // the census is written, MVP M-03) in its own, so a card edit doesn't invalidate the game's code chunk.
+        manualChunks(id) {
+          if (id.includes("/node_modules/phaser/") || id.includes("/node_modules/eventemitter3/")) return "phaser";
+          if (id.includes("/src/world/residents.gen.json")) return "residents";
+          return undefined;
+        }
+      }
+    },
     chunkSizeWarningLimit: 1500
   }
 });

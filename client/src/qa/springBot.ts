@@ -56,7 +56,7 @@ import { codes as PZ03_CODES, words as PZ03_WORDS } from '../puzzles/PZ-03';
 import { constraints as PZ04_CONSTRAINTS } from '../puzzles/PZ-04';
 import { attachSaves, finishSaving, loadGame, saveGame, saveStorage } from '../save/runtime';
 import { getEventLog, appendEvent } from '../scenes/events';
-import { attachDawnSync, getFriendship, livePlansFor, meetResident, regardFor, townNames, updateFriendship } from '../scenes/friendship';
+import { attachDawnSync, getFriendship, livePlansFor, meetResident, regardFor, regardMap, townNames, updateFriendship } from '../scenes/friendship';
 import { attachMigration, installMigration } from '../scenes/migration';
 import { findMark, marks, submitMark } from '../scenes/riddles';
 import { TOWN_KEY, attachTown, getTown } from '../scenes/TownLedgerScene';
@@ -80,6 +80,9 @@ import { boards, doorLinks, interiors, zones } from '../world/zones';
 import { DEFAULT_PLAYER_LOOK } from '../render/character/look';
 import type { TownState } from '../town/pillars';
 import { computeAppeal } from '../town/appeal';
+
+/** Every card's id, for the story's Regard (scenes/friendship.ts regardMap). */
+const CARD_ID_LIST: readonly string[] = personaCards.map(c => c.id);
 
 // ── Phaser stand-ins ────────────────────────────────────────────────────────
 
@@ -412,7 +415,7 @@ export class SpringBot {
       now: () => ({
         day: this.clock.day, minute: this.clock.minute, zone: this.district, place: this.place(), town: getTown(reg),
         profile: (getFellow(r)?.profile ?? null) as FellowProfile | null,
-        regard: Object.fromEntries(personaCards.map(c => [c.id, regardFor(reg, c.id)])),
+        regard: regardMap(reg, CARD_ID_LIST),
         ...this.storyArrival()
       }),
       setTown: state => { r.set(TOWN_KEY, state); },
@@ -1349,7 +1352,9 @@ export function auditSpring(): string[] {
     residents: new Map(personaCards.map(c => [c.id, { home: c.home, workplace: c.workplace, places: [...c.routine.weekday, ...c.routine.weekend].map(b => b.where), reachable: true }])),
     reachablePlace: (place: string) => !!placeArrival(zones, interiors, place), met: () => false,
   };
-  for (const c of personaCards.filter(c => c.kind !== 'animal')) {
+  // Every card the game loads (the Day-1 census's too, MVP M-03), less the animals and the under-fives: GDD-GAP, a child
+  // too small for school spends the day at home and asks nobody for a Favor.
+  for (const c of personaCards.filter(c => c.kind !== 'animal' && c.employment !== 'under_five')) {
     const f = instantiateFavor({ template: 'help_chore', target: c.id, text: 'Help?' }, `audit_${c.id}`, c.id, favorWorld);
     if (!f) { out.push(`${c.id} has no reachable Favor location`); continue; }
     check(`${c.id}'s Favor`, standingPlace(interiors, f.task.place), { keys: true });

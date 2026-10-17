@@ -18,7 +18,7 @@ import { budgetMind } from "./budget.js";
  *   - Leaving Notices (`notices`) become memories: the resident's own decision, and a word to each friend ("they tell
  *     friends", §6.4), important enough that tonight's reflection writes it (§9.8: Ambient reflects on 6+).
  */
-import { and, eq, inArray, or } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
   ARCHETYPES, ARRIVAL_SYSTEM_PROMPT, ArrivalHousehold, HOME_TOKEN, PersonaCard, RESERVED_FIRST_NAMES, ResidentState,
@@ -106,6 +106,8 @@ async function promptContext(db: Database, worldId: string, request: ArrivalRequ
     mode: "arrival", home, knownResidents: known,
     avoidFirst: [...RESERVED_FIRST_NAMES, ...rows.map(r => r.card.name.replace(/"[^"]*"\s*/g, "").split(" ")[0]!)].filter((v, i, a) => a.indexOf(v) === i),
     avoidFull: rows.filter(r => r.card.kind === "arrival").map(r => r.card.name),
+    // The name pool leaves out every living household's surname (V03 would refuse one).
+    avoidFamily: [...new Set(rows.map(r => r.card.name.replace(/"[^"]*"\s*/g, "").trim().split(/\s+/).at(-1) ?? "").filter(Boolean))].sort(),
     whim,
   };
 }
@@ -220,8 +222,9 @@ async function drawForBuffer(db: Database, worldId: string, seed: number, reques
   ]);
   const generated = living.filter(r => r.card.kind === "arrival");
   const buffered = rows.filter(r => r.status === "buffered");
-  // Buffered portraits count as worn: the buffer shouldn't fill with one face.
-  const uses = counts([...generated.map(r => r.card.portrait), ...buffered.flatMap(r => r.cards.map(c => c.portrait))], x => x);
+  // Every living resident's portrait counts as worn (MVP M-03: the Day-1 census wears 90 library busts, not only the
+  // arrivals), and so do the buffered ones: the buffer shouldn't fill with one face.
+  const uses = counts([...living.map(r => r.card.portrait), ...buffered.flatMap(r => r.cards.map(c => c.portrait))], x => x);
   // The buffer is written before anyone knows the homes: any free home size the town has, else a three-bed house.
   const homes = request.free_homes.length ? request.free_homes : [{ home: HOME_TOKEN, beds: 3 }];
   return drawHousehold({
@@ -323,7 +326,8 @@ export async function commitArrivals(deps: ArrivalDeps, worldId: string, request
     } else {
       const fresh = drawHousehold({
         seed: deps.seed, day: request.day, slot, facts, youthShare: request.youth_share, recent: [], alive: new Map(),
-        portraitUses: counts((await deps.db.select({ card: residents.card }).from(residents).where(eq(residents.worldId, worldId))).filter(r => r.card.kind === "arrival"), r => r.card.portrait),
+        // Every living resident's portrait is worn (the Day-1 census's busts too, MVP M-03).
+        portraitUses: counts(await deps.db.select({ portrait: sql<string>`${residents.card}->>'portrait'` }).from(residents).where(eq(residents.worldId, worldId)), r => r.portrait),
         today,
       });
       if (!fresh) break;

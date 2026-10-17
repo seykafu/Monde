@@ -104,9 +104,10 @@ for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".yaml")).sort()
     if (s.reveal.flag) for (const f of s.reveal.flag.split(/\s*&&\s*/)) if (!flagOk(f.replace(/^flag\./, ""))) err(`${where}: secret reveal uses undeclared flag '${f}'`);
 }
 
-// ---- the Day-1 census's generated cards (content/residents/day1/, MVP M-03 step 2; tools/gen-residents.ts). The game
-// doesn't load them yet (step 3): every loader reads content/residents/*.yaml only. Here: each card on its own (the
-// schema, places, look, A.3.7's static checks, the lexical filters), then against the skeleton (content/census/day1.yaml).
+// ---- the Day-1 census's generated cards (content/residents/day1/, MVP M-03; tools/gen-residents.ts). The game loads
+// them after the hand-written cards when they are there (tools/compile-residents.ts, server/src/content/loadContent.ts).
+// Here: each card on its own (the schema, places, look, A.3.7's static checks, the lexical filters), then against the
+// skeleton (content/census/day1.yaml).
 const day1Dir = path.join(dir, "day1");
 const day1 = new Map<string, Card>();
 const censusPins = parsePins(YAML.parse(fs.readFileSync(path.join(root, "content/census/pins.yaml"), "utf8")));

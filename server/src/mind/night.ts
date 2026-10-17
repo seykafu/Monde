@@ -33,9 +33,9 @@ import { and, count, eq, inArray, lte, max } from "drizzle-orm";
 import { z } from "zod";
 import { CLIENT_EVENT_BATCH_LIMIT, TownEvent, type EventIngestionResult } from "@monde/shared";
 import { events, memories, plans, residents, worlds } from "../db/schema.js";
-import type { WorldDatabase } from "../worlds/createWorld.js";
+import { ensureRoster, type WorldDatabase } from "../worlds/createWorld.js";
 import { eventTransaction, ingestClientEvents, ingestInTransaction } from "./eventIngestion.js";
-import { TIER_ORDER, resolveEncounter, type Encounter } from "./encounters.js";
+import { TIER_ORDER, persistRuleEncounters, resolveEncounter, ruleOutcome, type Encounter } from "./encounters.js";
 import type { MindClient } from "./mindClient.js";
 import { SILENT_LOG, type NightJobDeps, type NightLog, type NightWorld } from "./nightJob.js";
 import { loadPlaceRegistry } from "./places.js";
@@ -65,6 +65,12 @@ export const NIGHT_CLOSE_GRACE_MS = 4000;
 /** §9.8: Acquainted residents reflect daily after an importance-5+ memory; Ambient ones only after a 6+. */
 export const ACQUAINTED_REFLECT_IMPORTANCE = 5;
 export const AMBIENT_REFLECT_IMPORTANCE = 6;
+/**
+ * GDD-GAP: §9.15 budgets "15 event reflections" for Ambient residents a day without making it a rule. With the Day-1
+ * census (MVP M-03) a town event can touch most of the 190 Ambient residents at once, so tonight's Ambient reflections
+ * are capped at 15, the most important memories first (then by id). Core and Acquainted are never capped.
+ */
+export const AMBIENT_REFLECTIONS_PER_NIGHT = 15;
 
 /** GDD-GAP: defaults when the client sends no town facts: the Day-1 Pillars (§6.1) and census (§3). */
 export const DAY_ONE_PILLARS = { prosperity: 18, safety: 30, spirit: 22, charm: 25 } as const;
@@ -117,16 +123,22 @@ export interface NightJob {
  */
 export const acquaintedTurn = (day: number): boolean => day % 2 === 0;
 
-/** The night's jobs in queue order (Core, Acquainted, Ambient; by id within a tier). Ambient residents with nothing to do are left out. */
-export function nightJobs(tiers: ReadonlyMap<string, Tier>, topImportance: ReadonlyMap<string, number>, day: number): NightJob[] {
+/**
+ * The night's jobs in queue order (Core, Acquainted, Ambient; by id within a tier). Ambient residents with nothing to
+ * do are left out, and at most `ambientCap` reflect (AMBIENT_REFLECTIONS_PER_NIGHT, the most important first).
+ */
+export function nightJobs(tiers: ReadonlyMap<string, Tier>, topImportance: ReadonlyMap<string, number>, day: number, ambientCap = AMBIENT_REFLECTIONS_PER_NIGHT): NightJob[] {
   const jobs: NightJob[] = [];
+  const ambient: { residentId: string; top: number }[] = [];
   for (const [residentId, tier] of tiers) {
     const top = topImportance.get(residentId) ?? 0;
     if (tier === "core") jobs.push({ residentId, tier, reflect: true, plan: true });
     else if (tier === "acquainted") {
       jobs.push({ residentId, tier, reflect: top >= ACQUAINTED_REFLECT_IMPORTANCE || acquaintedTurn(day), plan: true });
-    } else if (top >= AMBIENT_REFLECT_IMPORTANCE) jobs.push({ residentId, tier, reflect: true, plan: false });
+    } else if (top >= AMBIENT_REFLECT_IMPORTANCE) ambient.push({ residentId, top });
   }
+  ambient.sort((a, b) => b.top - a.top || (a.residentId < b.residentId ? -1 : 1));
+  for (const a of ambient.slice(0, Math.max(0, ambientCap))) jobs.push({ residentId: a.residentId, tier: "ambient", reflect: true, plan: false });
   return jobs.sort((a, b) => TIER_ORDER[a.tier] - TIER_ORDER[b.tier] || (a.residentId < b.residentId ? -1 : 1));
 }
 
@@ -342,6 +354,9 @@ export class NightRunner {
   private async execute(run: NightRun, body: NightBody): Promise<void> {
     const { db } = this.options;
     const { worldId, day } = run;
+    // MVP M-03: a world made before the Day-1 census gets its residents before its first night here (a no-op after).
+    await ensureRoster(db, worldId, this.options.contentDir)
+      .catch((error: unknown) => { this.log.error({ err: error, worldId, day }, "roster backfill failed"); });
     await compactNight(this.deps(worldId, 0), worldId, day);
     // G-02: Quiet Mode households join and yesterday's leavers go before the tiers and the night's jobs see the town.
     const [seedRow] = await db.select({ seed: worlds.seed }).from(worlds).where(eq(worlds.id, worldId));
@@ -404,11 +419,20 @@ export class NightRunner {
       this.log.error({ err: error, worldId, day }, "friendship pass failed; reflections run without encounters");
     }
     const waits = new Map<string, Promise<void>[]>();
-    const encounters = (friendship?.encounters ?? []).map((encounter) => {
-      const work = this.runEncounter(run, friendship!, encounter);
+    const wait = (encounter: Encounter, work: Promise<void>) => {
       for (const id of [encounter.a, encounter.b]) waits.set(id, [...(waits.get(id) ?? []), work]);
+    };
+    // The rule-mode encounters (Ambient pairs, past the night's model cap, or no API key) are written together in one
+    // transaction (MVP M-03: a 212-resident night has a couple of hundred); the model's one by one, as before.
+    const tonight = friendship?.encounters ?? [];
+    const byRule = tonight.filter((e) => e.mode === "rule" || !this.options.mind.enabled);
+    const bulk = byRule.length ? this.runRuleEncounters(run, friendship!, byRule) : null;
+    if (bulk) for (const e of byRule) wait(e, bulk);
+    const encounters = [...(bulk ? [bulk] : []), ...tonight.filter((e) => !byRule.includes(e)).map((encounter) => {
+      const work = this.runEncounter(run, friendship!, encounter);
+      wait(encounter, work);
       return work;
-    });
+    })];
     await Promise.all([...encounters, ...jobs.map((job) => this.runJob(run, world, job, waits.get(job.residentId) ?? []))]);
 
     if (friendship) {
@@ -450,6 +474,19 @@ export class NightRunner {
       log: this.log,
       now: this.options.now,
     };
+  }
+
+  /** Tonight's rule-mode encounters in one transaction. Never rejects: a failure is logged and the reflections go ahead. */
+  private async runRuleEncounters(run: NightRun, friendship: FriendshipNight, list: readonly Encounter[]): Promise<void> {
+    const started = this.now();
+    const items = list.map((encounter) => {
+      const [a, b] = friendship.sides(encounter);
+      // The Ambient rule, and the news each side carried (resolveEncounter's rule outcome).
+      return { encounter, outcome: { ...ruleOutcome(a.state.mood.valence, b.state.mood.valence, encounter.mean), news: [...a.news, ...b.news].map((n) => n.id) } };
+    });
+    await persistRuleEncounters(this.options.db, friendship.context(list[0]!), items)
+      .then(() => { this.log.info({ worldId: run.worldId, day: run.day, encounters: list.length, ms: Math.round(this.now() - started) }, "rule encounters written"); })
+      .catch((error: unknown) => { this.log.error({ err: error, worldId: run.worldId, day: run.day, encounters: list.length }, "rule encounters failed"); });
   }
 
   /** One encounter. Never rejects: a failure is logged and the residents' reflections go ahead. */

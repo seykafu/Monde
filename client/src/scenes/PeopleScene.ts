@@ -309,7 +309,8 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
     this.text(cx, hy + 16, regardTier(regard), 17, { family: FAMILY_UI, bold: true });
     const arrived = livingArrivals((this.registry.get('monde.town') as TownState | undefined)?.people).find(r => r.card.id === id);
     const facts = [birthdayOf(card) ? `Birthday: ${birthdayOf(card)}` : null,
-      arrived ? `Arrived Day ${arrived.arrived_day} · ${homeName(arrived.card.home)}` : null,
+      // A Day-1 census resident (MVP M-03) lives at their homes.yaml address ("No. 7 Terrace Row").
+      arrived ? `Arrived Day ${arrived.arrived_day} · ${homeName(arrived.card.home)}` : card.household ? homeName(card.home) : null,
       bond ? `Last spoke ${bond.last_talk_day === this.open.clock.day ? 'today' : `on Day ${bond.last_talk_day}`}` : null].filter(Boolean).join('  ·  ');
     if (facts) this.text(cx, hy + 42, facts, 14, { family: FAMILY_UI, color: MUTED });
 

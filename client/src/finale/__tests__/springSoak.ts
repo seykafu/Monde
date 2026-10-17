@@ -9,11 +9,16 @@
 //     +4 social), under the +6 a day cap with the first-chat bonus;
 //   - the social player gives one gift a day that the resident likes (+4, §11.4);
 //   - the builder works beside Kasimir, Tib and Teo on the Projects most days (+1 each, §8 "Volunteer on a Project");
-//   - scripted scene Regard (S01–S10) is left out: every style plays the same scenes.
+//   - scripted scene Regard (S01–S10) is left out: every style plays the same scenes;
+//   - the town is the full Day-1 roster (MVP M-03): the hand-written cast and the census's 188 (their written cards, or
+//     every household's template card until the census is written, sim/__tests__/content.ts loadFullRoster).
 import { applyTalkTurn, EMPTY_TALK_LEDGER, giftRegard, neglectDelta, type SpringDeeds, type StrawPollRecord, type TalkLedger } from '@monde/shared';
+import { loadFullRoster } from '../../sim/__tests__/content';
 import { runMigrationSoak, type MigrationScenario } from '../../town/__tests__/migrationSoak';
-import { personaCards } from '../../world/residents';
 import { springPoll, workSeen } from '../poll';
+
+/** The Day-1 town's cards. */
+export const ROSTER = await loadFullRoster();
 
 export const PLAY_STYLES = ['strong', 'passive', 'lapsed', 'social', 'builder'] as const satisfies readonly MigrationScenario[];
 export type PlayStyle = (typeof PLAY_STYLES)[number];
@@ -71,7 +76,7 @@ export function soakPoll(style: PlayStyle, seed: number): SoakPoll {
   const regard = playerRegard(style);
   const flags = new Set(['option_known']);
   const poll = springPoll({
-    worldSeed: seed, town, cards: personaCards, regard: id => regard.get(id) ?? 0, met: id => regard.has(id),
+    worldSeed: seed, town, cards: ROSTER, regard: id => regard.get(id) ?? 0, met: id => regard.has(id),
     deeds: { ...DEEDS[style], work: workSeen(town) }, flags
   });
   return { style, seed, poll, spirit: town.pillars.spirit };

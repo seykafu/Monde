@@ -11,7 +11,7 @@ import { findMark, marks } from '../riddles';
 //   plays at once, with the Fellowship form at its {charcreate} cue (§11.1); `?skiptitle=1`, `?day=`, `?time=` and
 //   `?scene=` keep their old starting point.
 // - Cues that change the world beyond the client go to the event log (scenes/events.ts, M-06): memories, Regard and
-//   Scuffles as ClientEvents. The story reads Regard from the friendship mirror (scenes/friendship.ts regardFor).
+//   Scuffles as ClientEvents. The story reads Regard from the friendship mirror (scenes/friendship.ts regardMap).
 // - The Next hint (story/hint.ts): the scene the player can still catch today, for the HUD and the Ledger.
 // - Dev: `?scene=<id>` plays a scene immediately; `window.__story` lists, plays and inspects (dev builds or ?dev).
 import type Phaser from 'phaser';
@@ -37,13 +37,14 @@ import { DIALOGUE_SCENE } from '../DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE, type StoryOpen } from '../StoryScene';
 import { TOWN_KEY, TOWN_LEDGER_SCENE, getTown } from '../TownLedgerScene';
 import { appendEvent, getEventLog } from '../events';
-import { getFriendship, meetResident, regardFor } from '../friendship';
+import { getFriendship, meetResident, regardMap } from '../friendship';
 import { projectCue } from '../../projects/runtime';
 import { COINS_KEY, coinsOf } from '../../economy/runtime';
 import type { ResidentLayer } from '../zone/residents';
 
 const SESSION_KEY = 'monde.story.session';
 const CARD_IDS = new Set(personaCards.map(c => c.id));
+const CARD_ID_LIST: readonly string[] = [...CARD_IDS];
 /** save/runtime.ts saves this as SaveGame.story_flags and restores it on load. */
 const FLAGS_KEY = 'monde.story.flags';
 /** fellow/state.ts FELLOW_KEY (W-07): the signed Fellowship application for this game. */
@@ -130,7 +131,7 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     readRiddle: id => { findMark(registry, clock, id); return marks(registry).entries[id]?.status === 'solved'; },
     now: () => ({
       day: clock.day, minute: clock.minute, zone: district, place: placeHere(opts.position()), town: getTown(registry), profile: fellowProfile(registry),
-      regard: Object.fromEntries(personaCards.map(c => [c.id, regardFor(registry, c.id)])),
+      regard: regardMap(registry, CARD_ID_LIST),
       ...storyArrival(registry, clock.day)
     }),
     setTown: state => registry.set(TOWN_KEY, state),

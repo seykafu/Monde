@@ -217,6 +217,8 @@ export class ResidentLayer {
   private warned = 0;
   /** Called when a visible resident comes within PREWARM_RANGE (6 tiles, §9.10 step 1) of the player (M-05). */
   onApproach?: (residentId: string) => void;
+  /** How close a resident must come to count as approaching (Ambient residents: 3 tiles, mind/prewarm.ts). */
+  approachRange?: (residentId: string) => number;
   private near = new Set<string>();
   /** Tie emotes over residents who meet (§9.11.3): a pool made up front (so it belongs to the world camera). */
   private readonly emotePool: Phaser.GameObjects.Image[];
@@ -227,7 +229,11 @@ export class ResidentLayer {
   /** In a room (W-03): who the routines have inside its building, at their spots (world/indoorResidents.ts). */
   private readonly indoor: IndoorView | null;
 
-  /** Create every actor up front (hidden), so they all belong to the world camera. */
+  /**
+   * Actors only for the residents on this board's roster (or due on it within LOOKAHEAD_MIN) when the zone is built,
+   * so they belong to the world camera; anyone who turns up later gets theirs on the 1 Hz tick (`syncActors`), the UI
+   * camera told to skip it. MVP M-03: with the Day-1 census the town is 212, and a board shows a few dozen of them.
+   */
   constructor(private readonly scene: Phaser.Scene, private readonly zone: ZoneDef, private readonly projection: ObliqueProjection,
     private readonly clock: Clock, private readonly dev: boolean) {
     this.sim = sharedResidentSim(scene);
@@ -236,7 +242,8 @@ export class ResidentLayer {
     this.greetings = new Greetings(scene, clock);
     this.greetings.weather = () => this.chatter.weather();
     this.chatter.onStart = (a, b) => this.greetings.note(a, b);
-    this.actors = this.sim.profiles.map(profile => this.makeActor(profile));
+    this.roster = this.rosterAt(clock.day, clock.minute);
+    this.actors = this.sim.profiles.filter(p => this.roster.has(p.id)).map(profile => this.makeActor(profile));
     this.byId = new Map(this.actors.map(a => [a.profile.id, a]));
     this.camerasToSkip = () => scene.cameras.cameras.filter(c => c !== scene.cameras.main);
     this.overlay = scene.add.graphics().setDepth(DEPTH.DARKNESS + 0.5).setVisible(false);
@@ -266,17 +273,34 @@ export class ResidentLayer {
   }
 
   /**
-   * G-02: residents who joined the sim after this board was built (a household off this morning's ferry) get their
-   * actors now; the UI camera is told to skip them, as it skips the world built in create().
+   * Residents on this board's roster who have no actor yet (one walking in from another board, a household off this
+   * morning's ferry, G-02) get theirs now; the UI camera is told to skip them, as it skips the world built in create().
+   * Everyone else gets one when they come onto the board (the 1 Hz tick).
    */
-  syncActors(): void {
-    for (const profile of this.sim.profiles) {
-      if (this.byId.has(profile.id)) continue;
-      const actor = this.makeActor(profile);
-      this.actors.push(actor);
-      this.byId.set(profile.id, actor);
-      for (const cam of this.camerasToSkip()) cam.ignore([actor.sprite, actor.shadow, actor.label, actor.bubble]);
+  syncActors(ids: ReadonlySet<string> = this.roster): void {
+    for (const id of ids) if (!this.byId.has(id)) this.ensureActor(id);
+  }
+
+  /** The actor for a resident, made now if they have none (null for an id the sim doesn't know). */
+  private ensureActor(id: string): Actor | null {
+    const existing = this.byId.get(id);
+    if (existing) return existing;
+    const profile = this.sim.profile(id);
+    if (!profile) return null;
+    const actor = this.makeActor(profile);
+    this.actors.push(actor);
+    this.byId.set(profile.id, actor);
+    for (const cam of this.camerasToSkip()) cam.ignore([actor.sprite, actor.shadow, actor.label, actor.bubble]);
+    return actor;
+  }
+
+  /** Who is on this board at `minute`, or due on it within LOOKAHEAD_MIN (in a room: inside its building). */
+  private rosterAt(day: number, minute: number): Set<string> {
+    if (this.indoor) {
+      const states = this.sim.tick(day, minute);
+      return this.indoor.roster(m => (m === minute ? states : this.sim.executor.statesAt(this.sim.plansFor(day), m)), minute, LOOKAHEAD_MIN);
     }
+    return this.sim.boardRoster(this.zone.id, day, minute, LOOKAHEAD_MIN);
   }
 
   /** Perf-only adapter: the normal actor, placement, animation and drawing routines, without save/sim membership. */
@@ -420,7 +444,7 @@ export class ResidentLayer {
       player: () => this.lastPlayer,
       residents: () => this.actors.map(a => ({ id: a.profile.id, name: a.profile.name, x: a.pos?.x ?? null, y: a.pos?.y ?? null,
         place: a.state?.place ?? null, spot: a.pos ? spotAt(this.zone.social, a.pos) : null, visible: !!a.state?.visible && a.alpha > 0.5 })),
-      stage: (id, at) => { if (at) { this.staged.set(id, at); this.stagedMs = 0; } else this.staged.delete(id); },
+      stage: (id, at) => { if (at) { this.ensureActor(id); this.staged.set(id, at); this.stagedMs = 0; } else this.staged.delete(id); },
       staged: () => [...this.staged.keys()],
       startChatter: (a, b, mode) => this.chatter.force(a, b, this.talkers(this.actors.filter(x => x.base), this.viewRect()), this.lastPlayer ?? { x: 0, y: 0 }, mode),
       greet: (a, b) => this.greetings.force(a, b, this.talkers(this.actors.filter(x => x.base), this.viewRect())),
@@ -499,7 +523,8 @@ export class ResidentLayer {
   private approach(live: readonly Actor[], player: Position): void {
     const near = new Set<string>();
     for (const a of live) {
-      if (!a.pos || !a.state?.visible || Math.hypot(a.pos.x - player.x, a.pos.y - player.y) > PREWARM_RANGE) continue;
+      const range = this.approachRange?.(a.profile.id) ?? PREWARM_RANGE;
+      if (!a.pos || !a.state?.visible || Math.hypot(a.pos.x - player.x, a.pos.y - player.y) > range) continue;
       near.add(a.profile.id);
       if (!this.near.has(a.profile.id)) this.onApproach?.(a.profile.id);
     }
@@ -511,12 +536,13 @@ export class ResidentLayer {
   /** The 1 Hz off-screen tick: everyone's state, this board's roster, the dev readout. */
   private tick(day: number): void {
     this.tickMs = 0;
-    if (this.sim.profiles.length !== this.actors.length) this.syncActors();
     const minute = this.clock.minute;
     const states = this.sim.tick(day, minute);
     this.roster = this.indoor
       ? this.indoor.roster(m => (m === minute ? states : this.sim.executor.statesAt(this.sim.plansFor(day), m)), minute, LOOKAHEAD_MIN)
       : this.sim.boardRoster(this.zone.id, day, minute, LOOKAHEAD_MIN);
+    // Actors for whoever is on the board now and has none (late joiners: MVP M-03 makes them per board, not up front).
+    this.syncActors(this.roster);
     const warnings = this.sim.executor.warnings;
     if (warnings.size > this.warned) {
       this.warned = warnings.size;

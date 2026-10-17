@@ -20,6 +20,7 @@ import type { DialogueTimings } from "./mind/dialogue.js";
 import { NightRunner } from "./mind/night.js";
 import { registerEventRoutes } from "./mind/eventRoutes.js";
 import { registerNightRoutes } from "./mind/nightRoutes.js";
+import { loadContent } from "./content/loadContent.js";
 
 type Check = "ok" | "down" | "off";
 async function check(probe?: () => Promise<unknown>): Promise<Check> {
@@ -109,5 +110,8 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   registerNightRoutes(app, db, nightRunner);
   registerEventRoutes(app, db, config.MONDE_CONTENT_DIR);
   registerSnapshotRoutes(app, config, db, nightRunner);
+  // The roster (212 cards once the Day-1 census is written, MVP M-03) is read and checked once, before the first
+  // request: a broken card fails the boot, and no world creation pays for the read.
+  app.addHook("onReady", async () => { await loadContent(config.MONDE_CONTENT_DIR); });
   return app;
 }

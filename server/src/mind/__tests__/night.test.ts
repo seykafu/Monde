@@ -7,11 +7,12 @@ import { buildApp } from "../../app.js";
 import { parseConfig } from "../../config.js";
 import { loadContent } from "../../content/loadContent.js";
 import { createTestDatabase } from "../../db/testDatabase.js";
-import { aiLog, dialogueTurns, letters, memories, plans, residents, worlds } from "../../db/schema.js";
+import { aiLog, dialogueTurns, letters, memories, plans, relationships, residents, worlds } from "../../db/schema.js";
 import { createWorld } from "../../worlds/createWorld.js";
 import { worldToken } from "../../worlds/routes.js";
 import { DisabledMindClient, type MindClient } from "../mindClient.js";
-import { NIGHT_BUDGET_MS, NightRunner, acquaintedTurn, nightJobs, type NightRunnerOptions } from "../night.js";
+import { AMBIENT_REFLECTIONS_PER_NIGHT, NIGHT_BUDGET_MS, NightRunner, acquaintedTurn, nightJobs, type NightRunnerOptions } from "../night.js";
+import { FULL, fullRosterContent } from "../../__tests__/fullRoster.js";
 import { templatePlan } from "../templatePlan.js";
 import { FakeNightMind, type NightCall, type NightReply } from "./fakeNightMind.js";
 
@@ -407,3 +408,79 @@ it('compacts the day’s leftover sessions before reflections read memories', as
   await env.runner.idle(env.worldId);
   expect(mind.callsFor('reflect', 'pell').map(c => JSON.stringify(c.body.messages)).join()).toContain('brass bookmark');
 }, 15_000);
+
+// ── The full Day-1 roster (MVP M-03 step 3) ──────────────────────────────────────────────────────────────────────
+
+describe("the night pass on the full Day-1 roster (212)", () => {
+  let roster: Awaited<ReturnType<typeof fullRosterContent>>;
+  let full: PersonaCard[];
+  beforeAll(async () => { roster = await fullRosterContent(); full = await loadContent(roster.dir, FULL); }, 30_000);
+  afterAll(() => roster?.cleanup());
+
+  /** A world with all 212, its runner and app; `log` collects the runner's info lines. */
+  async function setupFull(mind: MindClient) {
+    const world = await createWorld(database.db, `device-${randomUUID()}`, "invite", roster.dir, FULL);
+    const lines: { obj: Record<string, unknown>; msg?: string }[] = [];
+    const log = { info: (obj: object, msg?: string) => { lines.push({ obj: obj as Record<string, unknown>, msg }); }, warn: () => undefined, error: (obj: object, msg?: string) => { lines.push({ obj: obj as Record<string, unknown>, msg }); } };
+    const runner = new NightRunner({ db: database.db, mind, budgetMs: NIGHT_BUDGET_MS, log });
+    const app = buildApp(parseConfig({ LOG_LEVEL: "silent" }), database.db, { mind, nightRunner: runner });
+    apps.push(app);
+    const headers = { authorization: `Bearer ${worldToken(world.id, world.deviceId, SECRET)}` };
+    return { app, runner, worldId: world.id, headers, lines };
+  }
+
+  it("answers within the 4 s budget with a model taking 150 ms a call; every Core plan lands; 15 Ambient reflections at most", async () => {
+    const mind = fake(happy, 150);
+    const env = await setupFull(mind);
+    // Forty Ambient residents (the census's) saw something that mattered today: only the fifteen most important reflect.
+    const ambient = full.filter((c) => c.generated_by).slice(0, 40);
+    for (const [i, c] of ambient.entries()) await remember(env.worldId, c.id, 1, i < 10 ? 9 : i < 20 ? 7 : 6);
+    const started = performance.now();
+    const res = await night(env, { day: 1 });
+    const elapsed = performance.now() - started;
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    const core = full.filter((c) => c.kind === "canon").map((c) => c.id).sort();
+    expect(body.tiers).toEqual({ core: core.length, acquainted: 0, ambient: 212 - core.length });
+    expect(elapsed).toBeLessThan(NIGHT_BUDGET_MS + 500);
+    await env.runner.idle(env.worldId);
+    const total = performance.now() - started;
+    const rule = env.lines.find((l) => l.msg === "rule encounters written");
+    console.info(`Night pass, full roster (212), 150 ms model: response ${elapsed.toFixed(0)} ms (budget ${NIGHT_BUDGET_MS}), `
+      + `done ${body.done} pending ${body.pending}; all work ${total.toFixed(0)} ms; ${mind.callsFor("gossip").length} model encounters, `
+      + `${rule?.obj.encounters ?? 0} rule encounters in one transaction (${rule?.obj.ms ?? "?"} ms); ${mind.calls.length} calls`);
+    const stored = await storedPlans(env.worldId, 2);
+    expect(stored.filter((p) => core.includes(p.residentId)).map((p) => p.residentId).sort()).toEqual(core);
+    expect(stored.every((p) => p.source === "model")).toBe(true);
+    const reflected = new Set(mind.callsFor("reflect").map((c) => c.resident));
+    for (const id of core) expect(reflected.has(id), id).toBe(true);
+    const ambientReflected = ambient.filter((c) => reflected.has(c.id)).map((c) => c.id);
+    expect(ambientReflected).toHaveLength(AMBIENT_REFLECTIONS_PER_NIGHT);
+    // The ten importance-9 memories and the five importance-7 ones first (by id).
+    expect(ambientReflected.slice(0, 10)).toEqual(ambient.slice(0, 10).map((c) => c.id));
+    expect(env.lines.some((l) => l.msg === "rule encounters failed")).toBe(false);
+  }, 60_000);
+
+  it("with no API key writes every encounter by the rule, together, the same as one at a time would", async () => {
+    const env = await setupFull(new DisabledMindClient());
+    const started = performance.now();
+    const res = await night(env, { day: 1 });
+    await env.runner.idle(env.worldId);
+    const total = performance.now() - started;
+    expect(res.json()).toMatchObject({ complete: true, pending: 0 });
+    const rule = env.lines.find((l) => l.msg === "rule encounters written")!;
+    expect(rule).toBeDefined();
+    const encounters = Number(rule.obj.encounters);
+    console.info(`Night pass, full roster (212), no API key: ${res.json().elapsed_ms} ms response, ${total.toFixed(0)} ms in all; `
+      + `${encounters} rule encounters in one transaction (${rule.obj.ms} ms)`);
+    expect(encounters).toBeGreaterThan(20);
+    // Each side of each encounter has its memory, and the pair's rows count it.
+    const met = await database.db.select().from(memories).where(and(eq(memories.worldId, env.worldId), eq(memories.kind, "did")));
+    expect(met.filter((m) => m.id.startsWith("met_1_"))).toHaveLength(2 * encounters);
+    const edges = await database.db.select().from(relationships).where(eq(relationships.worldId, env.worldId));
+    expect(edges.filter((e) => e.lastSeenDay === 1).length).toBe(2 * encounters);
+    expect(edges.filter((e) => e.lastSeenDay === 1).every((e) => e.encounters === 1)).toBe(true);
+    // A second night's claim never runs it twice.
+    expect((await night(env, { day: 1 })).json()).toMatchObject({ already: true });
+  }, 60_000);
+});

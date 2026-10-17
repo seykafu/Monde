@@ -71,7 +71,7 @@ export function migrationWorld(registry: Registry): MigrationWorld {
   return {
     seed, homes: allHomes(), dir: homeDirectory, beds: homeBeds, homeName,
     storyFlags: storyFlags(registry),
-    cast: new Map(personaCards.map(c => [c.id, { name: c.name }])),
+    cast: new Map(personaCards.map(c => [c.id, { name: c.name, portrait: c.portrait }])),
     friends: id => friendsInTown(registry, id),
     regard: id => regardFor(registry, id)
   };

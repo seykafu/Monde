@@ -33,9 +33,12 @@ export function syncTollmen(r: RegistryLike, day: number, minute: number): void 
   if (flags.has('ledger_published') && tollmen.ledgerDay === null) tollmen = { ...tollmen, ledgerDay: day };
 
   // GDD-GAP: eligible adult Safety-first volunteers enlist automatically; once enlisted, their +2 Safety is not farmable.
+  // A Tollman (the crew in quitZones, and anyone whose card says so: Dex, Dom and Weasel have cards since MVP M-03) never
+  // enlists on his own.
   let nextTown = town;
   for (const card of personaCards) {
     if (tollmen.deputies.length >= 4) break;
+    if (card.id in quitZones || /tollm[ae]n/i.test(card.occupation)) continue;
     if (card.id === 'augusta' || card.age < 18 || (regard[card.id] ?? 0) < 40 || tollmen.deputies.includes(card.id) || card.values.safety <= Math.max(card.values.prosperity, card.values.spirit, card.values.charm)) continue;
     tollmen = { ...tollmen, deputies: [...tollmen.deputies, card.id] };
     nextTown = applyPillarDelta(nextTown, 'safety', 2, 'tollmen', `${card.id} enlisted as a deputy`);

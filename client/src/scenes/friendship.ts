@@ -96,6 +96,24 @@ export const regardFor = (registry: Registry, id: string): number =>
     + getEventLog(registry).outbox.reduce((sum, event) => sum + (event.kind === 'favor_done' && event.resident === id
       ? getFriendship(registry).favor_book.find(f => f.id === event.favor)?.reward.regard ?? 0 : 0), 0)));
 
+/**
+ * regardFor for many residents at once: one read of the mirror and one pass over the event log, the same numbers. The
+ * story's context asks for every card's on each refresh (MVP M-03: 212 of them once the census is written).
+ */
+export function regardMap(registry: Registry, ids: readonly string[]): Record<string, number> {
+  const friendship = getFriendship(registry), background = getMind().player?.background;
+  const queued = new Map<string, number>();
+  for (const event of getEventLog(registry).outbox) {
+    if (event.kind === 'scripted_regard') queued.set(event.resident, (queued.get(event.resident) ?? 0) + event.delta);
+    else if (event.kind === 'favor_done') {
+      queued.set(event.resident, (queued.get(event.resident) ?? 0) + (friendship.favor_book.find(f => f.id === event.favor)?.reward.regard ?? 0));
+    }
+  }
+  const out: Record<string, number> = {};
+  for (const id of ids) out[id] = Math.max(-100, Math.min(100, regardOf(friendship, id, seedRegard(background, id)) + (queued.get(id) ?? 0)));
+  return out;
+}
+
 /** The server's Regard for the whole town (an events reply, the night's ingestion, the dawn): replace the mirror. */
 export const applyServerRegard = (registry: Registry, regard: RegardSnapshot): FriendshipState =>
   updateFriendship(registry, s => applyRegardSnapshot(s, regard));

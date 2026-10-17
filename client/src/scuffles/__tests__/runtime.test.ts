@@ -2,7 +2,7 @@ import { zones } from '../../world/zones';
 import { personaCards } from '../../world/residents';
 import { describe, expect, it } from 'vitest';
 import { emptyEventLog, emptyFriendship, emptyScuffles, emptyTollmen, migrateSave, SavedScuffles, startingSkills } from '@monde/shared';
-import { prepare, settle, scufflesOf, pressure } from '../runtime';
+import { prepare, settle, scufflesOf, pressure, syncTollmen } from '../runtime';
 import { createTownState, type TownState } from '../../town/pillars';
 import { collect } from '../../save/collect';
 import { restore } from '../../save/restore';
@@ -17,6 +17,21 @@ function registry() {
   r.set('monde.town', createTownState({ day: 15 })); r.set('monde.coins', { balance: 100 }); r.set('monde.inventory', emptyInventory());
   setFellow(r, defaultFellow()); return r;
 }
+describe('deputies (GDD-GAP: Safety-first friends enlist on their own)', () => {
+  it('never enlists a Tollman, Bru and Nettie or the census\'s Dex, Dom and Weasel (MVP M-03), however well they like the Fellow', () => {
+    const r = registry();
+    const friendly = Object.fromEntries(personaCards.map(c => [c.id, 80]));
+    // Even a Tollman who weighs Safety above all (the template cards' values can).
+    const tollmen = personaCards.filter(c => /tollm[ae]n/i.test(c.occupation));
+    expect(tollmen.map(c => c.id)).toEqual(expect.arrayContaining(['bru', 'nettie', 'rook']));
+    r.set('monde.friendship', { ...emptyFriendship(), regard: friendly });
+    syncTollmen(r, 15, 700);
+    const deputies = (r.get('monde.town') as TownState).tollmen!.deputies;
+    expect(deputies.length).toBeGreaterThan(0);
+    for (const t of tollmen) expect(deputies, t.id).not.toContain(t.id);
+  });
+});
+
 describe('Scuffle transaction and saves', () => {
   it('queues one importance-7 event and applies rewards and pressure only once', () => {
     const r = registry(), encounter = prepare(r, 'sc_market_saturday', { day: 15, minute: 700 }, { key: 'test:market' });

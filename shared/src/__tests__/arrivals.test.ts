@@ -169,6 +169,15 @@ describe("the persona contract (A.3.6)", () => {
     expect(arrivalUserMessage(draw, { ...prompt, validatorErrors: ["V02 bad"] })).toContain("YOUR LAST ANSWER FAILED VALIDATION. Fix exactly these and change nothing else: V02 bad");
   });
 
+  it("leaves the surnames living households carry out of the name pool (MVP M-03: V03 would refuse them)", () => {
+    const pool = (msg: string) => /family ([^\n]+)$/m.exec(msg)![1]!.split(", ");
+    const open = pool(arrivalUserMessage(draw, prompt));
+    expect(open).toHaveLength(12);
+    const taken = pool(arrivalUserMessage(draw, { ...prompt, avoidFamily: open }));
+    expect(taken).toHaveLength(12);
+    expect(taken.some(f => open.includes(f))).toBe(false);
+  });
+
   it("sends a schema structured outputs accept: closed objects, every key required, no ranges or lengths", () => {
     const visit = (node: unknown): void => {
       if (!node || typeof node !== "object") return;

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { MindClient, mindConfig, STORAGE_KEYS, uuid, type MindOptions, type StorageLike } from '../api';
-import { PrewarmGate } from '../prewarm';
+import { AMBIENT_PREWARMS_PER_DAY, AMBIENT_PREWARM_RANGE, PREWARM_RANGE, PrewarmGate, prewarmRange, prewarmTier } from '../prewarm';
 import type { TalkRequest, TalkTurn } from '../types';
 
 const BASE = 'https://mind.test';
@@ -245,6 +245,24 @@ describe('prewarm', () => {
     expect(gate.allow('pell', 2, 360 + 100)).toBe(false); // 160 game minutes later (26:00 and the next 06:00 are the same moment)
     expect(gate.allow('pell', 2, 360 + 180)).toBe(true);
     expect(gate.allow('pell', 2, 400)).toBe(true); // the dev keys moved the clock back
+  });
+
+  it('prewarms Ambient residents only within 3 tiles, and at most 30 of them a day (MVP M-03)', () => {
+    expect(prewarmTier('canon', undefined)).toBe('core');
+    expect(prewarmTier('resident', undefined)).toBe('ambient');
+    expect(prewarmTier('resident', 'acquainted')).toBe('acquainted');
+    expect(prewarmTier('canon', 'core')).toBe('core');
+    expect([prewarmRange('core'), prewarmRange('acquainted'), prewarmRange('ambient')]).toEqual([PREWARM_RANGE, PREWARM_RANGE, AMBIENT_PREWARM_RANGE]);
+    const gate = new PrewarmGate();
+    const ambient = Array.from({ length: AMBIENT_PREWARMS_PER_DAY + 5 }, (_, i) => `census_${i}`);
+    expect(ambient.map(id => gate.allow(id, 1, 600, 'ambient')).filter(Boolean)).toHaveLength(AMBIENT_PREWARMS_PER_DAY);
+    // Core and Acquainted residents aren't counted against it; a new day starts the count again.
+    expect(gate.allow('pell', 1, 600, 'core')).toBe(true);
+    expect(gate.allow('ada', 1, 600, 'acquainted')).toBe(true);
+    expect(gate.allow('census_99', 1, 601, 'ambient')).toBe(false);
+    expect(gate.allow('census_99', 2, 600, 'ambient')).toBe(true);
+    // A resident refused for the cap isn't marked as prewarmed.
+    expect(gate.allow(ambient.at(-1)!, 2, 610, 'ambient')).toBe(true);
   });
 });
 

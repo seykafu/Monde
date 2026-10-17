@@ -3,7 +3,7 @@ import type { RoutineBlock } from '@monde/shared';
 import { DAY_START, PASS_OUT, type Weekday } from '../clock';
 import { blocksFromRoutine, dayPlan, syntheticPlans, type DayPlan } from '../plans';
 import { LANE_LEG_MINUTES, OFFBOARD_LEG_MINUTES, RoutineExecutor, TILES_PER_GAME_MINUTE, type ResidentState } from '../routineExecutor';
-import { loadCards, loadHomes, loadWorld } from './content';
+import { loadCards, loadDay1Cards, loadHomes, loadWorld, sampleOf } from './content';
 
 const world = loadWorld();
 const cards = loadCards();
@@ -207,6 +207,21 @@ describe('full-day soak', () => {
       console.info(`[soak] ${day}: 30 residents laid out in ${layout.toFixed(0)} ms; ${walking} in sight at 12:25`);
     }
   });
+
+  it('runs a sample of the Day-1 census\'s cards (MVP M-03) through every day of the week, homes on lanes and off-board too', async () => {
+    // An even sample of the 188 (written, or their template cards until then) keeps the soak's runtime sane.
+    const census = sampleOf(await loadDay1Cards(), 36);
+    expect(census).toHaveLength(36);
+    const ex = new RoutineExecutor(world);
+    for (const day of WEEK) {
+      const plans = census.map(c => dayPlan(c, day));
+      const result = soak(ex, plans);
+      expect(result.offTile, day).toEqual([]);
+      expect(result.failures, day).toEqual([]);
+      expect(result.stuck, day).toEqual([]);
+    }
+    expect([...ex.warnings]).toEqual([]);
+  }, 60_000);
 });
 
 describe('homes (content/places/homes.yaml)', () => {

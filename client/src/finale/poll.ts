@@ -20,7 +20,7 @@ import { POLL_DAY } from './state';
 export interface SpringWorld {
   worldSeed: number;
   town: TownState;
-  /** The authored cards (the generated arrivals come from `town.people`). */
+  /** The game's cards: the hand-written cast and the Day-1 census (the generated arrivals come from `town.people`). */
   cards: readonly PersonaCard[];
   regard(id: string): number;
   met(id: string): boolean;
@@ -29,8 +29,11 @@ export interface SpringWorld {
   flags: ReadonlySet<string>;
 }
 
+// The census's own fields (MVP M-03) say who fishes, who collects for the Tollmen and who is out of work.
 const elector = (c: PersonaCard): ElectorCard => ({
-  id: c.id, name: c.name, age: c.age, kind: c.kind, occupation: c.occupation, home: c.home, values: c.values, relationships: c.relationships
+  id: c.id, name: c.name, age: c.age, kind: c.kind, occupation: c.occupation, home: c.home, values: c.values, relationships: c.relationships,
+  workplace: c.workplace,
+  ...(c.archetype ? { archetype: c.archetype } : {}), ...(c.employment ? { employment: c.employment } : {}), ...(c.generated_by ? { generated: true } : {})
 });
 const zoneOf = (place: string): string => place.split('.')[0] ?? place;
 

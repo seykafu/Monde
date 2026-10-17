@@ -1,4 +1,5 @@
-// Persona cards' looks (content/residents/*.yaml `look:`): the resolver, every card drawn by the rig, and caps.
+// Persona cards' looks (content/residents/*.yaml `look:`): the resolver, the hand-written cards drawn by the rig (and a
+// sample of the Day-1 census's, MVP M-03), and caps.
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'yaml';
@@ -10,6 +11,7 @@ import {
 } from '../look';
 import { IDLE_POSES, drawFrame, renderSheet } from '../rig';
 import { FRAME_H as H, FRAME_W as W, PROCEDURAL_LAYOUT, columns } from '../sheet';
+import { loadDay1Cards, sampleOf } from '../../../sim/__tests__/content';
 
 const dir = resolve(import.meta.dirname, '../../../../..', 'content/residents');
 const cards = readdirSync(dir).filter(f => f.endsWith('.yaml')).sort()
@@ -70,7 +72,7 @@ function problems(look: Look): string[] {
   return out;
 }
 
-describe('every resident card', () => {
+describe('the hand-written cards', () => {
   it('has a look, of the right kind', () => {
     expect(cards).toHaveLength(24);
     for (const c of cards) {
@@ -102,6 +104,17 @@ describe('every resident card', () => {
       return [l.hairStyle, l.hair, l.skin, l.outfit, l.top].join('/');
     });
     expect(new Set(keys).size).toBe(keys.length);
+  });
+});
+
+describe('the Day-1 census\'s cards (a sample)', () => {
+  it('draw inside the cell, feet down, within 24 colours a frame', async () => {
+    const census = sampleOf(await loadDay1Cards(), 24);
+    expect(census.length).toBe(24);
+    for (const c of census) {
+      expect(c.look?.kind, c.id).toBe('human');
+      expect(problems(lookFromCard(c.look!, ROSTER)), c.id).toEqual([]);
+    }
   });
 });
 

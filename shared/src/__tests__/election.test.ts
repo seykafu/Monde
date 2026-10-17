@@ -2,10 +2,13 @@
 // examples here are worked by hand from its formulas (each comment shows the arithmetic).
 import { describe, expect, it } from "vitest";
 import {
-  CANDIDATES, DAY_ONE_ADULTS, FAIR_HEADCOUNT, JITTER_SD, ballot, count, fairBallots, fairBand, fear, isEligible, jitter,
+  CANDIDATES, FAIR_HEADCOUNT, JITTER_SD, PRIORS, ballot, count, electorTraits, fairBallots, fairBand, fear, isEligible, jitter,
   leader, percentages, poll, portPrior, postalVotes, quoteBand, record, reg, scoreAll, springElectorate, strawPoll,
   turnoutChance, type ElectorCard, type ModelTown, type Voter,
 } from "../election";
+import type { PersonaCard } from "../persona";
+import { templateRoster } from "../../../tools/census-inputs";
+import { handCards } from "./censusFixtures";
 
 const EVEN = { prosperity: 0.25, safety: 0.25, spirit: 0.25, charm: 0.25 };
 const DAY1 = { prosperity: 18, safety: 30, spirit: 22, charm: 25 };
@@ -139,34 +142,62 @@ const CAST: ElectorCard[] = [
   card("bastien", 6, "market_row.bakery", { kind: "animal" }),
   card("vane", 48, "offmap.city"),
 ];
-const electorate = (over: { regard?: number; met?: boolean; flags?: string[]; seed?: number } = {}) => springElectorate({
-  worldSeed: over.seed ?? 5, day: 25, cards: CAST, regard: () => over.regard ?? 0, met: () => over.met ?? false, arrivals: [],
+const electorate = (over: { regard?: number; met?: boolean; flags?: string[]; seed?: number; cards?: readonly ElectorCard[] } = {}) => springElectorate({
+  worldSeed: over.seed ?? 5, day: 25, cards: over.cards ?? TOWN, regard: () => over.regard ?? 0, met: () => over.met ?? false, arrivals: [],
   deeds: { scuffles: [], projects: [] }, flags: new Set(over.flags ?? []),
 });
 
+/** The client's elector (client/src/finale/poll.ts): the card's fields, the census's own where it has them. */
+const elector = (c: PersonaCard): ElectorCard => ({
+  id: c.id, name: c.name, age: c.age, kind: c.kind, occupation: c.occupation, home: c.home, values: c.values, relationships: c.relationships,
+  workplace: c.workplace, ...(c.archetype ? { archetype: c.archetype } : {}), ...(c.employment ? { employment: c.employment } : {}),
+  ...(c.generated_by ? { generated: true } : {}),
+});
+/** The Day-1 town (MVP M-03): the hand-written cards and every census household's template card. */
+const TOWN: ElectorCard[] = [...handCards, ...await templateRoster()].map(elector);
+
 describe("the Spring electorate", () => {
-  it("is Monde's 187 grown-ups (A.1.4): 17 of the core cast, the 4 carded people of the 192, and 166 more", () => {
+  it("is Monde's 187 grown-ups (A.1.4), every one a card: the hand-written cast and the census's", () => {
+    expect(TOWN).toHaveLength(212);
     const people = electorate();
     const adults = people.filter(v => isEligible(v, { day: 25 }));
     expect(adults).toHaveLength(187);
-    expect(Object.values(DAY_ONE_ADULTS).reduce((s, b) => s + b![0] + b![1] + b![2], 0)).toBe(170);
     expect(people.some(v => v.id === "vane" || v.id === "bastien")).toBe(false);
     expect(people.find(v => v.id === "tib")!.age).toBe(11);
     expect(people.find(v => v.id === "moss")!.candidate).toBe("moss");
-    expect(people.filter(v => !v.named)).toHaveLength(166);
+    // No stand-ins any more: everyone is named (quotable, with a portrait) and can be met.
+    expect(people.every(v => v.named && v.meetable !== false)).toBe(true);
   });
 
-  it("is the same town for the same world seed, and a different one for another", () => {
+  it("is the hand-written cast alone without the census's cards (no stand-ins)", () => {
+    const people = electorate({ cards: CAST });
+    expect(people.filter(v => isEligible(v, { day: 25 }))).toHaveLength(21);
+    expect(people.every(v => v.named)).toBe(true);
+  });
+
+  it("reads who fishes, who collects for the Tollmen and who is out of work from the cards", () => {
+    const traits = new Map(TOWN.map(c => [c.id, electorTraits(c)]));
+    for (const id of ["rook", "dex", "dom", "weasel", "bru", "nettie"]) expect(traits.get(id)!.tollman, id).toBe(true);
+    expect([...traits.values()].filter(t => t.tollman)).toHaveLength(6);
+    const fishers = TOWN.filter(c => c.archetype === "fisher");
+    expect(fishers.length).toBeGreaterThanOrEqual(10);
+    for (const c of fishers) expect(traits.get(c.id)!.fisher, c.id).toBe(true);
+    expect(traits.get("moss")!.fisher).toBe(true);
+    const outOfWork = TOWN.filter(c => c.employment === "out_of_work");
+    expect(outOfWork.length).toBeGreaterThanOrEqual(9);
+    expect(outOfWork.every(c => traits.get(c.id)!.unemployed)).toBe(true);
+    // A Tollman's prior for Vane is his paymaster's (+45); a hand-written card's prior has no spread.
+    const people = new Map(electorate().map(v => [v.id, v]));
+    expect(people.get("dex")!.vaneRegard).toBeGreaterThan(PRIORS.vane.base + PRIORS.vane.tollman - PRIORS.vane.spread - 1);
+    expect(people.get("pell")!.vaneRegard).toBe(electorate({ seed: 99 }).find(v => v.id === "pell")!.vaneRegard);
+  });
+
+  it("is the same town for the same world seed; a census card's opinions spread with another", () => {
     expect(electorate({ seed: 9 })).toEqual(electorate({ seed: 9 }));
-    expect(electorate({ seed: 9 }).map(v => v.values)).not.toEqual(electorate({ seed: 10 }).map(v => v.values));
-  });
-
-  it("strangers' values are A.2's archetype values jittered within ±0.10 and renormalised", () => {
-    for (const v of electorate().filter(x => !x.named)) {
-      const sum = v.values.prosperity + v.values.safety + v.values.spirit + v.values.charm;
-      expect(sum).toBeCloseTo(1, 10);
-      for (const w of Object.values(v.values)) expect(w).toBeGreaterThan(0.03);
-    }
+    const a = electorate({ seed: 9 }), b = electorate({ seed: 10 });
+    const generated = new Set(TOWN.filter(c => c.generated).map(c => c.id));
+    expect(a.filter(v => generated.has(v.id)).map(v => v.port)).not.toEqual(b.filter(v => generated.has(v.id)).map(v => v.port));
+    expect(a.filter(v => !generated.has(v.id))).toEqual(b.filter(v => !generated.has(v.id)));
   });
 
   it("the Option Clause in the paper turns the town against Port Vane", () => {
@@ -197,7 +228,7 @@ describe("the Spring Straw Poll", () => {
     const pct = percentages(r.shares);
     expect(pct.fellow + pct.vane + pct.moss).toBe(100);
     expect(r.margin).toBeCloseTo(1 / Math.sqrt(65), 3);
-    expect(r.leans.length).toBe(20); // 21 carded grown-ups, less Moss (a candidate)
+    expect(r.leans.length).toBe(186); // 187 grown-ups, less Moss (a candidate)
     expect(r.leans.every(l => quoteBand({ choice: l.choice, margin: 1 }) !== "torn")).toBe(true);
   });
 

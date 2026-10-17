@@ -8,6 +8,7 @@
  *   npx tsx tools/gen-residents.ts --dry-run [--no-prompts]     prompts and a cost estimate; no calls, no writes
  *   npx tsx tools/gen-residents.ts [--target=staging]           through POST /admin/census/write on staging (default)
  *   npx tsx tools/gen-residents.ts --local                      in process, with ANTHROPIC_API_KEY (env or .env)
+ *   npx tsx tools/gen-residents.ts --template-only [--out <dir>]   development: every household's template card, no call
  *   options: --limit N (a trial of N households) · --concurrency N (4) · --regen <household> · --url <server>
  *
  * Staging reads ADMIN_TOKEN from the environment or ~/.config/monde/admin_token.txt (never printed). --local is charged
@@ -16,23 +17,27 @@
  * Writes content/residents/day1/<id>.yaml, one card per resident, and records each household's status ("drafted"),
  * generation record and input hash in content/census/day1.yaml. Idempotent: households whose cards exist, or whose
  * status is past skeleton, are skipped; --regen <household> removes that household's cards and writes it again. The
- * game doesn't load content/residents/day1/ yet (M-03 step 3); npm run lint:content checks it.
+ * game loads content/residents/day1/ when cards are there (M-03 step 3); npm run lint:content checks it.
+ *
+ * --template-only (M-03 step 3, development): A.3.8's template card for every household still to write, flagged
+ * generated_by: template, with no model call and no token. --out <dir> writes the cards there instead; a folder other
+ * than content/residents/day1 starts from the skeleton as seeded and leaves content/census/day1.yaml alone (the records
+ * stay in memory), so it is always the whole town. Into content/residents/day1 it records the households in the
+ * skeleton like any run (lint:content checks the two agree): remove the cards and `git checkout content/census/day1.yaml`
+ * before the real census, or it skips them.
  */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import YAML from "yaml";
-import {
-  ItemCatalog, PersonaCard, parseHomes, parsePins, runCensus, stringifyGeneratedCard, stringifySkeleton,
-  type CensusStore, type CensusWriter, type Day1Skeleton,
-} from "@monde/shared";
+import { runCensus, stringifyGeneratedCard, stringifySkeleton, type CensusStore, type CensusWriter } from "@monde/shared";
 import { lexicalHits } from "../server/src/mind/filters.ts";
 import { HAIKU_55_PRICES_PER_MTOK } from "../server/src/mind/pricing.ts";
+import { DAY1_CARDS_DIR, REPO_ROOT, SKELETON_FILE, loadCensusInput } from "./census-inputs.ts";
 
-const root = path.resolve(import.meta.dirname, "..");
-const read = (p: string) => fs.readFileSync(path.join(root, p), "utf8");
-const SKELETON = "content/census/day1.yaml";
-const CARDS_DIR = "content/residents/day1";
+const root = REPO_ROOT;
+const SKELETON = SKELETON_FILE;
+const CARDS_DIR = DAY1_CARDS_DIR;
 const STAGING = "https://monde-mind-staging.fly.dev";
 
 // ── Arguments ───────────────────────────────────────────────────────────────
@@ -53,29 +58,17 @@ const limit = value("limit") !== undefined ? Number(value("limit")) : undefined;
 const concurrency = value("concurrency") !== undefined ? Number(value("concurrency")) : undefined;
 const regen = value("regen") ?? null;
 const serverUrl = (value("url") ?? STAGING).replace(/\/+$/, "");
+const templateOnly = flag("template-only");
+const out = value("out");
+if (flag("out") && !out) { console.error("--out needs a folder"); process.exit(2); }
 
 // ── Inputs ──────────────────────────────────────────────────────────────────
 
-function loadCards(dir: string): PersonaCard[] {
-  if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir).filter(f => f.endsWith(".yaml")).sort().map(f => {
-    const parsed = PersonaCard.safeParse(YAML.parse(fs.readFileSync(path.join(dir, f), "utf8")));
-    if (!parsed.success) throw new Error(`${path.join(dir, f)}: ${parsed.error.issues.slice(0, 3).map(i => `${i.path.join(".")}: ${i.message}`).join("; ")}`);
-    return parsed.data;
-  });
-}
-
-const skeleton = YAML.parse(read(SKELETON)) as Day1Skeleton;
-const pins = parsePins(YAML.parse(read("content/census/pins.yaml")));
-const homes = parseHomes(YAML.parse(read("content/places/homes.yaml")));
-const placesDoc = YAML.parse(read("content/places/places.yaml")) as Record<string, string[]>;
-const places = new Set(Object.entries(placesDoc).flatMap(([zone, ids]) => ids.map(id => `${zone}.${id}`)));
-const items = ItemCatalog.parse(YAML.parse(read("content/items.yaml")));
-const giftTags = [...new Set(items.flatMap(i => i.tags))];
-// The hand-written cards only (content/residents/*.yaml); the generated ones live a folder down.
-const cards = loadCards(path.join(root, "content/residents"));
-const cardsDir = path.join(root, CARDS_DIR);
-const written = new Map(loadCards(cardsDir).map(c => [c.id, c]));
+const cardsDir = out ? path.resolve(out) : path.join(root, CARDS_DIR);
+/** Writing anywhere but content/residents/day1 leaves the skeleton's records alone (and starts from it as seeded). */
+const elsewhere = cardsDir !== path.join(root, CARDS_DIR);
+const input = loadCensusInput({ root, cardsDir, resetProgress: elsewhere });
+const written = input.written;
 
 // ── Files ───────────────────────────────────────────────────────────────────
 
@@ -92,7 +85,7 @@ const store: CensusStore = {
       if (c.household === household) fs.rmSync(path.join(cardsDir, f));
     }
   },
-  saveSkeleton: sk => fs.writeFileSync(path.join(root, SKELETON), stringifySkeleton(sk)),
+  saveSkeleton: sk => { if (!elsewhere) fs.writeFileSync(path.join(root, SKELETON), stringifySkeleton(sk)); },
   log: line => console.log(line),
 };
 
@@ -162,7 +155,7 @@ async function localWriter(): Promise<CensusWriter> {
 // ── Run ─────────────────────────────────────────────────────────────────────
 
 let writer: CensusWriter | undefined;
-if (!dryRun) {
+if (!dryRun && !templateOnly) {
   if (target === "local") writer = await localWriter();
   else {
     const token = adminToken();
@@ -171,9 +164,11 @@ if (!dryRun) {
   }
 }
 
+const started = Date.now();
 const result = await runCensus(
-  { skeleton, pins, homes, places, cards, written, giftTags, banned: text => lexicalHits(text).map(h => h.group) },
-  { writer, store, dryRun, regen, limit, concurrency, prices: HAIKU_55_PRICES_PER_MTOK },
+  { ...input, banned: text => lexicalHits(text).map(h => h.group) },
+  // Template cards one household at a time: the same ids every run.
+  { writer, store, dryRun, regen, limit, concurrency: templateOnly ? 1 : concurrency, templateOnly, prices: HAIKU_55_PRICES_PER_MTOK },
 );
 
 if (dryRun) {
@@ -184,6 +179,14 @@ if (dryRun) {
   console.log(`Expected: ~${e.calls} calls (one each, plus ${Math.round((e.calls / Math.max(1, e.households) - 1) * 100)}% retries), ~${e.input_tokens.toLocaleString()} uncached input tokens, ~${e.cached_tokens.toLocaleString()} cached system tokens, ~${e.output_tokens.toLocaleString()} output tokens: about $${e.cost_usd.toFixed(2)}.`);
   console.log(`Ceiling (every household failing six times at max_tokens): $${e.worst_cost_usd.toFixed(2)}.`);
   process.exit(0);
+}
+
+if (templateOnly) {
+  const n = result.written.length;
+  console.log(`\n${n} households written as template cards (${[...written.values()].filter(c => c.generated_by === "template").length} cards) into ${path.relative(root, cardsDir) || cardsDir} in ${Date.now() - started} ms; ${result.skipped.length} skipped, ${result.failed.length} not written.`);
+  if (!elsewhere && n) console.log(`content/census/day1.yaml records them: remove the cards and git checkout ${SKELETON} before the real census.`);
+  for (const f of result.failed) console.log(`not written: ${f.id}: ${f.reason}`);
+  process.exit(result.failed.length ? 1 : 0);
 }
 
 const models = result.written.filter(w => w.source === "model").length;

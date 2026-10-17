@@ -160,6 +160,22 @@ describe("the census run (M-03 step 2)", () => {
     expect(fatal.calls).toHaveLength(1);
   });
 
+  it("--template-only writes every household's template card with no writer and no call (M-03 step 3)", async () => {
+    const { input, store, files } = setup();
+    const r = await runCensus(input, { store, templateOnly: true, concurrency: 1 });
+    expect(r.failed).toEqual([]);
+    expect(r.calls).toBe(0);
+    expect(r.written).toHaveLength(107);
+    expect(r.written.every(w => w.source === "template" && w.attempts === 0)).toBe(true);
+    expect(files.size).toBe(188);
+    expect([...files.values()].every(f => f.includes("generated_by: template"))).toBe(true);
+    // The same cards every time: ids, names and all.
+    const again = setup();
+    await runCensus(again.input, { store: again.store, templateOnly: true, concurrency: 1 });
+    expect([...again.files.entries()].sort()).toEqual([...files.entries()].sort());
+    await expect(runCensus(censusInput(), { store })).rejects.toThrow(/a writer is needed unless dryRun or templateOnly/);
+  }, 60_000);
+
   it("--dry-run builds every prompt and estimates the cost, calling and writing nothing", async () => {
     const { input, store, counts } = setup();
     const r = await runCensus(input, { store, dryRun: true, prices: DEFAULT_CENSUS_PRICES });

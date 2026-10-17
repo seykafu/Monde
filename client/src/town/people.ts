@@ -95,8 +95,11 @@ export interface MigrationWorld extends StayWorld {
   homeName(home: HomeKey): string;
   /** Story flags that are on (plus the town's own): Projects started and done for the archetype gates. */
   storyFlags: ReadonlySet<string>;
-  /** Authored cards (V03's names): id → name. */
-  cast: ReadonlyMap<string, { name: string }>;
+  /**
+   * Every card the game loads (V03's names, and the portraits they wear: the Day-1 census's library busts count as worn,
+   * MVP M-03): id → name, portrait.
+   */
+  cast: ReadonlyMap<string, { name: string; portrait?: string }>;
   /** Regard toward the Fellow (the well-liked test). */
   regard(id: string): number;
 }
@@ -163,7 +166,9 @@ export function templateArrivals(state: TownState, world: MigrationWorld, day: n
     const draw = drawHousehold({
       seed: world.seed, day, slot: (opts.slotBase ?? 0) + slot, facts, youthShare, recent: recentOf(working),
       alive: countBy(livingArrivals(working), r => r.archetype),
-      portraitUses: countBy([...livingArrivals(working), ...working.pending.flatMap(h => h.residents)], r => r.card.portrait),
+      // Every portrait worn in town: the cast's (the Day-1 census wears library busts too) and the arrivals'.
+      portraitUses: countBy([...[...world.cast.values()].flatMap(c => (c.portrait ? [c.portrait] : [])),
+        ...[...livingArrivals(working), ...working.pending.flatMap(h => h.residents)].map(r => r.card.portrait)], p => p),
       today: working.pending.filter(h => h.day === day).map(h => h.archetype),
       ...(opts.archetype ? { archetype: opts.archetype as never } : {})
     });

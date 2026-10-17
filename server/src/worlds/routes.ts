@@ -4,12 +4,12 @@ import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 import type { Config } from "../config.js";
 import { residents, worlds } from "../db/schema.js";
-import { createWorld, type WorldDatabase } from "./createWorld.js";
+import { createWorld, ensureRoster, type WorldDatabase } from "./createWorld.js";
 
 export function worldToken(worldId: string, deviceId: string, secret: string) {
   return createHmac("sha256", secret).update(worldId + deviceId).digest("hex");
 }
-export function requireWorld(db: WorldDatabase | undefined, secret: string) {
+export function requireWorld(db: WorldDatabase | undefined, secret: string, contentDirectory?: string) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
     const { w } = request.params as { w: string };
     const token = request.headers.authorization?.match(/^Bearer ([a-f0-9]{64})$/)?.[1];
@@ -19,11 +19,14 @@ export function requireWorld(db: WorldDatabase | undefined, secret: string) {
     if (!world || !timingSafeEqual(Buffer.from(token, "hex"), Buffer.from(worldToken(w, world.deviceId, secret), "hex"))) {
       return reply.code(401).send({ error: "Unauthorized" });
     }
+    // MVP M-03: a world made before the Day-1 census was written gets its residents the first time it's loaded here.
+    // A failed backfill never fails the request (it is tried again on the next).
+    await ensureRoster(db, w, contentDirectory).catch((err: unknown) => { request.log.error({ err, worldId: w }, "roster backfill failed"); });
   };
 }
 export function registerWorldRoutes(app: FastifyInstance, config: Config, db?: WorldDatabase) {
   const secret = config.MONDE_TOKEN_SECRET ?? "monde-local-development-only";
-  const authorize = requireWorld(db, secret);
+  const authorize = requireWorld(db, secret, config.MONDE_CONTENT_DIR);
   // Covers both the world resource and all current/future nested world endpoints.
   app.addHook("preHandler", async (request, reply) => {
     if (/^\/v1\/worlds\/:w(?:\/|$)/.test(request.routeOptions.url ?? "")) {

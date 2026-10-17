@@ -13,7 +13,7 @@ import { ChatReply, type ChatBody } from '@monde/shared';
 // from the caller's `fallback`, so a conversation never dead-ends.
 import { readSse } from './sse';
 import { parseTalkEvent } from './talkStream';
-import { PrewarmGate } from './prewarm';
+import { PrewarmGate, type PrewarmTier } from './prewarm';
 import { parseDawnPackage, type DawnPackage, type NightRequest } from './dawn';
 import { EventIngestionResult, PlayerProfile as PlayerProfileSchema, type ClientEvent } from '@monde/shared';
 import type { PostOutcome } from './events';
@@ -350,10 +350,13 @@ export class MindClient {
     }
   }
 
-  /** The player came within range of a resident: prewarm at most once per resident per 4 in-game hours. */
-  prewarmNear(residentId: string, day: number, minute: number): void {
+  /**
+   * The player came within range of a resident: prewarm at most once per resident per 4 in-game hours, and an Ambient
+   * resident only while the day's Ambient prewarms last (prewarm.ts).
+   */
+  prewarmNear(residentId: string, day: number, minute: number, tier: PrewarmTier = 'core'): void {
     if (!this.enabled || this.now() < this.offlineUntil) return;
-    if (!this.prewarmGate.allow(residentId, day, minute)) return;
+    if (!this.prewarmGate.allow(residentId, day, minute, tier)) return;
     void this.prewarm(residentId, day);
   }
 

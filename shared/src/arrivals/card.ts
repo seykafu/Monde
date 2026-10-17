@@ -199,6 +199,11 @@ export interface PromptContext {
   knownResidents: readonly { id: string; name: string; line: string }[];
   avoidFirst: readonly string[];
   avoidFull: readonly string[];
+  /**
+   * Surnames living households already carry (MVP M-03: the Day-1 census's 107 households): left out of the name pool,
+   * which V03 would refuse anyway ("the surname belongs to another household").
+   */
+  avoidFamily?: readonly string[];
   /** A.3.8: "a fresh whim seed" on every call. */
   whim: string;
   validatorErrors?: readonly string[];
@@ -241,7 +246,8 @@ export function arrivalUserMessage(draw: HouseholdDraw, ctx: PromptContext): str
   const rng = SeededRng.of(draw.id, ctx.whim, "pool");
   const pool = (list: readonly string[], n: number) => [...list].sort(() => rng.next() - 0.5).slice(0, n);
   const firsts = pool([...new Set(draw.members.flatMap(m => FIRST_NAMES[m.presentation]))].filter(n => !ctx.avoidFirst.includes(n)), 14);
-  const lasts = pool(FAMILY_NAMES, 12);
+  const takenFamily = new Set((ctx.avoidFamily ?? []).map(foldName));
+  const lasts = pool(takenFamily.size ? FAMILY_NAMES.filter(f => !takenFamily.has(foldName(f))) : FAMILY_NAMES, 12);
   const t = ctx.town;
   const home = ctx.home ?? { id: HOME_TOKEN, description: "a restored house in Monde, its door chosen when they land (use home.own)", beds: draw.beds };
   const lines = [

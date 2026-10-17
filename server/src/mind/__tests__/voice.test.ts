@@ -69,6 +69,32 @@ describe("voice ownership: signature phrases", () => {
     expect(borrowedFor(arrival, roster).some((s) => s.phrase === "Mind the step.")).toBe(false);
   });
 
+  it("gives the Day-1 census's cards (generated_by) no phrase of their own, and lets them borrow none (MVP M-03)", () => {
+    // A template card for the bakery's neighbour whose tic is Odile's, and one whose tic is nobody's.
+    const template = (id: string, tics: string[]): PersonaCard =>
+      ({ ...card("june"), id, kind: "resident", generated_by: "template", household: "h1", voice: { ...card("june").voice, tics } }) as PersonaCard;
+    const neighbour = template("neighbour", ["Mind the step."]), plain = template("plain", ["We're settled."]);
+    const census: RosterVoice[] = [
+      { id: "neighbour", kind: "resident", tics: ["Mind the step."], generated: true },
+      { id: "plain", kind: "resident", tics: ["We're settled."], generated: true },
+    ];
+    const full = [...roster, ...census].sort((a, b) => (a.id < b.id ? -1 : 1));
+    // The census owns nothing, so the hand-written cast's phrases (and their cached blocks) are what they were.
+    expect(signatures(full)).toEqual(signatures(roster));
+    expect(ownSignatures(neighbour, full)).toEqual([]);
+    expect(borrowedFor(card("odile"), full)).toEqual(borrowedFor(card("odile"), roster));
+    expect(personaBlock(card("odile"), { flags: [], day: 3, voices: full })).toBe(personaBlock(card("odile"), { flags: [], day: 3, voices: roster }));
+    // Odile's phrase is still Odile's, on a census card that lists it: borrowed, and gone from its own tics.
+    expect(borrowedFor(neighbour, full).filter((s) => s.phrase === "Mind the step.").map((s) => s.owner)).toEqual(["odile"]);
+    expect(borrowedHits("Off you go. Mind the step.", borrowedFor(neighbour, full)).map((s) => s.owner)).toEqual(["odile"]);
+    const block = personaBlock(neighbour, { flags: [], day: 3, voices: full });
+    expect(block).toMatch(/Your tics, yours alone \(each at most once per conversation\): \(none\)/);
+    expect(block).toContain('Odile "Eat something.", "Mind the step."');
+    // A census card's own everyday tic is just how they talk: listed, owned by nobody.
+    expect(personaBlock(plain, { flags: [], day: 3, voices: full })).toContain('Your tics, yours alone (each at most once per conversation): "We\'re settled."');
+    expect(borrowedHits("We're settled.", borrowedFor(card("june"), full))).toEqual([]);
+  });
+
   it("matches a phrase the way it's used: whole words, one-word tics only as a sentence, questions as questions", () => {
     const june = borrowedFor(card("june"), roster);
     const hits = (text: string) => borrowedHits(text, june).map((s) => `${s.owner}:${s.phrase}`);

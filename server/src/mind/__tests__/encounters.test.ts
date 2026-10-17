@@ -2,7 +2,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import {
-  encounterChance, encounterRoll, romanceFlag, type GossipOutput, type PersonaCard, type PlanOutput, type ReflectionOutput,
+  encounterChance, encounterRoll, pairKey, romanceFlag, type GossipOutput, type PersonaCard, type PlanOutput, type ReflectionOutput,
 } from "@monde/shared";
 import { buildApp } from "../../app.js";
 import { parseConfig } from "../../config.js";
@@ -13,8 +13,8 @@ import { createWorld } from "../../worlds/createWorld.js";
 import { worldToken } from "../../worlds/routes.js";
 import { DisabledMindClient, type MindClient } from "../mindClient.js";
 import {
-  ENCOUNTERS_PER_RESIDENT, chooseEncounters, encounterMemoryId, encounterMemoryText, findMeetings, validateEncounter,
-  type DayPlan, type Meeting,
+  ENCOUNTERS_PER_RESIDENT, chooseEncounters, encounterMemoryId, encounterMemoryText, findMeetings, persistEncounter, persistRuleEncounters,
+  ruleOutcome, validateEncounter, type DayPlan, type Meeting,
 } from "../encounters.js";
 import { NightRunner } from "../night.js";
 import { templatePlan } from "../templatePlan.js";
@@ -233,6 +233,8 @@ describe("encounters in the night pass", () => {
     const failing = new FakeNightMind(respond(() => ({ output: "", stopReason: "refusal" })));
     const env = await setup(failing);
     await night(env, 1);
+    // Under a loaded test run the budget can end first; the rest finishes in the background.
+    await env.runner.idle(env.worldId);
     const logs = await database.db.select().from(aiLog).where(and(eq(aiLog.worldId, env.worldId), eq(aiLog.kind, "gossip")));
     expect(logs.length).toBe(failing.callsFor("gossip").length);
     expect(logs.every((l) => l.fallback && l.validation === "refusal")).toBe(true);
@@ -243,6 +245,7 @@ describe("encounters in the night pass", () => {
 
     const offline = await setup(new DisabledMindClient());
     await night(offline, 1);
+    await offline.runner.idle(offline.worldId);
     expect(await database.db.select().from(aiLog).where(eq(aiLog.worldId, offline.worldId))).toEqual([]);
     const strangers = await edge(offline.worldId, "hollis", "june");
     // Two residents who'd never met are acquaintances after a meeting (if their roll came up).
@@ -256,6 +259,7 @@ describe("encounters in the night pass", () => {
     ));
     const env = await setup(mind);
     await night(env, 1);
+    await env.runner.idle(env.worldId);
     expect(mind.callsFor("gossip").some((c) => c.resident.includes("tib"))).toBe(true);
     const rows = await database.db.select().from(relationships).where(eq(relationships.worldId, env.worldId));
     const touchingTib = rows.filter((r) => r.fromId === "tib" || r.toId === "tib");
@@ -326,4 +330,42 @@ describe("neglect, drift, milestones and the dawn's ties", () => {
     // The next dawn has no milestones of its own.
     expect((await dawn(env, 3)).json().ties.milestones).toEqual([]);
   });
+});
+
+describe("the night's rule-mode encounters, written together (MVP M-03)", () => {
+  it("writes exactly what persistEncounter writes one at a time: edges, memories, heard news, milestones; a met pair is skipped", async () => {
+    const cards = await loadContent();
+    const names = Object.fromEntries(cards.map((c) => [c.id, c.name]));
+    const meetings = findMeetings(cards.map((c) => ({ residentId: c.id, blocks: templatePlan(c, 1).blocks })));
+    const chosen = chooseEncounters(meetings, { seed: 5, day: 1, mean: () => 30, tier: () => "ambient", modelEnabled: false, perResident: 99 });
+    expect(chosen.length).toBeGreaterThan(5);
+    const [one, two] = await Promise.all([createWorld(database.db, `device-${randomUUID()}`, "invite"), createWorld(database.db, `device-${randomUUID()}`, "invite")]);
+    // News one side carries (it passes on), a pair already met today (a live chat's receipt), and a pair near a label.
+    const teller = chosen[0]!.a, met = chosen[1]!;
+    for (const w of [one, two]) {
+      await database.db.insert(memories).values({ worldId: w.id, id: "news_1", residentId: teller, day: 1, minute: 500, kind: "saw", text: "The lamps went out on Heron Lane.", who: [], wherePlace: "old_quarter.heron_lane", importance: 5, valence: -1 });
+      await database.db.insert(memories).values({ worldId: w.id, id: encounterMemoryId(1, met.a, met.b, met.a), residentId: met.a, day: 1, minute: 600, kind: "did", text: "Talked.", who: [met.b], wherePlace: met.place, importance: 3, valence: 1 });
+      await setEdge(w.id, chosen[2]!.a, chosen[2]!.b, { affinity: 39 });
+      await setEdge(w.id, chosen[2]!.b, chosen[2]!.a, { affinity: 39 });
+    }
+    const items = chosen.map((e, i) => ({ encounter: e, outcome: { ...ruleOutcome(i % 3 - 1, 2, e.mean), news: e.a === teller || e.b === teller ? ["news_1"] : [] } }));
+    for (const it of items) await persistEncounter(database.db, { worldId: one.id, day: 1, flags: [], names, romanceAllowed: false }, it.encounter, it.outcome, null, null);
+    const applied = await persistRuleEncounters(database.db, { worldId: two.id, day: 1, names }, items);
+    expect(applied.has(pairKey(met.a, met.b))).toBe(false);
+    expect(applied.size).toBe(items.length - 1);
+    const strip = <T extends { worldId: string }>(rows: T[], key: (r: T) => string) => rows.map(({ worldId: _w, ...r }) => r).sort((x, y) => (key(x as unknown as T) < key(y as unknown as T) ? -1 : 1));
+    const state = async (worldId: string) => ({
+      edges: strip(await database.db.select().from(relationships).where(eq(relationships.worldId, worldId)), (r) => `${r.fromId}>${r.toId}`),
+      memories: strip(await database.db.select().from(memories).where(eq(memories.worldId, worldId)), (r) => r.id),
+      milestones: strip(await database.db.select().from(tieMilestones).where(eq(tieMilestones.worldId, worldId)), (r) => `${r.aId}+${r.bId}`),
+    });
+    const [a, b] = await Promise.all([state(one.id), state(two.id)]);
+    expect(b.edges).toEqual(a.edges);
+    expect(b.memories).toEqual(a.memories);
+    expect(b.milestones).toEqual(a.milestones);
+    expect(b.memories.some((m) => m.kind === "heard")).toBe(true);
+    // Again: everything is already met, nothing changes.
+    expect((await persistRuleEncounters(database.db, { worldId: two.id, day: 1, names }, items)).size).toBe(0);
+    expect(await state(two.id)).toEqual(b);
+  }, 30_000);
 });

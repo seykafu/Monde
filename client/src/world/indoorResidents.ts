@@ -13,7 +13,9 @@
 // room gives them a post (Bastien by the oven).
 //
 // Where everyone is comes from the executor's samples alone; only who has which free spot is remembered (released when
-// they leave the roster, `keep`), so two customers never stand on one spot.
+// they leave the roster, `keep`), so two customers never stand on one spot. A full room (every free spot held: the pub
+// of an evening once the Day-1 census lives here, MVP M-03) shows nobody else until a spot comes free; the rest are in
+// the back, out of sight, as the street already has them indoors.
 
 import { centre, cumulative, pointAlong, ZoneNav, type Vec } from './nav';
 import type { Point, ZoneDef } from './zoneFormat';
@@ -69,8 +71,11 @@ export class IndoorView {
     return 'here';
   }
 
-  /** The tile a resident stands at in the room while their routine has them at `place`. */
-  spotFor(id: string, place: string): Point {
+  /**
+   * The tile a resident stands at in the room while their routine has them at `place`: their post, the free spot they
+   * hold, else a free one; null when every free spot is held by someone else (the room is full).
+   */
+  spotFor(id: string, place: string): Point | null {
     const def = this.room.interior!, local = place.slice(place.indexOf('.') + 1);
     const fits = (s: { place?: string }) => !s.place || s.place === local;
     const own = def.spots.find(s => s.who.includes(id) && fits(s));
@@ -81,12 +86,13 @@ export class IndoorView {
     if (!pool.length) pool = def.spots.filter(s => !s.who.length);
     if (!pool.length) return this.room.spawn;
     const first = hashString(`${id}|${local}`) % pool.length;
-    let at = pool[first]!.at;
+    let at: Point | null = null;
     for (let i = 0; i < pool.length; i++) {
       const s = pool[(first + i) % pool.length]!, key = s.at.join(',');
       const by = this.taken.get(key);
       if (by === undefined || by === id) { at = s.at; break; }
     }
+    if (!at) return null;
     if (held) this.taken.delete(held.at.join(','));
     this.assigned.set(id, { place: local, at });
     this.taken.set(at.join(','), id);
@@ -137,6 +143,7 @@ export class IndoorView {
     const s = this.sample(id, day, minute);
     if (this.where(s) !== 'here') return null;
     const spot = this.spotFor(id, s!.place);
+    if (!spot) return null;
     const w = this.walk(spot);
     const total = w.cum[w.cum.length - 1]!;
     let along = total, dir: Vec | null = null, moving = false;

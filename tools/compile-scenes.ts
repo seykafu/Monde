@@ -7,8 +7,10 @@
  */
 import fs from "node:fs";
 import path from "node:path";
+import YAML from "yaml";
+import { STANDARD_EXPRESSIONS } from "../shared/src/persona";
 import {
-  compileScenes, formatDiagnostic, registryFromContent, type CompiledScene, type Diagnostic,
+  FEATURED_SPEAKERS, compileScenes, formatDiagnostic, makeRegistry, registryFromContent, type CompiledScene, type Diagnostic,
 } from "../shared/src/script/index";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -16,11 +18,23 @@ const quiet = process.argv.includes("--quiet");
 const read = (p: string) => fs.readFileSync(path.join(root, p), "utf8");
 
 const residentsDir = path.join(root, "content/residents");
-const reg = registryFromContent({
+const base = registryFromContent({
   flagsYaml: read("content/flags.yaml"),
   residentYamls: fs.readdirSync(residentsDir).filter((f) => f.endsWith(".yaml")).sort().map((f) => read(`content/residents/${f}`)),
   placesYaml: read("content/places/places.yaml"),
 });
+// Featured speakers the Day-1 census has written cards for (Dex, Dom and Weasel; MVP M-03) speak as those cards once
+// content/residents/day1/ has them. A census card draws the six-face portrait set, onto which the standard eight alias
+// (laugh → warm, thinking → neutral), so their lines may still use any of the eight.
+const day1Dir = path.join(residentsDir, "day1");
+const featured = new Set<string>(FEATURED_SPEAKERS);
+const census = (fs.existsSync(day1Dir) ? fs.readdirSync(day1Dir).filter((f) => f.endsWith(".yaml")).sort() : []).flatMap((f) => {
+  const card = YAML.parse(read(`content/residents/day1/${f}`)) as { id?: unknown; portrait_expressions?: unknown };
+  if (typeof card?.id !== "string" || !featured.has(card.id)) return [];
+  const own = Array.isArray(card.portrait_expressions) ? card.portrait_expressions.filter((e): e is string => typeof e === "string") : [];
+  return [[card.id, [...new Set([...STANDARD_EXPRESSIONS, ...own])]] as const];
+});
+const reg = makeRegistry({ flags: base.flags, flagPatterns: base.flagPatterns, residents: [...base.residents, ...census], ...(base.places ? { places: base.places } : {}) });
 
 const scenesDir = "content/scenes";
 const files = fs.readdirSync(path.join(root, scenesDir)).filter((f) => f.endsWith(".scene.md")).sort(sceneOrder);

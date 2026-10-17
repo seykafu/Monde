@@ -1596,17 +1596,20 @@ OLD MOSS) and every grown-up in the crowd drops one bean. The rulings that fill 
   vote (scores plus jitter, no turnout: they were asked). The paper prints the shares with an honest margin of error,
   1/√n (±19, ±12 or ±8 points). The same model is also counted over the whole electorate with turnout, for testing.
 - **Eligibility.** §10.3's rule scaled to the poll day: 18+ and 10+ days in Monde by Day 25 (so arrivals up to Day 15).
-- **The electorate.** The carded residents (the core cast less Vane, who lives off the map until Day 48, and Tib, who is
-  eleven; plus Ada, Bru, Nettie and Old Moss, who are inside the 192), the generated arrivals, and stand-ins for the rest
-  of the 192 built from A.1.5's archetype × age-band quotas with A.2's values (the card jitter: ±0.10, floor 0.05, cap
-  0.60, renormalised), homes by A.1.3's shares (fishers on the Wharf, mill hands in Millbrook), and two carded friends
-  in their zone plus two neighbours. Stand-ins can't be met, so their reputation reads their carded friends only.
-  Old Moss votes for himself.
+- **The electorate.** Everyone with a card: the hand-written cast (less Vane, who lives off the map until Day 48) and
+  the Day-1 census's 188 (MVP M-03: Appendix A.1.5's 192 less the four with hand-written cards), so 210 people, 187 of
+  them grown-ups; and the generated arrivals. There are no stand-ins: who fishes (A.2's `fisher` archetype, or a
+  fishing or ferry trade), who collects for the Tollmen (the trade, or the hideout as workplace), who is out of work
+  (A.1.4's employment) and who is a mill hand or a retired organizer (the archetype) are read from the cards. Each
+  counts the residents their card ties them to with affinity 40 or more (their household, for most of the census) as
+  friends, and can be met, so their reputation is their own Regard once they have talked to the Fellow. Old Moss votes
+  for himself.
 - **Opinions the MVP doesn't simulate.** Without mirrored stances (§9.4), `port`, `vreg` and `moss_reg` start from priors:
   Port Vane wanted for Prosperity and feared for the Commons and the Wharf, `100·(P − 0.25) − 60·(C + Sp − 0.45)`, +15
-  for the out-of-work mill hands, +30 for Tollmen, +40 for Vane's staff, −30 for fishers, −15 for everyone once
-  `option_public`; Vane a polite stranger (+5 ± 12; mill hands +15, the out-of-work +10, fishers −15, Tollmen +45,
-  retired organizers −10); Moss the fishers' own (+25). A card's own relationship, or the dawn's tie, replaces a prior.
+  for the out-of-work, +30 for Tollmen, +40 for Vane's staff, −30 for fishers, −15 for everyone once `option_public`;
+  Vane a polite stranger (+5; mill hands +15, the out-of-work +10, fishers −15, Tollmen +45, retired organizers −10);
+  Moss the fishers' own (+25). A census card's priors carry a seeded spread (±10 on `port`, ±12 on `vreg`, ±10 on
+  `moss_reg`), the hand-written cast's none. A card's own relationship, or the dawn's tie, replaces a prior.
 - **Witnessed deeds.** A Project opened in your zone +8 Regard-points of reputation, a Scuffle won +6 (lost −3), half
   that for one elsewhere, a week's community work +0.5 a task (§8: being seen working); capped at 25.
 - **Terms §10.3 leaves open.** A lean is Player − Vane. Each candidate's score gets its own seeded ε (one ε shared by all
@@ -1617,9 +1620,9 @@ OLD MOSS) and every grown-up in the crowd drops one bean. The rulings that fill 
   one for someone else, one torn (top two within 0.04), live `{ai_line}`s with written lines in
   `content/lines/straw_poll.yaml` for Quiet Mode.
 
-The MVP's H5 soak (five play styles × eight worlds, `client/src/finale/__tests__/h5.test.ts`) puts the Fellow's share
-at about 10% for a passive player, 50% for one who lapses, 65% for a talker, 75% for a builder and 85% for the strong
-player: a spread of about 26 points.
+The MVP's H5 soak (five play styles × eight worlds over the full Day-1 roster, `client/src/finale/__tests__/h5.test.ts`)
+puts the Fellow's share of the jars at about 12% for a passive player, 36% for a talker, 44% for one who lapses, 68% for
+a builder and 77% for the strong player: a spread (standard deviation across all forty) of about 24 points.
 
 ### 10.4 Campaigning (Days 70–99)
 

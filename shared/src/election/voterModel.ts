@@ -74,8 +74,9 @@ export interface Voter {
   /** A candidate votes for themselves. */
   candidate?: Candidate;
   /**
-   * False for someone the player can't meet (springElectorate's stand-ins for the uncarded 192): they have no Regard to
-   * report, so a friend's reputation reads only their friends who can. Default true.
+   * False for someone the player can't meet (springElectorate's Spring electorate has nobody so since the Day-1
+   * census has cards, MVP M-03): they have no Regard to report, so a friend's reputation reads only their friends who
+   * can. Default true.
    */
   meetable?: boolean;
 }

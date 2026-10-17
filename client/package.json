@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "npm run scenes --prefix .. && vite",
-    "build": "npm run scenes --prefix .. && vite build",
-    "build:itch": "npm run scenes --prefix .. && vite build --outDir dist-itch --emptyOutDir",
+    "dev": "npm run scenes --prefix .. && npm run residents --prefix .. && vite",
+    "build": "npm run scenes --prefix .. && npm run residents --prefix .. && vite build",
+    "build:itch": "npm run scenes --prefix .. && npm run residents --prefix .. && vite build --outDir dist-itch --emptyOutDir",
     "preview": "vite preview --port 4173"
   },
   "dependencies": {

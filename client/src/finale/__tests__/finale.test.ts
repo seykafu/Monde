@@ -1,6 +1,9 @@
 // The Spring finale's pure parts (MVP G-11): the fair's dress, crowd and plans; the quotes; the poll in the paper; the
-// End-of-Spring report; the dev presets.
-import { describe, expect, it } from 'vitest';
+// End-of-Spring report; the dev presets. The poll is taken over the whole Day-1 town (MVP M-03): the census's cards, or
+// their template cards until they are written.
+import { describe, expect, it, vi } from 'vitest';
+vi.mock('../../world/residents', async importOriginal =>
+  (await import('../../sim/__tests__/content')).withFullRoster(await importOriginal<typeof import('../../world/residents')>()));
 import {
   emptyFinale, emptyFriendship, emptyProjects, emptyRiddles, emptyScuffles, fallbackPress, QUOTE_BANDS, type StrawPollRecord
 } from '@monde/shared';

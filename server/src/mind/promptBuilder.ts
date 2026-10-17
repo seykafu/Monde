@@ -28,7 +28,7 @@ import {
 import { promptExpressions } from "./expressions.js";
 import { addressFor, fellowLine, pronounNote, type FellowView } from "./naming.js";
 import { townNowBlock } from "./townState.js";
-import { borrowedFor, borrowedLine, phraseKey, type RosterVoice } from "./voice.js";
+import { borrowedFor, borrowedLine, phraseKey, type RosterVoice, type Signature } from "./voice.js";
 
 // ---------------------------------------------------------------------------------------------------------------
 // API settings (GDD §9.17 "API call settings"; AGENTS.md "Claude API rules")
@@ -224,10 +224,15 @@ const bullets = (items: readonly string[], empty: string): string =>
 const quoted = (items: readonly string[]): string => items.map((item) => `"${prose(item)}"`).join(", ");
 const round = (n: number): number => Math.round(n);
 
-/** A card's tics, quoted, with the ones it saves for leaving marked (`voice.exit_only`, MVP Q-01). */
-function ticList(voice: PersonaCard["voice"]): string {
+/**
+ * A card's tics, quoted, with the ones it saves for leaving marked (`voice.exit_only`, MVP Q-01). `skip`: phrases that
+ * aren't the card's to say (a generated card's tic that is a hand-written card's catchphrase, voice.ts).
+ */
+function ticList(voice: PersonaCard["voice"], skip: readonly Signature[] = []): string {
   const exit = new Set((voice.mode === "narrated_action" ? [] : voice.exit_only ?? []).map(phraseKey));
-  return voice.tics.map((tic) => `"${prose(tic)}"${exit.has(phraseKey(tic)) ? " (only as the conversation ends)" : ""}`).join(", ");
+  const others = new Set(skip.map((s) => phraseKey(s.phrase)));
+  const tics = voice.tics.filter((tic) => !others.has(phraseKey(tic)));
+  return tics.length ? tics.map((tic) => `"${prose(tic)}"${exit.has(phraseKey(tic)) ? " (only as the conversation ends)" : ""}`).join(", ") : "(none)";
 }
 
 function cached(text: string): Anthropic.TextBlockParam {
@@ -309,6 +314,7 @@ export function personaBlock(card: PersonaCard, ctx: CanonContext): string {
     : `Samples, to show your tone only (never repeat one or lift its phrases; say new things):\n${bullets(voice.samples.map(prose), "")}`;
   const big5 = card.personality.big5;
   const values = card.values;
+  const borrowed = borrowedFor(card, ctx.voices ?? []);
   return fillTemplate(loadTemplates().persona, {
     id: card.id,
     name: prose(card.name),
@@ -332,9 +338,10 @@ export function personaBlock(card: PersonaCard, ctx: CanonContext): string {
     chores: card.chores.map(prose).join("; "),
     relationships: bullets(card.relationships.map((r) => `${who(r.id, ctx.names)} (${r.tag}): ${prose(r.note)}`), "(none)"),
     register: prose(voice.register),
-    tics: ticList(voice),
+    // A generated card (MVP M-03) owns no catchphrase: its tics never include one of a hand-written card's.
+    tics: ticList(voice, card.generated_by ? borrowed : []),
     never_says: quoted(voice.never_says),
-    borrowed: borrowedLine(borrowedFor(card, ctx.voices ?? [])),
+    borrowed: borrowedLine(borrowed),
     voice_extra: voiceExtra,
     expressions: promptExpressions(card).join(", "),
     canon: bullets(activeCanonLocks(card, ctx), "(none right now)"),

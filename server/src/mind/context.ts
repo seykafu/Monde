@@ -61,6 +61,7 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
     db.select({
       id: residents.id, name: sql<string>`${residents.card}->>'name'`, kind: sql<string>`${residents.card}->>'kind'`,
       tics: sql<unknown>`${residents.card}->'voice'->'tics'`,
+      generated: sql<string | null>`${residents.card}->>'generated_by'`,
     }).from(residents).where(eq(residents.worldId, worldId)),
   ]);
   const names: Record<string, string> = {};
@@ -68,7 +69,7 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
   for (const r of [...everyone].sort((a, b) => (a.id < b.id ? -1 : 1))) {
     names[r.id] = r.name;
     const tics = Array.isArray(r.tics) ? r.tics.filter((t): t is string => typeof t === "string") : [];
-    voices.push({ id: r.id, kind: r.kind as RosterVoice["kind"], tics });
+    voices.push({ id: r.id, kind: r.kind as RosterVoice["kind"], tics, ...(r.generated ? { generated: true } : {}) });
   }
   return {
     card: row.card,

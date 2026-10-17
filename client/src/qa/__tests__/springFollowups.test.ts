@@ -3,7 +3,7 @@ import type Phaser from 'phaser';
 import { emptyFriendship, fallbackPress } from '@monde/shared';
 vi.mock('phaser', () => import('./phaserStub'));
 const { localTemplateFavors, favorBook, chooseFavor, favorInteraction, reachableFavorPlace } = await import('../../friendship/favors');
-const { meetResident, regardFor } = await import('../../scenes/friendship');
+const { meetResident, regardFor, regardMap } = await import('../../scenes/friendship');
 const { optionCalendar } = await import('../../story/optionCalendar');
 const { getEventLog } = await import('../../scenes/events');
 const { Clock } = await import('../../sim/clock');
@@ -39,6 +39,9 @@ describe('Quiet Mode ordinary Favors', () => {
     expect(favorBook(upstairs)[0]?.status).toBe('completed');
     expect(clock.minute).toBe(630);
     expect(regardFor(upstairs, 'odile')).toBe(before + f.reward.regard);
+    // The story's batch read (MVP M-03: every card on each refresh) is regardFor, resident by resident.
+    const ids = ['odile', 'pell', 'june', 'nobody'];
+    expect(regardMap(upstairs, ids)).toEqual(Object.fromEntries(ids.map(id => [id, regardFor(upstairs, id)])));
     localTemplateFavors(upstairs, 3);
     expect(favorBook(upstairs)).toHaveLength(1);
     expect(getEventLog(upstairs).outbox.map(e => e.kind)).toEqual(['favor_choice', 'favor_done']);

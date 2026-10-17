@@ -9,11 +9,13 @@
  *     own a second time in one conversation (§12.1: a habit once per conversation); the turn is regenerated once
  *     and then accepted, never swapped for an authored fallback over it.
  *
- * A signature phrase is a tic from a canon or resident card (the twenty-four hand-written ones) that isn't an
- * everyday word (COMMON_TICS). A tic two hand-written cards share belongs to both ("Right." is Augusta's and
- * Priya's, so Margo may not borrow it). Generated arrivals and animals own none and never take a phrase from its
- * owner, so an arrival stepping off the ferry never changes anyone else's cached persona block. Everything here is
- * pure and deterministic: the same roster always gives the same bytes.
+ * A signature phrase is a tic from a hand-written canon or resident card (the twenty-four in content/residents/*.yaml,
+ * no `generated_by`) that isn't an everyday word (COMMON_TICS). A tic two hand-written cards share belongs to both
+ * ("Right." is Augusta's and Priya's, so Margo may not borrow it). Generated residents (the Day-1 census's 188, MVP
+ * M-03, and the arrivals) and animals own none, and a generated resident may borrow none either, even one its own card
+ * lists ("Right." on a template card is still Augusta's). So the census and an arrival stepping off the ferry never
+ * change anyone else's cached persona block. Everything here is pure and deterministic: the same roster always gives
+ * the same bytes.
  *
  * Some tics are for leaving (a card's `voice.exit_only`, June's "Anyway."): the persona block marks them, and the
  * validator strips one said before the conversation's last line (`stripTics`).
@@ -25,6 +27,8 @@ export interface RosterVoice {
   id: string;
   kind: PersonaCard["kind"];
   tics: readonly string[];
+  /** A generated card (`generated_by` set: the Day-1 census, MVP M-03): owns no catchphrase. */
+  generated?: boolean;
 }
 
 /** A catchphrase that belongs to one resident. */
@@ -63,7 +67,7 @@ export function phraseKey(text: string): string {
  */
 export function signatures(roster: readonly RosterVoice[]): Signature[] {
   return [...roster]
-    .filter((voice) => OWNER_KINDS.has(voice.kind))
+    .filter((voice) => OWNER_KINDS.has(voice.kind) && !voice.generated)
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
     .flatMap((voice) => {
       const seen = new Set<string>();
@@ -82,12 +86,13 @@ function ownsKey(own: readonly string[], key: string): boolean {
 }
 
 /**
- * The signature phrases this resident must never borrow: everyone else's, minus any the resident's own card
- * also lists (or opens one of its own with). Animals never speak, so they borrow nothing.
+ * The signature phrases this resident must never borrow: everyone else's, minus any the resident's own hand-written
+ * card also lists (or opens one of its own with). A generated card's tics excuse nothing: it borrows none. Animals
+ * never speak, so they borrow nothing.
  */
-export function borrowedFor(card: Pick<PersonaCard, "id" | "voice">, roster: readonly RosterVoice[]): Signature[] {
+export function borrowedFor(card: Pick<PersonaCard, "id" | "voice" | "generated_by">, roster: readonly RosterVoice[]): Signature[] {
   if (card.voice.mode === "narrated_action") return [];
-  const own = card.voice.tics.map(phraseKey).filter(Boolean);
+  const own = card.generated_by ? [] : card.voice.tics.map(phraseKey).filter(Boolean);
   return signatures(roster).filter((s) => s.owner !== card.id && !ownsKey(own, phraseKey(s.phrase)));
 }
 

@@ -10,6 +10,7 @@ import {
 import { createTestDatabase } from "../../db/testDatabase.js";
 import { aiLog, arrivals, events, memories, relationships, residents } from "../../db/schema.js";
 import { createWorld } from "../../worlds/createWorld.js";
+import { FULL, fullRosterContent } from "../../__tests__/fullRoster.js";
 import {
   ARRIVAL_ATTEMPTS, ARRIVAL_BUFFER_SIZE, adoptHouseholds, arrivalsFor, commitArrivals, departResidents, generatedIds,
   noticeMemories, refillBuffer, writeHousehold, type ArrivalDeps, type ArrivalRequest,
@@ -198,5 +199,24 @@ describe("the night pass carries it (POST /night, GET /dawn)", () => {
     expect(pkg.arrivals).toHaveLength(1);
     expect(pkg.arrivals[0]!.residents.every(r => r.card.kind === "arrival")).toBe(true);
     await runner.close();
+  }, 30_000);
+});
+
+describe("arrivals into the full Day-1 town (MVP M-03)", () => {
+  it("count every resident's library portrait as worn, and take no living household's surname", async () => {
+    const roster = await fullRosterContent();
+    try {
+      const world = await createWorld(database.db, "arrivals-full", "invite", roster.dir, FULL);
+      const living = await database.db.select({ card: residents.card }).from(residents).where(eq(residents.worldId, world.id));
+      const worn = new Set(living.map(r => r.card.portrait).filter(p => p.startsWith("lib_")));
+      expect(worn.size).toBeGreaterThanOrEqual(80);
+      const surnames = new Set(living.map(r => r.card.name.replace(/"[^"]*"\s*/g, "").trim().split(/\s+/).at(-1)!));
+      const committed = await commitArrivals(deps(new DisabledMindClient()), world.id, request({ households: 2 }));
+      expect(committed.length).toBeGreaterThan(0);
+      for (const h of committed) for (const r of h.residents) {
+        expect(worn.has(r.card.portrait), `${r.card.id} wears ${r.card.portrait}`).toBe(false);
+        expect(surnames.has(r.card.name.split(" ").at(-1)!), r.card.name).toBe(false);
+      }
+    } finally { roster.cleanup(); }
   }, 30_000);
 });

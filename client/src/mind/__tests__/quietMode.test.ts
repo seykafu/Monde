@@ -4,6 +4,7 @@ import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
 import { PORTRAIT_SET, WEATHER_REPLIES, ZONE_REPLIES, derivedReplies, gameContext, replyHash } from '@monde/shared';
 import { personaCards } from '../../world/residents';
+import { loadDay1Cards, sampleOf } from '../../sim/__tests__/content';
 import { neverSaysHit } from '../voice';
 import { Rng } from '../../util/rng';
 import {
@@ -419,8 +420,10 @@ describe('Quiet Mode voice constraints', () => {
     expect(pick.line.id).toBe('ST-047');
   });
 
-  it('sweeps every speaking card and library line, with a safe survivor in every authored pool', () => {
-    for (const card of personaCards) {
+  it('sweeps every speaking hand-written card (and a sample of the Day-1 census) and library line, with a safe survivor in every authored pool', async () => {
+    // Every hand-written card; of the census's 188 (MVP M-03), an even sample keeps the sweep's runtime sane.
+    const census = sampleOf(await loadDay1Cards(), 24);
+    for (const card of [...personaCards.filter(c => !c.generated_by), ...census]) {
       if (card.voice.mode === 'narrated_action') continue;
       for (const line of library.lines) {
         const w = line.when;

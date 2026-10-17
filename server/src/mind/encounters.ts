@@ -14,7 +14,7 @@ import { budgetMind } from "./budget.js";
  *       count, a short memory for each side (tonight's reflection reads it) and the ai_log row.
  * Live chats share persistEncounter; the memory receipt prevents a second encounter in the night pass.
  */
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import {
   AFFINITY_SOURCES, GossipOutput, ROMANTIC_FEELINGS, ambientEncounterDelta, applyAffinity, clamp, clampGossip,
   encounterChance, encounterRoll, orderedPair, pairKey, pairMean, pairLabel, tieMilestone,
@@ -417,6 +417,126 @@ export async function persistEncounter(
     const kind = tieMilestone(before, after);
     if (kind) await tx.insert(tieMilestones).values({ worldId, day, aId: orderedPair(a, b)[0], bId: orderedPair(a, b)[1], kind, fromLabel: before, toLabel: after }).onConflictDoNothing();
     if (call) await tx.insert(aiLog).values(nightLogRow(worldId, pairKey(a, b), "gossip", version ?? promptVersion(), call, !model));
+  });
+  return applied;
+}
+
+/** One rule-mode encounter for the bulk writer: the encounter and its Ambient-rule outcome. */
+export interface RuleEncounter { encounter: Encounter; outcome: EncounterOutcome }
+
+/** Rows per statement in the bulk writer (one VALUES list per chunk). */
+const BULK_CHUNK = 100;
+const chunks = <T>(rows: readonly T[], n = BULK_CHUNK): T[][] => Array.from({ length: Math.ceil(rows.length / n) }, (_, i) => rows.slice(i * n, (i + 1) * n));
+
+/**
+ * The night's rule-mode encounters (Ambient pairs, calls over the night's cap, no API key), all in one transaction
+ * (MVP M-03: with 212 residents a night can have a couple of hundred): the same writes persistEncounter makes for
+ * each, batched. Every directed edge belongs to one pair and a pair meets once a night, so the order doesn't matter
+ * and the result is the one the encounters would have written one by one. Edges are locked in (from, to) order, then
+ * the receipts are checked, as persistEncounter does; an encounter already met today (a live chat) is skipped.
+ * Returns what each applied, by pair key.
+ */
+export async function persistRuleEncounters(
+  db: WorldDatabase, ctx: Pick<EncounterContext, "worldId" | "day" | "names">, items: readonly RuleEncounter[],
+): Promise<Map<string, { ab: number; ba: number }>> {
+  const { worldId, day } = ctx;
+  const applied = new Map<string, { ab: number; ba: number }>();
+  if (!items.length) return applied;
+  await db.transaction(async (tx) => {
+    const ids = [...new Set(items.flatMap((i) => [i.encounter.a, i.encounter.b]))];
+    for (const part of chunks(items)) {
+      await tx.insert(relationships).values(part.flatMap(({ encounter: { a, b } }) => [
+        { worldId, fromId: a, toId: b, affinity: 0, trust: 0, tag: "acquaintance", note: "" },
+        { worldId, fromId: b, toId: a, affinity: 0, trust: 0, tag: "acquaintance", note: "" },
+      ])).onConflictDoNothing();
+    }
+    const locked = await tx.select().from(relationships).where(and(
+      eq(relationships.worldId, worldId), inArray(relationships.fromId, ids), inArray(relationships.toId, ids),
+    )).orderBy(relationships.fromId, relationships.toId).for("update");
+    const edges = new Map(locked.map((r) => [`${r.fromId}>${r.toId}`, r]));
+    const receiptIds = items.map(({ encounter: { a, b } }) => encounterMemoryId(day, a, b, a));
+    const receipts = new Set<string>();
+    for (const part of chunks(receiptIds)) {
+      for (const r of await tx.select({ id: memories.id }).from(memories).where(and(eq(memories.worldId, worldId), inArray(memories.id, part)))) receipts.add(r.id);
+    }
+    const updates: RelationshipRow[] = [];
+    const newMemories: (typeof memories.$inferInsert)[] = [];
+    const milestones: (typeof tieMilestones.$inferInsert)[] = [];
+    const news: { id: string; recipientOf: (owner: string) => string | null; encounter: Encounter }[] = [];
+    for (const { encounter, outcome } of items) {
+      const { a, b } = encounter;
+      if (receipts.has(encounterMemoryId(day, a, b, a))) continue;
+      const ab = edges.get(`${a}>${b}`)!, ba = edges.get(`${b}>${a}`)!;
+      const before = pairLabel(ab.affinity, ba.affinity);
+      const step = (row: RelationshipRow, delta: SideDelta): { row: RelationshipRow; total: number } => {
+        let next = applyAffinity({ affinity: row.affinity, netDay: row.netDay, net: row.net }, day, delta.affinity, "encounter");
+        let total = next.applied;
+        if (encounter.planned) {
+          next = applyAffinity(next.edge, day, AFFINITY_SOURCES.together, "together");
+          total += next.applied;
+        }
+        // The Ambient rule moves no feelings (ruleOutcome); a feeling the model gave never comes here.
+        return {
+          row: { ...row, affinity: next.edge.affinity, netDay: next.edge.netDay, net: next.edge.net, trust: clamp(row.trust + delta.trust, -100, 100),
+            lastSeenDay: Math.max(row.lastSeenDay ?? day, day), encounters: row.encounters + 1 },
+          total,
+        };
+      };
+      const x = step(ab, outcome.a), y = step(ba, outcome.b);
+      updates.push(x.row, y.row);
+      applied.set(pairKey(a, b), { ab: x.total, ba: y.total });
+      const memory = (self: string, other: string, change: number) => ({
+        worldId, id: encounterMemoryId(day, a, b, self), residentId: self, day, minute: encounter.minute, kind: "did",
+        text: encounterMemoryText(ctx.names[other] ?? other, encounter.planned, change), who: [other], wherePlace: encounter.place,
+        importance: encounterImportance(change), valence: encounterValence(change),
+      });
+      newMemories.push(memory(a, b, x.total), memory(b, a, y.total));
+      for (const id of outcome.news) news.push({ id, recipientOf: (owner) => (owner === a ? b : owner === b ? a : null), encounter });
+      const after = pairLabel(x.row.affinity, y.row.affinity);
+      const kind = tieMilestone(before, after);
+      if (kind) milestones.push({ worldId, day, aId: orderedPair(a, b)[0], bId: orderedPair(a, b)[1], kind, fromLabel: before, toLabel: after });
+    }
+    // Every edge in one statement per chunk: UPDATE … FROM (VALUES …).
+    for (const part of chunks(updates)) {
+      const values = sql.join(part.map((r) => sql`(${r.fromId}::text, ${r.toId}::text, ${r.affinity}::int, ${r.netDay}::int, ${r.net}::int, ${r.trust}::int, ${r.lastSeenDay}::int, ${r.encounters}::int)`), sql`, `);
+      await tx.execute(sql`update ${relationships} as r set affinity = v.affinity, net_day = v.net_day, net = v.net, trust = v.trust,
+        last_seen_day = v.last_seen_day, encounters = v.encounters
+        from (values ${values}) as v(from_id, to_id, affinity, net_day, net, trust, last_seen_day, encounters)
+        where r.world_id = ${worldId} and r.from_id = v.from_id and r.to_id = v.to_id`);
+    }
+    for (const part of chunks(newMemories)) await tx.insert(memories).values(part).onConflictDoNothing();
+    // News that changed hands: copy provenance, one hop less important (as persistEncounter does, in bulk).
+    if (news.length) {
+      const sources = new Map<string, typeof memories.$inferSelect>();
+      for (const part of chunks([...new Set(news.map((n) => n.id))])) {
+        for (const m of await tx.select().from(memories).where(and(eq(memories.worldId, worldId), inArray(memories.id, part)))) sources.set(m.id, m);
+      }
+      const wanted: { source: typeof memories.$inferSelect; recipient: string; provenance: string; encounter: Encounter }[] = [];
+      for (const n of news) {
+        const source = sources.get(n.id);
+        const recipient = source ? n.recipientOf(source.residentId) : null;
+        if (!source || !recipient) continue;
+        wanted.push({ source, recipient, provenance: source.sourceEvent ?? source.id, encounter: n.encounter });
+      }
+      const known = new Set<string>();
+      const recipients = [...new Set(wanted.map((w) => w.recipient))];
+      for (const part of chunks([...new Set(wanted.map((w) => w.provenance))])) {
+        const rows = await tx.select({ residentId: memories.residentId, sourceEvent: memories.sourceEvent }).from(memories).where(and(
+          eq(memories.worldId, worldId), inArray(memories.residentId, recipients), inArray(memories.sourceEvent, part),
+        ));
+        for (const r of rows) known.add(`${r.residentId}|${r.sourceEvent}`);
+      }
+      const heard: (typeof memories.$inferInsert)[] = [];
+      for (const { source, recipient, provenance, encounter } of wanted) {
+        if (known.has(`${recipient}|${provenance}`)) continue;
+        known.add(`${recipient}|${provenance}`);
+        heard.push({ ...source, id: `heard_${recipient}_${provenance}`, sourceEvent: provenance, residentId: recipient,
+          day, minute: encounter.minute, kind: "heard", text: `${ctx.names[source.residentId] ?? source.residentId} told me: ${heardText(source.text)}`, importance: Math.max(1, source.importance - 1),
+          who: [...new Set([...source.who, source.residentId])], wherePlace: encounter.place });
+      }
+      for (const part of chunks(heard)) await tx.insert(memories).values(part).onConflictDoNothing();
+    }
+    for (const part of chunks(milestones)) await tx.insert(tieMilestones).values(part).onConflictDoNothing();
   });
   return applied;
 }

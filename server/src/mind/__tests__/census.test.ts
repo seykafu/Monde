@@ -1,7 +1,8 @@
 // MVP M-03 step 2 on the server: POST /admin/census/write (ADMIN_TOKEN, the request the server builds itself, the census
 // budget on one census world, ai_log), the whole run through it with a fake mind, the whims through the filters, and
-// the loaders leaving content/residents/day1/ alone until step 3.
+// the loaders reading content/residents/day1/ after the hand-written cards (step 3).
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -187,12 +188,35 @@ describe("the census's supporting pieces", () => {
     expect(personaBlock(generated, { flags: [], day: 1 })).toBe(personaBlock(pell, { flags: [], day: 1 }));
   });
 
-  it("loads only the hand-written cards: content/residents/day1/ waits for M-03 step 3", async () => {
+  it("npm run census:write -- --template-only --out <dir> writes all 188 template cards there, no call, the skeleton untouched", () => {
+    const out = mkdtempSync(join(tmpdir(), "monde-day1-"));
+    const before = read("content/census/day1.yaml");
+    const log = execFileSync(process.execPath, ["--import", "tsx", "tools/gen-residents.ts", "--template-only", "--out", out], { cwd: root, encoding: "utf8", env: { ...process.env, ADMIN_TOKEN: "", ANTHROPIC_API_KEY: "" } });
+    expect(log).toMatch(/107 households written as template cards \(188 cards\)/);
+    const files = readdirSync(out).filter(f => f.endsWith(".yaml"));
+    expect(files).toHaveLength(188);
+    for (const f of files.slice(0, 20)) expect(PersonaCard.parse(YAML.parse(readFileSync(join(out, f), "utf8")))).toMatchObject({ generated_by: "template", kind: "resident" });
+    expect(read("content/census/day1.yaml")).toBe(before);
+  }, 60_000);
+
+  it("loads content/residents/day1/ after the hand-written cards (M-03 step 3), and fails loudly on a bad one", async () => {
     const dir = mkdtempSync(join(tmpdir(), "monde-content-"));
     mkdirSync(join(dir, "residents", "day1"), { recursive: true });
     writeFileSync(join(dir, "residents", "pell.yaml"), read("content/residents/pell.yaml"));
-    writeFileSync(join(dir, "residents", "day1", "someone.yaml"), "this is not a card");
-    const loaded = await loadContent(dir);
-    expect(loaded.map(c => c.id)).toEqual(["pell"]);
+    // No Day-1 cards: the hand-written ones, as before.
+    expect((await loadContent(dir, { roster: "full" })).map(c => c.id)).toEqual(["pell"]);
+    const bad = mkdtempSync(join(tmpdir(), "monde-content-"));
+    mkdirSync(join(bad, "residents", "day1"), { recursive: true });
+    writeFileSync(join(bad, "residents", "pell.yaml"), read("content/residents/pell.yaml"));
+    writeFileSync(join(bad, "residents", "day1", "someone.yaml"), "this is not a card");
+    await expect(loadContent(bad, { roster: "full" })).rejects.toThrow(/Invalid resident card .*day1\/someone\.yaml/);
+    // A Day-1 card with a hand-written card's id is a duplicate.
+    const dup = mkdtempSync(join(tmpdir(), "monde-content-"));
+    mkdirSync(join(dup, "residents", "day1"), { recursive: true });
+    writeFileSync(join(dup, "residents", "pell.yaml"), read("content/residents/pell.yaml"));
+    writeFileSync(join(dup, "residents", "day1", "pell.yaml"), read("content/residents/pell.yaml"));
+    await expect(loadContent(dup, { roster: "full" })).rejects.toThrow(/Duplicate resident id: pell/);
+    // The server's unit tests run on the authored roster (MONDE_ROSTER=authored).
+    expect((await loadContent(bad)).map(c => c.id)).toEqual(["pell"]);
   });
 });

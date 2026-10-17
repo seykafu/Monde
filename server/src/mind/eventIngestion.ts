@@ -3,7 +3,7 @@ import { Favor, canCompleteFavor } from "@monde/shared";
 import { loadItems } from '../content/loadContent.js';
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray, gte, sql } from "drizzle-orm";
-import { ClientEvent, COMMUNITY_TASKS, matchGift, giftRegard, isBirthday, applyScriptedRegard, type EventIngestionResult, type RegardSnapshot } from "@monde/shared";
+import { ClientEvent, COMMUNITY_TASKS, matchGift, giftRegard, isBirthday, applyScriptedRegard, type EventIngestionResult, type PersonaCard, type RegardSnapshot } from "@monde/shared";
 import { events, memories, plans, processedClientEvents, residents, worlds, favors, relationships } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { loadPlaceRegistry } from "./places.js";
@@ -43,8 +43,14 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
   if (!world) throw new Error("Unknown world");
   const [registry, positions] = await Promise.all([loadPlaceRegistry(options.contentDir), loadPlacePositions(options.contentDir)]);
   const result: EventIngestionResult = { accepted: [], duplicates: [], rejected: [], regard: {} };
-  const rows = await tx.select().from(residents).where(eq(residents.worldId, worldId)).for("update");
+  // Every resident's row is locked (Regard and state change under it), but only the columns the batch writes are read
+  // (MVP M-03: 212 cards are most of a row's bytes); the cards come once, unlocked, when an event needs them.
+  const rows = await tx.select({ id: residents.id, state: residents.state }).from(residents).where(eq(residents.worldId, worldId)).for("update");
   const byId = new Map(rows.map(r => [r.id, r]));
+  let cardCache: Map<string, PersonaCard> | null = null;
+  const cards = async (): Promise<Map<string, PersonaCard>> => (cardCache ??= new Map(
+    (await tx.select({ id: residents.id, card: residents.card }).from(residents).where(eq(residents.worldId, worldId))).map(r => [r.id, r.card]),
+  ));
   const planDays = new Map<number, Map<string, typeof plans.$inferSelect.plan>>();
   for (const raw of batch) {
     const parsed = ClientEvent.safeParse(raw);
@@ -104,11 +110,11 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
           !canCompleteFavor({ ...parsedFavor.data, status: 'accepted', found: e.proof.found }, e.day, e.proof)) {
         result.rejected.push({ id: e.id, reason: 'invalid or expired favor completion' }); continue;
       }
-      const f = parsedFavor.data, row = byId.get(e.resident)!;
+      const f = parsedFavor.data, row = byId.get(e.resident)!, card = (await cards()).get(e.resident)!;
       row.state = { ...row.state, regard: applyScriptedRegard(row.state.regard, f.reward.regard) };
       await tx.update(residents).set({ state: row.state }).where(and(eq(residents.worldId, worldId), eq(residents.id, e.resident)));
       await tx.update(favors).set({ status: 'completed' }).where(and(eq(favors.worldId, worldId), eq(favors.id, e.favor)));
-      await tx.insert(events).values({ worldId,id:e.id,day:e.day,minute:e.minute,type:'favor_done',wherePlace:f.task.place,who:['player',e.resident],importance:2,tags:['favor_done'],summary:`The Fellow completed an errand for ${row.card.name}.` }).onConflictDoNothing();
+      await tx.insert(events).values({ worldId,id:e.id,day:e.day,minute:e.minute,type:'favor_done',wherePlace:f.task.place,who:['player',e.resident],importance:2,tags:['favor_done'],summary:`The Fellow completed an errand for ${card.name}.` }).onConflictDoNothing();
       if (f.task.kind === 'introduce') for (const [fromId, toId] of [[f.resident_id, f.task.recipient], [f.task.recipient, f.resident_id]]) {
         await tx.insert(relationships).values({ worldId, fromId: fromId!, toId: toId!, affinity: 10, trust: 0, tag: 'acquaintance', note: 'Introduced by the Fellow.', lastSeenDay: e.day }).onConflictDoUpdate({ target: [relationships.worldId,relationships.fromId,relationships.toId],set: { affinity: sql`least(100, ${relationships.affinity} + 10)`,lastSeenDay:e.day } });
       }
@@ -126,25 +132,29 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
           byResident = new Map(stored.map(p => [p.residentId, p.plan]));
           planDays.set(e.day, byResident);
         }
+        const everyone = await cards();
+        const seen: (typeof memories.$inferInsert)[] = [];
         for (const row of rows) {
           const participant = e.participants.includes(row.id);
-          if (!participant && !witnesses((byResident.get(row.id) ?? templatePlan(row.card, e.day)).blocks, e.place, e.minute, positions)) continue;
-          await tx.insert(memories).values({ worldId, id: randomUUID(), residentId: row.id, day: e.day, minute: e.minute,
+          if (!participant && !witnesses((byResident.get(row.id) ?? templatePlan(everyone.get(row.id)!, e.day)).blocks, e.place, e.minute, positions)) continue;
+          seen.push({ worldId, id: randomUUID(), residentId: row.id, day: e.day, minute: e.minute,
             kind: participant ? "did" : "saw", text: `${participant ? "I took part: " : "I saw: "}${e.summary}`.slice(0, 200),
             who: e.participants, wherePlace: e.place, importance: e.importance,
             // GDD-GAP: event/cue valence isn't authored. Neutral until a reflection interprets it.
             valence: 0, sourceEvent: e.id });
         }
+        // One statement per hundred witnesses (a busy square on a 212-resident Day 1 has dozens).
+        for (let i = 0; i < seen.length; i += 100) await tx.insert(memories).values(seen.slice(i, i + 100));
         result.accepted.push(e.id);
       }
     } else if ((e.kind === 'gift' || e.kind === 'meal') && item) {
-      const row = byId.get(e.resident)!;
-      const reaction = matchGift(item, row.card);
-      const delta = e.kind === 'meal' ? 2 : giftRegard(reaction, { birthday: isBirthday(e.day, row.card.birthday) });
+      const row = byId.get(e.resident)!, card = (await cards()).get(e.resident)!;
+      const reaction = matchGift(item, card);
+      const delta = e.kind === 'meal' ? 2 : giftRegard(reaction, { birthday: isBirthday(e.day, card.birthday) });
       row.state = { ...row.state, regard: applyScriptedRegard(row.state.regard, delta) };
       await tx.update(residents).set({ state: row.state, updatedAt: new Date() }).where(and(eq(residents.worldId, worldId), eq(residents.id, e.resident)));
       await tx.insert(memories).values({ worldId, id: randomUUID(), residentId: e.resident, day: e.day, minute: e.minute,
-        kind: 'did', text: e.kind === 'meal' ? `I shared ${item.name} with the Fellow.` : `The Fellow gave me ${item.name}. My reaction: ${reaction}.`, who: ['player', e.resident], wherePlace: row.card.home,
+        kind: 'did', text: e.kind === 'meal' ? `I shared ${item.name} with the Fellow.` : `The Fellow gave me ${item.name}. My reaction: ${reaction}.`, who: ['player', e.resident], wherePlace: card.home,
         importance: 2, valence: Math.sign(delta), sourceEvent: e.id });
       result.accepted.push(e.id);
     } else if (e.kind === "scripted_memory") {

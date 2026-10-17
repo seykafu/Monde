@@ -25,12 +25,13 @@
     "desktop:compile": "npm run build -w @monde/desktop",
     "desktop:build": "npm run build -w @monde/client && npm run desktop:compile",
     "desktop:dist": "npm run desktop:build && npm run dist -w @monde/desktop --",
-    "ci": "npm run typecheck && npm run lint && npm run lint:content && npm run scenes && npm test && npm run verify:puzzles && npm run build && npm run desktop:compile && npm run smoke:server",
+    "ci": "npm run typecheck && npm run lint && npm run lint:content && npm run scenes && npm run residents && npm test && npm run verify:puzzles && npm run build && npm run desktop:compile && npm run smoke:server",
     "lint:content": "tsx tools/lint-content.ts",
     "census:skeleton": "tsx tools/census.ts skeleton",
     "census:report": "tsx tools/census.ts report",
     "census:write": "tsx tools/gen-residents.ts",
     "scenes": "tsx tools/compile-scenes.ts",
+    "residents": "tsx tools/compile-residents.ts",
     "smoke:server": "bash tools/smoke-server.sh"
   },
   "devDependencies": {

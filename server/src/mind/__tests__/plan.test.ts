@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { PersonaCard, PlanOutput } from "@monde/shared";
 import { loadContent } from "../../content/loadContent.js";
 import { loadPlaceRegistry, openPlacesFor, placeHours, type PlaceRegistry } from "../places.js";
+import { templateRoster } from "../../../../tools/census-inputs.js";
 import { MAX_CHANGES, modelMinutes, planVerbs, validatePlan, type PlanValidationContext } from "../plan.js";
 import { routineBlocks, templatePlan, withoutMinutes } from "../templatePlan.js";
 
@@ -179,5 +180,17 @@ describe("open places for the plan prompt", () => {
     // Vane's routine goes to the mainland, so his list has it.
     expect(openPlacesFor(registry, card("vane")).map((p) => p.id)).toContain("offmap.city");
     expect(placeHours("old_quarter.library")).toEqual({ open: 360, close: 1560 });
+  });
+
+  it("leaves other census households' homes out of a Day-1 resident's list, never their own (MVP M-03)", async () => {
+    const day1 = await templateRoster();
+    const someone = day1.find((c) => /\.home_\d{2,3}$/.test(c.home))!;
+    const ids = openPlacesFor(registry, someone).map((p) => p.id);
+    expect(ids).toContain(someone.home);
+    const otherHomes = new Set(day1.map((c) => c.home).filter((h) => /\.home_\d{2,3}$/.test(h) && h !== someone.home));
+    expect(otherHomes.size).toBeGreaterThan(50);
+    expect(ids.filter((id) => otherHomes.has(id))).toEqual([]);
+    // The cast's lists lose them too, so the census never lengthens anyone's plan prompt.
+    expect(openPlacesFor(registry, card("odile")).some((p) => /\.home_\d{2,3}$/.test(p.id))).toBe(false);
   });
 });

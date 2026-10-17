@@ -316,6 +316,11 @@ export interface CensusRunOptions {
   dryRun?: boolean;
   /** Write at most this many households (a trial run). */
   limit?: number;
+  /**
+   * Development (M-03 step 3): every household's A.3.8 template card, no model call (no writer needed). The cards are
+   * flagged generated_by: template like any template fallback.
+   */
+  templateOnly?: boolean;
   prices?: CensusPrices;
   now?: () => Date;
 }
@@ -441,7 +446,7 @@ export async function runCensus(input: CensusInput, options: CensusRunOptions): 
     return result;
   }
   const writer = options.writer;
-  if (!writer) throw new Error("runCensus: a writer is needed unless dryRun");
+  if (!writer && !options.templateOnly) throw new Error("runCensus: a writer is needed unless dryRun or templateOnly");
 
   const lock = mutex();
   let consecutiveErrors = 0;
@@ -465,14 +470,14 @@ export async function runCensus(input: CensusInput, options: CensusRunOptions): 
   const writeOne = async (h: SkeletonHousehold): Promise<void> => {
     const draw = nativeDrawFor(input, h);
     let attempts = 0, cost = 0;
-    for (let round = 0; round < CENSUS_ROUNDS; round++) {
+    for (let round = 0; round < (options.templateOnly ? 0 : CENSUS_ROUNDS); round++) {
       // A.3.8: the second round starts over (a new whim, no errors carried).
       let errors: string[] = [];
       for (let k = 0; k < CENSUS_ATTEMPTS_PER_ROUND; k++) {
         if (result.stopped) { result.failed.push({ id: h.id, reason: `stopped (${result.stopped})` }); return; }
         attempts++;
         const ctx = nativeContextFor(input, h, draw, whimFor(sk.seed, h.id, attempts), errors);
-        const res = await writer(draw, ctx);
+        const res = await writer!(draw, ctx);
         if (res.kind === "budget") { result.stopped = "budget"; result.failed.push({ id: h.id, reason: `budget: ${res.message}` }); store.log(`budget: ${res.message}; stopping`); return; }
         if (res.kind === "error") {
           // The wire, not the words: leave the household for the next run.
@@ -502,7 +507,7 @@ export async function runCensus(input: CensusInput, options: CensusRunOptions): 
     // A.3.8: the template card, flagged generated_by: template.
     const vctx = nativeValidationContext(input, h, draw, { novelty: false });
     const done = await commit(h, draw, nativeTemplateHousehold(draw, vctx, sk.seed), "template", attempts, cost);
-    if (done.ok) { result.written.push({ id: h.id, source: "template", attempts, cost_usd: cost }); store.log(`${h.id}: template card after ${attempts} attempts`); }
+    if (done.ok) { result.written.push({ id: h.id, source: "template", attempts, cost_usd: cost }); store.log(options.templateOnly ? `${h.id}: template card` : `${h.id}: template card after ${attempts} attempts`); }
     else { result.failed.push({ id: h.id, reason: `template failed: ${done.errors.join(" | ")}` }); store.log(`${h.id}: the template card failed validation: ${done.errors.join(" | ")}`); }
   };
 

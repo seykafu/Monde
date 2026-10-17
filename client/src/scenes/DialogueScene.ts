@@ -9,7 +9,7 @@ import { openPeople } from './PeopleScene';
 import { SPRING_RIDDLES } from '@monde/shared';
 import { getFellow, setFellow } from '../fellow/state';
 import { gainXp } from '@monde/shared';
-import { containsAnswer } from '@monde/shared';
+import { containsAnswer, type SavedFriendship } from '@monde/shared';
 import { openBag } from '../economy/BagScene';
 import { giveGift, shareMeal } from '../economy/runtime';
 import { findMark, marks, refreshHints } from './riddles';
@@ -62,6 +62,7 @@ import type { TalkChoice, TalkContext, TalkInput, TalkTurn } from '../mind/types
 import { Portrait } from '../dialogue/portrait';
 import { PORTRAIT_H, PORTRAIT_W, portraitArtId, portraitLook, shadeColour, type PortraitLook } from '../dialogue/portraitModel';
 import { rosterEntry } from '../world/roster';
+import { prewarmRange, prewarmTier } from '../mind/prewarm';
 import { Backlog, type LogEntry } from '../dialogue/backlog';
 import { HeartRowView, heartTexture } from '../ui/hearts';
 import { HEART_ANIMATION, heartFeedback, type HeartFeedback } from '../friendship/hearts';
@@ -111,8 +112,11 @@ export function attachDialogue(host: Phaser.Scene, opts: { residents: ResidentLa
     host.scene.launch(DIALOGUE_SCENE, data);
   });
   opts.residents.chatter.weather = () => opts.weather().kind;
-  opts.residents.onApproach = id => { if (CARDS.has(id)) getMind().prewarmNear(id, opts.clock.day, opts.clock.minute); };
-  host.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { off(); opts.residents.onApproach = undefined; });
+  // Ambient residents (most of the Day-1 census, MVP M-03) prewarm closer and fewer a day (mind/prewarm.ts).
+  const tier = (id: string) => prewarmTier(CARDS.get(id)?.card.kind, (host.registry.get('monde.friendship') as SavedFriendship | undefined)?.tiers?.[id]);
+  opts.residents.approachRange = id => prewarmRange(tier(id));
+  opts.residents.onApproach = id => { if (CARDS.has(id)) getMind().prewarmNear(id, opts.clock.day, opts.clock.minute, tier(id)); };
+  host.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { off(); opts.residents.onApproach = undefined; opts.residents.approachRange = undefined; });
 }
 
 /** Everyone with a card, the generated residents who have arrived included (G-02, world/roster.ts). */

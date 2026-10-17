@@ -4,6 +4,10 @@
 import { writeFileSync } from 'node:fs';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 vi.mock('phaser', () => import('./phaserStub'));
+// The whole Day-1 town (MVP M-03): the hand-written cast and the census's 188, their written cards or, until the census
+// is written, every household's template card (tools/census-inputs.ts), so the bot plays the same town either way.
+vi.mock('../../world/residents', async importOriginal =>
+  (await import('../../sim/__tests__/content')).withFullRoster(await importOriginal<typeof import('../../world/residents')>()));
 
 // The game's dev logging ([town] dawn, [arrivals]…) would fill the run's output.
 vi.spyOn(console, 'info').mockImplementation(() => undefined);
