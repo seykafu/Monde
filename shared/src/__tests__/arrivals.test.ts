@@ -24,8 +24,8 @@ const ctx = (over: Partial<DrawContext> = {}): DrawContext => ({
 });
 
 describe("the portrait library (§16.2, A.3.5)", () => {
-  it("has sixteen tagged busts across every age band, each with a look the rig can draw", () => {
-    expect(PORTRAIT_LIBRARY).toHaveLength(16);
+  it("has 120 tagged busts (A-05: 40 masters, two colour variants each) across every age band, each with a look the rig can draw", () => {
+    expect(PORTRAIT_LIBRARY).toHaveLength(120);
     expect(new Set(PORTRAIT_LIBRARY.map(p => p.band))).toEqual(new Set(["child", "teen", "young_adult", "adult", "elder"]));
     expect(new Set(PORTRAIT_LIBRARY.map(p => p.presentation))).toEqual(new Set(["f", "m", "a"]));
     expect(new Set(PORTRAIT_LIBRARY.map(p => p.skin)).size).toBe(6);
@@ -37,12 +37,16 @@ describe("the portrait library (§16.2, A.3.5)", () => {
 
   it("assigns by band and presentation, prefers attire, and avoids a bust someone already wears", () => {
     const rng = new SeededRng(1);
-    const elderF = assignPortrait({ band: "elder", presentation: "f", attire: ["cardigan", "brooch"] }, rng, new Map());
-    expect(elderF).toMatchObject({ id: "lib_f68_013", band: "elder", presentation: "f" });
-    const worn = assignPortrait({ band: "elder", presentation: "f", attire: ["cardigan", "brooch"] }, new SeededRng(1), new Map([["lib_f68_013", 1]]));
-    expect(worn.id).toBe("lib_f76_015");
+    const want = { band: "elder", presentation: "f", attire: ["cardigan", "brooch"] } as const;
+    const elderF = assignPortrait(want, rng, new Map());
+    expect(elderF).toMatchObject({ band: "elder", presentation: "f" });
+    expect(elderF.attire).toEqual(expect.arrayContaining(["cardigan", "brooch"]));
+    const worn = assignPortrait(want, new SeededRng(1), new Map([[elderF.id, 1]]));
+    expect(worn).toMatchObject({ band: "elder", presentation: "f" });
+    expect(worn.id).not.toBe(elderF.id);
+    expect(worn.attire).toEqual(expect.arrayContaining(["cardigan", "brooch"]));
     // A band with no bust of that presentation still gives someone of that age.
-    expect(assignPortrait({ band: "teen", presentation: "m", attire: [] }, rng, new Map()).band).toBe("teen");
+    expect(assignPortrait({ band: "child", presentation: "a", attire: [] }, rng, new Map()).band).toBe("child");
   });
 
   it("matches a look to the bust that wears it", () => {

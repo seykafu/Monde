@@ -1,5 +1,5 @@
 {
-  "_about": "The portrait library (GDD §16.2, Appendix A.3.5): generic townsfolk busts for generated arrivals, six expressions each. Each entry is tagged with the look the paper-doll rig draws for the same person (shared/src/look.ts CardHumanLook), so the dialogue bust and the walking sprite agree. scripts/art/gen_portraits.py --library draws them; scripts/art/export_portraits.py exports them like any resident. Add rows to grow the library; never reorder or rename an id (saves store it).",
+  "_about": "The portrait library (GDD §16.2, Appendix A.3.5): generic townsfolk busts for generated residents and arrivals, six expressions each. Each entry is tagged with the look the paper-doll rig draws for the same person (shared/src/look.ts CardHumanLook), so the dialogue bust and the walking sprite agree. Ids are lib_<presentation><age>_<nnn>: 001–040 are masters; 041–120 are colour variants, two per master in master order (master nnn's variants are 039+2·nnn and 040+2·nnn, e.g. lib_f05_001 → lib_f05_041 and lib_f05_042). A variant names its master in `variant_of`: the same person, face, age, build, attire and pose, with only the hair and clothing colours changed (`recolour` lists the changes; its look differs from the master's only in hair, outfit, accessory and headwear colours). scripts/art/gen_portraits.py --library draws masters against the style key and each variant expression as a recolour of its master's same expression; scripts/art/export_portraits.py exports them like any resident. Add rows to grow the library (new masters and variants take the next free numbers); never reorder or rename an id (saves store it).",
   "portraits": [
     {
       "id": "lib_f05_001",
@@ -619,6 +619,4557 @@
         },
         "face": {
           "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m03_017",
+      "band": "child",
+      "age": 3,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "black",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A toddler of about three with round cheeks, black curls poking out from under a mustard bobble hat, and little red corduroy dungarees over a cream jumper. Big, solemn, unblinking eyes.",
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "curly",
+          "colour": 3
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "dungarees",
+          "top": 3,
+          "bottom": 3,
+          "bottom_style": "trousers",
+          "shoes": 4,
+          "trim": 9
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_f12_018",
+      "band": "child",
+      "age": 12,
+      "presentation": "f",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "flaxen blonde",
+      "attire": [
+        "school_jumper",
+        "scarf",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A girl of about twelve with long flaxen hair held back by a hairband, a navy school jumper, a mustard knitted scarf and a satchel strap across her chest. A sticking plaster on her chin and a bookish, sceptical look.",
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "long",
+          "colour": 5
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 6,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_m16_019",
+      "band": "teen",
+      "age": 16,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "black",
+      "attire": [
+        "coat",
+        "scarf",
+        "school_jumper"
+      ],
+      "build": "slight",
+      "caption": "A lanky lad of about sixteen with black hair flopping into his eyes, ears that stick out, a camel duffel coat over a grey jumper and a long red-and-cream striped scarf wound twice round his neck. A shy, sidelong, trying-to-look-bored look.",
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "swept",
+          "colour": 3
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 15,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 3
+        }
+      }
+    },
+    {
+      "id": "lib_m22_020",
+      "band": "young_adult",
+      "age": 22,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "dark brown",
+      "attire": [
+        "apron",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A young man in his early twenties with an unruly mop of dark brown hair, a smudge of flour on his nose and a white baker's apron over a blue striped shirt with rolled sleeves. An eager, sleepy, up-since-four look.",
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "tufty",
+          "colour": 0
+        },
+        "eyes": 3,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "apron",
+          "top": 5,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "apron",
+          "colour": 9
+        }
+      }
+    },
+    {
+      "id": "lib_f27_021",
+      "band": "young_adult",
+      "age": 27,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "dark brown",
+      "attire": [
+        "oilskin",
+        "jumper",
+        "knit_cap"
+      ],
+      "build": "average",
+      "caption": "A young woman in her late twenties with dark brown curls under a red bobble hat, a sea-green oilskin over a cream jumper and a muslin cloth slung over one shoulder. A tired, fond, running-on-tea look.",
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "curly",
+          "colour": 0
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 0,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 3
+        }
+      }
+    },
+    {
+      "id": "lib_f30_022",
+      "band": "young_adult",
+      "age": 30,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "blue-black",
+      "attire": [
+        "cardigan",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A young woman around thirty with long blue-black hair and a blunt fringe, a cornflower-blue cardigan over a white blouse and a satchel strap across her chest. A chalky handprint on one shoulder and an earnest, determined look.",
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "long",
+          "colour": 7
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 5,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 1
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_f39_023",
+      "band": "adult",
+      "age": 39,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "black",
+      "attire": [
+        "coat",
+        "nurse_watch"
+      ],
+      "build": "average",
+      "caption": "A woman in her late thirties with black hair in a neat low bun, a dark navy coat with rolled sleeves over a white collar, and a nurse's watch pinned upside down on her lapel. Calm eyes that have seen worse.",
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "bun",
+          "colour": 3
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_a41_024",
+      "band": "adult",
+      "age": 41,
+      "presentation": "a",
+      "skin": 3,
+      "skin_word": "olive",
+      "hair_word": "dark brown",
+      "attire": [
+        "smock",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A person in their early forties with short dark brown hair cropped close at the sides, a clay-streaked oatmeal potter's smock and a handwoven teal scarf. A smear of dried clay on one cheekbone and an absorbed, unhurried look.",
+      "look": {
+        "kind": "human",
+        "skin": 7,
+        "hair": {
+          "style": "cropped",
+          "colour": 0
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 9,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_m44_025",
+      "band": "adult",
+      "age": 44,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "light brown",
+      "attire": [
+        "coat",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A tall, soft-spoken man in his mid-forties with tidy light-brown hair, a neatly trimmed beard, a charcoal duffel coat and a long, lopsided green striped scarf that a child clearly knitted. A patient, slightly frazzled look.",
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "short",
+          "colour": 1
+        },
+        "eyes": 1,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 13,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 7
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f45_026",
+      "band": "adult",
+      "age": 45,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "mousy brown",
+      "attire": [
+        "cardigan",
+        "flat_cap"
+      ],
+      "build": "slight",
+      "caption": "A wiry woman in her mid-forties with short mousy-brown hair under a grey flat cap and a darned charcoal work cardigan buttoned to the neck. A chipped front tooth and a wry, unimpressed look.",
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "short",
+          "colour": 11
+        },
+        "eyes": 3,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 13,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 14
+        }
+      }
+    },
+    {
+      "id": "lib_f48_027",
+      "band": "adult",
+      "age": 48,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "black with a silver streak",
+      "attire": [
+        "cardigan",
+        "glasses",
+        "satchel"
+      ],
+      "build": "average",
+      "caption": "A woman in her late forties with a cloud of black curls and a single silver streak at the front, round tortoiseshell glasses on a beaded cord and a chalk-dusted teal cardigan. A warm, no-running-in-the-corridor look.",
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "curly",
+          "colour": 3
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 0,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 1
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round"
+      }
+    },
+    {
+      "id": "lib_m50_028",
+      "band": "adult",
+      "age": 50,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "black, shaved close",
+      "attire": [
+        "checked",
+        "neckerchief"
+      ],
+      "build": "broad",
+      "caption": "A big, broad man of about fifty with a close-shaved head, a magnificent black moustache, a white double-breasted cook's jacket, a red checked neckerchief and a tea towel slung over one shoulder. Twinkling eyes; looks like he's about to feed you.",
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "buzz",
+          "colour": 3
+        },
+        "eyes": 0,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "plain",
+          "top": 9,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 3
+        },
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m53_029",
+      "band": "adult",
+      "age": 53,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "salt-and-pepper",
+      "attire": [
+        "cardigan",
+        "flat_cap",
+        "work_jacket"
+      ],
+      "build": "broad",
+      "caption": "A stocky man in his early fifties with salt-and-pepper hair under a brown flat cap, a nose broken long ago and set a little crooked, and a grey work cardigan with leather elbow patches. A long-suffering, dryly amused look.",
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 11
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 14,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 1
+        },
+        "face": {
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f56_030",
+      "band": "adult",
+      "age": 56,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair and sun-freckled",
+      "hair_word": "faded strawberry blonde",
+      "attire": [
+        "jumper",
+        "boots",
+        "dungarees"
+      ],
+      "build": "average",
+      "caption": "A sturdy woman in her mid-fifties with sun-freckled cheeks, faded strawberry-blonde hair in a loose plait over one shoulder, leaf-green dungarees over a cream jumper and a sprig of rosemary tucked behind one ear. A cheerful, squinting-into-the-sun look.",
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "long",
+          "colour": 10
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "dungarees",
+          "top": 7,
+          "bottom": 7,
+          "bottom_style": "trousers",
+          "shoes": 2,
+          "trim": 9
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "freckles": true
+        }
+      }
+    },
+    {
+      "id": "lib_m58_031",
+      "band": "adult",
+      "age": 58,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "grey",
+      "attire": [
+        "smock",
+        "glasses"
+      ],
+      "build": "slight",
+      "caption": "A wiry man in his late fifties with grey hair in a stubby ponytail, a brass-rimmed magnifying visor pushed up on his forehead, a neat grey goatee and a slate-blue work smock full of little pockets. A distracted, delighted look.",
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "ponytail",
+          "colour": 2
+        },
+        "eyes": 5,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 6,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "glasses": "on_head",
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_f62_032",
+      "band": "elder",
+      "age": 62,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "pepper grey",
+      "attire": [
+        "blazer",
+        "glasses",
+        "badge"
+      ],
+      "build": "average",
+      "caption": "A brisk woman in her early sixties with close-cropped pepper-grey hair, reading glasses pushed up on her head and a brick-red blazer with a round enamel committee badge on the lapel. A no-nonsense, already-counting-volunteers look.",
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "cropped",
+          "colour": 11
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 3,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "glasses": "on_head"
+      }
+    },
+    {
+      "id": "lib_m64_033",
+      "band": "elder",
+      "age": 64,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "grey (once ginger)",
+      "attire": [
+        "work_jacket",
+        "cardigan"
+      ],
+      "build": "slight",
+      "caption": "A lean man in his mid-sixties with short grey hair that was ginger once, bushy ginger eyebrows that never got the message, and a worn brown work jacket over a grey cardigan. A dry, heard-it-all look.",
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "short",
+          "colour": 2
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 1,
+          "bottom": 14,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_a67_034",
+      "band": "elder",
+      "age": 67,
+      "presentation": "a",
+      "skin": 2,
+      "skin_word": "fair and wind-reddened",
+      "hair_word": "grey",
+      "attire": [
+        "raincoat",
+        "scarf",
+        "binoculars"
+      ],
+      "build": "slight",
+      "caption": "A weather-beaten person in their late sixties with cropped grey hair, wind-reddened cheeks, an olive waxed jacket with a corduroy collar, a mustard wool scarf and battered binoculars on a strap round the neck. A patient, far-off, listening look.",
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "cropped",
+          "colour": 2
+        },
+        "eyes": 4,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 10,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_f70_035",
+      "band": "elder",
+      "age": 70,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "silver",
+      "attire": [
+        "raincoat",
+        "scarf"
+      ],
+      "build": "broad",
+      "caption": "A plump, smiling woman of about seventy with silver hair swept up in a loose bun, big round earrings like boiled sweets, a cherry-red raincoat buttoned to the chin and a cream spotted scarf. A warm, nosy, delighted-to-see-you look.",
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "bun",
+          "colour": 2
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 3,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 9
+        }
+      }
+    },
+    {
+      "id": "lib_m71_036",
+      "band": "elder",
+      "age": 71,
+      "presentation": "m",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "white",
+      "attire": [
+        "raincoat",
+        "cardigan",
+        "glasses"
+      ],
+      "build": "average",
+      "caption": "A dapper man in his early seventies with close-cropped white hair, a neat white beard, round gold-rimmed spectacles, a mustard bow tie and a navy raincoat over a cardigan. A gentle, courtly, slightly mischievous look.",
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "buzz",
+          "colour": 8
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 14,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round",
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f73_037",
+      "band": "elder",
+      "age": 73,
+      "presentation": "f",
+      "skin": 1,
+      "skin_word": "pale and wind-burned",
+      "hair_word": "steel grey",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "navy_jumper"
+      ],
+      "build": "slight",
+      "caption": "A small, tough old woman in her seventies with short steel-grey hair under a brick-red knit cap, a thick navy fisherman's gansey and a gold hoop in one ear. Sea-squint crow's feet and a flinty, amused look.",
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "short",
+          "colour": 2
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 6,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 4
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 3
+        }
+      }
+    },
+    {
+      "id": "lib_m74_038",
+      "band": "elder",
+      "age": 74,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan and weathered",
+      "hair_word": "white",
+      "attire": [
+        "oilskin",
+        "jumper"
+      ],
+      "build": "broad",
+      "caption": "A barrel-chested old fisherman in his mid-seventies with white hair to his collar, a big white beard like a sea-washed broom, an anchor tattoo on his neck and a mustard oilskin over a cream jumper. A slow, weather-reading look.",
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "long",
+          "colour": 8
+        },
+        "eyes": 4,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 4,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f84_039",
+      "band": "elder",
+      "age": 84,
+      "presentation": "f",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "white",
+      "attire": [
+        "cardigan",
+        "glasses",
+        "knit_cap"
+      ],
+      "build": "slight",
+      "caption": "A tiny, very old woman of about eighty-four with wispy white hair escaping a teal knitted hat that looks suspiciously like a tea cosy, half-moon glasses on a chain and a rose-pink cardigan over a crocheted collar. A twinkling, mischievous, I'll-outlive-you-all look.",
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 8
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 12,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "halfmoon",
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_m86_040",
+      "band": "elder",
+      "age": 86,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "white",
+      "attire": [
+        "cardigan",
+        "flat_cap",
+        "scarf"
+      ],
+      "build": "slight",
+      "caption": "A frail, smiling old man in his mid-eighties with a fringe of white hair under a tweedy tan flat cap, big kindly ears, white stubble, and a bottle-green cardigan with a red tartan scarf tucked in. A slow, sweet, bemused look.",
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "tufty",
+          "colour": 8
+        },
+        "eyes": 6,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 10,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 3
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 15
+        },
+        "face": {
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f05_041",
+      "variant_of": "lib_f05_001",
+      "band": "child",
+      "age": 5,
+      "presentation": "f",
+      "skin": 3,
+      "skin_word": "warm tan",
+      "hair_word": "black",
+      "attire": [
+        "jumper",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A small girl of about five with black pigtails tied with red ribbons and a navy knitted jumper. A gap-toothed, curious look.",
+      "recolour": [
+        "hair: dark brown → black",
+        "yellow ribbons → red ribbons",
+        "red knitted jumper → navy knitted jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 7,
+        "hair": {
+          "style": "pigtails",
+          "colour": 3
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 6,
+          "bottom": 5,
+          "bottom_style": "trousers",
+          "shoes": 4
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_f05_042",
+      "variant_of": "lib_f05_001",
+      "band": "child",
+      "age": 5,
+      "presentation": "f",
+      "skin": 3,
+      "skin_word": "warm tan",
+      "hair_word": "copper",
+      "attire": [
+        "jumper",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A small girl of about five with copper pigtails tied with sky-blue ribbons and a leaf-green knitted jumper. A gap-toothed, curious look.",
+      "recolour": [
+        "hair: dark brown → copper",
+        "yellow ribbons → sky-blue ribbons",
+        "red knitted jumper → leaf-green knitted jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 7,
+        "hair": {
+          "style": "pigtails",
+          "colour": 4
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 7,
+          "bottom": 5,
+          "bottom_style": "trousers",
+          "shoes": 4
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_m09_043",
+      "variant_of": "lib_m09_002",
+      "band": "child",
+      "age": 9,
+      "presentation": "m",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "honey brown",
+      "attire": [
+        "school_jumper",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A boy of about nine with short honey-brown curls, a mustard school jumper over a white collar and a satchel strap across his chest. Bright, eager eyes.",
+      "recolour": [
+        "hair: black → honey brown",
+        "green school jumper → mustard school jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "curly",
+          "colour": 1
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 4,
+          "bottom": 6,
+          "bottom_style": "shorts",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_m09_044",
+      "variant_of": "lib_m09_002",
+      "band": "child",
+      "age": 9,
+      "presentation": "m",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "reddish brown",
+      "attire": [
+        "school_jumper",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A boy of about nine with short reddish-brown curls, a navy school jumper over a white collar and a satchel strap across his chest. Bright, eager eyes.",
+      "recolour": [
+        "hair: black → reddish brown",
+        "green school jumper → navy school jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "curly",
+          "colour": 9
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "shorts",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_a15_045",
+      "variant_of": "lib_a15_003",
+      "band": "teen",
+      "age": 15,
+      "presentation": "a",
+      "skin": 2,
+      "skin_word": "fair and freckled",
+      "hair_word": "sandy blond",
+      "attire": [
+        "apron",
+        "tool_belt",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A lanky teenager of about fifteen with a sandy-blond mop, a face full of freckles and a too-big olive-green canvas work apron over a brick-red shirt. Eager, a little sheepish.",
+      "recolour": [
+        "hair: ginger → sandy blond",
+        "canvas work apron → olive-green canvas work apron",
+        "blue shirt → brick-red shirt"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "tufty",
+          "colour": 5
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "apron",
+          "top": 3,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "apron",
+          "colour": 10
+        },
+        "face": {
+          "freckles": true
+        }
+      }
+    },
+    {
+      "id": "lib_a15_046",
+      "variant_of": "lib_a15_003",
+      "band": "teen",
+      "age": 15,
+      "presentation": "a",
+      "skin": 2,
+      "skin_word": "fair and freckled",
+      "hair_word": "dark brown",
+      "attire": [
+        "apron",
+        "tool_belt",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A lanky teenager of about fifteen with a dark brown mop, a face full of freckles and a too-big navy canvas work apron over a mustard shirt. Eager, a little sheepish.",
+      "recolour": [
+        "hair: ginger → dark brown",
+        "canvas work apron → navy canvas work apron",
+        "blue shirt → mustard shirt"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "tufty",
+          "colour": 0
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "apron",
+          "top": 4,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "apron",
+          "colour": 6
+        },
+        "face": {
+          "freckles": true
+        }
+      }
+    },
+    {
+      "id": "lib_f24_047",
+      "variant_of": "lib_f24_004",
+      "band": "young_adult",
+      "age": 24,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "dyed plum-red",
+      "attire": [
+        "smock",
+        "scarf"
+      ],
+      "build": "slight",
+      "caption": "A young woman in her twenties with long braids dyed a deep plum-red, a paint-spattered sky-blue smock and a teal scarf. Quick, amused eyes.",
+      "recolour": [
+        "hair: black → dyed plum-red",
+        "cream smock → sky-blue smock",
+        "mustard scarf → teal scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "braids",
+          "colour": 9
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 5,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_f24_048",
+      "variant_of": "lib_f24_004",
+      "band": "young_adult",
+      "age": 24,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "honey blonde",
+      "attire": [
+        "smock",
+        "scarf"
+      ],
+      "build": "slight",
+      "caption": "A young woman in her twenties with long honey-blonde braids, a paint-spattered sage-green smock and a brick-red scarf. Quick, amused eyes.",
+      "recolour": [
+        "hair: black → honey blonde",
+        "cream smock → sage-green smock",
+        "mustard scarf → brick-red scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "braids",
+          "colour": 10
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 7,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 3
+        }
+      }
+    },
+    {
+      "id": "lib_m26_049",
+      "variant_of": "lib_m26_005",
+      "band": "young_adult",
+      "age": 26,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "black",
+      "attire": [
+        "coat",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A young man in his mid-twenties with jet-black hair swept back, a camel wool coat a size too big and a teal knitted scarf. An easy, ironic smile.",
+      "recolour": [
+        "hair: sandy blond → black",
+        "an olive wool coat → a camel wool coat",
+        "red knitted scarf → teal knitted scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "swept",
+          "colour": 3
+        },
+        "eyes": 1,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 15,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_m26_050",
+      "variant_of": "lib_m26_005",
+      "band": "young_adult",
+      "age": 26,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "copper",
+      "attire": [
+        "coat",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A young man in his mid-twenties with copper hair swept back, a slate-navy wool coat a size too big and a mustard knitted scarf. An easy, ironic smile.",
+      "recolour": [
+        "hair: sandy blond → copper",
+        "an olive wool coat → a slate-navy wool coat",
+        "red knitted scarf → mustard knitted scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "swept",
+          "colour": 4
+        },
+        "eyes": 1,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_f31_051",
+      "variant_of": "lib_f31_006",
+      "band": "young_adult",
+      "age": 31,
+      "presentation": "f",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "bleached blonde",
+      "attire": [
+        "coat",
+        "tote"
+      ],
+      "build": "average",
+      "caption": "A woman around thirty with close-cropped bleached-blonde hair, small gold hoop earrings and a practical teal coat with a tote bag strap on one shoulder. Dry, efficient look.",
+      "recolour": [
+        "hair: black → bleached blonde",
+        "mustard coat → teal coat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "cropped",
+          "colour": 5
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 0,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_f31_052",
+      "variant_of": "lib_f31_006",
+      "band": "young_adult",
+      "age": 31,
+      "presentation": "f",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "dyed copper-red",
+      "attire": [
+        "coat",
+        "tote"
+      ],
+      "build": "average",
+      "caption": "A woman around thirty with close-cropped hair dyed copper-red, small gold hoop earrings and a practical plum coat with a tote bag strap on one shoulder. Dry, efficient look.",
+      "recolour": [
+        "hair: black → dyed copper-red",
+        "mustard coat → plum coat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "cropped",
+          "colour": 4
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 8,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_m33_053",
+      "variant_of": "lib_m33_007",
+      "band": "young_adult",
+      "age": 33,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "honey blond",
+      "attire": [
+        "oilskin",
+        "jumper"
+      ],
+      "build": "broad",
+      "caption": "A man in his early thirties with short honey-blond hair and stubble, a navy oilskin jacket over a grey cable-knit jumper. A weathered, steady look.",
+      "recolour": [
+        "hair: dark brown → honey blond",
+        "yellow oilskin jacket → navy oilskin jacket",
+        "cream cable-knit jumper → grey cable-knit jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 5
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m33_054",
+      "variant_of": "lib_m33_007",
+      "band": "young_adult",
+      "age": 33,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "black",
+      "attire": [
+        "oilskin",
+        "jumper"
+      ],
+      "build": "broad",
+      "caption": "A man in his early thirties with short black hair and stubble, a brick-red oilskin jacket over a navy cable-knit jumper. A weathered, steady look.",
+      "recolour": [
+        "hair: dark brown → black",
+        "yellow oilskin jacket → brick-red oilskin jacket",
+        "cream cable-knit jumper → navy cable-knit jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 3
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 3,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_a28_055",
+      "variant_of": "lib_a28_008",
+      "band": "young_adult",
+      "age": 28,
+      "presentation": "a",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "ash blonde",
+      "attire": [
+        "satchel",
+        "glasses",
+        "coat"
+      ],
+      "build": "slight",
+      "caption": "A person in their late twenties with an ash-blonde bob, round wire glasses and a bottle-green corduroy jacket with a canvas satchel strap. A thoughtful, precise expression.",
+      "recolour": [
+        "hair: chestnut → ash blonde",
+        "rust corduroy jacket → bottle-green corduroy jacket"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "bob",
+          "colour": 5
+        },
+        "eyes": 2,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 10,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round"
+      }
+    },
+    {
+      "id": "lib_a28_056",
+      "variant_of": "lib_a28_008",
+      "band": "young_adult",
+      "age": 28,
+      "presentation": "a",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "black",
+      "attire": [
+        "satchel",
+        "glasses",
+        "coat"
+      ],
+      "build": "slight",
+      "caption": "A person in their late twenties with a black bob, round wire glasses and a mustard corduroy jacket with a canvas satchel strap. A thoughtful, precise expression.",
+      "recolour": [
+        "hair: chestnut → black",
+        "rust corduroy jacket → mustard corduroy jacket"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "bob",
+          "colour": 3
+        },
+        "eyes": 2,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 4,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round"
+      }
+    },
+    {
+      "id": "lib_f42_057",
+      "variant_of": "lib_f42_009",
+      "band": "adult",
+      "age": 42,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "honey blonde",
+      "attire": [
+        "apron",
+        "checked"
+      ],
+      "build": "average",
+      "caption": "A woman in her forties with honey-blonde hair in a messy bun, a red checked shirt with rolled sleeves and a clean white apron. Bossy-kind eyes.",
+      "recolour": [
+        "hair: auburn → honey blonde",
+        "blue checked shirt → red checked shirt"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "bun",
+          "colour": 5
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "apron",
+          "top": 3,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "apron",
+          "colour": 9
+        }
+      }
+    },
+    {
+      "id": "lib_f42_058",
+      "variant_of": "lib_f42_009",
+      "band": "adult",
+      "age": 42,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "dark brown",
+      "attire": [
+        "apron",
+        "checked"
+      ],
+      "build": "average",
+      "caption": "A woman in her forties with dark brown hair in a messy bun, a green checked shirt with rolled sleeves and a clean navy apron. Bossy-kind eyes.",
+      "recolour": [
+        "hair: auburn → dark brown",
+        "blue checked shirt → green checked shirt",
+        "clean white apron → clean navy apron"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "bun",
+          "colour": 0
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "apron",
+          "top": 7,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "apron",
+          "colour": 6
+        }
+      }
+    },
+    {
+      "id": "lib_m47_059",
+      "variant_of": "lib_m47_010",
+      "band": "adult",
+      "age": 47,
+      "presentation": "m",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "iron grey",
+      "attire": [
+        "flat_cap",
+        "work_jacket",
+        "pencil"
+      ],
+      "build": "broad",
+      "caption": "A broad man in his late forties with a short iron-grey beard, iron-grey hair under a tan tweed flat cap, a pencil behind one ear and an olive canvas work jacket. A measured, patient look.",
+      "recolour": [
+        "hair: black, greying at the temples → iron grey",
+        "grey flat cap → tan tweed flat cap",
+        "a brown canvas work jacket → an olive canvas work jacket"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "short",
+          "colour": 2
+        },
+        "eyes": 0,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 10,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 15
+        },
+        "face": {
+          "grey_temples": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m47_060",
+      "variant_of": "lib_m47_010",
+      "band": "adult",
+      "age": 47,
+      "presentation": "m",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "prematurely white",
+      "attire": [
+        "flat_cap",
+        "work_jacket",
+        "pencil"
+      ],
+      "build": "broad",
+      "caption": "A broad man in his late forties with a short white beard, prematurely white hair under a charcoal flat cap, a pencil behind one ear and a slate-blue canvas work jacket. A measured, patient look.",
+      "recolour": [
+        "hair: black, greying at the temples → prematurely white",
+        "grey flat cap → charcoal flat cap",
+        "brown canvas work jacket → slate-blue canvas work jacket"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "short",
+          "colour": 8
+        },
+        "eyes": 0,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 13
+        },
+        "face": {
+          "grey_temples": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f51_061",
+      "variant_of": "lib_f51_011",
+      "band": "adult",
+      "age": 51,
+      "presentation": "f",
+      "skin": 3,
+      "skin_word": "light olive",
+      "hair_word": "salt-and-pepper",
+      "attire": [
+        "cardigan",
+        "tape_measure",
+        "glasses"
+      ],
+      "build": "average",
+      "caption": "A woman in her fifties with a long salt-and-pepper ponytail, half-moon glasses and a teal cardigan with a tape measure round her neck. A brisk shopkeeper's warmth.",
+      "recolour": [
+        "hair: brown → salt-and-pepper",
+        "plum cardigan → teal cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 7,
+        "hair": {
+          "style": "ponytail",
+          "colour": 11
+        },
+        "eyes": 3,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 0,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "halfmoon"
+      }
+    },
+    {
+      "id": "lib_f51_062",
+      "variant_of": "lib_f51_011",
+      "band": "adult",
+      "age": 51,
+      "presentation": "f",
+      "skin": 3,
+      "skin_word": "light olive",
+      "hair_word": "dyed auburn",
+      "attire": [
+        "cardigan",
+        "tape_measure",
+        "glasses"
+      ],
+      "build": "average",
+      "caption": "A woman in her fifties with a long ponytail dyed auburn, half-moon glasses and a mustard cardigan with a tape measure round her neck. A brisk shopkeeper's warmth.",
+      "recolour": [
+        "hair: brown → dyed auburn",
+        "plum cardigan → mustard cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 7,
+        "hair": {
+          "style": "ponytail",
+          "colour": 4
+        },
+        "eyes": 3,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 4,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "halfmoon"
+      }
+    },
+    {
+      "id": "lib_m38_063",
+      "variant_of": "lib_m38_012",
+      "band": "adult",
+      "age": 38,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale and ruddy",
+      "hair_word": "black",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "oilskin"
+      ],
+      "build": "broad",
+      "caption": "A man in his late thirties with a black beard, a brick-red knit cap and a thick navy fisherman's jumper. A short-spoken, weather-first face.",
+      "recolour": [
+        "hair: red-brown → black",
+        "navy knit cap → brick-red knit cap",
+        "thick cream fisherman's jumper → thick navy fisherman's jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "short",
+          "colour": 3
+        },
+        "eyes": 1,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 3
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m38_064",
+      "variant_of": "lib_m38_012",
+      "band": "adult",
+      "age": 38,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale and ruddy",
+      "hair_word": "sandy blond",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "oilskin"
+      ],
+      "build": "broad",
+      "caption": "A man in his late thirties with a sandy-blond beard, a mustard knit cap and a thick grey fisherman's jumper. A short-spoken, weather-first face.",
+      "recolour": [
+        "hair: red-brown → sandy blond",
+        "navy knit cap → mustard knit cap",
+        "thick cream fisherman's jumper → thick grey fisherman's jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "short",
+          "colour": 5
+        },
+        "eyes": 1,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 14,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 4
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f68_065",
+      "variant_of": "lib_f68_013",
+      "band": "elder",
+      "age": 68,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "silver grey",
+      "attire": [
+        "cardigan",
+        "brooch"
+      ],
+      "build": "slight",
+      "caption": "An older woman with a silver-grey bun, a rose-pink cardigan and a brooch at the collar. A dry, patient look.",
+      "recolour": [
+        "hair: white → silver grey",
+        "lavender cardigan → rose-pink cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "bun",
+          "colour": 2
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 12,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_f68_066",
+      "variant_of": "lib_f68_013",
+      "band": "elder",
+      "age": 68,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "dyed auburn",
+      "attire": [
+        "cardigan",
+        "brooch"
+      ],
+      "build": "slight",
+      "caption": "An older woman with a bun dyed auburn, a teal cardigan and a brooch at the collar. A dry, patient look.",
+      "recolour": [
+        "hair: white → dyed auburn",
+        "lavender cardigan → teal cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "bun",
+          "colour": 4
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 0,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_m72_067",
+      "variant_of": "lib_m72_014",
+      "band": "elder",
+      "age": 72,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "white",
+      "attire": [
+        "peaked_cap",
+        "navy_jumper"
+      ],
+      "build": "average",
+      "caption": "An older man with a white moustache, a soft charcoal peaked cap and a thick bottle-green jumper with brass buttons at the shoulder. Laconic, watchful eyes.",
+      "recolour": [
+        "hair: grey → white",
+        "soft navy peaked cap → soft charcoal peaked cap",
+        "thick navy jumper → thick bottle-green jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "short",
+          "colour": 8
+        },
+        "eyes": 4,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 10,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "peaked_cap",
+          "colour": 13
+        },
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m72_068",
+      "variant_of": "lib_m72_014",
+      "band": "elder",
+      "age": 72,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "salt-and-pepper",
+      "attire": [
+        "peaked_cap",
+        "navy_jumper"
+      ],
+      "build": "average",
+      "caption": "An older man with a salt-and-pepper moustache, a soft grey peaked cap and a thick oatmeal jumper with brass buttons at the shoulder. Laconic, watchful eyes.",
+      "recolour": [
+        "hair: grey → salt-and-pepper",
+        "soft navy peaked cap → soft grey peaked cap",
+        "thick navy jumper → thick oatmeal jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "short",
+          "colour": 11
+        },
+        "eyes": 4,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 9,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "peaked_cap",
+          "colour": 14
+        },
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_f76_069",
+      "variant_of": "lib_f76_015",
+      "band": "elder",
+      "age": 76,
+      "presentation": "f",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "white",
+      "attire": [
+        "raincoat",
+        "glasses"
+      ],
+      "build": "slight",
+      "caption": "An older woman with short white curls, heavy dark-framed glasses and a belted mustard raincoat with the collar up. A shrewd, amused look.",
+      "recolour": [
+        "hair: grey → white",
+        "belted teal raincoat → belted mustard raincoat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "curly",
+          "colour": 8
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 4,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "heavy"
+      }
+    },
+    {
+      "id": "lib_f76_070",
+      "variant_of": "lib_f76_015",
+      "band": "elder",
+      "age": 76,
+      "presentation": "f",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "dyed jet black",
+      "attire": [
+        "raincoat",
+        "glasses"
+      ],
+      "build": "slight",
+      "caption": "An older woman with short curls dyed jet black, heavy dark-framed glasses and a belted brick-red raincoat with the collar up. A shrewd, amused look.",
+      "recolour": [
+        "hair: grey → dyed jet black",
+        "belted teal raincoat → belted brick-red raincoat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "curly",
+          "colour": 3
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 3,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "heavy"
+      }
+    },
+    {
+      "id": "lib_m66_071",
+      "variant_of": "lib_m66_016",
+      "band": "elder",
+      "age": 66,
+      "presentation": "m",
+      "skin": 2,
+      "skin_word": "pale",
+      "hair_word": "iron grey",
+      "attire": [
+        "velvet_jacket",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "An older man with iron-grey tufts round a bald crown, a bushy iron-grey moustache, a plum velvet jacket and a gold silk scarf. A theatrical, self-mocking smile.",
+      "recolour": [
+        "hair: white → iron grey",
+        "bottle-green velvet jacket → plum velvet jacket",
+        "red silk scarf → gold silk scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "tufty",
+          "colour": 2
+        },
+        "eyes": 1,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 8,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        },
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m66_072",
+      "variant_of": "lib_m66_016",
+      "band": "elder",
+      "age": 66,
+      "presentation": "m",
+      "skin": 2,
+      "skin_word": "pale",
+      "hair_word": "dyed jet black",
+      "attire": [
+        "velvet_jacket",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "An older man with tufts dyed jet black round a bald crown, a bushy moustache dyed to match, a midnight-blue velvet jacket and a cream silk scarf. A theatrical, self-mocking smile.",
+      "recolour": [
+        "hair: white → dyed jet black",
+        "bottle-green velvet jacket → midnight-blue velvet jacket",
+        "red silk scarf → cream silk scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "tufty",
+          "colour": 3
+        },
+        "eyes": 1,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 9
+        },
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m03_073",
+      "variant_of": "lib_m03_017",
+      "band": "child",
+      "age": 3,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "honey brown",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A toddler of about three with round cheeks, honey-brown curls poking out from under a teal bobble hat, and little navy corduroy dungarees over a mustard jumper. Big, solemn, unblinking eyes.",
+      "recolour": [
+        "hair: black → honey brown",
+        "mustard bobble hat → teal bobble hat",
+        "red corduroy dungarees → navy corduroy dungarees",
+        "cream jumper → mustard jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "curly",
+          "colour": 1
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "dungarees",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 4,
+          "trim": 4
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_m03_074",
+      "variant_of": "lib_m03_017",
+      "band": "child",
+      "age": 3,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "dark brown",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A toddler of about three with round cheeks, dark brown curls poking out from under a red bobble hat, and little leaf-green corduroy dungarees over a sky-blue jumper. Big, solemn, unblinking eyes.",
+      "recolour": [
+        "hair: black → dark brown",
+        "mustard bobble hat → red bobble hat",
+        "red corduroy dungarees → leaf-green corduroy dungarees",
+        "cream jumper → sky-blue jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "curly",
+          "colour": 0
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "dungarees",
+          "top": 7,
+          "bottom": 7,
+          "bottom_style": "trousers",
+          "shoes": 4,
+          "trim": 5
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 3
+        }
+      }
+    },
+    {
+      "id": "lib_f12_075",
+      "variant_of": "lib_f12_018",
+      "band": "child",
+      "age": 12,
+      "presentation": "f",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "copper",
+      "attire": [
+        "school_jumper",
+        "scarf",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A girl of about twelve with long copper hair held back by a hairband, a bottle-green school jumper, a cream knitted scarf and a satchel strap across her chest. A sticking plaster on her chin and a bookish, sceptical look.",
+      "recolour": [
+        "hair: flaxen blonde → copper",
+        "navy school jumper → bottle-green school jumper",
+        "mustard knitted scarf → cream knitted scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "long",
+          "colour": 4
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 10,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 9
+        }
+      }
+    },
+    {
+      "id": "lib_f12_076",
+      "variant_of": "lib_f12_018",
+      "band": "child",
+      "age": 12,
+      "presentation": "f",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "dark brown",
+      "attire": [
+        "school_jumper",
+        "scarf",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A girl of about twelve with long dark brown hair held back by a hairband, a plum school jumper, a teal knitted scarf and a satchel strap across her chest. A sticking plaster on her chin and a bookish, sceptical look.",
+      "recolour": [
+        "hair: flaxen blonde → dark brown",
+        "navy school jumper → plum school jumper",
+        "mustard knitted scarf → teal knitted scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "long",
+          "colour": 0
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 8,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_m16_077",
+      "variant_of": "lib_m16_019",
+      "band": "teen",
+      "age": 16,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "mid brown",
+      "attire": [
+        "coat",
+        "scarf",
+        "school_jumper"
+      ],
+      "build": "slight",
+      "caption": "A lanky lad of about sixteen with mid-brown hair flopping into his eyes, ears that stick out, a navy duffel coat over a grey jumper and a long mustard-and-cream striped scarf wound twice round his neck. A shy, sidelong, trying-to-look-bored look.",
+      "recolour": [
+        "hair: black → mid brown",
+        "camel duffel coat → navy duffel coat",
+        "red-and-cream striped scarf → mustard-and-cream striped scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "swept",
+          "colour": 1
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_m16_078",
+      "variant_of": "lib_m16_019",
+      "band": "teen",
+      "age": 16,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "dark auburn",
+      "attire": [
+        "coat",
+        "scarf",
+        "school_jumper"
+      ],
+      "build": "slight",
+      "caption": "A lanky lad of about sixteen with dark auburn hair flopping into his eyes, ears that stick out, a bottle-green duffel coat over a grey jumper and a long blue-and-cream striped scarf wound twice round his neck. A shy, sidelong, trying-to-look-bored look.",
+      "recolour": [
+        "hair: black → dark auburn",
+        "camel duffel coat → bottle-green duffel coat",
+        "red-and-cream striped scarf → blue-and-cream striped scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "swept",
+          "colour": 9
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 10,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 5
+        }
+      }
+    },
+    {
+      "id": "lib_m22_079",
+      "variant_of": "lib_m22_020",
+      "band": "young_adult",
+      "age": 22,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "sandy blond",
+      "attire": [
+        "apron",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A young man in his early twenties with an unruly mop of sandy-blond hair, a smudge of flour on his nose and a white baker's apron over a red striped shirt with rolled sleeves. An eager, sleepy, up-since-four look.",
+      "recolour": [
+        "hair: dark brown → sandy blond",
+        "blue striped shirt → red striped shirt"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "tufty",
+          "colour": 5
+        },
+        "eyes": 3,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "apron",
+          "top": 3,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "apron",
+          "colour": 9
+        }
+      }
+    },
+    {
+      "id": "lib_m22_080",
+      "variant_of": "lib_m22_020",
+      "band": "young_adult",
+      "age": 22,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "chestnut red",
+      "attire": [
+        "apron",
+        "boots"
+      ],
+      "build": "slight",
+      "caption": "A young man in his early twenties with an unruly mop of chestnut-red hair, a smudge of flour on his nose and a white baker's apron over a green striped shirt with rolled sleeves. An eager, sleepy, up-since-four look.",
+      "recolour": [
+        "hair: dark brown → chestnut red",
+        "blue striped shirt → green striped shirt"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "tufty",
+          "colour": 9
+        },
+        "eyes": 3,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "apron",
+          "top": 7,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "apron",
+          "colour": 9
+        }
+      }
+    },
+    {
+      "id": "lib_f27_081",
+      "variant_of": "lib_f27_021",
+      "band": "young_adult",
+      "age": 27,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "honey brown",
+      "attire": [
+        "oilskin",
+        "jumper",
+        "knit_cap"
+      ],
+      "build": "average",
+      "caption": "A young woman in her late twenties with honey-brown curls under a mustard bobble hat, a navy oilskin over a cream jumper and a muslin cloth slung over one shoulder. A tired, fond, running-on-tea look.",
+      "recolour": [
+        "hair: dark brown → honey brown",
+        "red bobble hat → mustard bobble hat",
+        "sea-green oilskin → navy oilskin"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "curly",
+          "colour": 1
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_f27_082",
+      "variant_of": "lib_f27_021",
+      "band": "young_adult",
+      "age": 27,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "dyed copper",
+      "attire": [
+        "oilskin",
+        "jumper",
+        "knit_cap"
+      ],
+      "build": "average",
+      "caption": "A young woman in her late twenties with curls dyed copper under a leaf-green bobble hat, a brick-red oilskin over a cream jumper and a muslin cloth slung over one shoulder. A tired, fond, running-on-tea look.",
+      "recolour": [
+        "hair: dark brown → dyed copper",
+        "red bobble hat → leaf-green bobble hat",
+        "sea-green oilskin → brick-red oilskin"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "curly",
+          "colour": 4
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 3,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 7
+        }
+      }
+    },
+    {
+      "id": "lib_f30_083",
+      "variant_of": "lib_f30_022",
+      "band": "young_adult",
+      "age": 30,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "warm chestnut",
+      "attire": [
+        "cardigan",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A young woman around thirty with long warm-chestnut hair and a blunt fringe, a mustard cardigan over a white blouse and a satchel strap across her chest. A chalky handprint on one shoulder and an earnest, determined look.",
+      "recolour": [
+        "hair: blue-black → warm chestnut",
+        "cornflower-blue cardigan → mustard cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "long",
+          "colour": 9
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 4,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 1
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_f30_084",
+      "variant_of": "lib_f30_022",
+      "band": "young_adult",
+      "age": 30,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "honey blonde",
+      "attire": [
+        "cardigan",
+        "satchel"
+      ],
+      "build": "slight",
+      "caption": "A young woman around thirty with long honey-blonde hair and a blunt fringe, a rose cardigan over a white blouse and a satchel strap across her chest. A chalky handprint on one shoulder and an earnest, determined look.",
+      "recolour": [
+        "hair: blue-black → honey blonde",
+        "cornflower-blue cardigan → rose cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "long",
+          "colour": 10
+        },
+        "eyes": 0,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 12,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 1
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_f39_085",
+      "variant_of": "lib_f39_023",
+      "band": "adult",
+      "age": 39,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "dyed deep auburn",
+      "attire": [
+        "coat",
+        "nurse_watch"
+      ],
+      "build": "average",
+      "caption": "A woman in her late thirties with dyed deep-auburn hair in a neat low bun, a charcoal coat with rolled sleeves over a white collar, and a nurse's watch pinned upside down on her lapel. Calm eyes that have seen worse.",
+      "recolour": [
+        "hair: black → dyed deep auburn",
+        "dark navy coat → charcoal coat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "bun",
+          "colour": 9
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 13,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_f39_086",
+      "variant_of": "lib_f39_023",
+      "band": "adult",
+      "age": 39,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "salt-and-pepper",
+      "attire": [
+        "coat",
+        "nurse_watch"
+      ],
+      "build": "average",
+      "caption": "A woman in her late thirties with salt-and-pepper hair in a neat low bun, a dark plum coat with rolled sleeves over a white collar, and a nurse's watch pinned upside down on her lapel. Calm eyes that have seen worse.",
+      "recolour": [
+        "hair: black → salt-and-pepper",
+        "dark navy coat → dark plum coat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "bun",
+          "colour": 11
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 8,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_a41_087",
+      "variant_of": "lib_a41_024",
+      "band": "adult",
+      "age": 41,
+      "presentation": "a",
+      "skin": 3,
+      "skin_word": "olive",
+      "hair_word": "bleached blond",
+      "attire": [
+        "smock",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A person in their early forties with short bleached-blond hair cropped close at the sides, a clay-streaked rust-red potter's smock and a handwoven mustard scarf. A smear of dried clay on one cheekbone and an absorbed, unhurried look.",
+      "recolour": [
+        "hair: dark brown → bleached blond",
+        "oatmeal potter's smock → rust-red potter's smock",
+        "handwoven teal scarf → handwoven mustard scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 7,
+        "hair": {
+          "style": "cropped",
+          "colour": 5
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 11,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_a41_088",
+      "variant_of": "lib_a41_024",
+      "band": "adult",
+      "age": 41,
+      "presentation": "a",
+      "skin": 3,
+      "skin_word": "olive",
+      "hair_word": "prematurely silver",
+      "attire": [
+        "smock",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A person in their early forties with short, prematurely silver hair cropped close at the sides, a clay-streaked slate-blue potter's smock and a handwoven rose scarf. A smear of dried clay on one cheekbone and an absorbed, unhurried look.",
+      "recolour": [
+        "hair: dark brown → prematurely silver",
+        "oatmeal potter's smock → slate-blue potter's smock",
+        "handwoven teal scarf → handwoven rose scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 7,
+        "hair": {
+          "style": "cropped",
+          "colour": 2
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 6,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 12
+        }
+      }
+    },
+    {
+      "id": "lib_m44_089",
+      "variant_of": "lib_m44_025",
+      "band": "adult",
+      "age": 44,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "ginger",
+      "attire": [
+        "coat",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A tall, soft-spoken man in his mid-forties with tidy ginger hair, a neatly trimmed beard, a navy duffel coat and a long, lopsided mustard striped scarf that a child clearly knitted. A patient, slightly frazzled look.",
+      "recolour": [
+        "hair: light brown → ginger",
+        "charcoal duffel coat → navy duffel coat",
+        "lopsided green striped scarf → lopsided mustard striped scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "short",
+          "colour": 10
+        },
+        "eyes": 1,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m44_090",
+      "variant_of": "lib_m44_025",
+      "band": "adult",
+      "age": 44,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "black",
+      "attire": [
+        "coat",
+        "scarf"
+      ],
+      "build": "average",
+      "caption": "A tall, soft-spoken man in his mid-forties with tidy black hair, a neatly trimmed beard, a camel duffel coat and a long, lopsided sky-blue striped scarf that a child clearly knitted. A patient, slightly frazzled look.",
+      "recolour": [
+        "hair: light brown → black",
+        "charcoal duffel coat → camel duffel coat",
+        "lopsided green striped scarf → lopsided sky-blue striped scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "short",
+          "colour": 3
+        },
+        "eyes": 1,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 15,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 5
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f45_091",
+      "variant_of": "lib_f45_026",
+      "band": "adult",
+      "age": 45,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "dark auburn",
+      "attire": [
+        "cardigan",
+        "flat_cap"
+      ],
+      "build": "slight",
+      "caption": "A wiry woman in her mid-forties with short dark auburn hair under a brown tweed flat cap and a darned bottle-green work cardigan buttoned to the neck. A chipped front tooth and a wry, unimpressed look.",
+      "recolour": [
+        "hair: mousy brown → dark auburn",
+        "grey flat cap → brown tweed flat cap",
+        "darned charcoal work cardigan → darned bottle-green work cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "short",
+          "colour": 9
+        },
+        "eyes": 3,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 10,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 1
+        }
+      }
+    },
+    {
+      "id": "lib_f45_092",
+      "variant_of": "lib_f45_026",
+      "band": "adult",
+      "age": 45,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair",
+      "hair_word": "ash blonde",
+      "attire": [
+        "cardigan",
+        "flat_cap"
+      ],
+      "build": "slight",
+      "caption": "A wiry woman in her mid-forties with short ash-blonde hair under a charcoal flat cap and a darned navy work cardigan buttoned to the neck. A chipped front tooth and a wry, unimpressed look.",
+      "recolour": [
+        "hair: mousy brown → ash blonde",
+        "grey flat cap → charcoal flat cap",
+        "darned charcoal work cardigan → darned navy work cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "short",
+          "colour": 5
+        },
+        "eyes": 3,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 6,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 13
+        }
+      }
+    },
+    {
+      "id": "lib_f48_093",
+      "variant_of": "lib_f48_027",
+      "band": "adult",
+      "age": 48,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "dyed burgundy with a silver streak",
+      "attire": [
+        "cardigan",
+        "glasses",
+        "satchel"
+      ],
+      "build": "average",
+      "caption": "A woman in her late forties with a cloud of curls dyed burgundy and a single silver streak at the front, round tortoiseshell glasses on a beaded cord and a chalk-dusted mustard cardigan. A warm, no-running-in-the-corridor look.",
+      "recolour": [
+        "hair: black with a silver streak → dyed burgundy with a silver streak",
+        "chalk-dusted teal cardigan → chalk-dusted mustard cardigan",
+        "keep the single silver streak at the front silver"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "curly",
+          "colour": 9
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 4,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 1
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round"
+      }
+    },
+    {
+      "id": "lib_f48_094",
+      "variant_of": "lib_f48_027",
+      "band": "adult",
+      "age": 48,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "honey brown with a silver streak",
+      "attire": [
+        "cardigan",
+        "glasses",
+        "satchel"
+      ],
+      "build": "average",
+      "caption": "A woman in her late forties with a cloud of honey-brown curls and a single silver streak at the front, round tortoiseshell glasses on a beaded cord and a chalk-dusted plum cardigan. A warm, no-running-in-the-corridor look.",
+      "recolour": [
+        "hair: black with a silver streak → honey brown with a silver streak",
+        "chalk-dusted teal cardigan → chalk-dusted plum cardigan",
+        "keep the single silver streak at the front silver"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "curly",
+          "colour": 1
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 8,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 1
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round"
+      }
+    },
+    {
+      "id": "lib_m50_095",
+      "variant_of": "lib_m50_028",
+      "band": "adult",
+      "age": 50,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "iron grey, shaved close",
+      "attire": [
+        "checked",
+        "neckerchief"
+      ],
+      "build": "broad",
+      "caption": "A big, broad man of about fifty with a close-shaved head, a magnificent iron-grey moustache, a black double-breasted cook's jacket, a mustard checked neckerchief and a tea towel slung over one shoulder. Twinkling eyes; looks like he's about to feed you.",
+      "recolour": [
+        "hair: black, shaved close → iron grey, shaved close",
+        "white double-breasted cook's jacket → black double-breasted cook's jacket",
+        "red checked neckerchief → mustard checked neckerchief",
+        "the tea towel keeps its colours"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "buzz",
+          "colour": 2
+        },
+        "eyes": 0,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "plain",
+          "top": 13,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 4
+        },
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m50_096",
+      "variant_of": "lib_m50_028",
+      "band": "adult",
+      "age": 50,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "salt-and-pepper, shaved close",
+      "attire": [
+        "checked",
+        "neckerchief"
+      ],
+      "build": "broad",
+      "caption": "A big, broad man of about fifty with a close-shaved head, a magnificent salt-and-pepper moustache, a pale-blue double-breasted cook's jacket, a green checked neckerchief and a tea towel slung over one shoulder. Twinkling eyes; looks like he's about to feed you.",
+      "recolour": [
+        "hair: black, shaved close → salt-and-pepper, shaved close",
+        "white double-breasted cook's jacket → pale-blue double-breasted cook's jacket",
+        "red checked neckerchief → green checked neckerchief",
+        "the tea towel keeps its colours"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "buzz",
+          "colour": 11
+        },
+        "eyes": 0,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "plain",
+          "top": 5,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 7
+        },
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m53_097",
+      "variant_of": "lib_m53_029",
+      "band": "adult",
+      "age": 53,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "black",
+      "attire": [
+        "cardigan",
+        "flat_cap",
+        "work_jacket"
+      ],
+      "build": "broad",
+      "caption": "A stocky man in his early fifties with black hair under a grey tweed flat cap, a nose broken long ago and set a little crooked, and an oatmeal work cardigan with leather elbow patches. A long-suffering, dryly amused look.",
+      "recolour": [
+        "hair: salt-and-pepper → black",
+        "brown flat cap → grey tweed flat cap",
+        "a grey work cardigan → an oatmeal work cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 3
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 9,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 14
+        },
+        "face": {
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m53_098",
+      "variant_of": "lib_m53_029",
+      "band": "adult",
+      "age": 53,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "prematurely white",
+      "attire": [
+        "cardigan",
+        "flat_cap",
+        "work_jacket"
+      ],
+      "build": "broad",
+      "caption": "A stocky man in his early fifties with prematurely white hair under a navy flat cap, a nose broken long ago and set a little crooked, and a bottle-green work cardigan with leather elbow patches. A long-suffering, dryly amused look.",
+      "recolour": [
+        "hair: salt-and-pepper → prematurely white",
+        "brown flat cap → navy flat cap",
+        "grey work cardigan → bottle-green work cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 8
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "jumper",
+          "top": 10,
+          "bottom": 2,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 6
+        },
+        "face": {
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f56_099",
+      "variant_of": "lib_f56_030",
+      "band": "adult",
+      "age": 56,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair and sun-freckled",
+      "hair_word": "steel grey",
+      "attire": [
+        "jumper",
+        "boots",
+        "dungarees"
+      ],
+      "build": "average",
+      "caption": "A sturdy woman in her mid-fifties with sun-freckled cheeks, steel-grey hair in a loose plait over one shoulder, navy dungarees over a mustard jumper and a sprig of rosemary tucked behind one ear. A cheerful, squinting-into-the-sun look.",
+      "recolour": [
+        "hair: faded strawberry blonde → steel grey",
+        "leaf-green dungarees → navy dungarees",
+        "cream jumper → mustard jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "long",
+          "colour": 2
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "dungarees",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 2,
+          "trim": 4
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "freckles": true
+        }
+      }
+    },
+    {
+      "id": "lib_f56_100",
+      "variant_of": "lib_f56_030",
+      "band": "adult",
+      "age": 56,
+      "presentation": "f",
+      "skin": 2,
+      "skin_word": "fair and sun-freckled",
+      "hair_word": "chestnut",
+      "attire": [
+        "jumper",
+        "boots",
+        "dungarees"
+      ],
+      "build": "average",
+      "caption": "A sturdy woman in her mid-fifties with sun-freckled cheeks, chestnut-brown hair in a loose plait over one shoulder, rust dungarees over a sky-blue jumper and a sprig of rosemary tucked behind one ear. A cheerful, squinting-into-the-sun look.",
+      "recolour": [
+        "hair: faded strawberry blonde → chestnut",
+        "leaf-green dungarees → rust dungarees",
+        "cream jumper → sky-blue jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 0,
+        "hair": {
+          "style": "long",
+          "colour": 6
+        },
+        "eyes": 2,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "dungarees",
+          "top": 11,
+          "bottom": 11,
+          "bottom_style": "trousers",
+          "shoes": 2,
+          "trim": 5
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "freckles": true
+        }
+      }
+    },
+    {
+      "id": "lib_m58_101",
+      "variant_of": "lib_m58_031",
+      "band": "adult",
+      "age": 58,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "jet black",
+      "attire": [
+        "smock",
+        "glasses"
+      ],
+      "build": "slight",
+      "caption": "A wiry man in his late fifties with jet-black hair in a stubby ponytail, a brass-rimmed magnifying visor pushed up on his forehead, a neat black goatee and a tan work smock full of little pockets. A distracted, delighted look.",
+      "recolour": [
+        "hair: grey → jet black",
+        "slate-blue work smock → tan work smock"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "ponytail",
+          "colour": 3
+        },
+        "eyes": 5,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 15,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "glasses": "on_head",
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_m58_102",
+      "variant_of": "lib_m58_031",
+      "band": "adult",
+      "age": 58,
+      "presentation": "m",
+      "skin": 4,
+      "skin_word": "golden brown",
+      "hair_word": "white",
+      "attire": [
+        "smock",
+        "glasses"
+      ],
+      "build": "slight",
+      "caption": "A wiry man in his late fifties with white hair in a stubby ponytail, a brass-rimmed magnifying visor pushed up on his forehead, a neat white goatee and a bottle-green work smock full of little pockets. A distracted, delighted look.",
+      "recolour": [
+        "hair: grey → white",
+        "slate-blue work smock → bottle-green work smock"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 9,
+        "hair": {
+          "style": "ponytail",
+          "colour": 8
+        },
+        "eyes": 5,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "smock",
+          "top": 10,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "glasses": "on_head",
+        "face": {
+          "moustache": true
+        }
+      }
+    },
+    {
+      "id": "lib_f62_103",
+      "variant_of": "lib_f62_032",
+      "band": "elder",
+      "age": 62,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "white",
+      "attire": [
+        "blazer",
+        "glasses",
+        "badge"
+      ],
+      "build": "average",
+      "caption": "A brisk woman in her early sixties with close-cropped white hair, reading glasses pushed up on her head and a navy blazer with a round enamel committee badge on the lapel. A no-nonsense, already-counting-volunteers look.",
+      "recolour": [
+        "hair: pepper grey → white",
+        "brick-red blazer → navy blazer"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "cropped",
+          "colour": 8
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "glasses": "on_head"
+      }
+    },
+    {
+      "id": "lib_f62_104",
+      "variant_of": "lib_f62_032",
+      "band": "elder",
+      "age": 62,
+      "presentation": "f",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "dyed copper",
+      "attire": [
+        "blazer",
+        "glasses",
+        "badge"
+      ],
+      "build": "average",
+      "caption": "A brisk woman in her early sixties with close-cropped hair dyed copper, reading glasses pushed up on her head and a teal blazer with a round enamel committee badge on the lapel. A no-nonsense, already-counting-volunteers look.",
+      "recolour": [
+        "hair: pepper grey → dyed copper",
+        "brick-red blazer → teal blazer"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "cropped",
+          "colour": 4
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 0,
+          "bottom": 13,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "glasses": "on_head"
+      }
+    },
+    {
+      "id": "lib_m64_105",
+      "variant_of": "lib_m64_033",
+      "band": "elder",
+      "age": 64,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "white (once ginger)",
+      "attire": [
+        "work_jacket",
+        "cardigan"
+      ],
+      "build": "slight",
+      "caption": "A lean man in his mid-sixties with short white hair that was ginger once, bushy ginger eyebrows that never got the message, and a worn navy work jacket over an oatmeal cardigan. A dry, heard-it-all look.",
+      "recolour": [
+        "hair: grey (once ginger) → white (once ginger)",
+        "worn brown work jacket → worn navy work jacket",
+        "a grey cardigan → an oatmeal cardigan",
+        "keep the bushy eyebrows ginger"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "short",
+          "colour": 8
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 14,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_m64_106",
+      "variant_of": "lib_m64_033",
+      "band": "elder",
+      "age": 64,
+      "presentation": "m",
+      "skin": 1,
+      "skin_word": "pale",
+      "hair_word": "faded ginger",
+      "attire": [
+        "work_jacket",
+        "cardigan"
+      ],
+      "build": "slight",
+      "caption": "A lean man in his mid-sixties with short faded-ginger hair, bushy ginger eyebrows to match, and a worn olive work jacket over a navy cardigan. A dry, heard-it-all look.",
+      "recolour": [
+        "hair: grey (once ginger) → faded ginger",
+        "worn brown work jacket → worn olive work jacket",
+        "grey cardigan → navy cardigan",
+        "keep the bushy eyebrows ginger"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 4,
+        "hair": {
+          "style": "short",
+          "colour": 10
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 10,
+          "bottom": 14,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "none"
+        }
+      }
+    },
+    {
+      "id": "lib_a67_107",
+      "variant_of": "lib_a67_034",
+      "band": "elder",
+      "age": 67,
+      "presentation": "a",
+      "skin": 2,
+      "skin_word": "fair and wind-reddened",
+      "hair_word": "white",
+      "attire": [
+        "raincoat",
+        "scarf",
+        "binoculars"
+      ],
+      "build": "slight",
+      "caption": "A weather-beaten person in their late sixties with cropped white hair, wind-reddened cheeks, a navy waxed jacket with a corduroy collar, a brick-red wool scarf and battered binoculars on a strap round the neck. A patient, far-off, listening look.",
+      "recolour": [
+        "hair: grey → white",
+        "an olive waxed jacket → a navy waxed jacket",
+        "mustard wool scarf → brick-red wool scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "cropped",
+          "colour": 8
+        },
+        "eyes": 4,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 3
+        }
+      }
+    },
+    {
+      "id": "lib_a67_108",
+      "variant_of": "lib_a67_034",
+      "band": "elder",
+      "age": 67,
+      "presentation": "a",
+      "skin": 2,
+      "skin_word": "fair and wind-reddened",
+      "hair_word": "salt-and-pepper",
+      "attire": [
+        "raincoat",
+        "scarf",
+        "binoculars"
+      ],
+      "build": "slight",
+      "caption": "A weather-beaten person in their late sixties with cropped salt-and-pepper hair, wind-reddened cheeks, a brown waxed jacket with a corduroy collar, a teal wool scarf and battered binoculars on a strap round the neck. A patient, far-off, listening look.",
+      "recolour": [
+        "hair: grey → salt-and-pepper",
+        "an olive waxed jacket → a brown waxed jacket",
+        "mustard wool scarf → teal wool scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 1,
+        "hair": {
+          "style": "cropped",
+          "colour": 11
+        },
+        "eyes": 4,
+        "build": "narrow",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 1,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_f70_109",
+      "variant_of": "lib_f70_035",
+      "band": "elder",
+      "age": 70,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "snow white",
+      "attire": [
+        "raincoat",
+        "scarf"
+      ],
+      "build": "broad",
+      "caption": "A plump, smiling woman of about seventy with snow-white hair swept up in a loose bun, big round earrings like boiled sweets, a sunflower-yellow raincoat buttoned to the chin and a navy spotted scarf. A warm, nosy, delighted-to-see-you look.",
+      "recolour": [
+        "hair: silver → snow white",
+        "cherry-red raincoat → sunflower-yellow raincoat",
+        "cream spotted scarf → navy spotted scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "bun",
+          "colour": 8
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 4,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 6
+        }
+      }
+    },
+    {
+      "id": "lib_f70_110",
+      "variant_of": "lib_f70_035",
+      "band": "elder",
+      "age": 70,
+      "presentation": "f",
+      "skin": 4,
+      "skin_word": "brown",
+      "hair_word": "dyed mahogany",
+      "attire": [
+        "raincoat",
+        "scarf"
+      ],
+      "build": "broad",
+      "caption": "A plump, smiling woman of about seventy with hair dyed a rich mahogany swept up in a loose bun, big round earrings like boiled sweets, a teal raincoat buttoned to the chin and a rose spotted scarf. A warm, nosy, delighted-to-see-you look.",
+      "recolour": [
+        "hair: silver → dyed mahogany",
+        "cherry-red raincoat → teal raincoat",
+        "cream spotted scarf → rose spotted scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 5,
+        "hair": {
+          "style": "bun",
+          "colour": 9
+        },
+        "eyes": 3,
+        "build": "broad",
+        "height": "short",
+        "outfit": {
+          "cut": "coat",
+          "top": 0,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 12
+        }
+      }
+    },
+    {
+      "id": "lib_m71_111",
+      "variant_of": "lib_m71_036",
+      "band": "elder",
+      "age": 71,
+      "presentation": "m",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "iron grey",
+      "attire": [
+        "raincoat",
+        "cardigan",
+        "glasses"
+      ],
+      "build": "average",
+      "caption": "A dapper man in his early seventies with close-cropped iron-grey hair, a neat iron-grey beard, round gold-rimmed spectacles, a red bow tie and a camel raincoat over a cardigan. A gentle, courtly, slightly mischievous look.",
+      "recolour": [
+        "hair: white → iron grey",
+        "mustard bow tie → red bow tie",
+        "navy raincoat → camel raincoat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "buzz",
+          "colour": 2
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 15,
+          "bottom": 14,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round",
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m71_112",
+      "variant_of": "lib_m71_036",
+      "band": "elder",
+      "age": 71,
+      "presentation": "m",
+      "skin": 5,
+      "skin_word": "dark brown",
+      "hair_word": "salt-and-pepper",
+      "attire": [
+        "raincoat",
+        "cardigan",
+        "glasses"
+      ],
+      "build": "average",
+      "caption": "A dapper man in his early seventies with close-cropped salt-and-pepper hair, a neat salt-and-pepper beard, round gold-rimmed spectacles, a teal bow tie and an olive raincoat over a cardigan. A gentle, courtly, slightly mischievous look.",
+      "recolour": [
+        "hair: white → salt-and-pepper",
+        "mustard bow tie → teal bow tie",
+        "a navy raincoat → an olive raincoat"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 3,
+        "hair": {
+          "style": "buzz",
+          "colour": 11
+        },
+        "eyes": 0,
+        "build": "medium",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 10,
+          "bottom": 14,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "round",
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f73_113",
+      "variant_of": "lib_f73_037",
+      "band": "elder",
+      "age": 73,
+      "presentation": "f",
+      "skin": 1,
+      "skin_word": "pale and wind-burned",
+      "hair_word": "white",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "navy_jumper"
+      ],
+      "build": "slight",
+      "caption": "A small, tough old woman in her seventies with short white hair under a mustard knit cap, a thick cream fisherman's gansey and a gold hoop in one ear. Sea-squint crow's feet and a flinty, amused look.",
+      "recolour": [
+        "hair: steel grey → white",
+        "brick-red knit cap → mustard knit cap",
+        "thick navy fisherman's gansey → thick cream fisherman's gansey"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "short",
+          "colour": 8
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 9,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 4
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_f73_114",
+      "variant_of": "lib_f73_037",
+      "band": "elder",
+      "age": 73,
+      "presentation": "f",
+      "skin": 1,
+      "skin_word": "pale and wind-burned",
+      "hair_word": "faded flaxen",
+      "attire": [
+        "knit_cap",
+        "jumper",
+        "navy_jumper"
+      ],
+      "build": "slight",
+      "caption": "A small, tough old woman in her seventies with short faded-flaxen hair under a teal knit cap, a thick bottle-green fisherman's gansey and a gold hoop in one ear. Sea-squint crow's feet and a flinty, amused look.",
+      "recolour": [
+        "hair: steel grey → faded flaxen",
+        "brick-red knit cap → teal knit cap",
+        "thick navy fisherman's gansey → thick bottle-green fisherman's gansey"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 6,
+        "hair": {
+          "style": "short",
+          "colour": 5
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 10,
+          "bottom": 13,
+          "bottom_style": "trousers",
+          "shoes": 4
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 0
+        }
+      }
+    },
+    {
+      "id": "lib_m74_115",
+      "variant_of": "lib_m74_038",
+      "band": "elder",
+      "age": 74,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan and weathered",
+      "hair_word": "iron grey",
+      "attire": [
+        "oilskin",
+        "jumper"
+      ],
+      "build": "broad",
+      "caption": "A barrel-chested old fisherman in his mid-seventies with iron-grey hair to his collar, a big iron-grey beard like a sea-washed broom, an anchor tattoo on his neck and a navy oilskin over a grey jumper. A slow, weather-reading look.",
+      "recolour": [
+        "hair: white → iron grey",
+        "mustard oilskin → navy oilskin",
+        "cream jumper → grey jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "long",
+          "colour": 2
+        },
+        "eyes": 4,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 6,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m74_116",
+      "variant_of": "lib_m74_038",
+      "band": "elder",
+      "age": 74,
+      "presentation": "m",
+      "skin": 3,
+      "skin_word": "tan and weathered",
+      "hair_word": "salt-and-pepper",
+      "attire": [
+        "oilskin",
+        "jumper"
+      ],
+      "build": "broad",
+      "caption": "A barrel-chested old fisherman in his mid-seventies with salt-and-pepper hair to his collar, a big salt-and-pepper beard like a sea-washed broom, an anchor tattoo on his neck and a brick-red oilskin over a navy jumper. A slow, weather-reading look.",
+      "recolour": [
+        "hair: white → salt-and-pepper",
+        "mustard oilskin → brick-red oilskin",
+        "cream jumper → navy jumper"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "long",
+          "colour": 11
+        },
+        "eyes": 4,
+        "build": "broad",
+        "height": "tall",
+        "outfit": {
+          "cut": "coat",
+          "top": 3,
+          "bottom": 6,
+          "bottom_style": "trousers",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "none"
+        },
+        "face": {
+          "moustache": true,
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_f84_117",
+      "variant_of": "lib_f84_039",
+      "band": "elder",
+      "age": 84,
+      "presentation": "f",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "silver grey",
+      "attire": [
+        "cardigan",
+        "glasses",
+        "knit_cap"
+      ],
+      "build": "slight",
+      "caption": "A tiny, very old woman of about eighty-four with wispy silver-grey hair escaping a mustard knitted hat that looks suspiciously like a tea cosy, half-moon glasses on a chain and a lavender cardigan over a crocheted collar. A twinkling, mischievous, I'll-outlive-you-all look.",
+      "recolour": [
+        "hair: white → silver grey",
+        "teal knitted hat → mustard knitted hat",
+        "rose-pink cardigan → lavender cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 2
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 8,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "halfmoon",
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 4
+        }
+      }
+    },
+    {
+      "id": "lib_f84_118",
+      "variant_of": "lib_f84_039",
+      "band": "elder",
+      "age": 84,
+      "presentation": "f",
+      "skin": 3,
+      "skin_word": "tan",
+      "hair_word": "dyed auburn",
+      "attire": [
+        "cardigan",
+        "glasses",
+        "knit_cap"
+      ],
+      "build": "slight",
+      "caption": "A tiny, very old woman of about eighty-four with wispy hair dyed auburn escaping a red knitted hat that looks suspiciously like a tea cosy, half-moon glasses on a chain and a sky-blue cardigan over a crocheted collar. A twinkling, mischievous, I'll-outlive-you-all look.",
+      "recolour": [
+        "hair: white → dyed auburn",
+        "teal knitted hat → red knitted hat",
+        "rose-pink cardigan → sky-blue cardigan"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 2,
+        "hair": {
+          "style": "short",
+          "colour": 4
+        },
+        "eyes": 1,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 5,
+          "bottom": 6,
+          "bottom_style": "skirt",
+          "shoes": 13
+        },
+        "accessory": {
+          "kind": "glasses"
+        },
+        "glasses": "halfmoon",
+        "headwear": {
+          "kind": "knit_cap",
+          "colour": 3
+        }
+      }
+    },
+    {
+      "id": "lib_m86_119",
+      "variant_of": "lib_m86_040",
+      "band": "elder",
+      "age": 86,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "iron grey",
+      "attire": [
+        "cardigan",
+        "flat_cap",
+        "scarf"
+      ],
+      "build": "slight",
+      "caption": "A frail, smiling old man in his mid-eighties with a fringe of iron-grey hair under a tweedy charcoal flat cap, big kindly ears, iron-grey stubble, and a mustard cardigan with a navy tartan scarf tucked in. A slow, sweet, bemused look.",
+      "recolour": [
+        "hair: white → iron grey",
+        "tweedy tan flat cap → tweedy charcoal flat cap",
+        "bottle-green cardigan → mustard cardigan",
+        "red tartan scarf → navy tartan scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "tufty",
+          "colour": 2
+        },
+        "eyes": 6,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 4,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 6
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 13
+        },
+        "face": {
+          "stubble": true
+        }
+      }
+    },
+    {
+      "id": "lib_m86_120",
+      "variant_of": "lib_m86_040",
+      "band": "elder",
+      "age": 86,
+      "presentation": "m",
+      "skin": 6,
+      "skin_word": "deep brown",
+      "hair_word": "pepper grey",
+      "attire": [
+        "cardigan",
+        "flat_cap",
+        "scarf"
+      ],
+      "build": "slight",
+      "caption": "A frail, smiling old man in his mid-eighties with a fringe of pepper-grey hair under a tweedy brown flat cap, big kindly ears, pepper-grey stubble, and a plum cardigan with a green tartan scarf tucked in. A slow, sweet, bemused look.",
+      "recolour": [
+        "hair: white → pepper grey",
+        "tweedy tan flat cap → tweedy brown flat cap",
+        "bottle-green cardigan → plum cardigan",
+        "red tartan scarf → green tartan scarf"
+      ],
+      "look": {
+        "kind": "human",
+        "skin": 8,
+        "hair": {
+          "style": "tufty",
+          "colour": 11
+        },
+        "eyes": 6,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": 8,
+          "bottom": 1,
+          "bottom_style": "trousers",
+          "shoes": 2
+        },
+        "accessory": {
+          "kind": "scarf",
+          "colour": 7
+        },
+        "headwear": {
+          "kind": "flat_cap",
+          "colour": 1
+        },
+        "face": {
+          "stubble": true
         }
       }
     }

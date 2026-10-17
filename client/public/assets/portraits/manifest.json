@@ -135,6 +135,14 @@
   "surprised",
   "worried"
  ],
+ "lib_f42_057": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f51_011": [
   "neutral",
   "warm",
@@ -184,6 +192,22 @@
   "worried"
  ],
  "lib_m38_012": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m44_025": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m44_089": [
   "neutral",
   "warm",
   "sad",
