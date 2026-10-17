@@ -1,10 +1,10 @@
-# Generated (census-v1) for calloway; curated not yet. Edit here.
+# Generated (census-v1) for calloway; curated by hand (MVP M-03). Edit here.
 id: amara_borowski
 name: Amara Borowski
 age: 34
 pronouns: she/her
 kind: resident
-occupation: fish-market hand
+occupation: Fish-market hand; weaves rugs in the bunkhouse kitchen
 workplace: wharf.fish_market
 home: wharf.home_bunkhouse
 portrait: lib_f31_051
@@ -21,59 +21,77 @@ look:
   height: tall
   outfit: { cut: coat, top: 0, bottom: 6, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
-backstory: "Amara came to Monde from Marrow Quay 3 years ago and works as fish-market hand. What she wants
-  most is plain enough: a kiln or a loom that isn't in the kitchen."
+backstory: >
+  Amara wove hearth rugs on a borrowed loom over a Marrow Quay net loft until it was sold for its timber. The
+  winter Dex and Dom turned eighteen she took them across on the first boat with room for three, found the old
+  cannery bunkhouse in a week and took the fish-market job to pay the first quarter. Rook found the lads their
+  Saturdays that winter. She leaves porridge on the back of the stove and has never asked how the day went. The
+  loom came over in pieces and stands by the bunkhouse stove, with Dom's spoons going on the table beside it.
+  She weaves from the market's worn-out twine and posts the rugs to Carrow.
 personality:
-  traits: [ dreamy, restless, patient ]
-  big5: { open: 76, conscientious: 74, extravert: 42, agreeable: 47, neurotic: 44 }
-values: { prosperity: 0.2, safety: 0.15, spirit: 0.25, charm: 0.4 }
+  traits: [ steady, dry, thrifty, private ]
+  big5: { open: 68, conscientious: 84, extravert: 28, agreeable: 44, neurotic: 52 }
+values: { prosperity: 0.25, safety: 0.25, spirit: 0.15, charm: 0.35 }
 beliefs:
-  - Monde was busier when I was younger, and it will be again.
-  - Nobody on this street notices the empty houses any more.
+  - The lads will be done with Saturdays by the first frost.   # wrong: it has been three winters
+  - Nell hasn't put two and two together about the bunkhouse.   # wrong: the whole Wharf knows whose cousin she is
+  - Cotton remembers every damp night, so the stove stays banked.
+  - One good winter of rugs and there will be money for a workroom.   # wrong: Kasimir's beam and a dry room come first
 voice:
-  register: Patient and exact. Talks in process words and describes weather by what it does to materials.
-  tics: [ Damp morning. ]
-  never_says: [ no worries, awesome ]
+  register: >
+    Patient and exact, in loom nouns: warp, weft, pick, beat, selvedge. Names the weather by what it does to
+    cotton. Dry. Warms up when asked how a thing is made; turns to a chore when Saturday comes up.
+  tics: [ "I've a warp to wind.", "Let it settle." ]
+  never_says: [ Tollmen, protection, no worries, awesome ]
   samples:
-    - Damp morning. The glaze won't take till noon.
-    - Wedge it first. Always. Then you can argue with it.
-    - It's tension, mostly. Too tight and it puckers.
+    - "Fog since four. Cotton swells in this and grabs the shuttle, so I'll leave the beam alone till it lifts."
+    - "Plain hearth rug is eight coins, striped is eleven. The stripe takes a day longer, and that's the whole difference."
+    - "Your sleeve's wet through. Sit by the stove and watch the beam, it's lower than it looks."
 birthday: 53
-likes: [ parcels arriving unbroken, steady north light, people who ask how it's made ]
-dislikes: [ could you do it cheaper, damp materials, the ferry missing a day ]
-fears: [ the last ferry leaving with nobody coming back ]
+likes: [ steady north light, people who ask how it's made, parcels arriving unbroken, tea in a warmed cup, a warp that comes up even ]
+dislikes: [ could you do it cheaper, the ferry missing a day, damp in the cotton, spoons on the table mid-pick ]
+fears: [ Nell asking her straight where the lads go on Saturdays, the stove going out with a warp on the loom ]
 dream:
-  text: A kiln or a loom that isn't in the kitchen
+  text: A rug loom in a room of its own, so the bunkhouse table can go back to being a table.
   stages:
-    - Find a workspace
-    - Get venting or power put in by Kasimir
-    - Make the first piece with an audience
+    - Find a dry room with a north window and a door wide enough for the loom
+    - Get Kasimir to set a floor beam and widen the door (Regard ≥ 30 with Kasimir)
+    - Weave the first rug where the Wharf can come and watch it come off the loom
 routine:
   weekday:
     - { at: "07:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "08:30", do: work, where: wharf.fish_market }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
+    - { at: "07:30", do: work, where: wharf.fish_market }
+    - { at: "12:30", do: eat, where: wharf.harbor_steps }
     - { at: "13:30", do: work, where: wharf.fish_market }
     - { at: "17:30", do: shop, where: market_row.general_store }
-    - { at: "18:30", do: eat, where: wharf.home_bunkhouse }
-    - { at: "20:00", do: socialize, where: market_row.gull_and_anchor }
+    - { at: "18:30", do: cook, where: wharf.home_bunkhouse }
+    - { at: "19:30", do: eat, where: wharf.home_bunkhouse }
+    - { at: "20:30", do: tinker, where: wharf.home_bunkhouse }
     - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
-  weekend:
-    - { at: "08:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "10:00", do: shop, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: market_row.cafe_liss }
-    - { at: "14:30", do: wander, where: old_quarter.fountain_square }
-    - { at: "18:00", do: eat, where: wharf.home_bunkhouse }
-    - { at: "19:30", do: socialize, where: market_row.gull_and_anchor }
-    - { at: "22:00", do: sleep, where: wharf.home_bunkhouse }
-chores: [ fill the coal scuttle, beat the doormat ]
+  weekend:                       # Saturday: out to the ice before the lads are down, the empty kitchen to herself after, then she sits up for them. Sunday the same
+    - { at: "07:30", do: eat, where: wharf.home_bunkhouse }
+    - { at: "08:00", do: work, where: wharf.fish_market }
+    - { at: "12:30", do: eat, where: wharf.harbor_steps }
+    - { at: "14:00", do: tinker, where: wharf.home_bunkhouse }
+    - { at: "17:30", do: cook, where: wharf.home_bunkhouse }
+    - { at: "19:00", do: eat, where: wharf.home_bunkhouse }
+    - { at: "21:30", do: sit, where: wharf.home_bunkhouse }
+    - { at: "23:00", do: sleep, where: wharf.home_bunkhouse }
+chores: [ bank the bunkhouse stove at night, wind the next warp on the stair rail, leave porridge on the back of the stove for the lads, save the short ends of twine for Anouk Seaton ]
 relationships:
-  - { id: dex, affinity: 70, trust: 70, tag: cousin, note: Same house. }
-  - { id: dom, affinity: 70, trust: 70, tag: cousin, note: Same house. }
-secrets: []
+  - { id: dex, affinity: 70, trust: 70, tag: cousin, note: "Pins his timetables to her kitchen wall and has never once been late for one. Wants him to draw her a workroom as carefully as he draws everything else." }
+  - { id: dom, affinity: 70, trust: 70, tag: cousin, note: "Drums on the table beside the loom and tells every shopkeeper on the Row she's a genius. Wants him to sit still one Sunday afternoon and watch a rug come off." }
+  - { id: nell, affinity: 25, trust: 30, tag: wary, note: "Calls the orders on the fish-market floor and has never asked about the bunkhouse. Wants her to ask once, so the not-asking can stop." }
+  - { id: yannick_noonan, affinity: 25, trust: 20, tag: neighbor, note: "Next door on Cannery Row, through a wall thin enough to hear him bake at four. Takes the fish heads she brings home. Wants him to stop saying he's passing through; he's painted his door." }
+secrets:
+  - text: "A weaver in Port Sallow wrote last autumn offering her a bench, a floor loom and a bed. The letter is in the shuttle box, unanswered, because the lads would be on their own."
+    reveal: { regard_min: 55 }
+  - text: "Under her bed is a hearth rug with a stripe for each of the three of them. She will lay it by the stove the day the lads say they're done with Saturdays."
+    reveal: { regard_min: 70 }
 canon_locks: []
 story_role: none
 generated_by: template
+curated: true
 household: calloway
 archetype: remote_craftsperson
 employment: employed
