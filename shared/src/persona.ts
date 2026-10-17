@@ -141,6 +141,8 @@ export const PersonaCard = z.object({
   // census tables; none of these goes into the persona prompt block (server/src/mind/promptBuilder.ts personaBlock). ──
   /** A.3.8: written by the model, or the template card after the model failed. */
   generated_by: z.enum(["model", "template"]).optional(),
+  /** A census card finished by hand (M-03: the 14 named people). It owns its catchphrases like a hand-written card. */
+  curated: z.boolean().optional(),
   /** The census household (content/census/day1.yaml) the resident belongs to. */
   household: z.string().optional(),
   /** The A.2 archetype the card was written from. */

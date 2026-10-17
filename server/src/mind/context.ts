@@ -61,7 +61,8 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
     db.select({
       id: residents.id, name: sql<string>`${residents.card}->>'name'`, kind: sql<string>`${residents.card}->>'kind'`,
       tics: sql<unknown>`${residents.card}->'voice'->'tics'`,
-      generated: sql<string | null>`${residents.card}->>'generated_by'`,
+      // A curated census card (hand-finished) owns its catchphrases like a hand-written one.
+      generated: sql<string | null>`case when ${residents.card}->>'curated' = 'true' then null else ${residents.card}->>'generated_by' end`,
     }).from(residents).where(eq(residents.worldId, worldId)),
   ]);
   const names: Record<string, string> = {};

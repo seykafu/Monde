@@ -27,7 +27,7 @@ export interface RosterVoice {
   id: string;
   kind: PersonaCard["kind"];
   tics: readonly string[];
-  /** A generated card (`generated_by` set: the Day-1 census, MVP M-03): owns no catchphrase. */
+  /** A generated card (`generated_by` set and not `curated`: the Day-1 census, MVP M-03): owns no catchphrase. */
   generated?: boolean;
 }
 
@@ -90,9 +90,9 @@ function ownsKey(own: readonly string[], key: string): boolean {
  * card also lists (or opens one of its own with). A generated card's tics excuse nothing: it borrows none. Animals
  * never speak, so they borrow nothing.
  */
-export function borrowedFor(card: Pick<PersonaCard, "id" | "voice" | "generated_by">, roster: readonly RosterVoice[]): Signature[] {
+export function borrowedFor(card: Pick<PersonaCard, "id" | "voice" | "generated_by" | "curated">, roster: readonly RosterVoice[]): Signature[] {
   if (card.voice.mode === "narrated_action") return [];
-  const own = card.generated_by ? [] : card.voice.tics.map(phraseKey).filter(Boolean);
+  const own = card.generated_by && !card.curated ? [] : card.voice.tics.map(phraseKey).filter(Boolean);
   return signatures(roster).filter((s) => s.owner !== card.id && !ownsKey(own, phraseKey(s.phrase)));
 }
 

@@ -841,6 +841,9 @@
         "template"
       ]
     },
+    "curated": {
+      "type": "boolean"
+    },
     "household": {
       "type": "string"
     },
