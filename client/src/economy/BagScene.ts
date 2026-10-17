@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import type { Item } from '@monde/shared';
+import { BAG_SLOTS, type Item } from '@monde/shared';
 import type { Clock } from '../sim/clock';
 import { FAMILY_BODY, GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from '../util/constants';
 import { items, itemById } from './content';
@@ -27,11 +27,13 @@ export class BagScene extends Phaser.Scene {
     this.page = this.add.container(); this.draw();
     this.input.keyboard?.on('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key.toLowerCase() === 'i') this.scene.stop();
-      else if (e.key.startsWith('Arrow')) { const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 6, ArrowUp: -6 }[e.key] ?? 0; this.selected = (this.selected + d + 24) % 24; this.draw(); }
+      else if (e.key.startsWith('Arrow')) { const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 6, ArrowUp: -6 }[e.key] ?? 0; const n = this.cells(); this.selected = (this.selected + d + n) % n; this.draw(); }
       else if (e.key === 'Enter') this.use();
     });
     this.events.once('shutdown', () => { host.input.enabled = true; if (host.input.keyboard) { host.input.keyboard.enabled = true; host.input.keyboard.resetKeys(); } this.dataIn.clock.resume('bag'); });
   }
+  /** The grid's cells: the Bag's slots, or the store's whole stock. */
+  private cells(): number { return this.dataIn.shop ? items.length : BAG_SLOTS; }
   private text(x: number, y: number, text: string, click?: () => void, width = 900): void {
     const t = this.add.text(x, y, text, { fontFamily: FAMILY_BODY, fontSize: '18px', color: '#fff0ce', resolution: RENDER_SCALE, wordWrap: { width }, padding: { x: 6, y: 5 } });
     if (click) t.setInteractive({ useHandCursor: true }).on('pointerup', click).on('pointerover', () => t.setColor('#e4c77f')).on('pointerout', () => t.setColor('#fff0ce'));
@@ -42,14 +44,18 @@ export class BagScene extends Phaser.Scene {
     this.text(130, 40, `${this.dataIn.gift ? 'Choose a gift' : this.dataIn.shop ? 'The general store' : 'Your bag'}  ·  ${coinsOf(this.registry)} coins`);
     this.text(1000, 40, 'Close ×', () => this.scene.stop());
     const bag = bagOf(this.registry);
-    const tip = this.add.text(160, 440, '', { fontFamily: FAMILY_BODY, fontSize: '16px', color: '#fff0ce', backgroundColor: '#1f2a22', padding: { x: 10, y: 8 }, wordWrap: { width: 900 } }).setVisible(false).setDepth(50);
+    // The shop's fifth row (more than the Bag's 24 slots) pushes the details down a little.
+    const cells = this.cells(), extra = cells > BAG_SLOTS, rowH = extra ? 78 : 87, boxH = extra ? 72 : 78, detailY = extra ? 500 : 462;
+    const tip = this.add.text(160, detailY - 22, '', { fontFamily: FAMILY_BODY, fontSize: '16px', color: '#fff0ce', backgroundColor: '#1f2a22', padding: { x: 10, y: 8 }, wordWrap: { width: 900 } }).setVisible(false).setDepth(50);
     this.page.add(tip);
-    bag.slots.forEach((s, i) => {
-      const x = 130 + i % 6 * 170, y = 100 + Math.floor(i / 6) * 87;
-      const bg = this.add.rectangle(x, y, 162, 78, i === this.selected ? 0x526b4d : 0x28372d).setOrigin(0).setStrokeStyle(1, 0xe4c77f).setInteractive();
+    // The shop lists every item the store sells (more than the Bag's 24 slots).
+    Array.from({ length: cells }, (_, i) => bag.slots[i] ?? null).forEach((s, i) => {
+      const x = 130 + i % 6 * 170, y = 100 + Math.floor(i / 6) * rowH;
+      const bg = this.add.rectangle(x, y, 162, boxH, i === this.selected ? 0x526b4d : 0x28372d).setOrigin(0).setStrokeStyle(1, 0xe4c77f).setInteractive();
       bg.on('pointerup', () => { if (this.moving !== null) { this.registry.set(BAG_KEY, moveItem(bagOf(this.registry), this.moving, i, items)); this.moving = null; } this.selected = i; this.draw(); });
       this.page.add(bg);
       const stock = this.dataIn.shop ? items[i] : undefined;
+      if (this.dataIn.shop && !stock) return;
       const detail = stock ?? (s && itemById(s.item));
       if (detail) bg.on('pointerover', () => tip.setText(`${detail.description} · ${detail.tags.join(', ')}${detail.stamina ? ` · +${detail.stamina} Stamina` : ''}`).setVisible(true)).on('pointerout', () => tip.setVisible(false));
       // G-03: Dunmore's keeps only a little of some Project materials (content/projects.yaml shop_stock).
@@ -58,7 +64,7 @@ export class BagScene extends Phaser.Scene {
     });
     const stack = bag.slots[this.selected], item = this.dataIn.shop ? items[this.selected] : stack && itemById(stack.item);
     if (item) {
-      this.text(130, 462, `${item.description}  ${item.stamina ? `Restores ${item.stamina} Stamina.` : ''}\n${item.tags.join(' · ')}`);
+      this.text(130, detailY, `${item.description}  ${item.stamina ? `Restores ${item.stamina} Stamina.` : ''}\n${item.tags.join(' · ')}`);
       if (!this.dataIn.shop) this.text(130, 535, this.dataIn.gift ? 'Give this gift' : item.stamina ? 'Eat / drink' : '', () => this.use());
       if (this.dataIn.share && item.tags.includes('meal')) this.text(350, 535, 'Share this meal', () => { this.scene.stop(); this.dataIn.share!(this.selected, item); });
       if (!this.dataIn.gift && !this.dataIn.shop) {

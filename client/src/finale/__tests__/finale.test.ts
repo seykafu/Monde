@@ -187,6 +187,19 @@ describe('the End-of-Spring report', () => {
     expect(rep.standing.title).toBe("The town's choice, if you stood");
   });
 
+  it('dates the clock by the clocktower opening (S07a can chime from Day 6), and gives it one line', () => {
+    const r = spring('strong');
+    const projects = r.get('monde.projects') as ReturnType<typeof emptyProjects>;
+    // The preset opens the bakery ovens on Day 4; here the clock runs first, on Day 3.
+    const early = { ...projects, projects: { ...projects.projects, clocktower: { ...projects.projects.clocktower!, opened: 3 } } };
+    const rep = springReport({
+      day: 26, town: r.get('monde.town') as ReturnType<typeof createTownState>, projects: early, riddles: emptyRiddles(), scuffles: emptyScuffles(),
+      friendship: r.get('monde.friendship') as ReturnType<typeof emptyFriendship>, regard: regardIn(r), name: id => id, flags: new Set(['clock_running']), poll: null
+    });
+    expect(rep.moments.find(m => m.text.startsWith('The clocktower runs'))?.day).toBe(3);
+    expect(rep.moments.find(m => m.text.endsWith('the first Project of the Spring.'))).toEqual({ day: 4, text: 'The bakery ovens opened, the first Project of the Spring.' });
+  });
+
   it('counts friends in hearts, and says where the Fellow stands', () => {
     const r = spring('social');
     const rep = springReport({

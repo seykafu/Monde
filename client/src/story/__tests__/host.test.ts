@@ -5,7 +5,7 @@ import type { ZoneDef } from '../../world/zoneFormat';
 import { zones } from '../../world/zones';
 import type { StorySave } from '../director';
 import {
-  ARRIVAL_STANDIN, DEFAULT_FELLOW, buildStoryContext, clipActivity, createStoryHandlers, decodeStory, emptyLedger, encodeStory, fellowSigned, placeAt,
+  ARRIVAL_STANDIN, DEFAULT_FELLOW, buildStoryContext, clipActivity, createStoryHandlers, decodeStory, emptyLedger, encodeStory, fellowSigned, metInScenes, placeAt,
   plainText, pronounWords, sceneName, STORY_META_KEY, summonText, syncTownFlags,
   scuffleEvent, type HandlerDeps, type StoryLedger, type StoryPresenter, type StoryWorld, type WorldNow
 } from '../host';
@@ -168,6 +168,21 @@ describe('cue → effect', () => {
     await h.run({ cmd: 'riddle', id: 'OQ-1' }, 'g');
     expect(h.ledger).toMatchObject({ coins: 15, items: { lantern_pinion: 0 }, projects: ['fountain'], riddles: ['OQ-1'] });
     expect(h.outcomes.riddle).toEqual({ solved: false });
+  });
+
+  it('names the residents a scene introduced (their met_ flags), for the Journal', () => {
+    expect(metInScenes(['s01a_done', 'met_pell', 'met_tollmen', 'met_moss', 'metal'], id => ['pell', 'moss'].includes(id))).toEqual(['pell', 'moss']);
+  });
+
+  it('puts {coins} in the purse (G-09), once per cue', async () => {
+    const h = harness();
+    const purse = vi.fn();
+    h.world.coins = purse;
+    await h.run({ cmd: 'coins', delta: 20 }, 's01c_cottage:24', 's01c_cottage');
+    await h.run({ cmd: 'coins', delta: 20 }, 's01c_cottage:24', 's01c_cottage');
+    await h.run({ cmd: 'coins', delta: -20 }, 's03_tolls:40', 's03_tolls');
+    expect(purse.mock.calls).toEqual([[20], [-20]]);
+    expect(h.ledger.coins).toBe(0);
   });
 
   it('hands {project} to the Projects engine (G-03) once per cue, with the scene that cued it', async () => {

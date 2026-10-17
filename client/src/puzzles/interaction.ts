@@ -5,21 +5,34 @@ import { submitMark, marks } from '../scenes/riddles';
 import { puzzles } from './catalog';
 import { openPuzzle } from './scenes/PuzzleScene';
 import { deliverPuzzleItems, puzzleDawn, puzzleFlags, puzzleSave } from './runtime';
-const sites: Record<string,{id:string;day:number;requires?:string}> = {
-  'old_quarter.fountain_square':{id:'PZ-01',day:5},
+/**
+ * Where each Spring puzzle is played (its place prompt), from which day, and the flags it waits for. The three a scene
+ * opens (§15: PZ-03 in S02, PZ-01 in S04, PZ-15 in S07a) are first played in their scene; their place prompt is the
+ * re-entry for a board left unsolved there (`pz03_deferred`, `pz01_deferred`, `pz15_pending`) or, for PZ-15, the later
+ * fitting after S07b's borrowed chime (`clock_pending_pinion`). Before the scene the prompt would solve it early, and
+ * the clocktower would open (and the Lantern say so) days before Bertrand's chime.
+ */
+export const PUZZLE_SITES: Readonly<Record<string,{id:string;day:number;requires?:readonly string[]}>> = {
+  'old_quarter.fountain_square':{id:'PZ-01',day:5,requires:['s04_done']},
   'market_row.bakery':{id:'PZ-02',day:4},
-  'old_quarter.library':{id:'PZ-03',day:2},
+  'old_quarter.library':{id:'PZ-03',day:2,requires:['s02_done']},
   'market_row.market_hall':{id:'PZ-04',day:12},
   'wharf.lighthouse':{id:'PZ-05',day:16},
   'commons.duck_pond':{id:'PZ-06',day:6},
   'old_quarter.town_hall':{id:'PZ-13',day:8},
-  'old_quarter.clocktower':{id:'PZ-15',day:1,requires:'pinion_found'},
+  'old_quarter.clocktower':{id:'PZ-15',day:1,requires:['pinion_found','s07_done']},
   'commons.footbridge':{id:'PZ-18',day:15}
 };
+/** The puzzle a place offers now, if any (its day and flags; unsolved). Pure. */
+export function puzzleAt(place: string, day: number, flags: ReadonlySet<string>, solved: (id: string) => boolean): string | null {
+  const site=PUZZLE_SITES[place];
+  if(!site || day<site.day || (site.requires ?? []).some(f=>!flags.has(f)) || solved(site.id))return null;
+  return site.id;
+}
 interface Interaction {label:string;run():void}
 export function puzzleInteraction(scene: Phaser.Scene, clock: Clock, place: string, alternative?: Interaction | null): {label:string;run():void} | null {
-  const site=sites[place]; if(!site || clock.day<site.day || site.requires && !puzzleFlags(scene.registry).has(site.requires))return null;
-  if(puzzleSave(scene.registry).entries[site.id]?.solved)return null;
+  const id=puzzleAt(place,clock.day,puzzleFlags(scene.registry),p=>!!puzzleSave(scene.registry).entries[p]?.solved);
+  const site=id ? PUZZLE_SITES[place] : undefined; if(!site)return null;
   const title=puzzles[site.id]!.title;
   return {label:alternative ? `${title} / ${alternative.label}` : title,run:()=>{
     if(clock.paused)return;

@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { compileZone, districtOf, type ZoneDef } from '../zoneFormat';
 import { boards, doorLinks, interiors, zones } from '../zones';
-import { DOOR_ONLY, doorAt, doorOnly, linkInteriors, placeArrival, roomOf, walkingIn } from '../interiors';
+import { DOOR_ONLY, doorAt, doorOnly, linkInteriors, placeArrival, roomOf, standingPlace, walkingIn } from '../interiors';
 import { IndoorView } from '../indoorResidents';
 import { movePlayer } from '../player';
 import { placeRegistry } from '../places';
@@ -198,6 +198,21 @@ describe('the shipped rooms', () => {
     expect(placeArrival(zones, interiors, 'market_row.bakery_flat')).toEqual({ zone: 'bakery_interior', arrive: interiors.bakery_interior!.spawn });
     expect(placeArrival(zones, interiors, 'old_quarter.fountain_square')?.zone).toBe('old_quarter');
     expect(placeArrival(zones, interiors, 'nowhere.at_all')).toBeUndefined();
+  });
+
+  it('stands the player for a flat upstairs in the room below (a Favor at a resident\'s home), else at the place itself', () => {
+    expect(standingPlace(interiors, 'market_row.bakery_flat')).toBe('market_row.bakery');
+    expect(standingPlace(interiors, 'old_quarter.margo_flat')).toBe('old_quarter.library');
+    expect(standingPlace(interiors, 'market_row.pub_rooms')).toBe('market_row.gull_and_anchor');
+    expect(standingPlace(interiors, 'old_quarter.mayor_office')).toBe('old_quarter.mayor_office');
+    expect(standingPlace(interiors, 'wharf.nell_cottage')).toBe('wharf.nell_cottage');
+    // Every home upstairs is stood at on its room's floor, where the place test (and so the E prompt) finds it.
+    for (const c of personaCards) {
+      const at = standingPlace(interiors, c.home), room = roomOf(interiors, c.home);
+      if (!room) continue;
+      const to = placeArrival(zones, interiors, at)!;
+      expect(placeAt(room, { x: to.arrive[0] + 0.5, y: to.arrive[1] + 0.5 }), `${c.id} at ${c.home}`).toBe(at);
+    }
   });
 
   it('is where the story finds the player: inside, the building’s place; on its doorstep outside, the street', () => {

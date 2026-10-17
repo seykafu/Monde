@@ -1,5 +1,5 @@
 import type { Outcome as ScuffleOutcome } from '../combat/scuffle/engine';
-import { openScuffle } from '../scuffles/ScuffleScene';
+import { SCUFFLE_SCENE, openScuffle } from '../scuffles/ScuffleScene';
 import { openPuzzle } from '../puzzles/scenes/PuzzleScene';
 import { openStrawPoll } from '../finale/attach';
 // Scripted scenes as a VN (GDD §13.1 cues, §13.3 scenes, §18 Dialogue; MVP G-10).
@@ -564,7 +564,13 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   async scuffle(id: string, key: string): Promise<ScuffleOutcome> {
     this.panelLayer.setVisible(false); this.portrait?.root.setVisible(false); this.listen(false);
     try { return await openScuffle(this, this.open.clock, id, { key, story: true }); }
-    finally { if (!this.closed) { this.panelLayer.setVisible(true); this.portrait?.root.setVisible(true); this.listen(true); } }
+    finally {
+      // The board hands the outcome over before it stops, and on its shutdown it puts this scene's input back as it found
+      // it (off, while it was up): listen again only once it has gone, or the panel stops taking keys and clicks (S03).
+      const board = this.scene.get(SCUFFLE_SCENE);
+      if (board?.sys.isActive()) await new Promise<void>(resolve => board.events.once(Phaser.Scenes.Events.SHUTDOWN, () => resolve()));
+      if (!this.closed) { this.panelLayer.setVisible(true); this.portrait?.root.setVisible(true); this.listen(true); }
+    }
   }
 
   /** G-11 S10c: the Straw Poll's card over the scene (finale/attach.ts); resolves with `vote.*` once it's read. */

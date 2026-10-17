@@ -33,7 +33,7 @@ import { EVENTS_KEY, eventSyncFor, getEventLog } from './events';
 import { heardPairs, learnTies, nameIndex, tieIndex, townName } from '../friendship/knownTies';
 import type { RomanceNews } from '../friendship/milestones';
 import { personaCards } from '../world/residents';
-import type { Clock } from '../sim/clock';
+import { DAY_START, type Clock } from '../sim/clock';
 import { dailyWeather, describeWeather } from '../sim/weather';
 import type { Pillars } from '../town/pillars';
 
@@ -245,5 +245,11 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
 
   clock.onDawn(t => { void run(t.day, true); });
   // A save from mid-day (or the dawn autosave, written before the package came) has no plans for today yet.
-  if (clock.day > 1 && !getFriendship(registry).papers.some(p => p.day === clock.day)) void run(clock.day, false);
+  const today = getFriendship(registry).papers.find(p => p.day === clock.day);
+  if (clock.day > 1 && !today) void run(clock.day, false);
+  // The dawn autosave (what Continue loads) is written after the morning's paper was printed but before it was read:
+  // loaded at 06:00, the paper comes again.
+  else if (today && clock.minute === DAY_START && !registry.get('monde.press.pending')) {
+    registry.set('monde.press.seed', opts.weatherSeed()); registry.set('monde.press.pending', today); clock.pause('paper');
+  }
 }

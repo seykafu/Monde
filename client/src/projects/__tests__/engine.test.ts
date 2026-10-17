@@ -303,4 +303,13 @@ describe('the next step', () => {
     expect(E.nextStep(d, s.projects.fountain, world(5), ctx)).toContain("Dunmore's");
     expect(E.nextStep(d, s.projects.fountain, world(5), { ...ctx, carried: () => 2 })).toContain('Hand over 2 pipe_fitting');
   });
+
+  it('sends the found pinion to S07a, not to a puzzle the clocktower doesn\'t offer yet', () => {
+    const ctx: E.StepContext = { fund: 1800, carried: () => 0, count: (i, n) => `${n} ${i}`, placeName: p => p, residentName: r => r };
+    const clock = def('clocktower');
+    const found = E.unlockDue(PROJECTS, emptyProjects(), world(2, { flags: new Set(['pinion_found']) })).state.projects.clocktower;
+    expect(E.stageOf(clock, found, world(2, { flags: new Set(['pinion_found']) }))).toBe('puzzle');
+    expect(E.nextStep(clock, found, world(2, { flags: new Set(['pinion_found']) }), ctx)).toContain('Bertrand will fit it');
+    expect(E.nextStep(clock, found, world(15, { flags: new Set(['pinion_found', 's07_done']) }), ctx)).toContain('Solve the puzzle');
+  });
 });

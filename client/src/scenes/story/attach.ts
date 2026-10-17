@@ -20,7 +20,7 @@ import type { WeatherNow } from '../../sim/weather';
 import { getMind, uuid } from '../../mind/api';
 import { talkContext } from '../../mind/context';
 import { requestCheckpoint } from '../../save/runtime';
-import { decodeStory, placeAt, syncTownFlags, type FellowProfile, type StoryWorld } from '../../story/host';
+import { decodeStory, metInScenes, placeAt, syncTownFlags, type FellowProfile, type StoryWorld } from '../../story/host';
 import { HINT_KEY, storyHint, zoneRoute, type StoryHint } from '../../story/hint';
 import { liveLine } from '../../story/live';
 import { ALL_SCENES, SPRING_SCENES, StorySession } from '../../story/session';
@@ -37,11 +37,13 @@ import { DIALOGUE_SCENE } from '../DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE, type StoryOpen } from '../StoryScene';
 import { TOWN_KEY, TOWN_LEDGER_SCENE, getTown } from '../TownLedgerScene';
 import { appendEvent, getEventLog } from '../events';
-import { regardFor } from '../friendship';
+import { getFriendship, meetResident, regardFor } from '../friendship';
 import { projectCue } from '../../projects/runtime';
+import { COINS_KEY, coinsOf } from '../../economy/runtime';
 import type { ResidentLayer } from '../zone/residents';
 
 const SESSION_KEY = 'monde.story.session';
+const CARD_IDS = new Set(personaCards.map(c => c.id));
 /** save/runtime.ts saves this as SaveGame.story_flags and restores it on load. */
 const FLAGS_KEY = 'monde.story.flags';
 /** fellow/state.ts FELLOW_KEY (W-07): the signed Fellowship application for this game. */
@@ -137,6 +139,9 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     newId: uuid,
     persist: () => {
       registry.set(FLAGS_KEY, session.snapshot());
+      // A resident met in a scene has a page in the Journal's People (the dialogue panel's meetResident).
+      const known = getFriendship(registry).residents;
+      for (const id of metInScenes(session.flags.snapshot(), id => CARD_IDS.has(id))) if (!known[id]) meetResident(registry, id, clock.day);
       const town = getTown(registry);
       if (!town) return;
       const synced = syncTownFlags(town, session.flags.snapshot());
@@ -151,6 +156,8 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
     },
     zoneName: id => zones[id]?.name ?? id,
     projectCue: (id, sceneId) => projectCue(registry, { day: clock.day, minute: clock.minute }, id, sceneId),
+    // {coins}: the purse the HUD, the shop and the Projects use (economy/runtime.ts), never below empty.
+    coins: delta => { registry.set(COINS_KEY, { balance: Math.max(0, coinsOf(registry) + delta) }); },
     // S05's `arrival` speaks as the first real arrival (G-02, world/roster.ts).
     aiLine: (speaker, brief) => liveLine(getMind(), {
       residentId: resolveAlias(speaker), brief,

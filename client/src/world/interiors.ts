@@ -87,6 +87,18 @@ export function roomOf(interiors: Readonly<Record<string, ZoneDef>>, place: stri
 }
 
 /**
+ * The place the player stands at to be at `place`: itself, or for a place upstairs in a room (a flat over the shop:
+ * `market_row.bakery_flat`, Odile's), the room's own building place (`market_row.bakery`), since nobody walks
+ * upstairs (W-03). A Favor's chore at a resident's home is done there.
+ */
+export function standingPlace(interiors: Readonly<Record<string, ZoneDef>>, place: string): string {
+  const room = roomOf(interiors, place);
+  if (!room?.interior) return place;
+  const local = place.slice(place.indexOf('.') + 1);
+  return room.places.some(p => p.id === local) ? place : `${room.interior.district}.${room.interior.building}`;
+}
+
+/**
  * Where to take the player for a place: into its room (at the place's own door, where E acts on it: the bed, the
  * counter) when it has one, else to its door on its board. Undefined for a place no board knows.
  */

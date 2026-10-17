@@ -57,6 +57,7 @@ export interface SpringReport {
 
 /** §2.4's Day 1, as the Ledger shows it: Appeal ≈ 23 (§6.2). */
 export const DAY1_APPEAL = computeAppeal(createTownState()).appeal;
+const CLOCKTOWER = 'clocktower';
 /** GDD-GAP: "a handful of moments": five fit the page. */
 export const MOMENTS_MAX = 5;
 export const SPRING_DAYS = 25;
@@ -83,8 +84,8 @@ export function momentsOf(input: ReportInput): Moment[] {
   const out: (Moment & { weight: number })[] = [];
   const firstWin = Object.values(input.scuffles.results).filter(s => s.outcome === 'win' || s.outcome === 'talk_down').sort((a, b) => a.day - b.day)[0];
   if (firstWin) out.push({ day: firstWin.day, text: `You won your first Scuffle, "${scuffleName(firstWin.id)}".`, weight: 3 });
-  // The first Project and the last: the middle ones are on the list above.
-  const opened = Object.entries(input.projects.projects).filter(([, p]) => p.opened !== null).sort((a, b) => a[1].opened! - b[1].opened!);
+  // The first Project and the last: the middle ones are on the list above. The clocktower has its own line (below).
+  const opened = Object.entries(input.projects.projects).filter(([id, p]) => p.opened !== null && id !== CLOCKTOWER).sort((a, b) => a[1].opened! - b[1].opened!);
   opened.forEach(([id, p], i) => {
     const def = defOf(PROJECTS, id);
     if (!def || (i > 0 && i < opened.length - 1)) return;
@@ -93,7 +94,8 @@ export function momentsOf(input: ReportInput): Moment[] {
   if (input.firstArrival) out.push({ day: input.firstArrival.day, text: `${input.firstArrival.name} stepped off the Gannet, Monde's first newcomer in years.`, weight: 4 });
   const firstMark = Object.entries(input.riddles.entries).filter(([, r]) => r.status === 'solved').sort((a, b) => a[1].foundAt - b[1].foundAt)[0];
   if (firstMark) out.push({ day: Math.max(1, Math.floor(firstMark[1].foundAt / 1440) + 1), text: `You solved your first of Monde's Marks (${firstMark[0]}).`, weight: 2 });
-  if (input.flags.has('clock_running')) out.push({ day: 14, text: 'The clocktower runs again, for good.', weight: 3 });
+  // The day the clock ran: its Project opens the moment PZ-15 is solved (S07a from Day 6, or a later fitting after S07b).
+  if (input.flags.has('clock_running')) out.push({ day: input.projects.projects[CLOCKTOWER]?.opened ?? 14, text: 'The clocktower runs again, for good.', weight: 3 });
   else if (input.flags.has('clock_chimed')) out.push({ day: 14, text: 'The clocktower chimed once, on a borrowed part.', weight: 2 });
   if (input.flags.has('option_known')) out.push({ day: 18, text: 'Sable found the Option Clause in the council archive.', weight: 2 });
   // The fair: S10a's band, else the poll's (Sable's jars were out whether or not the Fellow came).

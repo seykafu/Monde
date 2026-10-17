@@ -96,6 +96,13 @@ export function attachProjectsClock(registry: Registry, clock: Clock): void {
   dawnAttached.add(clock);
   if (!registry.has(PROJECTS_KEY)) registry.set(PROJECTS_KEY, projectsOf(registry));
   clock.onDawn(t => { projectsDawn(registry, { day: t.day, minute: t.minute }); });
+  // A board solved anywhere (a scene's {puzzle}, a place prompt) is a Project's puzzle step: bring the Projects up to
+  // now at once, so the clocktower opens with S07a's chime (not at the next dawn) and an opening is set the same hour.
+  const onPuzzles = () => {
+    if (registry.get('monde.clock') !== clock) { registry.events.off('changedata-monde.puzzles', onPuzzles); return; }
+    syncProjects(registry, { day: clock.day, minute: clock.minute });
+  };
+  registry.events.on('changedata-monde.puzzles', onPuzzles);
   syncProjects(registry, { day: clock.day, minute: clock.minute });
 }
 

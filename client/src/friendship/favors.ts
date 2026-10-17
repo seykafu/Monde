@@ -14,6 +14,8 @@ import { addItem, removeItem } from '../economy/inventory';
 import { itemById } from '../economy/content';
 import { appendEvent } from '../scenes/events';
 import type { ResidentSim } from '../sim/residentSim';
+import { standingPlace } from '../world/interiors';
+import { interiors } from '../world/zones';
 type Registry = Phaser.Data.DataManager;
 export const favorBook = (r: Registry) => getFriendship(r).favor_book;
 export function chooseFavor(r: Registry, id: string, day: number, accept: boolean, minute = 360): boolean {
@@ -55,7 +57,8 @@ export function favorProof(r: Registry, clock: Clock, f: Favor, resident: string
   return { kind: f.task.kind, place, resident, item: f.task.item, nearby, minutes: 0, found: f.found };
 }
 export function favorInteraction(r: Registry, clock: Clock, place: string): { label: string; run(): void } | null {
-  const f = favorBook(r).find(x => x.status === 'accepted' && x.expires_day >= clock.day && x.task.place === place && (x.task.kind === 'chore' || x.task.kind === 'find' && !x.found));
+  // A home upstairs (a flat over the shop) is done from the room below (world/interiors.ts standingPlace).
+  const f = favorBook(r).find(x => x.status === 'accepted' && x.expires_day >= clock.day && standingPlace(interiors, x.task.place) === place && (x.task.kind === 'chore' || x.task.kind === 'find' && !x.found));
   if (!f) return null;
   return { label: f.task.kind === 'find' ? 'Look for the lost item' : `Help with the chore (${f.task.minutes} min)`, run: () => {
     if (clock.paused) return;
@@ -63,7 +66,7 @@ export function favorInteraction(r: Registry, clock: Clock, place: string): { la
       const item = itemById(f.task.item!); if (!item) return; const bag = addItem(bagOf(r),item); if (!bag) return;
       r.set(BAG_KEY,bag); updateFriendship(r,s => ({ ...s, favor_book: s.favor_book.map(x => x.id === f.id ? { ...x, found: true } : x) }));
     } else if (clock.minute + f.task.minutes <= 1560) {
-      if (finishFavor(r,clock,f,{ ...favorProof(r,clock,f,f.resident_id,place), minutes: f.task.minutes })) clock.advanceMinutes(f.task.minutes);
+      if (finishFavor(r,clock,f,{ ...favorProof(r,clock,f,f.resident_id,f.task.place), minutes: f.task.minutes })) clock.advanceMinutes(f.task.minutes);
     }
   } };
 }

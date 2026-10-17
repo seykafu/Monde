@@ -974,7 +974,9 @@ export class ZoneScene extends Phaser.Scene {
     const goIn = door ? (): void => this.goInside(door) : undefined;
     this.prompt.setText(scuffle ? `E: ${scuffle.label}` : talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : door ? `E: Go into ${placeName(door.building)}` : place ? `E: ${puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!scuffle || !!talk || !!mark || !!door || !!place);
     this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? goIn ?? (place ? puzzle?.run ?? project?.run ?? (locked ? () => this.showToast(locked) : () => console.log(`${here}.${place.id}`)) : undefined));
-    const entering = !scuffle && !talk ? walkingIn(doorLinks, this.zone, this.position, input) : undefined;
+    // A street encounter on the doorstep (the Old Quarter's bins sit at the cottage door every third day) is offered on E,
+    // never forced: walking up into the door still goes in.
+    const entering = !talk ? walkingIn(doorLinks, this.zone, this.position, input) : undefined;
     if (entering && !result.edge) { this.goInside(entering); return; }
     if (result.edge) {
       this.transitioning = true;

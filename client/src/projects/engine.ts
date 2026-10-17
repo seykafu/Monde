@@ -598,7 +598,10 @@ export function nextStep(def: ProjectDef, p: Progress | undefined, world: Projec
       const left = Math.max(0, def.vh - p!.vh);
       return `${left} ${plural(left, 'hour')} of work to go at ${site}: work a shift (E), or ask neighbours to help (H).`;
     }
-    case 'puzzle': return `Everything's in. Solve the puzzle at ${site}.`;
+    // PZ-15 is first played in S07a (Bertrand fits the pinion at the clocktower one afternoon, from Day 6).
+    case 'puzzle': return def.puzzle === 'PZ-15' && !world.flags.has('s07_done')
+      ? `The pinion is found. Bertrand will fit it at ${site} one afternoon (16:00–17:45, from Day 6).`
+      : `Everything's in. Solve the puzzle at ${site}.`;
     case 'ready': {
       const c = p!.ceremony;
       if (!c) return `Ready to open at ${site}.`;

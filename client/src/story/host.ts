@@ -66,7 +66,8 @@ export function pronounWords(pronouns: string): PronounWords {
  *   `scripted_regard` ClientEvent (M-06), and in the game the context reads the friendship mirror instead
  *   (WorldNow.regard: the server's snapshot plus what's still queued). The ledger's values stand in for residents the
  *   game doesn't mirror (the S05 `arrival`) and when no world supplies Regard (tests).
- * - coins / items / riddles: typed placeholders until the inventory and Marks systems land. projects: the ids the
+ * - coins: the story's own tally of its {coins} cues (the purse itself is the economy's: StoryWorld.coins). items /
+ *   riddles: typed placeholders until the inventory and Marks systems land. projects: the ids the
  *   story's {project} cues opened (the Projects themselves live in projects/runtime.ts, G-03).
  * - applied: `scene|cue key` of every durable effect already applied (idempotent restarts).
  */
@@ -237,6 +238,8 @@ export interface StoryWorld {
   aiLine(residentId: string, brief: string): Promise<readonly StoryLine[]>;
   /** {project: id} for the Projects engine (G-03); false for a Project it doesn't know. */
   projectCue?(id: string, sceneId: string): boolean;
+  /** {coins: ±n} into the player's purse (G-09's wallet): Pell's envelope in S01c, Vane's retainer in S06, S03's toll. */
+  coins?(delta: number): void;
 }
 
 export interface HandlerDeps {
@@ -304,7 +307,8 @@ export function createStoryHandlers(deps: HandlerDeps): StoryHandlers {
       if (!world || !town) { note(`no town engine for {pillar: ${cue.pillar}}`); return; }
       world.setTown(applyPillarDelta(town, cue.pillar, cue.delta, 'story', ctx.scene));
     }),
-    coins: (cue, ctx) => once(ctx, () => { deps.ledger().coins += cue.delta; }),
+    // The ledger keeps the story's own count; the purse is the economy's (a world without one keeps the ledger only).
+    coins: (cue, ctx) => once(ctx, () => { deps.ledger().coins += cue.delta; deps.world()?.coins?.(cue.delta); }),
     item: (cue, ctx) => once(ctx, () => {
       const items = deps.ledger().items;
       items[cue.item] = Math.max(0, (items[cue.item] ?? 0) + cue.delta);
@@ -409,6 +413,14 @@ export function scuffleEvent(s: { id: string; day: number; minute: number }, scu
     type: 'scuffle', place, participants: ['player', ...enemies],
     summary: `${name} ${won ? 'won' : 'lost'} a Scuffle${against} at ${placeName(placeId)}.`
   }) as ClientEvent;
+}
+
+/**
+ * The residents a scene introduced (`met_pell`, `met_margo`…: the scripts set one as the player first speaks with
+ * them). They have a page in the Journal's People from then on, as if the player had talked to them in the street.
+ */
+export function metInScenes(flags: Iterable<string>, isResident: (id: string) => boolean): string[] {
+  return [...flags].flatMap(f => (f.startsWith('met_') && isResident(f.slice(4)) ? [f.slice(4)] : []));
 }
 
 /** Story flags the town engine reads (§6.2, §6.5) follow the story: set in one, set in the other. */
