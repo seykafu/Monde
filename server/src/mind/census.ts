@@ -106,6 +106,9 @@ export function registerCensusRoutes(app: FastifyInstance, config: Config, db: W
     // A refusal or the token cap is an answer the tool handles (no text to read); a timeout or an API error isn't.
     if (call.call && (call.failure === "refusal" || call.failure === "max_tokens" || call.failure.startsWith("stop:")))
       return { text: "", stop_reason: call.call.stopReason, usage, cost_usd: call.call.costUsd, spent_usd: spent, cap_usd: cap };
-    return reply.code(502).send({ error: call.failure, usage, spent_usd: spent, cap_usd: cap });
+    // The API's own message (e.g. a 400 invalid_request) is what explains a failed call: log it and hand it back.
+    const detail = !call.ok && call.error instanceof Error ? call.error.message.slice(0, 500) : undefined;
+    request.log.warn({ failure: call.failure, detail }, "census call failed");
+    return reply.code(502).send({ error: call.failure, ...(detail ? { detail } : {}), usage, spent_usd: spent, cap_usd: cap });
   });
 }
