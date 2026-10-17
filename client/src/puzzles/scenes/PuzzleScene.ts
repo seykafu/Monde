@@ -1,3 +1,4 @@
+import { telemetry } from '../../telemetry/emit';
 import Phaser from 'phaser';
 import { FAMILY_BODY, FAMILY_HEADING, RENDER_SCALE } from '../../util/constants';
 import { sfxCineChime, installAudioUnlock } from '../../audio/Sfx';
@@ -45,6 +46,7 @@ export class PuzzleScene extends Phaser.Scene {
     const bg=backdrops[this.opening.id]; if (bg && !this.textures.exists(bg)) this.load.image(bg,`${import.meta.env.BASE_URL}assets/backdrops/${bg}.jpg`);
   }
   create(): void {
+    telemetry({ type: 'puzzle_opened', day: this.opening.clock.day, id: this.opening.id });
     const host=this.scene.get(this.opening.host), input=host.input.enabled, keyboard=host.input.keyboard?.enabled;
     host.input.enabled=false; if (host.input.keyboard) { host.input.keyboard.resetKeys(); host.input.keyboard.enabled=false; }
     this.opening.clock.pause('puzzle');
@@ -72,6 +74,7 @@ export class PuzzleScene extends Phaser.Scene {
       this.persist(); this.input.keyboard?.off('keydown',key);
       host.input.enabled=input;
       if (host.input.keyboard) { host.input.keyboard.resetKeys(); host.input.keyboard.enabled=keyboard ?? true; }
+      telemetry({ type: 'puzzle_left', day: this.opening.clock.day, id: this.opening.id });
       this.opening.clock.resume('puzzle'); this.opening.done?.(this.done || this.state.solved);
     });
   }
@@ -107,6 +110,7 @@ export class PuzzleScene extends Phaser.Scene {
     if (this.state.solved) return;
     this.beam=true;
     if (completePuzzle(this.registry,this.opening.clock,this.puzzle.id,this.state)) {
+      telemetry({ type: 'puzzle_solved', day: this.opening.clock.day, id: this.opening.id });
       this.state={...this.state,solved:true}; this.done=true; sfxCineChime();
       this.feedback=this.puzzle.id==='PZ-06'?'“I’m eighty-four, they looked hungry.” Bertrand grins.':this.puzzle.id==='PZ-03'?'Volume VI holds Aurélien’s map. Six lanterns, six trails.':'There. Everything settles into place.';
     } else this.feedback=this.puzzle.id==='PZ-01'?'A small spray of water. Something still leaks. No harm done.':this.puzzle.id==='PZ-05'?'The beam hasn’t reached the sea window through the prism yet.':'Not quite yet. Keep trying, or undo a step.';

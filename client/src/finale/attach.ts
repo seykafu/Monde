@@ -1,3 +1,4 @@
+import { surveyAfterReport } from '../scenes/SurveyScene';
 // The Spring finale in the world (MVP G-11). ZoneScene calls attachFinale() once per board:
 //   - the Bloom Fair: the Commons in fair dress on Days 24–25 (finale/fair.ts: trestles, bunting, barrels, the oil lamps
 //     along the sundial path at dusk), the fairgoers booked into Day 25's plans (a ResidentSim plan adjuster, as the
@@ -202,6 +203,7 @@ export function attachFinale(scene: Phaser.Scene, opts: FinaleAttachOptions): vo
       && !HOLDING.some(key => scene.scene.isActive(key))) {
       ensureStrawPoll(registry, id => regardFor(registry, id), worldSeedOf(registry));
       openSpringReport(scene, clock);
+      surveyAfterReport(scene, clock);
     }
   };
   scene.events.on('update', tick);

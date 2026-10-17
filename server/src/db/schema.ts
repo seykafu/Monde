@@ -220,3 +220,17 @@ export const arrivals = pgTable("arrivals", {
   home: text("home"),
   createdAt: createdAt(),
 }, (t) => [primaryKey({ columns: [t.worldId, t.id] }), index("arrivals_world_status_idx").on(t.worldId, t.status)]);
+
+/** Q-06: random installation ID; no profile or dialogue fields. World ID joins ai_log. */
+export const telemetryEvents = pgTable('telemetry_events', {
+  eventId: uuid('event_id').primaryKey(), telemetryId: uuid('telemetry_id').notNull(),
+  worldId: uuid('world_id').references(() => worlds.id, { onDelete: 'set null' }),
+  at: timestamp('at', { withTimezone: true }).notNull(), createdAt: createdAt(),
+  type: text('type').notNull(), day: integer('day').notNull(), data: jsonb('data').$type<import('@monde/shared').EventData>().notNull(),
+}, t => [index('telemetry_world_idx').on(t.worldId), index('telemetry_install_idx').on(t.telemetryId)]);
+export const surveyAnswers = pgTable('survey_answers', {
+  eventId: uuid('event_id').primaryKey().references(() => telemetryEvents.eventId, { onDelete: 'cascade' }),
+  telemetryId: uuid('telemetry_id').notNull(), worldId: uuid('world_id').references(() => worlds.id, { onDelete: 'set null' }),
+  survey: text('survey').notNull(), question: text('question').notNull(), resident: text('resident'),
+  value: jsonb('value').$type<string | number>().notNull(), createdAt: createdAt(),
+});

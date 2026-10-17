@@ -1,3 +1,4 @@
+import { chooseTelemetry, telemetryChoice } from '../telemetry/runtime';
 import Phaser from 'phaser';
 import { FAMILY_BODY, GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from '../util/constants';
 import { finishSaving, loadGame, resetGame, saveGame, saveStorage } from '../save/runtime';
@@ -92,13 +93,15 @@ class SaveMenuBase extends Phaser.Scene {
           this.message.setText(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Saved (temporary — this browser session only)' : 'Saved');
         } })),
         { text: 'Load', run: async () => this.loadList(sortForMenu(await saveStorage.list())) },
+        { text: 'Settings', run: () => this.settings() },
         { text: 'Resume', run: () => this.resume() },
         { text: 'Quit to title', run: () => this.confirm('Quit? Unsaved progress will be lost.', () => { this.scene.stop('Zone'); this.scene.start('Title'); }) }
       ], () => this.resume());
     } else {
       this.show([
         { text: 'Continue', run: entries[0] ? () => loadGame(this, entries[0]!.save) : undefined },
-        { text: 'New Game', run: () => this.newGame() },
+        // Q-06: the one-time sharing question comes before the first New Game (and on a first visit to Settings).
+        { text: 'New Game', run: () => (telemetryChoice() === null ? this.askSharing(() => this.newGame()) : this.newGame()) },
         { text: 'Load', run: async () => this.loadList(sortForMenu(await saveStorage.list())) },
         { text: 'Settings', run: () => this.settings() }
       ], () => undefined);
@@ -108,11 +111,19 @@ class SaveMenuBase extends Phaser.Scene {
    * Settings: the town's mind (GDD §9.14). Online residents speak for themselves; without an invite code (or a
    * reachable server) they speak written lines. The desktop app passes `--invite=`; here it can be typed instead.
    */
+  /** Q-06: off unless the player says yes; Esc keeps it off. Asked once per install. */
+  private askSharing(then: () => void): void {
+    this.message.setText('Share anonymous play events and optional surveys? No name, invite code, or dialogue is sent. Only the optional survey note sends typed text. Change this in Settings anytime.');
+    this.show([{ text: 'Keep sharing off', run: () => { chooseTelemetry(false); then(); } },
+      { text: 'Yes, help improve Monde', run: () => { chooseTelemetry(true); then(); } }], () => { chooseTelemetry(false); then(); });
+  }
   private settings(): void {
+    if (telemetryChoice() === null) { this.askSharing(() => this.settings()); return; }
     const mind = getMind();
     this.message.setText(statusDetail(mind.status));
     const retry = mind.status === 'unreachable' || mind.status === 'connecting';
     this.show([
+      { text: `Anonymous gameplay sharing: ${telemetryChoice() === 'yes' ? 'On' : 'Off'}`, run: () => { chooseTelemetry(telemetryChoice() !== 'yes'); this.settings(); } },
       { text: `Invite code: ${maskInvite(mind.invite)}`, run: () => this.askInvite() },
       ...(mind.invite ? [{ text: 'Clear invite code', run: async () => { await mind.setInvite(null); this.settings(); } }] : []),
       ...(retry ? [{ text: 'Try to reconnect', run: async () => { this.message.setText('Trying the town…'); await mind.reconnect(); this.settings(); } }] : []),

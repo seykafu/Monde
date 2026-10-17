@@ -28,3 +28,4 @@ export * from './gathering';
 export * from './scuffles';
 export * from './arrivals';
 export * from './election';
+export * from './telemetry';

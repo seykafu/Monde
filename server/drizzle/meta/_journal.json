@@ -57,6 +57,13 @@
       "when": 1792124845323,
       "tag": "0007_g02_arrivals",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792201030586,
+      "tag": "0008_q06_telemetry",
+      "breakpoints": true
     }
   ]
 }

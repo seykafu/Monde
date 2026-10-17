@@ -1,3 +1,4 @@
+import { telemetry } from '../telemetry/emit';
 // Taking the Straw Poll (MVP G-11), once per game: at the trestle in S10c, or, if the player missed the end of the fair,
 // at the next dawn so the Lantern still prints it (the Straw Poll is never cut, MVP_PLAN §10). Pure: no Phaser.
 import { type Press, type SavedFinale, type StrawPollRecord } from '@monde/shared';
@@ -13,6 +14,7 @@ export function ensureStrawPoll(r: RegistryLike, regard: (id: string) => number,
   const world = springWorldOf(r, regard, worldSeed);
   if (!world) return null;
   const poll = springPoll(world);
+  telemetry({ type: 'straw_poll_result', day: 25, ...voteOutcome(poll) });
   const quotes: PollQuote[] = pickQuoted(poll, met ?? world.met, worldSeed).map(q => ({ ...q, text: fallbackQuote(q.id, q.band, worldSeed), live: false }));
   return updateFinale(r, s => ({ ...s, poll, quotes }));
 }

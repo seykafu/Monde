@@ -1,3 +1,4 @@
+import { telemetry } from '../telemetry/emit';
 import { enqueue } from '../mind/events';
 import { emptyEventLog } from '@monde/shared';
 import { requestHint } from '../riddles/engine';
@@ -56,6 +57,7 @@ export function submitMark(registry: RegistryLike, clock: Pick<Clock, 'day' | 'm
     if (session) registry.set('monde.story.flags', session.snapshot());
   } };
   const result = answerMark(state, id, text, method, markContext(registry, clock), hooks);
+  if (result === 'solved') telemetry({ type: 'mark_solved', day: clock.day, id, hints: state.entries[id]?.hints ?? 0 });
   registry.set(RIDDLES_KEY, state); return result;
 }
 

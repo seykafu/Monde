@@ -1,3 +1,4 @@
+import { telemetry } from '../telemetry/emit';
 import { JoinedChatter } from './zone/joinChatter';
 import type { ChatterJoin } from './zone/chatter';
 import { updateFriendship } from "./friendship";
@@ -350,6 +351,7 @@ export class DialogueScene extends Phaser.Scene {
   }
 
   create(): void {
+    telemetry({ type: 'conversation_started', day: this.open.clock.day, resident: this.open.residentId });
     this.scene.bringToTop();
     this.pauseWorld(true);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.teardown());

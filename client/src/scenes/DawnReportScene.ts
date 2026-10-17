@@ -1,3 +1,4 @@
+import { openSurvey } from './SurveyScene';
 import { Portrait } from "../dialogue/portrait";
 import { portraitArtId, portraitLook } from "../dialogue/portraitModel";
 import { findCard } from "../world/roster";
@@ -84,7 +85,7 @@ export class DawnReportScene extends Phaser.Scene {
     text(450,682,'Tap or Enter · Keep in Journal → Today → Papers',15);
     let closed = false;
     // The morning Spring ends, the End-of-Spring report follows the paper (finale/attach.ts) instead of the People page.
-    const close = () => { if (closed) return; closed = true; this.scene.stop(); if (!this.opened.archive && !reportDue(this.registry, clock.day)) openPeople(host,clock,'Today'); };
+    const close = () => { if (closed) return; closed = true; this.scene.stop(); if (!this.opened.archive && openSurvey(host, clock, 'day7')) return; if (!this.opened.archive && !reportDue(this.registry, clock.day)) openPeople(host,clock,'Today'); };
     this.input.on('pointerup',close); this.input.keyboard?.on('keydown-ENTER',close); this.input.keyboard?.on('keydown-ESC',close);
     this.events.once('shutdown',() => { clock.resume('paper'); host.input.enabled = true; if (host.input.keyboard) { host.input.keyboard.enabled = true; host.input.keyboard.resetKeys(); } });
   }

@@ -1,0 +1,13 @@
+title: A moment for Monde?
+intro: Your answers help us make the town feel better. Skip any question.
+scale: [Strongly disagree, Disagree, Not sure, Agree, Strongly agree]
+day7:
+  pace: The first week moved at a comfortable pace.
+  residents: I wanted to get to know the residents.
+  next: I knew what I could do next.
+spring:
+  talk_again: Would you talk to them again?
+  talk_choices: [Yes, Not sure, No]
+  town_change: I could see the town change.
+  anything_else: Anything else? Optional. This text will be sent to the Monde team.
+  text_note: Please leave out names, contact details, and other personal information.

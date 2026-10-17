@@ -1,3 +1,5 @@
+import { optionClosesPlace } from '../town/optionClause';
+import { attachTelemetry } from '../telemetry/attach';
 import { attachScuffles, attachScuffleClock, scuffleInteraction, recoverScuffle } from '../scuffles/interaction';
 import { attachPuzzles, puzzleInteraction } from '../puzzles/interaction';
 import { attachProjects, attachProjectsClock, type ProjectsAttachment } from '../projects/attach';
@@ -476,6 +478,7 @@ export class ZoneScene extends Phaser.Scene {
     attachMigration(this.registry, clock);
     // The Projects' dawn (G-03): after the town's, before the Dawn Report, so the paper has last night's hours in.
     attachProjectsClock(this.registry, clock);
+    attachTelemetry(this.registry, clock);
     // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
     this.events.on('update', () => {
       const paper = this.registry.get(PAPER_PENDING) as Press | undefined;
@@ -958,22 +961,24 @@ export class ZoneScene extends Phaser.Scene {
     const door = locked ? undefined : link;
     const place = talk || mark || door ? undefined : nearbyPlace(this.zone, this.position);
     const here = districtOf(this.zone);
-    const economy = place ? (favorInteraction(this.registry, this.clock, `${here}.${place.id}`) ?? this.economy.interaction(`${here}.${place.id}`)) : null;
+    const town = getTown(this.registry);
+    const closed = !!place && !!town && optionClosesPlace(town, `${here}.${place.id}`);
+    const economy = place && !closed ? (favorInteraction(this.registry, this.clock, `${here}.${place.id}`) ?? this.economy.interaction(`${here}.${place.id}`)) : null;
     // G-03: a Project's next thing at its site (with the place's own job as a choice), and H's asks beside a resident.
     // Recomputed a few times a second (they read the Projects, the Bag and the flags).
     const cacheKey = `${place?.id ?? ''}|${talk?.id ?? ''}|${economy?.label ?? ''}`;
     if (time - this.projectCache.at > 200 || cacheKey !== this.projectCache.key) {
       this.projectCache = { at: time, key: cacheKey,
-        project: place ? this.projects.interaction(`${here}.${place.id}`, economy) : null,
+        project: place && !closed ? this.projects.interaction(`${here}.${place.id}`, economy) : null,
         ask: talk ? this.projects.ask(talk.id) : null };
     }
-    const project = place ? this.projectCache.project : null;
+    const project = place && !closed ? this.projectCache.project : null;
     this.askAction = talk ? this.projectCache.ask : null;
-    const puzzle = place ? puzzleInteraction(this, this.clock, `${here}.${place.id}`, project) : null;
+    const puzzle = place && !closed ? puzzleInteraction(this, this.clock, `${here}.${place.id}`, project) : null;
     const scuffle = !talk && !mark ? scuffleInteraction(this, this.clock, this.zone, this.position) : null;
     const goIn = door ? (): void => this.goInside(door) : undefined;
-    this.prompt.setText(scuffle ? `E: ${scuffle.label}` : talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : door ? `E: Go into ${placeName(door.building)}` : place ? `E: ${puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!scuffle || !!talk || !!mark || !!door || !!place);
-    this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? goIn ?? (place ? puzzle?.run ?? project?.run ?? (locked ? () => this.showToast(locked) : () => console.log(`${here}.${place.id}`)) : undefined));
+    this.prompt.setText(scuffle ? `E: ${scuffle.label}` : talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : door ? `E: Go into ${placeName(door.building)}` : place ? `E: ${closed ? 'Closed: Port Vane survey site' : puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!scuffle || !!talk || !!mark || !!door || !!place);
+    this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? goIn ?? (place ? (closed ? () => this.showToast('Closed: Port Vane survey site.') : puzzle?.run ?? project?.run) ?? (locked ? () => this.showToast(locked) : () => console.log(`${here}.${place.id}`)) : undefined));
     // A street encounter on the doorstep (the Old Quarter's bins sit at the cottage door every third day) is offered on E,
     // never forced: walking up into the door still goes in.
     const entering = !talk ? walkingIn(doorLinks, this.zone, this.position, input) : undefined;
