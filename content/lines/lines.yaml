@@ -2783,3 +2783,59 @@ lines:
       r_exact:
         - Stranger
     text: Nice to meet you properly. See you around.
+  - id: RX-060
+    kind: bye
+    when:
+      r_exact:
+        - Stranger
+    text: Good to meet you. Take care.
+  - id: GR-086
+    kind: greet
+    when:
+      m:
+        - glum
+      r_exact:
+        - Friend
+    text: Glad you stopped. Could use a little company.
+  - id: CX-092
+    kind: ctx
+    when:
+      z:
+        - old_quarter
+      req:
+        - "!flag.quarter_chime"
+    text: Still no chime from the clocktower. Quiet up there.
+  - id: CX-093
+    kind: ctx
+    when:
+      m:
+        - bright
+        - glowing
+      w:
+        - rain
+    text: Rain on the roof. Such a lovely sound.
+  - id: CX-094
+    kind: ctx
+    when:
+      m:
+        - even
+      ev:
+        - tollmen_near
+    text: Keep your eyes on the street today.
+  - id: CX-095
+    kind: ctx
+    when:
+      m:
+        - glum
+        - low
+      ev:
+        - arrival_new
+    text: A new face in town. Hope they find their feet.
+  - id: RX-061
+    kind: react
+    when:
+      r:
+        - Neighbor
+      ev:
+        - gift_love
+    text: Oh, this is wonderful. You picked just the thing.

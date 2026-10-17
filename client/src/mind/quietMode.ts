@@ -22,6 +22,7 @@ import {
   replyHash, replyId, type ExprContext, type MoodBand, type PortraitExpression, type RegardTier, type Reply, type ReplyCue,
   type ReplyNext
 } from '@monde/shared';
+import { neverSaysHit } from './voice';
 import type { TalkChoice, TalkInput, TalkTurn } from './types';
 
 export const LINE_KINDS = ['greet', 'talk', 'ctx', 'react', 'bye'] as const;
@@ -177,6 +178,7 @@ export interface QuietContext {
   event: string | null;
   /** In-game day: `today` and the 3-day group weighting are counted from it. */
   day: number;
+  neverSays?: readonly string[];
   speaker: { id: string; firstName: string };
   /** {player} */
   player: string;
@@ -234,6 +236,7 @@ export interface ContextInput {
   /** Regard −100..100 (§10.2). */
   regard: number;
   event?: string | null;
+  neverSays?: readonly string[];
   speaker: { id: string; name: string };
   player: string;
   residents: Readonly<Record<string, string>>;
@@ -242,7 +245,7 @@ export interface ContextInput {
 
 export function quietContext(input: ContextInput): QuietContext {
   return {
-    kind: input.kind, time: timeBand(input.minute), weather: input.weather, zone: input.zone,
+    neverSays: input.neverSays, kind: input.kind, time: timeBand(input.minute), weather: input.weather, zone: input.zone,
     mood: moodBand(input.valence), tier: regardTier(input.regard), event: input.event ?? null, day: input.day,
     speaker: { id: input.speaker.id, firstName: firstName(input.speaker.name) }, player: input.player,
     place: input.zone ? ZONE_DISPLAY[input.zone] ?? null : null, residents: input.residents, req: input.req
@@ -365,7 +368,12 @@ export function lineMatches(line: QuietLine, ctx: QuietContext): boolean {
   if (w.z && (!ctx.zone || !w.z.includes(ctx.zone))) return false;
   if (w.ev && (!ctx.event || !w.ev.includes(ctx.event))) return false;
   if (w.req && !holds(w.req, ctx)) return false;
-  return canFill(line.text, ctx);
+  return canSay(line, ctx);
+}
+
+/** Check the spoken text after substitution, including the last-resort fillers. */
+function canSay(line: QuietLine, ctx: QuietContext): boolean {
+  return canFill(line.text, ctx) && neverSaysHit(fillLine(line.text, ctx), ctx.neverSays ?? []) === null;
 }
 
 /** B.1 step 2. */
@@ -434,8 +442,10 @@ export function pickLine(lib: LineLibrary, ctx: QuietContext, state: QuietState,
   let filler = false;
   if (lines.length === 0) {
     filler = true;
-    ({ level, lines } = windowed(lib.fillers, ctx, state));
-    if (lines.length === 0) lines = [...lib.fillers];
+    // A card whose never_says rules out every filler (a generated arrival's could) still gets a line: never a dead end.
+    const fillers = lib.fillers.filter(l => canSay(l, ctx));
+    ({ level, lines } = windowed(fillers.length > 0 ? fillers : lib.fillers, ctx, state));
+    if (lines.length === 0) lines = fillers.length > 0 ? fillers : [...lib.fillers];
   }
   const best = Math.max(...lines.map(lineScore));
   const band = lines.filter(l => lineScore(l) >= best - DRAW_BAND);

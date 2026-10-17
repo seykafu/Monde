@@ -60,6 +60,9 @@ function fake(respond: (call: NightCall) => NightReply = happy, delayMs = 0): Fa
   return new FakeNightMind((call) => { bodies.push(call.body); return respond(call); }, delayMs);
 }
 
+/** A world seed whose Day-1 night rolls an encounter for Ada (seed 3, for one, rolls none). */
+const SEED_ADA_MEETS = 1;
+
 async function setup(mind: MindClient, runnerOptions: Partial<NightRunnerOptions> = {}) {
   const world = await createWorld(database.db, `device-${randomUUID()}`, "invite");
   const runner = new NightRunner({ db: database.db, mind, budgetMs: 2000, ...runnerOptions });
@@ -149,6 +152,8 @@ describe("POST /v1/worlds/:w/night", () => {
   it("runs Acquainted residents after Core, and Ambient ones only after an importance-6 memory", async () => {
     const mind = fake();
     const env = await setup(mind, { concurrency: 2 });
+    // The night's encounters roll on the world's seed (random per world): fix it so Ada meets someone tonight.
+    await database.db.update(worlds).set({ seed: SEED_ADA_MEETS }).where(eq(worlds.id, env.worldId));
     await talkedToday(env.worldId, "ada", 1);
     await remember(env.worldId, "ada", 1, 5);
     await remember(env.worldId, "bru", 1, 6);
@@ -270,7 +275,7 @@ describe("POST /v1/worlds/:w/night", () => {
     expect((await night(env, { day: 6 })).statusCode).toBe(200);
     const [world] = await database.db.select().from(worlds).where(eq(worlds.id, env.worldId));
     expect(world!.day).toBe(7);
-  });
+  }, 20_000); // three nights, each up to the 2 s budget: more than the 5 s default on a loaded machine
 });
 
 describe("GET /v1/worlds/:w/dawn/:day", () => {

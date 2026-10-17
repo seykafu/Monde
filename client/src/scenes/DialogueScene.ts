@@ -52,6 +52,7 @@ import { offlineMarker } from '../mind/connection';
 import { lineLibrary } from '../mind/lineLibrary';
 import { scriptedTurn, type ScriptedExchange } from '../mind/scripted';
 import { loadQuietState, loadTextSpeed, saveQuietState, saveTextSpeed } from '../mind/prefs';
+import { markReply } from '../mind/markReply';
 import { firstName, quietContext, quietTurn, QUIET_CHOICES, type QuietState } from '../mind/quietMode';
 import { DialogueReader, MS_PER_CHAR, TEXT_SPEEDS, type TextSpeed } from '../mind/reader';
 import type { TalkChoice, TalkContext, TalkInput, TalkTurn } from '../mind/types';
@@ -613,6 +614,7 @@ export class DialogueScene extends Phaser.Scene {
     // the client's mirror (scenes/friendship.ts): the last the server reported, or the Background's start.
     const { kind: _kind, ...context } = quietContext({
       kind: 'talk', day: clock.day, minute: clock.minute, weather: weather.kind, zone: districtOf(zone), valence: 0, regard: regardFor(this.registry, this.card.id),
+      neverSays: this.card.voice.mode === 'narrated_action' ? [] : this.card.voice.never_says,
       event: null, speaker: { id: this.card.id, name: this.card.name }, player: getMind().playerName, residents: FIRST_NAMES
     });
     const rng = new Rng(hashString(`${this.conversationId}:${turnIndex}`));
@@ -765,7 +767,7 @@ export class DialogueScene extends Phaser.Scene {
     if (ready) replies.push({ id: `favor_finish:${ready.id}`, text: ready.task.kind === 'delivery' ? 'I have a parcel for you.' : 'Let me introduce you.', intent: 'kind' });
     const selected = marks(this.registry).selected;
     if (selected && !this.usedMarks.has(selected) && marks(this.registry).entries[selected]?.status === 'found' && ['margo', 'bertrand', 'tib'].includes(this.card.id)) {
-      replies.push({ id: 'mark', text: `About ${selected}…`, intent: 'about_riddle' });
+      replies.push(markReply(selected));
     }
     if (this.card.id === 'tib' && SPRING_RIDDLES.some(r => r.chain === 'T' && marks(this.registry).entries[r.id]?.status !== 'solved')) replies.push({ id: 'tib_duel', text: 'A riddle duel?', intent: 'about_riddle' });
     this.shownReplies = replies;

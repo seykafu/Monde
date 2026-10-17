@@ -3,9 +3,11 @@ import { resolve } from 'node:path';
 import { parse } from 'yaml';
 import { describe, expect, it } from 'vitest';
 import { PORTRAIT_SET, WEATHER_REPLIES, ZONE_REPLIES, derivedReplies, gameContext, replyHash } from '@monde/shared';
+import { personaCards } from '../../world/residents';
+import { neverSaysHit } from '../voice';
 import { Rng } from '../../util/rng';
 import {
-  applyWindows, emptyQuietState, FILLER_IDS, fillLine, firstName, kindFor, lineMatches, lineScore, parseLineLibrary,
+  applyWindows, canFill, emptyQuietState, FILLER_IDS, fillLine, firstName, kindFor, lineMatches, lineScore, parseLineLibrary,
   pickLine, quietContext, quietExpression, quietReplies, quietTurn, rememberLine, replyCue, restoreQuietState, timeBand,
   WINDOW_LEVELS, type ContextInput, type LineLibrary, type QuietContext, type QuietState
 } from '../quietMode';
@@ -390,5 +392,59 @@ describe('a Quiet Mode turn', () => {
     expect(restoreQuietState(JSON.parse(JSON.stringify(state)))).toEqual(state);
     expect(restoreQuietState('nonsense')).toEqual(emptyQuietState());
     expect(restoreQuietState({ residents: { pell: { recent: [1, { id: 'x' }], uses: 'no' } } }).residents.pell).toEqual({ recent: [], uses: [] });
+  });
+});
+
+describe('Quiet Mode voice constraints', () => {
+  it('matches whole words, folded apostrophes and possessives', () => {
+    expect(neverSaysHit('SORRY, long day.', ['sorry'])).toBe('sorry');
+    expect(neverSaysHit('I’m fine.', ["I'm fine"])).toBe("I'm fine");
+    expect(neverSaysHit('Claudine‘s coat.', ['Claudine'])).toBe('Claudine');
+    expect(neverSaysHit('Whatever happens.', ['whatever'])).toBe('whatever');
+    expect(neverSaysHit('Around the rookery.', ['Rook'])).toBeNull();
+    expect(neverSaysHit('Perhaps.', ['', 'hap'])).toBeNull();
+  });
+
+  it('skips forbidden lines in the same pool, including substituted text and exhausted fillers', () => {
+    const lib = tiny([{ id: 'AA-001', text: 'Sorry, {player}.' }, { id: 'AA-002', text: 'Hello.' }]);
+    const c = ctx({ kind: 'talk', neverSays: ['sorry'] });
+    expect(pickLine(lib, c, emptyQuietState(), () => 0).line.id).toBe('AA-002');
+    const substituted = tiny([{ id: 'AA-001', text: 'Hello, {player}.' }, { id: 'AA-002', text: 'Hello.' }]);
+    expect(pickLine(substituted, { ...c, player: 'Sorry' }, emptyQuietState(), () => 0).line.id).toBe('AA-002');
+    const state = emptyQuietState();
+    const fallback = ctx({ kind: 'greet', neverSays: ['ST-046'] });
+    for (const line of lib.fillers) rememberLine(state, fallback.speaker.id, line, fallback.day);
+    const pick = pickLine(lib, fallback, state, () => 0);
+    expect(pick.filler).toBe(true);
+    expect(pick.line.id).toBe('ST-047');
+  });
+
+  it('sweeps every speaking card and library line, with a safe survivor in every authored pool', () => {
+    for (const card of personaCards) {
+      if (card.voice.mode === 'narrated_action') continue;
+      for (const line of library.lines) {
+        const w = line.when;
+        const c: QuietContext = {
+          ...ctx({ speaker: card, neverSays: card.voice.never_says }), kind: line.kind,
+          time: w.t?.[0] ?? 'morning', mood: w.m?.[0] ?? 'even', tier: w.r_exact?.[0] ?? w.r?.[0] ?? 'Friend',
+          weather: w.w?.[0] ?? 'sun', zone: w.z?.[0] ?? 'old_quarter', event: w.ev?.[0] ?? null,
+          residents: Object.fromEntries(personaCards.map(c => [c.id, firstName(c.name)])),
+          req: { resolve: () => w.req?.[0]?.startsWith('!') ? false : 1 }
+        };
+        expect(lineMatches({ ...line, text: 'Hm.' }, c)).toBe(true);
+        if (lineMatches(line, c)) expect(neverSaysHit(fillLine(line.text, c), card.voice.never_says), `${card.id}/${line.id}`).toBeNull();
+        // Force each eligible candidate through the real picker, independently of scores and random weights.
+        if (lineMatches(line, c)) {
+          const pick = pickLine({ ...library, lines: [line] }, c, emptyQuietState(), () => 0);
+          expect(pick.line.id).toBe(line.id);
+          expect(neverSaysHit(pick.text, card.voice.never_says)).toBeNull();
+        }
+        const pool = library.lines.filter(l => l.group === line.group && canFill(l.text, c));
+        if (pool.length) expect.soft(pool.some(l => neverSaysHit(fillLine(l.text, c), card.voice.never_says) === null), `${card.id}/${line.group}`).toBe(true);
+        const fallback = pickLine({ ...library, lines: [] }, c, emptyQuietState(), () => 0);
+        expect(fallback.text.length).toBeGreaterThan(0);
+        expect(neverSaysHit(fallback.text, card.voice.never_says)).toBeNull();
+      }
+    }
   });
 });
