@@ -18,8 +18,8 @@ import {
 import { playerView, type PlayerProfile } from "./player.js";
 import { contentWords, retrieveMemories, topicCards, type MemoryCandidate } from "./retrieval.js";
 import { riddleRecord, riddleTopic, type RiddleRecord } from "./riddles.js";
-import { ECHO_WINDOW, type ValidationContext } from "./validate.js";
-import { borrowedFor, ownSignatures, type RosterVoice } from "./voice.js";
+import { ECHO_WINDOW, cardVocabulary, type ValidationContext } from "./validate.js";
+import { borrowedFor, exitOnlyTics, ownSignatures, type RosterVoice } from "./voice.js";
 
 /** The scene the client reports with each turn. The client owns the clock, position and weather. */
 export interface TalkScene {
@@ -211,6 +211,8 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
 
   const recentLines = recentRows.flatMap((r) => [...r.output.lines].reverse().map((line) => line.text)).slice(0, ECHO_WINDOW);
   const player = playerView(world?.player as PlayerProfile | null | undefined);
+  const focus = turnFocus(args.playerText, args.playerIntent);
+  const voice = prefix.card.voice;
   const revealable = new Set(revealableSecrets(prefix.card, { regard: prefix.state.regard, flags: prefix.flags, day: scene.day }).map((s) => s.id));
 
   return {
@@ -237,7 +239,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         conversation,
         earlierTurns: turns.map(t => ({ user: t.promptUser ?? `<player_said>${t.playerInput ?? '(walks up to you)'}</player_said>`, assistant: t.rawOutput ?? JSON.stringify(t.output) })),
         playerSaid: args.playerSaid,
-        focus: turnFocus(args.playerText, args.playerIntent),
+        focus,
         whimSeed: null,
       },
       validation: {
@@ -250,7 +252,13 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         borrowed: borrowedFor(prefix.card, prefix.voices),
         own: ownSignatures(prefix.card, prefix.voices),
         conversationLines: conversation.filter((t) => t.speaker === "resident").map((t) => t.text),
-        samples: prefix.card.voice.mode === "narrated_action" ? [] : prefix.card.voice.samples,
+        samples: voice.mode === "narrated_action" ? [] : voice.samples,
+        vocabulary: cardVocabulary(prefix.card),
+        neverSays: voice.mode === "narrated_action" ? [] : voice.never_says,
+        fellow: { name: player.name, pronouns: player.pronouns },
+        exitOnly: exitOnlyTics(prefix.card),
+        // The route also sets this for the forced last exchange (routes.ts).
+        exit: focus === "bye",
         heartPerk: false,
       },
     },

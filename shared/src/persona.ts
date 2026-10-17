@@ -73,6 +73,11 @@ const HumanVoice = z.object({
   mode: z.literal("speech").optional(),
   register: z.string(),
   tics: z.array(z.string()),
+  /**
+   * Tics this resident saves for leaving (June's "Anyway."), each also listed in `tics`: said only in a goodbye or
+   * a conversation's last line (MVP Q-01; the server strips one said earlier).
+   */
+  exit_only: z.array(z.string()).optional(),
   never_says: z.array(z.string()),
   samples: z.array(z.string()).length(3),
 });

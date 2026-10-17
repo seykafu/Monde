@@ -7,6 +7,7 @@ import { aiLog } from "../db/schema.js";
 import type { CallRecord } from "./dialogue.js";
 import { aiLogRow } from "./effects.js";
 import type { MindClient } from "./mindClient.js";
+import type { FellowView } from "./naming.js";
 import type { PlaceRegistry } from "./places.js";
 import type { TownFacts } from "./promptBuilder.js";
 
@@ -29,6 +30,8 @@ export interface NightWorld {
    * canon locks see none.
    */
   flags: readonly string[];
+  /** Who the Fellow is (the Fellowship form), so plans and reflections get their pronouns right (naming.ts). */
+  fellow?: FellowView | null;
 }
 
 export interface NightLog {

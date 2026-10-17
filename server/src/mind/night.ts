@@ -40,6 +40,7 @@ import type { MindClient } from "./mindClient.js";
 import { SILENT_LOG, type NightJobDeps, type NightLog, type NightWorld } from "./nightJob.js";
 import { loadPlaceRegistry } from "./places.js";
 import { planResident } from "./plan.js";
+import { playerView, type PlayerProfile } from "./player.js";
 import { clockTime } from "./promptBuilder.js";
 import { reflectResident } from "./reflect.js";
 import { WorldSemaphores } from "./semaphore.js";
@@ -378,7 +379,8 @@ export class NightRunner {
     const tomorrow = all.filter((e) => e.day === day + 1).sort((a, b) => a.minute - b.minute);
 
     const town = body.town ?? {};
-    const [worldRow] = await db.select({ flags: worlds.storyFlags }).from(worlds).where(eq(worlds.id, worldId));
+    const [worldRow] = await db.select({ flags: worlds.storyFlags, player: worlds.player }).from(worlds).where(eq(worlds.id, worldId));
+    const fellow = playerView(worldRow?.player as PlayerProfile | null | undefined);
     const world: NightWorld = {
       worldId,
       day,
@@ -388,6 +390,7 @@ export class NightRunner {
       forecast: town.weather_tomorrow ?? UNKNOWN_FORECAST,
       eventsTomorrow: tomorrow.map(eventLine),
       flags: worldRow?.flags ?? [],
+      fellow: { name: fellow.name, pronouns: fellow.pronouns },
     };
     const jobs = nightJobs(tiers, new Map(tops.map((t) => [t.residentId, t.top ?? 0])), day);
     for (const job of jobs) run.jobs.set(job.residentId, "pending");

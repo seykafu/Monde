@@ -39,11 +39,12 @@ beliefs:
 voice:
   register: >
     Practical and teasing, hands before words. Nursing nouns: obs, dressing, pulse, sutures, sprain.
-    Shrinks a scare to its real size and then checks you again. Talks about leaving in the third
-    person ("someone could just go"). When someone is low the teasing stops: sincerity comes out quick
-    and low, and then she gives you something to hold (a cup, a job, a name to look for).
+    Shrinks a scare to its real size and then checks you again. Talks about leaving only in the third
+    person ("someone could just go", "someone with a packed bag"), never "I" and leaving in one breath.
+    When someone is low the teasing stops: one short sentence of sincerity, quick and low ("That's a
+    hard one. It is."), and then she gives you something to hold (a cup, a job, a name to look for).
   tics: ["Right.", "Let's have a look.", "Sit. Sleeves up."]
-  never_says: ["miracle", "I'm staying", "it's nothing", "plenty of rest"]
+  never_says: ["miracle", "I'm staying", "it's nothing", "plenty of rest", "I'm leaving"]
   samples:
     - "Right. Sit, sleeves up. That's a sprain, not a tragedy, and you've got the good kind of swelling."
     - "Dad's grumbling at the radio, which is how I know he's well. If you hear a crash, that's the radio."

@@ -43,7 +43,7 @@ voice:
     a full sentence. "Petit" or "petite" to the young, "you" to everyone else. Never says her
     daughter's name. Pride makes her gruff about gifts and generous with bread.
   tics: ["Hm.", "Eat something.", "Mind the step."]
-  never_says: ["awesome", "okay so", "Claudine", "I need help"]
+  never_says: ["awesome", "okay so", "Claudine", "I need help", "thank you"]
   samples:
     - "Oven's been hot since four. Sit or don't, but don't block the door."
     - "Rye's two coins, white's three. Today it's rye. Eat something, petit, you look like a coat on a hook."

@@ -94,7 +94,7 @@ secrets:
     reveal: { day: 18 }
 canon_locks:
   - { while: "!flag.charter_half", fact: "Margo has catalogued the Marks and believes they lead to a hidden Commons Charter. She has no proof and has never held a fragment." }
-  - { while: "!flag.pinion_found", fact: "She knows the lantern stamp is cut on the clocktower's escapement cover. She does not know what the lantern pinion is, and says so." }
+  - { while: "!flag.pinion_found", fact: "She knows the lantern stamp is cut on the clocktower's escapement cover. She does not know what the lantern pinion is, and says so if it comes up." }
   - { while: "!flag.clock_chimed", fact: "She and Bertrand have argued every Saturday for six years over who owns Aurélien's story. Neither has stopped coming." }
   - { while: "flag.charter_found", fact: "The Charter hangs in the reading room. Margo will not take credit and tells visitors the Fellow found it." }
 story_role: Act I ally and Marks guide. D2 "Monde's Marks," tutor for the riddle system, Charter fragment curator. The player's best source of dates.

@@ -4,9 +4,10 @@
  *   build (promptBuilder) → stream (MindClient) → check stop_reason → validate (validate.ts)
  *     → on a validation failure, regenerate ONCE with a corrective note → else the authored fallback.
  *
- * Soft failures (another resident's catchphrase, a card sample quoted back; validate.ts steps 8-9) regenerate once
- * too, but are never worth an authored line: a second soft failure is accepted, and if the regeneration fails
- * outright the first attempt's otherwise valid turn is kept.
+ * Soft failures (the Fellow wrongly gendered, a never-says word, money that isn't Monde's, another resident's
+ * catchphrase, a card sample quoted back, a leaving tic too early; validate.ts steps 8-10) regenerate once too, but
+ * are never worth an authored line: a second soft failure is accepted, and if the regeneration fails outright the
+ * first attempt's otherwise valid turn is kept.
  *
  * Deadlines (§9.10 step 4): if nothing visible has streamed by 2.5 s the caller gets `onThinking` (the client
  * plays "Hm."); if the model has produced no text by 6 s the call is abandoned. Inside that window a call that
@@ -24,11 +25,12 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { DialogueTurnOutput, LIMITS, fitText, modelOutputFormat } from "@monde/shared";
 import { apiParams, requestSettings, speech, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
-import { completeWords, lexicalHits } from "./filters.js";
-import { borrowedHits } from "./voice.js";
+import { completeWords, currencyHit, lexicalHits } from "./filters.js";
+import { misgenderHit } from "./naming.js";
+import { borrowedHits, stripTics } from "./voice.js";
 import { LineTextExtractor } from "./partialJson.js";
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
-import { correctiveNote, validateTurn, type ValidationContext } from "./validate.js";
+import { correctiveNote, neverSaysHit, validateTurn, type ValidationContext } from "./validate.js";
 import { prefixSystemBlocks, type ResidentPrefix } from "./context.js";
 import { salvageTurn } from "./salvage.js";
 
@@ -71,7 +73,8 @@ export interface CallRecord {
   /** The API's stop_reason, or "none" when no message came back (timeout, error, no key). */
   stopReason: string;
   /**
-   * "ok", a validation category ("schema", "lexical:brand", "riddle", "echo", "borrowed", "sample_echo"),
+   * "ok", a validation category ("schema", "lexical:brand", "riddle", "echo", "misgender", "never_says", "currency",
+   * "borrowed", "tic_repeat", "sample_echo", "exit_tic"),
    * "kept:<soft category>" (accepted despite a soft check), "salvaged" / "salvaged:<code>" (a cut-short reply whose
    * whole lines were kept), "hedge_lost" / "retried:<code>" (an extra call of the same attempt that didn't supply
    * the turn), or what stopped the call.
@@ -317,12 +320,16 @@ async function callOnce(
 }
 
 /**
- * Is this (whole-word) partial line safe to show before validation? Same lexical and riddle rules, and no other
- * resident's catchphrase (the turn will be regenerated, so the Fellow never sees June say Odile's line).
+ * Is this (whole-word) partial line safe to show before validation? Same lexical and riddle rules, and none of the
+ * line-level soft slips: another resident's catchphrase, the Fellow wrongly gendered, a never-says word, money that
+ * isn't Monde's (the turn will be regenerated, so the Fellow never sees June say Odile's line).
  */
 function streamSafe(text: string, validation: ValidationContext): boolean {
   if (lexicalHits(text).length > 0) return false;
   if (borrowedHits(text, validation.borrowed ?? []).length > 0) return false;
+  if (validation.fellow && misgenderHit(text, validation.fellow)) return false;
+  if (neverSaysHit(text, validation.neverSays ?? [])) return false;
+  if (currencyHit(text)) return false;
   return !validation.riddle; // Riddle-topic output is held until the complete turn has passed the guard.
 }
 
@@ -352,7 +359,7 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
   const thinkingTimer = setTimeout(() => {
     if (!visible && !finished) options.onThinking?.();
   }, timings.thinkingMs);
-  // A first attempt that failed only a soft check: kept if the regeneration can't do better (validate.ts 8-9).
+  // A first attempt that failed only a soft check: kept if the regeneration can't do better (validate.ts 8-10).
   let spare: { output: DialogueTurnOutput; rawOutput: string; adjustments: string[] } | null = null;
   const fail = (code: TurnFailureCode): GenerateResult => (spare
     ? { ...spare, failure: null, calls, salvaged: false }
@@ -369,13 +376,17 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
       const shown: string[] = [];
       let raw = "";
       let suppressed = false;
+      // A leaving tic is stripped from the stream as validation strips it (validate.ts step 2), unless this turn is
+      // the goodbye. (A turn that turns out to wrap up on its own gets it back in the final `turn`.)
+      const exitTics = options.validation.exit ? [] : options.validation.exitOnly ?? [];
       const onText = (delta: string) => {
         raw += delta;
         for (const line of extractor.push(delta)) {
           if (suppressed || line.index >= LIMITS.dialogue.maxLines) continue;
           // Hold back a word still being typed: "game" may become "gamekeeper", and "smartph" must not show.
           const capped = line.text.slice(0, LIMITS.dialogue.lineChars);
-          const text = line.done ? fitText(line.text, LIMITS.dialogue.lineChars) : completeWords(capped);
+          const whole = line.done ? fitText(line.text, LIMITS.dialogue.lineChars) : completeWords(capped);
+          const text = exitTics.length > 0 ? stripTics(whole, exitTics) : whole;
           if (!streamSafe(text, options.validation)) { suppressed = true; continue; }
           if (text.trim() === "" || text === shown[line.index]) continue;
           shown[line.index] = text;

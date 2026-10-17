@@ -36,7 +36,7 @@ import {
   WRAP_UP_NOTE, generateTurn, prewarmParams, type CallRecord, type DialogueTimings, type TurnFailure,
 } from "./dialogue.js";
 import { aiLogRow, persistTurn } from "./effects.js";
-import { LEAVE_CHOICE, THINKING_BEAT, fallbackTurn } from "./fallback.js";
+import { LEAVE_CHOICE, THINKING_BEAT, fallbackTurn, giftLine } from "./fallback.js";
 import { tokensOf, type MindClient } from "./mindClient.js";
 import { PlayerProfile, PlayerProfilePatch, savePlayerProfile, storedProfile } from "./player.js";
 import { costUsd } from "./pricing.js";
@@ -172,7 +172,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       const ctx = loaded.context;
       // GDD-GAP: the ±7 Heart judgment range unlocks with the L3 Regard perk.
       ctx.validation.heartPerk = (body.context.heart_level ?? 1) >= 3;
-      if (giftItem) ctx.input.focus = 'gift';
+      if (giftItem) { ctx.input.focus = 'gift'; ctx.validation.exit = false; }
       if (giftItem) ctx.input.playerSaid = body.input.kind === 'meal' ? `The player shares ${giftItem.name} with you. React in character; the engine already applied the meal's Regard.` : `The player gives you ${giftItem.name}. Your engine-decided reaction is ${matchGift(giftItem, ctx.prefix.card)}. React in character; do not award Regard for this gift (already applied outside conversation).`;
       ctx.input.sessionHistory = selected.session.history;
       ctx.input.sessionSystem = selected.session.system;
@@ -194,6 +194,8 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       raw.on("close", () => { if (!raw.writableFinished) clientGone.abort(); });
 
       const forced = ctx.turnIndex >= selected.session.exchangeLimit - 1;
+      // The forced last exchange sees the Fellow off, so a leaving tic belongs in it (validate.ts step 10).
+      if (forced) ctx.validation.exit = true;
       const applyLimit = (turn: DialogueTurnOutput): DialogueTurnOutput => {
         if (forced) return forceWrapUp(turn);
         if (ctx.turnIndex + 1 < selected.session.resumeUntil) return { ...turn, wrap_up: false,
@@ -207,12 +209,13 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
           turnIndex: context.turnIndex, riddle: context.riddle, playerText, intent: playerIntent,
           said: (context.input.conversation ?? []).filter((t) => t.speaker === "resident").map((t) => t.text),
           met: selected.resumed || (selected.session.history ?? "").trim() !== "",
-          playerPronouns: context.input.player.pronouns,
+          playerPronouns: context.input.player.pronouns, borrowed: context.validation.borrowed,
         });
         if (giftItem) {
+          // Authored, but still the resident's: the first line of the pool they could say (fallback.ts GIFT_LINES).
           const reaction = matchGift(giftItem, context.prefix.card);
-          const lines = { love: 'Oh, this is going on my best shelf. Thank you.', like: 'Thank you. I shall find a good place for this.', neutral: 'Thank you for thinking of me.', dislike: 'Kind of you to bring it. It is not quite my thing.' };
-          turn.lines = [{ text: body.input.kind === 'meal' ? "Pull up a chair. There's room." : lines[reaction], expr: reaction === 'dislike' ? 'worried' : 'warm' }];
+          const text = giftLine(body.input.kind === 'meal' ? 'meal' : reaction, { card: context.prefix.card, borrowed: context.validation.borrowed });
+          turn.lines = [{ text, expr: reaction === 'dislike' ? 'worried' : 'warm' }];
         }
         return applyLimit(turn);
       };

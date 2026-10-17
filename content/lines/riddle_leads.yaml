@@ -3,11 +3,19 @@
 # line, in the resident's own voice, that comes before it on the same line: "<lead-in> <hint>".
 #   give   the first time the hint comes up in a conversation; reads as a refusal to give the answer
 #   again  when that hint was already given in this conversation (the Fellow is pushing)
+#   trail  instead of `give` when the Fellow's line trails off ("About the plaque on my door…", how the client
+#          words every Mark reply): picks up the unfinished sentence first
 # Picked deterministically (resident, riddle, exchange), never one already said in the conversation.
 # Rules (tests check them): no riddle content at all (no accepted answer of any riddle, no inscription or hint
-# words), no other resident's catchphrase, the voice bible's house style (§12.1), and lead-in + longest hint fits
-# one 220-character line. Stage business is physical only. `default` covers residents without their own
-# (generated arrivals).
+# words), no other resident's catchphrase or the speaker's never_says, the voice bible's house style (§12.1), and
+# lead-in + longest hint fits one 220-character line. Stage business is physical only. `default` covers residents
+# without their own (generated arrivals).
+#
+# `retold` (below the leads): each hint again in other words, at the same level and no further, for when the Fellow
+# asks twice in one conversation; the resident switches between the authored hint and its retelling, so the same
+# sentence never comes twice in a row. One per hint level, null where the hint is never served (no hint, or one
+# that holds an accepted answer, which the hint guard withholds). Tests check every retelling against its riddle's
+# accepted answers, every card's never_says, and the line length.
 leads:
   default:
     give:
@@ -16,6 +24,9 @@ leads:
     again:
       - "Same as before. That's all I've got:"
       - "(Goes back to work.) I've nothing more than last time:"
+    trail:
+      - "(Waits for the rest of it.) A plaque, is it. I don't know the answer. This much, though:"
+      - "(Nods you on.) That plaque. All I can give you is this:"
   ada:
     give:
       - "(Stamps a stub without looking.) I sell tickets, not answers. One line, no charge:"
@@ -23,20 +34,27 @@ leads:
     again:
       - "Same as last time, Fellow. Price hasn't gone up:"
       - "(Taps the hatch.) Asked, and answered. Here it is again:"
+    trail:
+      - "(Looks up from the manifest.) The plaque. Go on, I know the one. One line, no charge:"
   augusta:
     give:
       - "(Writes while she talks.) I can't confirm an answer. I can tell you this:"
       - "(Turns a page in her notebook.) Not my department. What I've got is this:"
     again:
-      - "(Doesn't stop writing.) You've had that one already. Word for word:"
+      - "(Doesn't stop writing.) You've had that one already. Same statement, other words:"
       - "Same as before. I don't change a statement:"
+    trail:
+      - "(Writes the word plaque and underlines it.) That one. I can tell you this:"
   bertrand:
     give:
       - "(Winds a pocket watch.) My dear, Aurélien would never forgive me an answer. A nudge, then:"
       - "(Sets down a mainspring.) I shan't spoil it, young person. But I'll say this much:"
     again:
       - "(Holds up one finger.) Patience. The same nudge, and not a tooth more:"
-      - "Where was I. Yes. Exactly what I said before:"
+      - "Where was I. Yes. What I said before, put another way:"
+    trail:
+      - "(Lowers the loupe.) Ah, the plaque. Yes, my dear, I know the one. A nudge, then:"
+      - "(Waits, then finishes it for you.) The plaque. I shan't spoil it. But I'll say this much:"
   bru:
     give:
       - "(Turns a bit of alder in his hands.) Don't know the answer. I know this bit:"
@@ -44,13 +62,17 @@ leads:
     again:
       - "(Sets the knife down.) Same as before. It's what's here:"
       - "Same thing. That's all of it:"
+    trail:
+      - "(Waits.) The plaque. Yeah. Only got the one thing:"
   delphine:
     give:
       - "(Smooths a seam flat.) I'm afraid I don't know the answer. I can offer you this:"
       - "(Threads a needle without looking.) I shouldn't like to guess. There is this, however:"
     again:
-      - "(Folds the cloth on the bias.) As I said before, and I'm afraid it isn't more:"
+      - "(Folds the cloth on the bias.) As I said before, and I'm afraid there's no more:"
       - "(Sets the thimble down.) Only what I told you:"
+    trail:
+      - "(Sets the needle down.) The plaque, yes. I shouldn't like to guess. There is this, however:"
   felix:
     give:
       - "(Wipes chalk from his fingers.) I won't do your sums for you. Here's where to start:"
@@ -58,6 +80,8 @@ leads:
     again:
       - "(Folds his hands on the desk.) We'll go over it once more, from the top:"
       - "Goodness, the same question. The same clue, then:"
+    trail:
+      - "(Waits for the end of the sentence.) The plaque. We'll finish that thought later. Here's where to start:"
   hollis:
     give:
       - "(Checks the watch on its chain.) I don't deal in riddles. I deal in facts, and the fact is this:"
@@ -65,6 +89,8 @@ leads:
     again:
       - "(Taps the watch.) Asked two minutes ago, answered two minutes ago. Same again:"
       - "(Doesn't look up from the rails.) It hasn't changed since you last asked:"
+    trail:
+      - "(Waits exactly as long as it takes.) The plaque. What's written down is this:"
   ines:
     give:
       - "(Squares a folder on her knee.) To be clear, I've no answer to give. Only this:"
@@ -72,6 +98,8 @@ leads:
     again:
       - "As discussed, the same note. I'd hate to be imprecise:"
       - "(Rereads her note.) Nothing's changed since you asked:"
+    trail:
+      - "(Lets you finish, then doesn't.) The plaque. I'm not in a position to say. Only this:"
   june:
     give:
       - "(Hums a bar, then stops.) Mm, I'm no good at these, friend. Only this:"
@@ -79,6 +107,8 @@ leads:
     again:
       - "Mm, the same again, friend. It's all I've got:"
       - "(Plucks one string.) Same tune as before:"
+    trail:
+      - "(Hums the end of your sentence.) Mm, the plaque, friend. Just a bit:"
   kasimir:
     give:
       - "(Picks up his rule.) Don't know. Know this much:"
@@ -86,6 +116,8 @@ leads:
     again:
       - "Same as before. Measure twice:"
       - "(Sets the plane down.) Said it. Saying it again:"
+    trail:
+      - "(Looks up.) The plaque. Know this much:"
   margo:
     give:
       - "(Taps the plate.) All I'll give you is this:"
@@ -93,6 +125,9 @@ leads:
     again:
       - "(Doesn't look up.) Same note as before. It hasn't changed since you asked:"
       - "No. Technically, I've already told you everything I'll tell you:"
+    trail:
+      - "(Looks up from the folio.) The plaque. Yes, I know the one. All I'll give you is this:"
+      - "(Finishes the sentence for you.) The plaque. One note, and you'll want to copy it:"
   moss:
     give:
       - "(Coils a rope.) Riddles. Not my trade. Only this:"
@@ -100,6 +135,8 @@ leads:
     again:
       - "(Coils the same rope again.) Same again:"
       - "Same as before. I'm only saying:"
+    trail:
+      - "(Squints at you.) That plaque. Don't know. This, though:"
   nell:
     give:
       - "Look. I don't do riddles, I do crates and lorries. Fine. This:"
@@ -107,6 +144,8 @@ leads:
     again:
       - "(Arms folded.) You heard me the first time:"
       - "Look. Same not-answer as before:"
+    trail:
+      - "Finish a sentence, would you. The plaque. Fine. This:"
   nettie:
     give:
       - "(Flicks a pebble off the ledge.) Riddles are Tib's thing. Fine, Fellow. This:"
@@ -114,6 +153,8 @@ leads:
     again:
       - "Blast, you again. Same thing as before:"
       - "(Flicks another pebble.) Same as I said. Pay attention:"
+    trail:
+      - "(Flicks a pebble.) The plaque. Riddles are Tib's thing. This:"
   odile:
     give:
       - "(Dusts flour off her hands.) Hm. I'm no good at riddles. Here's what I've got:"
@@ -121,6 +162,8 @@ leads:
     again:
       - "(Doesn't stop kneading.) I said it once. I'll say it twice, no more:"
       - "Hm. Same as before:"
+    trail:
+      - "(Wipes her hands on her apron.) The plaque. I'm no good at riddles. Here's what I've got:"
   pell:
     give:
       - "(Takes off her glasses and folds them.) I'm no use with puzzles. All I can offer is this:"
@@ -128,6 +171,8 @@ leads:
     again:
       - "(Caps her pen.) I've told you all I know, and I'll tell it once more:"
       - "Now. Same as I said before, and that's the end of it:"
+    trail:
+      - "(Folds her glasses.) The plaque, dear. I'm no use with puzzles. I can tell you this much:"
   priya:
     give:
       - "(Rolls a bandage while she talks.) I patch people, not puzzles. Here's what I've got:"
@@ -135,6 +180,8 @@ leads:
     again:
       - "Right. Second dose, same as the first:"
       - "(Rolls the bandage tighter.) Same as before. It won't change if you ask harder:"
+    trail:
+      - "(Waits for the rest.) The plaque. No answers. Here's what I've got:"
   rook:
     give:
       - "(Pulls a loose thread from his cuff.) Riddles. Rot. One thing, then:"
@@ -142,6 +189,8 @@ leads:
     again:
       - "Don't. Same as before:"
       - "(Shrugs.) You heard it. Again:"
+    trail:
+      - "(Waits.) The plaque. Spit it out. Fine. This:"
   rosalind:
     give:
       - "(Wipes a glass that's already dry.) Between us, pet, this is all I've heard:"
@@ -149,6 +198,8 @@ leads:
     again:
       - "(Polishes the same glass.) Same as I told you, pet:"
       - "(Leans on the counter.) Only what I said before:"
+    trail:
+      - "(Leans on the counter.) The plaque, pet. This is all I've heard:"
   sable:
     give:
       - "(Wipes ink off her thumb.) I print facts, not answers. Here's a fact:"
@@ -156,6 +207,8 @@ leads:
     again:
       - "Same quote as before. No second edition:"
       - "(Doesn't look up from the forme.) I've already given you that one:"
+    trail:
+      - "(Pencil ready.) The plaque. Finish the quote another day. You get this:"
   teo:
     give:
       - "(Keeps his hands in the soil.) Oh, bother. I'm no good at these. Only this, sorry:"
@@ -163,6 +216,8 @@ leads:
     again:
       - "(Waters the same fern twice.) Sorry. Same as, same as before:"
       - "Sorry. It's still only this:"
+    trail:
+      - "(Looks up from the soil.) Oh, the plaque. I don't know it. I know this:"
   tib:
     give:
       - "I'm not supposed to say, but. Okay. Just this:"
@@ -170,6 +225,9 @@ leads:
     again:
       - "Same as before. I said. This:"
       - "(Kicks the cobbles.) I already told you. This:"
+    trail:
+      - "(Bounces on his heels.) That plaque. I know the one. Here's a bit:"
+      - "(Finishes it for you.) The plaque. Not telling. But here's a bit:"
   vane:
     give:
       - "(Adjusts his pocket square.) Riddles aren't my business. I can tell you this much:"
@@ -177,3 +235,79 @@ leads:
     again:
       - "(Straightens a cufflink.) The same as before. I'd hate to oversell it:"
       - "May I be frank? It's what I said last time:"
+    trail:
+      - "(Waits politely.) The plaque. Riddles aren't my business. I can tell you this much:"
+
+retold:
+  OQ-1:
+    - "Think of something that made a sound once and has gone quiet since."
+    - "No face, but a tongue and a skirt. And it keeps to a gate."
+    - "Go and look by the gate at St. Brigid's chapel."
+  OQ-2:
+    - "A pool with no water in it. In a town this dry, there aren't many to choose from."
+    - null
+    - null
+  OQ-3:
+    - "You'll find the year Monde was founded on the welcome sign by the ferry slip."
+    - "Walk all the way round the clocktower and count its faces. Each face has two hands, mind."
+    - "Start at 1838, add 8, then add 4."
+  OQ-4:
+    - "Take the first letter of every line and read them down."
+    - "Look for a window full of clocks, and not two of them agreeing."
+    - null
+  OQ-5:
+    - "One stroke at one o'clock, two at two, and on up from there."
+    - "Count every stroke from one o'clock through twelve, and add them all together."
+    - null
+  MR-1:
+    - "Its whole job is weighing things."
+    - null
+    - null
+  MR-2:
+    - "Think of a bird, and a bit off a ship."
+    - null
+    - null
+  MR-3:
+    - "A baker's dozen means thirteen."
+    - "Shift every letter thirteen along the alphabet. G turns into T."
+    - null
+  MR-4:
+    - "How many letters are in \"Monde\"? Count them."
+    - "You know how many faces the tower shows. If you don't, walk all the way round it."
+    - null
+  MR-5:
+    - "It swims, but in the wind, never in the water."
+    - null
+    - null
+  WF-1:
+    - "It comes twice a day, and it leaves a mark where it's been."
+    - null
+    - null
+  WF-2:
+    - "It won't hold water, but it'll hold fish."
+    - null
+    - "Count three hooks in, from the end nearest the water."
+  WF-3:
+    - null
+    - "It's kept upside down in the dark, and its \"spine\" means its keel."
+    - null
+  WF-4:
+    - "One eye, and it only works at night."
+    - "Eleven years it's been dark."
+    - null
+  CM-1:
+    - "It keeps the hour, and it has no hands to do it with."
+    - "It's no use at all without the sun."
+    - null
+  CM-2:
+    - "Shadows creep along as the sun crosses over."
+    - null
+    - "Pick a sunny afternoon, three o'clock or near it, and dig at the shadow's tip."
+  CM-3:
+    - "You can see straight through its walls."
+    - "Plants live in it, and nobody else."
+    - null
+  CM-4:
+    - "People walk across it."
+    - "The ducks go underneath it."
+    - null

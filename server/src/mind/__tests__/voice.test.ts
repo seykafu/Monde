@@ -34,23 +34,26 @@ describe("voice ownership: signature phrases", () => {
       "hollis:By my watch.", "margo:Technically,", "sable:On the record?", "rook:Rot."]) {
       expect(owned).toContain(expected);
     }
-    for (const phrase of ["hm", "right", "sorry", "sure", "look"]) expect(owned.some((o) => phraseKey(o.split(":")[1]!) === phrase)).toBe(false);
-    // Every owned key is unique, and none is on the everyday list.
-    const keys = signatures(roster).map((s) => phraseKey(s.phrase));
+    for (const phrase of ["hm", "sorry", "sure", "look"]) expect(owned.some((o) => phraseKey(o.split(":")[1]!) === phrase)).toBe(false);
+    // A tic two hand-written cards share belongs to both ("Right." after the 2026-10-16 eval).
+    expect(owned).toEqual(expect.arrayContaining(["augusta:Right.", "priya:Right."]));
+    // Each owner lists a phrase once, and none is on the everyday list.
+    const keys = signatures(roster).map((s) => `${s.owner}:${phraseKey(s.phrase)}`);
     expect(new Set(keys).size).toBe(keys.length);
-    expect(keys.some((k) => COMMON_TICS.has(k))).toBe(false);
+    expect(signatures(roster).some((s) => COMMON_TICS.has(phraseKey(s.phrase)))).toBe(false);
   });
 
-  it("never lets a tic two cards share, an arrival or an animal own a phrase", () => {
+  it("lets hand-written cards share a phrase, but never lets an arrival or an animal own one or take it", () => {
     const extra: RosterVoice[] = [
       { id: "zed", kind: "arrival", tics: ["Mind the step.", "Tide's turning."] },
       { id: "ash", kind: "resident", tics: ["By my watch."] },
     ];
     const owned = signatures([...roster, ...extra]);
     expect(owned.some((s) => s.owner === "zed" || s.owner === "bastien")).toBe(false);
-    // Shared with the arrival and with another resident card: nobody's any more.
-    expect(owned.some((s) => s.phrase === "Mind the step.")).toBe(false);
-    expect(owned.some((s) => s.phrase === "By my watch.")).toBe(false);
+    // An arrival with Odile's phrase leaves it Odile's, so nobody's cached block changes when the ferry comes in.
+    expect(owned.filter((s) => s.phrase === "Mind the step.").map((s) => s.owner)).toEqual(["odile"]);
+    expect(owned.filter((s) => s.phrase === "By my watch.").map((s) => s.owner)).toEqual(["ash", "hollis"]);
+    expect(signatures([...roster, extra[0]!])).toEqual(signatures(roster));
   });
 
   it("lists everyone else's phrases for a resident, never their own, and nothing for an animal", () => {
@@ -102,7 +105,7 @@ describe("the persona block (block 2) owns the voice", () => {
 
   it("calls the tics yours alone, lists the others' catchphrases and frames samples as tone", () => {
     const june = block(card("june"));
-    expect(june).toContain('Your tics, yours alone (each at most once per conversation): "Anyway.", "Sure.", "One, two,"');
+    expect(june).toContain('Your tics, yours alone (each at most once per conversation): "Anyway." (only as the conversation ends), "Sure.", "One, two,"');
     expect(june).toContain('Odile "Eat something.", "Mind the step."');
     expect(june).toContain("Samples, to show your tone only (never repeat one or lift its phrases; say new things):");
     expect(block(card("odile"))).not.toContain('Odile "');
@@ -172,7 +175,7 @@ describe("naming: what each resident calls the Fellow (GDD §12.1)", () => {
     const stranger = buildDialogueRequest(input(5));
     const friend = buildDialogueRequest(input(45));
     const user = (req: ReturnType<typeof buildDialogueRequest>) => req.messages.at(-1)!.content as string;
-    expect(user(stranger)).toMatch(/<player> Name: Wren \(she\/her\)\. Your regard: Stranger\. Background: Tinkerer\. Call her "Fellow" \("dear" now and then\), not "Wren"/);
+    expect(user(stranger)).toMatch(/<player> Name: Wren \(she\/her\)\. Words for her are "she" and "her": never "he", "him", "his", "a man", "lad" or "sir"\. Your regard: Stranger\. Background: Tinkerer\. Call her "Fellow" \("dear" now and then\), not "Wren"/);
     expect(user(friend)).toContain('Call her "Wren" when it\'s just the two of you');
     expect(JSON.stringify(friend.system)).toBe(JSON.stringify(stranger.system));
     expect(JSON.stringify(stranger.system)).not.toContain('Call her');
@@ -198,7 +201,7 @@ describe("naming: what each resident calls the Fellow (GDD §12.1)", () => {
 
 describe("riddle lead-ins (GDD §14.2)", () => {
   const library = () => loadRiddleLeads();
-  const allLeads = () => Object.entries(library().leads).flatMap(([id, pools]) => [...pools.give, ...pools.again].map((lead) => ({ id, lead })));
+  const allLeads = () => Object.entries(library().leads).flatMap(([id, pools]) => [...pools.give, ...pools.again, ...(pools.trail ?? [])].map((lead) => ({ id, lead })));
   const longestHint = () => Math.max(...SPRING_RIDDLES.flatMap((r) => r.hints.map((h) => h?.length ?? 0)));
 
   it("exist for every resident who speaks, plus a default", () => {
@@ -243,11 +246,13 @@ describe("riddle lead-ins (GDD §14.2)", () => {
     const state = { regard: 0, mood: { valence: 0, energy: 50, stress: 0, emotion: "content" as const, intensity: 10 } };
     const base = { card: card("margo"), state, playerName: "Wren", riddle: { record, allowed: 1 } };
     const hint = authoredHint(record, 1)!;
-    const first = fallbackTurn({ ...base, turnIndex: 1, playerText: "About the plaque on my door…" }).lines[0]!.text;
+    const first = fallbackTurn({ ...base, turnIndex: 1, playerText: "Who put the plaque on my door?" }).lines[0]!.text;
     expect(first).toBe(`${riddleLeadIn({ residentId: "margo", riddleId: "OQ-1", turnIndex: 1, again: false })} ${hint}`);
     expect(first.endsWith(` ${hint}`)).toBe(true);
+    // Asked again: the "again" lead-in, and the hint in its authored retelling, never the same sentence twice.
+    const retold = library().retold["OQ-1"]![0]!;
     const second = fallbackTurn({ ...base, turnIndex: 2, playerText: "Can you just tell me the answer?", said: [first] }).lines[0]!.text;
-    expect(second.endsWith(` ${hint}`)).toBe(true);
+    expect(second.endsWith(` ${retold}`)).toBe(true);
     expect(library().leads.margo!.again.some((lead) => second.startsWith(lead))).toBe(true);
     expect(containsAnswer(first, record.accepted) || containsAnswer(second, record.accepted)).toBe(false);
   });

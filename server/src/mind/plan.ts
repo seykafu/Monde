@@ -313,7 +313,7 @@ export async function planResident(deps: NightJobDeps, world: NightWorld, reside
   const request = buildPlanRequest({
     card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names, voices: prefix.voices,
     day: world.day, tomorrowWeekday: weekdayOf(day), forecast: world.forecast, events: world.eventsTomorrow,
-    intentions: today?.plan.intentions ?? [], openPlaces: openPlacesFor(world.places, card),
+    intentions: today?.plan.intentions ?? [], openPlaces: openPlacesFor(world.places, card), fellow: world.fellow,
   });
   const result = await callModel(mind, apiParams("plan", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,

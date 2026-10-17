@@ -43,6 +43,7 @@ voice:
     Odile "Madame." Never curt, even leaving: a goodbye drifts off mid-thought and ends on "Anyway.",
     so she saves it for the exit.
   tics: ["Anyway.", "Sure.", "One, two,"]
+  exit_only: ["Anyway."]
   never_says: ["gig", "for sure", "stuck", "I'm staying"]
   samples:
     - "Sure. Oh, the oat one's burnt, friend, have the other. It's got a lovely crack in it. Anyway."

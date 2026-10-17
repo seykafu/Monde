@@ -20,6 +20,11 @@
  * goodbye gets seen off, anything else a short acknowledgement; and its replies carry the conversation on (ask
  * again, change the subject, go) rather than restart it. A resident who has talked with the Fellow before never
  * opens with "we haven't met".
+ *
+ * An authored line is still the resident's line (MVP Q-01): from every pool the picker takes only lines the resident
+ * could say (`speakable`: nothing on their card's never_says, no other resident's catchphrase), so Nettie never
+ * stalls with "Sorry, I was miles away" and Odile never thanks anyone in words. The voice tests sweep every card
+ * against every authored line it can be served.
  */
 import {
   LIMITS, REPLY_CHARS, callName, derivedReplies, fillReply, moodBand, normalizeChoices, regardTier, replyHash, type DialogueTurnOutput,
@@ -29,7 +34,9 @@ import { containsAnswer, turnFocus } from "./promptBuilder.js";
 import type { RiddleRecord } from "./riddles.js";
 import { expressionFor } from "./expressions.js";
 import { addressFor } from "./naming.js";
-import { riddleLeadIn } from "./riddleLeads.js";
+import { riddleHintText, riddleLeadIn, trailsOff } from "./riddleLeads.js";
+import { neverSaysHit } from "./validate.js";
+import { borrowedHits, type Signature } from "./voice.js";
 
 /** The authored beat the client plays when nothing has streamed by 2.5 s (§9.10 flow step 4). */
 export const THINKING_BEAT = "Hm.";
@@ -205,6 +212,18 @@ export interface FallbackInput {
   met?: boolean;
   /** The Fellow's pronouns ("she/her"), for how the resident addresses them (naming.ts). */
   playerPronouns?: string;
+  /** Other residents' catchphrases this resident never borrows (voice.ts borrowedFor), so a pool skips lines with one. */
+  borrowed?: readonly Signature[];
+}
+
+/**
+ * Could this resident say this (filled) line? Nothing on their card's never_says and no other resident's catchphrase
+ * (§12.1 Monde rule 12). Narrated residents never speak, so the question doesn't arise.
+ */
+export function speakable(line: string, input: Pick<FallbackInput, "card" | "borrowed">): boolean {
+  const voice = input.card.voice;
+  if (voice.mode === "narrated_action") return true;
+  return neverSaysHit(line, voice.never_says) === null && borrowedHits(line, input.borrowed ?? []).length === 0;
 }
 
 const firstName = (card: PersonaCard): string => card.name.replace(/"[^"]*"/g, " ").trim().split(/\s+/)[0] ?? card.id;
@@ -235,31 +254,62 @@ export function fillAddress(line: string, term: string): string {
   });
 }
 
-/** The first line of `pool` (from a stable start) that the resident hasn't said in this conversation. */
+/**
+ * The first line of `pool` (from a stable start) the resident could say and hasn't said in this conversation; else
+ * the first they could say; else the pool's first line from that start.
+ */
 function freshLine(pool: readonly string[], input: FallbackInput, term: string): string {
   const said = new Set((input.said ?? []).map((line) => line.trim()));
   const start = replyHash(`${input.playerText ?? ""}|${input.turnIndex}`) % pool.length;
-  for (let i = 0; i < pool.length; i++) {
-    const line = fillAddress(pool[(start + i) % pool.length]!, term);
-    if (!said.has(line)) return line;
-  }
-  return fillAddress(pool[start]!, term);
+  const lines = pool.map((_, i) => fillAddress(pool[(start + i) % pool.length]!, term));
+  const own = lines.filter((line) => speakable(line, input));
+  return own.find((line) => !said.has(line)) ?? own[0] ?? lines[0]!;
 }
 
 /**
  * A riddle-topic turn: the resident's authored lead-in, then the best safe hint (§14.2), on one line. Asked again
- * after that hint was given in this conversation, the lead-in says so. Nothing safe to hint: stumped.
+ * after that hint was given in this conversation, the lead-in says so and the hint comes in its authored retelling
+ * (riddleLeads.ts), never the same sentence twice in a row. A first ask that trails off ("About the plaque on my
+ * door…") gets a lead-in that picks it up. Nothing safe to hint: stumped.
  */
 function riddleLine(input: FallbackInput, riddle: NonNullable<FallbackInput["riddle"]>): string {
   const hint = authoredHint(riddle.record, riddle.allowed);
   if (!hint) return STUMPED_LINE;
   const said = input.said ?? [];
+  const level = riddle.record.hints.indexOf(hint);
+  const delivered = riddleHintText({
+    riddleId: riddle.record.id, level, hint, said, speakable: (text) => speakable(text, input),
+  });
   const lead = riddleLeadIn({
     residentId: input.card.id, riddleId: riddle.record.id, turnIndex: input.turnIndex,
-    again: said.some((line) => line.includes(hint)), said,
+    again: delivered.again, trailing: trailsOff(input.playerText), said,
   });
-  const line = `${lead} ${hint}`;
-  return line.length <= LIMITS.dialogue.lineChars ? line : hint;
+  const line = `${lead} ${delivered.text}`;
+  return line.length <= LIMITS.dialogue.lineChars ? line : delivered.text;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Gifts and shared meals (G-09): the authored reaction when the model can't give one
+// ---------------------------------------------------------------------------------------------------------------
+
+export type GiftReaction = "love" | "like" | "neutral" | "dislike";
+
+/**
+ * Reactions to a gift, by the engine's reaction, and to a shared meal; the first line each resident could say is
+ * used. The second of each pair says it without thanks in words (Odile thanks with bread, §12.1).
+ */
+export const GIFT_LINES: Readonly<Record<GiftReaction | "meal", readonly string[]>> = {
+  love: ["Oh, this is going on my best shelf. Thank you.", "(Turns it over twice.) This is going on my best shelf."],
+  like: ["Thank you. I shall find a good place for this.", "(Holds it up to the light.) I know just where this goes."],
+  neutral: ["Thank you for thinking of me.", "(Sets it down carefully.) You thought of me. That's kind."],
+  dislike: ["Kind of you to bring it. It is not quite my thing.", "(Turns it over once.) Kind of you. It's not quite my thing."],
+  meal: ["Pull up a chair. There's room.", "(Shifts along the bench.) There's room. Sit."],
+};
+
+/** The authored reaction line for a gift or a shared meal. */
+export function giftLine(kind: GiftReaction | "meal", input: Pick<FallbackInput, "card" | "borrowed">): string {
+  const pool = GIFT_LINES[kind];
+  return pool.find((line) => speakable(line, input)) ?? pool[0]!;
 }
 
 export function fallbackLine(input: FallbackInput): string {
@@ -274,6 +324,7 @@ export function fallbackLine(input: FallbackInput): string {
   if (moment !== "open") return freshLine(MOMENT_LINES[moment], input, term);
   const tier = regardTier(input.state.regard);
   const line = input.met && tier === "Stranger" ? MET_LINES[group] : FALLBACK_LINES[tier][group];
+  // One line per cell, so these must suit everyone: the voice tests sweep them against every card.
   return fillAddress(line, term);
 }
 

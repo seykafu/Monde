@@ -14,12 +14,23 @@
  *   6. secrets     reveal_secret must be one of the revealable ids, else null                 (adjusts)
  *   7. echo        word-trigram overlap with the resident's last 20 lines must be ≤ 0.35      (fail: "echo")
  *
- * Then two soft checks (MVP Q-01). They regenerate once with a note, like any failure, but a turn that still trips
+ * Then the soft checks (MVP Q-01). They regenerate once with a note, like any failure, but a turn that still trips
  * one is accepted rather than swapped for an authored line (dialogue.ts): the slip is in voice, a fallback isn't.
- *   8. borrowed    no line may use another resident's signature phrase (voice.ts)            (soft: "borrowed")
+ *   8. misgender   no line may gender the Fellow wrongly where it's tied to "you": a
+ *                  vocative ("Sit, lad."), "you're a good lad", "a man like you", "Mr. Wren"
+ *                  against the Fellowship form's pronouns (naming.ts)                         (soft: "misgender")
+ *      never_says  nor use a word or phrase on the resident's card's never_says               (soft: "never_says")
+ *      currency    nor money that isn't Monde's: shillings, pence, pennies, dollars, quid,
+ *                  cents, "five pounds" (filters.ts currencyHit)                              (soft: "currency")
+ *      borrowed    nor another resident's signature phrase (voice.ts)                         (soft: "borrowed")
  *      tic_repeat  nor one of the resident's own a second time in this conversation          (soft: "tic_repeat")
  *   9. samples     no line may echo one of the resident's own card samples: trigram overlap
- *                  above 0.35, or a run of six or more words lifted from one                  (soft: "sample_echo")
+ *                  above 0.35, a run of six or more words lifted from one, a distinctive run
+ *                  of four or five (two distinctive words, no price or count), or most of a
+ *                  line's distinctive words taken from one sample                             (soft: "sample_echo")
+ *  10. exit_tic    a tic the card saves for leaving (June's "Anyway.") outside the turn that
+ *                  sees the Fellow off: stripped in step 2 where it stands as a sentence of
+ *                  its own and the line survives; anything left is a soft failure              (soft: "exit_tic")
  *
  * Step 2 also turns *asterisk* stage business into the house style's (parentheses) (adjusts).
  *
@@ -31,13 +42,14 @@ import {
 } from "@monde/shared";
 import { containsAnswer } from "./promptBuilder.js";
 import { checkedExpression } from "./expressions.js";
-import { lexicalHits, type FilterGroup } from "./filters.js";
+import { currencyHit, lexicalHits, type FilterGroup } from "./filters.js";
+import { misgenderHit, pronounRule, type FellowView } from "./naming.js";
 import type { RiddleRecord } from "./riddles.js";
-import { borrowedHits, type Signature } from "./voice.js";
+import { borrowedHits, stripTics, type Signature } from "./voice.js";
 
 export type ValidationCategory = "schema" | `lexical:${FilterGroup}` | "riddle" | "echo" | SoftCategory;
 /** Checks that regenerate once and then accept (dialogue.ts), never fall back. */
-export type SoftCategory = "borrowed" | "tic_repeat" | "sample_echo";
+export type SoftCategory = "misgender" | "never_says" | "currency" | "borrowed" | "tic_repeat" | "sample_echo" | "exit_tic";
 
 export interface ValidationContext {
   /** The name fills `{name}` in padded replies; kind keeps an animal's own expressions. */
@@ -59,6 +71,16 @@ export interface ValidationContext {
   conversationLines?: readonly string[];
   /** The resident's own card samples: tone, never script (step 9). */
   samples?: readonly string[];
+  /** The resident's own words (cardVocabulary), which never make a sample lift distinctive (step 9). */
+  vocabulary?: readonly string[];
+  /** The card's never_says: words and phrases this resident never uses (step 8). */
+  neverSays?: readonly string[];
+  /** Who the Fellow is, from the Fellowship form (step 8, misgender). */
+  fellow?: FellowView;
+  /** Tics the card saves for leaving (voice.ts exitOnlyTics; step 10). */
+  exitOnly?: readonly Signature[];
+  /** This turn sees the Fellow off (focus "bye", or the forced last exchange). A turn that sets wrap_up counts too. */
+  exit?: boolean;
   /** Heart skill perk widens the Regard clamp to ±7 (§9.10.2). Skills aren't built yet: false. */
   heartPerk?: boolean;
 }
@@ -132,12 +154,108 @@ export function sharedRun(line: string, other: string): number {
   return best === 0 ? 0 : best + 2;
 }
 
-/** The first of `samples` a line echoes (step 9), with why, or null. */
-export function sampleEcho(line: string, samples: readonly string[]): string | null {
+/**
+ * GDD-GAP: §9.10 has no rule for a short lift. The 2026-10-16 eval caught Odile turning her sample "Sit or don't, but
+ * don't block the door." into "Sit, petite, if you're staying. Don't block the door.": a four-word run and a third of
+ * the trigrams, under both limits above. So a shorter run counts when it's distinctive (this many words or more,
+ * with at least two distinctive words, and no price or count in it: "rye's two coins, white's three" may recur), and
+ * so does a line whose distinctive words come mostly from one sample (SAMPLE_WORD_SHARE of them, and at least
+ * SAMPLE_WORDS_SHARED). A distinctive word is a content word that isn't a price, a count, a weekday, a name, or the
+ * resident's own vocabulary (their register, tics, chores and likes: Pell counting the lamps at dusk is her chore,
+ * not a quotation; `cardVocabulary`).
+ */
+export const SAMPLE_DISTINCT_RUN = 4;
+export const SAMPLE_WORD_SHARE = 0.5;
+export const SAMPLE_WORDS_SHARED = 3;
+
+/** Words that carry no voice of their own: function words, contractions, and the Fellow's address terms. */
+const STOPWORDS: ReadonlySet<string> = new Set((
+  "a an the and or but if so as at by for from in into of off on onto out over to up with without about after before "
+  + "than then too very just only also even still yet again here there this that these those it it's its is are was "
+  + "were be been being am do does did don't doesn't didn't done have has had haven't hasn't i i'm i'll i'd i've me "
+  + "my mine you you're you'll you'd you've your yours he he's him his she she's her hers we we're us our they "
+  + "they're them their what what's who who's whom how when where why which all any some no not nor never can can't "
+  + "could couldn't would wouldn't should shouldn't will won't shall may might must let's that's there's here's "
+  + "oh ah well yes yeah now one ones get got go going gone come came say said see saw know like way thing things "
+  + "fellow petit petite friend dear pet"
+).split(" "));
+/** Prices, counts, days and "time": facts a resident may repeat in their own words (World Bible: "rye's two, white's three"). */
+const COUNT_WORDS: ReadonlySet<string> = new Set((
+  "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen "
+  + "eighteen nineteen twenty thirty forty fifty sixty seventy eighty ninety hundred thousand half quarter dozen "
+  + "coin coins penny monday tuesday wednesday thursday friday saturday sunday time"
+).split(" "));
+
+/** A word with its possessive dropped ("rye's" → "rye"), for comparing content words. */
+const stem = (word: string): string => word.replace(/'s$/, "");
+const isCount = (word: string): boolean => /^\d/.test(word) || COUNT_WORDS.has(stem(word));
+const isContent = (word: string): boolean => !STOPWORDS.has(word) && !isCount(word) && word.length > 1;
+
+/** Names: words written with a capital inside a sentence ("Hollis Brandt would tell you"), lower-cased and stemmed. */
+function names(text: string): Set<string> {
+  const out = new Set<string>();
+  for (const sentence of text.replace(/[’‘]/g, "'").split(/(?<=[.!?…)])\s+/)) {
+    const words = sentence.replace(/^[^\p{L}]+/u, "").split(/[^\p{L}']+/u).filter(Boolean);
+    for (const word of words.slice(1)) if (/^\p{Lu}/u.test(word)) out.add(stem(word.toLowerCase()));
+  }
+  return out;
+}
+
+/** The words a card gives its resident to use (register, tics, chores, likes), stemmed, for `sampleEcho`. */
+export function cardVocabulary(card: Pick<PersonaCard, "voice" | "chores" | "likes">): string[] {
+  const text = [card.voice.register, ...card.voice.tics, ...card.chores, ...card.likes].join(" ");
+  return [...new Set(normalizeWords(text).filter(isContent).map(stem))].sort();
+}
+
+/** Every maximal run (three words or more) of `line` that also appears in `other`, as word lists. */
+export function sharedRuns(line: string, other: string): string[][] {
+  const words = normalizeWords(line);
+  const grams = wordTrigrams(other);
+  const runs: string[][] = [];
+  let start = -1;
+  // One step past the last trigram, so a run that reaches the end is closed too.
+  for (let i = 0; i <= words.length - 2; i++) {
+    const hit = i + 2 < words.length && grams.has(`${words[i]} ${words[i + 1]} ${words[i + 2]}`);
+    if (hit && start < 0) start = i;
+    // The last matching trigram started at i - 1, so the run ends with word i + 1.
+    if (!hit && start >= 0) { runs.push(words.slice(start, i + 2)); start = -1; }
+  }
+  return runs;
+}
+
+/**
+ * The first of `samples` a line echoes (step 9), with why, or null. `vocabulary` is the resident's own words
+ * (`cardVocabulary`), which never make a lift distinctive.
+ */
+export function sampleEcho(line: string, samples: readonly string[], vocabulary: readonly string[] = []): string | null {
+  const own = new Set(vocabulary);
   for (const sample of samples) {
     const overlap = echoOverlap(line, [sample]);
     const run = sharedRun(line, sample);
     if (overlap > ECHO_THRESHOLD || run >= SAMPLE_RUN_WORDS) return `${overlap.toFixed(2)}/${run} words: ${sample}`;
+    const named = new Set([...names(line), ...names(sample)]);
+    const distinctive = (word: string): boolean => isContent(word) && !own.has(stem(word)) && !named.has(stem(word));
+    const lifted = sharedRuns(line, sample).find((words) => words.length >= SAMPLE_DISTINCT_RUN
+      && !words.some(isCount) && words.filter(distinctive).length >= 2);
+    if (lifted) return `"${lifted.join(" ")}": ${sample}`;
+    const mine = [...new Set(normalizeWords(line).filter(distinctive).map(stem))];
+    const theirs = new Set(normalizeWords(sample).filter(distinctive).map(stem));
+    const shared = mine.filter((word) => theirs.has(word));
+    if (shared.length >= SAMPLE_WORDS_SHARED && shared.length / mine.length >= SAMPLE_WORD_SHARE) {
+      return `${shared.length}/${mine.length} words (${shared.join(", ")}): ${sample}`;
+    }
+  }
+  return null;
+}
+
+/** The first of `phrases` (a card's never_says) the text uses, whole words, case and apostrophes folded; or null. */
+export function neverSaysHit(text: string, phrases: readonly string[]): string | null {
+  const words = normalizeWords(text);
+  // "Claudine's" still names her: possessives are checked without their 's too.
+  const forms = [` ${words.join(" ")} `, ` ${words.map(stem).join(" ")} `];
+  for (const phrase of phrases) {
+    const key = normalizeWords(phrase).join(" ");
+    if (key && forms.some((form) => form.includes(` ${key} `))) return phrase;
   }
   return null;
 }
@@ -168,12 +286,23 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
     return fail("schema", issue ? `${issue.path.join(".") || "(root)"}: ${issue.message}` : "invalid");
   }
   const adjustments: string[] = [];
-  const lines = parsed.data.lines.map((l) => ({ ...l, text: l.text.trim() })).filter((l) => l.text !== "").map((l) => {
+  let lines = parsed.data.lines.map((l) => ({ ...l, text: l.text.trim() })).filter((l) => l.text !== "").map((l) => {
     const text = parenthesizeStageBusiness(l.text);
     if (text !== l.text) adjustments.push("asterisk stage business→parentheses");
     return { ...l, text };
   });
   if (lines.length === 0) return fail("schema", "no lines");
+  // A tic saved for leaving, before the conversation's last line: dropped where it stands as a sentence of its own
+  // and something is left to say (step 10 catches the rest).
+  const exitTics = ctx.exit || parsed.data.wrap_up ? [] : ctx.exitOnly ?? [];
+  if (exitTics.length > 0) {
+    const stripped = lines.map((l) => ({ ...l, text: stripTics(l.text, exitTics) }));
+    const kept = stripped.filter((l) => l.text !== "");
+    if (kept.length > 0 && stripped.some((l, i) => l.text !== lines[i]!.text)) {
+      adjustments.push(`exit-only tic stripped: ${exitTics.map((t) => `"${t.phrase}"`).join(", ")}`);
+      lines = kept;
+    }
+  }
 
   // 2. Clamps. Choices first, so a reply dropped as a repeat or a second goodbye can be replaced by a fourth.
   const choices = normalizeChoices(parsed.data.choices, {
@@ -241,9 +370,24 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
     if (overlap > ECHO_THRESHOLD) return fail("echo", `${overlap.toFixed(2)}: ${line.text}`);
   }
 
-  // 8-9. Soft voice checks: another resident's catchphrase, a card sample quoted back.
+  // 8-10. Soft voice checks: the Fellow's pronouns, the card's never_says, Monde's money, another resident's
+  // catchphrase, the resident's own twice, a card sample quoted back, a leaving tic too early.
   const soft = (category: SoftCategory, detail: string): ValidationResult =>
     ({ ok: false, category, detail, soft: { output: out, adjustments } });
+  if (ctx.fellow) {
+    for (const line of out.lines) {
+      const hit = misgenderHit(line.text, ctx.fellow);
+      if (hit) return soft("misgender", `"${hit}" (${ctx.fellow.pronouns})`);
+    }
+  }
+  for (const line of out.lines) {
+    const hit = neverSaysHit(line.text, ctx.neverSays ?? []);
+    if (hit) return soft("never_says", `"${hit}"`);
+  }
+  for (const line of out.lines) {
+    const hit = currencyHit(line.text);
+    if (hit) return soft("currency", `"${hit}"`);
+  }
   for (const line of out.lines) {
     const borrowed = borrowedHits(line.text, ctx.borrowed ?? [])[0];
     if (borrowed) return soft("borrowed", `"${borrowed.phrase}" (${borrowed.owner})`);
@@ -255,8 +399,12 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
     said.push(line.text);
   }
   for (const line of out.lines) {
-    const echo = sampleEcho(line.text, ctx.samples ?? []);
+    const echo = sampleEcho(line.text, ctx.samples ?? [], ctx.vocabulary ?? []);
     if (echo) return soft("sample_echo", echo);
+  }
+  for (const line of out.lines) {
+    const early = borrowedHits(line.text, exitTics)[0];
+    if (early) return soft("exit_tic", `"${early.phrase}"`);
   }
 
   return { ok: true, output: out, adjustments };
@@ -277,6 +425,23 @@ export function correctiveNote(category: ValidationCategory, detail = ""): strin
   }
   if (category === "sample_echo") {
     return "That repeats one of your card's samples nearly word for word. The samples only show your tone: say something new, in your own words.";
+  }
+  if (category === "misgender") {
+    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That";
+    const pronouns = /\(([^)]+)\)\s*$/.exec(detail)?.[1];
+    return `${what} gets the Fellow wrong.${pronouns ? ` ${pronounRule(pronouns)}` : ""} Say it again.`;
+  }
+  if (category === "never_says") {
+    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That phrase";
+    return `You never say ${what}: it's on your card's never-says list. Say it again without it, in your own words.`;
+  }
+  if (category === "currency") {
+    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That";
+    return `${what} isn't Monde money. Money here is coins: "two coins", "every coin". Say it again.`;
+  }
+  if (category === "exit_tic") {
+    const what = /^"[^"]*"/.exec(detail)?.[0] ?? "That phrase";
+    return `${what} is how you leave a conversation, and you aren't leaving yet. Say it again without it.`;
   }
   if (category === "schema") {
     return "Your last reply didn't match the schema. Reply again with JSON only: one to three lines and two or three choices.";

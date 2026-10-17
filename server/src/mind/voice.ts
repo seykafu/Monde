@@ -9,10 +9,14 @@
  *     own a second time in one conversation (§12.1: a habit once per conversation); the turn is regenerated once
  *     and then accepted, never swapped for an authored fallback over it.
  *
- * A signature phrase is a tic from a canon or resident card (the twenty-four hand-written ones) that no other card
- * shares and that isn't an everyday word (COMMON_TICS). Generated arrivals and animals own none, so an arrival
- * stepping off the ferry never changes anyone else's cached persona block. Everything here is pure and
- * deterministic: the same roster always gives the same bytes.
+ * A signature phrase is a tic from a canon or resident card (the twenty-four hand-written ones) that isn't an
+ * everyday word (COMMON_TICS). A tic two hand-written cards share belongs to both ("Right." is Augusta's and
+ * Priya's, so Margo may not borrow it). Generated arrivals and animals own none and never take a phrase from its
+ * owner, so an arrival stepping off the ferry never changes anyone else's cached persona block. Everything here is
+ * pure and deterministic: the same roster always gives the same bytes.
+ *
+ * Some tics are for leaving (a card's `voice.exit_only`, June's "Anyway."): the persona block marks them, and the
+ * validator strips one said before the conversation's last line (`stripTics`).
  */
 import type { PersonaCard } from "@monde/shared";
 
@@ -33,11 +37,11 @@ export interface Signature {
 
 /**
  * Tics that are everyday speech: any resident may say them, so nobody owns them. Keys are `phraseKey` forms.
- * (A shared tic, like "Right." on two cards, is nobody's too.) Kept short on purpose: tune against eval
- * transcripts (§9.16), not by guesswork.
+ * Kept short on purpose: tune against eval transcripts (§9.16), not by guesswork. ("Right." left this list after
+ * the 2026-10-16 eval: as a sentence of its own it is Augusta's and Priya's, and Margo saying it read as Priya.)
  */
 export const COMMON_TICS: ReadonlySet<string> = new Set([
-  "hm", "right", "sorry", "sure", "look", "don't", "easy", "visitor", "gloves", "roland",
+  "hm", "sorry", "sure", "look", "don't", "easy", "visitor", "gloves", "roland",
   "show me", "let's see", "forgive me", "to be clear", "right then", "your money", "walk with me", "it's well",
   "oh and", "between us", "my dear", "for the record", "let's have a look", "give it a day", "one two",
 ]);
@@ -53,35 +57,50 @@ export function phraseKey(text: string): string {
     .map((word) => word.replace(/^'+|'+$/g, "")).filter(Boolean).join(" ");
 }
 
-/** Every signature phrase in the roster, by owner id and then in card order. */
+/**
+ * Every signature phrase in the roster, by owner id and then in card order. A phrase on two hand-written cards is
+ * listed once for each owner.
+ */
 export function signatures(roster: readonly RosterVoice[]): Signature[] {
-  const owners = new Map<string, number>();
-  for (const voice of roster) {
-    if (voice.kind === "animal") continue;
-    for (const key of new Set(voice.tics.map(phraseKey))) owners.set(key, (owners.get(key) ?? 0) + 1);
-  }
   return [...roster]
     .filter((voice) => OWNER_KINDS.has(voice.kind))
     .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
-    .flatMap((voice) => voice.tics.flatMap((tic) => {
-      const key = phraseKey(tic);
-      return key && !COMMON_TICS.has(key) && owners.get(key) === 1 ? [{ owner: voice.id, phrase: tic.trim() }] : [];
-    }));
+    .flatMap((voice) => {
+      const seen = new Set<string>();
+      return voice.tics.flatMap((tic) => {
+        const key = phraseKey(tic);
+        if (!key || COMMON_TICS.has(key) || seen.has(key)) return [];
+        seen.add(key);
+        return [{ owner: voice.id, phrase: tic.trim() }];
+      });
+    });
+}
+
+/** The tic keys a card owns, and so may say: its own tics, and any phrase one of them starts ("Right, then." covers "Right."). */
+function ownsKey(own: readonly string[], key: string): boolean {
+  return own.some((mine) => mine === key || mine.startsWith(`${key} `));
 }
 
 /**
  * The signature phrases this resident must never borrow: everyone else's, minus any the resident's own card
- * also lists. Animals never speak, so they borrow nothing.
+ * also lists (or opens one of its own with). Animals never speak, so they borrow nothing.
  */
 export function borrowedFor(card: Pick<PersonaCard, "id" | "voice">, roster: readonly RosterVoice[]): Signature[] {
   if (card.voice.mode === "narrated_action") return [];
-  const own = new Set(card.voice.tics.map(phraseKey));
-  return signatures(roster).filter((s) => s.owner !== card.id && !own.has(phraseKey(s.phrase)));
+  const own = card.voice.tics.map(phraseKey).filter(Boolean);
+  return signatures(roster).filter((s) => s.owner !== card.id && !ownsKey(own, phraseKey(s.phrase)));
 }
 
 /** This resident's own signature phrases, for the once-per-conversation check (§12.1 "Same-conversation repetition"). */
 export function ownSignatures(card: Pick<PersonaCard, "id">, roster: readonly RosterVoice[]): Signature[] {
   return signatures(roster).filter((s) => s.owner === card.id);
+}
+
+/** The card's tics saved for leaving (`voice.exit_only`, each also one of its `tics`), as the card's own phrases. */
+export function exitOnlyTics(card: Pick<PersonaCard, "id" | "voice">): Signature[] {
+  if (card.voice.mode === "narrated_action") return [];
+  const exit = new Set((card.voice.exit_only ?? []).map(phraseKey));
+  return card.voice.tics.filter((tic) => exit.has(phraseKey(tic))).map((tic) => ({ owner: card.id, phrase: tic.trim() }));
 }
 
 const label = (id: string): string => id.charAt(0).toUpperCase() + id.slice(1);
@@ -130,3 +149,30 @@ export function borrowedHits(text: string, borrowed: readonly Signature[]): Sign
   const folded = text.replace(/[’‘]/g, "'");
   return borrowed.filter((s) => patternFor(s.phrase).test(folded));
 }
+
+/**
+ * `text` without the given tics where each stands as a sentence of its own ("Mm, the reed's split. Anyway. You
+ * wanted the waltz?" → "Mm, the reed's split. You wanted the waltz?"). A tic inside a sentence is left alone, so
+ * `borrowedHits` still sees it.
+ */
+export function stripTics(text: string, tics: readonly Signature[]): string {
+  // Folding apostrophes is one character for one, so match positions line up with `text`.
+  let out = text;
+  for (const tic of tics) {
+    const words = phraseKey(tic.phrase).split(" ").map(escapeRegex);
+    if (words.length === 0 || words[0] === "") continue;
+    const sentence = new RegExp(
+      `(?<=^|[.!?…)\\]])\\s*${words.join("[^\\p{L}\\p{N}']+")}\\s*[.!?…]+(?=\\s|$|["')\\]])`, "giu",
+    );
+    const folded = out.replace(/[’‘]/g, "'");
+    let kept = "";
+    let from = 0;
+    for (const match of folded.matchAll(sentence)) {
+      kept += out.slice(from, match.index);
+      from = match.index + match[0].length;
+    }
+    out = kept + out.slice(from);
+  }
+  return out.replace(/\s{2,}/g, " ").trim();
+}
+

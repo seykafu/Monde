@@ -11,6 +11,7 @@ import { loadResidentPrefix, weekdayOf } from './context.js';
 import { encounterMemoryId, persistEncounter, ruleOutcome, type Encounter } from './encounters.js';
 import { buildLiveGossipRequest, validateLiveGossip } from './liveGossip.js';
 import { apiParams, promptVersion } from './promptBuilder.js';
+import { playerView, type PlayerProfile } from './player.js';
 import { callModel } from './callModel.js';
 import { nightLogRow } from './nightJob.js';
 
@@ -42,7 +43,7 @@ export function registerChatRoutes(app: FastifyInstance, db: WorldDatabase | und
     if (!db) return reply.code(503).send({ error: 'Database unavailable' });
     const body = parsed.data, worldId = request.params.w;
     if (!(await loadPlaceRegistry()).ids.has(body.place)) return reply.code(400).send({ error: 'unknown place' });
-    const [world] = await db.select({ day: worlds.day }).from(worlds).where(eq(worlds.id, worldId));
+    const [world] = await db.select({ day: worlds.day, player: worlds.player }).from(worlds).where(eq(worlds.id, worldId));
     if (world?.day !== body.day) return reply.code(409).send({ error: 'chat day must match the world day' });
     const [a, b] = await Promise.all([loadResidentPrefix(db, worldId, body.a), loadResidentPrefix(db, worldId, body.b)]);
     if (!a || !b) return reply.code(404).send({ error: 'unknown resident' });
@@ -78,7 +79,8 @@ export function registerChatRoutes(app: FastifyInstance, db: WorldDatabase | und
       let answer = { ...fallback, reason: denied ?? (mind.enabled && ambient ? 'ambient' : 'offline') };
       if (!denied && mind.enabled && !ambient) {
         const input = buildLiveGossipRequest({ a: { card: a.card, view: av, news: an }, b: { card: b.card, view: bv, news: bn },
-          flags: a.flags, names: a.names, day: body.day, weekday: weekdayOf(body.day), minute: body.minute, place: body.place, mode: 'live' }, body, a, b);
+          flags: a.flags, names: a.names, day: body.day, weekday: weekdayOf(body.day), minute: body.minute, place: body.place, mode: 'live',
+          fellow: playerView(world?.player as PlayerProfile | null | undefined) }, body, a, b);
         for (let attempt = 0; attempt < 2; attempt++) {
           const result = await callModel(mind, apiParams('gossip', input), { timeoutMs: CHAT_TIMEOUT_MS });
           const valid = result.ok ? validateLiveGossip(result.text, a, b, new Set([...an, ...bn].map(n => n.id)), romanceAllowed) : null;

@@ -446,7 +446,7 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
   const request = buildReflectRequest({
     card: prefix.card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names, voices: prefix.voices,
     day: world.day, memoriesToday: selectReflectionMemories(today, prefix, world.day), town: world.town,
-    favorTemplates: PROPOSABLE_FAVORS,
+    favorTemplates: PROPOSABLE_FAVORS, fellow: world.fellow,
   });
   request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${[...itemIds].join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
   const result = await callModel(mind, apiParams("reflect", request), {

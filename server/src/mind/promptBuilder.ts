@@ -26,8 +26,9 @@ import {
   type FavorTemplate, type Memory, type PersonaCard, type ResidentState, type Verb,
 } from "@monde/shared";
 import { promptExpressions } from "./expressions.js";
-import { addressFor } from "./naming.js";
-import { borrowedFor, borrowedLine, type RosterVoice } from "./voice.js";
+import { addressFor, fellowLine, pronounRule, type FellowView } from "./naming.js";
+import { townNowBlock } from "./townState.js";
+import { borrowedFor, borrowedLine, phraseKey, type RosterVoice } from "./voice.js";
 
 // ---------------------------------------------------------------------------------------------------------------
 // API settings (GDD §9.17 "API call settings"; AGENTS.md "Claude API rules")
@@ -111,7 +112,7 @@ type Templates = Readonly<Record<TemplateName, string>>;
  * Bump when the code-side serialization below changes in a way the template files don't show (list formats,
  * field order), so the logged prompt version still changes.
  */
-const SERIALIZER_VERSION = "q01.1";
+const SERIALIZER_VERSION = "q01.2";
 
 /**
  * Where the templates live. Source runs read them next to this file. The bundled server (tsup → server/dist)
@@ -223,6 +224,12 @@ const bullets = (items: readonly string[], empty: string): string =>
 const quoted = (items: readonly string[]): string => items.map((item) => `"${prose(item)}"`).join(", ");
 const round = (n: number): number => Math.round(n);
 
+/** A card's tics, quoted, with the ones it saves for leaving marked (`voice.exit_only`, MVP Q-01). */
+function ticList(voice: PersonaCard["voice"]): string {
+  const exit = new Set((voice.mode === "narrated_action" ? [] : voice.exit_only ?? []).map(phraseKey));
+  return voice.tics.map((tic) => `"${prose(tic)}"${exit.has(phraseKey(tic)) ? " (only as the conversation ends)" : ""}`).join(", ");
+}
+
 function cached(text: string): Anthropic.TextBlockParam {
   return { type: "text", text, cache_control: { type: "ephemeral" } };
 }
@@ -325,7 +332,7 @@ export function personaBlock(card: PersonaCard, ctx: CanonContext): string {
     chores: card.chores.map(prose).join("; "),
     relationships: bullets(card.relationships.map((r) => `${who(r.id, ctx.names)} (${r.tag}): ${prose(r.note)}`), "(none)"),
     register: prose(voice.register),
-    tics: quoted(voice.tics),
+    tics: ticList(voice),
     never_says: quoted(voice.never_says),
     borrowed: borrowedLine(borrowedFor(card, ctx.voices ?? [])),
     voice_extra: voiceExtra,
@@ -625,6 +632,8 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     doing: input.doing ? clause(input.doing) : "nothing in particular",
     player_name: playerName,
     player_pronouns: speech(player.pronouns),
+    pronoun_rule: pronounRule(player.pronouns),
+    town_now: trusted(townNowBlock(flags)),
     regard_tier: regardTier(state.regard),
     player_background: clause(player.background),
     address: address.line,
@@ -668,6 +677,8 @@ export interface PlanInput {
   events: readonly string[];
   intentions: readonly string[];
   openPlaces: readonly { id: string; hours?: string | null }[];
+  /** Who the Fellow is (the Fellowship form), so a bark or a plan to find them gets their pronouns right. */
+  fellow?: FellowView | null;
 }
 
 const isWeekend = (weekday: string): boolean => /^(sat|sun)/i.test(weekday.trim());
@@ -700,6 +711,8 @@ export function buildPlanRequest(input: PlanInput): MindRequest {
     intentions: bullets(input.intentions.map(prose), "(none)"),
     places: bullets(input.openPlaces.map((p) => (p.hours ? `${p.id} (${prose(p.hours)})` : p.id)), "(none)"),
     verbs: planVerbs(card).join(", "),
+    town_now: trusted(townNowBlock(input.flags)),
+    fellow: input.fellow ? fellowLine(input.fellow) : "",
   });
   return {
     system: systemBlocks(card, state, input.relationships, ctx),
@@ -736,6 +749,8 @@ export interface ReflectInput {
    * engine-authored (§9.9) and which the engine triggers itself.
    */
   favorTemplates?: readonly FavorTemplate[];
+  /** Who the Fellow is (the Fellowship form), so beliefs, the diary and letters get their pronouns right. */
+  fellow?: FellowView | null;
 }
 
 export function buildReflectRequest(input: ReflectInput): MindRequest {
@@ -762,6 +777,8 @@ export function buildReflectRequest(input: ReflectInput): MindRequest {
     dream_stage: dreamStageText(card, state.dream.stage),
     dream_notes: state.dream.notes ? prose(state.dream.notes) : "(none)",
     town: townText,
+    town_now: trusted(townNowBlock(input.flags)),
+    fellow: input.fellow ? fellowLine(input.fellow) : "",
     favor_templates: templates.join(", "),
   });
   return {
@@ -794,6 +811,8 @@ export interface GossipInput {
   place: string;
   /** "live" writes lines (player in earshot); "summary" returns only effects (§9.11). */
   mode: "live" | "summary";
+  /** Who the Fellow is (the Fellowship form), for a line that mentions them. */
+  fellow?: FellowView | null;
 }
 
 /** A compact sketch for two-resident calls: identity, voice and live canon only (no secrets, no backstory). */
@@ -805,7 +824,7 @@ export function gossipSketch(card: PersonaCard, ctx: CanonContext): string {
   return [
     `${prose(card.name)}, ${card.age}, ${card.pronouns}. ${prose(card.occupation)}. ${KIND_LINE[card.kind]}`,
     `Voice: ${prose(voice.register)}`,
-    `Tics: ${quoted(voice.tics)}. Never says: ${quoted(voice.never_says)}.`,
+    `Tics: ${ticList(voice)}. Never says: ${quoted(voice.never_says)}.`,
     style,
     "Canon (never contradict):",
     bullets(activeCanonLocks(card, ctx), "(none right now)"),
@@ -832,6 +851,8 @@ export function buildGossipRequest(input: GossipInput): MindRequest {
     b_to_a: view(input.b.view),
     a_news: news(input.a.news),
     b_news: news(input.b.news),
+    town_now: trusted(townNowBlock(input.flags)),
+    fellow: input.fellow ? fellowLine(input.fellow) : "",
   });
   return {
     // Two residents, so no single persona prefix: the World Bible is the cached block (§9.15 cost table).

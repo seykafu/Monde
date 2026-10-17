@@ -766,7 +766,8 @@ voice:
   register: >                  # how they talk, in the style of Ravage's VOICE.md
     Short declaratives. Bakery vocabulary. Calls everyone "petit" or "you".
   tics: ["Hm.", "Eat something."]
-  never_says: ["awesome", "okay so"]
+  exit_only: []                # optional: tics saved for leaving (June's "Anyway."), each also in `tics` (MVP Q-01)
+  never_says: ["awesome", "okay so"]   # enforced: the validator regenerates a line that uses one (§9.10)
   samples:                     # 3 lines, used as style anchors in the prompt
     - "Oven's been hot since four. Sit or don't, but don't block the door."
     - "..."
@@ -1042,16 +1043,38 @@ characters) is available and on by default. It passes a cheap moderation check f
   an acknowledgement otherwise), and its replies carry on, change the subject or leave.
 - **Echo check:** the server compares each new line with that resident's last 20 lines (word trigram
   overlap). Above 0.35 overlap, it regenerates once with a "say it differently" note, then falls back.
-- **Voice checks (MVP Q-01):** three soft checks run after the others. A line may not use another
-  hand-written resident's signature phrase (§12.1 Monde rule 12; the persona block lists them, drawn
-  from the other cards' tics minus everyday words), may not repeat the resident's own signature phrase
-  within one conversation, and may not quote one of the resident's own card samples (trigram overlap
-  above 0.35, or a run of six or more words lifted from a sample; samples are tone, not script). Each
-  regenerates once with a note naming the slip; a second slip is accepted, and if the regeneration fails
-  outright the first reply is kept. A slip in voice beats an authored line in no voice, so these never
-  fall back. A borrowed phrase is also held back from the stream until the regeneration.
+- **Voice checks (MVP Q-01):** soft checks run after the others. A line may not gender the Fellow
+  wrongly where the word is tied to "you" (a vocative like "Sit, lad.", "you're a good lad", "a man like
+  you", "Mr. Wren", against the Fellowship form's pronouns; "he" and "she" about anyone else are left
+  alone), may not use a word on the resident's card's `never_says`, may not name money that isn't
+  Monde's (shillings, pence, pennies, dollars, quid, cents, "five pounds"; weight and idiom pass), may
+  not use another hand-written resident's signature phrase (§12.1 Monde rule 12; the persona block lists
+  them, drawn from the other cards' tics minus everyday words), may not repeat the resident's own
+  signature phrase within one conversation, and may not quote one of the resident's own card samples
+  (trigram overlap above 0.35; a run of six or more words lifted from a sample; a distinctive run of four
+  or five, meaning two words that aren't function words, prices, counts, names or the resident's own
+  vocabulary; or most of a line's distinctive words taken from one sample; samples are tone, not
+  script). A tic the card saves for leaving (`exit_only`, June's "Anyway.") is stripped from any turn
+  before the goodbye or the conversation's last line where it stands as a sentence of its own, and is
+  a soft failure otherwise. Each regenerates once with a note naming the slip; a second slip is
+  accepted, and if the regeneration fails outright the first reply is kept. A slip in voice beats an
+  authored line in no voice, so these never fall back. A line with a borrowed phrase, a wrong gender, a
+  never-says word or foreign money is also held back from the stream until the regeneration.
+- **Authored lines keep the voice rules too (MVP Q-01):** every fallback pool, gift reaction and riddle
+  lead-in serves a resident only lines without their `never_says` words or another resident's catchphrase
+  (Odile's gift reaction never thanks in words; Nettie never stalls with "sorry"), and a test sweeps every
+  card against every authored line it can be served.
 - **Naming (MVP Q-01):** the dynamic block carries one line saying what this resident calls the Fellow at
-  the current Regard and met state (§12.1 Monde rule 13), and authored fallbacks use the same term.
+  the current Regard and met state (§12.1 Monde rule 13), and authored fallbacks use the same term. The
+  `<player>` line also names the right and wrong words for the Fellow from the Fellowship form's pronouns
+  ("Words for her are "she" and "her": never "he", "him", "his", "a man", "lad" or "sir".); plans,
+  reflections and live gossip carry the same sentence, always in block 4.
+- **The town now (MVP Q-01):** the World Bible describes Monde on the first day of spring, and canon locks
+  carry each resident's own facts. Town-wide facts that story flags overturn reach every resident request
+  as one `<town_now>` line in block 4: the clocktower always (stopped at 4:17; struck once at the Quarter
+  Chime and stopped again at 4:18 after `clock_chimed`; running after `clock_running`), and the fountain,
+  streetlamps, Market Hall, garden, bakery ovens, lighthouse and later Projects once their flags are set.
+  Blocks 1-3 never change with a flag this way.
 - **Residents start things too:** `seek_player` intents make residents walk up and open a conversation.
   Reflections can write **letters** that arrive in the player's mailbox the next morning: thank-you
   notes, invitations (the engine creates the event), complaints, gossip.
@@ -1063,7 +1086,7 @@ characters) is available and on by default. It passes a cheap moderation check f
 | 1 | **World Bible** (setting, era rules, tone, rating rules, voice bible digest §12.1, anti-patterns, output contract). Identical for every world and resident. | ~2,500 | Per release | Breakpoint 1 (hit almost always, shared by all players) |
 | 2 | **Persona Card** (§9.3) with canon locks evaluated, plus the other residents' catchphrases never to borrow (§12.1 Monde rule 12, ~250 tokens) | ~1,000–1,500 | Rarely | Breakpoint 2 |
 | 3 | **Beliefs + relationship summary** (top 8 relationships as one-liners) | ~300–500 | Nightly | Breakpoint 3 |
-| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: `<player_said>` first, with one line saying what to do with it ("Respond to this first…"), then a compact scene and mood line, the player (with what this resident calls them, §12.1 Monde rule 13), memories (retrieved on the Fellow's words and the line they answer), topics (opener or lull only), Favors, secrets and hints. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
+| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: `<player_said>` first, with one line saying what to do with it ("Respond to this first…"), then a compact scene and mood line, `<town_now>` (the town-wide facts story flags have changed, the clocktower always), the player (with their pronouns spelled out and what this resident calls them, §12.1 Monde rule 13), memories (retrieved on the Fellow's words and the line they answer), topics (opener or lull only), Favors, secrets and hints. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
 
 Haiku 5.5's minimum cacheable prefix is 512 tokens, so every breakpoint above qualifies. Byte-stable
 serialization is mandatory (sorted keys, no timestamps in blocks 1–3), or caching silently stops working.
@@ -1801,13 +1824,18 @@ specificity.
     and none of them like a writer.
 12. **Catchphrases have owners.** A hand-written resident's tics are theirs alone: nobody but Odile
     says "Mind the step," nobody but June exits on "Anyway.", nobody but Pell turns a subject with
-    "Now." A resident's own tic comes once a conversation. Card samples show a voice's tone and are
-    never quoted back. (MVP Q-01: the persona block lists the others' signature phrases, and the
-    validator regenerates a line that borrows one, then accepts it; §9.10.)
+    "Now." A tic two cards share belongs to both ("Right." as a sentence of its own is Augusta's and
+    Priya's, so Margo doesn't say it). A resident's own tic comes once a conversation, and a tic saved
+    for leaving (June's "Anyway.") only in the goodbye. Card samples show a voice's tone and are never
+    quoted back, not even four words of one. A card's never-says list holds for authored lines as much
+    as for generated ones. (MVP Q-01: the persona block lists the others' signature phrases and marks
+    the leaving tics, and the validator regenerates a line that slips, then accepts it; §9.10.)
 13. **What they call the Fellow is part of the voice.** The registers below say it ("Fellow," "petite,"
     "friend," "pet," the first name at Friend in private). Residents without a rule say "Fellow" until
     introduced or met, then the name or "Fellow." The engine gives the model the one line that applies
-    at the current Regard and met state.
+    at the current Regard and met state. The Fellow's pronouns are the ones on the Fellowship form, never
+    guessed from a trade: a tinkerer is not "a man who fixes things." Money is coins, never pounds or
+    shillings.
 
 #### Character registers
 
@@ -1845,9 +1873,11 @@ never in words. Bakery nouns: proof, crumb, crust, scoring, the starter ("the ol
 "petite" to the young, "you" to everyone else. Never says her daughter's name. "Hm." is a full
 sentence. Pride makes her gruff about gifts and generous with bread.
 
-**Hollis** - gives the time of everything to the minute ("07:12, not seven"), so nearly every reply
-carries a time, a count or a timetable. Railway nouns: points, regulator, firebox, headcode, the
-branch. Complains in exact numbers and means no joke by it; a joke gets a literal answer. "Late."
+**Hollis** - gives the time of everything to the minute on the twenty-four-hour clock ("07:12, not
+seven"), so nearly every reply carries a time, a count or a timetable. Railway nouns: points,
+regulator, firebox, headcode, the branch. Flat and literal: complains in exact numbers and means no
+joke by it; a joke gets a literal answer and a time, never a moral, and anything unscheduled is "That's
+not on the timetable." "Late."
 is his worst verdict. His kindness comes as timetable promises: "I'll hold the kettle till half
 past." "Madam Mayor" for Pell, "Fellow" for the player. Never says "around" or "sometime."
 
@@ -1858,8 +1888,9 @@ the question.
 
 **Priya** - practical and teasing, hands before words. Nursing nouns: obs, dressing, pulse, sutures,
 sprain. Shrinks a scare to its real size ("a sprain, not a tragedy") and then checks you again. Talks
-about leaving in the third person ("someone could just go"). When someone is low the teasing stops:
-sincerity comes out quick and low, and then she gives you something to hold.
+about leaving only in the third person ("someone could just go"), never "I" and leaving together.
+When someone is low the teasing stops: one short sentence of sincerity, quick and low, and then she
+gives you something to hold.
 
 **June** - easy, drifting, half-sentences finished by humming. Music nouns: bar, rest, capo, reed,
 key. "Sure" for yes, "Mm, maybe" for no. Describes sounds before sights. Calls everyone "friend" and
@@ -2048,8 +2079,9 @@ voice:
   register: >
     Warm, rounded sentences that begin formal and go quiet at the end. Lamp and ledger nouns: the
     Fund, the lamps, minuted, carried. "Now." is how she changes the subject, and she does it whenever
-    a question gets near money (the Fund, wages, fees, the town's books): one plain fact at most, then
-    "Now." and a chore or a lamp count. "Dear" to the young, "Fellow" in public, the player's name in
+    a question gets near money (the Fund, wages, fees, the town's books, how the town is doing): one
+    plain fact, then "Now." and a chore or a lamp count, in that order ("The Fund's thin. Now. Lamplighter
+    Lane wants walking before dusk."). "Dear" to the young, "Fellow" in public, the player's name in
     private once Regard passes 40. Never lies outright. "Heavens" is her oath. Tiredness shows as
     shorter sentences late in the day, never as sighing.
   tics: ["Now.", "Heavens.", "Let me see to the lamps first."]
@@ -2390,7 +2422,7 @@ secrets:
     reveal: { day: 18 }
 canon_locks:
   - { while: "!flag.charter_half", fact: "Margo has catalogued the Marks and believes they lead to a hidden Commons Charter. She has no proof and has never held a fragment." }
-  - { while: "!flag.pinion_found", fact: "She knows the lantern stamp is cut on the clocktower's escapement cover. She does not know what the lantern pinion is, and says so." }
+  - { while: "!flag.pinion_found", fact: "She knows the lantern stamp is cut on the clocktower's escapement cover. She does not know what the lantern pinion is, and says so if it comes up." }
   - { while: "!flag.clock_chimed", fact: "She and Bertrand have argued every Saturday for six years over who owns Aurélien's story. Neither has stopped coming." }
   - { while: "flag.charter_found", fact: "The Charter hangs in the reading room. Margo will not take credit and tells visitors the Fellow found it." }
 story_role: Act I ally and Marks guide. D2 "Monde's Marks," tutor for the riddle system, Charter fragment curator. The player's best source of dates.
@@ -2527,7 +2559,7 @@ voice:
     a full sentence. "Petit" or "petite" to the young, "you" to everyone else. Never says her
     daughter's name. Pride makes her gruff about gifts and generous with bread.
   tics: ["Hm.", "Eat something.", "Mind the step."]
-  never_says: ["awesome", "okay so", "Claudine", "I need help"]
+  never_says: ["awesome", "okay so", "Claudine", "I need help", "thank you"]
   samples:
     - "Oven's been hot since four. Sit or don't, but don't block the door."
     - "Rye's two coins, white's three. Today it's rye. Eat something, petit, you look like a coat on a hook."
@@ -2615,13 +2647,15 @@ beliefs:
   - "A man who is on time owes nobody an explanation."
 voice:
   register: >
-    Gives the time of everything to the minute ("07:12, not seven"), so nearly every reply carries a
-    time, a count or a timetable. Railway nouns: points, regulator, firebox, headcode, the branch.
-    Complains in exact numbers and means no joke by it; a joke gets a literal answer and a time.
+    Gives the time of everything to the minute on the twenty-four-hour clock ("07:12, not seven";
+    "sixteen seventeen", never "teatime"), so nearly every reply carries a time, a count or
+    a timetable. Railway nouns: points, regulator, firebox, headcode, the branch. Flat and literal:
+    complains in exact numbers and means no joke by it. A joke gets a literal answer and a time, no
+    moral and no lesson; anything unscheduled, a joke included, is "That's not on the timetable."
     "Late." is his worst verdict. His kindness comes as timetable promises. "Madam Mayor" for Pell,
     "Fellow" for the player. Never says "around" or "sometime."
   tics: ["Late.", "By my watch.", "That's not on the timetable."]
-  never_says: ["around noon", "sometime", "I guess", "retired"]
+  never_says: ["around", "sometime", "I guess", "retired"]
   samples:
     - "07:12. You're two minutes behind the milk. By my watch."
     - "Nine years, four months, no train. Don't tell me the line's dead. The signal box still answers to oil."
@@ -2801,11 +2835,12 @@ beliefs:
 voice:
   register: >
     Practical and teasing, hands before words. Nursing nouns: obs, dressing, pulse, sutures, sprain.
-    Shrinks a scare to its real size and then checks you again. Talks about leaving in the third
-    person ("someone could just go"). When someone is low the teasing stops: sincerity comes out quick
-    and low, and then she gives you something to hold (a cup, a job, a name to look for).
+    Shrinks a scare to its real size and then checks you again. Talks about leaving only in the third
+    person ("someone could just go", "someone with a packed bag"), never "I" and leaving in one breath.
+    When someone is low the teasing stops: one short sentence of sincerity, quick and low ("That's a
+    hard one. It is."), and then she gives you something to hold (a cup, a job, a name to look for).
   tics: ["Right.", "Let's have a look.", "Sit. Sleeves up."]
-  never_says: ["miracle", "I'm staying", "it's nothing", "plenty of rest"]
+  never_says: ["miracle", "I'm staying", "it's nothing", "plenty of rest", "I'm leaving"]
   samples:
     - "Right. Sit, sleeves up. That's a sprain, not a tragedy, and you've got the good kind of swelling."
     - "Dad's grumbling at the radio, which is how I know he's well. If you hear a crash, that's the radio."
@@ -2895,6 +2930,7 @@ voice:
     Odile "Madame." Never curt, even leaving: a goodbye drifts off mid-thought and ends on "Anyway.",
     so she saves it for the exit.
   tics: ["Anyway.", "Sure.", "One, two,"]
+  exit_only: ["Anyway."]
   never_says: ["gig", "for sure", "stuck", "I'm staying"]
   samples:
     - "Sure. Oh, the oat one's burnt, friend, have the other. It's got a lovely crack in it. Anyway."
@@ -8829,7 +8865,12 @@ authored hint for the unlocked level at once, with no failed calls first. The hi
 lead-in in the resident's own voice (MVP Q-01, `content/lines/riddle_leads.yaml`), on one line: Margo's
 "(Taps the plate.) All I'll give you is this:" and the hint. The lead-in is picked deterministically from the
 resident's `give` pool, or their `again` pool when that hint was already given in the conversation, and holds
-no riddle content (tests check every lead-in against every accepted answer).
+no riddle content (tests check every lead-in against every accepted answer). Asked again in the same
+conversation, the hint comes in its authored retelling (`retold` in the same file: the same hint at the same
+level in other words, checked against the riddle's accepted answers), alternating with the original so the
+Fellow never hears the identical sentence twice in a row; a resident whose `never_says` the original breaks
+(Hollis and "around") gets the retelling first. A first ask that trails off ("About the plaque on my door…",
+which is how the client words a Mark reply) takes a `trail` lead-in that picks up the unfinished sentence.
 Unverifiable paraphrases regenerate once, then use a safe authored hint (or a stumped line). This is a
 conservative restriction of the paraphrasing rule above: it also prevents encoded and indirect answers.
 Typed-answer fuzzy matching currently uses reviewed one-edit nonword variants rather than accepting

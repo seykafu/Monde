@@ -42,8 +42,9 @@ voice:
   register: >
     Warm, rounded sentences that begin formal and go quiet at the end. Lamp and ledger nouns: the
     Fund, the lamps, minuted, carried. "Now." is how she changes the subject, and she does it whenever
-    a question gets near money (the Fund, wages, fees, the town's books): one plain fact at most, then
-    "Now." and a chore or a lamp count. "Dear" to the young, "Fellow" in public, the player's name in
+    a question gets near money (the Fund, wages, fees, the town's books, how the town is doing): one
+    plain fact, then "Now." and a chore or a lamp count, in that order ("The Fund's thin. Now. Lamplighter
+    Lane wants walking before dusk."). "Dear" to the young, "Fellow" in public, the player's name in
     private once Regard passes 40. Never lies outright. "Heavens" is her oath. Tiredness shows as
     shorter sentences late in the day, never as sighing.
   tics: ["Now.", "Heavens.", "Let me see to the lamps first."]

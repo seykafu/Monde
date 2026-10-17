@@ -1,7 +1,8 @@
 import { LiveGossipOutput, modelOutputFormat, type ChatLine, type ChatBody } from '@monde/shared';
 import { buildGossipRequest, type GossipInput } from './promptBuilder.js';
 import type { ResidentPrefix } from './context.js';
-import { lexicalHits } from './filters.js';
+import { currencyHit, lexicalHits } from './filters.js';
+import { neverSaysHit } from './validate.js';
 import { checkedExpression } from './expressions.js';
 import { validateEncounter } from './encounters.js';
 
@@ -25,6 +26,9 @@ export function validateLiveGossip(raw: string, a: ResidentPrefix, b: ResidentPr
   const out = parsed.data;
   if (out.lines.length < 2 || out.lines.length > 6) return null;
   if (out.lines.some((l, i) => l.speaker !== (i % 2 ? 'b' : 'a') || !l.text.trim() || l.text.length > 220 || lexicalHits(l.text).length)) return null;
+  // Each speaker's never_says, and Monde's money (MVP Q-01): the route retries once, then plays an authored exchange.
+  const neverSays = (side: ResidentPrefix) => (side.card.voice.mode === 'narrated_action' ? [] : side.card.voice.never_says);
+  if (out.lines.some((l) => neverSaysHit(l.text, neverSays(l.speaker === 'a' ? a : b)) || currencyHit(l.text))) return null;
   const effects = validateEncounter(raw, { offered, romanceAllowed });
   if (!effects.ok) return null;
   const lines: ChatLine[] = out.lines.map(l => {
