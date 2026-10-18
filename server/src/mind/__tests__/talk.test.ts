@@ -114,7 +114,7 @@ describe("POST /v1/worlds/:w/talk", () => {
 
     const events = sse(res.payload);
     const deltas = events.filter((e) => e.event === "line_delta");
-    expect(deltas.length).toBeGreaterThan(3);
+    expect(deltas.length).toBeGreaterThanOrEqual(good().lines.length);
     expect(events.findIndex((e) => e.event === "turn")).toBe(events.length - 1);
     expect(deltas[0]!.data).toMatchObject({ index: 0, attempt: 1 });
     expect(deltas.filter((d) => d.data.index === 0).at(-1)!.data.text_so_far).toBe(good().lines[0]!.text);
@@ -410,18 +410,16 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect((await logs(env.worldId)).map((l) => [l.validation, l.fallback])).toEqual([["borrowed", false], ["kept:borrowed", false]]);
   });
 
-  it("checks an opener (input kind open) for whole sample sentences too, and the retry note keeps the Fellow first", async () => {
+  it("keeps an already visible opener with sample slips and logs the slips", async () => {
     // The blind A/B eval's Odile opener (2026-10-16): two of her card's sample sentences, prices and all.
     const sampled = good(["Rye's two coins, white's three. Today it's rye.", "Eat something, you look like a coat on a hook."], { regard_delta: 0 });
     const fresh = good(["(Dusts flour off her hands.) You're early. The first tray's still on the rack."], { regard_delta: 0 });
     const mind = new FakeMind([{ output: sampled, chunk: 6 }, { output: fresh }]);
     const env = await setup(mind);
     const events = sse((await talk(env, payload({ resident_id: "odile", input: { kind: "open" }, context: { place: "market_row.bakery" } }))).payload);
-    expect(finalTurn(events)).toMatchObject({ fallback: false, lines: fresh.lines });
-    const note = userBlocks(mind.streams[1]!).at(-1)!;
-    expect(note).toMatch(/^"Rye's two coins, white's three\." comes from your card's samples/);
-    expect(note).toMatch(/Reply again: answer what the Fellow just said first, as before, and change only that\.$/);
-    expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["sample_echo", "ok"]);
+    expect(finalTurn(events)).toMatchObject({ fallback: false, lines: sampled.lines });
+    expect(mind.streams).toHaveLength(1);
+    expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["kept:sample_echo"]);
   });
 
   it("forces wrap_up on the sixth exchange and carries exact earlier turns", async () => {

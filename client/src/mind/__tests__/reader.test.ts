@@ -26,6 +26,20 @@ const turn = (...texts: string[]): TalkTurn => ({
 });
 
 describe('DialogueReader', () => {
+  it('keeps visible text until a replacement first line arrives, then swaps without blanking', () => {
+    const r = new DialogueReader(wrap(40, 3));
+    r.delta({ index: 0, text_so_far: 'Tea is ready.', attempt: 1 });
+    typeOut(r);
+    expect(r.delta({ index: 0, text_so_far: '', attempt: 2 })).toBe('none');
+    expect(r.visible).toBe('Tea is ready.');
+    expect(r.delta({ index: 1, text_so_far: 'Later.', attempt: 2 })).toBe('none');
+    expect(r.visible).toBe('Tea is ready.');
+    expect(r.delta({ index: 0, text_so_far: 'Have a seat.', attempt: 2 })).toBe('reset');
+    expect(r.visible).toBe('Have a seat.');
+    expect(r.finish(turn('An authored fallback.'))).toBe('reset');
+    expect(r.visible).toBe('An authored fallback.');
+  });
+
   it('types only what has streamed, waits for more, and never takes shown text back', () => {
     const r = new DialogueReader(wrap(40, 3));
     r.delta({ index: 0, text_so_far: 'Morning,', attempt: 1 });
@@ -49,7 +63,7 @@ describe('DialogueReader', () => {
     r.tick(10_000, 0);
     expect(r.visible).toBe('The gamekeeper said');
     expect(r.delta({ index: 0, text_so_far: 'Well.', attempt: 2 })).toBe('reset');
-    expect(r.visible).toBe('');
+    expect(r.visible).toBe('Well.');
     r.tick(16, 0);
     expect(r.visible).toBe('Well.');
   });

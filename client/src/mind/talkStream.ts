@@ -5,7 +5,7 @@ import { Favor } from "@monde/shared";
 // (whole words, already filtered). When validation fails the server regenerates once and attempt 2's deltas
 // start over, so everything from attempt 1 is void. The final `turn` is authoritative: if its lines carry on
 // from what was streamed the typewriter just keeps going; if they don't (an authored fallback after a
-// streamed attempt), the client clears and starts again.
+// streamed attempt), the reader swaps to replacement text once it arrives.
 import { INTENTS, type Intent, type TurnRegard } from '@monde/shared';
 import type { SseEvent } from './sse';
 import type { LineDelta, TalkChoice, TalkEvent, TalkLine, TalkTurn } from './types';
@@ -96,6 +96,8 @@ export class StreamedTurn {
 
   applyDelta(d: LineDelta): StreamChange {
     if (this.final || d.attempt < this.attempt) return 'none';
+    // Keep the previous attempt until replacement text for its first line actually arrives.
+    if (d.attempt > this.attempt && (d.index !== 0 || !d.text_so_far.trim())) return 'none';
     let change: StreamChange = 'grow';
     if (d.attempt > this.attempt) {
       change = this.lines.length > 0 ? 'reset' : 'grow';

@@ -14,7 +14,7 @@
  *   6. secrets     reveal_secret must be one of the revealable ids, else null                 (adjusts)
  *   7. echo        word-trigram overlap with the resident's last 20 lines must be ≤ 0.35      (fail: "echo")
  *
- * Then the soft checks (MVP Q-01). They regenerate once with a note, like any failure, but a turn that still trips
+ * Then the soft checks (MVP Q-01). They regenerate silently once only before text is visible; a turn that still trips
  * one is accepted rather than swapped for an authored line (dialogue.ts): the slip is in voice, a fallback isn't.
  *   8. misgender   no line may gender the Fellow wrongly where it's tied to "you": a
  *                  vocative ("Sit, lad."), "you're a good lad", "a man like you", "Mr. Wren"
@@ -35,7 +35,7 @@
  *
  * Every soft slip a turn has is collected (`slips`), so the one regeneration's note names them all (softNote), and
  * the note always sends the retry back to answering the Fellow's line first. When the retry slips too, the attempt
- * with fewer slips is kept (dialogue.ts).
+ * with fewer slips is kept only if neither attempt was visible (dialogue.ts).
  *
  * Step 2 also turns *asterisk* stage business into the house style's (parentheses) (adjusts).
  *
@@ -43,7 +43,7 @@
  * pretends to do them. Favor feasibility is M-09: favors are stored as "proposed".
  */
 import {
-  DialogueTurnOutput, MVP_FAVOR_TEMPLATES, callName, clampDialogue, normalizeChoices, type Emotion, type PersonaCard,
+  DialogueTurnOutput, coinsFor, MVP_FAVOR_TEMPLATES, callName, clampDialogue, normalizeChoices, type Emotion, type PersonaCard,
 } from "@monde/shared";
 import { containsAnswer } from "./promptBuilder.js";
 import { checkedExpression } from "./expressions.js";
@@ -351,6 +351,17 @@ export function parenthesizeStageBusiness(text: string): string {
   return text.replace(/\*([^*\n]+)\*/g, (_match, inner: string) => `(${inner.trim()})`).replace(/\(\(([^()]*)\)\)/g, "($1)");
 }
 
+/** Per-line repairs shared with streaming; turn-dependent exit tics are handled separately. */
+export function repairDialogueLine(text: string, ctx: ValidationContext, adjustments: string[] = []): string {
+  const staged = parenthesizeStageBusiness(text.trim());
+  if (staged !== text.trim()) adjustments.push("asterisk stage business→parentheses");
+  const agreed = ctx.fellow ? agreeAddress(staged, ctx.fellow) : staged;
+  if (agreed !== staged) adjustments.push(`address agreed with ${ctx.fellow!.pronouns}`);
+  const money = coinsFor(agreed);
+  if (money) adjustments.push(`currency repaired: ${JSON.stringify(money.swaps)}`);
+  return money?.text ?? agreed;
+}
+
 /** Text the player will see (and that a riddle answer could leak through). */
 function visibleTexts(out: DialogueTurnOutput): string[] {
   return [...out.lines.map((l) => l.text), ...out.choices.map((c) => c.text), ...(out.effects.favor ? [out.effects.favor.text] : [])];
@@ -373,11 +384,7 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
   }
   const adjustments: string[] = [];
   let lines = parsed.data.lines.map((l) => ({ ...l, text: l.text.trim() })).filter((l) => l.text !== "").map((l) => {
-    const staged = parenthesizeStageBusiness(l.text);
-    if (staged !== l.text) adjustments.push("asterisk stage business→parentheses");
-    const text = ctx.fellow ? agreeAddress(staged, ctx.fellow) : staged;
-    if (text !== staged) adjustments.push(`address agreed with ${ctx.fellow!.pronouns}`);
-    return { ...l, text };
+    return { ...l, text: repairDialogueLine(l.text, ctx, adjustments) };
   });
   if (lines.length === 0) return fail("schema", "no lines");
   // A tic saved for leaving, before the conversation's last line: dropped where it stands as a sentence of its own
@@ -462,6 +469,8 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
   // catchphrase, the resident's own twice, a card sample quoted back, a leaving tic too early. Every one is
   // collected, so the regeneration's note can name them all.
   const slips: Slip[] = [];
+  const originalMoney = parsed.data.lines.map(l => currencyHit(l.text)).find(Boolean);
+  if (originalMoney) slips.push({ category: "currency", detail: `"${originalMoney}"` });
   const slip = (category: SoftCategory, detail: string | null | undefined): void => {
     if (detail && !slips.some((s) => s.category === category)) slips.push({ category, detail });
   };

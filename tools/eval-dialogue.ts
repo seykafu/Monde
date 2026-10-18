@@ -32,6 +32,8 @@ import { randomUUID } from "node:crypto";
 import { parse as parseYaml } from "yaml";
 import { SPRING_RIDDLES, containsAnswer } from "@monde/shared";
 
+import { StreamedTurn, parseTalkEvent } from "../client/src/mind/talkStream.js";
+
 // ── Options ──────────────────────────────────────────────────────────────────
 
 const args = new Map(process.argv.slice(2).map((arg) => {
@@ -159,6 +161,8 @@ interface TurnRecord {
   /** Time to the first line_delta (the first visible text), or null if nothing streamed. */
   firstVisibleMs: number | null;
   thinking: boolean;
+  /** Whether replaying the SSE events in the client replaced text already shown. */
+  visibleRestart: boolean;
   error: { code: string; message: string } | null;
   fallback: boolean;
   salvaged: boolean;
@@ -212,12 +216,14 @@ async function talk(base: string, worldId: string, token: string, body: unknown)
     method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${token}`, accept: "text/event-stream" },
     body: JSON.stringify(body),
   });
-  const empty = { totalMs: Math.round(performance.now() - started), firstVisibleMs: null, thinking: false, error: null, fallback: true,
+  const empty = { totalMs: Math.round(performance.now() - started), firstVisibleMs: null, thinking: false, visibleRestart: false, error: null, fallback: true,
     salvaged: false, stop: `http ${res.status}`, lines: [], choices: [], wrapUp: false, regardDelta: null };
   if (!res.ok || !res.body) return { http: res.status, ...empty, error: { code: `http_${res.status}`, message: (await res.text()).slice(0, 200) } };
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
+  const streamed = new StreamedTurn();
+  let visibleRestart = false;
   let firstVisible: number | null = null;
   let thinking = false;
   let error: TurnRecord["error"] = null;
@@ -227,6 +233,12 @@ async function talk(base: string, worldId: string, token: string, body: unknown)
     const data = /^data: (.+)$/m.exec(block)?.[1];
     if (!event || !data) return;
     const value = JSON.parse(data) as Record<string, unknown>;
+    const parsed = parseTalkEvent({ event, data });
+    if (parsed?.type === "line_delta") {
+      const hadText = streamed.lines.some(Boolean);
+      const change = streamed.applyDelta(parsed.data);
+      if (hadText && change === "reset") visibleRestart = true;
+    } else if (parsed?.type === "turn" && streamed.applyTurn(parsed.data) === "reset") visibleRestart = true;
     if (event === "line_delta" && firstVisible === null) firstVisible = performance.now();
     else if (event === "thinking") thinking = true;
     else if (event === "error") error = { code: String(value.code), message: String(value.message) };
@@ -243,12 +255,12 @@ async function talk(base: string, worldId: string, token: string, body: unknown)
   const totalMs = Math.round(performance.now() - started);
   const firstVisibleMs = firstVisible === null ? null : Math.round((firstVisible as number) - started);
   const t = turn as Record<string, unknown> | null;
-  if (!t) return { http: res.status, ...empty, totalMs, firstVisibleMs, thinking, error: error ?? { code: "no_turn", message: "stream ended without a turn" } };
+  if (!t) return { http: res.status, ...empty, totalMs, firstVisibleMs, thinking, visibleRestart, error: error ?? { code: "no_turn", message: "stream ended without a turn" } };
   const fallback = t.fallback === true;
   const salvaged = t.salvaged === true;
   const regard = t.regard as { delta?: number } | null | undefined;
   return {
-    http: res.status, totalMs, firstVisibleMs, thinking, error, fallback, salvaged, stop: inferStop(error, fallback, salvaged),
+    http: res.status, totalMs, firstVisibleMs, thinking, visibleRestart, error, fallback, salvaged, stop: inferStop(error, fallback, salvaged),
     lines: (t.lines as { text: string }[]).map((l) => l.text),
     choices: t.choices as TurnRecord["choices"],
     wrapUp: t.wrap_up === true,
@@ -543,7 +555,9 @@ function render(run: RunRecord, scores: Scores | null): string {
   out.push(`- Judge: ${run.judge}`);
   out.push(`- Run: ${run.startedAt}; ${run.scenarios.length} scenario entries (${run.repeat ?? 1} repeat(s) each), ${turns.length} turns (${answers.length} answer a player line)`, "");
 
-  out.push("## Summary", "", "| Metric | Value |", "|---|---|");
+  out.push("## Summary", "");
+  out.push(`Visible restarts: ${turns.filter(({ t }) => t.visibleRestart).length}/${turns.length}`, "");
+  out.push("| Metric | Value |", "|---|---|");
   out.push(`| Fallback turns | ${turns.filter(({ t }) => t.fallback).length}/${turns.length} (${pct(turns.filter(({ t }) => t.fallback).length, turns.length)}) |`);
   out.push(`| Fallbacks on turns answering the player | ${answers.filter(({ t }) => t.fallback).length}/${answers.length} (${pct(answers.filter(({ t }) => t.fallback).length, answers.length)}) |`);
   out.push(`| Fallback causes | ${[...codes].map(([k, v]) => `${k} ×${v}`).join(", ") || "none"} |`);
@@ -585,7 +599,7 @@ function render(run: RunRecord, scores: Scores | null): string {
     out.push(`### ${s.id} (${s.resident} @ ${s.place}: ${s.tests})`, "");
     for (const t of s.turns) {
       const g = score(s, t.step);
-      const meta = [t.fallback ? `**fallback: ${t.error?.code ?? "?"}**` : "live", t.salvaged ? "salvaged" : "", `stop ${t.stop}`, `first ${t.firstVisibleMs ?? "-"} ms`, `turn ${t.totalMs} ms`, t.thinking ? "thinking beat" : "", t.leak ? "**LEAK**" : "",
+      const meta = [t.fallback ? `**fallback: ${t.error?.code ?? "?"}**` : "live", t.salvaged ? "salvaged" : "", t.visibleRestart ? "visible restart" : "", `stop ${t.stop}`, `first ${t.firstVisibleMs ?? "-"} ms`, `turn ${t.totalMs} ms`, t.thinking ? "thinking beat" : "", t.leak ? "**LEAK**" : "",
         g ? `judge ${g.responds}/${g.remembers ?? "-"}/${g.in_character}` : ""].filter(Boolean).join(" · ");
       out.push(`- **Fellow:** ${t.player}${t.inputKind === "choice" ? " _(picked)_" : ""}  `);
       for (const line of t.lines) out.push(`  **${s.resident}:** ${line}  `);

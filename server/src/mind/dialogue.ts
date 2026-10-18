@@ -5,10 +5,11 @@ import { BudgetError } from "./budget.js";
  *   build (promptBuilder) → stream (MindClient) → check stop_reason → validate (validate.ts)
  *     → on a validation failure, regenerate ONCE with a corrective note → else the authored fallback.
  *
- * Soft failures (the Fellow wrongly gendered, a never-says word, money that isn't Monde's, another resident's
- * catchphrase, a card sample quoted back, a leaving tic too early; validate.ts steps 8-10) regenerate once too, but
- * are never worth an authored line: a second soft failure is accepted, and if the regeneration fails outright the
- * first attempt's otherwise valid turn is kept.
+ * Soft slips regenerate only while silent. Once an attempt has shown text, accept its repaired lines and log
+ * every slip. A visible regeneration owns the final turn: never return the earlier attempt after showing it.
+ * Hard failures can replace visible text with a regeneration or authored fallback.
+ * Streaming shares validation's line repairs, holding unresolved text (stage actions, exit tics, length splits)
+ * until its final spelling and position are known, so the authoritative turn continues what the player read.
  *
  * Deadlines (§9.10 step 4): if nothing visible has streamed by 2.5 s the caller gets `onThinking` (the client
  * plays "Hm."); if the model has produced no text by 6 s the call is abandoned. Inside that window a call that
@@ -26,12 +27,12 @@ import type Anthropic from "@anthropic-ai/sdk";
 import { DialogueTurnOutput, LIMITS, fitText, modelOutputFormat, splitLine } from "@monde/shared";
 import { apiParams, historyBlock, requestSettings, type MindRequest } from "./promptBuilder.js";
 import { MindStreamError, MindUnavailableError, tokensOf, type MindClient } from "./mindClient.js";
-import { completeWords, currencyHit, lexicalHits } from "./filters.js";
-import { agreeAddress, misgenderHit } from "./naming.js";
+import { currencyHit, lexicalHits } from "./filters.js";
+import { misgenderHit } from "./naming.js";
 import { borrowedHits, stripTics } from "./voice.js";
 import { LineTextExtractor } from "./partialJson.js";
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
-import { correctiveNote, neverSaysHit, softNote, validateTurn, type ValidationContext } from "./validate.js";
+import { correctiveNote, neverSaysHit, repairDialogueLine, softNote, validateTurn, type ValidationContext } from "./validate.js";
 import { prefixSystemBlocks, type ResidentPrefix } from "./context.js";
 import { salvageTurn } from "./salvage.js";
 
@@ -120,6 +121,8 @@ export interface GenerateOptions {
   signal?: AbortSignal;
   onLineDelta?: (delta: LineDelta) => void;
   onThinking?: () => void;
+  /** A hard validation failure; lets the route attach its reason to a subsequent visible restart. */
+  onHardFailure?: (reason: string) => void;
   now?: () => number;
 }
 
@@ -378,27 +381,41 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
       const shown: string[] = [];
       let raw = "";
       let suppressed = false;
-      // A leaving tic is stripped from the stream as validation strips it (validate.ts step 2), unless this turn is
-      // the goodbye. (A turn that turns out to wrap up on its own gets it back in the final `turn`.)
+      let attemptVisible = false;
+      // Exit-tic removal depends on the final wrap_up flag; defer affected lines until it is known.
       const exitTics = options.validation.exit ? [] : options.validation.exitOnly ?? [];
       const onText = (delta: string) => {
         raw += delta;
         for (const line of extractor.push(delta)) {
           if (suppressed || line.index >= LIMITS.dialogue.maxLines) continue;
-          // Hold back a word still being typed: "game" may become "gamekeeper", and "smartph" must not show.
-          const capped = line.text.slice(0, LIMITS.dialogue.lineChars);
-          // A finished over-long line shows up to its last sentence; the final turn carries the rest as the next line
-          // (clamps.ts fitLines).
-          const whole = line.done
-            ? splitLine(line.text, LIMITS.dialogue.lineChars)?.[0] ?? fitText(line.text, LIMITS.dialogue.lineChars)
-            : completeWords(capped);
-          const agreed = options.validation.fellow ? agreeAddress(whole, options.validation.fellow) : whole;
-          const text = exitTics.length > 0 ? stripTics(agreed, exitTics) : agreed;
+          // A complete line decides actions, address agreement and money idioms. Partial spellings can
+          // still change ("penny" → "penny whistle", "*action*" → "(action)"). Hold them until decided.
+          if (!line.done) continue;
+          const repaired = repairDialogueLine(line.text, options.validation);
+          const stripped = exitTics.length > 0 ? stripTics(repaired, exitTics) : repaired;
+          // wrap_up arrives later and can keep an exit tic; removing an empty line also shifts indices.
+          // Defer this line and everything after it until the authoritative turn resolves those choices.
+          if (!repaired || stripped !== repaired) { suppressed = true; continue; }
+          const fitted = fitText(repaired, LIMITS.dialogue.lineChars);
+          const head = splitLine(repaired, LIMITS.dialogue.lineChars)?.[0] ?? fitted;
+          // Whether splitting is allowed depends on the final line count. Only show their common prefix,
+          // then defer later indices (a split could insert a new line ahead of them).
+          let text = fitted;
+          if (repaired.length > LIMITS.dialogue.lineChars) {
+            let end = 0;
+            while (end < fitted.length && end < head.length && fitted[end] === head[end]) end++;
+            text = fitted.slice(0, end).trimEnd();
+            suppressed = true;
+          }
           if (!streamSafe(text, options.validation)) { suppressed = true; continue; }
           if (text.trim() === "" || text === shown[line.index]) continue;
           shown[line.index] = text;
-          visible = true;
-          options.onLineDelta?.({ index: line.index, text_so_far: text, attempt });
+          if (options.onLineDelta) {
+            visible = true;
+            attemptVisible = true;
+            if (attempt === 2) spare = null;
+            options.onLineDelta({ index: line.index, text_so_far: text, attempt });
+          }
         }
       };
       const result = await callOnce(options.mind, params, timings, options.signal, onText, now);
@@ -456,15 +473,16 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
           output: validated.soft.output, rawOutput: textOf(message), slips: validated.soft.slips.length,
           adjustments: [...validated.soft.adjustments, `kept despite ${validated.soft.slips.map((s) => `${s.category}: ${s.detail}`).join("; ")}`],
         };
-        if (attempt === 2) {
-          // The regeneration slipped too: keep whichever attempt slipped less (the regeneration on a tie).
-          const first = spare && spare.slips < kept.slips ? spare : null;
+        if (attemptVisible || attempt === 2) {
+          // Visible text wins. Only silent attempts may compete on their number of slips.
+          const first = !attemptVisible && spare && spare.slips < kept.slips ? spare : null;
           record(tokens, stopReason, first ? validated.category : `kept:${validated.category}`);
           const chosen = first ?? kept;
           return { output: chosen.output, rawOutput: chosen.rawOutput, adjustments: chosen.adjustments, failure: null, calls, salvaged: false };
         }
         spare = kept;
       }
+      if (!validated.soft) options.onHardFailure?.(`${validated.category}: ${validated.detail}`);
       record(tokens, stopReason, validated.category);
       // Every soft slip in one note, which still sends the retry back to the Fellow's line first.
       corrective = validated.soft ? softNote(validated.soft.slips) : correctiveNote(validated.category, validated.detail);

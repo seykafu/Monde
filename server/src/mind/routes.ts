@@ -189,7 +189,26 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
       const raw = reply.raw;
       raw.writeHead(200, sseHeaders(reply));
       raw.flushHeaders();
+      let streamedAttempt = 0;
+      let streamedLines: string[] = [];
+      let restartReason = "hard validation failure";
       const send = (event: string, data: unknown) => {
+        if (raw.writableEnded || raw.destroyed) return;
+        let restart = false;
+        if (event === "line_delta") {
+          const delta = data as { attempt: number; index: number; text_so_far: string };
+          if (delta.attempt > streamedAttempt) {
+            restart = streamedLines.some(Boolean);
+            streamedLines = [];
+            streamedAttempt = delta.attempt;
+          }
+          if (streamedLines[delta.index] && !delta.text_so_far.startsWith(streamedLines[delta.index]!)) restart = true;
+          streamedLines[delta.index] = delta.text_so_far;
+        } else if (event === "turn") {
+          const turn = data as { lines: { text: string }[] };
+          restart = streamedLines.some((text, i) => !turn.lines[i]?.text.startsWith(text));
+        }
+        if (restart) request.log.warn({ reason: restartReason, event, attempt: streamedAttempt }, "dialogue restart after visible text");
         if (!raw.writableEnded && !raw.destroyed) raw.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
       };
       const clientGone = new AbortController();
@@ -268,6 +287,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
             signal: generation.signal,
             onLineDelta: (delta) => { if (cleared) send("line_delta", delta); else held.push(delta); },
             onThinking: () => send("thinking", { text: THINKING_BEAT }),
+            onHardFailure: (reason) => { restartReason = reason; },
           });
           const safety = await gate;
           inputApproved = safety === 'fine';
@@ -285,12 +305,14 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
             calls = result.calls;
             rawOutput = result.rawOutput;
             failure = result.failure;
+            restartReason = result.failure?.code ?? result.calls.map(c => c.validation).join(", ");
             salvaged = result.salvaged;
             output = result.output ? applyLimit(result.output) : fallbackFor(ctx);
             if (result.salvaged) request.log.warn({ calls: calls.map((c) => [c.stopReason, c.validation, c.tokens.output]) }, "dialogue reply cut short; whole lines salvaged");
             if (result.adjustments.length) request.log.info({ adjustments: result.adjustments }, "dialogue output adjusted");
           }
         } catch (error) {
+          restartReason = "api_error";
           request.log.error({ err: error }, "dialogue generation crashed");
           failure = { code: "api_error", message: "The turn failed; using an authored line." };
           output = fallbackFor(ctx);
@@ -308,6 +330,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         } catch (error) {
           request.log.error({ err: error, calls }, "persisting the dialogue turn failed");
           send("error", { code: "persist_failed", message: "The turn couldn't be saved; using an authored line." });
+          restartReason = "persist_failed";
           sendTurn(fallbackFor(ctx), true, null);
           return;
         }
@@ -316,6 +339,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         if (failure) send("error", failure);
         sendTurn(output, fallback, regard);
       } catch (error) {
+        restartReason = "internal";
         request.log.error({ err: error }, "talk stream failed");
         send("error", { code: "internal", message: "Something went wrong; using an authored line." });
         sendTurn(fallbackFor(ctx), true, null);

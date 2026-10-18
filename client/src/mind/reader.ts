@@ -2,7 +2,7 @@
 // Pure: the scene supplies a paginate function (Phaser word wrap) and the frame time; tests supply their own.
 //
 // The typewriter never runs ahead of the streamed text, so nothing shown is later taken back, except when the
-// stream itself starts over (a new attempt, or a final turn that doesn't continue it): then the reader resets.
+// stream itself starts over (a new attempt, or a final turn that doesn't continue it): then the reader swaps directly to the available replacement.
 // Greedy word wrap is prefix-stable, so as a line grows its pages only ever gain text at the end.
 import { StreamedTurn, type StreamChange } from './talkStream';
 import type { LineDelta, TalkTurn } from './types';
@@ -63,13 +63,13 @@ export class DialogueReader {
     this.rewind();
   }
 
-  /** Feed a streamed delta. Returns 'reset' when the visible text was cleared. */
+  /** Feed a streamed delta. Returns 'reset' when the visible text was replaced. */
   delta(d: LineDelta): StreamChange {
     const shown = this.visible;
     return this.after(this.stream.applyDelta(d), shown);
   }
 
-  /** Feed the authoritative turn. Returns 'reset' when the visible text was cleared. */
+  /** Feed the authoritative turn. Returns 'reset' when the visible text was replaced. */
   finish(turn: TalkTurn): StreamChange {
     const shown = this.visible;
     return this.after(this.stream.applyTurn(turn), shown);
@@ -157,7 +157,12 @@ export class DialogueReader {
 
   /** Keep the reading position on the same characters after the text grew, or start over. */
   private after(change: StreamChange, shown: string): StreamChange {
-    if (change === 'reset') { this.rewind(); return 'reset'; }
+    if (change === 'reset') {
+      this.rewind();
+      // Swap directly to available replacement text, without an empty typewriter frame.
+      this.chars = this.pageText.length;
+      return 'reset';
+    }
     if (change === 'none') return 'none';
     const at = continuedAt(this.pages()[this.page] ?? '', shown);
     if (at < 0) { this.rewind(); return 'reset'; }
