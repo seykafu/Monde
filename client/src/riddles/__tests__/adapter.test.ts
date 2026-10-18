@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
-import { baseSkills, emptyRiddles, emptyEventLog, Inventory, Wallet, SavedRiddles } from '@monde/shared';
+import { baseSkills, emptyRiddles, emptyEventLog, Inventory, Wallet, SavedRiddles, SPRING_RIDDLES } from '@monde/shared';
+import { StorySession } from '../../story/session';
 import { createTownState } from '../../town/pillars';
 import { findMark, marks, submitMark, homeHint } from '../../scenes/riddles';
 import { getFellow, setFellow } from '../../fellow/state';
@@ -30,4 +31,21 @@ it('does not spend Stamina away from home', () => {
   r.set('monde.riddles', state); r.set('monde.inventory', Inventory.parse({}));
   expect(homeHint(r, 'OQ-1')).toBe(false);
   expect(r.get('monde.economy')).toBeUndefined();
+});
+it('sets charter_half when the third Charter fragment is recovered, not before', () => {
+  const r = registry(); r.set('monde.town', createTownState()); r.set('monde.riddles', emptyRiddles());
+  setFellow(r, { profile: null, look: null, skills: baseSkills() });
+  const session = new StorySession({ world: null });
+  session.flags.set('project_lighthouse_done'); r.set('monde.story.session', { session });
+  const clock = { day: 8, minute: 600 };
+  const answers: Record<string, string> = Object.fromEntries(SPRING_RIDDLES.map(m => [m.id, m.accepted[0]!]));
+  for (const chain of ['OQ', 'MR', 'WF']) {
+    expect(session.flags.has('charter_half')).toBe(false);
+    for (let n = 1; n <= 5; n++) {
+      const id = `${chain}-${n}`;
+      expect(findMark(r, clock, id)).toBe(true);
+      expect(submitMark(r, clock, id, answers[id]!)).toBe('solved');
+    }
+  }
+  expect(session.flags.has('charter_half')).toBe(true);
 });

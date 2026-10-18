@@ -23,10 +23,11 @@ import type { z } from "zod";
 import {
   ANIMAL_VERBS, DialogueTurnOutput, GossipOutput, MVP_FAVOR_TEMPLATES, PlanOutput, ReflectionOutput, VERBS,
   evaluate, gameContext, modelOutputFormat, regardTier,
-  type FavorTemplate, type Memory, type PersonaCard, type ResidentState, type Verb,
+  type FavorTemplate, type Memory, type PersonaCard, type ResidentState, type TalkQuest, type Verb,
 } from "@monde/shared";
 import { promptExpressions } from "./expressions.js";
 import { addressFor, fellowLine, pronounNote, type FellowView } from "./naming.js";
+import { asksWhatToDo, questLines } from "./quest.js";
 import { townNowBlock } from "./townState.js";
 import { borrowedFor, borrowedLine, phraseKey, type RosterVoice, type Signature } from "./voice.js";
 
@@ -112,7 +113,7 @@ type Templates = Readonly<Record<TemplateName, string>>;
  * Bump when the code-side serialization below changes in a way the template files don't show (list formats,
  * field order), so the logged prompt version still changes.
  */
-const SERIALIZER_VERSION = "q01.5";
+const SERIALIZER_VERSION = "q01.6";
 
 /**
  * Where the templates live. Source runs read them next to this file. The bundled server (tsup → server/dist)
@@ -555,6 +556,11 @@ export interface DialogueInput {
   /** A random word from the whim list (§9.17) for variety. */
   whimSeed?: string | null;
   /**
+   * The player's objective and this resident's open threads, as the client reported them (quest.ts). Only block 4
+   * ever carries any of it, and only for a resident it involves or when the Fellow asks what to do.
+   */
+  quest?: TalkQuest | null;
+  /**
    * They have talked before, for how the resident addresses the Fellow (naming.ts). Defaults to: there is a history
    * with the Fellow, or this conversation was resumed.
    */
@@ -572,8 +578,9 @@ export const WALK_UP = "(walks up to you)";
  *   lull   their line gives little to answer ("Right.", "Hm."): respond, then pick up a thread (topic cards offered)
  *   bye    they're leaving: see them off
  *   gift   the engine describes a gift or a shared meal: react to it
+ *   quest  they picked "What should I be doing?" (intent about_quest): help with directions from <quest> (quest.ts)
  */
-export type TurnFocus = "open" | "reply" | "lull" | "bye" | "gift";
+export type TurnFocus = "open" | "reply" | "lull" | "bye" | "gift" | "quest";
 
 const BYE_WORDS = /\b(?:good ?bye|bye|farewell|see you|take care|so long|get going|be going|be off|head off|heading off|must go|should go|have to go|got to go|let you get on|leave you to it)\b/i;
 const LULL_LINE = /^(?:ok(?:ay)?|right|hm+|mm+(?:-hm)?|ah|oh|yes|yeah|no|sure|fine|alright|all right|i see|cool|nice|huh|fair enough|well|indeed|go on)[\s.!,]*$/i;
@@ -582,6 +589,7 @@ const LULL_LINE = /^(?:ok(?:ay)?|right|hm+|mm+(?:-hm)?|ah|oh|yes|yeah|no|sure|fi
 export function turnFocus(text: string | null | undefined, intent?: string | null): TurnFocus {
   if (text == null || text.trim() === "" || text === WALK_UP) return "open";
   if (intent === "leave" || (BYE_WORDS.test(text) && !text.includes("?"))) return "bye";
+  if (intent === "about_quest") return "quest";
   if (LULL_LINE.test(text.trim())) return "lull";
   return "reply";
 }
@@ -593,7 +601,21 @@ export const FOCUS_DIRECTIVES: Readonly<Record<TurnFocus, string>> = {
   lull: "Respond to this first. It gives you little to answer, so then pick up a thread from this conversation or one of the topics below.",
   bye: "Respond to this first: the Fellow is taking their leave. See them off in a line or two and set wrap_up to true.",
   gift: "Respond to this first: react to it in your own way.",
+  quest: "Respond to this first: the Fellow is asking what to do next. Help them concretely from the notes from their Journal below (where to go, when, and who is expecting them), in your own words and your own voice. Add no appointment, event or time the notes don't give.",
 };
+
+/**
+ * The `<quest>` element for block 4 (quest.ts decides the lines), or "" (the template drops the line). Client text,
+ * so every line is escaped; it sits with the other background, below the Fellow's words and the memories.
+ */
+export function questBlock(quest: TalkQuest | null | undefined, card: PersonaCard, focus: TurnFocus, playerSaid: string): string {
+  // The Fellow's own words: a reply they typed or picked, or a lull. Never the walk-up or the engine's gift line.
+  const asked = (focus === "reply" || focus === "lull") && asksWhatToDo(playerSaid);
+  const lines = questLines(quest, card, { asked, intent: focus === "quest" });
+  return lines.length
+    ? `<quest> From the Fellow's Journal (background: use it to help them; never add to it):\n${bullets(lines.map(speech), "")}\n</quest>`
+    : "";
+}
 
 /**
  * Earlier conversations with the Fellow, as the resident remembers them (sessions.ts historyFor). Framed as their own
@@ -628,7 +650,9 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
   const playerName = speech(player.name);
   const met = input.met ?? ((input.sessionHistory ?? "").trim() !== "" || input.resumedAfter !== undefined);
   const address = addressFor({ residentId: card.id, playerName, pronouns: player.pronouns, regard: state.regard, met });
-  const focus = input.focus ?? (input.playerSaid === WALK_UP ? "open" : "reply");
+  const wanted = input.focus ?? (input.playerSaid === WALK_UP ? "open" : "reply");
+  // An about_quest reply with no quest report (a scripted scene's handoff) is answered like any other reply.
+  const focus: TurnFocus = wanted === "quest" && !input.quest ? "reply" : wanted;
   // Topic cards invite a change of subject, so they're offered only when there's nothing to answer (§9.10).
   const offerTopics = focus === "open" || focus === "lull";
   const topics = offerTopics
@@ -652,6 +676,7 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     player_name: playerName,
     player_pronouns: speech(pronounNote(player.pronouns)),
     town_now: trusted(townNowBlock(flags)),
+    quest: trusted(questBlock(input.quest, card, focus, input.playerSaid)),
     regard_tier: regardTier(state.regard),
     player_background: clause(player.background),
     address: address.line,

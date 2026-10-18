@@ -8,6 +8,7 @@ import { SavedFriendship, emptyFriendship } from './friendshipData';
 import { ClientEvent } from './events';
 import { TownPeople } from './arrivals/people';
 import { QUOTE_BANDS, StrawPollRecord } from './election/strawPoll';
+import { SavedQuests, emptyQuests } from './dreams';
 
 const n = z.number().finite();
 const count = n.int().nonnegative();
@@ -157,7 +158,9 @@ export const SaveGame = z.object({
   /** G-03 Projects: optional on read (a save from before them has none begun), so no version bump. */
   projects: SavedProjects.default(emptyProjects),
   /** G-11 the Spring finale: optional on read. */
-  finale: SavedFinale.default(emptyFinale)
+  finale: SavedFinale.default(emptyFinale),
+  /** The Journal's Quests (dreams the player knows, the first-steps card): optional on read. */
+  quests: SavedQuests.default(emptyQuests)
 });
 export type SaveGame = z.infer<typeof SaveGame>;
 

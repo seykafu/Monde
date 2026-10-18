@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { baseSkills, emptyEventLog, emptyFinale, emptyProjects, migrateSave, SaveGame, startingSkills, type ClientEvent } from '@monde/shared';
+import { baseSkills, emptyEventLog, emptyFinale, emptyProjects, emptyQuests, migrateSave, SaveGame, startingSkills, type ClientEvent } from '@monde/shared';
 import { lookFromChoices, randomChoices } from '../../fellow/options';
 import { Clock } from '../../sim/clock';
 import { dailyWeather } from '../../sim/weather';
@@ -76,7 +76,7 @@ describe('save format and restore', () => {
     const restored = restore(file);
     expect(restored.clock.time).toEqual(source.clock.time);
     const defaults = collect(source, 'manual', 'Home');
-    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, puzzles: defaults.puzzles, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy, projects: defaults.projects, scuffles: defaults.scuffles, finale: defaults.finale });
+    expect({ ...restored, clock: null }).toEqual({ ...source, clock: null, puzzles: defaults.puzzles, riddles: defaults.riddles, friendship: defaults.friendship, inventory: defaults.inventory, coins: defaults.coins, economy: defaults.economy, projects: defaults.projects, scuffles: defaults.scuffles, finale: defaults.finale, quests: defaults.quests });
     restored.town.pillars.charm++;
     expect(restored.town.pillars.charm).not.toEqual(source.town.pillars.charm);
     expect(runDawnsThrough(restored.town, 5).state.day).toBe(5);
@@ -92,6 +92,14 @@ describe('save format and restore', () => {
     expect(restore(JSON.parse(JSON.stringify(saved))).projects).toEqual(projects);
     const { projects: _p, ...old } = saved;
     expect(migrateSave(old).projects).toEqual(emptyProjects());
+  });
+
+  it('keeps the Journal’s Quests (the dreams known, the first-steps card), and reads an older save as none of it', () => {
+    const quests = { first_steps: true, dreams: { odile: { learned: 4, how: 'regard' as const, stage: 1, done: [{ stage: 0, day: 4, by: 'regard' as const, printed: 5 }] } } };
+    const saved = collect({ ...state(), quests }, 'autosave', 'Dawn', '2026-10-18T12:00:00.000Z');
+    expect(restore(JSON.parse(JSON.stringify(saved))).quests).toEqual(quests);
+    const { quests: _q, ...old } = saved;
+    expect(migrateSave(old).quests).toEqual(emptyQuests());
   });
 
   it('keeps the Spring finale (G-11), and reads a save from before the fair as none of it', () => {

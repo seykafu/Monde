@@ -1,4 +1,5 @@
 import { optionCalendar } from '../story/optionCalendar';
+import { dreamPaper } from '../quests/paper';
 import { isMarketDay } from "../town/fund";
 import { isFerryDay } from "../town/migration";
 import { expireFavor } from "@monde/shared";
@@ -237,6 +238,8 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     // G-03: yesterday's Project opening leads a template edition; today's openings and the calls for hands are notices.
     let edition = projectPaper(registry, day, paper ?? fallbackPress(day,events,templates.headlines,opts.town()?.fund === undefined ? {} : { coins: opts.town()!.fund! }), templates.headlines);
     edition = optionCalendar(registry, day, edition);
+    // The dreams the player helped along since the last paper (quests/paper.ts), among the notices.
+    edition = dreamPaper(registry, day, edition, id => townNames()[id] ?? id);
     // G-11: the morning after the Bloom Fair the Lantern prints the Straw Poll (counted now if the player missed the trestle).
     if (day === REPORT_DAY) {
       const finale = ensureStrawPoll(registry, id => regardFor(registry, id), opts.weatherSeed());

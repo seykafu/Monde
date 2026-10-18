@@ -4,6 +4,8 @@ import { openPaper } from "./DawnReportScene";
 import { printPaper } from "../press/report";
 import { favorBook } from "../friendship/favors";
 import { MarkPages } from './MarkPages';
+import { QuestPages, objectiveSwitchText } from './QuestPages';
+import { questLogNow } from '../quests/runtime';
 import { marks } from './riddles';
 // The People page (GDD §9.11.3 "What the player sees", §18 Journal → People; MVP G-13 client).
 //
@@ -36,7 +38,7 @@ export interface PeopleOpen {
   /** The scene underneath: its input is paused while the page is open. */
   host: string;
   clock: Clock;
-  tab?: 'People' | 'Marks' | 'Today';
+  tab?: 'Quests' | 'People' | 'Marks' | 'Today';
 }
 
 /** Open the People page over `host` (no-op if it, the Ledger or the dialogue panel is already up). */
@@ -71,6 +73,9 @@ const CLOTH = 0x2c4a44, CLOTH_EDGE = 0x1d332e, CLOTH_STITCH = 0x6f8f7f;
 const PAPER = 0xf2e8d0, PAPER_EDGE = 0xe3d4b0;
 const INK = 0x2b2219, INK_CSS = '#2b2219', MUTED = '#6f6150', BRASS_CSS = '#8a6a24', BRASS = 0xa67c2e;
 const PICKED = 0xe6d6ae;
+/** The Journal's tabs, left to right (Kasey's playtest 2026-10-18: Quests first). ←/→ go through them. */
+const TABS = ['Quests', 'People', 'Marks', 'Today', 'Favors'] as const;
+type Tab = (typeof TABS)[number];
 
 const TIE_SOURCE_TEXT: Readonly<Record<TieSource, string>> = { seen: 'seen together', heard: 'heard about it', read: 'in the Lantern' };
 const ROMANCE_TEXT: Readonly<Record<RomanceStage, string>> = { courting: 'Courting', together: 'Together with', married: 'Married to' };
@@ -88,6 +93,9 @@ let lastPicked: string | null = null;
 export class PeopleScene extends Phaser.Scene {
   private open!: PeopleOpen;
   private markPages!: MarkPages;
+  private questPages!: QuestPages;
+  private tabTexts: Phaser.GameObjects.Text[] = [];
+  private questSwitch!: Phaser.GameObjects.Text;
   private content!: Phaser.GameObjects.Container;
   private portraits: Portrait[] = [];
   private hearts: HeartRowView[] = [];
@@ -121,6 +129,11 @@ export class PeopleScene extends Phaser.Scene {
     this.content = this.add.container(0, 0);
     accessiblePages(this, this.content);
     this.markPages = new MarkPages(this, this.open.clock, this.content, () => this.refresh());
+    this.questPages = new QuestPages(this, this.content, { lx: LX, lw: LW, rx: RX, rw: RW, top: LIST_Y - 6, bottom: BY + BH - 46 }, () => this.refresh(),
+      // Only the people the player has met: a scene's reason keeps a stranger a stranger ("a man in a good coat").
+      ids => ids.filter(id => !!getFriendship(this.registry).residents[id]).map(id => townNames()[id] ?? id).join(', '));
+    this.questSwitch = this.add.text(LX, BY + BH - 30, '', { fontFamily: FAMILY_UI, fontSize: '13px', color: BRASS_CSS, resolution: RENDER_SCALE })
+      .setOrigin(0, 0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.questPages.toggleObjective());
     this.ids = peopleIds(metResidents(getFriendship(this.registry)), this.registry.get('monde.town') as TownState | undefined, this.open.clock.day);
     const keep = lastPicked ? this.ids.indexOf(lastPicked) : -1;
     this.picked = keep >= 0 ? keep : 0;
@@ -131,7 +144,10 @@ export class PeopleScene extends Phaser.Scene {
     this.registry.events.on(`changedata-${FRIENDSHIP_KEY}`, onChange);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.registry.events.off(`changedata-${FRIENDSHIP_KEY}`, onChange));
     this.input.keyboard!.on('keydown', (e: KeyboardEvent) => this.onKey(e));
-    this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => { if (accessibility().textSize === 'normal') this.scroll(Math.sign(dy)); });
+    this.input.on('wheel', (_p: unknown, _o: unknown, _dx: number, dy: number) => {
+      if (this.tab() === 'Quests') this.questPages.wheel(dy);
+      else if (accessibility().textSize === 'normal') this.scroll(Math.sign(dy));
+    });
 
     this.cameras.main.setAlpha(0);
     this.tweens.add({ targets: this.cameras.main, alpha: 1, duration: 140 });
@@ -145,6 +161,8 @@ export class PeopleScene extends Phaser.Scene {
     if (e.key === 'Escape') { this.close(); return; }
     // The J that opened the page mustn't close it again.
     if ((e.key === 'j' || e.key === 'J' || e.code === 'KeyJ') && !e.repeat && performance.now() - this.openedAt > 150) { this.close(); return; }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { this.setTab(TABS[(TABS.indexOf(this.tab()) + (e.key === 'ArrowRight' ? 1 : TABS.length - 1)) % TABS.length]!); return; }
+    if (this.tab() === 'Quests') { this.questPages.key(e); return; }
     if (e.key === 'ArrowDown' || e.key === 's' || e.key === 'S') this.pick(this.picked + 1);
     else if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') this.pick(this.picked - 1);
     else if (e.key === 'PageDown') this.pick(this.picked + ROWS);
@@ -186,10 +204,10 @@ export class PeopleScene extends Phaser.Scene {
     // A ribbon marker hanging from the top of the right page.
     g.fillStyle(0x9c2f3a, 1).fillRect(SPINE + BW / 2 - 70, BY - 12, 12, 64).fillTriangle(SPINE + BW / 2 - 70, BY + 52, SPINE + BW / 2 - 58, BY + 52, SPINE + BW / 2 - 64, BY + 44);
     this.add.text(LX, BY + 28, 'Journal', { fontFamily: FAMILY_DISPLAY, fontSize: '38px', color: INK_CSS, resolution: RENDER_SCALE });
-    (['People', 'Marks', 'Today', 'Favors'] as const).forEach((tab, i) => this.add.text(LX + 120 + i * 100, BY + 74, tab, { fontFamily: FAMILY_UI, fontSize: '17px', color: INK_CSS }).setInteractive({ useHandCursor: true }).on('pointerdown', () => { this.favorsTab = tab === 'Favors'; if (tab !== 'Favors') marks(this.registry).tab = tab; this.refresh(); }));
+    this.tabTexts = TABS.map((tab, i) => this.add.text(LX + 70 + i * 88, BY + 74, tab, { fontFamily: FAMILY_UI, fontSize: '17px', color: INK_CSS }).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.setTab(tab)));
     this.add.text(LX + 2, BY + 74, 'Pages', { fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE });
     g.fillStyle(INK, 1).fillRect(LX, BY + 100, LW, 2).fillRect(LX, BY + 104, LW, 1);
-    this.add.text(BX + BW - 30, BY + BH - 30, 'W/S or ↑↓ to choose  ·  J or Esc to close', {
+    this.add.text(BX + BW - 30, BY + BH - 30, '←→ pages  ·  W/S or ↑↓ to choose  ·  J or Esc to close', {
       fontFamily: FAMILY_UI, fontSize: '13px', color: MUTED, resolution: RENDER_SCALE
     }).setOrigin(1, 0.5);
   }
@@ -208,12 +226,26 @@ export class PeopleScene extends Phaser.Scene {
     this.text(x, y, s.toUpperCase(), 13, { family: FAMILY_UI, color: BRASS_CSS, bold: true });
   }
 
+  /** The tab showing now. */
+  private tab(): Tab { return this.favorsTab ? 'Favors' : marks(this.registry).tab; }
+
+  private setTab(tab: Tab): void {
+    this.favorsTab = tab === 'Favors';
+    if (tab !== 'Favors') marks(this.registry).tab = tab;
+    this.refresh();
+  }
+
   private refresh(): void {
     for (const p of this.portraits) p.destroy();
     for (const h of this.hearts) h.destroy();
     this.portraits = [];
     this.hearts = [];
     this.content.removeAll(true);
+    const current = this.tab();
+    this.tabTexts.forEach((t, i) => t.setColor(TABS[i] === current ? BRASS_CSS : INK_CSS).setFontStyle(TABS[i] === current ? 'bold' : 'normal'));
+    this.questSwitch.setText(objectiveSwitchText()).setVisible(current === 'Quests');
+    if (current !== 'Quests') this.questPages.leave();
+    if (current === 'Quests') { this.questPages.draw(questLogNow(this.registry)); return; }
     if (this.favorsTab) {
       const all = favorBook(this.registry);
       this.text(LX,LIST_Y,'Favors · open / completed / expired',20);
@@ -230,7 +262,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
       this.text(RX,610,'Later →',17).setInteractive().on('pointerdown',() => { if ((this.favorPage+1)*4 < all.length) this.favorPage++; this.refresh(); }); return;
     }
     const tab = marks(this.registry).tab;
-    if (tab !== 'People') {
+    if (tab !== 'People' && tab !== 'Quests') {
       this.markPages.draw(tab);
       if (tab === 'Today') {
         this.text(RX,420,'Papers',24);
@@ -380,6 +412,7 @@ ${f.reward.regard} Regard · ${f.reward.coins} coins`,16,{ wrap: RW });
     for (const h of this.hearts) h.destroy();
     this.portraits = [];
     this.hearts = [];
+    this.questPages?.destroy();
     this.pauseWorld(false);
   }
 }

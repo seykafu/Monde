@@ -62,7 +62,9 @@ Pillars go through the town engine, {project} opens a Project in the Projects en
 cue carries Pell's signature), coins/items/riddles are ledger placeholders, checkpoints go to the save
 system. The story flags reach the server as `flags` snapshots (`scenes/events.ts`). `{charcreate}` opens the
 Fellowship form whenever the application isn't signed yet: a New Game reaches it on the ferry slip (§11.1).
-`hint.ts` (pure) picks the HUD's Next hint: the scene the player can still catch today, its place and window.
+`hint.ts` (pure) picks the HUD's Next hint: the scene the player can still catch today, its place and window; between
+beats, `upcomingBeat` names the next scene on a later day. The HUD's objective line and the Journal's Quests page
+(`quests/`) show them, with something to do meanwhile.
 Durable effects are idempotent per `scene|cue key`. `encodeStory` keeps the director and ledger inside the save's
 `story_flags` record (flags as `true`, the rest under `$story`), so the save schema is unchanged.
 `session.ts` owns one game's director (Spring scenes S01–S10; `?story=all` for every scene), summons with a

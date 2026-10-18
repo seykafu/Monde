@@ -31,6 +31,13 @@ Dawn also returns `regard: Record<residentId, number>`; replace the local mirror
 - Remove acknowledged accepted/duplicate IDs from the queue. Inspect rejected records; don't silently
   discard unknown residents, invalid payloads or unsupported placeholders. An obsolete flags snapshot may be
   superseded by the latest revision. Split longer logs across /events requests before calling night.
+- `dream_stage {resident, stage}` (the Journal's Quests, client/src/quests): a stage of the resident's dream is done,
+  `stage` counting the stages done. The client checks the stage's conditions (shared/src/dreams.ts; Quiet Mode too);
+  the server raises `ResidentState.dream.stage` to it (never lowers it, never past the card's stages), so the prompt's
+  dream stage moves on, and writes the resident a memory of the help (importance 5, GDD-GAP). Receipts dedupe per
+  resident and stage. Its Regard comes as a `scripted_regard` cue (`dream` / `<resident>:<stage>`).
+- A dream stage's Favor (`dream_<resident>_<stage>_<window>`) is rebuilt on `favor_choice` from its id, the card and
+  `offered_day` (favorFeasibility.ts restoreDreamFavor), as Quiet Mode's chores are.
 - Gift and community_work are implemented (G-09). Gifts use catalog tags and card preferences, with a
   resident/day receipt as well as the event-id receipt, and apply Regard outside the talk ledger.
   Community work validates the task, opening day, time and place, then writes a town event and witnessed memories.

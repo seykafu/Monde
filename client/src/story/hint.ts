@@ -1,4 +1,5 @@
-// "Where to go next" (MVP polish): the HUD's small Next hint and the Ledger's line. Pure: no Phaser, no DOM.
+// "Where to go next" (MVP polish): the Next hint (shown by the HUD's objective line, quests/hud.ts, and the Journal's
+// Quests page) and the Ledger's line. Pure: no Phaser, no DOM.
 //
 // Scripted scenes wait at a place in a time window (§13.1 headers; §13.2 calendar). Nothing in the world points at
 // them, so a new player who dawdles after S01a slips S01b/S01c to the next day. The hint names the next scene the
@@ -15,7 +16,7 @@
 //     expecting you at …".
 // A gentle toast when an open window is about to close and the player isn't there yet (closingToast).
 import { evaluate, type CompiledScene } from '@monde/shared';
-import { formatClock } from '../sim/clock';
+import { formatClock, weekdayOf } from '../sim/clock';
 import type { FlagStore } from './flags';
 import { calendarOrder, expressionContext, isSummoned, minutes, sceneDone, type StoryContext } from './triggers';
 
@@ -122,6 +123,79 @@ export function storyHint(scenes: readonly CompiledScene[], context: StoryContex
     sceneId: next.scene.id, place: h.place, placeName, zoneName, via, start: next.start, end: next.end, open, summoned,
     reason, where, when, text: `${where}, ${when} — ${reason.replace(/\.$/, '')}`
   };
+}
+
+// ── Between beats (Kasey's playtest, 2026-10-18: "help guide the player on where to go") ──────────────────────
+//
+// storyHint is null whenever nothing more can be caught today: Day 1 after the cottage, Day 4, most of Days 11–17 and
+// 19–24 (§13.2's calendar is sparse on purpose). The Journal's Quests page and the HUD's objective line then name the
+// next beat on a later day, so the player always knows when the story picks up again (quests/objective.ts puts a
+// suggestion for now beside it).
+
+/** GDD-GAP: how far ahead to look; Spring's longest gap (S09 on Day 18 → the Bloom Fair on Day 25) is a week. */
+export const UPCOMING_DAYS = 14;
+
+export interface UpcomingBeat {
+  sceneId: string;
+  /** `zone.place` */
+  place: string;
+  placeName: string;
+  zoneName: string;
+  day: number;
+  /** The window that day, minutes since midnight. */
+  start: number;
+  end: number;
+  summoned: boolean;
+  reason: string;
+  /** "Tomorrow" / "Day 5". */
+  dayText: string;
+  /** "Tomorrow, 10:00–12:00". */
+  when: string;
+  /** "Library, Old Quarter" (always with the district: it's another day). */
+  where: string;
+  /** "Tomorrow, 10:00–12:00: Library, Old Quarter — Margo is opening the Marks log". */
+  text: string;
+}
+
+export interface UpcomingOptions {
+  /** Whether the ferry sails on a day (town/migration.ts isFerryDay): S05 waits for a ferry day. */
+  ferryDay?(day: number): boolean;
+}
+
+/**
+ * The first beat on a later day the player could catch as things stand (flags, Appeal, the calendar), when nothing
+ * more can be caught today; null when there is none in UPCOMING_DAYS (the Spring is over). Earliest day first, then
+ * the window that opens first, then calendar order.
+ */
+export function upcomingBeat(scenes: readonly CompiledScene[], context: StoryContext, flags: FlagStore, places: HintPlaces,
+  completed: ReadonlySet<string> = new Set(), active?: string, opts: UpcomingOptions = {}): UpcomingBeat | null {
+  if (context.inScuffle) return null;
+  for (let d = context.day + 1; d <= context.day + UPCOMING_DAYS; d++) {
+    const found: Candidate[] = [];
+    for (const scene of scenes) {
+      const h = scene.header;
+      if (!h || h.calledFrom || scene.id === active || d < h.day || sceneDone(scene, flags, completed)) continue;
+      const start = minutes(h.time.start), end = minutes(h.time.end);
+      const [zone = ''] = h.place.split('.');
+      const values = { ...context.values, ...(opts.ferryDay ? { ferry_day: opts.ferryDay(d) } : {}) };
+      const there: StoryContext = { ...context, day: d, weekday: weekdayOf(d).toLowerCase(), minute: start, zone, place: h.place, values, asleep: false };
+      let ok = false;
+      try { ok = !!evaluate(h.trigger, expressionContext(there, flags)); } catch { ok = false; }
+      if (ok) found.push({ scene, start, end });
+    }
+    const next = found.sort((a, b) => a.start - b.start || calendarOrder(a.scene, b.scene))[0];
+    if (!next) continue;
+    const h = next.scene.header!;
+    const [zone = '', placeId = ''] = h.place.split('.');
+    const placeName = places.placeName(placeId), zoneName = places.zoneName(zone);
+    const dayText = d === context.day + 1 ? 'Tomorrow' : `Day ${d}`;
+    const when = `${dayText}, ${formatClock(next.start)}–${formatClock(next.end)}`;
+    const where = `${placeName}, ${zoneName}`;
+    const reason = SCENE_REASONS[next.scene.id] ?? `Someone is expecting you at ${placeName}.`;
+    return { sceneId: next.scene.id, place: h.place, placeName, zoneName, day: d, start: next.start, end: next.end, summoned: isSummoned(next.scene),
+      reason, dayText, when, where, text: `${when}: ${where} — ${reason.replace(/\.$/, '')}` };
+  }
+  return null;
 }
 
 /**

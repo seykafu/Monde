@@ -28,6 +28,8 @@ export interface GameState {
   projects?: SaveGame['projects'];
   /** G-11 the Spring finale (finale/state.ts); absent means the fair hasn't happened. */
   finale?: SaveGame['finale'];
+  /** The Journal's Quests (quests/state.ts): the dreams the player knows; absent means none yet. */
+  quests?: SaveGame['quests'];
 }
 export function collect(state: GameState, kind: SaveGame['kind'], label: string, savedAt = new Date().toISOString()): SaveGame {
   return SaveGame.parse({ schema_version: SAVE_SCHEMA_VERSION, saved_at: savedAt, kind, label,
@@ -36,6 +38,6 @@ export function collect(state: GameState, kind: SaveGame['kind'], label: string,
     mind: { world_id: null, branch_id: null, snapshot_id: null }, clock: state.clock.time,
     town: serialize(state.town), player: state.player, weather: state.weather,
     story_flags: state.story_flags, quiet: state.quiet, client_events: state.client_events,
-    fellow: state.fellow, inventory: state.inventory, coins: state.coins, economy: state.economy, skills: state.skills, friendship: state.friendship, riddles: state.riddles, puzzles: state.puzzles, projects: state.projects, scuffles: state.scuffles, finale: state.finale
+    fellow: state.fellow, inventory: state.inventory, coins: state.coins, economy: state.economy, skills: state.skills, friendship: state.friendship, riddles: state.riddles, puzzles: state.puzzles, projects: state.projects, scuffles: state.scuffles, finale: state.finale, quests: state.quests
   });
 }

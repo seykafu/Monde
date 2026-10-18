@@ -9,7 +9,7 @@ import { Verb } from "./verbs";
  * Ranges are enforced afterwards by the engine's clamps (clamps.ts). Describe intent with .describe().
  */
 
-export const INTENTS = ["kind", "curious", "joke", "firm", "ask_favor", "about_riddle", "campaign", "leave"] as const;
+export const INTENTS = ["kind", "curious", "joke", "firm", "ask_favor", "about_riddle", "about_quest", "campaign", "leave"] as const;
 export const Intent = z.enum(INTENTS);
 export type Intent = z.infer<typeof Intent>;
 

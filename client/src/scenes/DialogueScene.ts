@@ -56,6 +56,8 @@ import { lineLibrary } from '../mind/lineLibrary';
 import { scriptedTurn, type ScriptedExchange } from '../mind/scripted';
 import { loadQuietState, loadTextSpeed, saveQuietState, saveTextSpeed } from '../mind/prefs';
 import { markReply } from '../mind/markReply';
+import { MARK_HELPERS, questQuietLine, questReply } from '../mind/questTalk';
+import { talkQuest } from '../mind/questSources';
 import { firstName, quietContext, quietTurn, QUIET_CHOICES, type QuietState } from '../mind/quietMode';
 import { DialogueReader, MS_PER_CHAR, TEXT_SPEEDS, type TextSpeed } from '../mind/reader';
 import type { TalkChoice, TalkContext, TalkInput, TalkTurn } from '../mind/types';
@@ -67,7 +69,7 @@ import { Backlog, type LogEntry } from '../dialogue/backlog';
 import { HeartRowView, heartTexture } from '../ui/hearts';
 import { HEART_ANIMATION, heartFeedback, type HeartFeedback } from '../friendship/hearts';
 import { meetResident, recordDialogueTurn, regardFor } from './friendship';
-import { callName, isBareLeave, normalizeChoices, type PersonaCard } from '@monde/shared';
+import { callName, isBareLeave, normalizeChoices, type PersonaCard, type TalkQuest } from '@monde/shared';
 
 export const DIALOGUE_SCENE = 'Dialogue';
 
@@ -305,9 +307,12 @@ export class DialogueScene extends Phaser.Scene {
   constructor() { super(DIALOGUE_SCENE); }
 
   private usedMarks = new Set<string>();
+  /** The quest reply ("What should I be doing?") is offered at most once a conversation (mind/questTalk.ts). */
+  private usedQuest = false;
 
   init(data: DialogueOpen): void {
     this.usedMarks.clear();
+    this.usedQuest = false;
     this.open = data;
     const other = data.chatter ? CARDS.get(data.chatter.secondary) : undefined;
     this.joined = other && data.chatter ? new JoinedChatter(data.chatter, displayName(other.card.name), displayName(CARDS.get(data.residentId)!.card.name), other.card.voice.mode === 'narrated_action') : null;
@@ -521,7 +526,7 @@ export class DialogueScene extends Phaser.Scene {
     try {
       result = mind.enabled
         ? await mind.talk(
-          { resident_id: this.card.id, conversation_id: this.conversationId, input, context: { ...this.context, heart_level: getFellow(this.registry)?.skills.heart.level ?? 1 } },
+          { resident_id: this.card.id, conversation_id: this.conversationId, input, context: { ...this.context, heart_level: getFellow(this.registry)?.skills.heart.level ?? 1, quest: this.quest() } },
           {
             signal: abort.signal, fallback,
             onLineDelta: d => { if (seq === this.requestSeq && this.reader.delta(d) === 'reset') this.restartQuietly(); },
@@ -609,6 +614,10 @@ export class DialogueScene extends Phaser.Scene {
       const topic = this.context.riddle, record = riddle(topic.id);
       const text = record?.hints.slice(0, topic.hints_allowed).filter((h): h is string => !!h && !containsAnswer(h, record!.accepted)).at(-1) ?? "I'm stumped. Give it a little time.";
       return { conversation_id: this.conversationId, resident_id: this.card.id, turn_index: turnIndex, lines: [{ text, expr: 'thinking' }], choices: [{ id: 'a', text: 'Thank you.', intent: 'kind' }], wrap_up: false, fallback: true };
+    }
+    // The quest reply, offline: the Journal's own words (mind/questTalk.ts), not small talk.
+    if (input.kind === 'choice' && input.intent === 'about_quest' && this.card.voice.mode !== 'narrated_action') {
+      return { conversation_id: this.conversationId, resident_id: this.card.id, turn_index: turnIndex, lines: [{ text: questQuietLine(this.quest()), expr: 'neutral' }], choices: [{ id: 'a', text: 'Thank you.', intent: 'kind' }], wrap_up: false, fallback: true };
     }
     const canned = input.kind !== 'gift' && input.kind !== 'meal' && this.open.scripted && scriptedTurn(this.open.scripted, this.scriptedNodes[turnIndex - 1] ?? null, input, {
       conversationId: this.conversationId, residentId: this.card.id, turnIndex, vars: { name: firstName(this.card.name), player: getMind().playerName }
@@ -775,10 +784,13 @@ export class DialogueScene extends Phaser.Scene {
     const ready = favorBook(this.registry).find(f => f.status === 'accepted' && (f.task.kind === 'introduce' && f.resident_id === this.card.id));
     if (ready) replies.push({ id: `favor_finish:${ready.id}`, text: ready.task.kind === 'delivery' ? 'I have a parcel for you.' : 'Let me introduce you.', intent: 'kind' });
     const selected = marks(this.registry).selected;
-    if (selected && !this.usedMarks.has(selected) && marks(this.registry).entries[selected]?.status === 'found' && ['margo', 'bertrand', 'tib'].includes(this.card.id)) {
+    if (selected && !this.usedMarks.has(selected) && marks(this.registry).entries[selected]?.status === 'found' && MARK_HELPERS.has(this.card.id)) {
       replies.push(markReply(selected));
     }
     if (this.card.id === 'tib' && SPRING_RIDDLES.some(r => r.chain === 'T' && marks(this.registry).entries[r.id]?.status !== 'solved')) replies.push({ id: 'tib_duel', text: 'A riddle duel?', intent: 'about_riddle' });
+    // A key character can point the way: once a conversation, never over a Favor to answer or after a wrap-up.
+    const quest = favor || turn.wrap_up || replies.some(c => c.intent === 'about_quest') ? null : questReply(this.card, this.quest(), this.usedQuest);
+    if (quest) replies.push(quest);
     this.shownReplies = replies;
     const rows = replies.map((c, i) => new PanelButton(this, CHOICE_X, 0, CHOICE_W, `${i + 1}   ${c.text}`, () => this.choose(c)));
     const row: PanelButton[] = [];
@@ -867,7 +879,28 @@ export class DialogueScene extends Phaser.Scene {
         this.context = { ...this.context, riddle: { id, hints_allowed: state.entries[id]!.hints } };
       }
     } else this.context = { ...this.context, riddle: null };
+    // Asked once (the authored reply or one of the resident's own), the quest reply isn't offered again.
+    if (choice.intent === 'about_quest') this.usedQuest = true;
     void this.send({ kind: 'choice', choice_id: choice.id, text: choice.text, intent: choice.intent }, choice.text);
+  }
+
+  /**
+   * What this turn tells the server about the player's objective and this resident's threads (mind/questSources.ts).
+   * None in a scripted scene's handoff ({ai_open}), which is its own beat with its own topic.
+   */
+  private quest(): TalkQuest | null {
+    const { topic, place, scripted, zone, clock } = this.open;
+    if (topic !== undefined || place !== undefined || scripted || !zone) return null;
+    try {
+      return talkQuest({
+        registry: this.registry, card: this.card, day: clock.day, minute: clock.minute,
+        district: districtOf(zone), favors: favorBook(this.registry), marks: marks(this.registry)
+      });
+    } catch (error) {
+      // A conversation never waits on this: the turn goes without the report.
+      console.warn('[dialogue] quest report failed; sending none', error);
+      return null;
+    }
   }
 
   /** Leave: after a wrap-up the resident has said goodbye already; otherwise they say one (authored, free). */

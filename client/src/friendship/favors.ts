@@ -5,7 +5,7 @@ import { departureDay, resolveNotice, stayFactors, stayInputsOf } from "../town/
 import { friendsInTown } from "../scenes/migration";
 import { items } from "../economy/content";
 import { getTown } from "../scenes/TownLedgerScene";
-import { acceptFavor, canCompleteFavor, type Favor, type FavorProof } from '@monde/shared';
+import { acceptFavor, canCompleteFavor, type Favor, type FavorProof, type FavorWorld } from '@monde/shared';
 import type Phaser from 'phaser';
 import type { Clock } from '../sim/clock';
 import { getFriendship, updateFriendship } from '../scenes/friendship';
@@ -35,7 +35,7 @@ export function chooseFavor(r: Registry, id: string, day: number, accept: boolea
     const item = itemById(f.task.item); if (!item) return false;
     const bag = addItem(bagOf(r),item); if (!bag) return false; parcelBag = bag;
   }
-  if (!appendEvent(r,{ kind: 'favor_choice',id: `favor_choice_${id}`,favor: id,resident:f.resident_id,day,minute,accept,...(f.id.startsWith('quiet_chore_') ? { offered_day: f.created_day } : {}),notice:f.notice })) return false;
+  if (!appendEvent(r,{ kind: 'favor_choice',id: `favor_choice_${id}`,favor: id,resident:f.resident_id,day,minute,accept,...(f.id.startsWith('quiet_chore_') || f.id.startsWith('dream_') ? { offered_day: f.created_day } : {}),notice:f.notice })) return false;
   if (parcelBag) r.set(BAG_KEY,parcelBag);
   updateFriendship(r,s => ({ ...s, favor_book: s.favor_book.map(x => x.id === id ? next : x) })); return true;
 }
@@ -101,6 +101,13 @@ export function localLastChances(r: Registry, day: number): void {
     });
     if (f) updateFriendship(r,s => ({ ...s,favor_book: [...s.favor_book,f] }));
   }
+}
+
+/** The world Quiet Mode's own Favors are made in (localTemplateFavors, the dreams' stage Favors): met residents are reachable. */
+export function localFavorWorld(r: Registry, day: number): FavorWorld {
+  const state = getFriendship(r);
+  return { day, items: new Set(items.map(i => i.id)), places: favorPlaces, reachablePlace: reachableFavorPlace, met: () => true,
+    residents: new Map(allCards().map(c => [c.id, favorResident(c, c.kind !== 'animal' && !!state.residents[c.id])])) };
 }
 
 /** M-11: deterministic template requests, also used when the dawn service is unavailable. */

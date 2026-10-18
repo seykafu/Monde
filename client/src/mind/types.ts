@@ -46,6 +46,8 @@ export interface TalkContext {
   weather: string;
   current_activity?: string | null;
   riddle?: { id: string; hints_allowed: number } | null;
+  /** The player's objective and this resident's open threads (mind/questTalk.ts; shared TalkQuest). */
+  quest?: import('@monde/shared').TalkQuest | null;
 }
 
 export interface TalkRequest {

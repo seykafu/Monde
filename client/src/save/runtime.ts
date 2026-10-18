@@ -69,7 +69,7 @@ export async function requestCheckpoint(key: string): Promise<void> {
   }
 }
 export function resetGame(scene: Phaser.Scene): void {
-  for (const key of ['monde.press.pending', 'monde.press.seed', 'monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.puzzles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies', 'monde.projects', 'monde.scuffles', 'monde.scuffle.recovery', 'monde.scuffle.offers', 'monde.finale']) scene.registry.remove(key);
+  for (const key of ['monde.press.pending', 'monde.press.seed', 'monde.save.wakePlayer', 'monde.inventory', 'monde.coins', 'monde.economy', 'monde.riddles', 'monde.puzzles', 'monde.clock', 'monde.town', 'monde.dawnReport', 'monde.residents', 'monde.weatherOverride', 'monde.save.weather', 'monde.story.flags', 'monde.events', 'monde.story.hint', 'monde.story.warned', 'monde.save.playtime', 'monde.save.name', 'monde.friendship', 'monde.dawnTies', 'monde.projects', 'monde.scuffles', 'monde.scuffle.recovery', 'monde.scuffle.offers', 'monde.finale', 'monde.quests', 'monde.quests.objective']) scene.registry.remove(key);
   clearFellow(scene.registry);
   saveQuietState(quietStorage, emptyQuietState());
   capture = undefined; dawnSave = undefined; lastSave = undefined;
@@ -91,6 +91,7 @@ export async function loadGame(scene: Phaser.Scene, save: SaveGame, slot?: strin
   scene.registry.set('monde.scuffles', state.scuffles);
   if (state.projects) scene.registry.set('monde.projects', state.projects);
   if (state.finale) scene.registry.set('monde.finale', state.finale);
+  if (state.quests) scene.registry.set('monde.quests', state.quests);
   scene.registry.set('monde.clock', state.clock);
   scene.registry.set('monde.town', state.town);
   scene.registry.set('monde.save.weather', state.weather);
@@ -136,7 +137,8 @@ export function attachSaves(scene: Phaser.Scene, clock: Clock, player: () => Sav
     friendship: scene.registry.get('monde.friendship') as SaveGame['friendship'] | undefined,
     scuffles: scene.registry.get('monde.scuffles') as SaveGame['scuffles'] | undefined,
     projects: scene.registry.get('monde.projects') as SaveGame['projects'] | undefined,
-    finale: scene.registry.get('monde.finale') as SaveGame['finale'] | undefined
+    finale: scene.registry.get('monde.finale') as SaveGame['finale'] | undefined,
+    quests: scene.registry.get('monde.quests') as SaveGame['quests'] | undefined
   }, 'manual', '');
   capture = take;
   const tick = (_time: number, delta: number) => { elapsed += delta / 1000; player(); };

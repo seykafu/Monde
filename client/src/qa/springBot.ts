@@ -81,6 +81,8 @@ import { boards, doorLinks, interiors, zones } from '../world/zones';
 import { DEFAULT_PLAYER_LOOK } from '../render/character/look';
 import type { TownState } from '../town/pillars';
 import { computeAppeal } from '../town/appeal';
+import { attachQuestsClock, objectivesNow, rulesFor } from '../quests/runtime';
+import { getQuests } from '../quests/state';
 
 /** Every card's id, for the story's Regard (scenes/friendship.ts regardMap). */
 const CARD_ID_LIST: readonly string[] = personaCards.map(c => c.id);
@@ -209,6 +211,10 @@ export interface BotResult {
   puzzles: string[];
   scuffles: { key: string; outcome: string }[];
   favors: { id: string; status: string }[];
+  /** The dreams the player came to know (the Journal's Quests): stages done of all, and how it was learned. */
+  dreams: { resident: string; stage: number; total: number; how: string; learned: number }[];
+  /** What the HUD's objective line said, sampled each game hour (kind: title), for the log. */
+  objectives: string[];
   arrivals: number;
   departures: number;
   saves: number;
@@ -288,7 +294,7 @@ export class SpringBot {
   constructor(readonly script: Script, readonly opts: BotOptions = {}) {
     this.style = STYLES[script];
     this.seed = opts.seed ?? 1;
-    this.result = { script, played: [], flags: [], projects: {}, marks: [], puzzles: [], scuffles: [], favors: [], arrivals: 0, departures: 0,
+    this.result = { script, played: [], flags: [], projects: {}, marks: [], puzzles: [], scuffles: [], favors: [], dreams: [], objectives: [], arrivals: 0, departures: 0,
       saves: 0, reloads: 0, poll: null, report: null, issues: [], days: [], log: [] };
     this.scene.onStart = data => this.boot(data);
   }
@@ -340,6 +346,7 @@ export class SpringBot {
     attachTown(r, clock);
     attachMigration(r, clock);
     attachProjectsClock(r, clock);
+    attachQuestsClock(r, clock);
     attachDawnSync(r, clock, { weatherSeed: () => this.seed, town: () => getTown(r) });
     // create(): the economy's clock, the puzzles' dawn, the Scuffles, the dawn autosave.
     attachEconomyClock(s, clock);
@@ -676,6 +683,7 @@ export class SpringBot {
       puzzles: puzzleSave(this.r).rewarded, scuffles: Object.keys(scufflesOf(this.r).results).sort(),
       regard: Object.fromEntries(['pell', 'odile', 'kasimir', 'bertrand', 'margo', 'tib', 'nell', 'augusta'].map(id => [id, this.regard(id)])),
       favors: getFriendship(r).favor_book.map(f => `${f.id}:${f.status}`), papers: getFriendship(r).papers.length,
+      dreams: Object.entries(getQuests(this.r).dreams).map(([id, d]) => `${id}:${d.stage}`).sort(),
       fellow: getFellow(this.r)?.profile?.name ?? null, finale: finaleOf(this.r)
     };
   }
@@ -701,14 +709,30 @@ export class SpringBot {
     await this.morning();
     this.worked.clear();
     let saved = !SpringBot.MANUAL_SAVES[this.script].includes(this.clock.day);
+    let checkedHour = -1;
     for (let guard = 0; guard < 400 && this.clock.minute < this.style.bedtime; guard++) {
       if (!saved && this.clock.minute >= 14 * 60 && !this.session.active) { saved = true; await this.manualSave(); }
+      if (Math.floor(this.clock.minute / 60) !== checkedHour && !this.session.active) { checkedHour = Math.floor(this.clock.minute / 60); this.checkObjective(); }
       if (await this.story()) continue;
       if (await this.followHint()) continue;
       if (await this.act()) continue;
       await this.wait(15);
     }
     await this.bed();
+  }
+
+  /**
+   * The HUD's objective line (quests/hud.ts, quests/runtime.ts objectivesNow) is never empty, and until the Spring's
+   * last scene it always names a story beat: one to catch today, or the next one on a later day.
+   */
+  checkObjective(): void {
+    const o = objectivesNow(asRegistry(this.r));
+    const over = this.session.flags.has('s10c_done');
+    if (!o.hud.title.trim() || !o.hud.header.trim()) this.issue(`the objective line is empty (${JSON.stringify(o.hud)})`);
+    if (!over && !o.main && !o.next) this.issue('the objective names no story beat: nothing to catch today and no next beat');
+    if (o.main && o.main.kind === 'story' && !o.main.where) this.issue(`the objective for ${o.main.id} has no place`);
+    const line = `${o.hud.kind}: ${o.hud.title}`;
+    if (this.result.objectives.at(-1)?.endsWith(line) !== true) this.result.objectives.push(`D${this.clock.day} ${this.hhmm()} ${line}`);
   }
 
   /** The HUD's Next hint (story/hint.ts, as scenes/story/attach.ts computes it): go where it says, in time. */
@@ -1323,6 +1347,7 @@ export class SpringBot {
     res.flags = this.session.flags.serialize();
     for (const b of E.begun(PROJECTS, projectsOf(this.r))) res.projects[b.id] = { opened: b.progress.opened, stage: E.stageOf(b.def, b.progress, w) };
     res.favors = favorBook(asRegistry(this.r)).map(f => ({ id: f.id, status: f.status }));
+    res.dreams = Object.entries(getQuests(this.r).dreams).map(([resident, d]) => ({ resident, stage: d.stage, total: rulesFor(resident)?.stages.length ?? 0, how: d.how, learned: d.learned }));
     const town = this.town();
     res.arrivals = town.people?.households.reduce((n, h) => n + h.residents.length, 0) ?? 0;
     res.departures = town.people?.departed?.length ?? 0;

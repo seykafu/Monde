@@ -4,7 +4,9 @@ import { createTownState } from '../../town/pillars';
 import { placeName } from '../../world/player';
 import { zones } from '../../world/zones';
 import { FlagStore } from '../flags';
-import { CLOSING_WARNING_MINUTES, SCENE_REASONS, catchableToday, closingToast, storyHint, zoneRoute } from '../hint';
+import { CLOSING_WARNING_MINUTES, SCENE_REASONS, catchableToday, closingToast, storyHint, upcomingBeat, zoneRoute } from '../hint';
+import { minutes } from '../triggers';
+import { isFerryDay } from '../../town/migration';
 import { buildStoryContext, emptyLedger, type WorldNow } from '../host';
 import { SPRING_SCENES } from '../session';
 
@@ -94,3 +96,55 @@ describe('zoneRoute', () => {
 });
 
 it('explains Pell’s S09 invitation', () => { expect(SCENE_REASONS.s09_pell_confession).toBe('Pell is waiting to talk about the Option.'); });
+
+describe('between beats: the next beat on a later day', () => {
+  const ferry = (d: number) => isFerryDay(d);
+  const next = (over: Partial<WorldNow>, set: string[], done: string[] = []) =>
+    upcomingBeat(SPRING_SCENES, at(over), flags(...set), places, new Set(done), undefined, { ferryDay: ferry });
+  const S01 = [...AFTER_S01A, 's01b_done', 's01c_done', 'cottage_keys_given'];
+
+  it('after the cottage on Day 1, points at Margo and the library tomorrow', () => {
+    expect(storyHint(SPRING_SCENES, at({ minute: 13 * 60, zone: 'old_quarter', place: '' }), flags(...S01), places)).toBeNull();
+    expect(next({ minute: 13 * 60, zone: 'old_quarter', place: '' }, S01)).toMatchObject({
+      sceneId: 's02_marks', day: 2, dayText: 'Tomorrow', when: 'Tomorrow, 10:00–12:00', where: 'Monde Free Library, Old Quarter', reason: SCENE_REASONS.s02_marks,
+      text: 'Tomorrow, 10:00–12:00: Monde Free Library, Old Quarter — Margo is opening the Marks log'
+    });
+  });
+
+  it('on Day 4 points at the fountain on Day 5, and after Pell’s confession at the Bloom Fair', () => {
+    expect(next({ day: 4, minute: 600, zone: 'market_row', place: '' }, [...S01, 's02_done', 's03_done'])).toMatchObject({ sceneId: 's04_water_again', day: 5, dayText: 'Tomorrow' });
+    expect(next({ day: 19, minute: 600, zone: 'market_row', place: '' }, [...TO_S07, 's08_done', 's09_done'])).toMatchObject({ sceneId: 's10a_bloom_open', day: 25, dayText: 'Day 25', summoned: true });
+  });
+
+  it('is nothing once the Spring’s last scene is done', () => {
+    expect(next({ day: 25, minute: 22 * 60, zone: 'commons', place: '' }, [...TO_S07, 's08_done', 's09_done', 's10a_done', 's10b_done', 's10c_done'])).toBeNull();
+  });
+
+  it('covers every hour of the Spring: a scene to catch today, or the next one, until the Straw Poll is taken', () => {
+    // A player who turns up for every scene the moment its window opens (S05 waits for Appeal: the empty boat plays).
+    const f = flags(), completed = new Set<string>();
+    const gaps: string[] = [];
+    let hours = 0;
+    for (let day = 1; day <= 25 && !f.has('s10c_done'); day++) {
+      for (let minute = 6 * 60; minute < 24 * 60; minute += 30) {
+        const ctx = at({ day, minute, zone: 'old_quarter', place: '' });
+        if (day === 1 && minute < 9 * 60 + 50) continue; // a New Game opens 09:50 on the ferry slip
+        const today = storyHint(SPRING_SCENES, ctx, f, places, completed);
+        const later = today ? null : upcomingBeat(SPRING_SCENES, ctx, f, places, completed, undefined, { ferryDay: ferry });
+        if (!today && !later && !f.has('s10c_done')) gaps.push(`D${day} ${minute}`);
+        hours++;
+        // Play what's open now (as the director would, the player standing there).
+        for (const scene of catchableToday(SPRING_SCENES, ctx, f, completed)) {
+          if (minute < minutes(scene.scene.header!.time.start)) continue;
+          completed.add(scene.scene.id);
+          for (const flag of scene.scene.header!.sets) f.set(flag);
+        }
+      }
+    }
+    expect(hours).toBeGreaterThan(800);
+    expect(gaps).toEqual([]);
+    expect(f.has('s10c_done')).toBe(true);
+    expect([...completed]).toEqual(['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's05b_empty_boat', 's06_good_coat',
+      's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']);
+  });
+});

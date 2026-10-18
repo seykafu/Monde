@@ -3,13 +3,15 @@ import { enqueue } from '../mind/events';
 import { emptyEventLog } from '@monde/shared';
 import { requestHint } from '../riddles/engine';
 /** Registry adapter for the pure Marks engine. */
-import { gainXp, Wallet, Economy, Inventory, emptyRiddles, type SavedRiddles } from '@monde/shared';
+import { gainXp, Wallet, Economy, Inventory, emptyRiddles, SPRING_RIDDLES, type SavedRiddles } from '@monde/shared';
 import type { RegistryLike } from '../fellow/state';
 import { ensureFellow, setFellow } from '../fellow/state';
 import type { Clock } from '../sim/clock';
 import type { StorySession } from '../story/session';
 import { applyPillarDelta, type TownState } from '../town/pillars';
 import { answerMark, gameMinute, readMark, tickHints, type RiddleContext, type RewardHooks } from '../riddles/engine';
+/** Fragments recovered when `charter_half` is set (§14 flag table: three of the six). */
+export const CHARTER_HALF_FRAGMENTS = 3;
 export const RIDDLES_KEY = 'monde.riddles';
 export function marks(registry: RegistryLike): SavedRiddles {
   let state = registry.get(RIDDLES_KEY) as SavedRiddles | undefined;
@@ -50,6 +52,10 @@ export function submitMark(registry: RegistryLike, clock: Pick<Clock, 'day' | 'm
       state.headlines.push({ day: clock.day, text: headline });
       // GDD-GAP: §14.3 supplies no memory importance; 6 matches a landmark opening.
       for (const resident of ['margo', 'bertrand', 'tib']) enqueueReward({ kind: 'scripted_memory', id: `riddle:${key}:memory:${resident}`, day: clock.day, minute: Math.floor(clock.minute), resident, scene_id: 'riddles', cue_key: key, place: 'old_quarter.library', text: headline, importance: 6 });
+      // §14 flag table: `charter_half` is "three of the six Charter fragments have been found" (System). Margo's dream
+      // waits for it (quests/runtime.ts counts it as the story's), so no chore can stand in for the fragments.
+      const recovered = SPRING_RIDDLES.filter(r => r.fragment && (r.id === key || state.entries[r.id]?.status === 'solved')).length;
+      if (recovered >= CHARTER_HALF_FRAGMENTS) session?.flags.set('charter_half');
     }
     const consumer = registry.get('monde.riddle.rewardConsumer') as RiddleRewardConsumer | undefined;
     if (consumer) consumer.apply(key, 0, reward.items, reward.regard);

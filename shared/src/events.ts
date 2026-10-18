@@ -31,6 +31,9 @@ export const ClientEvent = z.discriminatedUnion("kind", [
   z.object({ ...stamp, kind: z.literal("gift"), resident: key, item: key }),
   z.object({ ...stamp, kind: z.literal("meal"), resident: key, item: key }),
   z.object({ ...stamp, kind: z.literal("community_work"), task: key, place: PlaceId, participants: z.array(key).max(500) }),
+  // A stage of the resident's dream is done (client/src/quests/dreams.ts): `stage` is how many are done now, mirrored
+  // into ResidentState.dream.stage (§9.4) so the prompt's dream stage moves on. Never lowers the stage.
+  z.object({ ...stamp, kind: z.literal("dream_stage"), resident: key, stage: z.number().int().min(1).max(20) }),
 ]);
 export type ClientEvent = z.infer<typeof ClientEvent>;
 export const ClientEventBatch = z.array(ClientEvent).max(CLIENT_EVENT_BATCH_LIMIT);

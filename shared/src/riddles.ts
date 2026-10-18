@@ -12,9 +12,9 @@ export const RiddleDefinition = z.object({
 export type RiddleDefinition = z.infer<typeof RiddleDefinition>;
 export const SPRING_RIDDLES = z.array(RiddleDefinition).parse(data);
 export const SavedRiddle = z.object({ status: z.enum(['found', 'solved']), foundAt: z.number().nonnegative(), hints: z.number().int().min(0).max(3), attempts: z.array(z.string()), method: z.enum(['named', 'found']).optional() });
-export const SavedRiddles = z.object({ headlines: z.array(z.object({ day: z.number().int().positive(), text: z.string() })).default([]), entries: z.record(z.string(), SavedRiddle), tab: z.enum(['People', 'Marks', 'Today']).default('People'), selected: z.string().nullable().default(null), pinned: z.array(z.string()).default([]) });
+export const SavedRiddles = z.object({ headlines: z.array(z.object({ day: z.number().int().positive(), text: z.string() })).default([]), entries: z.record(z.string(), SavedRiddle), tab: z.enum(['Quests', 'People', 'Marks', 'Today']).default('Quests'), selected: z.string().nullable().default(null), pinned: z.array(z.string()).default([]) });
 export type SavedRiddles = z.infer<typeof SavedRiddles>;
-export const emptyRiddles = (): SavedRiddles => ({ headlines: [], entries: {}, tab: 'People', selected: null, pinned: [] });
+export const emptyRiddles = (): SavedRiddles => ({ headlines: [], entries: {}, tab: 'Quests', selected: null, pinned: [] });
 const small = 'zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'.split(' ');
 const tens = 'twenty thirty forty fifty sixty seventy eighty ninety'.split(' ');
 /** Fold number words as runs, so “seventy-eight” and “one thousand eight hundred fifty” work. */

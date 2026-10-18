@@ -20,10 +20,10 @@ const write = (res: Result) => {
   writeFileSync(`${OUT}/bot_${res.script}.txt`, [
     res.played.join(' → '),
     `saves ${res.saves} · reloads ${res.reloads} · Marks ${res.marks.length} · puzzles ${res.puzzles.join(',')} · arrivals ${res.arrivals} · departures ${res.departures}`,
-    `scuffles ${JSON.stringify(res.scuffles)}`, `favors ${JSON.stringify(res.favors)}`,
+    `scuffles ${JSON.stringify(res.scuffles)}`, `favors ${JSON.stringify(res.favors)}`, `dreams ${JSON.stringify(res.dreams)}`,
     '', 'ISSUES', ...res.issues, '', 'PROJECTS', JSON.stringify(res.projects), '', 'REPORT', JSON.stringify(res.report), '',
     'DAYS', ...res.days.map(d => `D${d.day} ${d.weekday} appeal ${d.appeal} census ${d.census} coins ${d.coins} fund ${d.fund} stamina ${d.stamina}`),
-    '', 'LOG', ...res.log
+    '', 'OBJECTIVES', ...res.objectives, '', 'LOG', ...res.log
   ].join('\n'));
 };
 
@@ -57,7 +57,9 @@ describe('the Spring soak bot', () => {
       shares.push(100 * res.poll!.shares.fellow);
       if (script !== 'lazy') expect(res.favors.some(f => f.id.startsWith('quiet_chore_') && f.status === 'completed')).toBe(true);
       console.log(`${script} poll: ${JSON.stringify(res.report?.poll?.shares)}`);
+      // The objective line was never empty, and named a story beat until the Straw Poll (springBot checkObjective).
       expect(res.issues).toEqual([]);
+      expect(res.objectives.length).toBeGreaterThan(20);
       expect(res.played).toEqual(BEATS[script]);
       for (const flag of ['s10c_done', 'spring_poll_taken', 'option_known', 'pell_confessed', 'bloom_fair_closed']) expect(res.flags, flag).toContain(flag);
       // Every dawn saved; the strong and social players reload every dawn save (and a few afternoon saves).
@@ -82,6 +84,15 @@ describe('the Spring soak bot', () => {
       const s07 = res.log.find(l => l.includes('▶ s07a_chime_runs'))!;
       expect(res.projects.clocktower?.opened).toBe(Number(/^D(\d+)/.exec(s07)![1]));
       expect(res.report!.moments.find(m => m.text.startsWith('The clocktower runs'))?.day).toBe(res.projects.clocktower?.opened);
+    });
+
+    if (script === 'strong') it('comes to know the neighbours’ dreams and helps them along (the Journal’s Quests)', () => {
+      expect(res.dreams.length).toBeGreaterThan(0);
+      expect(res.dreams.some(d => d.stage >= 1)).toBe(true);
+      // A dream stage worked as its Favor, accepted and done like any other.
+      expect(res.favors.some(f => f.id.startsWith('dream_') && f.status === 'completed')).toBe(true);
+      // Bertrand's clock runs in this script (S07a), and with it his dream.
+      expect(res.dreams.find(d => d.resident === 'bertrand')).toMatchObject({ stage: 4, total: 4 });
     });
 
     if (script === 'social') it('does the Favors it is asked, including a chore at a home upstairs', () => {

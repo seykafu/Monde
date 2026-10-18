@@ -8,7 +8,7 @@ import { safePlayerText } from "./safetyText.js";
  */
 import { and, asc, desc, eq, inArray, or, sql } from "drizzle-orm";
 import {
-  FavorTemplate, type Memory, type PersonaCard, type ResidentState,
+  FavorTemplate, type Memory, type PersonaCard, type ResidentState, type TalkQuest,
 } from "@monde/shared";
 import { dialogueTurns, events, favors, memories, relationships, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
@@ -17,6 +17,7 @@ import {
   type RelationshipView,
 } from "./promptBuilder.js";
 import { playerView, type PlayerProfile } from "./player.js";
+import { questTopic } from "./quest.js";
 import { contentWords, retrieveMemories, topicCards, type MemoryCandidate } from "./retrieval.js";
 import { riddleRecord, riddleTopic, type RiddleRecord } from "./riddles.js";
 import { ECHO_WINDOW, cardVocabulary, type ValidationContext } from "./validate.js";
@@ -30,6 +31,8 @@ export interface TalkScene {
   weather: string;
   current_activity?: string | null;
   riddle?: { id: string; hints_allowed: number } | null;
+  /** The player's objective and this resident's open threads (shared TalkQuest; quest.ts decides what's said). */
+  quest?: TalkQuest | null;
 }
 
 /** Everything that feeds prompt blocks 1-3. Prewarm and dialogue build it the same way so the bytes match. */
@@ -205,6 +208,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
     weather: scene.weather,
     activity: scene.current_activity,
     recentTopics: prefix.state.recent_topics,
+    quest: questTopic(scene.quest, prefix.card),
   });
 
   const openFavors: OpenFavorView[] = favorRows.flatMap((f) => {
@@ -246,6 +250,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         playerSaid: args.playerSaid,
         focus,
         whimSeed: null,
+        quest: scene.quest ?? null,
       },
       validation: {
         card: prefix.card,

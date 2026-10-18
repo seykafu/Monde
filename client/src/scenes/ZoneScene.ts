@@ -64,7 +64,9 @@ import { attachStory, type StoryAttachment } from './story/attach';
 import { attachMigration } from './migration';
 import { attachArrivals } from './zone/arrivals';
 import { attachFinale } from '../finale/attach';
-import { closingToast, type StoryHint } from '../story/hint';
+import { closingToast } from '../story/hint';
+import { attachQuestHud } from '../quests/hud';
+import { attachQuestsClock } from '../quests/runtime';
 import { DIALOGUE_SCENE } from './DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE } from './StoryScene';
 
@@ -92,7 +94,7 @@ const DEV_KEYS = import.meta.env.DEV || query.has('dev');
 const SIGN_DEFAULT_FELLOW = query.get('skiptitle') === '1' || query.get('demo') === '1';
 /** Scene windows already warned about (story/hint.ts closingToast), per game: `sceneId@day`. */
 const WARNED_KEY = 'monde.story.warned';
-/** Overlays that hide the Next hint (it's for walking about). */
+/** Overlays that hold back the closing toast (it's for walking about). */
 const HINT_HIDDEN_UNDER = [STORY_SCENE, DIALOGUE_SCENE, FELLOWSHIP_SCENE, 'TownLedger', 'People', 'SaveMenu'];
 /** render/diorama/Lighting's glow texture: how the board's lamp glows are found to switch them by night. */
 const TORCH_GLOW_KEY = 'torch_glow';
@@ -224,16 +226,6 @@ const gustConfig = (w: Wind): EmitterConfig => {
   };
 };
 interface Cast { cast: Phaser.GameObjects.Image; src: Phaser.GameObjects.Image }
-/** The Next hint under the HUD (story/hint.ts): a small card with when, where and why. */
-interface HintCard {
-  bg: Phaser.GameObjects.Graphics;
-  when: Phaser.GameObjects.Text;
-  where: Phaser.GameObjects.Text;
-  why: Phaser.GameObjects.Text;
-  x: number;
-  w: number;
-  shown: string;
-}
 
 interface Hud {
   date: Phaser.GameObjects.Text;
@@ -299,7 +291,6 @@ export class ZoneScene extends Phaser.Scene {
   /** H beside a resident: ask about the Projects. */
   private askAction: { label: string; run(): void } | null = null;
   private projectCache = { at: 0, key: '', project: null as { label: string; run(): void } | null, ask: null as { label: string; run(): void } | null };
-  private hintCard!: HintCard;
   private toast!: Phaser.GameObjects.Text;
   private hintAt = 0;
   /** v2 zones: the town drawn from its sprites (render/town), and its small life. */
@@ -473,6 +464,8 @@ export class ZoneScene extends Phaser.Scene {
     this.projects = attachProjects(this, { zone: this.zone, clock: this.clock, residents: this.residents, projection: this.projection,
       position: () => this.position, weather: () => this.now, toast: text => this.showToast(text),
       refreshBoard: () => this.town?.refresh(this.townLook()), busy: () => this.transitioning });
+    // The objective line under the clock, the first-steps card and the dreams' toasts (quests/hud.ts).
+    attachQuestHud(this, { story: this.story, projects: this.projects, toast: text => this.showToast(text), busy: () => this.transitioning, x: GAME_WIDTH - 20 - 248, w: 248 });
     // G-02: newcomers off the ferry, leavers to the slip, and the Gannet's timetable on the Wharf.
     attachArrivals(this, { zone: this.zone, clock: this.clock, residents: this.residents, board: this.town,
       refreshBoard: () => this.town?.refresh(this.townLook()), toast: text => this.showToast(text) });
@@ -514,6 +507,8 @@ export class ZoneScene extends Phaser.Scene {
     attachMigration(this.registry, clock);
     // The Projects' dawn (G-03): after the town's, before the Dawn Report, so the paper has last night's hours in.
     attachProjectsClock(this.registry, clock);
+    // The dreams' dawn (the Journal's Quests): after the Projects', before the dawn sync offers the morning's Favors.
+    attachQuestsClock(this.registry, clock);
     attachTelemetry(this.registry, clock);
     // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
     this.events.on('update', () => {
@@ -805,56 +800,16 @@ export class ZoneScene extends Phaser.Scene {
     };
     this.pillarStrip = new PillarStrip(this, x0, y0 + H + 6, W).onClick(() => openTownLedger(this, this.clock));
     this.mindDot = new MindStatusDot(this, x0 + W - 14, y0 + 14, y0 + H + 4);
-    return [bg, ...Object.values(this.hud), ...this.pillarStrip.objects, ...this.mindDot.objects, ...this.buildHintCard(x0, W)];
+    return [bg, ...Object.values(this.hud), ...this.pillarStrip.objects, ...this.mindDot.objects];
   }
 
-  // ── The Next hint (story/hint.ts) ──────────────────────────────────────────
+  // ── The closing toast (story/hint.ts); the objective line is quests/hud.ts ──
 
-  private buildHintCard(x: number, w: number): Phaser.GameObjects.GameObject[] {
-    const style = (size: number, color: string, italic = false): Phaser.Types.GameObjects.Text.TextStyle =>
-      ({ fontFamily: FAMILY_BODY, fontSize: `${size}px`, color, fontStyle: italic ? 'italic' : 'normal', resolution: RENDER_SCALE, wordWrap: { width: w - 28 } });
-    this.hintCard = {
-      bg: this.add.graphics(),
-      when: this.add.text(x + 14, 0, '', style(13, '#e4c77f')),
-      where: this.add.text(x + 14, 0, '', style(16, '#fff0ce')),
-      why: this.add.text(x + 14, 0, '', style(14, '#d9cfb4', true)),
-      x, w, shown: ''
-    };
-    const card = this.hintCard;
-    for (const o of [card.bg, card.when, card.where, card.why]) o.setVisible(false);
-    return [card.bg, card.when, card.where, card.why];
-  }
-
-  /** Lay the card out for a hint (only when its text changed) and show or hide it. */
-  private showHint(hint: StoryHint | null, visible: boolean): void {
-    const card = this.hintCard;
-    if (!card) return;
-    const on = visible && !!hint;
-    // Under the Pillar strip, or where it would be when P has hidden it.
-    const top = this.pillarStrip.visible ? 16 + 102 + 6 + 32 + 6 : 16 + 102 + 6;
-    const key = on ? `${hint!.text}|${top}` : '';
-    if (key !== card.shown) {
-      card.shown = key;
-      if (on) {
-        card.when.setText(`NEXT · ${hint!.when}`).setY(top + 9);
-        card.where.setText(hint!.where).setY(card.when.y + card.when.height + 2);
-        card.why.setText(hint!.reason).setY(card.where.y + card.where.height + 2);
-        const h = card.why.y + card.why.height + 9 - top;
-        card.bg.clear().fillStyle(0x28372d, 0.86).fillRoundedRect(card.x, top, card.w, h, 8)
-          .lineStyle(1.5, 0xe4c77f, 0.4).strokeRoundedRect(card.x, top, card.w, h, 8);
-      }
-    }
-    for (const o of [card.bg, card.when, card.where, card.why]) o.setVisible(on);
-  }
-
-  /** A few times a second: the hint for now, hidden under scenes, dialogue and menus; a toast as a window closes. */
+  /** A few times a second: a toast as an open scene's window is about to close, unless something covers the zone. */
   private refreshHint(): void {
     const covered = HINT_HIDDEN_UNDER.some(key => this.scene.isActive(key));
-    const hint = this.story.hint() ?? this.projects.hint();
-    // Standing there with the window open: the scene is about to start, nothing to point at.
-    const arrived = !!hint && hint.open && this.story.place() === hint.place;
-    this.showHint(hint, !covered && !this.transitioning && !arrived);
     if (covered || this.transitioning) return;
+    const hint = this.story.hint() ?? this.projects.hint();
     let warned = this.registry.get(WARNED_KEY) as Set<string> | undefined;
     if (!warned) { warned = new Set(); this.registry.set(WARNED_KEY, warned); }
     const toast = closingToast(hint, { day: this.clock.day, minute: this.clock.minute, place: this.story.place() }, warned);

@@ -995,6 +995,18 @@ can unlock Projects, shop reopenings or relationships). The model writes the req
 the template and target. The engine checks feasibility (items obtainable, resident Y exists and is
 Acquainted or Core, time window valid) and rejects or repairs it otherwise.
 
+**Dreams as side quests** (Kasey's playtest, 2026-10-18). A resident's dream (§9.3) is a side quest once
+the player learns it: when the resident, met, trusts the player as far as its first stage asks (else at
+Neighbor), when the story has already done one of its stages, and a `(hidden)` dream only when its first
+stage is done. Each stage's parenthetical is its engine condition (Regard, `needs flag.x`, a Project, Rook's
+fair Scuffles, a newcomer's archetype, `(Favor…)`); a flag the story sets is the story's to give, a flag
+nothing else sets is the dream's own and is set when the stage is done, and a stage with nothing to check is
+worked as a Favor (a `help_chore` at the resident's place, one per stage, at most three dream Favors open, the
+next asked the day after a stage). A stage done earns +5 Regard (a Favor's own reward instead), the last +15 in
+all; it goes in the Journal's Quests page, the next morning's Lantern notices, and the resident's
+`dream.stage` (§9.4) through a `dream_stage` client event. The client checks every condition, so it works in
+Quiet Mode too. Code: `client/src/quests/`, `shared/src/dreams.ts`.
+
 ### 9.10 Dialogue
 
 **Flow.**
@@ -1023,8 +1035,8 @@ Acquainted or Core, time window valid) and rejects or repairs it otherwise.
    (people have places to be), and it caps cost.
 
 **Player input.** By default the player chooses from **2–3 generated replies** plus *Leave*, each
-tagged with an intent (`kind`, `curious`, `joke`, `firm`, `ask_favor`, `about_riddle`, `campaign`) so
-the engine can apply skill checks (Heart, Wits) to some. The replies answer the lines just spoken
+tagged with an intent (`kind`, `curious`, `joke`, `firm`, `ask_favor`, `about_riddle`, `about_quest`,
+`campaign`) so the engine can apply skill checks (Heart, Wits) to some. The replies answer the lines just spoken
 (answer the question, react to the news, ask a follow-up), first person in the Fellow's voice,
 different in tone, at most one a goodbye; the validator keeps 2–3 distinct ones and pads a short turn
 with replies derived from the last line. The reply picked is the player's words in the next turn's
@@ -1084,6 +1096,19 @@ characters) is available and on by default. It passes a cheap moderation check f
   streetlamps, Market Hall, garden, bakery ovens, lighthouse and later Projects once their flags are set.
   With nothing changed there is no line. Blocks 1-3 never change with a flag this way. (An always-on
   clocktower line made residents pull the clock into unrelated answers: blind A/B eval, 2026-10-16.)
+- **Quest-aware key characters (playtest, 2026-10-18):** the key characters (the hand-written core cast
+  and the curated census cards) help the Fellow find the main story. Each turn the client reports the
+  HUD's Next hint (where, when, the hint's reason, and who it involves: the scene's cast or the Project's
+  leads) and this resident's own threads (a Favor they asked that the Fellow took on, a Project they lead
+  with the Ledger's next step, an unsolved Mark they can help with, never its title). Block 4 carries it
+  as one `<quest>` element, framed as background: every turn for a key character the objective involves
+  (in it, or at their workplace or home) or who has a thread of their own, and for anyone else only on a
+  turn where the Fellow asks what to do or where to go. Only the hint's own words reach the model, never
+  the cast list, a secret or a scene's lines. The opener or a lull may offer one quest topic card (the
+  beat they're in, their Project's next step, the Favor they're waiting on). The panel offers one authored
+  reply at most once a conversation, intent `about_quest` ("About the clocktower…" when the objective
+  involves them; "What should I be doing?" to any key character when nothing is waiting today), and the
+  turn's directive then asks for concrete directions from `<quest>` in the resident's own voice.
 - **Residents start things too:** `seek_player` intents make residents walk up and open a conversation.
   Reflections can write **letters** that arrive in the player's mailbox the next morning: thank-you
   notes, invitations (the engine creates the event), complaints, gossip.
@@ -1095,7 +1120,7 @@ characters) is available and on by default. It passes a cheap moderation check f
 | 1 | **World Bible** (setting, era rules, tone, rating rules, voice bible digest §12.1, anti-patterns, output contract). Identical for every world and resident. | ~2,500 | Per release | Breakpoint 1 (hit almost always, shared by all players) |
 | 2 | **Persona Card** (§9.3) with canon locks evaluated, plus the other residents' catchphrases never to borrow (§12.1 Monde rule 12, ~250 tokens) | ~1,000–1,500 | Rarely | Breakpoint 2 |
 | 3 | **Beliefs + relationship summary** (top 8 relationships as one-liners) | ~300–500 | Nightly | Breakpoint 3 |
-| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: `<player_said>` first, with one line saying what to do with it ("Respond to this first…"), then a compact scene and mood line, the player (with their pronouns and the words never to use, and what this resident calls them, §12.1 Monde rule 13), memories (retrieved on the Fellow's words and the line they answer), topics (opener or lull only), `<town_now>` (only what story flags have changed since the first day of spring, as background; absent when nothing has), Favors, secrets and hints. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
+| 4 | **Session history (cached) + per-turn context.** First user message: `<history_with_player>` (digest + last 6 summaries), frozen for the session. Earlier exchanges: verbatim player words as user turns and exact assistant JSON. Final user message: `<player_said>` first, with one line saying what to do with it ("Respond to this first…"), then a compact scene and mood line, the player (with their pronouns and the words never to use, and what this resident calls them, §12.1 Monde rule 13), memories (retrieved on the Fellow's words and the line they answer), topics (opener or lull only), `<town_now>` (only what story flags have changed since the first day of spring, as background; absent when nothing has), `<quest>` (the Fellow's objective and this resident's threads, for a key character it involves or when the Fellow asks; §9.10.1), Favors, secrets and hints. | History ≤ 150 + 6 × 60 words; live session ≤ 8 exchanges; dynamic context ~800–1,500 tokens | Earlier messages append only; final context changes every turn | Breakpoint 4 on the last earlier assistant turn (on history before the first exchange); final context uncached |
 
 Haiku 5.5's minimum cacheable prefix is 512 tokens, so every breakpoint above qualifies. Byte-stable
 serialization is mandatory (sorted keys, no timestamps in blocks 1–3), or caching silently stops working.
@@ -1159,7 +1184,7 @@ Verbatim database records remain for analytics but only the current session reac
 {
   "lines": [ { "text": "string ≤ 220 chars", "expr": "warm" } ],          // 1–3 lines
   "choices": [ { "id": "a", "text": "string ≤ 90 chars",
-                 "intent": "kind|curious|joke|firm|ask_favor|about_riddle|campaign|leave" } ], // 2–3
+                 "intent": "kind|curious|joke|firm|ask_favor|about_riddle|about_quest|campaign|leave" } ], // 2–3
   "effects": {
     "regard_delta": 0,                   // −5..5 (clamped; Heart skill widens to ±7)
     "mood": { "valence": 0, "stress": 0 },// each −10..10
@@ -1470,6 +1495,7 @@ OUTPUT: valid JSON matching the provided schema. Lines are speech only, with opt
 <memories> {top_8_memories} </memories>
 <topics_to_choose_from> {3 topic cards: on the opener or a lull only} </topics_to_choose_from>
 <already_discussed> {recent_topics} </already_discussed>
+<quest> {the Next hint and this resident's threads: only when it involves them or the Fellow asks} </quest>
 <open_favors> {…} </open_favors>
 <revealable_secrets> {only ids + text the engine allows now} </revealable_secrets>
 <hints allowed="{n}"> {only if the topic is a riddle} </hints>
@@ -10414,7 +10440,11 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
 ## 18. UI and UX
 
 - **HUD:** the clock with the day, weekday and weather; Stamina; coins; a small Pillar strip; the
-  Option Clause gauge when relevant (§6.5). It hides automatically when standing still.
+  Option Clause gauge when relevant (§6.5). It hides automatically when standing still. Under the clock, the
+  **objective line**: the scene to catch today (where, when, why, and "→ Market Row" when it's on another
+  board), or between beats something to do meanwhile with the next beat's day; hidden during scenes and menus,
+  and switched off from the Journal's Quests page. After S01c a one-time first-steps card says where to go next
+  and that the Quests page keeps track.
 - **Dawn Report:** a full-screen front page each morning, dismissed with one tap, re-readable in the
   Journal.
 - **Dialogue (VN panel):** a backdrop, the resident's portrait (left or right, one of six expressions
@@ -10424,7 +10454,8 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
   What the player says, picked or typed, shows first under a "You" plate with the resident dimmed,
   then stays as a one-line echo while the reply types in. A soft shimmer on the name plate means a
   line is generating. There's no spinner.
-- **Journal tabs:** Today (events, ferry, tides) · People (portrait book with Regard tier, likes they've
+- **Journal tabs:** Quests (the main story's next step and the last beats done, Projects under way, Favors
+  taken on, the dreams the player knows: §9.9) · Today (events, ferry, tides) · People (portrait book with Regard tier, likes they've
   told you, relationships you've learned, last seen) · Favors · Projects · Marks (riddles with
   inscriptions, typed-answer field and hints) · Map · Letters · Town Ledger (Pillars, Appeal split,
   census, housing, Fund) · Campaign (D70+).

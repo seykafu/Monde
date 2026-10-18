@@ -29,7 +29,7 @@ import type { OutgoingHttpHeaders } from "node:http";
 import type { FastifyInstance, FastifyReply } from "fastify";
 import { and, asc, eq, gte } from "drizzle-orm";
 import { z } from "zod";
-import { SUMMARY_TIMEOUT_MS, Intent, PlaceId, ResidentId, normalizeChoices, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
+import { SUMMARY_TIMEOUT_MS, Intent, PlaceId, ResidentId, TalkQuest, normalizeChoices, type DialogueTurnOutput, type TurnRegard } from "@monde/shared";
 import { aiLog, dialogueTurns, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { WALK_UP, buildDialogueRequest, promptVersion, speech } from "./promptBuilder.js";
@@ -76,6 +76,8 @@ export const TalkBody = z.object({
     weather: z.string().trim().min(1).max(40),
     current_activity: z.string().trim().min(1).max(120).nullish(),
     riddle: z.object({ id: z.string().min(1).max(16), hints_allowed: z.number().int().min(0).max(3) }).nullish(),
+    // The player's objective and this resident's threads (quest.ts). A malformed report is dropped, never a 400.
+    quest: TalkQuest.nullish().catch(null),
   }),
 });
 export type TalkBody = z.infer<typeof TalkBody>;

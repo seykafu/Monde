@@ -1,5 +1,5 @@
-import { feasibleFavor, restoreQuietFavor } from "./favorFeasibility.js";
-import { Favor, canCompleteFavor } from "@monde/shared";
+import { feasibleFavor, restoreDreamFavor, restoreQuietFavor } from "./favorFeasibility.js";
+import { Favor, canCompleteFavor, clampDreamStage, stageWords } from "@monde/shared";
 import { loadItems } from '../content/loadContent.js';
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray, gte, sql } from "drizzle-orm";
@@ -72,6 +72,7 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
     if (e.kind === "favor_choice") keys.push(JSON.stringify(["favor_choice", e.favor]));
     if (e.kind === "favor_done") keys.push(JSON.stringify(["favor", e.favor]));
     if (e.kind === 'gift') keys.push(JSON.stringify(['gift', e.resident, e.day]));
+    if (e.kind === 'dream_stage') keys.push(JSON.stringify(['dream_stage', e.resident, e.stage]));
     const receipts = await tx.select().from(processedClientEvents).where(and(eq(processedClientEvents.worldId, worldId), inArray(processedClientEvents.key, keys)));
     if (receipts.length) {
       // Remember a new id that aliases an already applied cue, too.
@@ -88,10 +89,12 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
     if ("resident" in e && !byId.has(e.resident)) reason = "unknown resident";
     if ("participants" in e && e.participants.some(id => id !== "player" && !byId.has(id))) reason = "unknown participant";
     if (e.kind === "flags" && e.revision <= world.flagsRevision) reason = "stale flags revision";
+    if (e.kind === "dream_stage" && !reason && e.stage > ((await cards()).get(e.resident)?.dream.stages.length ?? 0)) reason = "the dream has fewer stages";
     if (reason) { result.rejected.push({ id: e.id, reason }); continue; }
 
     if (e.kind === 'favor_choice') {
       await restoreQuietFavor(tx, worldId, e);
+      await restoreDreamFavor(tx, worldId, e);
       if (e.notice && e.notice.resident === e.resident && e.favor === `last_chance_${e.resident}_${e.notice.deadline}` && e.notice.deadline >= e.day && e.notice.deadline <= e.day + 2) {
         const existing = await tx.select().from(favors).where(eq(favors.worldId,worldId));
         const open = existing.filter(f => ['proposed','accepted'].includes(f.status) && f.expiresDay >= e.day);
@@ -166,6 +169,19 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
       row.state = { ...row.state, regard: applyScriptedRegard(row.state.regard, e.delta) };
       await tx.update(residents).set({ state: row.state, updatedAt: new Date() })
         .where(and(eq(residents.worldId, worldId), eq(residents.id, e.resident)));
+      result.accepted.push(e.id);
+    } else if (e.kind === "dream_stage") {
+      // The client checks the stage's conditions (client/src/quests/dreams.ts, Quiet Mode too); the server keeps the
+      // count for the prompt's dream stage (promptBuilder dreamStageText) and a memory of the help. Never lowers it.
+      const row = byId.get(e.resident)!, card = (await cards()).get(e.resident)!;
+      const stage = Math.max(row.state.dream.stage, clampDreamStage(e.stage, card.dream.stages.length));
+      row.state = { ...row.state, dream: { ...row.state.dream, stage } };
+      await tx.update(residents).set({ state: row.state, updatedAt: new Date() }).where(and(eq(residents.worldId, worldId), eq(residents.id, e.resident)));
+      const words = stageWords(card.dream.stages[e.stage - 1] ?? "");
+      // GDD-GAP: §9.6 gives no importance for dream progress; 5 sits between a gift (2) and a Project opening (6).
+      await tx.insert(memories).values({ worldId, id: randomUUID(), residentId: e.resident, day: e.day, minute: e.minute,
+        kind: "did", text: `The Fellow helped me a step nearer what I want: ${words}.`.slice(0, 200), who: ["player", e.resident],
+        wherePlace: card.home, importance: 5, valence: 1, sourceEvent: e.id });
       result.accepted.push(e.id);
     } else if (e.kind === "flags") {
       world.storyFlags = [...new Set(e.flags)].sort();

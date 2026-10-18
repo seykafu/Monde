@@ -89,7 +89,7 @@ const TOPIC_MEMORY_IMPORTANCE = 4;
 /** GDD-GAP: "recent" isn't defined for topic cards; the last 3 in-game days keeps them current. */
 const TOPIC_MEMORY_DAYS = 3;
 
-export type TopicSource = "memory" | "favor" | "event" | "dream" | "scene";
+export type TopicSource = "memory" | "quest" | "favor" | "event" | "dream" | "scene";
 
 export interface TopicInput {
   today: number;
@@ -105,6 +105,11 @@ export interface TopicInput {
   activity?: string | null;
   /** The resident's last 10 topics with the player (already discussed). */
   recentTopics: readonly string[];
+  /**
+   * One quest card for a key character (quest.ts questTopic): the beat they're in, their Project's next step, or the
+   * Favor the Fellow took on for them.
+   */
+  quest?: string | null;
 }
 
 interface Candidate { source: TopicSource; text: string; score: number }
@@ -115,6 +120,7 @@ const oneLine = (text: string): string => text.replace(/\s+/g, " ").trim();
  * GDD-GAP: §9.10 lists the sources (recent memories, unresolved feelings, open Favors, the day's events, the
  * dream) but not how they're scored. Heuristic, documented so it can be tuned:
  *   memory  importance (≥ 4) + 2 if from today, + 1 if yesterday              text: the memory
+ *   quest   8 (the story is waiting on the Fellow, or the resident's Project)  text: quest.ts questTopic
  *   favor   7 (the resident is waiting on it)                                 text: "your favor: …"
  *   event   importance, + 2 at this place, + 1 in this zone                   text: the event summary
  *   dream   3                                                                  text: "your dream: …"
@@ -130,6 +136,7 @@ export function topicCards(input: TopicInput): string[] {
       candidates.push({ source: "memory", text: oneLine(m.text), score: m.importance + (age === 0 ? 2 : age === 1 ? 1 : 0) });
     }
   }
+  if (input.quest) candidates.push({ source: "quest", text: oneLine(input.quest), score: 8 });
   for (const f of input.favors) candidates.push({ source: "favor", text: `your favor: ${oneLine(f.text)}`, score: 7 });
   for (const e of input.events) {
     const near = e.where === input.place ? 2 : zoneOf(e.where) === zoneOf(input.place) ? 1 : 0;
