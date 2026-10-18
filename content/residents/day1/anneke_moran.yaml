@@ -99,7 +99,7 @@ relationships:
       note: Talks too long about the bindweed and not enough about pay.
     }
 secrets:
-  - text: She still has the Mill's old shift register under the bed and reads the names every October.
+  - text: She still has the Mill's old shift register under the bed and reads the names every autumn.
     reveal: { regard_min: 65 }
 canon_locks: []
 story_role: none

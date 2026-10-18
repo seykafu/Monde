@@ -2140,7 +2140,7 @@ relationships:
   - { id: bertrand, affinity: 65, trust: 60, tag: old_friend, note: "Only he calls her Eddie, since Arthur. Wants him to see a doctor about his stairs and hasn't managed to say so." }
   - { id: frye, affinity: 50, trust: 70, tag: clerk, note: "Keeps the archive key and has never opened the Streetlight file. Wants him to keep not opening it." }
 secrets:
-  - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the clerk, keeps the key and has never opened that file."
+  - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the archivist, keeps the key and has never opened that file."
     reveal: { flag: option_known }
   - text: "A letter of resignation, dated the day before the Fellow arrived, is in her desk. Hiring the Fellow was her last try before she posted it."
     reveal: { regard_min: 60 }
@@ -4554,7 +4554,7 @@ N: Market Row first. It's a short street with long gaps in it.
 N: Nine shutters down, six up, and you count them without meaning to. A bakery window steamed from the inside. A general store with its crates out. A pub with a slate that says CIDER 2 and nothing else.
 PELL [neutral]: That's Fournier & Fille. You'll smell it before you see it. Rye's two coins, white's three. Buy the rye. She'll know if you don't.
 PELL [neutral]: Dunmore's. The Gull & Anchor. Café Liss. I'd walk on the left.
-N: The left is the side away from the bench outside the old ironmonger's. Two young men sit on it with their hands in their jackets, watching you pass with the patient interest of landlords.
+N: The left is the side away from the bench outside the shuttered chandlery. Two young men sit on it with their hands in their jackets, watching you pass with the patient interest of landlords.
 N: Pell talks a little faster until the bench is behind you.
 N: Bastien follows two paces behind, then sits down on the bakery step.
 {set: saw_tollmen_idle}
@@ -5595,7 +5595,7 @@ PLAYER: Eighty-one of a hundred and three still light. Pell counts them at dusk.
 SABLE [neutral]: Eighty-one lamps on a Fund that can't carry forty. Somebody's paying. For three weeks I thought it was Pell. Private money. A friend with a full purse.
 SABLE [angry]: I was wrong. It's worse.
 N: She wipes both hands properly this time, takes a folder from under the stone, and lays it on the desk like something that might wake.
-SABLE [neutral]: Council archive, basement, bottom drawer. The clerk retired in spring and nobody locked the cabinet. The label says STREETLIGHT CONTRACT. It is a streetlight contract, for eight pages. Then it's page nine.
+SABLE [neutral]: Council archive, basement, bottom drawer. The lock on that drawer gave out years ago. Frye still keeps the key. The label says STREETLIGHT CONTRACT. It is a streetlight contract, for eight pages. Then it's page nine.
 N: A typed sheet, foxed at the edges and signed in two hands. One is E. Pell, Mayor, in blue ink, careful, slightly slanting. The other is a long, confident S. Vane.
 SABLE [neutral]: (reads, flat and fast) "Should the census of the Municipality fall below two hundred persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
 SABLE [neutral]: Forty thousand coins, twelve years ago. The lamps stayed lit. And a coin a metre.
@@ -6504,7 +6504,7 @@ N: Nettie, on her ledge, watches you all the way to the wall. Bru raises the wre
 - **Kasimir** patched a house for the first arrival, over a Sunday, for nothing. The fountain Project is tracked on a chalked plank with columns FUND, PARTS, HANDS, VALVES.
 - **Vane** drives a long grey car; the retainer is a LETTER OF ENGAGEMENT whose first line reads "Advisory services concerning the development potential of the Wharf" and whose second page is longer than the first.
 - **Ines** writes in a small notebook, lives on the second floor of the Gull & Anchor (card) and offers to "minute" anything for the Fellow. She calls June "Miss Castellanos".
-- **Sable** put a typed note under Pell's door: "I have page nine. Three days. S.M." She found the loan under "STREETLIGHT CONTRACT" in the council archive basement; the clerk retired in spring and nobody locked the cabinet. The loan runs to eight pages before page nine.
+- **Sable** put a typed note under Pell's door: "I have page nine. Three days. S.M." She found the loan under "STREETLIGHT CONTRACT" in the council archive basement; the drawer's lock gave out years ago (Frye only ever kept the key) and nobody locked the cabinet. The loan runs to eight pages before page nine.
 - **Hollis** keeps a log with a line per day: "Service: none". On D30 he writes "Visitor: one" for the first time. The Branch Board wants a platform, a working signal and "forty on the morning train".
 - **Bloom Fair** details: the council's heritage ribbon has been cut eleven years running (the same ribbon); Tib's riddle trail has twelve clues and eleven jam sandwiches; Teo plants Vane's tulips by the duck pond if asked; headcounts 31 / 73 / 190 by Spirit band; Kasimir's flatbed becomes June's stage.
 - **Tollmen detail:** Rook calls a one-day truce on D25 (he stands by the Old Elm, buys nothing and leaves before the last song).
@@ -10191,7 +10191,7 @@ river line up across them:
   shop, the Constabulary), Fountain Square south of it with houses on Heron Lane and the empty terrace on Bell
   Row either side, the Briar road south past the green and well, and Lamplighter Lane, its cottage last on the
   left; Well Row mirrors it west of the road, along the top of the green. *Market Row:* Café Liss, the Gull &
-  Anchor, the old ironmonger's, Dunmore's and Fournier & Fille on
+  Anchor, the shuttered Amsel & Daughter chandlery, Dunmore's and Fournier & Fille on
   the north side, the Market Hall on the Cross with the public scale by its steps, five empty shops east of
   it; the market's stalls on the flags south of the street, Lower Row behind them (three more empty shops),
   the back alley behind the north side, Cross Green, the carters' yard and the allotments by the river.

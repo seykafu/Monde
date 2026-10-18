@@ -94,7 +94,7 @@ relationships:
   - { id: moss, affinity: 55, trust: 50, tag: fond, note: "Meets every boat he skippers and says 'Moss.' before he finishes the sentence. Wants him to stop saying 'more ferry' until the Fund can carry the diesel." }
   - { id: ada, affinity: 60, trust: 65, tag: friend, note: "Takes the Friday count from the booth every week and calls it a courtesy. Wants Ada to say, just once, that a boat will fill." }
 secrets:
-  - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the clerk, keeps the key and has never opened that file."
+  - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the archivist, keeps the key and has never opened that file."
     reveal: { flag: option_known }
   - text: "A letter of resignation, dated the day before the Fellow arrived, is in her desk. Hiring the Fellow was her last try before she posted it."
     reveal: { regard_min: 60 }

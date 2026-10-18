@@ -438,6 +438,10 @@ export function cardProblems(card: PersonaCard, opts: { canonName?: boolean; hou
   }
   if (card.secrets.length > 2) out.push("V15 secrets: at most 2");
   for (const s of card.secrets) {
+    // The named canon people's secrets are the town's affairs by design (§12.4: Barney's Saturday "sundries", Frye's
+    // key), and like the hand-written cast's they may open on a story flag or a day instead of Regard (Kasey,
+    // 2026-10-18). Everyone else keeps A.3.7's V15.
+    if (opts.canonName) continue;
     const min = s.reveal.regard_min;
     if (min === undefined || min < 40 || min > 80) out.push("V15 secrets: regard_min 40-80");
     if (SECRET_TOPICS.test(s.text)) out.push(`V15 a secret touches the town's affairs: "${s.text.slice(0, 40)}…"`);

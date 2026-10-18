@@ -16,7 +16,7 @@ N: Market Row first. It's a short street with long gaps in it.
 N: Nine shutters down, six up, and you count them without meaning to. A bakery window steamed from the inside. A general store with its crates out. A pub with a slate that says CIDER 2 and nothing else.
 PELL [neutral]: That's Fournier & Fille. You'll smell it before you see it. Rye's two coins, white's three. Buy the rye. She'll know if you don't.
 PELL [neutral]: Dunmore's. The Gull & Anchor. Café Liss. I'd walk on the left.
-N: The left is the side away from the bench outside the old ironmonger's. Two young men sit on it with their hands in their jackets, watching you pass with the patient interest of landlords.
+N: The left is the side away from the bench outside the shuttered chandlery. Two young men sit on it with their hands in their jackets, watching you pass with the patient interest of landlords.
 N: Pell talks a little faster until the bench is behind you.
 N: Bastien follows two paces behind, then sits down on the bakery step.
 {set: saw_tollmen_idle}

@@ -92,7 +92,7 @@ households:
       - { person: dom }
       - { slot: { note: "The twins' cousin (A.1.2); not one of the Tollmen (A.1.5 names the five)." } }
   # §12.4 put Weasel at the hideout; A.1.3: "each has a bed on paper elsewhere". D4: a flat over a Market Row storefront,
-  # No. 6, the old ironmonger's with the Tollmen's bench outside, where he hears everything on Market Row.
+  # No. 6, the shuttered Amsel & Daughter chandlery with the Tollmen's bench outside, where he hears everything on Market Row.
   - { id: pike, type: G, zone: market_row, home: market_row.home_13, surname: Pike, members: [{ person: weasel }] }
   # §12.4: old_quarter.st_brigids. D4: she is A.1.4's sexton.
   - { id: cobb, type: A, zone: old_quarter, home: old_quarter.st_brigids, surname: Cobb, members: [{ person: cobb }] }

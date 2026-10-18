@@ -29,7 +29,7 @@ PLAYER: Eighty-one of a hundred and three still light. Pell counts them at dusk.
 SABLE [neutral]: Eighty-one lamps on a Fund that can't carry forty. Somebody's paying. For three weeks I thought it was Pell. Private money. A friend with a full purse.
 SABLE [angry]: I was wrong. It's worse.
 N: She wipes both hands properly this time, takes a folder from under the stone, and lays it on the desk like something that might wake.
-SABLE [neutral]: Council archive, basement, bottom drawer. The clerk retired in spring and nobody locked the cabinet. The label says STREETLIGHT CONTRACT. It is a streetlight contract, for eight pages. Then it's page nine.
+SABLE [neutral]: Council archive, basement, bottom drawer. The lock on that drawer gave out years ago. Frye still keeps the key. The label says STREETLIGHT CONTRACT. It is a streetlight contract, for eight pages. Then it's page nine.
 N: A typed sheet, foxed at the edges and signed in two hands. One is E. Pell, Mayor, in blue ink, careful, slightly slanting. The other is a long, confident S. Vane.
 SABLE [neutral]: (reads, flat and fast) "Should the census of the Municipality fall below two hundred persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
 SABLE [neutral]: Forty thousand coins, twelve years ago. The lamps stayed lit. And a coin a metre.

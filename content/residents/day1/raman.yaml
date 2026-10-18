@@ -81,7 +81,7 @@ routine:
 chores: [ mend the back gate, wind the kitchen clock, take in the washing before rain, check every bulb in the house ]
 relationships:
   - { id: priya, affinity: 85, trust: 70, tag: kin, note: "His daughter, whom he loves and tries not to need. Wants her to go to a ward with a doctor in it and a door of her own." }
-  - { id: kasimir, affinity: 35, trust: 45, tag: friend, note: "Fixed the porch step in March and has found three more things to fix since. Raman puts the kettle on and thinks it is the house." }
+  - { id: kasimir, affinity: 35, trust: 45, tag: friend, note: "Fixed the porch step last winter and has found three more things to fix since. Raman puts the kettle on and thinks it is the house." }
   - { id: einar_chalmers, affinity: 20, trust: 25, tag: friend, note: "Neighbour on Weir Road who lends him books and tea and says the mill will reopen. Wants one conversation that does not end there." }
   - { id: ilona, affinity: 40, trust: 45, tag: friend, note: "Sits beside him on the laundry green at half past four and tells him what the post used to bring. Wants to be asked to her Thursday table, and not to be the one who asks." }
   - { id: delphine, affinity: 30, trust: 40, tag: fond, note: "He wired the looms she ran for twenty-three years. Wants an excuse to carry her a bulb for the sewing lamp." }
@@ -92,7 +92,7 @@ secrets:
     reveal: { regard_min: 70 }
 canon_locks:
   - { while: "true", fact: "Raman is Priya's father, a retired mill electrician and a widower. He had a stroke on the weir path eight months ago and has walked it alone for months since, hiding it so Priya will stop fussing. He wants her to go." }
-  - { while: "true", fact: "Kasimir fixed Raman's porch step in March and has found three more reasons to call at the house." }
+  - { while: "true", fact: "Kasimir fixed Raman's porch step last winter and has found three more reasons to call at the house." }
 story_role: "Priya's father and the reason she is home. His hidden weir walks are what keep Priya fussing, and what could let her go."
 generated_by: model
 curated: true
