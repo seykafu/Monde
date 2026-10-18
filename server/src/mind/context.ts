@@ -44,6 +44,8 @@ export interface ResidentPrefix {
   flags: string[];
   /** Display names by resident id (stable: from the cards). */
   names: Record<string, string>;
+  /** Pronouns by resident id (from the cards). Block 4 only: the quest line names who's waiting (quest.ts). */
+  pronouns?: Record<string, string>;
   /** Every resident's tics, sorted by id (stable: from the cards), for voice ownership (voice.ts). */
   voices: RosterVoice[];
 }
@@ -63,15 +65,18 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
     db.select().from(relationships).where(and(eq(relationships.worldId, worldId), eq(relationships.fromId, residentId))),
     db.select({
       id: residents.id, name: sql<string>`${residents.card}->>'name'`, kind: sql<string>`${residents.card}->>'kind'`,
+      pronouns: sql<string | null>`${residents.card}->>'pronouns'`,
       tics: sql<unknown>`${residents.card}->'voice'->'tics'`,
       // A curated census card (hand-finished) owns its catchphrases like a hand-written one.
       generated: sql<string | null>`case when ${residents.card}->>'curated' = 'true' then null else ${residents.card}->>'generated_by' end`,
     }).from(residents).where(eq(residents.worldId, worldId)),
   ]);
   const names: Record<string, string> = {};
+  const pronouns: Record<string, string> = {};
   const voices: RosterVoice[] = [];
   for (const r of [...everyone].sort((a, b) => (a.id < b.id ? -1 : 1))) {
     names[r.id] = r.name;
+    if (r.pronouns) pronouns[r.id] = r.pronouns;
     const tics = Array.isArray(r.tics) ? r.tics.filter((t): t is string => typeof t === "string") : [];
     voices.push({ id: r.id, kind: r.kind as RosterVoice["kind"], tics, ...(r.generated ? { generated: true } : {}) });
   }
@@ -84,6 +89,7 @@ export async function loadResidentPrefix(db: WorldDatabase, worldId: string, res
     })),
     flags: worldRows[0]?.flags ?? [],
     names,
+    pronouns,
     voices,
   };
 }
@@ -235,6 +241,7 @@ export async function loadDialogueContext(db: WorldDatabase, args: DialogueConte
         relationships: prefix.relationships,
         flags: prefix.flags,
         names: prefix.names,
+        pronouns: prefix.pronouns,
         voices: prefix.voices,
         scene: { day: scene.day, weekday: weekdayOf(scene.day), minute: scene.minute, place: scene.place, weather: scene.weather },
         doing: scene.current_activity ?? null,

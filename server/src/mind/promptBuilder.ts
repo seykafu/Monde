@@ -560,6 +560,8 @@ export interface DialogueInput {
    * ever carries any of it, and only for a resident it involves or when the Fellow asks what to do.
    */
   quest?: TalkQuest | null;
+  /** Pronouns by resident id, for the people the quest line names (block 4 only; blocks 1-3 never read it). */
+  pronouns?: Readonly<Record<string, string>>;
   /**
    * They have talked before, for how the resident addresses the Fellow (naming.ts). Defaults to: there is a history
    * with the Fellow, or this conversation was resumed.
@@ -608,10 +610,15 @@ export const FOCUS_DIRECTIVES: Readonly<Record<TurnFocus, string>> = {
  * The `<quest>` element for block 4 (quest.ts decides the lines), or "" (the template drops the line). Client text,
  * so every line is escaped; it sits with the other background, below the Fellow's words and the memories.
  */
-export function questBlock(quest: TalkQuest | null | undefined, card: PersonaCard, focus: TurnFocus, playerSaid: string): string {
+export function questBlock(
+  quest: TalkQuest | null | undefined, card: PersonaCard, focus: TurnFocus, playerSaid: string,
+  where: { place?: string; names?: Readonly<Record<string, string>>; pronouns?: Readonly<Record<string, string>> } = {},
+): string {
   // The Fellow's own words: a reply they typed or picked, or a lull. Never the walk-up or the engine's gift line.
   const asked = (focus === "reply" || focus === "lull") && asksWhatToDo(playerSaid);
-  const lines = questLines(quest, card, { asked, intent: focus === "quest" });
+  const here = !!where.place && where.place === quest?.objective?.place;
+  const person = (id: string) => where.names?.[id] && where.pronouns?.[id] ? { name: where.names[id]!, pronouns: where.pronouns[id]! } : null;
+  const lines = questLines(quest, card, { asked, intent: focus === "quest", here, person });
   return lines.length
     ? `<quest> From the Fellow's Journal (background: use it to help them; never add to it):\n${bullets(lines.map(speech), "")}\n</quest>`
     : "";
@@ -676,7 +683,7 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     player_name: playerName,
     player_pronouns: speech(pronounNote(player.pronouns)),
     town_now: trusted(townNowBlock(flags)),
-    quest: trusted(questBlock(input.quest, card, focus, input.playerSaid)),
+    quest: trusted(questBlock(input.quest, card, focus, input.playerSaid, { place: scene.place, names: input.names, pronouns: input.pronouns })),
     regard_tier: regardTier(state.regard),
     player_background: clause(player.background),
     address: address.line,

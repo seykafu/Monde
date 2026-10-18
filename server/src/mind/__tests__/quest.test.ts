@@ -95,8 +95,11 @@ describe("who hears the objective", () => {
   const none = { asked: false, intent: false };
 
   it("keeps it for a key character the objective involves: in the cast, or at their workplace or home", () => {
-    expect(questLines(S07A_BERTRAND, card("bertrand"), none).join("\n")).toContain("The Fellow is expected this afternoon (16:00–17:45) at Clocktower.");
-    expect(questLines(DAY1, card("pell"), none)[0]).toContain('Their Journal says: "Pell is waiting." If they seem unsure what to do');
+    expect(questLines(S07A_BERTRAND, card("bertrand"), none).join("\n")).toContain("The Fellow is expected this afternoon (16:00–17:45) at Clocktower, and you're one of the people expecting them there.");
+    // The one they're meeting hears it as their own appointment (live check 2026-10-18: Pell sent the Fellow to "Pell's office").
+    expect(questLines(DAY1, card("pell"), none)[0]).toContain('Their Journal says: "Pell is waiting." (that\'s you) If they seem unsure what to do, tell them where and when to find you');
+    expect(questLines(DAY1, card("pell"), { asked: true, intent: false, here: true })[0]).toBe(
+      'The Fellow is expected here now (until 11:30), and you\'re one of the people expecting them. Their Journal says: "Pell is waiting." (that\'s you) They\'re asking what to do: tell them, in your own words, that they\'ve found the right place and you.');
     const bakery: TalkQuest = { objective: { id: "s03_tolls", place: "market_row.bakery", where: "Fournier & Fille", when: "this morning (10:00–14:00)", reason: "The Tollmen are paying the bakery an early call.", people: ["rook"] }, threads: [] };
     expect(questLines(bakery, card("odile"), none)[0]).toContain("That's your workplace.");
   });
@@ -142,7 +145,7 @@ describe("the <quest> element in block 4", () => {
     const req = buildDialogueRequest(input(bertrand, { quest: S07A_BERTRAND, flags: ["clock_chimed"] }));
     const text = userText(req);
     const quest = questSection(text)!;
-    expect(quest).toContain("The Fellow is expected this afternoon (16:00–17:45) at Clocktower.");
+    expect(quest).toContain("The Fellow is expected here this afternoon (16:00–17:45), and you're one of the people expecting them.");
     expect(quest).toContain("Your Project, the clocktower. What it needs next:");
     expect(text.indexOf("<town_now>")).toBeGreaterThan(-1);
     expect(text.indexOf("<quest>")).toBeGreaterThan(text.indexOf("<town_now>"));
@@ -175,7 +178,7 @@ describe("the <quest> element in block 4", () => {
     expect(questSection(userText(buildDialogueRequest(input(odile, { quest: S07A, playerSaid: "Where should I go next?" }))))).toContain("They're asking what to do");
     const picked = userText(buildDialogueRequest(input(odile, { quest: S07A, playerSaid: "What should I be doing?", focus: "quest" })));
     expect(picked.split("\n")[1]).toBe(FOCUS_DIRECTIVES.quest);
-    expect(questSection(picked)).toContain("at Clocktower");
+    expect(questSection(picked)).toContain("They're asking what to do: tell them they're in the right place");
     // The walk-up never counts as asking, and a typed question still gets the ordinary reply directive.
     expect(questSection(userText(buildDialogueRequest(input(odile, { quest: S07A, playerSaid: WALK_UP, focus: "open" }))))).toBeNull();
     expect(userText(buildDialogueRequest(input(odile, { quest: S07A, playerSaid: "What should I do?" }))).split("\n")[1]).toBe(FOCUS_DIRECTIVES.reply);
@@ -208,6 +211,15 @@ describe("the <quest> element in block 4", () => {
     // The whole turn for an uninvolved resident who didn't ask carries none of it.
     const odile = userText(buildDialogueRequest(input(card("odile"), { quest: { ...S07A, threads: [{ kind: "mark" }] } })));
     expect(odile).not.toContain("Clocktower");
+  });
+
+  it("names the pronouns of the people the Journal names, and never the rest of the cast", () => {
+    const june = { ...card("june"), workplace: "old_quarter.cafe_liss", home: "old_quarter.june_room" } as PersonaCard;
+    const block = questBlock(DAY1, june, "reply", "What should I do now?", {
+      place: "market_row.bakery", names: { pell: "Edwina Pell", bertrand: "Bertrand Achterberg" }, pronouns: { pell: "she/her", bertrand: "he/him" },
+    });
+    expect(block).toContain('at Fountain Square, Old Quarter. Their Journal says: "Pell is waiting." (Pell: she/her) They\'re asking what to do: point them there');
+    expect(block).not.toContain("Bertrand");
   });
 
   it("escapes client text: nothing can close the element or open a tag", () => {

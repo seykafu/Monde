@@ -20,7 +20,7 @@
  */
 import { questInvolvement, type PersonaCard, type QuestObjective, type TalkQuest } from "@monde/shared";
 
-type QuestCard = Pick<PersonaCard, "id" | "kind" | "home" | "workplace" | "generated_by" | "curated">;
+type QuestCard = Pick<PersonaCard, "id" | "kind" | "home" | "workplace" | "generated_by" | "curated"> & Partial<Pick<PersonaCard, "name">>;
 
 // ---------------------------------------------------------------------------------------------------------------
 // Did the Fellow ask what to do?
@@ -75,6 +75,31 @@ export interface QuestAsk {
   asked: boolean;
   /** The Fellow picked an about_quest reply (focus "quest"). */
   intent: boolean;
+  /** The conversation is at the objective's place. */
+  here?: boolean;
+  /** A resident's display name and pronouns, so the line can say who's waiting without a guessed "he". */
+  person?: (id: string) => { name: string; pronouns: string } | null;
+}
+
+/**
+ * "(Pell: she/her)" for each of the objective's people the Journal's words name. Only people already named: the
+ * cast list itself stays with the client (a scene's cast can be a surprise). Live check 2026-10-18: June sent the
+ * Fellow to "Mayor Pell … before he starts counting the lamps".
+ */
+function whoNote(objective: QuestObjective, ask: QuestAsk): string {
+  const said = `${objective.reason} ${objective.where}`;
+  const notes = objective.people.flatMap((id) => {
+    const p = ask.person?.(id);
+    const word = p && nameIn(p.name, said);
+    return p && word ? [`${word}: ${p.pronouns}`] : [];
+  });
+  return notes.length ? ` (${notes.join("; ")})` : "";
+}
+
+/** The word of a display name ("Edwina Pell", 'Marguerite "Margo" Liang') that `text` uses, whole word; or null. */
+function nameIn(name: string, text: string): string | null {
+  const escape = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return name.replace(/["“”]/g, " ").split(/\s+/).find((w) => w.length >= 3 && new RegExp(`\\b${escape(w)}\\b`).test(text)) ?? null;
 }
 
 const sentence = (text: string): string => {
@@ -83,13 +108,30 @@ const sentence = (text: string): string => {
 };
 
 /** What the Fellow's Journal says they could do next, as one line for this resident. */
-function objectiveLine(objective: QuestObjective, place: ReturnType<typeof questInvolvement>, ask: QuestAsk): string {
-  const at = `The Fellow is expected ${objective.when} at ${objective.where}. Their Journal says: "${sentence(objective.reason)}"`;
+function objectiveLine(objective: QuestObjective, place: ReturnType<typeof questInvolvement>, ask: QuestAsk, card: QuestCard): string {
+  const asking = ask.asked || ask.intent;
+  // One of the people the Fellow is meeting hears it as their own appointment: the Journal's "Pell is waiting." read to
+  // Pell made her talk about herself in the third person and send the Fellow off to her office (live check 2026-10-18).
+  if (place === "cast") {
+    const you = card.name && nameIn(card.name, objective.reason) ? " (that's you)" : "";
+    const journal = ` Their Journal says: "${sentence(objective.reason)}"${you}`;
+    if (ask.here) {
+      return `The Fellow is expected here ${objective.when}, and you're one of the people expecting them.${journal}${asking
+        ? " They're asking what to do: tell them, in your own words, that they've found the right place and you."
+        : ""}`;
+    }
+    return `The Fellow is expected ${objective.when} at ${objective.where}, and you're one of the people expecting them there.${journal}${asking
+      ? " They're asking what to do: tell them, in your own words, where and when to find you."
+      : " If they seem unsure what to do, tell them where and when to find you, in your own words."}`;
+  }
+  const at = ask.here
+    ? `The Fellow is expected here ${objective.when}. Their Journal says: "${sentence(objective.reason)}"`
+    : `The Fellow is expected ${objective.when} at ${objective.where}. Their Journal says: "${sentence(objective.reason)}"`;
   const yours = place === "workplace" ? " That's your workplace." : place === "home" ? " That's your home." : "";
-  const use = ask.asked || ask.intent
-    ? " They're asking what to do: point them there in your own words."
-    : " If they seem unsure what to do, point them there in your own words.";
-  return `${at}${yours}${use}`;
+  const use = asking
+    ? ` They're asking what to do: ${ask.here ? "tell them they're in the right place" : "point them there"} in your own words.`
+    : ` If they seem unsure what to do, ${ask.here ? "tell them they're in the right place" : "point them there"} in your own words.`;
+  return `${at}${whoNote(objective, ask)}${yours}${use}`;
 }
 
 /**
@@ -105,7 +147,7 @@ export function questLines(quest: TalkQuest | null | undefined, card: QuestCard,
   const own = threads.some((t) => t.kind === "favor" || t.kind === "project");
   if (!place && !asking && !own) return [];
   const lines: string[] = [];
-  if (objective && (place || asking)) lines.push(objectiveLine(objective, place, ask));
+  if (objective && (place || asking)) lines.push(objectiveLine(objective, place, ask, card));
   else if (!objective && asking) {
     lines.push("Nothing in particular is expected of the Fellow for the rest of today. Suggest something ordinary from your own day or the town; don't invent an event.");
   }
