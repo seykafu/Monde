@@ -95,7 +95,39 @@
   "surprised",
   "worried"
  ],
+ "lib_a15_045": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_a15_046": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_a28_008": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_a28_055": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_a28_056": [
   "neutral",
   "warm",
   "sad",
@@ -111,7 +143,39 @@
   "surprised",
   "worried"
  ],
+ "lib_a41_087": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_a41_088": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_a67_034": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_a67_107": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_a67_108": [
   "neutral",
   "warm",
   "sad",
@@ -127,7 +191,39 @@
   "surprised",
   "worried"
  ],
+ "lib_f05_041": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f05_042": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f12_018": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f12_075": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f12_076": [
   "neutral",
   "warm",
   "sad",
@@ -143,6 +239,22 @@
   "surprised",
   "worried"
  ],
+ "lib_f24_047": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f24_048": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f27_021": [
   "neutral",
   "warm",
@@ -151,7 +263,39 @@
   "surprised",
   "worried"
  ],
+ "lib_f27_081": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f27_082": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f30_022": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f30_083": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f30_084": [
   "neutral",
   "warm",
   "sad",
@@ -191,6 +335,22 @@
   "surprised",
   "worried"
  ],
+ "lib_f39_085": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f39_086": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f42_009": [
   "neutral",
   "warm",
@@ -223,7 +383,39 @@
   "surprised",
   "worried"
  ],
+ "lib_f45_091": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f45_092": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f48_027": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f48_093": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f48_094": [
   "neutral",
   "warm",
   "sad",
@@ -263,7 +455,39 @@
   "surprised",
   "worried"
  ],
+ "lib_f56_099": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f56_100": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f62_032": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f62_103": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f62_104": [
   "neutral",
   "warm",
   "sad",
@@ -303,7 +527,39 @@
   "surprised",
   "worried"
  ],
+ "lib_f70_109": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f70_110": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f73_037": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f73_113": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f73_114": [
   "neutral",
   "warm",
   "sad",
@@ -319,7 +575,39 @@
   "surprised",
   "worried"
  ],
+ "lib_f76_069": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f76_070": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_f84_039": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f84_117": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_f84_118": [
   "neutral",
   "warm",
   "sad",
@@ -335,7 +623,39 @@
   "surprised",
   "worried"
  ],
+ "lib_m03_073": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m03_074": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m09_002": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m09_043": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m09_044": [
   "neutral",
   "warm",
   "sad",
@@ -351,7 +671,39 @@
   "surprised",
   "worried"
  ],
+ "lib_m16_077": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m16_078": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m22_020": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m22_079": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m22_080": [
   "neutral",
   "warm",
   "sad",
@@ -447,6 +799,14 @@
   "surprised",
   "worried"
  ],
+ "lib_m44_090": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m47_010": [
   "neutral",
   "warm",
@@ -479,7 +839,39 @@
   "surprised",
   "worried"
  ],
+ "lib_m50_095": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m50_096": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m53_029": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m53_097": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m53_098": [
   "neutral",
   "warm",
   "sad",
@@ -495,7 +887,39 @@
   "surprised",
   "worried"
  ],
+ "lib_m58_101": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m58_102": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m64_033": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m64_105": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m64_106": [
   "neutral",
   "warm",
   "sad",
@@ -511,7 +935,39 @@
   "surprised",
   "worried"
  ],
+ "lib_m66_071": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m66_072": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m71_036": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m71_111": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m71_112": [
   "neutral",
   "warm",
   "sad",
@@ -527,6 +983,22 @@
   "surprised",
   "worried"
  ],
+ "lib_m72_067": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m72_068": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m74_038": [
   "neutral",
   "warm",
@@ -535,7 +1007,39 @@
   "surprised",
   "worried"
  ],
+ "lib_m74_115": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m74_116": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "lib_m86_040": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m86_119": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "lib_m86_120": [
   "neutral",
   "warm",
   "sad",
