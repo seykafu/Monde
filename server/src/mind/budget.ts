@@ -6,6 +6,9 @@ import type { Config } from '../config.js';
 import { MindUnavailableError, MindStreamError, tokensOf, type MindClient } from './mindClient.js';
 import { costUsd } from './pricing.js';
 
+/** What an Ambient resident keeps doing past 100% of the world's day budget (§9.15): being talked to. */
+const AMBIENT_TALK: ReadonlySet<string> = new Set(['dialogue', 'precheck']);
+
 export class BudgetError extends MindUnavailableError { override name = 'BudgetError'; }
 const limits = new WeakMap<object, { world: number; global: number }>();
 export function configureBudget(db: WorldDatabase, config: Config): void {
@@ -94,7 +97,10 @@ export function budgetMind(db: WorldDatabase, mind: MindClient, worldId: string,
     const coreDialogue = resident?.tier === 'core' && (kind === 'dialogue' || kind === 'precheck');
     if (global + reserve > cap.global
       || (!coreDialogue && spend >= cap.world * 2)
-      || (resident?.tier === 'ambient' && spend >= cap.world)
+      // §9.15: past 100% Ambient *work* pauses (plans, reflections, encounters, summaries, and the optional prewarm);
+      // talking to them goes on until 200%, when only Core dialogue does. (Playtest 2026-10-18: Ambient residents fell
+      // to written lines at 100%, half the budget the GDD gives their conversations.)
+      || (resident?.tier === 'ambient' && !AMBIENT_TALK.has(kind) && spend >= cap.world)
       || (resident?.tier === 'acquainted' && kind === 'plan' && spend >= cap.world * 1.5)) throw new BudgetError('budget');
     return { worldId, day, kind };
   });

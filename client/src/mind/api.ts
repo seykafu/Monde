@@ -343,7 +343,9 @@ export class MindClient {
     try {
       const res = await this.authed('/prewarm', { method: 'POST', body: JSON.stringify(day ? { resident_id: residentId, day } : { resident_id: residentId }) }, REQUEST_TIMEOUT_MS);
       if (res && !res.ok) this.log('warn', `prewarm ${residentId}: HTTP ${res.status}`);
-      if (res?.ok) { const data = await res.json() as { reason?: string }; if (data.reason === 'budget') this.budgetQuiet = true; }
+      // A prewarm refused for budget (§9.15: past 100% an Ambient resident isn't prewarmed) says nothing about talking to
+      // them, which goes on to 200%: only a refused turn puts the town in Quiet Mode.
+      if (res?.ok) await res.json().catch(() => undefined);
       else if (res) await res.body?.cancel().catch(() => undefined);
     } catch (error) {
       this.log('info', `prewarm ${residentId} failed`, error);

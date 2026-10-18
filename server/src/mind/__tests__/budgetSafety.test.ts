@@ -148,3 +148,23 @@ it('leaves hard feelings to the resident: a model-only self_harm verdict passes,
   expect(safetyLine('self_harm', 'x', 'priya')).not.toContain('find Priya');
   expect(safetyLine('self_harm', 'x', 'odile')).toMatch(/Priya/);
 });
+
+it('lets Ambient residents keep talking between 100% and 200% of the day budget, but not prewarm or plan (§9.15)', async () => {
+  const w = await world(), mind = new FakeMind();
+  configureBudget(database.db, parseConfig({}));
+  // 110% of the $0.06 world budget.
+  await database.db.update(worlds).set({ aiSpendUsd: '0.066', aiSpendDay: 1 }).where(eq(worlds.id, w.id));
+  await database.db.update(residents).set({ tier: 'ambient' }).where(eq(residents.worldId, w.id));
+  const params = { model: 'claude-haiku-5-5', max_tokens: 0, messages: [{ role: 'user' as const, content: 'test' }] };
+  await budgetMind(database.db, mind, w.id, 'pell', 'precheck').createMessage(params);
+  await budgetMind(database.db, mind, w.id, 'pell', 'dialogue').createMessage(params);
+  await expect(budgetMind(database.db, mind, w.id, 'pell', 'prewarm').createMessage(params)).rejects.toThrow('budget');
+  await expect(budgetMind(database.db, mind, w.id, 'pell', 'plan').createMessage(params)).rejects.toThrow('budget');
+  expect(mind.creates).toHaveLength(2);
+  // Past 200%, their conversations stop too (only Core dialogue goes on).
+  await database.db.update(worlds).set({ aiSpendUsd: '0.13' }).where(eq(worlds.id, w.id));
+  const w2 = await world();
+  await database.db.update(worlds).set({ aiSpendUsd: '0.13', aiSpendDay: 1 }).where(eq(worlds.id, w2.id));
+  await database.db.update(residents).set({ tier: 'ambient' }).where(eq(residents.worldId, w2.id));
+  await expect(budgetMind(database.db, mind, w2.id, 'pell', 'dialogue').createMessage(params)).rejects.toThrow('budget');
+});

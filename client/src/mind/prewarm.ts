@@ -10,11 +10,12 @@ export const PREWARM_RANGE = 6;
 export const PREWARM_EVERY_MINUTES = 4 * 60;
 /**
  * GDD-GAP: §9.10 prewarms everyone within 6 tiles. With the Day-1 census (MVP M-03) most of the 212 are Ambient (§9.8)
- * and a walk down Market Street passes dozens, few of whom the player will talk to: an Ambient resident is prewarmed
- * only within 3 tiles, and at most 30 Ambient residents a game day (§9.15's 60 dialogue turns a day is the scale).
+ * and a walk down Market Street passes dozens, few of whom the player will talk to. A prewarm writes the resident's
+ * cache whether or not anyone talks, and in a playtest (2026-10-18) prewarms were half a world's day spend: an Ambient
+ * resident is prewarmed only when the player is close enough to be about to talk (2 tiles), at most 12 a game day.
  */
-export const AMBIENT_PREWARM_RANGE = 3;
-export const AMBIENT_PREWARMS_PER_DAY = 30;
+export const AMBIENT_PREWARM_RANGE = 2;
+export const AMBIENT_PREWARMS_PER_DAY = 12;
 
 export type PrewarmTier = 'core' | 'acquainted' | 'ambient';
 
