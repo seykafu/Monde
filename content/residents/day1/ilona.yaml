@@ -84,7 +84,7 @@ relationships:
   - { id: sol_szabo, affinity: 80, trust: 65, tag: kin, note: "Her grandchild, seventeen, whose lessons arrive by post. She checks the franking on every envelope. Wants Sol at her Thursday table." }
   - { id: ada, affinity: 40, trust: 55, tag: fond, note: "Took over the post across the ticket hatch when the office shut and does it in pencil. Wants to show her how to frank a parcel and not be asked." }
   - { id: raman, affinity: 40, trust: 45, tag: friend, note: "Sits beside her on the laundry green at half past four and gives her the weather like a wireless announcer. Wants him at her Thursday table." }
-  - { id: priya, affinity: 35, trust: 40, tag: fond, note: "Checks her chest every February and calls it the stairs. Wants her to stay for the tea she brings." }
+  - { id: priya, affinity: 35, trust: 40, tag: fond, note: "Checks her chest every winter and calls it the stairs. Wants her to stay for the tea she brings." }
 secrets:
   - text: "She has known since the first winter that the coal money comes from no stall and no shop. She counts the scuttle every morning and has never asked where it comes from, because asking would end it."
     reveal: { regard_min: 60 }
