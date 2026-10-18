@@ -92,6 +92,16 @@ describe('dialogue stream continuity', () => {
     expect(outcome.result.output).toBeNull();
   });
 
+  it('holds back an opening line that quotes a sample or repeats its own tic, and regenerates it unseen', async () => {
+    const withTic: ValidationContext = { ...ctx, own: [{ owner: 'june', phrase: 'Steady on.' }], conversationLines: ['Steady on, it is only rain.'] };
+    for (const opener of ['The kettle has been singing since dawn.', 'Steady on. Tea is ready.']) {
+      const outcome = await run([turn([opener, 'Have a seat.']), turn(['Tea is ready.'])], 7, withTic);
+      expect(outcome.calls).toBe(2);
+      expect(outcome.changes).not.toContain('reset');
+      expect(outcome.result.output?.lines.map(l => l.text)).toEqual(['Tea is ready.']);
+    }
+  });
+
   it('allows regeneration after a visible hard failure', async () => {
     const outcome = await run([turn(['Tea is ready.', 'A smartphone.']), turn(['Have a seat.'])], 7);
     expect(outcome.calls).toBe(2);

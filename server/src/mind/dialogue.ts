@@ -32,7 +32,7 @@ import { misgenderHit } from "./naming.js";
 import { borrowedHits, stripTics } from "./voice.js";
 import { LineTextExtractor } from "./partialJson.js";
 import { NO_TOKENS, costUsd, type CallTokens } from "./pricing.js";
-import { correctiveNote, neverSaysHit, repairDialogueLine, softNote, validateTurn, type ValidationContext } from "./validate.js";
+import { correctiveNote, neverSaysHit, repairDialogueLine, sampleEcho, softNote, validateTurn, type ValidationContext } from "./validate.js";
 import { prefixSystemBlocks, type ResidentPrefix } from "./context.js";
 import { salvageTurn } from "./salvage.js";
 
@@ -325,16 +325,20 @@ async function callOnce(
 }
 
 /**
- * Is this (whole-word) partial line safe to show before validation? Same lexical and riddle rules, and none of the
- * line-level soft slips: another resident's catchphrase, the Fellow wrongly gendered, a never-says word, money that
- * isn't Monde's (the turn will be regenerated, so the Fellow never sees June say Odile's line).
+ * Is this complete line safe to show before validation? Same lexical and riddle rules, and none of the line-level
+ * soft slips: another resident's catchphrase, the Fellow wrongly gendered, a never-says word, money that isn't
+ * Monde's, a card sample quoted back, the resident's own tic said twice (`earlier`: this turn's lines before it).
+ * A slip held back before anything shows leaves the attempt silent, so its regeneration never reads as a restart.
  */
-function streamSafe(text: string, validation: ValidationContext): boolean {
+function streamSafe(text: string, validation: ValidationContext, earlier: readonly string[]): boolean {
   if (lexicalHits(text).length > 0) return false;
   if (borrowedHits(text, validation.borrowed ?? []).length > 0) return false;
   if (validation.fellow && misgenderHit(text, validation.fellow)) return false;
   if (neverSaysHit(text, validation.neverSays ?? [])) return false;
   if (currencyHit(text)) return false;
+  if (sampleEcho(text, validation.samples ?? [], validation.vocabulary ?? [], validation.tics ?? [])) return false;
+  const said = [...(validation.conversationLines ?? []), ...earlier];
+  if (borrowedHits(text, validation.own ?? []).some((s) => said.some((line) => borrowedHits(line, [s]).length > 0))) return false;
   return !validation.riddle; // Riddle-topic output is held until the complete turn has passed the guard.
 }
 
@@ -407,7 +411,7 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
             text = fitted.slice(0, end).trimEnd();
             suppressed = true;
           }
-          if (!streamSafe(text, options.validation)) { suppressed = true; continue; }
+          if (!streamSafe(text, options.validation, shown.slice(0, line.index).filter(Boolean))) { suppressed = true; continue; }
           if (text.trim() === "" || text === shown[line.index]) continue;
           shown[line.index] = text;
           if (options.onLineDelta) {

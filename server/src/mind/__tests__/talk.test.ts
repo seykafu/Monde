@@ -410,16 +410,19 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect((await logs(env.worldId)).map((l) => [l.validation, l.fallback])).toEqual([["borrowed", false], ["kept:borrowed", false]]);
   });
 
-  it("keeps an already visible opener with sample slips and logs the slips", async () => {
+  it("holds back an opener that quotes the card's samples and regenerates it before anything shows", async () => {
     // The blind A/B eval's Odile opener (2026-10-16): two of her card's sample sentences, prices and all.
     const sampled = good(["Rye's two coins, white's three. Today it's rye.", "Eat something, you look like a coat on a hook."], { regard_delta: 0 });
     const fresh = good(["(Dusts flour off her hands.) You're early. The first tray's still on the rack."], { regard_delta: 0 });
-    const mind = new FakeMind([{ output: sampled, chunk: 6 }, { output: fresh }]);
+    const mind = new FakeMind([{ output: sampled, chunk: 6 }, { output: fresh, chunk: 6 }]);
     const env = await setup(mind);
     const events = sse((await talk(env, payload({ resident_id: "odile", input: { kind: "open" }, context: { place: "market_row.bakery" } }))).payload);
-    expect(finalTurn(events)).toMatchObject({ fallback: false, lines: sampled.lines });
-    expect(mind.streams).toHaveLength(1);
-    expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["kept:sample_echo"]);
+    expect(finalTurn(events)).toMatchObject({ fallback: false, lines: fresh.lines });
+    expect(mind.streams).toHaveLength(2);
+    const deltas = events.filter((e) => e.event === "line_delta");
+    expect(deltas.length).toBeGreaterThan(0);
+    expect(deltas.every((e) => e.data.attempt === 2 && !/two coins/i.test(e.data.text_so_far))).toBe(true);
+    expect((await logs(env.worldId)).map((l) => l.validation)).toEqual(["sample_echo", "ok"]);
   });
 
   it("forces wrap_up on the sixth exchange and carries exact earlier turns", async () => {
