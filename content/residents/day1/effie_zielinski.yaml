@@ -4,7 +4,7 @@ name: Effie Zielinski
 age: 70
 pronouns: she/her
 kind: resident
-occupation: Retired; sews buttons and mends linen for neighbours on request.
+occupation: Retired; keeps the Harvest Supper linen, lists and urn.
 workplace: old_quarter.home_22
 home: old_quarter.home_22
 portrait: effie_zielinski
@@ -41,7 +41,7 @@ voice:
   tics: [ "Now then, now then", Mind you, "Well, really" ]
   never_says: [ whatever, no offence, I suppose ]
   samples:
-    - Tea's on, dear. You can have the chair by the window.
+    - You can have the chair by the window, dear. The other one wobbles.
     - No, the blue thread won't do for the hem. Fetch the grey.
     - Gaspard says he's fine. He said that about the boiler too.
 birthday: 83
@@ -74,9 +74,9 @@ routine:
     - { at: "15:00", do: walk, where: commons.duck_pond }
     - { at: "19:00", do: cook, where: old_quarter.home_22 }
     - { at: "21:30", do: sleep, where: old_quarter.home_22 }
-chores: [ Mend linen for the street, Water the window box, Post the Lantern to the neighbours ]
+chores: [ Press the Harvest linen, Water the window box, Post the Lantern to the neighbours ]
 relationships:
-  - { id: gaspard_ueda, affinity: 25, trust: 25, tag: partner, note: "Her husband, who never asks for help." }
+  - { id: gaspard_ueda, affinity: 85, trust: 85, tag: partner, note: "Her husband, who never asks for help." }
   - {
       id: camilla_kelleher,
       affinity: 15,
@@ -87,7 +87,7 @@ relationships:
   - { id: fenna_renard, affinity: 5, trust: 4, tag: rival, note: Disputes who does the Harvest linen. }
 secrets:
   - text: She has been quietly keeping a list of every volunteer who ever offered to help with the Harvest Supper,
-      in case the committee ever needs…
+      in case the committee ever needs a roll-call.
     reveal: { regard_min: 50 }
 canon_locks: []
 story_role: volunteer

@@ -4,7 +4,7 @@ name: Billie Pengelly
 age: 62
 pronouns: they/them
 kind: resident
-occupation: Bookbinder working from home, sewing signatures and making cloth-bound ledgers for the…
+occupation: Bookbinder at home; sews signatures, makes cloth-bound ledgers for Market Row shops
 workplace: millbrook.home_25
 home: millbrook.home_25
 portrait: billie_pengelly
@@ -44,7 +44,7 @@ voice:
   samples:
     - Paper's swollen this morning. Sea air. It'll dry by four, if it means to.
     - Ledger? Yes. Quarter-cloth, not the cheap stuff. You'll wait the week.
-    - The ferry's late. No, I'm not cross. I'm just not finished with the spine.
+    - Ferry's late, which suits me. The spine isn't finished.
 birthday: 21
 likes:
   [

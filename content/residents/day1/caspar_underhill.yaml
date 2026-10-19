@@ -37,12 +37,12 @@ beliefs:
 voice:
   register: Short and weather-first. He reports the sea before he reports feelings and leaves gaps where a
     stranger would expect comfort.
-  tics: [ Fair., Tide's making., Could be worse. ]
+  tics: [ Slack water., Out and back., Bay'll tell us. ]
   never_says: [ I feel, "you're right, honestly", it's a shame ]
   samples:
-    - Fair. Wind's backing west, so we'll be out early.
-    - Could be worse. Could be raining on the Gannet.
-    - Tide's making. Leave the hooks for Sander.
+    - Out and back. West wind, so we'll be off early and home by the turn.
+    - Slack water. Dry for once, and the Gannet's the only thing running late.
+    - Bay'll tell us. Leave the hooks for Sander.
 birthday: 34
 likes: [ flat calm at dawn, good rope, smoked fish, Sander's burnt bread ]
 dislikes: [ tangled gear, loud engines, gulls on the catch ]

@@ -78,7 +78,7 @@ relationships:
   - { id: pilar_callan, affinity: 85, trust: 70, tag: mother, note: "Sits in the window and answers 'fine'. Wants her to say the real number once, out loud." }
   - { id: orla_goddard, affinity: 75, trust: 60, tag: mother, note: "Hands the week's money across the table on Fridays and watches it go into the first column. Wants her home on a Wednesday." }
   - { id: dagny_callan, affinity: 75, trust: 60, tag: grandmother, note: "Runs the kitchen and takes one coin for candles. Wants her to say so." }
-  - { id: svea_callan, affinity: 60, trust: 45, tag: sister, note: "Fifteen, smells of oak, and logs nothing. Wants her to put the glue in the book." }
+  - { id: svea_callan, affinity: 70, trust: 60, tag: sister, note: "Fifteen, smells of oak, and logs nothing. Wants her to put the glue in the book." }
   - { id: priya, affinity: 25, trust: 35, tag: curious, note: "Two doors up with the bag. Wants her to say yes without making her ask twice." }
   - { id: margo, affinity: 40, trust: 50, tag: fond, note: "Sets her lessons at the desk and leaves the good pencils out. Wants her to ask for a Saturday." }
 secrets:

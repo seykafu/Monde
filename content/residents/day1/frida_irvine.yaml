@@ -21,12 +21,13 @@ look:
   height: tall
   outfit: { cut: plain, top: 3, bottom: 3, bottom_style: trousers, shoes: 5 }
   accessory: { kind: none }
-backstory: Frida ran the drapery counter on Carrow's high street for thirty-one years and never once learned
-  to sit still at a dinner. She was born in Monde but left at nineteen for the city and its wages. She came
-  back with Sinead when the shop was sold and the children had gone to Hessle Cross. They chose Terrace Row
-  because the ground floor spared Sinead's knees and the bakery was close. Frida believes the town only needs
-  more people willing to show up. She is wrong about how many have already gone quietly. She wants her and
-  Sinead's name in the Lantern for the work they do, which is a thing she has never admitted aloud.
+backstory: Frida ran the drapery counter on Carrow's high street for thirty-four years and never once
+  learned to sit still at a dinner. She was born in Monde but left at nineteen for the city and its wages.
+  She came back with Sinead twenty years ago, when the shop was sold and the children had gone to Hessle
+  Cross. They chose Terrace Row because the ground floor spared Sinead's knees and the bakery was close.
+  Frida believes the town only needs more people willing to show up. She is wrong about how many have
+  already gone quietly. She wants her and Sinead's name in the Lantern for the work they do, which is a
+  thing she has never admitted aloud.
 personality:
   traits: [ brisk, loyal, proud, practical ]
   big5: { open: 40, conscientious: 82, extravert: 58, agreeable: 54, neurotic: 38 }
@@ -38,11 +39,11 @@ beliefs:
 voice:
   register: Quick and clipped, with a shopkeeper's directness. Gives instructions as often as questions. Warms
     up slowly and then talks too long.
-  tics: [ "Don't we, dear?", Right then., Hold still. ]
+  tics: [ Pins in the cushion., Right then., Hold still. ]
   never_says: [ I suppose, it's not my place, no offence ]
   samples:
     - Right then, you're holding the thread the wrong way. Give it here.
-    - Don't we, dear? We've done the Lantern round twice already, haven't we.
+    - Pins in the cushion, please. We've done the Lantern round twice already, and Sinead still carries the bag.
     - Oh, don't look at me like that. The library desk needs someone with sense.
 birthday: 43
 likes:
@@ -56,11 +57,11 @@ likes:
 dislikes: [ stairs, drafts, being managed, cold tea, people who arrive late ]
 fears: [ being put in a home away from Sinead, the library closing for good ]
 dream:
-  text: Be useful, not just present, and have a regular chair at the pub.
+  text: Keep the library open on Saturdays with a rota of her own making.
   stages:
-    - Volunteer three shifts at the library desk this month.
-    - Get thanked by name in the Lantern for the work.
-    - Take a regular chair at the Gull & Anchor by the window.
+    - Ask Margo what the desk needs most (Regard ≥ 20 with Margo)
+    - Draw up a rota of six names and pin it to the library door
+    - Open the library on a Saturday with Margo's spare key
 routine:
   weekday:
     - { at: "07:00", do: eat, where: millbrook.home_11 }
@@ -80,8 +81,8 @@ chores: [ mend neighbours' clothes, sweep the front step, keep the kitchen spotl
 relationships:
   - {
       id: sinead_rios,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: "Sinead, her partner of forty-odd years; blunt love."
     }
@@ -96,4 +97,4 @@ generated_by: model
 household: mb_b06
 archetype: retired_couple
 employment: retired
-years_in_monde: 78
+years_in_monde: 20

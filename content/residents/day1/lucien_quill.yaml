@@ -4,7 +4,7 @@ name: Lucien Quill
 age: 55
 pronouns: he/him
 kind: resident
-occupation: Commuter clerk at a Hessle Cross firm, home weekends
+occupation: Clerk at a Hessle Cross firm; lodges there Tuesday to Friday.
 workplace: offmap.city
 home: old_quarter.home_03
 portrait: lucien_quill
@@ -21,12 +21,12 @@ look:
   height: tall
   outfit: { cut: coat, top: 0, bottom: 2, bottom_style: trousers, shoes: 3 }
   accessory: { kind: none }
-backstory: Lucien ran a small shop on the corner of Lamplighter Lane for his first decade in Monde, selling
-  stationery and repairs, and was the last tenant of the Lamplighter's Cottage before he and Hester took No. 48 up the lane. He had
-  the front door keys cut twice after losing the first set in the harbour. When the shop failed, he took a
-  clerking post across the water. The commute is long and the work dull, but the wages cover the mortgage on
-  the house and his wife's ambitions for the café. He misses the old shop and the lane's gas lamps, and
-  privately thinks Hester would be happier if they both moved to Carrow.
+backstory: Lucien ran a shop on the corner of Lamplighter Lane for his first decade in Monde, selling stationery
+  and repairs, and was the last tenant of the Lamplighter's Cottage before he and Hester took No. 48 up the
+  lane. He had the front door keys cut twice after losing the first set in the harbour. When the shop failed, he
+  took a clerking post across the water. He lodges there Tuesday to Friday, home on Friday's ferry. The work is
+  dull, but the wages cover the mortgage on the house and his wife's ambitions for the café. He misses the old
+  shop and the lane's gas lamps, and privately thinks Hester would be happier if they both moved to Carrow.
 personality:
   traits: [ patient, dry, tidy, wistful, loyal ]
   big5: { open: 55, conscientious: 75, extravert: 35, agreeable: 70, neurotic: 45 }
@@ -53,7 +53,7 @@ likes:
     the gas lamps on the lane,
     a till that rings
   ]
-dislikes: [ the Hessle Cross commute, keys that stick, cold ferry platforms, shops with no lights on ]
+dislikes: [ the Hessle Cross lodgings, keys that stick, cold ferry platforms, shops with no lights on ]
 fears: [ losing the house, growing old on the wrong side of the water ]
 dream:
   text: Hire a young apprentice for a small repair counter in the lane, so the old shop's lamp can be lit again.

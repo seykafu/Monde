@@ -53,7 +53,7 @@ likes:
     strong tea in a cracked cup,
     the harbour at low tide,
     honest tradesmen,
-    tea in a tin mug
+    a dry pair of socks
   ]
 dislikes: [ meetings with no agenda, people who ask for favours twice, the smell of paraffin in the flat ]
 fears: [ being left with the bills after her brother dies ]
@@ -84,8 +84,8 @@ chores: [ Mends nets on the kitchen table, Keeps the books for the flat, Sweeps 
 relationships:
   - {
       id: karim_barros,
-      affinity: 18,
-      trust: 25,
+      affinity: 75,
+      trust: 70,
       tag: brother,
       note: Her brother; she keeps him fed and honest.
     }
@@ -94,7 +94,7 @@ relationships:
       affinity: 12,
       trust: 15,
       tag: friend,
-      note: Trades mending for rye from the bakery.
+      note: Trades mending for rye from Winifred's own oven.
     }
   - {
       id: odile,

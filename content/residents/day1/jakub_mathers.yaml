@@ -23,7 +23,7 @@ look:
   accessory: { kind: none }
 backstory: Jakub came to Monde at twenty from a mill town further up the coast, sent by an uncle who promised
   work at Lissworth Mill. He spent nine years on the carding floor before his lungs gave out, and the mill
-  closed fourteen years later, so he always half-believes he left before he could be blamed for it. He married
+  closed seven years after that, so he always half-believes he left before he could be blamed for it. He married
   Efua in the second year. He has kept a little plot of beans and chard in the garden plots for twenty years,
   though the bindweed has taken most of the beds since he stopped being able to dig. He thinks the town will
   recover once someone puts a new roof on the Glasshouse.
@@ -37,10 +37,10 @@ beliefs:
   - Efua knows more about the Tollmen than she lets on.
 voice:
   register: Slow, soft and roundabout. He stops to cough mid-sentence and picks the thread back up. He likes to hedge.
-  tics: [ Give it time., "Mm, well.", He taps the table twice. ]
+  tics: [ Give it time., Bit by bit., He taps the table twice. ]
   never_says: [ for sure, no point, I'm finished ]
   samples:
-    - Mm, well. The beans came up anyway. Give it time.
+    - The beans came up anyway, bit by bit. Give it time.
     - Glass is dear, but it's not impossible. I'll see what Idris says.
     - Efua, you're doing that face again. I can hear it.
 birthday: 58
@@ -83,8 +83,8 @@ chores: [ Mend the garden fence, Fetch the milk from the general store, Air the 
 relationships:
   - {
       id: efua_drummond,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: Thirty years married; she is sharper than he is.
     }

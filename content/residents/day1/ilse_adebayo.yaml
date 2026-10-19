@@ -4,7 +4,7 @@ name: Ilse Adebayo
 age: 45
 pronouns: she/her
 kind: resident
-occupation: Commuter clerk for an office in Hessle Cross; keeps a small shop-minded…
+occupation: Invoice clerk in Hessle Cross, lodging there Tuesday to Friday.
 workplace: offmap.city
 home: station_hill.home_07
 portrait: ilse_adebayo
@@ -21,12 +21,12 @@ look:
   height: short
   outfit: { cut: coat, top: 7, bottom: 11, bottom_style: trousers, shoes: 10 }
   accessory: { kind: scarf, colour: 11 }
-backstory: Ilse grew up in a rented flat above a chandler's in Hessle Cross and learned early that a shop
-  lives or dies on its margins. She came to Monde at thirty after a marriage ended, drawn by cheap rent on
-  Tower Lane and the quiet. Her weekdays belong to a desk on the mainland, where she handles invoices for a
-  wholesale haberdashery. Every Saturday she walks the Row and counts the shuttered windows, sure that a
-  well-run shop could fill one. She is wrong that the town simply needs a shop; she has never asked why the
-  last three closed. She keeps a chipped-nose garden gnome on her step that she refuses to explain.
+backstory: Ilse grew up in a rented flat above a chandler's in Hessle Cross and learned early that a shop lives
+  or dies on its margins. She came to Monde at thirty after a marriage ended, drawn by cheap rent on Tower Lane
+  and the quiet. She lodges in Hessle Cross Tuesday to Friday at a desk handling invoices for a wholesale
+  haberdashery, home on Friday's ferry. Every Saturday she walks the Row and counts the shuttered windows, sure
+  that a well-run shop could fill one. She is wrong that the town simply needs a shop; she has never asked why
+  the last three closed. She keeps a chipped-nose garden gnome on her step that she refuses to explain.
 personality:
   traits: [ shrewd, warm, stubborn, practical ]
   big5: { open: 62, conscientious: 78, extravert: 55, agreeable: 58, neurotic: 35 }
@@ -38,22 +38,22 @@ beliefs:
 voice:
   register: Quick and businesslike, with a salesperson's warmth over a ledger's precision. She speaks in prices,
     margins and small concrete numbers, and laughs at her own bluntness.
-  tics: [ "Right, then.", Call it four and six., Do you see what I mean? ]
+  tics: [ "Right, then.", Call it four coins., Do you see what I mean? ]
   never_says: [ just browsing, "oh, I couldn't", it's all right ]
   samples:
-    - Four and six for the lot, and I'll throw in the string.
+    - Four coins for the lot, and I'll throw in the string.
     - Right, then. You're the third person this month who wants a shop. Shall we talk about rent?
-    - No, I don't think it's a fee. I think it's a habit nobody has ever bothered to name.
+    - Everyone says it's the fees. I'd say it's a habit nobody has bothered to name.
 birthday: 56
 likes: [ a till that rings, hand-lettered signs, first customers, the bay at dusk, strong black coffee ]
 dislikes: [ fees nobody explained, just browsing said twice, empty windows, the ferry running late ]
 fears: [ the shop failing in her name, being the last to leave Monde ]
 dream:
-  text: Open a proper shop on Market Row by the end of the month, with her name painted on the glass.
+  text: Open a haberdashery counter on Market Row, with her name on the glass and thread for neighbours who used to send away for it.
   stages:
-    - Stock the shelves with haberdashery bought on the mainland.
-    - Get a sign painted by the hand-lettering man on Tower Lane.
-    - Cut the ribbon with the mayor standing beside her.
+    - Ask the last three shopkeepers on Market Row why they closed.
+    - Stock one shelf with haberdashery bought on the mainland and sell it at the Saturday market.
+    - Hang her name on the glass of a Market Row storefront.
 routine:
   weekday:
     - { at: "06:30", do: eat, where: station_hill.home_07 }

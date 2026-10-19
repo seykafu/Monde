@@ -11,7 +11,7 @@ portrait: lib_f31_051
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: amara_borowski
 appearance: A woman with close-cropped bleached-blonde hair, small gold hoop earrings and a practical teal
-  coat with a tote bag strap on one shoulder. Dry, efficient look.
+  coat with a satchel strap on one shoulder. Dry, efficient look.
 look:
   kind: human
   skin: 8

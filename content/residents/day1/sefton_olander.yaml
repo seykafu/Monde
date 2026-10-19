@@ -26,7 +26,7 @@ backstory: Sefton grew up inland in a market town where his father sold feed and
   At twenty-four he took a ferry out of Carrow on a whim, saw the harbour steps at low tide, and asked for
   work the same afternoon. He was useless at knots for two seasons and nobody let him forget it. The boats
   kept him because he never complained about the cold. He lives alone in a ground-floor flat on Shore Lane
-  with more chairs than he needs. The scarf came from Bea Hendry's youngest, Tam, who knitted it at school and
+  with more chairs than he needs. The scarf came from a neighbour's youngest, who knitted it at school and
   insisted he wear it on every crossing.
 personality:
   traits: [ patient, dry, loyal, tidy ]
@@ -40,14 +40,14 @@ beliefs:
 voice:
   register: Quiet and unhurried. He speaks in short sentences and leads with the weather. He rarely offers an
     opinion unasked, and when he does it comes out flat and sensible.
-  tics: [ Fair enough., Tide's making., Could be worse. ]
+  tics: [ Aye, well., Not before noon., Nets first. ]
   never_says: [ I reckon, absolutely, you know what, to be honest ]
   samples:
-    - Fair. Wind's backing west, we'll not get out before noon.
-    - Could be worse. Could be raining on the nets.
-    - Tam's scarf? Aye, I'll wear it. It's not as if I'd want to be cold.
+    - Aye, well. Wind's gone west. We'll not get out before noon, and it's nets first until then.
+    - Nets first. It could be raining on them, and it isn't.
+    - The scarf? Aye, I'll wear it. It's not as if I'd want to be cold.
 birthday: 83
-likes: [ Flat calm at dawn, Good rope, Smoked fish, Tam's knitting, The chime of the harbour bell ]
+likes: [ Flat calm at dawn, Good rope, Smoked fish, A child's knitting, The chime of the harbour bell ]
 dislikes: [ Tangled gear, Loud engines, Gulls on the catch, Being hurried on the steps ]
 fears: [ Losing a crewmate to a sudden squall, The cannery stays shut forever ]
 dream:

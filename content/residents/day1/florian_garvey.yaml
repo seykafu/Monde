@@ -41,22 +41,22 @@ beliefs:
 voice:
   register: Short and weather-first. He trails off when a problem interests him more than the conversation. He
     is understated and rarely asks direct questions.
-  tics: [ Fair enough., Tide's making., "Hmm, hold on." ]
+  tics: [ Fair enough., Needs a drop of oil., "Hmm, hold on." ]
   never_says: [ I'm not sure, honestly, you know what ]
   samples:
-    - Fair. Wind's backing, we'll not get out before noon.
-    - Could be worse. The engine's sound, I've only got it propped up with string.
-    - Tide's making, so I'll leave the pots till you're done with that net.
+    - Fair enough. The float's sticking, so we'll not get out before noon.
+    - Hmm, hold on. The engine's sound, I've only got it propped up with string.
+    - Needs a drop of oil, that winch. I'll leave the pots till you're done with that net.
 birthday: 14
 likes: [ flat calm at dawn, good rope, smoked fish, clock mechanisms left open on the bench ]
 dislikes: [ tangled gear, loud engines, gulls on the catch ]
 fears: [ the boathouse roof coming down in a storm, being asked to take on a crew he can't train ]
 dream:
-  text: I want a boat with my name on it, and I want to bring her round the breakwater myself.
+  text: Finish the brass music box and put it in a child's hands.
   stages:
-    - Find a hull that's sound enough to rebuild.
-    - Raise sixty coins from catches and the odd repair job.
-    - Launch her on Regatta day and take her out alone.
+    - Ask Bertrand for a steel comb tooth to mend the broken one (Regard ≥ 15 with Bertrand)
+    - Tune the comb at the boathouse bench until it plays a whole tune
+    - Give it to a child at Millbrook School
 routine:
   weekday:
     - { at: "06:00", do: wander, where: wharf.home_05 }

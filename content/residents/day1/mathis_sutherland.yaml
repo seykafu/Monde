@@ -4,7 +4,7 @@ name: Mathis Sutherland
 age: 52
 pronouns: he/him
 kind: resident
-occupation: Casual boathouse hand and fair-day odd-jobber; out of work since the cannery…
+occupation: Casual boathouse hand, fair-day odd-jobber; jobless since the cannery shut.
 workplace: millbrook.home_36
 home: millbrook.home_36
 portrait: mathis_sutherland
@@ -23,7 +23,7 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 7 }
 backstory: Mathis arrived in Monde at twenty-two, as Dafydd did, and went straight to the Liss Cannery on the
-  Wharf, where he worked the packing line for ten years before it shut. He is the one who talks to people on
+  Wharf, where he worked the packing line for nineteen years before it shut. He is the one who talks to people on
   the doorstep and knows which house has a leaky roof before the owner does. He thinks the Tollmen are a bad
   lot but also that they are the only ones who ever show up on a Saturday, which he admits is an unhappy thing
   to say. He wants to see the Wharf working again, and he wants Dafydd to stop looking at the mill like a
@@ -39,12 +39,12 @@ beliefs:
 voice:
   register: Chatty, warm and quick, with a laugh ready. Uses the Wharf's slang. Will go on a little, then catch
     himself.
-  tics: [ Mind the step., "Oh, go on.", "Well, there it is." ]
+  tics: [ Never mind the smell., "Oh, go on.", "Well, there it is." ]
   never_says: [ that's not my problem, I don't care, nothing ever happens here ]
   samples:
     - Oh, go on, have the last heel of the loaf. Odile won't miss it.
     - Dafydd says it's all over. I say the boathouse wants a hand Thursday.
-    - Mind the step, the fish smell gets into everything, even the Sunday shirt.
+    - Never mind the smell, the fish gets into everything, even the Sunday shirt.
 birthday: 65
 likes:
   [
@@ -85,10 +85,10 @@ chores: [ Sweeps the front step, Bakes on Sundays, Chases the cat off the washin
 relationships:
   - {
       id: dafydd_sutherland,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
-      note: Brother-in-spirit; he worries about Dafydd and says so too often.
+      note: Shares his house and his silences; worries about Dafydd and says so too often.
     }
   - {
       id: bru,

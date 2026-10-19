@@ -36,7 +36,7 @@ beliefs:
   - A man should always have a spare pair of boots.
 voice:
   register: Quiet and dry. Short sentences, a little teasing. Says less when he is worried.
-  tics: [ "well, then", mind the step ]
+  tics: [ "well, then", "Don't fuss." ]
   never_says: [ that's the spirit, I'm no expert ]
   samples:
     - Ferry's Tuesday and Friday. Ask me again then.
@@ -73,8 +73,8 @@ chores: [ mend the garden fence, fill the coal scuttle, oil the kitchen door hin
 relationships:
   - {
       id: rosa_zanetti,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: "His wife of thirty-five years, the one who makes the decisions."
     }

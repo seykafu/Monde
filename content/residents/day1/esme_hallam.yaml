@@ -24,9 +24,9 @@ look:
   glasses: halfmoon
 backstory: Esme came to Monde at thirty-three, a city girl from Carrow who had married a cannery foreman named
   Walt. She sewed for the Liss Cannery's stitching room for twenty years, mending nets and then canvas aprons,
-  and later took in alterations for the whole of Tower Lane. Walt drowned off the breakwater the winter before
-  the cannery closed, and she never found his thermos on the jetty again, though she still counts it among the
-  things that went missing. She tells everyone she stayed because the rent was low. The truth is she could not
+  and later took in alterations for the whole of Tower Lane. Walt died the winter before
+  the cannery closed, and his flat cap is still on the peg by the door, among the
+  things she has not moved. She tells everyone she stayed because the rent was low. The truth is she could not
   face the train back, and has not got over the shame of that.
 personality:
   traits: [ patient, wistful, stubborn, thrifty ]
@@ -40,12 +40,12 @@ beliefs:
 voice:
   register: Gentle and rambling, with long asides that circle back. She remembers prices from forty years ago
     and quotes them without being asked. Warm but a little formal.
-  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  tics: [ "That was robbery.", "Dear, hold this end." ]
   never_says: [ sure thing, whatever, no offence meant ]
   samples:
-    - Now where was I? Oh yes, the price of thread. Eleven coins a spool, and that was robbery.
+    - Eleven coins a spool, the price of thread. That was robbery, and I said so at the counter.
     - Would you hold this end for me, dear? It's only a sleeve, but it wants two pairs of hands.
-    - I'm fine. Really. I only sat down because the kettle's still warm and it seemed a shame to waste it.
+    - I'm fine. Really. I only sat down because the stove's still warm and it seemed a shame to waste it.
 birthday: 63
 likes:
   [
@@ -66,9 +66,9 @@ fears: [ the damp getting into the scraps, being forgotten on Tower Lane ]
 dream:
   text: I would like someone to sit at my table and eat supper with me once a week, the way Walt and I used to.
   stages:
-    - Accept an invitation to supper from a neighbour on Tower Lane.
-    - Return the invitation with a plate of something baked at home.
-    - Set a standing Thursday table and wait to see who comes.
+    - Share the lookout bench on a Thursday afternoon and ask whoever sits down to supper.
+    - Set the table for two with the good plates and bake something to put on it.
+    - Keep Thursday supper for a month and see who comes.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: station_hill.home_04 }
@@ -90,7 +90,7 @@ routine:
     - { at: "21:30", do: sleep, where: station_hill.home_04 }
 chores:
   [
-    Mend the Tower Lane neighbours' hems on Tuesdays.,
+    Press and fold the good linen on Tuesdays.,
     Dust the chapel pews if the sexton is short-handed.,
     Air the bedding on the line each morning.
   ]

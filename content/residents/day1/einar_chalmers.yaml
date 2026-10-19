@@ -23,7 +23,7 @@ look:
   accessory: { kind: glasses }
   glasses: heavy
 backstory: Einar was born on Weir Road and went into Lissworth Mill at sixteen as a loom-setter's boy. He
-  spent twenty-two years on the frames until the mill closed fourteen years ago and took six hundred jobs with
+  spent twenty-four years on the frames until the mill closed fourteen years ago and took six hundred jobs with
   it. He tried retraining in Carrow and hated the clipboard men who ran the course, so he came home. Now he
   hauls post and crates along the wharf and out to the far houses. He keeps his father's tin mug on the hook
   by the back door and drinks tea from it every morning. He still says the mill will reopen, and he has told
@@ -39,10 +39,10 @@ beliefs:
 voice:
   register: Plain and short. Speaks in numbers and hours and tends to answer a question with a count. Dry,
     rarely warm in words, warm in deeds.
-  tics: [ Used to be., That's the lot., "Three bolts, two hours." ]
+  tics: [ Crates first., That's the lot., "Three bolts, two hours." ]
   never_says: [ I feel, no offence, all things considered ]
   samples:
-    - Two hundred crates to Dunmore's before noon. Used to be I'd have done it in one.
+    - Crates first. Two hundred to Dunmore's before noon, and the post after.
     - Tea's in the tin. Help yourself, there's enough for two.
     - The Mill'll go again. Don't ask me when.
 birthday: 52
@@ -57,11 +57,11 @@ likes:
 dislikes: [ being retrained, short shifts, men with clipboards, the stopped clocktower ]
 fears: [ the frames being broken up for scrap, growing old with nothing to do ]
 dream:
-  text: Wages for work again, enough to stop borrowing from Raman's tin.
+  text: Wages paid in full, every Friday, enough to put back what he owes Raman's tin.
   stages:
-    - Register at Town Hall for casual work on the wharf.
-    - Do one casual job a day for three days.
-    - Take a shift at the boathouse or a floor job when the Mill reopens.
+    - Ask Barney and Odile to settle deliveries weekly, in coin
+    - Take the far-house haulage runs for a month, whatever the weather
+    - Put the last coin back in Raman's tin and say nothing
 routine:
   weekday:
     - { at: "06:00", do: sleep, where: millbrook.home_35 }

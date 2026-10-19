@@ -40,7 +40,7 @@ beliefs:
 voice:
   register: Warm and quick, often cut off mid-sentence by a child. Counts the day in naps and talks in run-on
     lists when stressed.
-  tics: [ "right, sorry", that's nap gone, "oh, he's—" ]
+  tics: [ "right, sorry", that's nap gone, "oh, she's—" ]
   never_says: [ I can't manage, don't mind me, it's nothing ]
   samples:
     - Right, sorry, she's up, and that's nap gone for good.

@@ -22,8 +22,8 @@ look:
   outfit: { cut: coat, top: 3, bottom: 6, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
   face: { stubble: true }
-backstory: Dmitri painted shop signs in Carrow for nine years before a firm there switched to printed vinyl
-  and let him go. He came to Monde at twenty-nine with a van full of brushes and a half-finished plan to open
+backstory: Dmitri painted shop signs in Carrow for nine years before a firm there switched to machine-printed
+  signs and let him go. He came to Monde at twenty-nine with a van full of brushes and a half-finished plan to open
   his own sign shop. The van died on the coast road and he never replaced it. He still believes the Market Row
   shopfronts will want new lettering once someone is brave enough to ask. Nobody has asked. He stays because
   Cass is happy here, and because the light on the harbour steps is the best he has seen for paint.
@@ -52,7 +52,7 @@ likes:
     being asked what a piece is for,
     fresh gesso in the morning
   ]
-dislikes: [ being told his talent is a diagnosis, work offered for exposure, rain on a wet mural, vinyl lettering ]
+dislikes: [ being told his talent is a diagnosis, work offered for exposure, rain on a wet mural, machine-printed lettering ]
 fears: [ the van never being replaced, Cass deciding Monde is a mistake ]
 dream:
   text: Paint a wall in Monde that people stop and point at, with the whole town there to see it finished.

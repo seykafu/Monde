@@ -26,7 +26,7 @@ backstory: Oona trained as a draughtswoman in a shipyard town and came to Monde 
   winter and a worse marriage. She rented the flat above Market Row for its north light and has built model
   ferries, schooners and the Gannet in miniature for thirty-one years. Her boats sell well by post, but she
   believes the town's children would love them more than collectors do, and she is wrong that she can afford
-  to give them away. Kofi came with her, and she still counts herself lucky he stayed.
+  to give them away. Kofi came the same year, and she still counts herself lucky he stayed.
 personality:
   traits: [ exact, wry, private, generous ]
   big5: { open: 70, conscientious: 88, extravert: 25, agreeable: 60, neurotic: 40 }
@@ -58,9 +58,9 @@ fears: [ her hands losing their steadiness, the flat being sold ]
 dream:
   text: Get a shelf of her boats in the Market Hall beside the best of the town's craft.
   stages:
-    - Show her samples to the mayor.
-    - Fill a table at one Saturday market.
-    - Win a standing order from a Market Row shop.
+    - Show the miniature Gannet to Mayor Pell and ask for shelf room.
+    - Set out a table of boats at a Saturday market, with children welcome to hold them.
+    - Fix the shelf in the Market Hall with one boat priced for a child's savings.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: market_row.home_09 }
@@ -83,8 +83,8 @@ chores: [ Keeps the workbench clear, Washes the brushes each night, Walks the pa
 relationships:
   - {
       id: kofi_santos,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Her husband; he keeps her fed and her glasses clean.
     }

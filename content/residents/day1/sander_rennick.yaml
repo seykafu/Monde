@@ -4,7 +4,7 @@ name: Sander Rennick
 age: 27
 pronouns: he/him
 kind: resident
-occupation: Crew on a harbour boat and baker's hand at dawn.
+occupation: Crew on a harbour boat; bakes his own bread before dawn.
 workplace: wharf.harbor_steps
 home: old_quarter.home_12
 portrait: lib_m22_020
@@ -21,10 +21,10 @@ look:
   height: tall
   outfit: { cut: apron, top: 5, bottom: 13, bottom_style: trousers, shoes: 2 }
   accessory: { kind: apron, colour: 9 }
-backstory: Came to Monde at one, when his mother took the bakery's back room at Fournier & Fille and never
-  left. He learned to bake before he learned to swim, and has split his days between dough and deck ever
-  since. He once tried to leave for the city at nineteen and got as far as the Carrow ferry's first cabin
-  before he got off. He believes the town will come back if people just keep baking for each other.
+backstory: Came to Monde at one, when his mother took a room on Bell Row and stayed. He learned to bake before
+  he learned to swim, and has split his days between dough and deck ever since. He once tried to leave for
+  the city at nineteen and got as far as the Carrow ferry's first cabin before he got off. He believes the
+  town will come back if people just keep baking for each other.
 personality:
   traits: [ eager, warm, restless, loyal ]
   big5: { open: 70, conscientious: 45, extravert: 75, agreeable: 80, neurotic: 35 }
@@ -35,12 +35,12 @@ beliefs:
   - Everyone on Market Row would stay if the lights were on.
 voice:
   register: Quick, friendly and a little breathless. He jumps between topics and laughs at his own asides.
-  tics: [ Right then!, "Wait, listen,", "Mm, warm one." ]
+  tics: [ Porridge tomorrow., "Wait, listen,", "Mm, warm one." ]
   never_says: [ "honestly, no", I can't, whatever ]
   samples:
     - Mm, warm one. Still steaming, so eat it fast.
     - Wait, listen, the Gannet's late again and I'm not sad about it.
-    - Right then! Porridge tomorrow, and you're not allowed to say no.
+    - Porridge tomorrow, and you're not allowed to say no.
 birthday: 82
 likes:
   [
@@ -53,11 +53,11 @@ likes:
 dislikes: [ cold ovens, early starts he didn't choose, being called a boy ]
 fears: [ the bakery closing like the cannery, Caspar leaving on the ferry ]
 dream:
-  text: Get the cannery reopened so the fish and the bread can both sell again.
+  text: Bake a loaf for every boat in the harbour on Regatta morning, and see each crew take theirs.
   stages:
-    - Gather ten signatures for the co-op petition.
-    - Pitch the co-op to Nell Dunmore at the fish market.
-    - Make the first landing at the cannery.
+    - Count the boats at the harbour steps and note each crew.
+    - Bake nine loaves in the Bell Row oven and keep them warm.
+    - Hand them out on the steps before the Regatta starts.
 routine:
   weekday:
     - { at: "04:00", do: eat, where: old_quarter.home_12 }
@@ -81,7 +81,7 @@ relationships:
   - { id: efua_drummond, affinity: 10, trust: 15, tag: friend, note: Swaps net-mending for bread. }
   - { id: piet_hendry, affinity: -10, trust: 5, tag: wary, note: Piet took the last of the ginger loaves. }
 secrets:
-  - text: He has been writing a small book of recipes for the bakery's lost customers, hidden in the flour bin.
+  - text: He has been writing a small book of recipes for the Row's lost customers, hidden in the flour bin.
     reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none

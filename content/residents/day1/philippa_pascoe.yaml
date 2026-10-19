@@ -4,7 +4,7 @@ name: Philippa Pascoe
 age: 53
 pronouns: she/her
 kind: resident
-occupation: Bar and kitchen hand at The Gull & Anchor, cooking the pub's…
+occupation: Kitchen and bar hand at The Gull & Anchor, cooking the pies.
 workplace: market_row.gull_and_anchor
 home: market_row.home_02
 portrait: lib_f42_009
@@ -36,13 +36,13 @@ beliefs:
   - Roz pays too little and would be lost without me.
   - Nobody in Monde eats enough vegetables.
 voice:
-  register: Brisk and affectionate, with kitchen warnings delivered as pet names. Measures everything in
-    handfuls and pinches. Short sentences when busy, longer when she's pleased.
-  tics: [ "mind the tray, love", a handful of, that's my girl ]
+  register: Brisk and affectionate, with kitchen warnings delivered as pet names. Measures everything by
+    eye and thumb. Short sentences when busy, longer when she's pleased.
+  tics: [ Turn the tray., Proud of that one., Hot enough to bite. ]
   never_says: [ I'm sorry for your loss, it's not a big deal, I don't know how ]
   samples:
     - Don't touch that tray, love, it's hot enough to bite. Go and sit down.
-    - A handful of salt, a bit more, there. Now it tastes like something.
+    - Salt. A bit more, there. Now it tastes like something.
     - Well. That's a pie I'd be proud to put my name to.
 birthday: 28
 likes:
@@ -59,7 +59,7 @@ dream:
   text: Cook a Harvest Supper big enough to feed the whole town, and serve it in the Market Hall on the autumn
     night.
   stages:
-    - Plan a Harvest Supper menu with Roz and the Lantern's printer.
+    - Plan a Harvest Supper menu with Roz and Sable.
     - Cook alongside four volunteers in the Gull's kitchen.
     - Serve the supper at the Market Hall to every household in town.
 routine:

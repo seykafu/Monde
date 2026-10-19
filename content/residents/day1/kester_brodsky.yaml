@@ -4,8 +4,8 @@ name: Kester Brodsky
 age: 17
 pronouns: he/him
 kind: resident
-occupation: Lessons by post; Saturday hand at Fournier & Fille
-workplace: market_row.bakery
+occupation: Lessons by post; sweeps and scrubs trays at Fournier & Fille, unpaid
+workplace: wharf.home_03
 home: wharf.home_03
 portrait: lib_m16_078
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
@@ -23,11 +23,12 @@ look:
   outfit: { cut: coat, top: 10, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 5 }
 backstory: >
-  Kester sits his post lessons at Margo's library desk and on Saturdays scrubs trays at Fournier & Fille. He
-  weighs, sweeps and says "not hungry" through a mouthful of crust. Odile has never told him he is doing
-  anything right. She says "Hm." He has decided that means no. What he wants is to hear "again", which is what
-  she says to a loaf she means to keep. His mothers think he is saving for Carrow. He is saving for a cane
-  proving basket.
+  Kester sits his post lessons at Margo's library desk and on Saturdays turns up at Fournier & Fille to
+  scrub trays, unasked and unpaid, for the day-old heel. He sweeps, carries and says "not hungry" through a
+  mouthful of crust. Odile has never hired him and never sent him off, and she has never told him he is
+  doing anything right. She says "Hm." He has decided that means no. What he wants is to hear "again", which
+  is what she says to a loaf she means to keep. His mothers think he is saving for Carrow. He is saving for
+  a cane proving basket.
 personality:
   traits: [ shy, hungry, observant, dry ]
   big5: { open: 60, conscientious: 52, extravert: 22, agreeable: 58, neurotic: 74 }
@@ -67,9 +68,9 @@ routine:
     - { at: "21:30", do: sleep, where: wharf.home_03 }
   weekend:                       # Saturday market day: the bakery, trays and rolls, from half past six
     - { at: "05:30", do: eat, where: wharf.home_03 }
-    - { at: "06:30", do: work, where: market_row.bakery }
+    - { at: "06:30", do: visit, where: market_row.bakery }
     - { at: "11:30", do: eat, where: market_row.bakery }
-    - { at: "12:30", do: work, where: market_row.bakery }
+    - { at: "12:30", do: visit, where: market_row.bakery }
     - { at: "15:00", do: sit, where: wharf.breakwater }
     - { at: "18:00", do: eat, where: wharf.home_03 }
     - { at: "20:00", do: write, where: wharf.home_03 }
@@ -79,7 +80,7 @@ relationships:
   - { id: liv_brodsky, affinity: 85, trust: 70, tag: mother, note: "Mum, who pencils his Saturdays on the door and has not asked about Carrow." }
   - { id: thora_brodsky, affinity: 80, trust: 55, tag: mother, note: "Mam, who leaves a pamphlet on the table each Friday. He has read none and kept them all." }
   - { id: leonie_brodsky, affinity: 65, trust: 60, tag: sister, note: "Eight and loud, and the only one who asks what he draws in the back of his book." }
-  - { id: odile, affinity: 35, trust: 20, tag: curious, note: "His Saturday master. Gives him trays, a broom and a heel, and no words. Wants her to say 'again.'" }
+  - { id: odile, affinity: 35, trust: 20, tag: curious, note: "Neither hires him nor sends him off. Gives him trays, a broom and a heel, and no words. Wants her to say 'again.'" }
   - { id: margo, affinity: 40, trust: 45, tag: fond, note: "Keeps his lesson book at the library desk and says nothing about the loaves drawn in the back." }
 secrets:
   - text: "In the back of his lesson book he draws every loaf Odile scores, and marks which cuts she repeats."

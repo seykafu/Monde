@@ -46,11 +46,11 @@ likes: [ the squeaky chair, the ferry horn, bread crusts, being waved at, the we
 dislikes: [ being put down, wet cuffs, the dark ]
 fears: [ the loud gull on the wall, being left alone in a room ]
 dream:
-  text: Grown, she wants a Saturday job at the bakery.
+  text: To be lifted up to see the Gannet's horn close, the day she comes in.
   stages:
-    - Ask around Market Row for part-time hours.
-    - Do a trial week at Fournier & Fille.
-    - Get on the rota.
+    - Be carried to the ferry slip on a Tuesday.
+    - Wave at the Gannet from Mina's hip.
+    - Be lifted up by Moss to see the horn close.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_28 }

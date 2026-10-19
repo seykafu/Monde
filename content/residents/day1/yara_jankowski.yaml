@@ -37,11 +37,11 @@ beliefs:
 voice:
   register: Quick and cheerful with a dry edge. Gives weather reports before greetings. Trails off when she is
     about to say something soft.
-  tics: [ Fair enough, Tide's making, Squint at the sky first ]
+  tics: [ Fair enough, Boots on, Brace yourself ]
   never_says: [ I suppose, it's a shame, believe me ]
   samples:
-    - Morning. Could be worse, could be raining.
-    - Tide's making, you'd best get your boots on.
+    - Morning. Dry so far. Don't thank me yet.
+    - The tide's coming in fast, you'd best get your boots on.
     - Piet's cooking again. Brace yourself.
 birthday: 92
 likes: [ flat calm at dawn, good rope, smoked fish, her brother's letters ]
@@ -76,8 +76,8 @@ chores: [ Dries the nets on the line, Keeps the rosemary bed by the door, Writes
 relationships:
   - {
       id: piet_hendry,
-      affinity: 20,
-      trust: 25,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: "Her husband, the only man who can make her laugh before breakfast."
     }

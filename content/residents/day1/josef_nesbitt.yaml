@@ -77,7 +77,7 @@ relationships:
   - { id: elke_nesbitt, affinity: 90, trust: 85, tag: mother, note: "Mum, who runs and then stops, and posts a door every Wednesday." }
   - { id: corin_madsen, affinity: 85, trust: 80, tag: parent, note: "Counts the stairs with him and lets him have the landing lamp." }
   - { id: leila_nesbitt, affinity: 80, trust: 70, tag: grandmother, note: "Gran, who holds the rail and lies about her knees." }
-  - { id: hanne_nesbitt, affinity: 65, trust: 40, tag: sister, note: "Skips the eleventh stair and pretends it's habit. He knows it isn't." }
+  - { id: hanne_nesbitt, affinity: 75, trust: 55, tag: sister, note: "Skips the eleventh stair and pretends it's habit. He knows it isn't." }
   - { id: felix, affinity: 40, trust: 45, tag: fond, note: "His teacher and the top of the lane. Wants him to admit the creaking step." }
   - { id: alun_osei, affinity: 50, trust: 45, tag: friend, note: "Two doors along, bigger, and carries him when it rains. Wants him to tell him how the lorry sounds before it turns the corner." }
 secrets:

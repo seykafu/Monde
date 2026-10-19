@@ -49,11 +49,11 @@ likes: [ a fishing rod, tools that fit the hand, Philippa's cooking, the harbour
 dislikes: [ stairs, drafts, being told how to sit, loud radios ]
 fears: [ his hands going stiff, being found out for old debts ]
 dream:
-  text: A dance in the old hall on a Saturday night, with a gramophone and Soren's hand in his.
+  text: Every chair in the Gull & Anchor mended, and one by the window kept for Soren.
   stages:
-    - Find a hall with a sound floor and space.
-    - Find a gramophone or ask a band to play.
-    - Hold the dance and keep time badly on purpose.
+    - Count the broken chairs with Philippa and make a list.
+    - Mend six before the Regatta, working in the pub's back room.
+    - Set the last one by the window and see Soren sit in it.
 routine:
   weekday:
     - { at: "07:15", do: eat, where: market_row.home_07 }
@@ -76,8 +76,8 @@ chores: [ Mend chairs, Sharpen the saw, Fetch the milk ]
 relationships:
   - {
       id: soren_falk,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: Argues with him over every crossword clue and would not trade a day of it.
     }
@@ -86,7 +86,7 @@ relationships:
       affinity: 14,
       trust: 10,
       tag: friend,
-      note: Gives him the pub's broken stools to fix and a plate of something hot after.
+      note: Gives him the pub's broken chairs to fix and a plate of something hot after.
     }
   - {
       id: yaa_ennis,
@@ -96,8 +96,8 @@ relationships:
       note: Asks about her stall's crates; he asks about her boats.
     }
 secrets:
-  - text: He kept a small wooden fishing lure carved for a boy who drowned off the breakwater, and he has never
-      told Soren why he fishes…
+  - text: He kept a small wooden fishing lure carved for a boy who left on the Friday ferry and never wrote, and he has never
+      told Soren why he fishes off the Wharf at dusk.
     reveal: { regard_min: 65 }
 canon_locks: []
 story_role: none

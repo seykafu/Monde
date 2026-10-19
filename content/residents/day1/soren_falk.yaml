@@ -23,7 +23,7 @@ look:
   accessory: { kind: glasses }
   glasses: round
 backstory: Soren came to Monde at twenty-six to take a post as clerk at Lissworth Mill, which was then hiring
-  nearly everyone who could count. He kept the wage ledgers for eleven years and still remembers the names of
+  nearly everyone who could count. He kept the wage ledgers for thirty years and still remembers the names of
   the women who ran the spinning frames. When the mill closed he was offered a clerk's job in Carrow and
   refused it, because he had already decided the town was where he wanted to be old. He has never regretted
   it, though he will tell you he has.
@@ -34,7 +34,7 @@ values: { prosperity: 0.1, safety: 0.4, spirit: 0.2, charm: 0.3 }
 beliefs:
   - The mill would have reopened if the council had asked the right people.
   - Anyone who leaves Monde for good was never really from here.
-  - A kettle on the stove is the only honest clock in the house.
+  - A tide table is the only honest clock in the house.
 voice:
   register: Measured and exact, a clerk's habit of finishing a point before anyone else can start. Tends toward
     complete sentences even in small talk.
@@ -42,18 +42,18 @@ voice:
   never_says: [ I suppose, whatever you like, no harm done ]
   samples:
     - The Gannet is at half past eight, Tuesdays and Fridays. Don't let Moss tell you otherwise.
-    - I kept those wage books for eleven years. I could tell you what every frame-girl earned.
-    - Well. Ask me again when the kettle's on.
+    - I kept those wage books for thirty years. I could tell you what every frame-girl earned.
+    - Well. Ask me again once I've checked the book.
 birthday: 40
 likes: [ the morning paper, tide tables, a clean ledger, Fournier's rye bread, a morning paper ]
 dislikes: [ stairs, drafts, being managed, rounded numbers ]
 fears: [ the house going quiet, forgetting a name from the mill ]
 dream:
-  text: A bench on the Commons facing the water, where he and Mikael can sit and count the boats coming in.
+  text: The names of every frame-hand in the Lissworth wage books, written out fair and hung in the Market Hall.
   stages:
-    - Choose a spot on the Commons near the bandstand.
-    - Raise fifteen coins or ask Kasimir to build the bench.
-    - Sit on it with the first neighbour who stops.
+    - Copy the names from the wage books at the long table in the Town Hall archive.
+    - Take the fair copy to Sable to be set in the Lantern.
+    - Hang the framed list in the Market Hall on Harvest Supper day.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: market_row.home_07 }
@@ -76,8 +76,8 @@ chores: [ Wind the kitchen clock, Keep the tide table current, Carry the coal in
 relationships:
   - {
       id: mikael_saunders,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: "Forty-four years of arguing about everything, and still the first person he checks on."
     }

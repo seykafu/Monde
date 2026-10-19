@@ -22,9 +22,9 @@ look:
   outfit: { cut: jumper, top: 0, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: none }
 backstory: Anouk spent her working life measuring and cutting cloth in a draper's shop in a mill town inland,
-  where she was known for never letting a customer leave with the wrong length. When the mill closed she moved
-  to Monde to be near a cousin, and found the cousin had gone to the mainland. She kept the lease on the Shore
-  Lane flat anyway and took up odd sewing for the lane. She met Genevieve at the pub quiz and has been arguing
+  where she was known for never letting a customer leave with the wrong length. When the inland mill shut she moved
+  to Monde to be near a cousin, and found the cousin had gone to the mainland. She kept the lease on the Wharf
+  flat anyway and took up the tatting she had always meant to learn. She met Genevieve at a Harvest Supper table and has been arguing
   with her ever since. Her private belief is that Monde would never have lasted without the cannery, though
   the cannery closed eleven years ago and took most of the town's money with it.
 personality:
@@ -38,22 +38,22 @@ beliefs:
 voice:
   register: Measured and dry, with short sentences and a habit of correcting small details. She disagrees as a
     kind of affection and seldom raises her voice.
-  tics: [ "Don't we, dear?", That's not quite right., Mm. ]
+  tics: [ Measure it again., That's not quite right., Mm. ]
   never_says: [ I'm sure it'll be fine, Just a little ]
   samples:
     - Mm. You've hemmed that the wrong way, but it'll do.
     - Genevieve says the cat is ours. I say the cat has never asked either of us.
-    - Don't we, dear? I was only saying the bread was better on Tuesday.
+    - The bread wasn't as good as Tuesday's. Measure it again if you doubt me.
 birthday: 81
 likes: [ a morning paper, her teal cardigan, quiet afternoons with a needle, neat seams, a kettle on the stove ]
 dislikes: [ drafts, being managed, loud pubs, uneven hems ]
 fears: [ being left alone in the flat, forgetting how to do a fine stitch ]
 dream:
-  text: To be useful again, sewing and mending for the town, and to be thanked by name in the Lantern.
+  text: To teach three children from the school to cut and hem a straight handkerchief before the school closes.
   stages:
-    - Volunteer three shifts at the library or the school.
-    - Get thanked by name in the Lantern.
-    - Take a regular chair at the Gull & Anchor.
+    - Ask Margo if the library will lend a table on Wednesday afternoons.
+    - Teach three children to cut and hem a handkerchief.
+    - Show the handkerchiefs at Bloom Fair.
 routine:
   weekday:
     - { at: "07:30", do: wander, where: wharf.home_06 }
@@ -76,8 +76,8 @@ chores: [ Mend the household's linen, Set out the morning paper, Keep the kettle
 relationships:
   - {
       id: genevieve_corrigan,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: Her partner of thirty-six years; argues with her fondly.
     }

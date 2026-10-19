@@ -79,7 +79,7 @@ relationships:
   - { id: dmitri_osei, affinity: 80, trust: 60, tag: father, note: "Wants to put her behind the wheel of the lorry. Wants her to say yes. She says 'Ask me Tuesday.'" }
   - { id: anselm_osei, affinity: 85, trust: 75, tag: father, note: "Packs a second sandwich in the lunch box for the boathouse and says nothing when she brings it back eaten." }
   - { id: tilde_osei, affinity: 70, trust: 55, tag: grandmother, note: "Draws her at the kitchen table with a pencil behind one ear. Elodie holds still because Gran needs the practice." }
-  - { id: alun_osei, affinity: 65, trust: 50, tag: brother, note: "Keeps asking to sound the lorry horn and to see the boathouse. Gets neither." }
+  - { id: alun_osei, affinity: 70, trust: 55, tag: brother, note: "Keeps asking to sound the lorry horn and to see the boathouse. Gets neither." }
   - { id: signe_starling, affinity: 50, trust: 50, tag: fond, note: "Teaches her the seam and says 'wrongly' about everything she holds. Wants her to say 'again' and not 'wrongly'." }
   - { id: ruth_doherty, affinity: 40, trust: 40, tag: curious, note: "Keeps the keys on a nail. Wants her to say whether a key is for Tuesdays or for good." }
 secrets:

@@ -22,11 +22,12 @@ look:
   outfit: { cut: coat, top: 0, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: glasses }
   glasses: heavy
-backstory: Lavinia worked thirty-one years as a clerk at the Carrow ferry office, writing down names and cargo
-  in a ledger that never once balanced on the first try. She came home to Monde when the mill closed and her
-  sister's roof started leaking. She still thinks the ferry timetable is printed wrong. Her one real regret is
-  that she never learned to drive the Gannet's little dinghy, which she has told everyone she was too busy
-  for. She stays because the sea is quiet here and she has finally stopped counting things.
+backstory: Lavinia worked thirty-one years as a clerk at the Carrow ferry office, writing down names and
+  cargo in a ledger that never once balanced on the first try. She came home to Monde fourteen years ago,
+  when the mill closed and her sister's roof started leaking. She still thinks the ferry timetable is
+  printed wrong. Her one real regret is that in thirty-one years of logging the Gannet's passengers she
+  never once rode her for no reason, which she has told everyone she was too busy for. She stays because the
+  sea is quiet here and she has finally stopped counting things.
 personality:
   traits: [ dry, exacting, loyal, observant ]
   big5: { open: 45, conscientious: 82, extravert: 40, agreeable: 58, neurotic: 35 }
@@ -42,18 +43,18 @@ voice:
   never_says: [ darling, I feel, whatever you like ]
   samples:
     - Well, technically the tide turns at twenty past, not half past. Hm, yes.
-    - Don't we, Winifred? You always did leave the kettle on.
+    - You always did leave the kettle on, Winifred. I've said so for fourteen years.
     - No, I won't come to the pub. I'll sit by the window and watch the gulls fight.
 birthday: 56
 likes: [ a morning paper, a kettle on the stove, strict timetables, the ferry horn at dusk ]
 dislikes: [ stairs, drafts, being managed, rounded numbers ]
 fears: [ running out of tea, her sister getting ill again ]
 dream:
-  text: A bench on the Commons where she can read the paper and count the gulls without anyone interrupting.
+  text: See her corrected ferry and tide table printed in the Lantern, exactly as she wrote it.
   stages:
-    - Choose a quiet spot on the Commons near the duck pond.
-    - Raise fifteen coins or ask Kasimir Wolanski to build it.
-    - Sit on it with the first neighbour who stops to talk.
+    - Compare a month of arrival times with Hollis's log (Regard ≥ 20 with Hollis)
+    - Draft the corrected table on one sheet and check every figure twice
+    - Take it to Sable and see it printed as written
 routine:
   weekday:
     - { at: "07:00", do: eat, where: old_quarter.home_06 }
@@ -74,10 +75,10 @@ chores: [ balance the house accounts, fetch the post, wind the wall clock ]
 relationships:
   - {
       id: winifred_flynn,
-      affinity: 20,
-      trust: 25,
-      tag: spouse,
-      note: "Her sister. Argues with her every morning, out of love."
+      affinity: 75,
+      trust: 70,
+      tag: twin,
+      note: "Her twin, older by eleven minutes and still saying so. Argues with her every morning, out of love."
     }
   - {
       id: ulla_ferreira,
@@ -103,4 +104,4 @@ generated_by: model
 household: oq_b04
 archetype: retired_couple
 employment: retired
-years_in_monde: 64
+years_in_monde: 14

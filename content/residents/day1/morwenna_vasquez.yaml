@@ -23,11 +23,11 @@ look:
   accessory: { kind: glasses }
   glasses: round
 backstory: Morwenna spent twenty-two years as a steward at Lissworth Mill, arguing rota disputes on the
-  factory floor until the frames went quiet. Her lungs gave out before the mill did, and she came home to
-  Monde on a doctor's advice and never left. She was born in the terraces behind Millbrook and knows which
-  doorsteps have been empty longest. Her wife's shop sits under her window, so she hears every complaint about
-  the Tollmen before it reaches the Lantern. She still keeps the union's minute book in a drawer, and she
-  still believes that a town run on lists will hold together.
+  factory floor until the frames went quiet. Her lungs gave out before the mill did, so on a doctor's advice
+  she took the flat over Café Liss, away from the lint, and never left. She was born in the terraces behind
+  Millbrook and knows which doorsteps have been empty longest. Café Liss sits under her window, so she hears
+  every complaint about the Tollmen before it reaches the Lantern. She still keeps the union's minute book
+  in a drawer, and she still believes that a town run on lists will hold together.
 personality:
   traits: [ organised, stubborn, warm, precise ]
   big5: { open: 40, conscientious: 88, extravert: 62, agreeable: 58, neurotic: 45 }
@@ -39,11 +39,11 @@ beliefs:
 voice:
   register: Brisk and formal, with a warmth she tries to hide under procedure. She numbers her points and makes
     sure people know when a thing is decided.
-  tics: [ Item one., Right then., Who's putting their name down? ]
+  tics: [ Item one., For the minutes., Who's putting their name down? ]
   never_says: [ I suppose, whatever you like, it doesn't matter, not my problem ]
   samples:
     - Item one. We need someone for the Saturday bins, and I am looking at you.
-    - No, that's not a complaint, that's a rota. Write it down, it'll help.
+    - Write it down, it'll help. Wednesday's bins, Thursday's step, and your name by both.
     - Thank you. I mean it. Don't make me say it twice.
 birthday: 23
 likes: [ blank foolscap, being thanked by name, the Lantern going out on time, a gavel she keeps for emergencies ]
@@ -76,8 +76,8 @@ chores: [ Pins the rota to the café door, Sorts the Lantern's copy, Keeps the h
 relationships:
   - {
       id: pernille_vasquez,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
       note: "Her wife, who runs the books her way."
     }

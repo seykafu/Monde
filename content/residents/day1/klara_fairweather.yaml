@@ -82,8 +82,8 @@ chores: [ bake on Fridays, darn the household socks, water the windowbox ]
 relationships:
   - {
       id: nkechi_fairweather,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: "Her steady, sharp-tongued other half."
     }

@@ -22,9 +22,9 @@ look:
   outfit: { cut: plain, top: 7, bottom: 6, bottom_style: skirt, shoes: 3 }
   accessory: { kind: none }
 backstory: Came to Monde at twenty-four from a weaving town up the coast, hired on at Lissworth Mill because
-  the pay was steady and the frames were the best in the region. She set looms for twenty-six years and could
+  the pay was steady and the frames were the best in the region. She set looms for twenty-one years and could
   tell a bad pick by ear. When the mill shut fourteen years ago she took casual repair work and then less and
-  less. She stayed for Dafydd, who she met on her second week, and because nobody else in town tells her the
+  less. She stayed for Gilles, who she met on her second week, and because nobody else in town tells her the
   frames will never run again. She still checks the Mill yard gate when she walks past.
 personality:
   traits: [ practical, blunt, proud, loyal ]
@@ -35,15 +35,15 @@ beliefs:
   - The mill will run again if somebody puts their hands on it.
   - Nobody in Monde listens to a woman who talks about wages.
 voice:
-  register: "Plain and short. She counts things: picks, bolts, hours. Says 'used to be' when she means it hurts."
-  tics: [ used to be, that's the job ]
+  register: "Plain and short. She counts things: picks, bolts, hours. Gives the old gauge when she means it hurts."
+  tics: [ forty to the inch, that's the job ]
   never_says: [ I'm fine, it's a shame, someday ]
   samples:
-    - Used to be forty picks to the inch. Don't tell me it's gone.
+    - Forty to the inch, that's what we wove. Don't tell me it's gone.
     - I'm not waiting on the Tollmen to sort it. We'll sort it.
     - Tea's in the tin. Mind, it's stewed.
 birthday: 61
-likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time, Dafydd's bad jokes ]
+likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time, Gilles's bad jokes ]
 dislikes: [ being retrained, short shifts, men with clipboards ]
 fears: [ the house being taken for the unpaid rates, losing her hands to arthritis ]
 dream:
@@ -73,8 +73,8 @@ chores: [ mend the kitchen curtains, sweep the step on Weir Road, take the bins 
 relationships:
   - {
       id: gilles_tremaine,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: "Her husband of thirty-five years, still her best argument."
     }

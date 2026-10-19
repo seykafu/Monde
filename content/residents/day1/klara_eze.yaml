@@ -38,7 +38,7 @@ beliefs:
 voice:
   register: Precise and brisk, with clipped sentences when she is sure of something and long pauses when she is
     not. She corrects small facts out of affection.
-  tics: [ "that's the figure, then", "well, I did say", "don't we, dear?" ]
+  tics: [ "that's the figure, then", "well, I did say", "put that on the list" ]
   never_says: [ I'm sure it'll be fine, no need to fuss, it's just a feeling ]
   samples:
     - The Gannet is late again, dear. Put that on the list.
@@ -87,15 +87,15 @@ chores:
 relationships:
   - {
       id: emrys_eze,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
       note: "Her husband. She corrects him, and he lets her."
     }
   - { id: ilona, affinity: 18, trust: 15, tag: friend, note: Swaps mending and gossip over the back fence. }
   - { id: gideon_szabo, affinity: 8, trust: 6, tag: curious, note: Watches how he manages his mother's care. }
 secrets:
-  - text: She has kept every Lantern since 1989 in a trunk under the stairs, in order.
+  - text: She has kept every Lantern since her first winter here in a trunk under the stairs, in order.
     reveal: { regard_min: 60 }
 canon_locks: []
 story_role: volunteer

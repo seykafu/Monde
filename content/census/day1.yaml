@@ -4590,7 +4590,7 @@ households:
         presentation: f
         pronoun_default: she/her
         employment: employed
-        job: { row: 15, title: post round, workplace: wharf.ticket_booth }
+        job: { row: 15, title: post round, workplace: wharf.ferry_slip }
         saturday_job: null
         surname: Brodsky
         first_names: [ Liv, Katrien, Matilde, Esme, Celeste, Sabine ]
@@ -4700,7 +4700,7 @@ households:
         presentation: f
         pronoun_default: she/her
         employment: employed
-        job: { row: 15, title: post round, workplace: wharf.ticket_booth }
+        job: { row: 15, title: post round, workplace: wharf.ferry_slip }
         saturday_job: null
         surname: Verhoeven
         first_names: [ Ottilie, Amara, Clemency, Soraya, Estelle, Aurore ]

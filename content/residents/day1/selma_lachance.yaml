@@ -4,7 +4,7 @@ name: Selma Lachance
 age: 80
 pronouns: she/her
 kind: resident
-occupation: Retired radio and clock repairer who still takes in small jobs at…
+occupation: Retired radio and clock repairer; still takes in small jobs.
 workplace: millbrook.home_40
 home: millbrook.home_40
 portrait: selma_lachance
@@ -23,11 +23,11 @@ look:
   accessory: { kind: glasses }
   glasses: heavy
 backstory: Selma spent thirty-one years repairing wirelesses and mantel clocks in a cramped shop in Carrow,
-  under a foreman who never once said thank you. She married a ferry engineer, Anselm, who died six winters
+  under a foreman who never once said thank you. She married a ferry engineer, Marcel, who died six winters
   ago; she still keeps his tin of spare valves on the shelf above her bench. She came to Monde at sixty-three
-  because the mill rents were cheap and the quiet suited her ears. The first repair she did here was a ship's
+  because the Millbrook rents were cheap and the quiet suited her ears. The first repair she did here was a ship's
   clock from the Gannet, and Old Moss paid her in a bag of plums she has never fully forgiven herself for
-  enjoying. She believes the town's wireless hall could be made to work again with patience alone.
+  enjoying. She believes the Town Hall's old wireless could be made to work again with patience alone.
 personality:
   traits: [ patient, dry, meticulous, stubborn ]
   big5: { open: 62, conscientious: 82, extravert: 28, agreeable: 44, neurotic: 38 }
@@ -35,7 +35,7 @@ values: { prosperity: 0.15, safety: 0.25, spirit: 0.3, charm: 0.3 }
 beliefs:
   - A machine that will not sing has only a loose wire.
   - Monde's quiet is the kind that can be listened to.
-  - Nobody in this town wants the old hall set working except me.
+  - Nobody in this town wants the old Town Hall set working except me.
 voice:
   register: Short, dry, technical. Explains things with plumbing comparisons and tends to repeat instructions to
     herself. Warm underneath but rarely shows it outright.
@@ -43,7 +43,7 @@ voice:
   never_says: [ that's nice, I'm sure it'll be fine, it's just a radio ]
   samples:
     - Hold this. No, the other this.
-    - Mm, there it is. Don't touch the dial, it's thinking.
+    - Mm, there it is. Hands off the valve, it's still warming.
     - Ferry's late. Tide's been wrong all week, like the clock.
 birthday: 99
 likes:
@@ -63,10 +63,10 @@ dislikes:
   ]
 fears: [ her hands going before her ears do, the wireless going silent for good ]
 dream:
-  text: Get the old wireless hall set singing again so the whole town can hear the evening forecast together.
+  text: Get the Town Hall's old wireless set singing again so the whole town can hear the forecast together.
   stages:
-    - Fix the Hall's old set before the damp finishes it.
-    - Tune the evening shipping forecast for the pub.
+    - Fix the Town Hall's old set before the damp finishes it.
+    - Tune in the morning time signal and pin a notice of it on the Hall door.
     - Hold the first Listening Night on the Commons.
 routine:
   weekday:
@@ -93,7 +93,7 @@ relationships:
   - { id: felix, affinity: 6, trust: 6, tag: fond, note: Wants his pupils to learn to solder. }
 secrets:
   - text: She still listens to the Carrow station late at night, and has kept a notebook of every forecast since
-      Anselm died.
+      Marcel died.
     reveal: { regard_min: 55 }
 canon_locks: []
 story_role: mentor

@@ -21,8 +21,8 @@ look:
   height: short
   outfit: { cut: jumper, top: 6, bottom: 5, bottom_style: trousers, shoes: 4 }
   accessory: { kind: none }
-backstory: Selma was born in Carrow and came to Monde at one, which means she remembers almost nothing of the
-  city but the trams, which she still waves at out of habit. She has a favourite spot on the laundry green
+backstory: Selma was born in Hessle Cross and came to Monde at one, which means she remembers almost nothing of the
+  town but the trams, which she still waves at out of habit. She has a favourite spot on the laundry green
   where the bindweed is tallest and she likes to pull it up one stem at a time. Vera calls her a hazard with a
   good heart. She is convinced the heron on the fountain square is her friend. She is wrong about that, and
   about the heron's name, which she has decided is Gerald.
@@ -75,11 +75,11 @@ relationships:
       tag: fond,
       note: The old lady who gives her radio knobs to play with.
     }
-  - { id: vera_rourke, affinity: 40, trust: 35, tag: mother, note: Mama. Always watching. }
+  - { id: vera_rourke, affinity: 90, trust: 85, tag: mother, note: Mama. Always watching. }
   - {
       id: dorian_rourke,
-      affinity: 45,
-      trust: 30,
+      affinity: 88,
+      trust: 80,
       tag: father,
       note: "Papa, who comes home with ferry smell on him."
     }

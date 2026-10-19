@@ -52,7 +52,7 @@ dream:
   text: A loom in a proper workroom with a window that opens, where people can watch the cloth come off it.
   stages:
     - Find a room with proper ventilation and a second window.
-    - Ask Kasimir for a lintel and a power point for the dye vats.
+    - Ask Kasimir for a lintel and a flue for the dye vats.
     - Weave the first full length in front of whoever comes to watch.
 routine:
   weekday:
@@ -73,7 +73,7 @@ routine:
     - { at: "22:00", do: sleep, where: old_quarter.home_05 }
 chores: [ dye skeins in the back yard, mend the loom's heddles, sweep the workroom floor ]
 relationships:
-  - { id: noam_ashdown, affinity: 25, trust: 30, tag: spouse, note: Husband; the one who keeps the kiln lit. }
+  - { id: noam_ashdown, affinity: 85, trust: 80, tag: spouse, note: Husband; the one who keeps the kiln lit. }
   - {
       id: ulla_ferreira,
       affinity: 18,

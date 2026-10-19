@@ -21,7 +21,7 @@ look:
   height: short
   outfit: { cut: coat, top: 9, bottom: 2, bottom_style: skirt, shoes: 3 }
   accessory: { kind: none }
-backstory: Nkechi kept the drapery counter at a Carrow department store for twenty years, measuring hems for
+backstory: Nkechi kept the drapery counter at a Carrow department store for ten years, measuring hems for
   brides and widows. She met Klara at a Saturday dance when Klara was twenty-four and Nkechi was twenty-nine
   and already tired of the city. They took the Gannet over with two suitcases and a sewing box. The mill was
   still loud then, and the town seemed to have room for two more women who wanted a quiet life. Nkechi has
@@ -37,11 +37,11 @@ beliefs:
 voice:
   register: Clipped and exact, with a teacher's patience and a draper's habit of checking the measure twice.
     Speaks in short declaratives and lets silence do the rest.
-  tics: [ "Well, now.", Measure twice., "That's the thing, isn't it." ]
+  tics: [ "Well, now.", Measure twice., "Check the selvedge." ]
   never_says: [ I suppose, whatever you like, not my problem ]
   samples:
     - Measure twice, then speak. That's how we managed forty years.
-    - No, the hem is fine. It's the thread that's gone wrong.
+    - Hem's sound. The thread has gone wrong; fetch me a new reel.
     - You'll want the good chair by the stove. Klara will try to take it.
 birthday: 49
 likes:
@@ -55,11 +55,11 @@ likes:
 dislikes: [ stairs, drafts from the front door, being managed, late post ]
 fears: [ being the one left in the flat alone, a cold that settles in for good ]
 dream:
-  text: A bench on the Commons where she can sit and watch the duck pond with Klara.
+  text: Sew one wedding dress in Monde, hem and all, before her hands go cold for good.
   stages:
-    - Choose a spot beside the duck pond, away from the bindweed.
-    - Raise fifteen coins from the Saturday market or ask Kasimir to build it.
-    - Sit on it with the first neighbour who stops to talk.
+    - Show the Carrow gown pattern to someone in town who might wear it.
+    - Measure twice and cut the cloth on the kitchen table.
+    - Hem the finished gown and see it walk up the chapel aisle.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_22 }
@@ -81,8 +81,8 @@ chores: [ sort the thread on Mondays, mend Klara's pinafore hems, wind the wirel
 relationships:
   - {
       id: klara_fairweather,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Thirty-nine years of arguing over the stove.
     }

@@ -78,8 +78,8 @@ routine:
 chores: [ post the Wednesday card, change the ribbon on Friday night, put the kettle on before she takes her coat off, count the stairs to the landing ]
 relationships:
   - { id: corin_madsen, affinity: 85, trust: 80, tag: partner, note: "Has kept the house and the beans while she types. Wants Corin to tell her what she misses on a Wednesday, and Corin says 'nothing', and means everything." }
-  - { id: leila_nesbitt, affinity: 70, trust: 45, tag: mother, note: "Feeds her the minute she's in the door and has never said the ferry was right. Wants her to say it." }
-  - { id: hanne_nesbitt, affinity: 65, trust: 40, tag: daughter, note: "Fifteen and answers in capitals. Wants her to ask for something, anything, on a Friday." }
+  - { id: leila_nesbitt, affinity: 70, trust: 45, tag: mother, note: "Feeds her the minute she's in the door and has never said the ferry was right; they stay apart on that. Wants her to say it." }
+  - { id: hanne_nesbitt, affinity: 65, trust: 40, tag: daughter, note: "Fifteen and answers in capitals; the four days a week they spend apart don't help. Wants her to ask for something, anything, on a Friday." }
   - { id: josef_nesbitt, affinity: 90, trust: 80, tag: son, note: "Knows her step on the stairs before the door opens. Keeps her cards in a tin, in order." }
   - { id: felix, affinity: 35, trust: 40, tag: fond, note: "Teaches Josef, and knows his name before she says it. Wants him to tell her, in writing, how many names the roll needs." }
   - { id: moss, affinity: 30, trust: 40, tag: friend, note: "Holds the gangplank for her bag on forty Tuesdays a year and hasn't once asked why she goes." }

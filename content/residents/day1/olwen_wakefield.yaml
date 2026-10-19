@@ -4,7 +4,7 @@ name: Olwen Wakefield
 age: 29
 pronouns: she/her
 kind: resident
-occupation: Repair-counter keeper and shop founder, weekday commuter at a Hessle Cross firm
+occupation: Repair-counter keeper and shop founder; lodges in Hessle Cross Tuesday to Friday.
 workplace: offmap.city
 home: millbrook.home_19
 portrait: lib_f30_084
@@ -24,9 +24,9 @@ look:
 backstory: Olwen trained as a bookkeeper in Hessle Cross and spent six years balancing other people's margins
   before she could afford her own. She met Malachy in Carrow on a bus where his sketchbook slid onto her lap.
   She talked him into Monde because she had read that a town of two hundred people has room for a shop nobody
-  else would dare open. Her first year was spent on the ferry. The second was spent trying to get the bakery
-  to take her salt. She is still certain the Wharf has a fine building left in it, and wrong about how many
-  customers a month a shop needs.
+  else would dare open. Her first year was spent lodging in Hessle Cross Tuesday to Friday and coming home on
+  Friday's ferry. The second was spent trying to get the bakery to take her salt. She is still certain the Wharf
+  has a fine building left in it, and wrong about how many customers a month a shop needs.
 personality:
   traits: [ precise, warm, stubborn, thrifty, restless ]
   big5: { open: 58, conscientious: 82, extravert: 60, agreeable: 52, neurotic: 46 }
@@ -38,7 +38,7 @@ beliefs:
 voice:
   register: Brisk and businesslike, with a salesperson's warmth over a ledger. Talks in prices and margins.
     Short sentences, then a laugh when she catches herself counting.
-  tics: [ that's a margin, "fair enough, two and six", let me check the book ]
+  tics: [ that's a margin, "counting it twice", let me check the book ]
   never_says: [ just browsing, it's only a little, cheap ]
   samples:
     - Four coins, no. Sorry, coins. Four coins for the lamp, and the wick's on me.
@@ -50,7 +50,7 @@ dislikes:
   [
     fees nobody explained,
     empty windows,
-    weekend commutes that eat Saturday,
+    a Friday ferry that eats the evening,
     people who ask for credit twice
   ]
 fears:
@@ -82,14 +82,14 @@ routine:
 chores:
   [
     Balances the household accounts on Sunday evenings,
-    Packs the satchel for the ferry,
+    Packs the satchel for Tuesday's ferry,
     Scrubs the front step
   ]
 relationships:
   - {
       id: malachy_wakefield,
-      affinity: 25,
-      trust: 20,
+      affinity: 85,
+      trust: 75,
       tag: spouse,
       note: Husband; she trusts his eye and doubts his deadlines.
     }
@@ -108,8 +108,8 @@ relationships:
       note: Keeps the Loom Street ledger and admires her columns.
     }
 secrets:
-  - text: She has been sending her old employers small paid invoices for work she never finished, so she can claim
-      it on her tax to the…
+  - text: She has been ringing small sales into the till herself, out of her own purse, so the shop's book shows trade
+      before the first real customer walks in.
     reveal: { regard_min: 65 }
 canon_locks: []
 story_role: shopkeeper

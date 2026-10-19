@@ -4,7 +4,7 @@ name: Elin Fleury
 age: 88
 pronouns: she/her
 kind: resident
-occupation: Retired seamstress, mends for neighbours when asked.
+occupation: Retired seamstress; christening gowns and collars, now only by request.
 workplace: wharf.home_12
 home: wharf.home_12
 portrait: elin_fleury
@@ -22,7 +22,7 @@ look:
   outfit: { cut: plain, top: 15, bottom: 14, bottom_style: trousers, shoes: 3 }
   accessory: { kind: none }
 backstory: Elin sewed hems and christenings for forty years in Hessle Cross, first in a shop with her sister
-  and later from her own front room. When her husband Anders died she found the city too loud to think in, and
+  and later from her own front room. When her husband Arne died she found the city too loud to think in, and
   at seventy she took the ferry to Monde with two suitcases and a sewing box. Shingle Row had a ground-floor
   room going cheap. She still has the trunk she brought up from the boat, and she has never opened the bottom
   of it. She says she came for the quiet, which is partly true. The rest was a letter from her sister that she
@@ -39,12 +39,12 @@ beliefs:
 voice:
   register: Gentle and rambling on purpose, she circles back to earlier points. She quotes old prices and dates
     without meaning to. Short, warm sentences, with an occasional sharp aside.
-  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  tics: [ "A hem will tell you.", "I keep meaning to." ]
   never_says: [ grandma, you young ones, I suppose it's fine ]
   samples:
-    - Now where was I? Ah, yes, the hem. You'd be amazed what a hem will tell you.
-    - Mind the step on the way out, it's loose since the storm. I keep meaning to see to it.
-    - No, no, I don't need company. Though you could sit a minute, if you've got one to spare.
+    - A hem will tell you. Hold it to the window, and you'd be amazed what it says.
+    - Watch the doorstone on the way out, it's loose since the storm. I keep meaning to see to it.
+    - No, no, I don't need company. Though there's the good chair, if you've a minute to spare.
 birthday: 65
 likes:
   [
@@ -68,11 +68,11 @@ fears:
     her sister's letter ending up in the wrong hands
   ]
 dream:
-  text: Someone to eat supper with, on a standing night, the way Anders and I always did.
+  text: Someone to eat supper with, on a standing night, the way Arne and I always did.
   stages:
-    - Accept an invitation to supper from a neighbour on Shingle Row.
-    - Return the invitation with a meal of your own at your table.
-    - Set a standing Thursday table and keep it for a month.
+    - Take supper at Annick Olsen's table on Shingle Row, eggs and all.
+    - Have her back to the ground-floor room, with the trunk left shut in its corner.
+    - Keep a standing Thursday table for a month.
 routine:
   weekday:
     - { at: "07:30", do: sit, where: wharf.home_12 }
@@ -92,7 +92,7 @@ routine:
     - { at: "15:00", do: walk, where: commons.picnic_lawn }
     - { at: "18:30", do: socialize, where: market_row.gull_and_anchor }
     - { at: "21:30", do: sleep, where: wharf.home_12 }
-chores: [ Mends neighbours' buttons and hems, Trims the step and sweeps the Row, Takes in washing on Mondays ]
+chores: [ Turns collars and sews on buttons by request, Trims the step and sweeps the Row, Takes in washing on Mondays ]
 relationships:
   - { id: annick_olsen, affinity: 22, trust: 15, tag: fond, note: Brings her eggs and gossip most mornings. }
   - {
@@ -107,7 +107,7 @@ secrets:
   - text: She has a sister in Hessle Cross she has not written to in eighteen years, and her letter lies unopened
       in the trunk.
     reveal: { regard_min: 60 }
-  - text: She still sews a small blue stitch into every hem she makes, Anders's mother's pattern, and nobody has
+  - text: She still sews a small blue stitch into every hem she makes, Arne's mother's pattern, and nobody has
       ever noticed.
     reveal: { regard_min: 45 }
 canon_locks: []

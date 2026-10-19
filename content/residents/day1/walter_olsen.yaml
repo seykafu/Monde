@@ -4,7 +4,7 @@ name: Walter Olsen
 age: 59
 pronouns: he/him
 kind: resident
-occupation: Retired early; formerly a mill floor fitter at Lissworth.
+occupation: Retired early; formerly a floor fitter at a Carrow mill.
 workplace: wharf.home_13
 home: wharf.home_13
 portrait: lib_m53_097
@@ -23,7 +23,7 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 14 }
   face: { stubble: true }
-backstory: Walter spent twenty-two years on the floor at Lissworth Mill, fitting frames and breathing the
+backstory: Walter spent twenty-two years on the floor at a Carrow mill, fitting frames and breathing the
   fibre dust that eventually made him stop. He was not sorry to leave the city, though he misses the foremen's
   jokes. He and Annick came to Monde after a summer's holiday that went on for three weeks longer than
   planned, and they took the empty half of a house on Shingle Row. He is not a joiner, but he has been mending
@@ -40,29 +40,29 @@ beliefs:
 voice:
   register: Short and dry, with long pauses. He answers questions before they are finished and rarely offers
     more than he is asked. He does not hurry and does not apologise for silence.
-  tics: [ "Well, that's that.", Mm., "Don't we, dear?" ]
+  tics: [ "Well, that's that.", Wants oiling., I'd say. ]
   never_says: [ I feel, in my opinion, you must ]
   samples:
-    - Mm. Stool's wobbling again, I'd say.
+    - Stool's wobbling again, I'd say.
     - Can't say I've seen the ferry on time since the winter, but it's not my boat.
-    - Well, that's that. Annick'll want the kettle on, I'd bet you won't.
+    - Well, that's that. Annick'll be wanting me home, so I'd best be going.
 birthday: 98
 likes:
   [
     a morning paper,
     a sharp saw,
     the smell of cut pine,
-    stout at the Gull & Anchor on Fridays,
+    cider at the Gull & Anchor on Fridays,
     a kettle on the stove
   ]
 dislikes: [ stairs, drafts, being managed, rainy harbour mornings ]
 fears: [ losing the workbench to damp, being put in a home ]
 dream:
-  text: He wants a bench on the Commons facing the sea that he built himself, so people can sit with a view.
+  text: Every stool at the Gull & Anchor sound on all four legs, so he can stop mending them.
   stages:
-    - Choose a spot on the Commons near the picnic lawn.
-    - Raise fifteen coins or ask Kasimir to cut the timber.
-    - Sit on it with the first neighbour who stops.
+    - Walk the bar with Roz and mark each wobbling stool (Regard ≥ 20 with Roz)
+    - Ask Kasimir for six legs from his offcuts.
+    - Fit them and sit on every stool in turn.
 routine:
   weekday:
     - { at: "07:00", do: wander, where: wharf.home_13 }
@@ -84,8 +84,8 @@ chores: [ Mend stool legs at the pub, Split kindling for the stove, Oil the door
 relationships:
   - {
       id: annick_olsen,
-      affinity: 30,
-      trust: 30,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: His wife of thirty-five years; she corrects his facts.
     }

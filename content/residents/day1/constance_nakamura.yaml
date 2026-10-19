@@ -21,8 +21,8 @@ look:
   height: short
   outfit: { cut: plain, top: 3, bottom: 13, bottom_style: skirt, shoes: 15 }
   accessory: { kind: scarf, colour: 10 }
-backstory: Constance sewed for a dressmaker's in Carrow for twenty years before her husband Tomas took the
-  post at Lissworth Mill, and the two of them moved out to Monde when she was fifty. Tomas died six winters
+backstory: Constance sewed for a dressmaker's in Carrow for twenty years before her husband Kenzo took the
+  post at Lissworth Mill, and the two of them moved out to Monde when she was fifty. Kenzo died six winters
   ago, and she still keeps his thermos in the hall cupboard though it has not held tea since. She opened the
   sewing room at the back of the house to whoever wanted a hem taken up, and most of the street came. She
   believes the ferry timetable was kinder when she was young, which is not quite true, and she thinks the
@@ -33,36 +33,36 @@ personality:
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
   - Everything was cheaper when I was young, and better made.
-  - The boys on Mill Lane ride too fast because nobody teaches them manners.
+  - The young people on Mill Lane leave gates swinging because nobody teaches them manners.
   - The Commons will come right once someone with sense takes it in hand.
-  - Tomas would have known where the lost spool went.
+  - Kenzo would have known where the lost spool went.
 voice:
   register: Gentle and rambling on purpose, circling back to earlier threads. Often starts with a price from
     forty years ago. Speaks slowly and warmly, with contractions, and drops into quiet when she loses her
     thread.
-  tics: [ Now where was I?, "In my day, that was a coin", Mind the step ]
+  tics: [ Lost things turn up., "Slowly, now.", Two coins, it was. ]
   never_says: [ honestly, to be fair, in a nutshell ]
   samples:
-    - Now where was I? Oh yes, the bread was two coins and nobody complained.
+    - Gloves? Two coins, it was, and they lasted nine winters.
     - Sit down, love, you look like you've been up since dawn and I can see it.
     - Lost things turn up. They always do, if you give them time and don't go hunting.
 birthday: 25
 likes:
   [
-    knitting,
-    small birds at the window,
-    being asked for a story,
+    a thimble worn smooth,
+    the sill herbs in June,
+    a loaf with a good crust,
     the smell of cut cloth,
     Thursday afternoons
   ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, hurry ]
-fears: [ the house going quiet for good, forgetting Tomas's voice ]
+dislikes: [ gates left swinging, a thread pulled the wrong way, damp in the hall cupboard, hurry ]
+fears: [ the house going quiet for good, forgetting Kenzo's voice ]
 dream:
-  text: Someone to eat supper with, a standing table once a week.
+  text: Teach one child to thread a needle and sew a button on, and see it hold.
   stages:
-    - Accept a neighbour's invitation to supper at the Gull and Anchor.
-    - Return the invitation with a loaf and a story from Carrow.
-    - Set a standing Thursday table at number thirteen.
+    - Ask Felix which pupil keeps losing buttons.
+    - Show them the stitch in her back room on a Thursday afternoon.
+    - Watch them sew a button on their own coat, and see it hold.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: millbrook.home_30 }
@@ -82,7 +82,7 @@ routine:
     - { at: "15:00", do: sit, where: commons.duck_pond }
     - { at: "18:00", do: cook, where: millbrook.home_30 }
     - { at: "21:00", do: sleep, where: millbrook.home_30 }
-chores: [ Mend hems for neighbours on Thursdays, Water the sill herbs, Air the bedding on the green ]
+chores: [ Sort the button jars on Thursdays, Water the sill herbs, Air the bedding on the green ]
 relationships:
   - {
       id: anouk_clancy,
@@ -103,10 +103,10 @@ relationships:
       affinity: -12,
       trust: -5,
       tag: wary,
-      note: Arvid rides his bicycle past her gate with no bell.
+      note: Arvid cuts through her front garden on the way to school.
     }
 secrets:
-  - text: She still keeps Tomas's last unfinished waistcoat folded in the trunk and sometimes sews one buttonhole
+  - text: She still keeps Kenzo's last unfinished waistcoat folded in the trunk and sometimes sews one buttonhole
       on it at night.
     reveal: { regard_min: 60 }
 canon_locks: []

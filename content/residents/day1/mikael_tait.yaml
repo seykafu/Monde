@@ -26,7 +26,7 @@ look:
 backstory: Mikael grew up in a mill town on the northern coast where his father ran a plumbing van until the
   lanes emptied. He trained with a firm in Hessle Cross, then went freelance at nineteen, taking any job the
   ferry would carry him to. A burst main in a Monde cellar in his second year got him talking to the town's
-  old men about its roofs, and he never left. He married Mikael's partner Viggo's counterpart in the same
+  old men about its roofs, and he never left. He met Viggo on a cold job at the harbour, married him that
   year, and they bought the Bell Row flat. He still regrets leaving his first apprentice behind on the
   mainland, and he believes the town will rebuild itself if someone simply starts with the worst roof.
 personality:
@@ -44,7 +44,7 @@ voice:
   never_says: [ it'll do, good enough, whatever ]
   samples:
     - Mm. Roof's sound, mostly. Give me a Saturday and I'll tell you the rest.
-    - Slate's worth more than gold round here, if you ask me.
+    - Slate's worth more than gold on Bell Row, if you ask me.
     - Not today. The beam's still wet and I won't rush it.
 birthday: 50
 likes:
@@ -85,10 +85,10 @@ chores: [ mend the workshop bench, fix the kitchen tap washer, sweep the Bell Ro
 relationships:
   - {
       id: viggo_tait,
-      affinity: 22,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
-      note: Husband of twenty-one years; teases him about the flat cap.
+      note: Husband of twenty years; teases him about the flat cap.
     }
   - {
       id: augusta,

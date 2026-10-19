@@ -4,15 +4,14 @@ name: Dafydd Sutherland
 age: 52
 pronouns: he/him
 kind: resident
-occupation: Loom-setter, out of work since the mill closed; does casual repair when…
+occupation: Out-of-work loom-setter; does casual repairs for the boathouse and Kasimir.
 workplace: millbrook.home_36
 home: millbrook.home_36
 portrait: dafydd_sutherland
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: dafydd_sutherland
 appearance: A broad man with tufty black hair under round glasses, wearing a dark brown shirt and his rose
-  flat cap. His cap is pushed back from a face that looks like it has been squinting at machinery for thirty
-  years.
+  flat cap. His cap is pushed back from a face that looks like it has been squinting at machinery for decades.
 look:
   kind: human
   skin: 3
@@ -25,7 +24,7 @@ look:
   glasses: round
   headwear: { kind: flat_cap, colour: 12 }
 backstory: Dafydd came to Monde at twenty-two from a weaving town up the coast, signed on at Lissworth Mill,
-  and set looms there for nearly thirty years. He could tell a bad pick by the sound before the cloth showed
+  and set looms there for sixteen years. He could tell a bad pick by the sound before the cloth showed
   it. When the mill closed fourteen years ago he took the packing of the frames personally and still walks
   past the gates most mornings. He has done odd repairs for the boathouse and Kasimir since, but nothing with
   a wage that lasts. He stayed because Monde is where his friend was, and because a mill town is the only sort
@@ -40,7 +39,7 @@ beliefs:
   - Every Tollman is somebody's nephew, and that is the trouble with them.
 voice:
   register: Plain and short. Speaks in numbers and hours. Says little, and means what he says.
-  tics: [ Used to be., "Right, then.", Mm. ]
+  tics: [ Used to be., Give it here., Don't ask me twice. ]
   never_says: [ I'm fine, it's a shame, no hard feelings ]
   samples:
     - Used to be forty picks a minute on that frame. Now it's me and a tin of tea.
@@ -84,8 +83,8 @@ chores: [ Splits and stacks the kindling, Mends the back gate hinge, Washes the 
 relationships:
   - {
       id: mathis_sutherland,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Shared house and shared lost mill; they talk little but understand each other.
     }
@@ -101,10 +100,10 @@ relationships:
       affinity: 5,
       trust: 10,
       tag: curious,
-      note: Old counting-house clerk; they once argued over pick counts.
+      note: Retired mill electrician; they once argued over whose fault a blown loom fuse was.
     }
 secrets:
-  - text: He still keeps the last bolt ticket from the mill, folded in his wallet, and has never told Malachy.
+  - text: He still keeps the last bolt ticket from the mill, folded in his wallet, and has never told Mathis.
     reveal: { regard_min: 60 }
 canon_locks: []
 story_role: mentor

@@ -4,7 +4,7 @@ name: Remy Corbett
 age: 15
 pronouns: they/them
 kind: resident
-occupation: Student doing lessons by post and Felix's Thursday class; Saturday job at…
+occupation: Lessons by post and Felix's Thursday class; Saturday hand at the Lantern
 workplace: old_quarter.lantern_office
 home: station_hill.home_03
 portrait: lib_a15_046
@@ -41,7 +41,7 @@ voice:
   samples:
     - Sorry, sorry, that's my fault. Got the lever stuck again.
     - Right, right. Type's backwards. Fancy that.
-    - It's not a big deal. It's just the best thing I did all week.
+    - Oh, that's only the proof sheet. Best thing I did all week, though.
 birthday: 55
 likes:
   [

@@ -58,11 +58,11 @@ likes:
 dislikes: [ Stairs at the end of a long day, Drafts, People who fuss, Late ferries ]
 fears: [ The mill frames coming down, Being managed by anyone ]
 dream:
-  text: Be useful to the town in a way that gets his name printed, then sit in the same pub chair every evening.
+  text: Clear the Commons beds of bindweed to the last root, and find them still clear a season later.
   stages:
-    - Volunteer three shifts at the Commons garden this month.
-    - Get your name printed in the Lantern for the clearing.
-    - Take a regular chair at the Gull & Anchor.
+    - Work the Commons garden plots before dawn for three mornings.
+    - Ask Teo which beds hold the worst bindweed and dig them out.
+    - Come back at the turn of the season and find them clear.
 routine:
   weekday:
     - { at: "05:30", do: eat, where: old_quarter.home_21 }
@@ -83,8 +83,8 @@ chores: [ Carry coal up the Well Row stairs, Mend his own nets on the back step,
 relationships:
   - {
       id: sage_menon,
-      affinity: 25,
-      trust: 20,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
       note: Married; finishes their sentences and argues as affection
     }

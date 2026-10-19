@@ -25,8 +25,8 @@ look:
   face: { moustache: true }
 backstory: Born on Shingle Row, Edmund spent forty years keeping the ledgers at the Lissworth Mill until the
   frames went quiet. He still has the mill's old pencil stub in his coat pocket and sharpens it every morning,
-  though he has nothing left to write. He and Dorian met at the harbour steps when they were nineteen and have
-  never bothered to be anywhere else. He thinks the town will come back by the spring after next, and says so
+  though he has nothing left to write. He and Dorian met at the harbour steps when Dorian was nineteen and he was
+  twenty-four, and have never bothered to be anywhere else. He thinks the town will come back by the spring after next, and says so
   to anyone who will hold still for it. Last year he started a list of everyone who has left, and he has not
   shown it to Dorian.
 personality:
@@ -40,11 +40,11 @@ beliefs:
 voice:
   register: Measured and exact, with a clerk's habit of correcting small figures. He tends to finish sentences
     with a question addressed to Dorian, and disagrees as a kind of affection.
-  tics: [ "Don't we, dear?", "Strictly speaking,", That's not quite right. ]
+  tics: [ "By my count,", "Pass the milk.", That's not quite right. ]
   never_says: [ "Honestly, I'm fine", you're right, no worries ]
   samples:
-    - The ferry's late again. Strictly speaking, it's only four minutes, but I counted.
-    - Don't we, dear? We said we'd sit on the harbour steps before the tide turns.
+    - The ferry's late again. By my count it's only four minutes, but I wrote it down.
+    - Dorian, we said we'd sit on the harbour steps before the tide turns. That was the plan.
     - Hm. Pass the milk.
 birthday: 93
 likes:
@@ -53,16 +53,16 @@ likes:
     The sound of the Gannet's horn,
     Brass lamps,
     Crosswords done in ink,
-    a morning paper
+    a sharpened pencil
   ]
 dislikes: [ Drafts under doors, Being managed, Stairs ]
 fears: [ Dorian getting ill before him, The mill being pulled down ]
 dream:
-  text: A bench on the Commons, facing the water, with a plaque that gives the right year of their birth.
+  text: Have one name on his list of those who left write back to him, and cross it off in ink.
   stages:
-    - Choose a spot beside the duck pond on the Commons.
-    - Raise fifteen coins from the neighbours or ask Kasimir to build it.
-    - Sit on it with the first neighbour who stops to talk.
+    - Copy the list of those who left, with the last town each was heard from.
+    - Ask Ada at the ticket hatch to put a card for each in Friday's bag.
+    - Cross off the first name that answers, in ink.
 routine:
   weekday:
     - { at: "07:00", do: sleep, where: wharf.home_11 }
@@ -86,8 +86,8 @@ chores: [ Sharpen the pencils, Air the bedroom, Wind the kitchen clock ]
 relationships:
   - {
       id: dorian_vale,
-      affinity: 20,
-      trust: 25,
+      affinity: 90,
+      trust: 85,
       tag: partner,
       note: Partner of forty years; they argue about the kettle daily.
     }

@@ -102,7 +102,7 @@ relationships:
       note: Keeps asking about the old mill; Hartley doesn't answer.
     }
 secrets:
-  - text: He still keeps the mill's brass pulley from his first job in a drawer at home, and oils it every spring.
+  - text: He still keeps the brass pulley from the inland mill where he started in a drawer at home, and oils it every spring.
     reveal: { regard_min: 55 }
 canon_locks: []
 story_role: mentor

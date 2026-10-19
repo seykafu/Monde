@@ -4,7 +4,7 @@ name: Hilde Sorensen
 age: 67
 pronouns: she/her
 kind: resident
-occupation: Retired draper who now takes in neighbours' hems and gossip in equal…
+occupation: Retired draper who takes in neighbours' hems and gossip in equal measure
 workplace: old_quarter.home_08
 home: old_quarter.home_08
 portrait: lib_f70_110
@@ -21,7 +21,7 @@ look:
   height: short
   outfit: { cut: coat, top: 0, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: scarf, colour: 12 }
-backstory: Hilde ran a dressmaker's counter in Carrow for thirty years, measuring brides and widows alike. She
+backstory: Hilde ran a dressmaker's counter in Carrow for twelve years, measuring brides and widows alike. She
   came to Monde with Yusuf when the shop was sold, meaning only to rest. Within a month she had mended half of
   Well Row for nothing and been told everything. She still thinks the Saturday market needs a proper bunting
   line, and she has been asking Florent to stop hanging it crooked for three years. She stayed because she
@@ -40,7 +40,7 @@ voice:
   tics: [ "oh, love", "don't we, dear?", well I never ]
   never_says: [ that's none of my business, I don't gossip, I can't be bothered ]
   samples:
-    - Oh, love, you look peaky. Sit down before you fall down, and I'll put the kettle on.
+    - Oh, love, you look peaky. Take the good chair and I'll put the kettle on.
     - Yusuf says the ferry's late. I say he's just never liked the captain.
     - Well I never. Who's been sitting on the good chair?
 birthday: 78
@@ -78,8 +78,8 @@ chores: [ mend neighbours' hems, water the window boxes, sweep the step ]
 relationships:
   - {
       id: yusuf_sorensen,
-      affinity: 25,
-      trust: 25,
+      affinity: 90,
+      trust: 85,
       tag: spouse,
       note: "Her husband, who she still finds the best company in Monde."
     }

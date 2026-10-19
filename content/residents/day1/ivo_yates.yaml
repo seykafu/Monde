@@ -4,7 +4,7 @@ name: Ivo Yates
 age: 26
 pronouns: he/him
 kind: resident
-occupation: Commuter working weekdays in Carrow, home weekends.
+occupation: Clerk at a Carrow freight office; away Tuesday to Friday.
 workplace: offmap.city
 home: millbrook.home_28
 portrait: ivo_yates
@@ -21,12 +21,12 @@ look:
   height: tall
   outfit: { cut: jumper, top: 4, bottom: 2, bottom_style: trousers, shoes: 0 }
   accessory: { kind: none }
-backstory: Ivo came to Monde at eighteen, when his mother took the last vacant flat above the chandler's and
-  told him the sea air would straighten him out. It didn't, but he liked the ferry well enough. He took a
-  clerk's post in Carrow, working on invoices for a freight office, and has done the Tuesday crossing for
-  eight years. Monde is where he sleeps on weekends and where Mina waits. He thinks the town will keep its
-  shops open because people are too stubborn to leave, which is only half true. He also has a small habit of
-  buying a second loaf at Fournier's and quietly leaving it with a neighbour.
+backstory: Ivo came to Monde at eighteen, when his mother took the last vacant house on Mill Lane and told him
+  the sea air would straighten him out. It didn't, but he liked the ferry well enough. He took a clerk's post in
+  Carrow, working on invoices for a freight office, and has lodged there Tuesday to Friday for eight years, home
+  on Friday's ferry. Monde is where he sleeps from Friday night and where Mina waits. He thinks the town will
+  keep its shops open because people are too stubborn to leave, which is only half true. He also has a small
+  habit of buying a second loaf at Fournier's and quietly leaving it with a neighbour.
 personality:
   traits: [ steady, dry, loyal, tired ]
   big5: { open: 45, conscientious: 78, extravert: 40, agreeable: 68, neurotic: 35 }
@@ -38,7 +38,7 @@ beliefs:
 voice:
   register: Quiet and measured, with short sentences and the occasional dry aside. He trails off when tired and
     laughs at himself lightly.
-  tics: [ right then, that's the boat, "mm, go on" ]
+  tics: [ the Gannet won't wait, that's the boat, "mm, go on" ]
   never_says: [ I suppose, in my opinion, to be honest ]
   samples:
     - Right then, the Gannet won't wait, and neither will the baby's bottle.
@@ -80,8 +80,8 @@ relationships:
     }
   - {
       id: rosa_yates,
-      affinity: 65,
-      trust: 40,
+      affinity: 85,
+      trust: 70,
       tag: daughter,
       note: "His daughter, who already has his stubbornness."
     }
@@ -93,7 +93,7 @@ relationships:
       note: Neighbour on Mill Lane who commutes too and never complains.
     }
 secrets:
-  - text: He has been saving the ferry fare in a biscuit tin to take Mina to the mainland cinema once.
+  - text: He has been saving the ferry fare in a biscuit tin to take Mina to a night at the Carrow theatre once.
     reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none

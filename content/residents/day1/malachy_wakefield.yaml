@@ -25,7 +25,7 @@ look:
 backstory: Malachy grew up in a river town near Carrow, where he painted shop signs for a living until the
   chandlery he worked for closed. He drew constantly in the margins of ledgers and ferry timetables. He came
   to Monde at twenty-two with a rucksack of brushes and a half-finished plan to paint the whole Market Row.
-  The plan stalled after the first shutter. He met Olwen at a fish market queue and married her within a year.
+  The plan stalled after the first shutter. He met Olwen on a Carrow bus, when his sketchbook slid onto her lap, and married her within a year.
   He still believes the town's walls are waiting for him, though most of them are simply tired.
 personality:
   traits: [ quick, funny, anxious, generous, distractible ]
@@ -43,7 +43,7 @@ voice:
   never_says: [ talented, my masterpiece, as an artist ]
   samples:
     - Sorry, I was going to say the mural, and then I thought about the wall, and now I've forgotten the mural.
-    - No, I'm not sulking, I'm sketching the bench. It's a good bench. Nobody looks at it.
+    - Sketching the bench. It's a good bench, nobody looks at it, and Olwen thinks I'm sulking.
     - Olwen says I should get a proper job. I said I've got a proper job, I just haven't been paid for it yet.
 birthday: 30
 likes:
@@ -91,8 +91,8 @@ chores: [ Washes brushes at the laundry green, Sweeps the attic studio, Buys bre
 relationships:
   - {
       id: olwen_wakefield,
-      affinity: 25,
-      trust: 20,
+      affinity: 88,
+      trust: 80,
       tag: spouse,
       note: Wife; teases him about the unfinished wall.
     }

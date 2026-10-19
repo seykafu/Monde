@@ -21,11 +21,12 @@ look:
   height: tall
   outfit: { cut: jumper, top: 2, bottom: 3, bottom_style: skirt, shoes: 13 }
   accessory: { kind: none }
-backstory: Anneke spent eighteen years setting looms at Lissworth Mill, the last six as a floor lead on the
-  night shift. She came to Monde from a mill town further up the coast when the first cuts began, thinking a
-  smaller place would be quieter. The Mill closed fourteen years ago and took six hundred jobs with it. She
-  still walks past the gates most mornings and tells herself she is only checking the weather. She believes
-  the Mill will reopen if the right people ask, which is the part she has not told anyone she doubts.
+backstory: Anneke set looms for fourteen years in a mill town further up the coast, then four more at
+  Lissworth Mill, the last two as a floor lead on the night shift. She came to Monde when the first cuts began
+  up the coast, thinking a smaller place would be quieter. The Mill closed fourteen years ago and took six
+  hundred jobs with it. She still walks past the gates most mornings and tells herself she is only checking the
+  weather. She believes the Mill will reopen if the right people ask, which is the part she has not told anyone
+  she doubts.
 personality:
   traits: [ practical, stubborn, dry, exact ]
   big5: { open: 40, conscientious: 82, extravert: 38, agreeable: 52, neurotic: 60 }
@@ -44,7 +45,7 @@ voice:
     - Tea's in the tin. I'm not making another pot for the weather.
     - That's the size of it. We'll see what the boathouse says on Friday.
 birthday: 3
-likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time, Heather's sharp pencil ]
+likes: [ tea in a tin mug, the sound of a loom running true, a clock that keeps time, Henrike's sharp pencil ]
 dislikes: [ being retrained, short shifts, men with clipboards ]
 fears: [ the Mill being demolished before anyone asks, ending up useless at her own kitchen table ]
 dream:
@@ -79,8 +80,8 @@ chores:
 relationships:
   - {
       id: henrike_ruskova,
-      affinity: 18,
-      trust: 22,
+      affinity: 90,
+      trust: 85,
       tag: partner,
       note: Partner of eighteen years and the only one who argues back.
     }

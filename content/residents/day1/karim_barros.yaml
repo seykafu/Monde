@@ -24,11 +24,11 @@ look:
   headwear: { kind: flat_cap, colour: 15 }
   face: { grey_temples: true, stubble: true }
 backstory: Karim set looms at Lissworth Mill for nineteen years, first as a fitter's boy and then as the man
-  the floor leads sent for when a shuttle jammed. He came to Monde at thirty-three after a bad winter in
-  Carrow, following a cousin who promised work on the cannery line. He got eleven good years there before the
-  Liss Cannery shut, and then the Mill went the year after. His sister kept the flat from sinking into debt
-  while he learned to take whatever odd job came up. He still walks past the Mill yard most mornings, though
-  he tells himself it is only the shortest way to the harbour.
+  the floor leads sent for when a shuttle jammed. He came to Monde at seventeen after a bad winter in
+  Carrow, following a cousin who promised work at the Mill. When the Mill shut he got three more years on
+  the cannery line before the Liss Cannery went the same way. His sister kept the flat from sinking into
+  debt while he learned to take whatever odd job came up. He still walks past the Mill yard most mornings,
+  though he tells himself it is only the shortest way to the harbour.
 personality:
   traits: [ patient, methodical, stubborn, quiet ]
   big5: { open: 40, conscientious: 82, extravert: 30, agreeable: 65, neurotic: 45 }
@@ -44,7 +44,7 @@ voice:
   never_says: [ I feel, no offence, in my opinion ]
   samples:
     - Used to be forty picks an hour, on a good loom.
-    - Tea's on the hob. Mind the stair, it's soft.
+    - Third stair's soft. Keep to the wall side.
     - Mm. Ask me again when the Mill's got a roof on it.
 birthday: 12
 likes:
@@ -88,8 +88,8 @@ chores:
 relationships:
   - {
       id: aline_barros,
-      affinity: 18,
-      trust: 25,
+      affinity: 75,
+      trust: 70,
       tag: sister,
       note: "His sister; she does the talking, he does the fixing."
     }
@@ -104,4 +104,4 @@ generated_by: model
 household: mr_f01
 archetype: mill_hand
 employment: out_of_work
-years_in_monde: 17
+years_in_monde: 33

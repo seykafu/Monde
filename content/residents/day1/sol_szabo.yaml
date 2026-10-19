@@ -22,8 +22,8 @@ look:
   outfit: { cut: apron, top: 3, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: apron, colour: 10 }
   face: { freckles: true }
-backstory: Sol was born in Monde and remembers the mill before it closed, when the whole street rang with the
-  frames. Now they study by post at the library desk and attend Felix's Thursday evening class. They help
+backstory: Sol was born in Monde three years before the mill closed and remembers it only as a noise, the
+  whole street ringing with the frames. Now they study by post at the library desk and attend Felix's Thursday evening class. They help
   Kasimir on weekends and want to build boats, though the harbour has none left to repair. They are protective
   of their sister Maud and pretend it is an annoyance. Their mother was Carrow-born, and they sometimes think
   the rail line will return one day.
@@ -50,7 +50,7 @@ likes:
     the harbour steps,
     fixing things,
     tea that stays hot long enough to finish,
-    neighbors who knock before advising
+    neighbours who knock before advising
   ]
 dislikes: [ the Saturday collection, being told they are too young, rain on the boat plans ]
 fears: [ leaving Monde for good, letting Maud down ]

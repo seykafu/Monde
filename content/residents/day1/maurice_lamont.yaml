@@ -45,7 +45,7 @@ voice:
   never_says: [ I feel, honestly, you know, to be frank ]
   samples:
     - Wind's backing. Glass is falling. Bring your coat.
-    - Four bells. Kettle's on if you want it.
+    - Four bells. Tea's in the pot if you want it.
     - The lamp's sound. Nobody's looked at the bearing, that's all.
 birthday: 61
 likes: [ barometers, steady rain, a kettle on a spirit stove, his chair by the fire ]
@@ -98,10 +98,10 @@ relationships:
       tag: fond,
       note: Brings him mended socks and leaves them on the step.
     }
-  - { id: margo, affinity: 10, trust: 14, tag: curious, note: Asks her for old Admiralty tide tables. }
+  - { id: margo, affinity: 10, trust: 14, tag: curious, note: Asks her for the old harbour-office tide tables. }
 secrets:
   - text: He has kept a private log of the Monde light's lamp hours since he arrived, and it shows the light was
-      last properly trimmed nine…
+      last properly trimmed twelve winters ago.
     reveal: { regard_min: 55 }
   - text: He still lights a candle for his late wife on the anniversary of her death, and never tells anyone why
       he is sitting up late.

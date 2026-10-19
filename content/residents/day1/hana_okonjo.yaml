@@ -39,7 +39,7 @@ beliefs:
 voice:
   register: Bossy but affectionate, with kitchen warnings used as pet names. She counts out measures in handfuls
     and says what she means without padding it.
-  tics: [ "mind the door, love", a handful of this, that's too hot for you ]
+  tics: [ Start again., "Go on, I've got the oven", that's too hot for you ]
   never_says: [ I'm fine, it doesn't matter, whatever you like ]
   samples:
     - Sit down before you fall down, love. There's a heel of rye going spare.
@@ -56,12 +56,11 @@ dislikes:
   ]
 fears: [ the ovens going cold for good, her father falling on the stairs ]
 dream:
-  text: Learn the starter properly, from the beginning, the way her mother kept it in Carrow, and bake a loaf
-    that tastes like home.
+  text: Bake her mother's Carrow loaf from her own starter, and let her father cut the first slice.
   stages:
-    - Turn up at four in the morning and ask Odile Fournier for the starter.
-    - Feed the starter three days running without forgetting once.
-    - Bake a loaf under supervision and let someone else taste it first.
+    - Ask Hester for the back oven on Sunday mornings (Regard ≥ 20 with Hester)
+    - Bake the loaf from her mother's starter three Sundays running.
+    - Set it on the café counter and let her father cut the first slice.
 routine:
   weekday:
     - { at: "05:30", do: cook, where: old_quarter.home_18 }
@@ -86,8 +85,8 @@ chores: [ bake the morning loaves, mend the stair rail, wash the flour sacks ]
 relationships:
   - {
       id: lucas_okonjo,
-      affinity: 18,
-      trust: 22,
+      affinity: 85,
+      trust: 80,
       tag: father,
       note: Her father; she loves him and worries he forgets his pills.
     }

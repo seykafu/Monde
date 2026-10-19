@@ -24,11 +24,11 @@ look:
   accessory: { kind: glasses }
   glasses: halfmoon
 backstory: Birgit sewed for a tailoring house in Carrow for nineteen years, mostly wedding hems and the
-  occasional funeral coat. When her husband Tomas took a post at the Carrow docks, they rented a flat near the
+  occasional funeral coat. When her husband Duarte took a post at the Carrow docks, they rented a flat near the
   tram sheds, but the noise wore him down, and they bought a cheap terrace house in Monde because it was quiet
-  and the rent was nothing. Tomas died eight years later, in the front room, with the radio on. She has kept
+  and the rent was nothing. Duarte died eight years later, in the front room, with the radio on. She has kept
   the house as he left it, including his pipe rack. She tells people she came for the sea air. She came
-  because Tomas wanted a garden, and she never planted one, which she privately regrets.
+  because Duarte wanted a garden, and she never planted one, which she privately regrets.
 personality:
   traits: [ patient, wry, stubborn, warm, rambling ]
   big5: { open: 45, conscientious: 78, extravert: 40, agreeable: 55, neurotic: 35 }
@@ -41,29 +41,29 @@ voice:
   register: Gentle and meandering, she starts one story and wanders into another, then pulls herself back. She
     remembers old prices exactly and says so. Her sentences are long and kind, with a dry edge when someone
     annoys her.
-  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  tics: [ Poor lamb., Don't stand on the step., Told him twice. ]
   never_says: [ that's fine, nobody cares, I'm busy ]
   samples:
-    - Now where was I? Oh yes, a wedding hem in Carrow, and the bride cried over the sleeve, poor lamb.
-    - Come in, come in, don't stand on the step like a stray. The kettle's been on since nine.
+    - A wedding hem in Carrow, that was. The bride cried over the sleeve, poor lamb.
+    - Come in, come in, don't stand on the step like a stray. The pot's been warm since nine.
     - No bell on that bicycle and no manners either. I've told that boy twice, and I'll tell his mother.
 birthday: 35
 likes:
   [
-    knitting by the front window,
-    small birds at the window,
-    being asked for a story,
+    seed catalogues,
+    the front window at four,
+    a hem that lies flat,
     the smell of cut wool,
     Thursday afternoons
   ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, loud radios after dark ]
+dislikes: [ boys on bicycles with no bells, uneven stitches, a drawn blind at noon, loud radios after dark ]
 fears: [ the front room going quiet for good, being forgotten by the town ]
 dream:
-  text: Have a neighbour to supper, and set a table that stays set every Thursday.
+  text: Plant a row of sweet peas by the front step and see them flower.
   stages:
-    - Invite Anouk Clancy to supper on Thursday evening.
-    - Return the invitation with a plate of her seed cake.
-    - Set a standing Thursday table and keep the second chair ready.
+    - Buy a packet of sweet pea seed at Dunmore's General Store.
+    - Ask Teo at the Glasshouse for a strip of earth or a deep pot.
+    - Sow the row, keep it watered, and see the first flower.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: millbrook.home_31 }
@@ -84,7 +84,7 @@ routine:
     - { at: "18:00", do: cook, where: millbrook.home_31 }
     - { at: "21:00", do: read, where: millbrook.home_31 }
     - { at: "22:00", do: sleep, where: millbrook.home_31 }
-chores: [ Sweep the front step every morning, Mend neighbours' hems on Tuesdays, Polish the stove and keep it lit ]
+chores: [ Sweep the front step every morning, Press the wedding-hem samples on Tuesdays, Polish the stove and keep it lit ]
 relationships:
   - {
       id: anouk_clancy,
@@ -100,9 +100,9 @@ relationships:
       tag: wary,
       note: Her boys ride bikes past the house without bells.
     }
-  - { id: cordelia_soto, affinity: 5, trust: 10, tag: fond, note: Sends her cheese from the carer's rounds. }
+  - { id: cordelia_soto, affinity: 5, trust: 10, tag: fond, note: "Sends her cheese on market Saturdays." }
 secrets:
-  - text: She has never planted the garden Tomas wanted, and still has his seed packets in a tin under the sink.
+  - text: She has never planted the garden Duarte wanted, and still has his seed packets in a tin under the sink.
     reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none

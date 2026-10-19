@@ -24,11 +24,11 @@ look:
   glasses: halfmoon
 backstory: >
   Hester came to Monde at thirty-six from the haberdashery counter of a Carrow department store, with a tape
-  measure round her neck and a cardboard box of buttons. The mill still ran three shifts then. She sold
-  buttons and mending from the box until a neighbour asked for a coffee, so she bought a kettle and a counter,
-  and Café Liss has paid its way for twenty-three years. She drinks only tea. Lucien clerks at a Hessle Cross
-  desk on weekdays so the house and the café can both be paid for, and she has never forgiven the sums that
-  make him. She wants him home on a Tuesday.
+  measure round her neck and a cardboard box of buttons. The mill still ran three shifts then. She sold buttons
+  and mending from the box until a neighbour asked for a coffee, so she bought a kettle and a counter, and Café
+  Liss has paid its way for twenty-three years. She drinks only tea. Lucien clerks at a Hessle Cross desk,
+  lodging there Tuesday to Friday, so the house and the café can both be paid for, and she has never forgiven
+  the sums that make him. She wants him home on a Tuesday.
 personality:
   traits: [ exact, fussy, generous, proud, practical ]
   big5: { open: 40, conscientious: 85, extravert: 65, agreeable: 55, neurotic: 50 }
@@ -81,7 +81,7 @@ routine:
 chores: [ scald the pot before every brew, count the saucers on Tuesdays, balance the till each evening, order flour and milk on Mondays ]
 relationships:
   - { id: june, affinity: 45, trust: 50, tag: fond, note: "Her morning shift, paid in wages and a free cup. Wants June to say whether she is staying, so Hester can hire for winter." }
-  - { id: lucien_quill, affinity: 60, trust: 70, tag: spouse, note: "Her husband, away most weekdays." }
+  - { id: lucien_quill, affinity: 60, trust: 70, tag: spouse, note: "Her husband, who lodges in Hessle Cross Tuesday to Friday." }
   - { id: frye, affinity: 35, trust: 50, tag: friend, note: "Lives in the flat upstairs and takes his pot on the landing at half past six, steeped four minutes exactly. Wants him to say what he thinks of the strength." }
   - { id: odile, affinity: 35, trust: 45, tag: fond, note: "Buys eleven loaves a week from her and has never been thanked, which she counts as a compliment. Wants Odile to set foot in the café once." }
   - { id: weasel, affinity: -15, trust: -20, tag: wary, note: "Takes the Saturday twenty and a biscuit at ten. Wants him to take the twenty and leave the biscuit." }
@@ -93,7 +93,7 @@ secrets:
     reveal: { regard_min: 60 }
 canon_locks:
   - { while: "true", fact: "Hester owns Café Liss and drinks only tea. June Castellanos has the morning shift and a free cup." }
-  - { while: "true", fact: "Hester's husband Lucien clerks at a Hessle Cross firm and is away on weekdays. They live at No. 48 Lamplighter Lane, with Dunstan Frye in the flat upstairs." }
+  - { while: "true", fact: "Hester's husband Lucien clerks at a Hessle Cross firm, lodges there Tuesday to Friday and comes home on Friday's ferry. They live at No. 48 Lamplighter Lane, with Dunstan Frye in the flat upstairs." }
   - { while: "!flag.tollmen_broken", fact: "On Saturdays the Tollmen collect 20 coins at Café Liss. Weasel Pike comes in at ten, takes the twenty and a biscuit, and Hester pays." }
 story_role: "Owner of Café Liss and June's employer. Where Pell lunches and the town stops for tea; the Saturday collection comes in at ten."
 generated_by: model

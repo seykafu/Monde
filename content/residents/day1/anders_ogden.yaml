@@ -21,7 +21,7 @@ look:
   height: short
   outfit: { cut: apron, top: 3, bottom: 3, bottom_style: trousers, shoes: 5 }
   accessory: { kind: scarf, colour: 12 }
-backstory: Anders trained as a baker in Hessle Cross from nineteen, then came to Monde to work the ovens at
+backstory: Anders trained as a baker in Hessle Cross from fifteen, then came to Monde at nineteen to work the ovens at
   Fournier & Fille. He loved the four a.m. start, the first loaf out, the smell that reached the harbour. A
   lung complaint from years of flour dust, and a bad fall in the bakery's cellar, ended his work early. He
   never told Benedek how much the quiet hurt him, and he still bakes small batches at home for the lane. He
@@ -34,7 +34,7 @@ values: { prosperity: 0.3, safety: 0.1, spirit: 0.25, charm: 0.35 }
 beliefs:
   - A kitchen with no salt is a kitchen with no heart.
   - Everyone in Monde is one good meal from talking again.
-  - The bakery will reopen if somebody starts the starter.
+  - Odile could bake two hundred again if somebody mended that oven door.
 voice:
   register: Bossy-kind. He gives kitchen warnings as terms of endearment and measures everything in handfuls. He
     teases warmly and lets silence do the rest.
@@ -56,11 +56,11 @@ likes:
 dislikes: [ skimping, cold kitchens, a bit of salt, people who take bread without a word ]
 fears: [ his hands losing their skill, Benedek going out to work and not coming home easy ]
 dream:
-  text: Cook a harvest supper for a hundred, enough to fill the Market Hall and bring the town round one table.
+  text: Sell every copy of his recipe booklet on market day, for the school fund.
   stages:
-    - Plan a Harvest Supper menu with the town.
-    - Cook with four volunteers in the Market Hall.
-    - Serve the supper and count every plate taken.
+    - Write out twelve recipes in a clean hand.
+    - Ask Sable to print forty copies on the Lantern's press (Regard ≥ 20 with Sable)
+    - Sell every copy on a Saturday market day.
 routine:
   weekday:
     - { at: "06:00", do: eat, where: millbrook.home_37 }

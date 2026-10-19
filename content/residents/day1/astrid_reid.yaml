@@ -4,7 +4,7 @@ name: Astrid Reid
 age: 76
 pronouns: she/her
 kind: resident
-occupation: Retired postmistress, mends buttonholes when asked.
+occupation: Retired sorting-office manager from Hessle Cross; mends buttonholes when asked.
 workplace: millbrook.home_03
 home: millbrook.home_03
 portrait: astrid_reid
@@ -43,7 +43,7 @@ voice:
   never_says: [ sorry for the bother, hurry along, that's just how it is ]
   samples:
     - Now where was I? Ah yes, the bread was two coins, no, I'm thinking of the coin and not the loaf.
-    - Come in, come in, the kettle's nearly on. Mind the step, it's been loose since the spring gales.
+    - Come in, come in, the good chair's free. The top stair's been loose since the spring gales.
     - No, I won't take the tin home for you. Tomas would have had words about it.
 birthday: 62
 likes:
@@ -56,10 +56,10 @@ likes:
   ]
 dislikes:
   [
-    boys on bicycles with no bells,
+    parcels tied with wet string,
     being called grandma by strangers,
     a cold stove,
-    letters addressed with no postcode
+    letters addressed with no street
   ]
 fears: [ the Gannet being cancelled for good, falling on the stairs at night ]
 dream:

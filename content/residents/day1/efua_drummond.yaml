@@ -42,7 +42,7 @@ voice:
   never_says: [ I suppose, sorry for, it's fine really ]
   samples:
     - Hm. Bring it round on Friday and I'll see what's salvageable.
-    - Jakub, sit down before you fall down. The kettle's on.
+    - Jakub, sit. Cough it out before you start on that fence.
     - You want the honest answer, or the one that lets you sleep?
 birthday: 51
 likes:
@@ -84,8 +84,8 @@ chores: [ Wash the salt from the nets, Keep the stove lit, Carry the coal in ]
 relationships:
   - {
       id: jakub_mathers,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: Her husband; she worries about his breathing.
     }

@@ -42,7 +42,7 @@ voice:
   samples:
     - Fair. Could be worse, could be Carrow.
     - Tide's making. Don't stand there looking at it, Sabine.
-    - I'm not vain, I'm well turned out. There's a difference.
+    - I'm well turned out. Sander calls it vain, and Sander wore the same oilskin to a christening.
 birthday: 12
 likes: [ flat calm at dawn, good rope, smoked fish, his wife's bad jokes, the harbour at dusk ]
 dislikes: [ tangled gear, loud engines, gulls on the catch, being fussed over ]
@@ -78,7 +78,7 @@ relationships:
       affinity: 70,
       trust: 65,
       tag: spouse,
-      note: Thirty-eight years married and still arguing about the tide.
+      note: Forty-one years married and still arguing about the tide.
     }
   - {
       id: caspar_underhill,

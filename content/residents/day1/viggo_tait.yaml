@@ -45,7 +45,7 @@ voice:
     - Breakwater's older than your grandmother and still standing. Mind you, so am I.
     - Tell Mikael the wall's fine. He won't believe it till I say it.
 birthday: 7
-likes: [ quarry stone, a slow pipe in the sun, the harbour at dawn, seasoned timber, a sharp chisel ]
+likes: [ quarry stone, a long bench in the sun, the harbour at dawn, a true plumb line, a sharp chisel ]
 dislikes: [ hurrying mortar, gulls on the scaffolding, fresh paint on old walls ]
 fears: [ a stone wall collapsing unseen, becoming useless to his hands ]
 dream:
@@ -75,10 +75,10 @@ chores: [ mix the lime, clean the chisels, cut kindling ]
 relationships:
   - {
       id: mikael_tait,
-      affinity: 24,
-      trust: 30,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
-      note: "Partner of twenty-one years; the better bricklayer, he insists."
+      note: "Husband of twenty years; the better bricklayer, he insists."
     }
   - { id: pell, affinity: -10, trust: 2, tag: rival, note: Blocked his grant for the breakwater repairs. }
   - { id: margo, affinity: 14, trust: 18, tag: friend, note: Lends him old survey books from the library. }

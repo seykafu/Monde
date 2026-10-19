@@ -26,7 +26,7 @@ look:
 backstory: Lucas ran the sorting office in Carrow for thirty-one years and knew most of the city's street
   names by the handwriting on envelopes. He retired at sixty-eight, the year his wife died, and came to Monde
   because his daughter would not let him live alone above a noisy street. He still remembers what a
-  first-class stamp cost in 1958 and will tell you without being asked. He never managed to be a good cook,
+  stamp cost the year he started and will tell you without being asked. He never managed to be a good cook,
   though he tried for Hana's sake, and he was glad when she took over the kitchen. He is slowly losing track
   of the days, and has started to think the post still comes on Tuesdays.
 personality:
@@ -40,7 +40,7 @@ beliefs:
 voice:
   register: Slow and sweet, circling back to earlier points. Remembers prices from forty years ago and sometimes
     misplaces the day.
-  tics: [ now where was I, in my day, mind the step ]
+  tics: [ now where was I, in my day, tell it again slower ]
   never_says: [ I don't know, that's modern, no thank you ]
   samples:
     - Now where was I? Ah, yes, a coin stamp in my day, and nobody thought twice.
@@ -81,8 +81,8 @@ chores: [ fold the washing, feed the sparrows, wind the mantel clock ]
 relationships:
   - {
       id: hana_okonjo,
-      affinity: 24,
-      trust: 26,
+      affinity: 85,
+      trust: 80,
       tag: daughter,
       note: His daughter; he is proud and a little bewildered by her.
     }

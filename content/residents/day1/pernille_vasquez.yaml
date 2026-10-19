@@ -4,7 +4,7 @@ name: Pernille Vasquez
 age: 59
 pronouns: she/her
 kind: resident
-occupation: Retired seamstress and shop hand at Café Liss
+occupation: Retired seamstress; mends the aprons for Café Liss downstairs
 workplace: market_row.home_01
 home: market_row.home_01
 portrait: lib_f51_061
@@ -44,10 +44,10 @@ voice:
   samples:
     - Hm. Give it here, I'll have it sorted by teatime.
     - Morwenna's got a rota for the rota. Leave her to it.
-    - Tea's on. Sit down before you fall down.
+    - Sit. You're making the room look small.
 birthday: 96
 likes: [ the smell of the café kitchen, a good seam, quiet Sunday mornings, lists, a gavel ]
-dislikes: [ loud arguments in the shop, unpicked stitches, being hurried ]
+dislikes: [ loud arguments in the café, unpicked stitches, being hurried ]
 fears: [ losing the flat over Café Liss, Morwenna's health getting worse ]
 dream:
   text: A welcome for every newcomer who comes down the slip, with a basket and a hem already mended.
@@ -74,7 +74,7 @@ routine:
     - { at: "22:00", do: sleep, where: market_row.home_01 }
 chores: [ Mends the café aprons, Keeps the upstairs kettle full, Sweeps the back step ]
 relationships:
-  - { id: morwenna_vasquez, affinity: 25, trust: 30, tag: spouse, note: Her wife; keeps her in order. }
+  - { id: morwenna_vasquez, affinity: 85, trust: 80, tag: spouse, note: Her wife; keeps her in order. }
   - { id: odile, affinity: 18, trust: 20, tag: friend, note: Trades bread for hemming. }
   - {
       id: lavinia_garnier,
@@ -88,7 +88,7 @@ secrets:
       in her sewing box.
     reveal: { regard_min: 50 }
 canon_locks: []
-story_role: shopkeeper
+story_role: favor_giver
 generated_by: model
 household: mr_e01
 archetype: retired_organizer

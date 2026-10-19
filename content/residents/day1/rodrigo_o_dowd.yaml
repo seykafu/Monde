@@ -4,7 +4,7 @@ name: Rodrigo O'Dowd
 age: 53
 pronouns: he/him
 kind: resident
-occupation: Former loom-setter; commuter on weekly casual repair contracts in Hessle Cross
+occupation: Former loom-setter; lodges in Hessle Cross Tuesday to Friday on repair contracts.
 workplace: offmap.city
 home: millbrook.home_23
 portrait: rodrigo_o_dowd
@@ -23,11 +23,11 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 8 }
 backstory: He came to Monde at twenty-nine, when Lissworth Mill was still running three shifts and the frames
-  were loud enough to hear from the breakwater. He set looms for ten years and was good at it, quick with
-  a spanner and patient with the new lads. When the Mill shut he took what casual work there was, and for a
-  while that meant the boathouse and whatever Kasimir could spare. Now he goes across on the Gannet on Tuesday
-  and comes back on Friday's boat, because Hessle Cross pays by the job and Monde pays in promises. He stays in
-  Monde because the house is paid for and the tide sounds like something.
+  were loud enough to hear from the breakwater. He set looms for ten years and was good at it, quick with a
+  spanner and patient with the new lads. When the Mill shut he took what casual work there was, and for a while
+  that meant the boathouse and whatever Kasimir could spare. Now he goes across on the Gannet on Tuesday, lodges
+  in Hessle Cross, and comes back on Friday's boat, because Hessle Cross pays by the job and Monde pays in
+  promises. He stays in Monde because the house is paid for and the tide sounds like something.
 personality:
   traits: [ steady, dry, stubborn, practical ]
   big5: { open: 35, conscientious: 78, extravert: 30, agreeable: 55, neurotic: 40 }

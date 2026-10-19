@@ -4,7 +4,7 @@ name: Constance Ballard
 age: 70
 pronouns: she/her
 kind: resident
-occupation: Retired draper, still mends neighbours' hems
+occupation: Retired draper; keeps the town's bunting and a ledger of favours
 workplace: station_hill.home_02
 home: station_hill.home_02
 portrait: constance_ballard
@@ -22,7 +22,7 @@ look:
   outfit: { cut: plain, top: 4, bottom: 7, bottom_style: trousers, shoes: 3 }
   accessory: { kind: none }
 backstory: Born in the terrace above the harbour, Constance ran the drapery counter in Dunmore's for
-  thirty-one years before her knees gave out. She sewed the bunting for every wedding and funeral in the Old
+  twenty-nine years before her knees gave out. She sewed the bunting for every wedding and funeral in the Old
   Quarter and kept a ledger of who owed what, mostly in thread. When the mill closed she thought the town
   would empty in a season, and it did, but slowly enough that she stayed. She married Omar because he was the
   only man in the Gull who laughed at her jokes before she finished them. Her one regret is that she never
@@ -38,22 +38,22 @@ beliefs:
 voice:
   register: Quick and matter-of-fact, with frequent asides to her husband. She lets sentences trail when she is
     tactful and snaps them short when she is not.
-  tics: [ "Don't we, dear?", "Well, obviously.", Mind the step. ]
+  tics: [ Put it on the list., "Well, obviously.", That's one you owe. ]
   never_says: [ I suppose, no offence but, it is what it is ]
   samples:
-    - Don't we, dear? The bunting's faded again, and I've got no thread left.
-    - Well, obviously the kettle's on. Sit down before you fall down.
+    - Put it on the list. The bunting's faded again, and I've got no thread left.
+    - Well, obviously there's tea. Sit down before you fall down.
     - Ask me about the Tollmen again and you'll get the hem treatment.
 birthday: 70
 likes: [ a morning paper, a kettle on the stove, pleasant strangers, Saturday dances at the Gull, clean pins ]
 dislikes: [ stairs, drafts, being managed, people who return library books late ]
-fears: [ the bench going unused, losing her eyesight before her hands ]
+fears: [ the bunting coming down in the first gale, losing her eyesight before her hands ]
 dream:
-  text: "Be useful, not just present: volunteer at the library and get thanked by name in the Lantern."
+  text: String mended bunting from the clocktower to the Market Hall for Bloom Fair, paid for with favours from her ledger.
   stages:
-    - Volunteer three shifts at Margo's library desk each week.
-    - Get thanked by name in the Lantern for the bunting repair.
-    - Take a regular chair at the Gull & Anchor and hold court.
+    - Mend the faded bunting; find thread and a ladder (Favors)
+    - Call in eight favours from the ledger to hang it
+    - Hang it by Bloom Fair morning and get thanked by name in the Lantern
 routine:
   weekday:
     - { at: "07:30", do: eat, where: station_hill.home_02 }
@@ -75,8 +75,8 @@ chores: [ mend the Saturday bunting, keep the kettle on, write the ledger of fav
 relationships:
   - {
       id: omar_quarrie,
-      affinity: 25,
-      trust: 30,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: Her husband of forty years; they bicker fondly.
     }

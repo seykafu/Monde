@@ -42,7 +42,7 @@ voice:
   never_says: [ that's boring, I'm too little, nobody cares ]
   samples:
     - Guess what, Felix says the heron fountain has a secret. Can I see it?
-    - Why does the ferry only come on Tuesdays?
+    - Why does the ferry only come on Tuesdays and Fridays?
     - Raoul says he's too old for pebbles. I still have mine.
 birthday: 86
 likes:
@@ -79,15 +79,15 @@ chores: [ Feed the hens with Raoul, Bring in the kindling ]
 relationships:
   - {
       id: raoul_soto,
-      affinity: 20,
-      trust: 18,
+      affinity: 70,
+      trust: 65,
       tag: brother,
       note: "His big brother, who is always too busy."
     }
   - {
       id: cordelia_soto,
-      affinity: 15,
-      trust: 20,
+      affinity: 85,
+      trust: 80,
       tag: mother,
       note: "His mum at home, who always knows where the boots are."
     }

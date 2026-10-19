@@ -4,7 +4,7 @@ name: Omar Quarrie
 age: 73
 pronouns: he/him
 kind: resident
-occupation: Retired engineer's apprentice, now fixes clocks for fun
+occupation: Retired mill engineer, now fixes clocks for fun
 workplace: station_hill.home_02
 home: station_hill.home_02
 portrait: omar_quarrie
@@ -23,7 +23,7 @@ look:
   accessory: { kind: glasses }
   glasses: round
 backstory: Omar's family came over on the Carrow ferry when he was three, and he has never seen the point of
-  anywhere else. He apprenticed at Lissworth Mill and spent his twenties keeping the great looms running,
+  anywhere else. He apprenticed at Lissworth Mill and spent more than forty years keeping the great looms running,
   until the day the last shift went home and the frames stopped for good. Since then he has tinkered with
   clocks, most of them his neighbours' and none of them the tower's, which he is fairly sure he could fix if
   anyone asked. He married Constance after a dance in the Gull, and he still claims he proposed first. He is
@@ -39,7 +39,7 @@ beliefs:
 voice:
   register: Slow and deliberate, with dry understatement and the occasional technical word he then explains. He
     answers questions with questions when he wants to think.
-  tics: [ "Hmm, well.", Let me look at it., That's not quite right. ]
+  tics: [ "Hmm, well.", Let me look at it., Give it a minute. ]
   never_says: [ that's impossible, nothing to be done, trust me ]
   samples:
     - Hmm. The escapement's sound, but the hands are wrong.
@@ -50,11 +50,11 @@ likes: [ the smell of machine oil, pocket watches, a good argument over tea, the
 dislikes: [ loud radios, being rushed, people who say a thing is broken without looking ]
 fears: [ the clocktower stopping for good, forgetting how a movement sounds ]
 dream:
-  text: A bench with a view over the bay, where he can sit and listen for the tower.
+  text: Mend every stopped clock on Station Hill and set them to agree, to the minute, by his own bench watch.
   stages:
-    - Choose a spot on the Commons with a clear line to the lighthouse.
-    - Raise fifteen coins or ask Kasimir to build the bench.
-    - Sit on it with the first neighbour who stops to talk.
+    - Collect the stopped clocks from five Station Hill doors (Favors)
+    - Clean, oil and rate each one at his kitchen bench
+    - Hand them back, set to the same minute, one door at a time
 routine:
   weekday:
     - { at: "07:00", do: eat, where: station_hill.home_02 }
@@ -78,8 +78,8 @@ chores: [ wind the kitchen clock, sweep the workbench, split the kindling ]
 relationships:
   - {
       id: constance_ballard,
-      affinity: 25,
-      trust: 30,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: His wife; she keeps him honest and he keeps her entertained.
     }

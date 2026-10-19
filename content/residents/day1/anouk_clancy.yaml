@@ -4,7 +4,7 @@ name: Anouk Clancy
 age: 60
 pronouns: she/her
 kind: resident
-occupation: Retired draper; still takes in hemming for neighbours when asked.
+occupation: Retired draper; keeps the pattern drawers and a sharp eye for cloth.
 workplace: millbrook.home_27
 home: millbrook.home_27
 portrait: anouk_clancy
@@ -38,22 +38,22 @@ beliefs:
 voice:
   register: Quick, fond and direct, with a shopkeeper's habit of pricing things aloud. Teases Gaspard in front
     of others and is gentler when they are alone.
-  tics: [ "Don't we, dear?", Well I never. ]
+  tics: [ Hold still., Honestly, Mark it down. ]
   never_says: [ that's not my business, I don't mind, it's nothing ]
   samples:
-    - Don't we, dear? Pear drops are not a meal, Gaspard, but I'll allow one.
+    - Pear drops are not a meal, Gaspard, but I'll allow one.
     - Hold still and let me look at that hem. Honestly, you'd walk out in rags.
-    - Well I never. Billie's binding another ledger. Somebody in this town is still writing things down.
+    - Honestly. Billie's binding another ledger. Somebody in this town is still writing things down.
 birthday: 45
 likes: [ a kettle on the stove, pleasant strangers, fresh bread from Fournier & Fille, the sound of the ferry ]
 dislikes: [ drafts, being managed, bad stitching ]
 fears: [ a long winter alone without Gaspard, the house falling down around them ]
 dream:
-  text: To be useful again, volunteering at the library and getting her name in the Lantern for it.
+  text: A remnants counter in an empty Market Row storefront, one Saturday a month, with her brass yardstick set into it.
   stages:
-    - Volunteer three shifts at the library desk.
-    - Get thanked by name in the Lantern.
-    - Take a regular chair by the window at the pub.
+    - Ask Pell which empty storefront could take a counter for a Saturday (Regard ≥ 25 with Pell)
+    - Fetch the brass yardstick from the cellar and polish it.
+    - Open the counter on a Saturday with the shutters up.
 routine:
   weekday:
     - { at: "07:00", do: wander, where: millbrook.home_27 }
@@ -73,7 +73,7 @@ routine:
     - { at: "15:00", do: walk, where: wharf.harbor_steps }
     - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: millbrook.home_27 }
-chores: [ Bakes the Sunday loaf, Hems neighbours' trousers, Checks the house for drafts ]
+chores: [ Bakes the Sunday loaf, Sorts the pattern drawers, Checks the house for drafts ]
 relationships:
   - {
       id: gaspard_clancy,

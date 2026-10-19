@@ -4,7 +4,7 @@ name: Raoul Soto
 age: 13
 pronouns: he/him
 kind: resident
-occupation: Teenager doing lessons by post at the library desk and Felix's Thursday-evening…
+occupation: Teenager doing post lessons at the library desk and Felix's Thursday class
 workplace: millbrook.home_26
 home: millbrook.home_26
 portrait: raoul_soto
@@ -22,12 +22,12 @@ look:
   outfit: { cut: dungarees, top: 14, bottom: 15, bottom_style: trousers, shoes: 2, trim: 11 }
   accessory: { kind: none }
   face: { freckles: true }
-backstory: Raoul was born in Monde but barely remembers the mill's full shifts; he remembers the lamps going
-  out one by one in the yard. He is the older brother and is supposed to set an example, which he resents a
-  little. He takes his post lessons seriously at the library desk, where Margo keeps a kettle going. He has
-  started to think about leaving for the mainland, since his mother talks about it and his father is away most
-  of the week. He believes the town will stay small whatever anyone does. He is partly right, and he is also
-  hiding a plan to stay that he has not told anyone.
+backstory: Raoul was born in Monde the year after the mill closed, so he knows its full shifts only from the
+  grown-ups, and the yard only dark. He is the older brother and is supposed to set an example, which he resents
+  a little. He takes his post lessons seriously at the library desk, where Margo keeps a kettle going. He has
+  started to think about leaving for the mainland, since Cordelia talks about the school and Ayesha is away
+  most of the week. He believes the town will stay small whatever anyone does. He is partly right, and he is
+  also hiding a plan to stay that he has not told anyone.
 personality:
   traits: [ sardonic, restless, thoughtful, proud ]
   big5: { open: 70, conscientious: 55, extravert: 38, agreeable: 45, neurotic: 52 }
@@ -39,11 +39,11 @@ beliefs:
 voice:
   register: Offhand and dry, with a teenager's flat delivery. He says more with silence than most people do with
     speeches.
-  tics: [ Whatever., "Fine, sure.", It's not that deep. ]
+  tics: [ Whatever., "Fine, sure.", Doesn't matter. ]
   never_says: [ I love this town, I want to be a farmer, let's go ]
   samples:
     - Whatever. The post lesson's on the bench. I'll do it later.
-    - It's not that deep. The ferry's late, that's all.
+    - Doesn't matter. The ferry's late, that's all.
     - Felix says I'm good at arithmetic. I didn't ask.
 birthday: 72
 likes:
@@ -83,12 +83,12 @@ chores: [ Cut wood for the stove, Walk Arvid to school ]
 relationships:
   - {
       id: arvid_soto,
-      affinity: 14,
-      trust: 18,
+      affinity: 70,
+      trust: 65,
       tag: brother,
       note: "His little brother, who follows him everywhere."
     }
-  - { id: ayesha_soto, affinity: 12, trust: 14, tag: mother, note: "Mum's wife, away in Hessle Cross." }
+  - { id: ayesha_soto, affinity: 65, trust: 60, tag: mother, note: "Mum, lodging in Hessle Cross Tuesday to Friday. He says it doesn't matter and counts the days." }
   - { id: cordelia_soto, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
 secrets:
   - text: He has been secretly drafting a letter to the Carrow technical college, asking for a place he doesn't

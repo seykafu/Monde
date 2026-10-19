@@ -26,8 +26,8 @@ look:
   headwear: { kind: knit_cap, colour: 3 }
 backstory: Camilla sewed hems and wedding dresses in Carrow for twenty years before a bad winter cost her the
   shop lease. She came to Monde at 46 on the Gannet with one trunk and a sewing machine she still uses. She
-  taught half the girls on Well Row to hem a skirt, and she says the mill would have had her if the mill had
-  lasted. Her husband Tom left her in the second year, and she never bothered to be cross about it. She keeps
+  taught half the girls on Well Row to hem a skirt, and she says the mill would have had her if she had cared to
+  stand at a frame. Her husband Fergal left her in the second year, and she never bothered to be cross about it. She keeps
   a tin of buttons from every coat she ever altered and will not say why.
 personality:
   traits: [ teasing, patient, stubborn, warm ]
@@ -40,11 +40,11 @@ beliefs:
 voice:
   register: Gentle and rambling on purpose, circling back to earlier points. She remembers old prices and
     comments on them. She speaks in full sentences with long pauses.
-  tics: [ Now where was I?, "In my day,", Mind the step ]
+  tics: [ "In my day,", "Mark my words." ]
   never_says: [ stuff like that, whatever, no offence ]
   samples:
-    - Now where was I? Oh yes, a good wool coat cost less than a loaf of bread in my first year here.
-    - Sit down, love, the kettle's on. You look like you've walked all the way from Carrow.
+    - In my day a good wool coat cost less than a loaf of bread, my first year here.
+    - Come in, love, and shut the door behind you. You look like you've come the long way round.
     - I'll outlive the lot of you, mark my words, and I'll have the last biscuit too.
 birthday: 69
 likes: [ knitting, small birds at the window, being asked for a story, the smell of cut cloth, Lantern Night ]

@@ -38,11 +38,11 @@ beliefs:
 voice:
   register: Quick, chatty and affectionate, with a habit of asking questions and answering them herself. She
     teases her partner openly and laughs at her own jokes before they land.
-  tics: [ "Well now,", "Don't we, Henrike?", I'm only saying. ]
+  tics: [ "Fancy that,", "Who'd have thought?", Have a bit of that. ]
   never_says: [ I'm not one for gossip, I couldn't possibly ]
   samples:
-    - Well now, you're up early. Did you hear the gulls wake the whole lane?
-    - Henrike says I talk too much. I told her someone has to keep the town informed.
+    - Fancy that, you're up early. Did you hear the gulls wake the whole lane?
+    - Anouk says I talk too much. I told her someone has to keep the town informed.
     - Oh, don't look at me like that. Have a bit of the cod, it's going spare.
 birthday: 86
 likes:
@@ -56,11 +56,11 @@ likes:
 dislikes: [ stairs, drafts, being managed, cold fish ]
 fears: [ the lane going quiet for good, running out of people to talk to ]
 dream:
-  text: A dance on a Saturday night in a hall with real music, the way the town used to do it.
+  text: To call the Regatta races from the ferry slip, boat by boat, loud enough for the whole Wharf to hear.
   stages:
-    - Find a hall with a floor that will hold up.
-    - Find a gramophone or ask the Treharne boy to bring his fiddle.
-    - Hold the dance and make sure Henrike leads the first waltz.
+    - Learn the name of every boat from the crews on the harbour steps.
+    - Borrow a speaking trumpet from the boathouse.
+    - Call the first race at the Regatta, boat by boat.
 routine:
   weekday:
     - { at: "06:30", do: wander, where: wharf.home_06 }
@@ -81,15 +81,15 @@ chores: [ Sweep the step and the stoop, Wash the yellow raincoat, Feed the lane 
 relationships:
   - {
       id: anouk_seaton,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: Her partner of thirty-six years; teases her gently.
     }
   - { id: nell, affinity: 12, trust: 10, tag: fond, note: Works the stall beside her; they trade gossip. }
   - { id: florian_garvey, affinity: 8, trust: 6, tag: curious, note: Neighbour who knows the fishing boats. }
 secrets:
-  - text: She has been saving coins in a teapot to buy a proper cat flap, and has never told Henrike.
+  - text: She has been saving coins in a teapot to buy a proper cat flap, and has never told Anouk.
     reveal: { regard_min: 55 }
 canon_locks: []
 story_role: none

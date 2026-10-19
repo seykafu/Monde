@@ -40,12 +40,12 @@ beliefs:
 voice:
   register: Slow and warm, with long digressions he always comes back from. He remembers what things cost forty
     years ago and says so. Short when tired, expansive when asked for a story.
-  tics: [ Now where was I?, "Back in my day,", that's the way of it ]
+  tics: [ "Ruthie would've said,", Aye., that's the way of it ]
   never_says: [ you'll be fine, in my opinion, to be honest ]
   samples:
-    - Now where was I? Ah, the loom-shop. Bread was two coins, mind, and nobody thought twice.
+    - Ah, the loom-shop. Bread was two coins, mind, and nobody thought twice.
     - Don't you fret about the ferry, it'll come when it's good and ready.
-    - Aye. Ruthie would've had the kettle on by now, so I'll see to it. 
+    - Aye. Ruthie would've had the table laid by now, so I'll see to it.
 birthday: 14
 likes:
   [
@@ -66,9 +66,9 @@ fears: [ the house going quiet for good, forgetting Ruthie's voice ]
 dream:
   text: Someone to eat supper with, and a reason to lay two plates again.
   stages:
-    - Be invited to supper by a neighbour.
-    - Return the invitation at Loom Street.
-    - Set a standing Thursday table for whoever comes.
+    - Lay a second plate on Saturday and ask Frankie round (Regard ≥ 20 with Frankie)
+    - Cook the stew Ruthie's way, with the wooden spoon from the drawer.
+    - Lay two plates every Sunday, and see who knocks.
 routine:
   weekday:
     - { at: "06:30", do: wander, where: millbrook.home_17 }

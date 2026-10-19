@@ -24,8 +24,8 @@ look:
   glasses: heavy
 backstory: Signe came to Monde at nineteen to work in the draper's on Market Row, where she learned to measure
   a bolt of cloth by eye. She met Iain when he came in to buy thread for his mother. They married and took the
-  terrace house at No. 30, and she has been stitching for the whole street ever since. She remembers which
-  children outgrew which coats and what every family's linen looks like. When the draper closed she kept her
+  terrace house at No. 30, and she has kept the house in thread ever since. She remembers which children
+  outgrew which coats and what every family's washing looks like on the line. When the draper closed she kept her
   shears and her pattern books and never complained about it once.
 personality:
   traits: [ observant, patient, wry, warm ]
@@ -38,11 +38,11 @@ beliefs:
 voice:
   register: Gentle and teasing, quick to correct a detail. She speaks in complete sentences and often ends with
     a question to the listener.
-  tics: [ "Don't we, dear?", Hold still a moment. ]
+  tics: [ "There, now.", Hold still a moment. ]
   never_says: [ that's not my business, whatever, I'm fine, it doesn't matter ]
   samples:
     - Hold still, dear, you'll pull the whole sleeve out.
-    - Iain says the boat is late. I say the boat is always late. Don't we, love?
+    - Iain says the boat is late. I say the boat is always late, and he writes it down anyway.
     - There, that's better. Now you look like someone who meant to come out today.
 birthday: 46
 likes:
@@ -51,17 +51,16 @@ likes:
     good thread,
     the sound of the kettle,
     people who sit still while she pins,
-    a kettle on the stove
+    the last of the afternoon light at the window
   ]
 dislikes: [ drafts, stairs in the cold, being hurried, badly cut cloth ]
 fears: [ going blind before her eyes are done with the needle, the terrace emptying out one house at a time ]
 dream:
-  text: A Saturday night with music in a hall, Iain on the floor and the whole street dancing until the lamps go
-    out.
+  text: Make herself a good dress in real cloth, and wear it to the Harvest Supper on Iain's arm.
   stages:
-    - Find a hall with a floor that will hold a waltz.
-    - Find a gramophone or a band willing to play for coins.
-    - Hold the dance and make Iain take the first turn.
+    - Choose a pattern and a length of good cloth.
+    - Ask Delphine for a dress form and a corner of her table.
+    - Cut and fit it, and walk into the Market Hall in it.
 routine:
   weekday:
     - { at: "06:45", do: eat, where: millbrook.home_14 }
@@ -81,21 +80,21 @@ routine:
     - { at: "15:00", do: garden, where: commons.picnic_lawn }
     - { at: "19:30", do: cook, where: millbrook.home_14 }
     - { at: "22:00", do: sleep, where: millbrook.home_14 }
-chores: [ mend the terrace's linen, refill the thermos each morning, sweep the front step ]
+chores: [ mend the house linen, air the spare blankets, sweep the front step ]
 relationships:
   - {
       id: iain_marchant,
-      affinity: 28,
-      trust: 25,
+      affinity: 90,
+      trust: 85,
       tag: spouse,
-      note: "Her husband of forty-six years, and her favourite argument."
+      note: "Her husband of forty-five years, and her favourite argument."
     }
   - {
       id: ilona,
       affinity: 18,
       trust: 15,
       tag: friend,
-      note: Ilona brings her the neighbours' mending and they swap gossip over it.
+      note: Ilona leans on the gate to compare stitches and swap gossip.
     }
   - { id: gideon_szabo, affinity: 6, trust: 4, tag: curious, note: Keeps asking after his mother's health. }
 secrets:

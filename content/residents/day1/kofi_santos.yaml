@@ -22,7 +22,7 @@ look:
   outfit: { cut: coat, top: 13, bottom: 1, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 7 }
   face: { moustache: true, stubble: true }
-backstory: Kofi grew up in a crowded port flat two countries away and took the Carrow ferry at seventeen with
+backstory: Kofi grew up in a crowded port flat far down the coast and took the Carrow ferry at seventeen with
   one suitcase and a letter of introduction to a cousin who had already left. He worked the Liss Cannery
   packing line until it closed eleven years ago, then turned to looking after the house and Oona. He still
   thinks the town should have fought harder for the mill, and he is wrong that anyone could have saved it. He
@@ -43,7 +43,7 @@ voice:
   never_says: [ I suppose, whatever you think ]
   samples:
     - Tea's on, if you want it before the bread goes.
-    - No, the ferry's not in till four. Sit a minute.
+    - No, the ferry's not in till four. Take the stool by the stove.
     - Oona says the glue needs warmth. So does the stove, so we wait.
 birthday: 73
 likes: [ the harbour at dusk, knitting patterns, bread still warm, the ferry horn, parcels arriving unbroken ]
@@ -77,8 +77,8 @@ chores: [ Does the shopping and the bread run, Mends the household's clothes, Ke
 relationships:
   - {
       id: oona_santos,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: His wife; he watches her hands when she works.
     }

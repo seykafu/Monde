@@ -42,7 +42,7 @@ voice:
   never_says: [ I'm busy, that's none of my business, in my opinion ]
   samples:
     - He's got the look of a man about to fix something he shouldn't.
-    - Oh, sit down, the pair of you. The kettle's only just boiled.
+    - Oh, sit down, the pair of you. The pot's only just steeped.
     - Tuesday, is it? Then the Gannet's in and I'm owed a biscuit from Odile.
 birthday: 95
 likes:
@@ -97,7 +97,7 @@ relationships:
     }
   - { id: voss, affinity: 8, trust: 6, tag: curious, note: Asks too many questions about her maps. }
 secrets:
-  - text: She has written a short romance under a false name and has been posting it to the Lantern's back page.
+  - text: She has written a short romance under a false name and has been slipping it under the Lantern office door, a page at a time.
     reveal: { regard_min: 50 }
 canon_locks: []
 story_role: volunteer

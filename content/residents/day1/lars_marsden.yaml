@@ -25,8 +25,8 @@ look:
   face: { moustache: true, stubble: true }
 backstory: Lars was born in the Millbrook terraces and his father was a loom-setter at the mill. He kept the
   books for a draper's on Market Row until the shop shut, then took a stall on Saturdays selling notions he
-  buys wholesale from Carrow. He still counts the Mill's old wage bells in his head when the church clock is
-  silent. He has told Cyprian for forty years that he never liked the sea, which is untrue; he simply prefers
+  buys wholesale from Carrow. He still counts the Mill's old wage bells in his head when the clocktower is
+  silent. He has told Cyprian for thirty years that he never liked the sea, which is untrue; he simply prefers
   to watch it from a bench. He stayed because the terraces are where his mother's sewing box still sits on the
   windowsill.
 personality:
@@ -40,18 +40,17 @@ beliefs:
 voice:
   register: Measured and courteous, with small precise corrections and a dry lift at the end of sentences. He
     enjoys a well-placed understatement.
-  tics: [ "Don't we, dear?", Quite so., If you'll permit me ]
+  tics: [ Two for a coin., Quite so., If you'll permit me ]
   never_says: [ sorry for your trouble, that's a bit much, whatever you like ]
   samples:
-    - Two buttons for a coin, though I'm told we don't say coin. Coins, then. Two for a coin, and a ribbon
-      thrown in.
-    - The Gannet's late again, Cyprian. Don't we, dear? Still, I'd rather wait for a boat than for the Tollmen.
+    - Two buttons for a coin, and a ribbon thrown in. Three, if you tell me whose coat they're for.
+    - The Gannet's late again, Cyprian. Quite so. Still, I'd rather wait for a boat than for the Tollmen.
     - I've mended that coat three times. A fourth won't hurt it, and it won't hurt me either.
 birthday: 58
 likes:
   [
     a morning paper,
-    a kettle on the stove,
+    a pressed handkerchief,
     the cardigan with leather buttons,
     Saturday market chatter,
     Cyprian's bad jokes
@@ -87,10 +86,10 @@ chores: [ Iron the cardigans, Sweep the front step, Carry the kettle to the stov
 relationships:
   - {
       id: cyprian_nowak,
-      affinity: 22,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: partner,
-      note: His oldest friend and housemate for thirty years.
+      note: "His oldest friend and partner, housemate for thirty years."
     }
   - {
       id: florent_rasku,

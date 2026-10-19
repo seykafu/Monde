@@ -21,11 +21,11 @@ look:
   height: short
   outfit: { cut: jumper, top: 12, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: none }
-backstory: Winifred ran the drapery counter on Market Row for twenty-six years, measuring cloth for brides and
-  widows alike. When the shop shut she sold her sewing machine and kept only her thimble and a basket of
-  buttons. She moved in with her sister after a bad winter and found she liked the slower days better than she
-  expected. She is certain the bakery's rye is better than anything in Carrow. Her quiet grief is a bolt of
-  blue wool she never cut, which she keeps folded in the wardrobe.
+backstory: Winifred ran the drapery counter on Market Row for twenty-six years, measuring cloth for brides
+  and widows alike. When the shop shut she sold her sewing machine and kept only her thimble and a basket of
+  buttons. Her twin Lavinia came home the year the mill closed, and Winifred found she liked the company
+  better than she expected. She is certain the bakery's rye is better than anything in Carrow. Her quiet
+  grief is a bolt of blue wool she never cut, which she keeps folded in the wardrobe.
 personality:
   traits: [ patient, thrifty, warm, stubborn ]
   big5: { open: 40, conscientious: 75, extravert: 55, agreeable: 73, neurotic: 30 }
@@ -48,12 +48,11 @@ likes: [ the Saturday market, good wool, the bakery's rye, afternoon tea on the 
 dislikes: [ loud radios, sloppy hems, people who won't sit down ]
 fears: [ the blue wool going to waste, being left alone in the flat ]
 dream:
-  text: A Saturday night dance in a hall with a gramophone, a few old friends and a waltz she has not danced in
-    years.
+  text: Cut the blue wool at last and make Lavinia the winter coat she keeps refusing.
   stages:
-    - Find a hall with a floor that will hold the weight.
-    - Find a gramophone or a band willing to play for coins.
-    - Hold the dance and make Lavinia admit she enjoyed it.
+    - Take the bolt out of the wardrobe and measure Lavinia without her noticing
+    - Borrow Fenna Renard's pattern and a pair of good shears
+    - Cut it, sew it, and leave it on Lavinia's chair on her birthday
 routine:
   weekday:
     - { at: "07:15", do: eat, where: old_quarter.home_06 }
@@ -75,10 +74,10 @@ chores: [ mend hems and buttons, bake Sunday loaf, feed the cat ]
 relationships:
   - {
       id: lavinia_flynn,
-      affinity: 18,
-      trust: 22,
-      tag: spouse,
-      note: Her sister. Wins most arguments by going quiet.
+      affinity: 75,
+      trust: 70,
+      tag: twin,
+      note: Her twin. Wins most arguments by going quiet.
     }
   - {
       id: fenna_renard,

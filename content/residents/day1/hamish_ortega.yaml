@@ -44,7 +44,7 @@ voice:
   samples:
     - If I may, the gutter outside number nine is blocked again.
     - Quite so, dear. I'll fetch the rug before it turns.
-    - I don't mind the walk. I'm simply not sure we'll get back before dark.
+    - The walk is no trouble. I'm simply not sure we'll get back before dark.
 birthday: 68
 likes:
   [
@@ -57,11 +57,11 @@ likes:
 dislikes: [ being rushed, loose papers in the wind, anyone who calls him Hammy ]
 fears: [ the house falling into disrepair, losing Cedric to the sea ]
 dream:
-  text: Be useful in Monde, with his name printed in the Lantern and a regular chair at the pub.
+  text: Get the three worst flagstones in the Old Quarter relaid, from his own list of the pavements.
   stages:
-    - Volunteer three shifts at the library desk or the school.
-    - Get thanked by name in the Lantern for the work.
-    - Take a regular chair at the Gull & Anchor by the fire.
+    - Walk the Old Quarter with a pencil and list every loose flagstone.
+    - Bring the list to Pell at the Town Hall (Regard ≥ 25 with Pell)
+    - Stand by while the first flagstone is relaid.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: millbrook.home_21 }
@@ -82,8 +82,8 @@ chores: [ Writes the household ledger, Sweeps the front step, Airs the bedding o
 relationships:
   - {
       id: cedric_ortega,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Partner of thirteen years; keeps him steady.
     }
@@ -102,7 +102,7 @@ relationships:
       note: Neighbour; she mends his waistcoats for a pot of tea.
     }
 secrets:
-  - text: He has kept every Lantern since he arrived, bound in a box under the stairs.
+  - text: He waltzes alone in the front room on Sunday nights, to the wireless, counting the steps under his breath so he won't tread on Cedric.
     reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none

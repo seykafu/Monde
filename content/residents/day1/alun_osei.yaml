@@ -75,7 +75,7 @@ relationships:
   - { id: dmitri_osei, affinity: 90, trust: 75, tag: father, note: "Dad, who sings to the engine and says no to the horn." }
   - { id: anselm_osei, affinity: 85, trust: 80, tag: father, note: "Pa, who makes the custard and writes notes in the lunch box." }
   - { id: tilde_osei, affinity: 75, trust: 65, tag: grandmother, note: "Gran, who says yes to the horn the day the label is printed." }
-  - { id: elodie_osei, affinity: 60, trust: 45, tag: sister, note: "Seventeen, close-mouthed about the boathouse and a key. Wants her to take him down to see the slip." }
+  - { id: elodie_osei, affinity: 70, trust: 60, tag: sister, note: "Seventeen, close-mouthed about the boathouse and a key. Wants her to take him down to see the slip." }
   - { id: einar_chalmers, affinity: 40, trust: 35, tag: fond, note: "Hauls with Dad and drinks from a tin mug. Wants him to say yes to a ride." }
   - { id: josef_nesbitt, affinity: 45, trust: 40, tag: friend, note: "Two doors along; can name the lorry by its sound and wants a ride." }
   - { id: tib, affinity: 15, trust: 15, tag: rival, note: "Eleven, counts everything, and counted Alun's dares aloud at school." }

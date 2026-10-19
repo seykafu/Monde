@@ -23,7 +23,7 @@ look:
   accessory: { kind: glasses }
   glasses: halfmoon
 backstory: Ulla sewed hems and christening gowns for thirty years in a Carrow tailor's back room, and came to
-  Monde at fifty-five when her husband Teo's chest gave out and the doctor said sea air. He died the first
+  Monde at fifty-five when her husband Anton's chest gave out and the doctor said sea air. He died the first
   winter, and she stayed because the flat was cheap and the sea kept her up at night in a way she found
   company. She still hears the ferry's horn on Tuesdays and thinks it sounds lonelier than it used to. Her one
   proud thing is a gown she made for Millbrook's last christening, which nobody has mentioned since.
@@ -39,11 +39,11 @@ voice:
   register: Rambling and gentle, she sets off down one story and comes back to it on purpose. She remembers what
     things cost forty years ago and says so, and she asks people questions about their lives more than she
     answers them.
-  tics: [ Now where was I?, "Well, it's not as if", Mind the step ]
+  tics: [ Where's my thimble?, "Well, it's not as if", Hold the rail ]
   never_says: [ grandma, I'm not sure, in my day, hurry up ]
   samples:
-    - Now where was I? Ah, yes, the thread. You can't get that colour anymore, not for love or money.
-    - Oh, don't fuss. I've got the kettle on and the cherries aren't going anywhere.
+    - Where's my thimble? Ah, there. You can't get that thread colour anymore, not for love or money.
+    - Oh, don't fuss. The cherries aren't going anywhere, and neither am I.
     - That's the bit that gets me. I was never any good at saying goodbye, was I?
 birthday: 71
 likes:
@@ -68,11 +68,11 @@ fears:
     losing her eyesight before the quilt is finished
   ]
 dream:
-  text: Have someone to eat supper with on a regular night, and be the one who sets the table.
+  text: Finish the christening quilt and see it laid on a cot in Millbrook.
   stages:
-    - Accept a supper invitation from a neighbour this week.
-    - Return the invitation with a dish she has cooked herself.
-    - Set a standing Thursday table and wait to see who comes.
+    - Piece the last twelve squares of the quilt by the window
+    - Ask Priya, quietly, whether a christening is due in Millbrook
+    - Carry the finished quilt to the house and leave it on the step
 routine:
   weekday:
     - { at: "07:00", do: eat, where: old_quarter.home_14 }
@@ -91,7 +91,7 @@ routine:
     - { at: "15:00", do: sit, where: commons.picnic_lawn }
     - { at: "18:00", do: cook, where: old_quarter.home_14 }
     - { at: "22:00", do: sleep, where: old_quarter.home_14 }
-chores: [ Mend the church linens on Tuesdays, Air the flat before the afternoon, Walk to the bakery for bread ]
+chores: [ Mend the chapel linens on Tuesdays, Air the flat before the afternoon, Walk to the bakery for bread ]
 relationships:
   - {
       id: margo,
@@ -109,7 +109,7 @@ relationships:
       note: "The boy who rings his bell at her, and she secretly likes it."
     }
 secrets:
-  - text: She still keeps Teo's last letter folded inside her sewing box and rereads it when the wind is loud.
+  - text: She still keeps Anton's last letter folded inside her sewing box and rereads it when the wind is loud.
     reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none

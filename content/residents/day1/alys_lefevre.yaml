@@ -4,7 +4,7 @@ name: Alys Lefevre
 age: 80
 pronouns: she/her
 kind: resident
-occupation: Retired seamstress, still takes in the odd buttonhole.
+occupation: Retired seamstress, piecing the quilt she began for Pierre.
 workplace: millbrook.home_04
 home: millbrook.home_04
 portrait: alys_lefevre
@@ -25,7 +25,7 @@ look:
 backstory: Alys was born in the house on Terrace Row and sewed for the whole street for forty years, first at
   the mill's finishing room and then from her front parlour after the looms went quiet. She married Pierre
   Lefevre, a rigger from the harbour, and they had three children, two of whom went to Carrow and one who went
-  further. Pierre died eight winters ago on the breakwater steps, after a rope gave way, and she has not been
+  further. Pierre died eight winters ago in his chair by the stove, and she has not been
   able to finish the quilt she started for him. She stayed because the street still knows her name and because
   leaving felt like admitting the town had finished with her.
 personality:
@@ -40,10 +40,10 @@ beliefs:
 voice:
   register: Gentle and meandering, she starts a sentence about one thing and ends up on another. She uses old
     prices and names, and circles back to a point she forgot she had.
-  tics: [ Now where was I?, "In my day,", "Well, there's a thing." ]
+  tics: [ "Pierre always said,", "Sit a while.", "Well, there's a thing." ]
   never_says: [ that's modern, "I suppose so, dear", hurry up ]
   samples:
-    - Now where was I? Oh yes, a loaf was two coins once, and you'd have thought the baker had given it to you.
+    - A loaf was two coins once, and you'd have thought the baker had given it to you.
     - Pierre always said the Liss would tell you when to go. It hasn't told me yet.
     - Mm. Pass me that scrap of blue, would you? Sit a while.
 birthday: 67
@@ -56,7 +56,7 @@ likes:
     a warm kitchen
   ]
 dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, gulls on the bins ]
-fears: [ the quilt never getting finished, being forgotten on Terrace Row, the breakwater in a storm ]
+fears: [ the quilt never getting finished, being forgotten on Terrace Row, the Liss in flood ]
 dream:
   text: Finish the quilt she began for Pierre, with a patch from every street that will give her one.
   stages:
@@ -84,7 +84,7 @@ routine:
     - { at: "21:00", do: sleep, where: millbrook.home_04 }
 chores:
   [
-    Sew buttonholes for neighbours on Thursdays.,
+    Cut quilt patches on Thursdays.,
     Keep the stove banked before dark.,
     Take scraps to the library desk.
   ]
@@ -94,7 +94,7 @@ relationships:
       affinity: 22,
       trust: 18,
       tag: friend,
-      note: "Old postmistress, sends Alys the week's gossip by hand."
+      note: "Retired sorting-office manager from Hessle Cross, still reads every postmark. Sends Alys the week's gossip by hand."
     }
   - {
       id: frida_irvine,
@@ -111,7 +111,7 @@ relationships:
       note: Ran the wage office; she thinks he weighed things too carefully.
     }
 secrets:
-  - text: She still keeps Pierre's last letter folded inside the quilt's lining, unread since the day it arrived.
+  - text: The centre square of the quilt is cut from the curtain of the room where Pierre proposed, and she has not told her children which patch it is.
     reveal: { regard_min: 60 }
   - text: She has been fixing the Glasshouse's broken panes in secret with glazier's putty from Kasimir's shed.
     reveal: { regard_min: 70 }

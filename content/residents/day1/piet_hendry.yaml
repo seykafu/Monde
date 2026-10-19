@@ -24,7 +24,7 @@ look:
   accessory: { kind: scarf, colour: 3 }
   face: { moustache: true }
 backstory: Born on Shore Lane, the youngest of four boys whose father crewed the old trawlers. He cooked on a
-  Carrow ferry for three years as a young man, then came home when the Mill closed and the boats needed hands.
+  Carrow ferry for three years as a young man, then came home when his father's knees went and the boats needed hands.
   He still cooks the crew's dinner on the quay stove when the weather allows. He stayed because the bay is the
   only place he has ever felt he knew where he was.
 personality:
@@ -37,22 +37,22 @@ beliefs:
   - The Tollmen are just men who want their cut, nothing more.
 voice:
   register: Big and easy, teasing, short on tact. He fills silences with food talk and asks after people's appetites.
-  tics: [ Have you eaten?, Right then, Mind the stove ]
+  tics: [ Have you eaten?, Come and watch, Mind the stove ]
   never_says: [ I'm sorry to say, in my opinion, dear me ]
   samples:
     - Sit down, you look like you've been pulled out of the bay.
-    - Fair catch today. Could be worse, could be a cabbage.
+    - Fair catch today. Cod, mostly, and one crab with opinions.
     - No, I won't give you the recipe. Come and watch me make it.
 birthday: 98
 likes: [ smoked fish, early calm mornings, loud crew songs, good knives, flat calm at dawn ]
 dislikes: [ gulls on the catch, cold tea, people who skip breakfast ]
 fears: [ the last boat being sold off, losing his hands to the cold ]
 dream:
-  text: A boat with my name on it, the Piet, tied at the boathouse with the crew cheering.
+  text: A roofed stove on the quay, so the crews can eat a hot dinner in any weather.
   stages:
-    - Find a sound hull at the crane yard.
-    - Raise sixty coins from catches and crew work.
-    - Launch the boat on Regatta day.
+    - Ask Nell where an old stove-hood could stand on the quay (Regard ≥ 20 with Nell)
+    - Raise twenty coins for tin sheet and a flue.
+    - Cook the first crew dinner under it.
 routine:
   weekday:
     - { at: "04:30", do: eat, where: wharf.home_07 }
@@ -79,8 +79,8 @@ chores:
 relationships:
   - {
       id: yara_jankowski,
-      affinity: 20,
-      trust: 25,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: "His wife, who laughs at his cooking and eats it anyway."
     }

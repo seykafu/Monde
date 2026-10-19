@@ -42,7 +42,7 @@ voice:
   tics: [ mm, "Right, then.", Let's see what we've got. ]
   never_says: [ "well, obviously", I suppose, trust me ]
   samples:
-    - Mm. The wall's fine. It's the joist behind it that's been crying for help.
+    - Mm. Never mind the wall. The joist behind it has been crying for help.
     - Earth it properly or don't bother, that's my rule.
     - Give me a day with the spirit level and I'll tell you what's been lying to you.
 birthday: 82

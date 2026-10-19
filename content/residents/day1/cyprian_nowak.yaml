@@ -23,7 +23,7 @@ look:
   accessory: { kind: none }
   face: { moustache: true }
 backstory: "Cyprian came to Monde at four when his family took the Gannet from Carrow with two suitcases and a
-  goat. He worked as a deckhand for Old Moss Ferrante for twenty-five years and learned every knot the harbour
+  goat. He worked the Gannet's deck for twenty-five years, the last eleven under Old Moss Ferrante, and learned every knot the harbour
   steps needed. He wanted to be a sailor and a cook and ended up mostly a talker on the breakwater. Since
   retiring he mends fishing nets for anyone who asks and takes the long way round to the chapel. He is wrong
   about Lars: he loves the sea, and mostly he is waiting for Lars to say so."
@@ -38,16 +38,16 @@ beliefs:
 voice:
   register: Big, cheerful and nautical. He jokes loudly, then goes quiet when someone mentions the Gannet. He
     speaks in short bursts and stretches vowels when he's pleased.
-  tics: [ Mind the step, "Aye, well", "Ah, there we are" ]
+  tics: [ Steady as she goes, "Aye, well", "Ah, there we are" ]
   never_says: [ I'm too old for this, it's all fine, nothing to see here ]
   samples:
-    - Mind the step, Lars. Those harbour steps have had more of my knees than any other part of me.
+    - Steady as she goes, Lars. Those harbour steps have had more of my knees than any other part of me.
     - Aye, well. The Gannet'll be in on Friday, and I'll be on the quay to wave, same as always.
-    - Ah, there we are. You've put the kettle on, and I forgive you for the bow tie.
+    - Ah, there we are. You've found the good chair, and I forgive you for the bow tie.
 birthday: 80
-likes: [ the harbour at dusk, the Gannet's horn, thick sandwiches, a morning paper, a kettle on the stove ]
+likes: [ the harbour at dusk, the Gannet's horn, thick sandwiches, a morning paper, the smell of tar and rope ]
 dislikes: [ being told to slow down, closed doors, tinned fish, the clocktower's silence ]
-fears: [ that the ferry will stop running, dying before the bench is built ]
+fears: [ that the ferry will stop running, Lars turning down the dance ]
 dream:
   text: Dance with Lars on a Saturday night in a hall that smells of sea salt and cider.
   stages:
@@ -75,10 +75,10 @@ chores: [ Mend the nets, Peel the potatoes, Oil the door hinges ]
 relationships:
   - {
       id: lars_marsden,
-      affinity: 24,
-      trust: 30,
+      affinity: 85,
+      trust: 80,
       tag: partner,
-      note: Housemate and the only man who argues with him kindly.
+      note: "Housemate, partner and the only man who argues with him kindly."
     }
   - {
       id: emrys_eze,

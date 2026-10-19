@@ -44,7 +44,7 @@ voice:
   never_says: [ I feel, no problem, honestly, "anyway, moving on" ]
   samples:
     - The Tuesday boat is late again. I've written it down.
-    - Don't we, dear? I mean, we did agree on the second pot.
+    - Signe, we did agree on the second pot. Check page four of the accounts.
     - Give it a week and the figures will look better. They always do.
 birthday: 32
 likes:
@@ -53,16 +53,16 @@ likes:
     the kettle on the stove,
     adding up a column correctly,
     the weir in the early light,
-    a kettle on the stove
+    a freshly sharpened pencil
   ]
 dislikes: [ stairs, drafts, being managed, rounding errors ]
 fears: [ the house being empty when he comes back from the shop, losing his memory of the mill floor ]
 dream:
-  text: A bench on the Commons where he and Signe can watch the harbour without anyone asking them to move along.
+  text: See a lamp lit again in the mill's wage-office window on Lantern Night, with Signe at his side.
   stages:
-    - Choose a spot on the Commons where the sea shows clearly.
-    - Raise the coins quietly or ask Kasimir to build it plain.
-    - Sit on it with the first neighbour who stops to talk.
+    - Ask Kasimir to look over the wage-office shutter in the mill yard.
+    - Clean the window and set a lamp behind it.
+    - Light it on Lantern Night with Signe watching from the gate.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: millbrook.home_14 }
@@ -89,10 +89,10 @@ chores:
 relationships:
   - {
       id: signe_marchant,
-      affinity: 28,
-      trust: 25,
+      affinity: 90,
+      trust: 85,
       tag: spouse,
-      note: Thirty-odd years of finishing each other's sentences.
+      note: Forty-five years of finishing each other's sentences.
     }
   - {
       id: klara_eze,

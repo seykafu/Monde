@@ -21,9 +21,9 @@ look:
   height: tall
   outfit: { cut: smock, top: 9, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 4 }
-backstory: Linnea grew up in Carrow above a dry cleaner's and came to Monde at seventeen, drawn by a cheap room
-  and the idea of painting the sea. She got work at the Liss Cannery packing tins until it closed that same year,
-  then at the Gull & Anchor pulling pints until a bad winter and a child on the way cost her the job.
+backstory: Linnea grew up in Carrow above a dry cleaner's and came to Monde at eighteen, drawn by a cheap room
+  and the idea of painting the sea. The Liss Cannery had shut the year before, so she took pints at the Gull & Anchor
+  until a bad winter and a child on the way cost her the job.
   Cecily was born in the back bedroom of No. 4. Linnea still paints every night after bedtime, mostly the
   breakwater, mostly badly. She tells herself she stayed for the light. Really she stayed because leaving
   would mean admitting the Cannery was never coming back.
@@ -58,7 +58,7 @@ fears: [ losing the house, Cecily getting sick with no doctor nearer than the fe
 dream:
   text: Hours that fit around the school run, so I can finally take a shift I'm not dreading.
   stages:
-    - Ask the bakery for fixed morning hours.
+    - Ask Rosalind for fixed lunchtime shifts at the Gull & Anchor.
     - Swap school-run days with a neighbour.
     - Write the new timetable on the kitchen wall.
 routine:

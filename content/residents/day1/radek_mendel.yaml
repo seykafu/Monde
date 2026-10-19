@@ -11,7 +11,7 @@ portrait: radek_mendel
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: radek_mendel
 appearance: A slight older man with close-cropped white hair, round glasses and a neat moustache, always in
-  his cream coat even indoors. Golden-brown skin and a faint smell of pipe tobacco and machine oil.
+  his cream coat even indoors. Golden-brown skin and a faint smell of camphor and machine oil.
 look:
   kind: human
   skin: 9
@@ -43,14 +43,14 @@ voice:
   register: Measured and unhurried, like someone reading a timetable aloud. He qualifies his opinions, goes back
     over details, and gets distracted by the weather. He says exact times and prices from decades ago as if
     they still apply.
-  tics: [ "Now, where was I?", Mind the step., To the minute. ]
+  tics: [ "By the timetable,", "Wait for the bell.", To the minute. ]
   never_says: [ I suppose, whatever you like, that's just how it is, you know what I mean ]
   samples:
-    - Now, where was I? Ah, yes, the Carrow train used to leave at quarter past seven, and nobody ever argued
+    - By the timetable, the Carrow train used to leave at quarter past seven, and nobody ever argued
       with it.
-    - The clock hasn't gone since the seventeenth of... well, it stopped at four seventeen. I don't hold that
-      against it.
-    - Don't worry, I'll not keep you. Mind the step on the way out, it's loose.
+    - The clock hasn't gone since the seventeenth of... well, it stopped at four seventeen. I don't blame it
+      for that.
+    - Don't worry, I'll not keep you. Watch the third stair on the way out, it's loose.
 birthday: 2
 likes:
   [

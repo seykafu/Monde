@@ -4,7 +4,7 @@ name: Ayesha Soto
 age: 36
 pronouns: she/her
 kind: resident
-occupation: Office clerk in Hessle Cross, working weekdays and home weekends.
+occupation: Office clerk in Hessle Cross, away Tuesday to Friday.
 workplace: offmap.city
 home: millbrook.home_26
 portrait: ayesha_soto
@@ -38,12 +38,12 @@ beliefs:
 voice:
   register: Dry and quick, with short sentences. She uses the ferry timetable as a kind of joke. She is warm but
     not gushing.
-  tics: [ Ferry's at six., "Sensible, that.", "Right, I'll manage." ]
+  tics: [ Ferry's at six., "Sensible, that.", Envelope's on the dresser. ]
   never_says: [ I'm too tired, I don't know, we'll see ]
   samples:
     - Ferry's at six. Don't wait up if the wind's up.
-    - Two weeks' pay in the envelope. Tell Cordelia it isn't a loan.
-    - Yes, I'm home Friday. Yes, I'll bring the good bread.
+    - Envelope's on the dresser. Two weeks' pay. Tell Cordelia it isn't a loan.
+    - Yes, I'm on Friday's boat. Yes, I'll bring the good bread.
 birthday: 45
 likes:
   [
@@ -53,7 +53,7 @@ likes:
     The sound of the Gannet's horn,
     a lunch box packed right
   ]
-dislikes: [ Commuting on Mondays, Empty shops on Market Row, Being asked when she'll move home for good ]
+dislikes: [ The Tuesday boat before light, Empty shops on Market Row, Being asked when she'll move home for good ]
 fears: [ Missing something important at home, The mainland job ending ]
 dream:
   text: Plant a garden behind the house that the whole street can share.

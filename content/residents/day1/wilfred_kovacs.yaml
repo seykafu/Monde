@@ -23,7 +23,7 @@ look:
   accessory: { kind: scarf, colour: 3 }
   face: { moustache: true }
 backstory: Wilfred came to Monde at 23 when Lissworth Mill was still running three shifts and needed men who
-  could set a loom by ear. He spent fourteen years on the floor, then the mill closed and he went to the
+  could set a loom by ear. He spent twenty-three years on the floor, then the mill closed and he went to the
   boathouse for casual shifts. He met Einar at a Saturday market when Einar was selling carved spoons, and
   they have shared this house on Railings Lane for thirty-seven years. He still thinks the mill would reopen
   if someone asked the right men. Nobody has asked him in a long while, and he has stopped expecting it.
@@ -80,13 +80,13 @@ chores: [ sweep the front step, mend the window seat cushion, wind the kitchen c
 relationships:
   - {
       id: einar_kovacs,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Thirty-seven years in one house; he knows every mood.
     }
   - { id: rosalind, affinity: 12, trust: 10, tag: friend, note: Tells her the same two stories every Friday. }
-  - { id: nell, affinity: 8, trust: 6, tag: curious, note: Asks after her brother's boat engine. }
+  - { id: nell, affinity: 8, trust: 6, tag: curious, note: Asks after her boat's engine. }
 secrets:
   - text: He still keeps a loom shuttle in his jacket pocket and runs his thumb along it when he is thinking.
     reveal: { regard_min: 60 }

@@ -4,7 +4,7 @@ name: Yusuf Sorensen
 age: 66
 pronouns: he/him
 kind: resident
-occupation: Retired clerk who still keeps the ledger of the street's birthdays in…
+occupation: Retired clerk who still keeps a ledger of the street's birthdays
 workplace: old_quarter.home_08
 home: old_quarter.home_08
 portrait: yusuf_sorensen
@@ -22,10 +22,10 @@ look:
   outfit: { cut: plain, top: 2, bottom: 4, bottom_style: trousers, shoes: 13 }
   accessory: { kind: glasses }
   glasses: round
-backstory: Yusuf spent twenty-six years as a clerk in a shipping office in Carrow, counting crates that never
+backstory: Yusuf spent twelve years as a clerk in a shipping office in Carrow, counting crates that never
   seemed to arrive. He came to Monde with Hilde after a bad winter and a worse boss, expecting to hate the
-  damp. Instead he found the Lantern's printer always needed help folding, and he has folded every issue
-  since. He still believes the ferry timetable is printed wrong on purpose. He stays in because Hilde would
+  damp. Instead he found the Lantern's office short of hands on folding day, and he has turned up on Tuesdays
+  ever since. He still believes the ferry timetable is printed wrong on purpose. He stays in because Hilde would
   never forgive him for leaving the garden to her.
 personality:
   traits: [ precise, dry, loyal, fussy ]
@@ -34,7 +34,7 @@ values: { prosperity: 0.1, safety: 0.4, spirit: 0.15, charm: 0.35 }
 beliefs:
   - The ferry timetable is printed wrong on purpose.
   - A town that keeps its accounts honest keeps its people.
-  - Hilde is always right about people, and I am always right about numbers.
+  - Hilde is right about people, and I am right about dates.
 voice:
   register: Measured and exact, with small corrections offered gently. He qualifies his opinions and then
     commits to them anyway.
@@ -42,19 +42,18 @@ voice:
   never_says: [ just trust me, it's a mess, no offence ]
   samples:
     - Strictly speaking, the ferry leaves at ten past, not ten. I've checked it against my watch twice.
-    - Hilde, your scarf is on the peg. Don't we say it's on the peg?
+    - Hilde, your scarf is on the peg. It was on the peg yesterday, too.
     - I'll grant you the tea's good. I won't grant you it's warm.
 birthday: 13
 likes: [ a morning paper, a kettle on the stove, the Lantern's smell of ink, crossword puzzles, Hilde's laugh ]
 dislikes: [ stairs, drafts, being managed, late ferries ]
 fears: [ being a burden to Hilde, the house going quiet ]
 dream:
-  text: A bench on the Commons where we can watch the ferry come in, with a plaque reading the names of those
-    who sat there.
+  text: Get every household's birthday into his ledger, and not miss a single one for a whole year.
   stages:
-    - Choose a spot near the bandstand where the view is clear.
-    - Raise fifteen coins from the Saturday market or ask Kasimir to build it.
-    - Sit on it with the first neighbour who stops to talk.
+    - Ask each neighbour on Well Row for their birthday, door by door.
+    - Copy the ledger out fair and hang a page in the Town Hall porch.
+    - Leave a card at the right door on the right morning, for a month.
 routine:
   weekday:
     - { at: "07:00", do: wander, where: old_quarter.home_08 }
@@ -78,8 +77,8 @@ chores: [ fold the Lantern on Tuesdays, keep the house ledger, wind the kitchen 
 relationships:
   - {
       id: hilde_sorensen,
-      affinity: 25,
-      trust: 25,
+      affinity: 90,
+      trust: 85,
       tag: spouse,
       note: "Thirty-two years of disagreeing about everything, happily."
     }

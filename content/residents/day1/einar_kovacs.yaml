@@ -80,7 +80,7 @@ routine:
     - { at: "22:30", do: sleep, where: commons.home_02 }
 chores: [ whittle the day's shavings into the stove, wash the tin mugs, sweep the yard gate ]
 relationships:
-  - { id: wilfred_kovacs, affinity: 25, trust: 28, tag: spouse, note: Keeps the peace and the teapot full. }
+  - { id: wilfred_kovacs, affinity: 85, trust: 85, tag: spouse, note: Keeps the peace and the teapot full. }
   - { id: odile, affinity: 10, trust: 8, tag: fond, note: Brings her the offcuts for the bakery's kindling. }
   - {
       id: felix,
@@ -90,7 +90,7 @@ relationships:
       note: Once asked him to show the pupils how to hold a chisel.
     }
 secrets:
-  - text: He has kept every letter Wilfred wrote him in the city before they moved to Monde, tied with string
+  - text: He has kept every note Wilfred left on his spoon bench that first winter, tied with string
       under the floorboards.
     reveal: { regard_min: 70 }
 canon_locks: []

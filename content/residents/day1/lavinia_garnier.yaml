@@ -4,14 +4,14 @@ name: Lavinia Garnier
 age: 31
 pronouns: she/her
 kind: resident
-occupation: Bar and kitchen hand at The Gull & Anchor, mostly peeling and…
+occupation: Bar and kitchen hand at the Gull & Anchor; peels and pickles
 workplace: market_row.gull_and_anchor
 home: market_row.pub_rooms
 portrait: lib_f31_052
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: lavinia_garnier
 appearance: She has close-cropped copper-red hair and small gold hoop earrings, and she wears a practical plum
-  coat with a tote bag strap across one shoulder. Her look is dry and efficient.
+  coat with a canvas satchel strap across one shoulder. Her look is dry and efficient.
 look:
   kind: human
   skin: 8
@@ -93,8 +93,8 @@ relationships:
       note: Her employer and the one person who knows her cooking.
     }
   - { id: odile, affinity: 10, trust: 8, tag: curious, note: Keeps asking for her starter and never gets it. }
-  - { id: june, affinity: 6, trust: 4, tag: flatmate, note: "Flatmate in all but name, borrows her sugar." }
-  - { id: ines, affinity: 35, trust: 40, tag: flatmate, note: Shares the house. }
+  - { id: june, affinity: 55, trust: 50, tag: flatmate, note: "Flatmate in all but name, borrows her sugar." }
+  - { id: ines, affinity: 60, trust: 55, tag: flatmate, note: Shares the house. }
 secrets:
   - text: She has been keeping a notebook of every recipe the pub's regulars describe to her, in case the booklet
       ever happens.

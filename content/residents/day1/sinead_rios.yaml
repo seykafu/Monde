@@ -24,7 +24,7 @@ look:
   glasses: halfmoon
 backstory: Sinead cooked for the Carrow schools for twenty-eight years and kept a notebook of every child's
   allergies. She met Frida at the drapers when she came in for a pair of gloves and left with a button she
-  didn't need. They lived in Carrow until the children moved to Hessle Cross, and then they chose Monde
+  didn't need. They lived in Carrow until the children moved to Hessle Cross, and then, twenty years ago, they chose Monde
   because Frida had grown up here and missed the sea. Sinead's knees gave out on the Carrow hill, so the
   ground floor on Terrace Row suited them. Sinead thinks the bench on the Commons will change everything. She
   is wrong that anyone will sit on it without being asked.
@@ -42,7 +42,7 @@ voice:
   tics: [ "Oh, now.", Mm., "Well, there." ]
   never_says: [ you should have, hurry up, in my day ]
   samples:
-    - Mm. Put the kettle on, dear, and we'll see.
+    - Mm. Sit, dear, and we'll see.
     - Oh, now, that's a lovely bench idea. Who'd sit on it, though?
     - Well, there. Frida's buttons have found their way to a drawer again.
 birthday: 90
@@ -83,8 +83,8 @@ chores: [ bake for the library, take in the washing, feed the cat from the Eze h
 relationships:
   - {
       id: frida_irvine,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: partner,
       note: "Frida, her partner; they finish each other's sentences."
     }
@@ -112,4 +112,4 @@ generated_by: model
 household: mb_b06
 archetype: retired_couple
 employment: retired
-years_in_monde: 75
+years_in_monde: 20

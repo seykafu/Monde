@@ -40,11 +40,11 @@ beliefs:
   - Rain at night is the only honest weather.
 voice:
   register: Short, weather-first, earthy. He answers questions with a question about the ground. Small, slow sentences.
-  tics: [ Give it time., "Mm, well.", Looks like rain. ]
+  tics: [ Give it time., How's your ground?, Looks like rain. ]
   never_says: [ in my opinion, I feel, trust me, it's a sign ]
   samples:
     - Give it time. Soil doesn't hurry.
-    - Mm, well. Beans don't care who's watching.
+    - How's your ground? Mine's wet. Beans don't care who's watching.
     - Looks like rain tonight. Good. The bed needed it.
 birthday: 84
 likes:

@@ -22,7 +22,7 @@ look:
   height: tall
   outfit: { cut: coat, top: 1, bottom: 1, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 0 }
-backstory: Sage grew up inland in a rail town and spent thirty years as a ledger clerk for a canning firm
+backstory: Sage grew up inland in a rail town and spent twenty years as a ledger clerk for a canning firm
   before it moved its office abroad. They wanted to see the sea every day, so they and Benedek bought the top
   flat on Well Row after a holiday that rained the whole week and that they still call the best of their
   lives. Sage keeps a weather log in pencil and sends the figures to nobody, which they insist is not a hobby.
@@ -39,7 +39,7 @@ beliefs:
 voice:
   register: Mild and unhurried, often trailing off into a thought. Speaks softly and listens longer than they
     talk. Affectionate needling of Benedek.
-  tics: [ "Hm, I think so.", "Don't we, dear?", Let me just note that down. ]
+  tics: [ "Hm, I think so.", Wind's gone round., Let me just note that down. ]
   never_says: [ Mate, Bloody, You know what I mean ]
   samples:
     - Wind's gone round to the south since breakfast. Note that, would you?
@@ -76,8 +76,8 @@ chores: [ Log the weather in pencil by the window, Mend the scarf's frayed end, 
 relationships:
   - {
       id: benedek_menon,
-      affinity: 25,
-      trust: 20,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
       note: Married; their bickering is a form of love
     }

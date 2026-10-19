@@ -4,7 +4,7 @@ name: Lene Devlin
 age: 47
 pronouns: she/her
 kind: resident
-occupation: Out of work and looking; does occasional sewing and alterations for neighbours.
+occupation: Out of work and looking; takes in odd mending for neighbours.
 workplace: station_hill.home_05
 home: station_hill.home_05
 portrait: lene_devlin
@@ -23,7 +23,7 @@ look:
   accessory: { kind: none }
 backstory: Came to Monde at 14 when her mother took a post at the cannery, and she worked the line there from
   sixteen until it closed eleven years ago. She married Idris in her twenties and has kept the house on Tower
-  Lane ever since. Since the cannery shut she has taken in mending and the odd alteration, and she is waiting
+  Lane ever since. Since the cannery shut she has taken in mending and odd jobs, and she is waiting
   on a place at the Carrow post office that she has not yet heard back about. She tells people she is happy
   here, and mostly she is. She is less sure the town will still be here when her own children would have
   needed it.
@@ -40,9 +40,9 @@ voice:
   tics: [ love, mind you, that's you sorted ]
   never_says: [ "I'm fine, really", it's not my place, nobody cares ]
   samples:
-    - Kettle's on, love. Sit down before you fall.
+    - Come in, love, you're letting the warm out.
     - Mind you, the post office might write back. They might.
-    - Fourteen years and I still wait for the ferry like it's Christmas.
+    - Thirty-three years and I still wait for the ferry like it's Christmas.
 birthday: 48
 likes:
   [
@@ -58,8 +58,8 @@ dream:
   text: Find steady paid work again, something she can do with her own hands in town.
   stages:
     - Register at Town Hall with a list of every job she has ever done.
-    - Take a casual job at the bakery three mornings a week.
-    - Get taken on for a full post at the boathouse or the post office.
+    - Take casual shifts on the market hall stalls on Saturdays.
+    - Get taken on for a full post at the boathouse or the fish market.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: station_hill.home_05 }

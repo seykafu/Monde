@@ -78,7 +78,7 @@ relationships:
   - { id: pilar_callan, affinity: 85, trust: 65, tag: mother, note: "Sits in the window and asks what she's building. Gets 'a stool'." }
   - { id: orla_goddard, affinity: 80, trust: 60, tag: mother, note: "Cuts patterns and shows her how a notch lines up. Wants her to see the dovetail before Friday." }
   - { id: dagny_callan, affinity: 85, trust: 70, tag: grandmother, note: "Reads the weir standing up. Wants to see her read it sitting." }
-  - { id: paloma_callan, affinity: 65, trust: 50, tag: sister, note: "Seventeen, ledger-keeping, notices everything. Svea would like her not to notice this." }
+  - { id: paloma_callan, affinity: 70, trust: 60, tag: sister, note: "Seventeen, ledger-keeping, notices everything. Svea would like her not to notice this." }
   - { id: kasimir, affinity: 55, trust: 55, tag: fond, note: "Pays her in tea and offcuts and says 'Could be'. Wants him to say 'True'." }
 secrets:
   - text: "The cloth hides a bench for Dagny's birthday. She has paid Kasimir for the oak in sweeping, and he has never asked what for."

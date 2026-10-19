@@ -10,8 +10,8 @@ home: market_row.home_15
 portrait: lib_m58_031
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: yannick_rudd
-appearance: A wiry man with grey hair in a stubby ponytail and a neat grey goatee, a brass-rimmed magnifying
-  visor pushed up on his forehead. He wears a slate-blue work smock full of small pockets.
+appearance: A wiry man with grey hair in a stubby ponytail and a neat grey goatee, an old pair of field
+  glasses on a strap round his neck. He wears a slate-blue work smock full of small pockets.
 look:
   kind: human
   skin: 9
@@ -23,7 +23,7 @@ look:
   accessory: { kind: none }
   glasses: on_head
   face: { moustache: true }
-backstory: Yannick was born in the terrace on Millbrook Lane and went to work at Lissworth Mill at seventeen,
+backstory: Yannick was born in the terrace on Mill Lane and went to work at Lissworth Mill at seventeen,
   sweeping fibre from the frames. The dust got into his chest and the mill closed fourteen years ago, so he
   came home to the flat above Market Row with his tools and a pair of old field glasses. He had meant to leave
   for Carrow once, but his mother needed him, and then she died in the flat, and he stayed. Mornings on the
@@ -40,7 +40,7 @@ beliefs:
 voice:
   register: Hushed and exact. He names species without hesitation and goes vague about people, trailing off when
     the talk turns personal. Short sentences, lots of half-stops.
-  tics: [ "Shh. No, wait.", Fine. It's gone., Count it twice. ]
+  tics: [ "Shh. No, wait.", Fine. It's gone., One more minute. ]
   never_says: [ bird brain, for the record, as it were ]
   samples:
     - Shh. No, wait. There, grey heron, on the piling. Don't move.

@@ -76,10 +76,10 @@ routine:
     - { at: "22:00", do: sleep, where: millbrook.home_38 }
 chores: [ put Josef's marbles back in their jar, copy the week's notices onto the door in capitals, carry the library books back on Fridays ]
 relationships:
-  - { id: elke_nesbitt, affinity: 65, trust: 40, tag: mother, note: "Home Fridays, with a Carrow door on a card for Josef and nothing for her. Wants her to stay past Saturday just once." }
+  - { id: elke_nesbitt, affinity: 65, trust: 40, tag: mother, note: "Home Fridays, with a Carrow door on a card for Josef and nothing for her. Resents the four days away and says she doesn't. Wants her to stay past Saturday just once." }
   - { id: corin_madsen, affinity: 70, trust: 50, tag: parent, note: "Notices everything and says nothing, which she respects. Wants them to stop leaving the landing lamp lit." }
   - { id: leila_nesbitt, affinity: 70, trust: 55, tag: grandmother, note: "Cooks for the lane and prods her to eat. Wants her to read the notices on the door out loud." }
-  - { id: josef_nesbitt, affinity: 60, trust: 40, tag: brother, note: "Seven, loud, and organises her pencils by colour. Wants him to stop; has not said so." }
+  - { id: josef_nesbitt, affinity: 60, trust: 40, tag: brother, note: "Seven, loud, and organises her pencils by colour. Thinks he spies for Corin and resents it. Wants him to stop; has not said so." }
   - { id: sable, affinity: 15, trust: 20, tag: curious, note: "Says 'On the record?' and nothing else. Wants her to say yes or no to a line of type." }
   - { id: remy_corbett, affinity: -10, trust: 10, tag: rival, note: "Has the Lantern's Saturday job and the hook for his coat. Wants the hook, and says she doesn't." }
   - { id: margo, affinity: 45, trust: 50, tag: fond, note: "Sets her lessons and corrects her capitals. Wants her to put in a word at the Lantern door." }

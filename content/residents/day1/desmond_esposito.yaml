@@ -34,36 +34,35 @@ personality:
   big5: { open: 62, conscientious: 48, extravert: 38, agreeable: 80, neurotic: 35 }
 values: { prosperity: 0.1, safety: 0.4, spirit: 0.25, charm: 0.25 }
 beliefs:
-  - The mill would have reopened if somebody had simply written to Carrow.
-  - Boys on bicycles are the only thing in Monde that still makes noise.
+  - The mill would have reopened if enough men had gone to the meetings.
+  - The gulls are the only thing in Monde that still makes noise.
   - A cup of tea fixes most things, including things it cannot fix.
 voice:
   register: Slow and warm, circling back to earlier threads, with prices from forty years ago dropped in
     unprompted. He trails off and restarts, and asks people to tell him a story when he runs out.
-  tics: [ Now where was I?, "Back in my day, a loaf cost", Mind the step ]
+  tics: [ "Tuesday, always Tuesday.", Ruth would've said., Tide tables never lied. ]
   never_says: [ "Dear me, I'm fine", you should have known, it's all over now ]
   samples:
-    - Now where was I? Oh yes, the ferry. Tuesday, always Tuesday.
-    - Ruth would've had the kettle on by now. Would you like a cup, or shall I just talk at you?
-    - A fish supper, that's the thing. Nell's cod, wrapped in the Lantern. Don't tell the Lantern.
+    - The ferry? Tuesday, always Tuesday. I copied the tide tables for it by hand.
+    - Ruth would've said we've had enough tea by now. Would you like a cup, or shall I just talk at you?
+    - A fish supper, now there's a meal. Nell's cod, wrapped in the Lantern. Don't tell the Lantern.
 birthday: 97
 likes:
   [
-    knitting,
-    small birds at the window,
-    being asked for a story,
+    a sharp pencil,
+    gulls on the shingle path,
+    a ruled page of figures,
     the ferry going out on Tuesdays,
     Nell's cod on a Friday
   ]
-dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, the mill's closed gate ]
+dislikes: [ a blunt pencil, tide tables copied wrong, a cold cup of tea, the mill's closed gate ]
 fears: [ the house going quiet for good, forgetting the way Ruth hummed ]
 dream:
-  text: Be invited to supper by a neighbour, and then sit at a table with someone who will stay until the kettle
-    is cold.
+  text: See a month of tide tables pinned on the harbour steps in his own hand, and the boats reading them.
   stages:
-    - Walk the length of Shingle Row and knock on a door.
-    - Return the invitation with a fish supper from Nell's.
-    - Set a standing Thursday table for whoever comes.
+    - Borrow ruled paper and a good pencil from the boathouse.
+    - Copy a month of tides out by hand at the harbour steps.
+    - Pin it up and watch the boats check their lines by it.
 routine:
   weekday:
     - { at: "07:00", do: sit, where: wharf.home_15 }
@@ -97,7 +96,7 @@ relationships:
       note: Swaps seed packets and gossip over the gate.
     }
   - { id: mei_lindgren, affinity: 14, trust: 12, tag: fond, note: Brings him soup when she remembers. }
-  - { id: olav_lindgren, affinity: -12, trust: -6, tag: wary, note: The bicycle boy who rings nothing. }
+  - { id: olav_lindgren, affinity: -12, trust: -6, tag: wary, note: "The notebook boy, who writes down what he says and reads it back wrong." }
 secrets:
   - text: He still writes Ruth a short letter each Tuesday and posts it in the library box, which is his own
       private joke about the post.

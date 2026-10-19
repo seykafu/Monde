@@ -22,7 +22,7 @@ look:
   outfit: { cut: coat, top: 3, bottom: 6, bottom_style: skirt, shoes: 13 }
   accessory: { kind: glasses }
   glasses: heavy
-backstory: Yaa trained as a draughtswoman in Carrow and spent her twenties surveying harbour depths for a
+backstory: Yaa trained as a draughtswoman in Carrow and spent her first working years surveying harbour depths for a
   shipping office there. She came to Monde at twenty-two to draw the coast for a dull commission and never
   left. Her first Saturday stall was a bet with a fishwife who said nobody would pay for a map of their own
   street. Eleven maps sold that morning. She still keeps the coin from the first sale in her raincoat pocket
@@ -54,7 +54,7 @@ dislikes:
     folded maps,
     being told it's just up there,
     the ferry timetable changing,
-    tourists who ask for the castle
+    strangers who ask the way and ignore it
   ]
 fears: [ the old lanes being built over before she records them, losing her sight before the survey is done ]
 dream:

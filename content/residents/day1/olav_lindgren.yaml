@@ -77,7 +77,7 @@ relationships:
   - { id: bram_lindgren, affinity: 85, trust: 70, tag: father, note: "Home Fridays, with a bag and a rope joke. Answers six of seven questions." }
   - { id: marthe_demir, affinity: 85, trust: 70, tag: mother, note: "Takes the seventh question and has the plate out before he asks it." }
   - { id: mei_lindgren, affinity: 80, trust: 65, tag: grandmother, note: "Gran, who says it in ten words. He tries." }
-  - { id: meera_lindgren, affinity: 60, trust: 45, tag: sister, note: "Five and a half, hates aniseed, and answers every question with 'forty-one'." }
+  - { id: meera_lindgren, affinity: 75, trust: 70, tag: sister, note: "Five and a half, hates aniseed, and answers every question with 'forty-one'." }
   - { id: maurice_lamont, affinity: 50, trust: 50, tag: fond, note: "Kept a light for twenty-six years and answers in numbers. Wants him to hand over the barometer." }
   - { id: tib, affinity: 40, trust: 35, tag: friend, note: "Counts steps and plaques at school; Olav counts nights. Wants to know how many alleys he has." }
 secrets:

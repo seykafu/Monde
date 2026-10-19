@@ -61,8 +61,8 @@ dream:
   text: Find a hull with good bones and turn it into a boat with my name painted on the transom.
   stages:
     - Find a sound hull at the back of the Wharf and haul it out.
-    - Raise sixty coins from catches and mending work.
-    - Launch her on Regatta day under her own name.
+    - Strip her and re-plank what needs it, evenings at the boathouse.
+    - Paint her name on the transom and float her on a flat-calm morning.
 routine:
   weekday:
     - { at: "06:30", do: eat, where: old_quarter.home_09 }

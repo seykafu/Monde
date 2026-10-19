@@ -22,9 +22,9 @@ look:
   outfit: { cut: coat, top: 4, bottom: 6, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
   face: { moustache: true, stubble: true }
-backstory: Gaspard fished out of Harrowgate on a crabber until his knees gave out at thirty-six. He answered
+backstory: Gaspard fished out of Port Sallow on a crabber until his knees gave out at thirty-six. He answered
   the Town Hall notice for a caretaker because it paid a wage and let him keep an eye on the weather from the
-  roof. He once rowed a drowned dinghy's crew back to shore in a gale and has never told anyone the full
+  roof. He once rowed a swamped dinghy's crew back to shore in a gale and has never told anyone the full
   story. He came to Monde for the quiet and stayed because Effie liked the view of the breakwater. He still
   believes the clocktower could be fixed with a spare spring, though nobody has let him try.
 personality:
@@ -37,7 +37,7 @@ beliefs:
   - Nobody in Monde reads the minutes of anything.
 voice:
   register: Slow and plain, little wasted breath. Speaks in weather and tide words. Dry humour that often misses.
-  tics: [ "Well, now.", Mind the step., Looks at the sky first ]
+  tics: [ "Well, now.", Wind's backing., Looks at the sky first ]
   never_says: [ I feel, in my opinion, to be honest ]
   samples:
     - Wind's backing north. Shut the Hall windows, will you.
@@ -79,12 +79,12 @@ routine:
     - { at: "15:00", do: sit, where: commons.picnic_lawn }
     - { at: "20:00", do: eat, where: old_quarter.home_22 }
     - { at: "22:00", do: sleep, where: old_quarter.home_22 }
-chores: [ Check the Town Hall boiler each morning, Carry coal up the stairs, Sweep the harbour steps on Fridays ]
+chores: [ Check the Town Hall boiler each morning, Carry coal up the stairs, Sweep the Town Hall steps on Fridays ]
 relationships:
   - {
       id: effie_zielinski,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: Thirty-nine years married; she keeps him honest.
     }

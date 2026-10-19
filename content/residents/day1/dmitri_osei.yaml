@@ -82,7 +82,7 @@ relationships:
   - { id: elodie_osei, affinity: 80, trust: 60, tag: daughter, note: "Seventeen and quiet about what she wants. Wants her to say the key out loud." }
   - { id: alun_osei, affinity: 85, trust: 70, tag: son, note: "Wants the horn. Gets the answer 'what for?', every Saturday, in the cab." }
   - { id: einar_chalmers, affinity: 30, trust: 40, tag: friend, note: "Hauls the other half of the wharf round from his father's tin mug. Wants him to stop saying the mill will reopen before the load is on." }
-  - { id: ottilie_verhoeven, affinity: 35, trust: 40, tag: friend, note: "Takes the post sacks he drops at the booth. Wants her to hum along so he can stop singing alone." }
+  - { id: ottilie_verhoeven, affinity: 35, trust: 40, tag: friend, note: "Takes the post sacks he drops at the ferry slip. Wants her to hum along so he can stop singing alone." }
 secrets:
   - text: "He is learning to read music from the chapel's songbook, to sing a harmony with Anselm at the Harvest Supper."
     reveal: { regard_min: 50 }

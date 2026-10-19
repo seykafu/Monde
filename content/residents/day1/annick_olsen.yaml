@@ -4,7 +4,7 @@ name: Annick Olsen
 age: 62
 pronouns: she/her
 kind: resident
-occupation: Retired; formerly a seamstress for a draper on Market Row.
+occupation: Retired; formerly a seamstress for a Carrow draper.
 workplace: wharf.home_13
 home: wharf.home_13
 portrait: annick_olsen
@@ -21,10 +21,10 @@ look:
   height: short
   outfit: { cut: pinafore, top: 9, bottom: 0, bottom_style: skirt, shoes: 2, trim: 6 }
   accessory: { kind: none }
-backstory: Annick sewed for a draper on Carrow's high street for nineteen years before she married Walter and
-  followed him to the coast. She still thinks of Monde as a holiday that got out of hand. When the draper's on
-  Market Row closed she took over his unsold bolts of cloth and now mends for half the street, asking only
-  that people bring their own thread. Her garden is the best on Shingle Row, though she will not admit it, and
+backstory: Annick sewed for a draper on Carrow's high street for eleven years before she married Walter.
+  She still thinks of Monde as a holiday that got out of hand. When a draper on
+  Market Row closed she took over his unsold bolts of cloth and sews her own and Walter's clothes from
+  them. Her garden is the best on Shingle Row, though she will not admit it, and
   she gives away the beans to anyone who holds the gate for her. She believes the town has forgotten how to be
   kind to strangers, which is only half true; she has never once been unkind to one.
 personality:
@@ -42,7 +42,7 @@ voice:
   never_says: [ that's not my business, I can't be bothered, everything happens for a reason ]
   samples:
     - Don't we, dear? He'll say he's fine, but he's not sleeping.
-    - Well, I never. Bring that jacket here and I'll have the sleeve back by Friday.
+    - Well, I never. Walter's good jacket has had that sleeve turned twice, and I'll turn it again by Friday.
     - Isn't that the way. The beans are ready if anyone wants them, they won't keep.
 birthday: 96
 likes:
@@ -55,11 +55,11 @@ likes:
 dislikes: [ drafts, being fussed over, cold tea, loud talk after dark ]
 fears: [ Walter's chest worsening, the library closing, being forgotten by the town ]
 dream:
-  text: She wants to be useful to the town, and to be thanked by name in the Lantern.
+  text: A bean row in the Commons garden, with a gate that anyone can hold open for a share.
   stages:
-    - Volunteer three shifts at the library desk.
-    - Get thanked by name in the Lantern.
-    - Take a regular chair at the Gull & Anchor.
+    - Ask Teo which community garden plot is free (Regard ≥ 20 with Teo)
+    - Swap seed packets with three neighbours along Shingle Row.
+    - Stake the first bean row and hang the gate.
 routine:
   weekday:
     - { at: "07:00", do: cook, where: wharf.home_13 }
@@ -79,12 +79,12 @@ routine:
     - { at: "16:00", do: pray, where: old_quarter.st_brigids }
     - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "21:30", do: sleep, where: wharf.home_13 }
-chores: [ Mend neighbours' hems, Sweep the front step, Tend the bean rows ]
+chores: [ Turn Walter's collars, Sweep the front step, Tend the bean rows ]
 relationships:
   - {
       id: walter_olsen,
-      affinity: 30,
-      trust: 30,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Her husband; she keeps his secrets and his hats.
     }

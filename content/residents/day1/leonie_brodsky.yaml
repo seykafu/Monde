@@ -43,7 +43,7 @@ voice:
   tics: [ "Guess how many.", "Nearly Friday.", "Can I ring it?" ]
   never_says: [ come home, boring, I hate the ferry ]
   samples:
-    - "Guess how many days till Friday. No, three. You always say four. Mam's boat is the one that's late, so I count it twice."
+    - "Guess how many days till Friday. No, three. You always say four. Mam's boat is the one that's late, so I tally it twice."
     - "Moss won't let me ring the bell. He says it isn't a toy. I've got a spoon and a fence post. It's nearly the same."
     - "Mum chalks the board and I rub out the wrong bits. She says I'm quicker than the sponge. It's just that I like the squeak."
 birthday: 32

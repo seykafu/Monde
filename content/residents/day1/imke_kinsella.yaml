@@ -21,7 +21,7 @@ look:
   height: tall
   outfit: { cut: coat, top: 11, bottom: 1, bottom_style: skirt, shoes: 1 }
   accessory: { kind: none }
-backstory: Imke grew up in a mill town inland and took the post office counter job at Liss at nineteen, when
+backstory: Imke grew up in a mill town inland and took a post office sorting job in her home town at nineteen, when
   the branch still had a telegraph key. She married Piet Kinsella, a fitter at the mill, and they came to
   Monde when she was thirty-four because the rent on Tower Lane was low and the sea air was supposed to be
   good for his chest. Piet died eleven winters ago. She sorted the mail under Ilona Szabo at the Monde post office until it closed, then
@@ -39,10 +39,10 @@ beliefs:
 voice:
   register: Unhurried and wandering on purpose, she starts one story and drifts into another, often correcting
     herself. She remembers prices from forty years ago and quotes them without being asked.
-  tics: [ Now where was I?, "In my day,", Mind the stove. ]
+  tics: [ Never mind., "No, the other chair.", Nearly there. ]
   never_says: [ sorry for the bother, whatever, in a hurry, modern ]
   samples:
-    - Now where was I? Oh yes, a loaf cost one coin then, and the baker would give you the crust for
+    - A loaf cost one coin then, and the baker would give you the crust for
       nothing.
     - Sit down, love, the kettle's nearly there. No, the other chair, the one with the good springs.
     - Piet liked it cold, the stove, I mean. Never mind. You'll have a cup of tea anyway.
@@ -58,11 +58,11 @@ likes:
 dislikes: [ boys on bicycles with no bells, being called grandma by strangers, a cold stove, hurried conversation ]
 fears: [ being forgotten on Tower Lane, the stove going out in the night ]
 dream:
-  text: Have someone to share a supper with, and be invited to a neighbour's table once in a while.
+  text: Sort the Friday post again, at the ticket hatch, and see every letter to the right door by dark.
   stages:
-    - Ask Esme Hallam round for soup on a Thursday.
-    - Return the invitation with a loaf from Fournier & Fille.
-    - Set a standing Thursday table for whoever comes by.
+    - Ask Ada if she may sort the Friday post at the hatch (Regard ≥ 20 with Ada)
+    - Sort one Friday's post without a mistake.
+    - Carry the last letter to its door before dark.
 routine:
   weekday:
     - { at: "06:30", do: wander, where: station_hill.home_06 }

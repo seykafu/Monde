@@ -174,7 +174,8 @@ export const JOB_ROWS: readonly JobRow[] = [
   { row: 12, workplace: "Wolanski carpentry", places: ["millbrook.kasimir_workshop"], bands: [0, 1, 0], titles: ["carpenter"], prefer: [] },
   { row: 13, workplace: "Delphine's alterations, from home", places: ["millbrook.mercer_house"], bands: [0, 0, 1], titles: ["seamstress"], prefer: [] },
   { row: 14, workplace: "Glasshouse and Commons grounds", places: ["commons.glasshouse"], bands: [1, 0, 1], titles: ["groundskeeper"], prefer: ["market_gardener", "retired_couple", "widowed_elder"] },
-  { row: 15, workplace: "Post round and haulage", places: ["wharf.ticket_booth", "wharf.crane_yard"], bands: [0, 4, 0], titles: ["post round", "haulier"], prefer: ["school_family", "mill_hand", "single_parent", "shop_founder"] },
+  // The post round meets each sailing and sorts the sacks on the slip; the booth is Ada's (census review 2026-10-19).
+  { row: 15, workplace: "Post round and haulage", places: ["wharf.ferry_slip", "wharf.crane_yard"], bands: [0, 4, 0], titles: ["post round", "haulier"], prefer: ["school_family", "mill_hand", "single_parent", "shop_founder"] },
   { row: 16, workplace: "Building trades", places: ["home.own"], bands: [0, 4, 1], titles: ["plumber", "electrician", "roofer", "mason", "mason"], prefer: ["builder"] },
   { row: 17, workplace: "Home-based makers", places: ["home.own"], bands: [0, 2, 2], titles: ["potter", "weaver", "model-boat builder", "binder"], prefer: ["remote_craftsperson"] },
   { row: 18, workplace: "Market-day stallholders (Saturdays)", places: ["market_row.market_hall", "market_row.market_street"], bands: [0, 2, 2], titles: ["stallholder"], prefer: ["market_gardener", "cartographer", "cook_baker", "remote_craftsperson", "retired_couple"] },

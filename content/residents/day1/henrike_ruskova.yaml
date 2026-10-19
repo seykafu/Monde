@@ -24,8 +24,8 @@ look:
   headwear: { kind: flat_cap, colour: 6 }
 backstory: Henrike came to the Mill from the cannery towns on the south coast, where she had mended nets and
   fixed engines since her teens. She met Anneke on the night shift and they have shared a house ever since.
-  When the cannery on the Wharf closed eleven years ago she took whatever repair work she could find, mostly
-  bicycles and radios for neighbours who paid in eggs and favours. She talks about the Mill's machines as if
+  After the Mill she kept the Wharf cannery's engines going until it closed eleven years ago, then took
+  whatever repair work she could find, mostly bicycles and radios for neighbours who paid in eggs and favours. She talks about the Mill's machines as if
   they were animals she once looked after. She is sure the cannery could run again with two engines and a
   decent crew.
 personality:
@@ -39,10 +39,10 @@ beliefs:
 voice:
   register: Slow and kind, with long pauses. She prefers to show rather than tell and will fix something while
     she talks.
-  tics: [ Hold that for me., "Listen to her, she's fine.", Give it a moment. ]
+  tics: [ Pass me the small one., "Listen to her, she's fine.", Give it a moment. ]
   never_says: [ that's terrible, nothing to be done, I suppose, you must understand ]
   samples:
-    - Hold that for me, would you? Give it a moment and she'll turn over.
+    - Pass me the small one, would you? Give it a moment and she'll turn over.
     - Anneke's up before the gulls again. I've told her, she never listens.
     - No, the bicycle's fine. It just wanted someone to ask nicely.
 birthday: 2
@@ -57,11 +57,11 @@ likes:
 dislikes: [ waste, people who shout at machines, being rushed at the boathouse ]
 fears: [ losing the workbench, seeing Anneke give up ]
 dream:
-  text: Get the old loom turning again, and hear it run true.
+  text: Get the boathouse winch running again, and watch a hull come up the slip without six backs behind it.
   stages:
-    - Find the loom parts in the Mill yard.
-    - Oil and set them with Kasimir's help.
-    - Run the first bolt of cloth on the loom.
+    - Look the winch over with Ruth Doherty and list the worn parts.
+    - Find a gearbox and a length of chain in the cannery scrap.
+    - Haul a hull up the slip on it, with Ruth watching.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: millbrook.home_08 }
@@ -87,7 +87,7 @@ chores:
     Sharpens the household knives on Sundays.
   ]
 relationships:
-  - { id: anneke_moran, affinity: 18, trust: 22, tag: partner, note: "Her partner, who never sleeps enough." }
+  - { id: anneke_moran, affinity: 90, trust: 85, tag: partner, note: "Her partner, who never sleeps enough." }
   - {
       id: viggo_mendes,
       affinity: 14,

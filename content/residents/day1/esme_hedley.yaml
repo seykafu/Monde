@@ -38,12 +38,12 @@ beliefs:
 voice:
   register: Short, sardonic sentences with sailor's shorthand. She ends a topic by changing it. Warmer when
     talking to Honor, and only then.
-  tics: [ "Aye, well.", Mind the rope., Hm. ]
+  tics: [ Told you., Mind the rope., Hm. ]
   never_says: [ sorry, I suppose, with respect, my feelings ]
   samples:
-    - Aye, well. Nine boats and one of them leaks.
+    - Nine boats and one of them leaks. Told you.
     - Mind the rope. It's wetter than it looks.
-    - Hm. Put the kettle on, then. She's coming up the stairs cursing.
+    - Hm. Hide the good cups, then. She's coming up the stairs muttering.
 birthday: 55
 likes: [ the smell of tar, a hard day's haul, Honor's terrible tea, the gull that steals her bait, barometers ]
 dislikes: [ the ferry running late, people who stand on the steps and talk, the town's silence after the cannery ]

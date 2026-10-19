@@ -4,8 +4,8 @@ name: Liv Brodsky
 age: 42
 pronouns: she/her
 kind: resident
-occupation: Post round and the ticket booth chalkboard on the Wharf
-workplace: wharf.ticket_booth
+occupation: Wharf post round; meets the ferry and chalks the Gannet's days.
+workplace: wharf.ferry_slip
 home: wharf.home_03
 portrait: lib_f48_027
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
@@ -24,12 +24,12 @@ look:
   accessory: { kind: glasses }
   glasses: round
 backstory: >
-  Liv has carried the Wharf's post for eleven years, since the post office shut, and keeps the chalk board at
-  the ticket booth: the Gannet's days, the parcels waiting, whose letter has come. She says she has never read
-  one. Thora takes Tuesday's ferry to Hessle Cross and comes home Friday, so the house runs on the Board, Liv's
-  lists pinned to the kitchen door and amended by Leonie in pencil. Liv wants Moss to name one time for the
-  Friday boat and hold it. She has chalked "about two" beside it for six winters, and she is running out of
-  board.
+  Liv has carried the Wharf's post for eleven years, since the cannery's mail room shut. She meets every sailing
+  with the sacks and keeps the chalk board on the ferry slip beside Ada's booth: the Gannet's days, the parcels
+  waiting, whose letter has come. She says she has never read one. Thora takes Tuesday's ferry to Hessle Cross
+  and comes home Friday, so the house runs on the Board, Liv's lists pinned to the kitchen door and amended by
+  Leonie in pencil. Liv wants Moss to name one time for the Friday boat and hold it. She has chalked "about two"
+  beside it for six winters, and she is running out of board.
 personality:
   traits: [ organizing, warm, dry, tired ]
   big5: { open: 50, conscientious: 78, extravert: 62, agreeable: 74, neurotic: 55 }
@@ -53,7 +53,7 @@ likes: [ a lunch box packed right, chalk that doesn't squeak, strong tea, a boar
 dislikes: [ a parcel with no name on it, the Friday boat landing after dark, pencils without a rubber, being told the children will adapt ]
 fears: [ Thora's boat landing after the lamps, the school roll stopping at nine ]
 dream:
-  text: A school worth the long walk from the Wharf, with one Friday lesson taught from the ticket booth board.
+  text: A school worth the long walk from the Wharf, with one Friday lesson taught from the board on the ferry slip.
   stages:
     - "Visit Felix's classroom with the board under her arm (Regard ≥ 20 with Felix)"
     - "Teach a Friday lesson on the ferry days, with stubs and rope for props"
@@ -61,27 +61,27 @@ dream:
 routine:
   weekday:
     - { at: "06:00", do: eat, where: wharf.home_03 }
-    - { at: "07:30", do: work, where: wharf.ticket_booth }
+    - { at: "07:30", do: work, where: wharf.ferry_slip }
     - { at: "09:30", do: walk, where: market_row.market_street }
-    - { at: "12:30", do: eat, where: wharf.ticket_booth }
-    - { at: "13:30", do: work, where: wharf.ticket_booth }
+    - { at: "12:30", do: eat, where: wharf.ferry_slip }
+    - { at: "13:30", do: work, where: wharf.ferry_slip }
     - { at: "17:00", do: shop, where: market_row.general_store }
     - { at: "18:00", do: cook, where: wharf.home_03 }
     - { at: "21:30", do: sleep, where: wharf.home_03 }
   weekend:                       # Saturday the sacks are double; Friday evening and Saturday morning Thora is home
     - { at: "07:30", do: eat, where: wharf.home_03, with: [ thora_brodsky, leonie_brodsky, kester_brodsky ] }
-    - { at: "09:00", do: work, where: wharf.ticket_booth }
+    - { at: "09:00", do: work, where: wharf.ferry_slip }
     - { at: "12:30", do: eat, where: wharf.home_03 }
     - { at: "14:30", do: walk, where: wharf.breakwater, with: [ thora_brodsky, leonie_brodsky ] }
     - { at: "17:00", do: shop, where: market_row.market_street }
     - { at: "18:00", do: cook, where: wharf.home_03, with: [ thora_brodsky ] }
     - { at: "21:30", do: sleep, where: wharf.home_03 }
-chores: [ chalk the Gannet's days on the board, pencil the week onto the kitchen door, count the parcels twice, trim the booth lamp ]
+chores: [ chalk the Gannet's days on the board, pencil the week onto the kitchen door, count the parcels twice, trim the slip lamp ]
 relationships:
   - { id: thora_brodsky, affinity: 90, trust: 85, tag: spouse, note: "Shared a desk with her at the old Wharf school, and was not apart from her for a month until the rope-walk. Wants her home on a Wednesday." }
   - { id: leonie_brodsky, affinity: 90, trust: 80, tag: daughter, note: "Rubs out the wrong bits on the board and writes in the right ones in a hand all her own." }
   - { id: kester_brodsky, affinity: 85, trust: 70, tag: son, note: "Eats like a boy who isn't hungry. She suspects Carrow and hasn't asked." }
-  - { id: ada, affinity: 55, trust: 60, tag: friend, note: "Sells the tickets while Liv sorts the sacks behind her. Wants to know, too, what Moss chalks on the wheelhouse beam." }
+  - { id: ada, affinity: 55, trust: 60, tag: friend, note: "Sells the tickets at the hatch while Liv sorts the sacks out on the slip and hands her the parcels. Wants to know, too, what Moss chalks on the wheelhouse beam." }
   - { id: moss, affinity: -10, trust: 15, tag: wary, note: "Skippers the Gannet by the tide and calls it a timetable. Wants him to name one Friday time and keep it." }
   - { id: nell, affinity: 40, trust: 45, tag: fond, note: "Next door at 53A, and shouts across the fence at half past four. Liv stopped hearing it years ago and sleeps through the rest." }
 secrets:

@@ -91,7 +91,7 @@ relationships:
       affinity: 85,
       trust: 85,
       tag: spouse,
-      note: "Her wife, away in Hessle Cross all week."
+      note: "Her wife, lodging in Hessle Cross Tuesday to Friday."
     }
   - {
       id: greta_grieve,

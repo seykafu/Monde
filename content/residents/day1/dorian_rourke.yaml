@@ -4,7 +4,7 @@ name: Dorian Rourke
 age: 28
 pronouns: he/him
 kind: resident
-occupation: Commuter in Carrow, weekdays at offmap.city
+occupation: Freight-office clerk in Carrow; lodges there Tuesday to Friday.
 workplace: offmap.city
 home: millbrook.home_41
 portrait: dorian_rourke
@@ -22,11 +22,11 @@ look:
   outfit: { cut: jumper, top: 14, bottom: 11, bottom_style: trousers, shoes: 1 }
   accessory: { kind: none }
 backstory: Dorian trained as a cabinet maker in Hessle Cross and got a job in a Carrow office that handles
-  freight paperwork, which pays better than the workshops did. He hates the office and says so only to the
-  ferry. He came to Monde at twenty-seven, when Vera's pregnancy made them want a garden. He was sure the
-  commute would be a few months. It has been a year. He is wrong about how long he can keep this up and wrong
-  that Kasimir's workshop is too busy to take him on at weekends. He would like Kasimir to ask him, not the
-  other way round.
+  freight paperwork, which pays better than workshops. He hates the office and says so only to the ferry. He
+  lodges in Carrow Tuesday to Friday, home on Friday's boat. He came to Monde at twenty- seven, when Selma
+  started to walk and they wanted a garden. He was sure the commute would be a few months. It has been a year.
+  He is wrong about how long he can keep this up and wrong that Kasimir's workshop is too busy to take him on at
+  weekends. He would like Kasimir to ask him, not the other way round.
 personality:
   traits: [ tired, decent, restless, careful ]
   big5: { open: 62, conscientious: 70, extravert: 44, agreeable: 70, neurotic: 55 }
@@ -46,7 +46,7 @@ voice:
 birthday: 8
 likes: [ sawdust, the ferry deck in the wind, fresh bread, Vera's terrible jokes, hand-me-downs ]
 dislikes: [ the office, paperwork, people talking about the Tollmen in whispers ]
-fears: [ losing the house, missing Milan's first steps ]
+fears: [ losing the house, missing Selma's first full sentence ]
 dream:
   text: A front door of our own, with a surveyed roof and a house number the whole street can see.
   stages:
@@ -81,15 +81,15 @@ relationships:
     }
   - {
       id: vera_rourke,
-      affinity: 25,
-      trust: 30,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: "His wife, who is always right about the gutters."
     }
   - {
       id: selma_rourke,
-      affinity: 45,
-      trust: 30,
+      affinity: 90,
+      trust: 80,
       tag: daughter,
       note: "His daughter, his favourite person to sit with."
     }

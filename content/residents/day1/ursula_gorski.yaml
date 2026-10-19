@@ -21,13 +21,13 @@ look:
   height: short
   outfit: { cut: coat, top: 15, bottom: 3, bottom_style: skirt, shoes: 14 }
   accessory: { kind: none }
-backstory: Ursula sewed hems and linings in a Carrow tailor's back room for twenty-two years before she came
-  to Monde at forty-five, following her husband Piotr to his late uncle's terrace house. Piotr died six
-  winters later, and she has kept his thermos on the windowsill ever since, never filled. She says it's
-  because the cork sticks. It isn't. She came to Monde because the rent was low and the tide was loud enough
-  to stop her thinking. The thing she got wrong was believing the town would empty out slowly enough for her
-  to watch it happen from her chair. It emptied faster, and the friends who might have sat with her left on
-  the ferry one by one.
+backstory: Ursula sewed hems and linings in a Carrow uniform works for twenty-two years before she came to
+  Monde at forty-five, following her husband Piotr to his late uncle's terrace house. Piotr died six winters
+  later, and she has kept his boots by the door ever since, never moved. She says it's because the laces are
+  knotted. They aren't. She came to Monde because the rent was low and the tide was loud enough to stop her
+  thinking. The thing she got wrong was believing the town would empty out slowly enough for her to watch it
+  happen from her chair. It emptied faster, and the friends who might have sat with her left on the ferry
+  one by one.
 personality:
   traits: [ patient, wry, stubborn, warm ]
   big5: { open: 55, conscientious: 78, extravert: 35, agreeable: 70, neurotic: 40 }
@@ -39,12 +39,12 @@ beliefs:
 voice:
   register: Gentle and rambling on purpose. She circles back to earlier points, quotes prices from the old days,
     and trails off into what the weather did in a year she remembers.
-  tics: [ Now where was I?, "Back in my day, a loaf cost", Mind the step ]
+  tics: [ Now where was I?, "Back in my day, a loaf cost", Mind the wick ]
   never_says: [ so yeah, honestly, I suppose it doesn't matter, grandma ]
   samples:
     - Now where was I? Oh, yes, the hem. You'd not believe what a good wool coat cost before the mill shut.
-    - Mind the step, love, it's loose. Piotr always meant to fix it. He meant to fix a lot of things.
-    - Tea? The kettle's warm. I've not had anyone to pour for since Tuesday last, so you'd be doing me a
+    - The back step's loose, love. Piotr always meant to fix it. He meant to fix a lot of things.
+    - Tea? I've the pot warm. I've not had anyone to pour for since Tuesday last, so you'd be doing me a
       favour.
 birthday: 30
 likes:
@@ -63,14 +63,13 @@ dislikes:
     loud radios after dark,
     letters that come with bad news
   ]
-fears: [ dying in the chair and not being found until the milk turns, the terrace going quiet ]
+fears: [ a week going by in the chair with nobody knocking, the terrace going quiet ]
 dream:
-  text: I'd like someone to sit across from me at supper again, even once a week, so the second chair isn't
-    always a coat rack.
+  text: I'd like a neighbour to call over the wall first, even once a week, so the second chair isn't always a coat rack.
   stages:
     - Wait on the step until a neighbour calls over the wall with a hello.
     - Return the invitation with a plate of buns and a long story.
-    - Set a standing Thursday table and keep the lamp lit for whoever comes.
+    - Keep the lamp lit in the window and the second chair clear for whoever comes.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: millbrook.home_18 }
@@ -92,7 +91,7 @@ routine:
     - { at: "21:30", do: sleep, where: millbrook.home_18 }
 chores:
   [
-    Mend the neighbours' hems on Tuesdays,
+    Mend the neighbours' hems on Fridays,
     Sweep the step before the milk comes,
     Trim the wick on the lamp by the window
   ]
@@ -109,7 +108,7 @@ relationships:
       affinity: 18,
       trust: 15,
       tag: kin,
-      note: Worked the looms beside her before the mill closed.
+      note: Piotr's cousin by marriage; they swap thread and opinions on hems.
     }
   - {
       id: priya,

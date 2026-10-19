@@ -22,28 +22,29 @@ look:
   outfit: { cut: plain, top: 10, bottom: 9, bottom_style: trousers, shoes: 14 }
   accessory: { kind: scarf, colour: 9 }
 backstory: Came to Monde at twenty-seven from a mill town inland, drawn by Lissworth's steady wage and a
-  foreman's letter promising work for life. She set looms for eight years, then the Mill closed fourteen years
-  ago and the cannery took her on as night watch when it was still running. The cannery shut eleven years ago,
-  but the company never formally released its watch contract, so she still walks the Wharf most nights and
-  logs nothing. Her husband Emil drowned off the breakwater nine years back, and she keeps his thermos in the
-  boathouse and never fills it. She tells people she stays because the rent is cheap.
+  foreman's letter promising work for life. She set looms for twenty-one years, until the Mill closed
+  fourteen years ago, and the cannery took her on as night watch while it was still running. The cannery
+  shut eleven years ago, but the company never formally released its watch contract, so she still walks the
+  Wharf most nights and logs nothing. Her husband Emil drowned off the breakwater nine years back, and his
+  thermos still hangs on the hook by her door where he left it. She tells people she stays because the rent
+  is cheap.
 personality:
   traits: [ steady, watchful, dry, loyal, stubborn ]
   big5: { open: 35, conscientious: 82, extravert: 30, agreeable: 55, neurotic: 40 }
 values: { prosperity: 0.5, safety: 0.25, spirit: 0.1, charm: 0.15 }
 beliefs:
-  - The Mill will reopen if people just hold on.
+  - The company never let go of her watch contract, so the cannery is still hers to guard.
   - Nobody on Market Row pays attention to the harbour anymore.
   - A tin mug of tea is worth more than any clock.
 voice:
   register: "Plain and short. Speaks in numbers when she can: hours, tides, bolts. Says things once and does not
     repeat herself."
-  tics: [ Used to be., Mind the step., That's the tide talking. ]
+  tics: [ Nothing to log., Lamp's lit., That's the tide talking. ]
   never_says: [ I feel, sorry for your trouble, you know what I mean ]
   samples:
-    - Tide's turning. Mind the step on the harbour side.
-    - Used to be eight hours a shift, and a hot dinner after. Now it's a cold cup.
-    - No, I don't need company. But the kettle's on if you're passing.
+    - Tide's turning. Keep to the wall on the harbour side. Nothing to log.
+    - Eight hours a shift, once, and a hot dinner after. Now it's a cold cup and the cannery gate.
+    - No, I don't need company. But the gate's open if you're passing.
 birthday: 9
 likes:
   [

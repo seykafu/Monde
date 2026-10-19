@@ -74,7 +74,7 @@ relationships:
   - { id: bram_lindgren, affinity: 95, trust: 80, tag: father, note: "Dad, who comes on the late boat with a paper bag. She eats what is in it." }
   - { id: marthe_demir, affinity: 90, trust: 75, tag: mother, note: "Mum, who takes her to the bakery step on Saturdays and says 'sit a minute'." }
   - { id: mei_lindgren, affinity: 90, trust: 70, tag: grandmother, note: "Gran, who taps and gets taps back." }
-  - { id: olav_lindgren, affinity: 60, trust: 45, tag: brother, note: "Ten, asks too many questions, shares his pencil on a string." }
+  - { id: olav_lindgren, affinity: 75, trust: 70, tag: brother, note: "Ten, asks too many questions, shares his pencil on a string." }
   - { id: bastien, affinity: 55, trust: 20, tag: fond, note: "The baker's cat, who lets her count to forty and then goes." }
   - { id: odile, affinity: 10, trust: 20, tag: curious, note: "Gives her the crust and says 'Hm.' Wants her to say 'stay' to the cat." }
 secrets:

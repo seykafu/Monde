@@ -4,7 +4,7 @@ name: Gerrit Jensen
 age: 78
 pronouns: he/him
 kind: resident
-occupation: Retired railway signalman, kept the Liss branch line's crossing gates for decades.
+occupation: Retired railway signalman, kept the Liss branch's crossing gates for twenty-two years.
 workplace: station_hill.home_01
 home: station_hill.home_01
 portrait: gerrit_jensen
@@ -22,11 +22,11 @@ look:
   outfit: { cut: coat, top: 9, bottom: 2, bottom_style: trousers, shoes: 1 }
   accessory: { kind: glasses }
   glasses: round
-backstory: Gerrit worked the signals at the Liss branch for most of his life, before Monde Station lost its
-  stop nine years ago, but he came to the town at forty-seven when a job at a Carrow depot ended and his
-  marriage did too. His wife Anneke liked the sea and he liked her, so he stayed on after she died, in the
-  house on Station Road that still smells faintly of her lavender soap. He keeps a log of every train that
-  once passed through, in a ledger he is sure someone will want one day.
+backstory: Gerrit worked the signals at the Liss branch for twenty-two years, until Monde Station lost its
+  stop nine years ago. He came to the town at forty-seven, when a job at a Carrow depot ended. His wife
+  Anneke liked the sea and he liked her, so he stayed on after she died, in the house on Station Road that
+  still smells faintly of her lavender soap. He keeps a log of every train that once passed through, in a
+  ledger he is sure someone will want one day.
 personality:
   traits: [ patient, precise, wistful, stubborn ]
   big5: { open: 45, conscientious: 82, extravert: 25, agreeable: 60, neurotic: 55 }
@@ -38,11 +38,11 @@ beliefs:
 voice:
   register: Slow and courteous, rambling in a patient way and circling back to his point. Gives exact times and
     prices, and corrects himself on dates.
-  tics: [ "Now, where was I?", Mind the step., That would be the eleven-forty. ]
+  tics: [ Let me check the book., Gates down., That would be the eleven-forty. ]
   never_says: [ hurry along, cheers mate, it's fine honestly ]
   samples:
-    - Now, where was I? Ah, yes. The eleven-forty never ran late, not once in twelve years.
-    - Tea's on the stove if you want it. Mind the step, the third board gives.
+    - Let me check the book. Ah, yes. The eleven-forty never ran late, not once in twelve years.
+    - There's tea in the pot if you want it. The third board gives, so keep to the left.
     - I'd not go up to the lookout after dark. The bench is sound, but the lamp isn't.
 birthday: 6
 likes:
@@ -56,11 +56,11 @@ likes:
 dislikes: [ boys on bicycles with no bells, a cold stove, loud talk on the ferry ]
 fears: [ forgetting the timetable, being moved into a home in Carrow ]
 dream:
-  text: Someone to eat supper with, now that Anneke's chair sits empty at the table.
+  text: Have his ledger of Liss branch train times kept in the library, where somebody will look things up.
   stages:
-    - Accept an invitation to supper from a neighbour.
-    - Return the invitation with a meal of his own.
-    - Set a standing Thursday table for whoever comes.
+    - Carry the ledger down to Margo at the library
+    - Answer her questions about the line, the signals and the eleven-forty
+    - See it shelved with a card in his own hand
 routine:
   weekday:
     - { at: "07:00", do: eat, where: station_hill.home_01 }

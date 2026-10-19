@@ -4,7 +4,7 @@ name: Greta Grieve
 age: 52
 pronouns: she/her
 kind: resident
-occupation: Commuter bookkeeper, working weekdays in Carrow, home weekends.
+occupation: Commuter bookkeeper in Carrow, away Tuesday to Friday, home weekends.
 workplace: offmap.city
 home: millbrook.home_24
 portrait: greta_grieve
@@ -23,7 +23,7 @@ look:
   accessory: { kind: glasses }
   glasses: round
 backstory: Greta trained as a bookkeeper in Carrow and took a clerk's post there before she was twenty-five.
-  At twenty-six she married a ferryman's cousin, Teo's uncle, and moved to Monde for the quiet and the cheaper
+  At twenty-six she married a ferryman's cousin and moved to Monde for the quiet and the cheaper
   rent on Mill Lane. The marriage ended within four years, but she stayed, mostly because the ferry timetable
   suited her. She still keeps the ledger for the Liss Cannery's old pension fund from her kitchen table,
   though nobody has paid her for it in years. She tells herself the town will come back. She believes the
@@ -43,7 +43,7 @@ voice:
   samples:
     - The Gannet's late again. Two minutes is a rounding error, and I've rounded it into a grudge.
     - Pass the salt. And no, I'm not going to tell you what the Saturday fee is for.
-    - Mm. Fair enough. Put the kettle on, then, if you're staying.
+    - Mm. Fair enough. Take the chair by the stove, if you're staying.
 birthday: 75
 likes:
   [

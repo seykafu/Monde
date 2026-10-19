@@ -39,7 +39,7 @@ beliefs:
 voice:
   register: Slow and warm, with a laugh that arrives before the joke. He speaks in short practical sentences and
     trails off into kindness.
-  tics: [ mind the step, that'll hold, well now ]
+  tics: [ it's holding, that'll hold, near enough ]
   never_says: [ that's beyond saving, nothing I can do, I give up ]
   samples:
     - Give me the good ladder, that one's rotten at the top.
@@ -84,10 +84,10 @@ chores: [ mends the terrace gate, hauls water for the Glasshouse, sweeps the har
 relationships:
   - {
       id: klara_eze,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
-      note: His wife of fifty years. She keeps the list; he keeps the house.
+      note: His wife of thirty-five years. She keeps the list; he keeps the house.
     }
   - {
       id: teo,

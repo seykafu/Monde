@@ -10,7 +10,7 @@ home: millbrook.home_41
 portrait: lib_f31_006
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
 sprite: vera_rourke
-appearance: Close-cropped black hair, small gold hoop earrings, and a practical mustard coat with a tote bag
+appearance: Close-cropped black hair, small gold hoop earrings, and a practical mustard coat with a canvas bag
   strap across one shoulder. She looks dry and efficient, like someone who has already made the list.
 look:
   kind: human
@@ -21,9 +21,9 @@ look:
   height: tall
   outfit: { cut: coat, top: 4, bottom: 6, bottom_style: trousers, shoes: 13 }
   accessory: { kind: none }
-backstory: Vera grew up in a flat above a launderette in Hessle Cross, where the trams ran past the window all
+backstory: Vera grew up in a flat above a laundry in Hessle Cross, where the trams ran past the window all
   night. She trained as a bookkeeper by post and did the accounts for a removals firm until the firm folded.
-  When she found she was pregnant, the city rent made the choice for them. She came to Monde at twenty-four
+  When Selma was born, the city rent made the choice for them. She came to Monde at twenty-four
   because a letting agent in Carrow had a house listed for almost nothing, and she has never quite forgiven
   the agent for being right. The house is damp in the back bedroom and she has told nobody but the wallpaper.
 personality:
@@ -41,12 +41,12 @@ voice:
   never_says: [ "I'm fine, honestly", we'll see, so brave ]
   samples:
     - Right, the back bedroom again. I've put a bucket under it and I'm not discussing it.
-    - That'll do. Hand me the peg bag and mind the step, it's loose.
-    - No, I don't need the afternoon off. I need the ferry to run on time, which it won't.
+    - That'll do. Hand me the peg bag and watch the back step, it's loose.
+    - Afternoon off? I need the ferry to run on time, which it won't.
 birthday: 19
 likes: [ hand-me-downs, a gate that latches, the ferry timetable, tea without sugar ]
 dislikes: [ damp bedrooms, steep steps without a rail, being called brave for moving here ]
-fears: [ the damp spreading, being stuck on the island alone with the baby ]
+fears: [ the damp spreading, being stuck here alone with the toddler ]
 dream:
   text: A toddler hour that isn't just the two of us, with other children and a kettle that works.
   stages:
@@ -79,16 +79,16 @@ relationships:
       tag: fond,
       note: Brings radio parts round and never asks for payment.
     }
-  - { id: dorian_rourke, affinity: 25, trust: 30, tag: spouse, note: "Her husband, away most of the week." }
+  - { id: dorian_rourke, affinity: 85, trust: 85, tag: spouse, note: "Her husband, away most of the week." }
   - {
       id: selma_rourke,
-      affinity: 40,
-      trust: 35,
+      affinity: 90,
+      trust: 85,
       tag: daughter,
       note: "Her daughter, who is always into something."
     }
 secrets:
-  - text: She keeps the old printing-press bills from Lissworth Mill, a relic of the job she never got back.
+  - text: She keeps the last ledger from the removals firm that folded, a relic of the job she never got back.
     reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none

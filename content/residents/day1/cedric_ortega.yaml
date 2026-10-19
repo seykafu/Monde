@@ -44,7 +44,7 @@ voice:
   samples:
     - Right, then. Net's mended, so you can stop looking at it.
     - Hamish says it'll rain. He's wrong, but don't tell him I said so.
-    - I'm not asking for much. Just a bit of quiet and a warm kettle.
+    - A bit of quiet and a warm kettle. That's the lot.
 birthday: 76
 likes:
   [
@@ -82,8 +82,8 @@ chores: [ Mends nets on the back step, Carries water from the pump, Sweeps the f
 relationships:
   - {
       id: hamish_ortega,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Partner of thirteen years; they argue like brothers.
     }

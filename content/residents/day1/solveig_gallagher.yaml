@@ -4,7 +4,7 @@ name: Solveig Gallagher
 age: 65
 pronouns: she/her
 kind: resident
-occupation: Retired seamstress, mends neighbours' clothes for coins when asked.
+occupation: Retired alterations hand from a Hessle Cross department house.
 workplace: wharf.home_09
 home: wharf.home_09
 portrait: solveig_gallagher
@@ -22,13 +22,12 @@ look:
   outfit: { cut: pinafore, top: 11, bottom: 13, bottom_style: trousers, shoes: 9, trim: 11 }
   accessory: { kind: glasses }
   glasses: round
-backstory: Solveig sewed alterations for a department house in Hessle Cross for thirty years, until her
-  husband Tomas died of a stubborn lung infection and the work stopped meaning anything. She sold their flat
+backstory: Solveig sewed alterations for a department house in Hessle Cross for fifteen years, until her
+  husband Ansgar died of a stubborn lung infection and the work stopped meaning anything. She sold their flat
   and took the cheap ground-floor room on Shore Lane because a friend's letter said the sea air helped the
   nerves. Twenty-seven years on she still finds the ferry timetable on the wall and writes the fares down out
-  of habit. Her one regret is the quilt she started for Tomas's sister and never finished, which she keeps
-  folded at the foot of the bed. She believes the Gull's cider is too sweet and that the tap in her kitchen
-  drips to spite her.
+  of habit. Her one regret is a ship's flag she once offered to sew for the Gannet and never did. She
+  believes the Gull's cider is too sweet and that the tap in her kitchen drips to spite her.
 personality:
   traits: [ patient, meandering, observant, stubborn, warm ]
   big5: { open: 55, conscientious: 78, extravert: 35, agreeable: 68, neurotic: 42 }
@@ -41,12 +40,12 @@ beliefs:
 voice:
   register: Gentle and rambling on purpose, circling back to earlier points. She remembers prices from forty
     years ago and compares everything to them. Speaks in soft, unhurried sentences.
-  tics: [ Now where was I?, "In my day,", that's the thing about cloth ]
+  tics: [ I'll say nothing., Mind the tap., "Four coins a loaf, then." ]
   never_says: [ cool, you're welcome, obviously, going forward ]
   samples:
-    - Now where was I? Oh yes, the bread used to be four coins a loaf, and now look at it.
+    - The bread used to be four coins a loaf, and now look at it.
     - That boy on the bicycle has no bell again. I'll say nothing, I'll just listen for him.
-    - Sit down, love, the kettle's nearly there. The tap's been at it all morning, mind.
+    - The tap's been at it all morning, mind. I put a saucer under it and it holds a grudge against the saucer too.
 birthday: 100
 likes:
   [
@@ -64,13 +63,13 @@ dislikes:
     sweet cider,
     loud radio in the morning
   ]
-fears: [ forgetting the sound of Tomas's voice, the house going quiet for good ]
+fears: [ forgetting the sound of Ansgar's voice, the house going quiet for good ]
 dream:
-  text: Finish the quilt she started for Tomas's sister, with scraps gathered from the whole town.
+  text: Sew a new flag for the Gannet and see Moss raise it at the Regatta.
   stages:
-    - Gather scraps from five residents, each with a story to share.
-    - Sew at the library table through a long afternoon.
-    - Hang the finished quilt at the Harvest Supper for everyone to see.
+    - Ask Moss for the Gannet's old flag, torn at the corner (Regard ≥ 20 with Moss)
+    - Cut and sew the new flag at her own table.
+    - Watch it go up on the Gannet for the Regatta.
 routine:
   weekday:
     - { at: "07:00", do: eat, where: wharf.home_09 }
@@ -89,7 +88,7 @@ routine:
     - { at: "15:00", do: walk, where: commons.picnic_lawn }
     - { at: "18:00", do: eat, where: wharf.home_09 }
     - { at: "22:00", do: sleep, where: wharf.home_09 }
-chores: [ mend neighbours' coats, trim the wick of the bedside lamp, wipe the drips from the kitchen tap ]
+chores: [ darn her own stockings by the lamp, trim the wick of the bedside lamp, wipe the drips from the kitchen tap ]
 relationships:
   - {
       id: anouk_seaton,
@@ -113,7 +112,7 @@ relationships:
       note: Old skipper who still nods when she passes the slip.
     }
 secrets:
-  - text: She still keeps Tomas's last letter folded inside her pinafore pocket and reads it at night.
+  - text: She loosened the tap washer herself years ago, so there would be a sound in the kitchen at night. She tells everyone it drips to spite her.
     reveal: { regard_min: 60 }
 canon_locks: []
 story_role: none

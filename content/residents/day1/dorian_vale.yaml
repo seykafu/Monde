@@ -32,13 +32,13 @@ personality:
   big5: { open: 55, conscientious: 70, extravert: 65, agreeable: 80, neurotic: 35 }
 values: { prosperity: 0.15, safety: 0.3, spirit: 0.2, charm: 0.35 }
 beliefs:
-  - A good hem can fix any mood.
+  - A tape measure never flatters, and nobody really minds.
   - The Tollmen keep the lights on at the Glasshouse.
   - Edmund will never admit a joke landed.
 voice:
   register: Light and teasing, quick to reach for a small kindness. He often repeats the last word of a question
     before answering it, and laughs at his own jokes first.
-  tics: [ "Oh, lovely.", "Mind the step,", "Well, there we are." ]
+  tics: [ "Oh, lovely.", "Shall I pour?", "Well, there we are." ]
   never_says: [ doom, nothing to be done, it's hopeless ]
   samples:
     - Oh, lovely. Edmund's left the kettle on again. Shall I pour, or shall we sulk?
@@ -56,11 +56,11 @@ likes:
 dislikes: [ Cold hands, Empty shop windows, Being rushed ]
 fears: [ Forgetting a face, Going into a home in Carrow ]
 dream:
-  text: A proper dance on a Saturday night, with a gramophone and the whole row turning up in their good shoes.
+  text: Dress one empty window on Market Row in good cloth again, and stand outside it on Bloom Fair morning.
   stages:
-    - Find a hall with a floor that will take dancing.
-    - Borrow a gramophone or a band from the Gull.
-    - Hold the dance and make Edmund lead the first waltz.
+    - Pick an empty shopfront on Market Row and ask Mayor Pell about the key.
+    - Borrow bolts from Delphine and a stand from Dunmore's.
+    - Dress the window and stand outside it on Bloom Fair morning.
 routine:
   weekday:
     - { at: "07:30", do: sleep, where: wharf.home_11 }
@@ -84,8 +84,8 @@ chores: [ Mend cushions, Dust the cloth shelves, Set out the bread knife ]
 relationships:
   - {
       id: edmund_mcbride,
-      affinity: 20,
-      trust: 25,
+      affinity: 90,
+      trust: 85,
       tag: partner,
       note: Partner of forty years; the only man who can make him laugh at a funeral.
     }

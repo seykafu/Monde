@@ -35,7 +35,7 @@ personality:
 values: { prosperity: 0.1, safety: 0.45, spirit: 0.25, charm: 0.2 }
 beliefs:
   - Things that are oiled and checked do not fail.
-  - The mill will reopen one day.
+  - A key kept is a door that can open again.
   - Most people here are too proud to ask for help.
 voice:
   register: Measured, unhurried, with a machinist's bluntness. He gives exact times and prices and dislikes
@@ -44,7 +44,7 @@ voice:
   never_says: [ "I'm fine, thank you", just a bit of fun, no trouble at all ]
   samples:
     - Ferry's at half past two on Tuesdays. Don't let the gull tell you otherwise.
-    - I kept the key. Someone ought to. Mind the step, it's loose.
+    - I kept the key. Someone ought to. The shed door sticks, so lift as you pull.
     - Hanne liked her tea stewed. I never could stand it, but I made it for her anyway.
 birthday: 48
 likes:

@@ -84,10 +84,10 @@ chores: [ bring clay up from the harbour, keep the kiln door wedged dry, wash th
 relationships:
   - {
       id: hadley_ashdown,
-      affinity: 25,
-      trust: 30,
+      affinity: 85,
+      trust: 80,
       tag: spouse,
-      note: Wife; the one who keeps the loom going.
+      note: "Hadley, who keeps the loom going and him honest."
     }
   - {
       id: ulla_ferreira,

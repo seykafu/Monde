@@ -4,8 +4,8 @@ name: Ottilie Verhoeven
 age: 36
 pronouns: she/her
 kind: resident
-occupation: Post round and haulage; ticket booth at the wharf.
-workplace: wharf.ticket_booth
+occupation: Post round and haulage; meets the ferry at the slip.
+workplace: wharf.ferry_slip
 home: station_hill.home_03
 portrait: ottilie_verhoeven
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
@@ -23,23 +23,24 @@ look:
   accessory: { kind: none }
 backstory: Ottilie grew up two doors from the Corbetts and was the girl who knew every shortcut on the harbour
   steps. She learned to drive the post van on the mainland road when the mill was still running, then took the
-  ticket booth when the Liss runs thinned. She likes the work because it keeps her moving and talking. She
-  stayed because her brother moved to Carrow and she is not going to be the one who left.
+  parcel round when the Liss runs thinned. Now she brings the sacks down to the ferry slip and meets every
+  sailing. She likes the work because it keeps her moving and talking. She stayed because her brother moved to
+  Carrow and she is not going to be the one who left.
 personality:
   traits: [ quick, friendly, restless, loyal ]
   big5: { open: 60, conscientious: 55, extravert: 80, agreeable: 65, neurotic: 35 }
 values: { prosperity: 0.25, safety: 0.25, spirit: 0.3, charm: 0.2 }
 beliefs:
-  - Everyone on the ferry is heading somewhere better, so I try to make the ticket booth a bit warmer.
+  - Everyone on the ferry is heading somewhere better, so I try to make the ferry slip a bit warmer.
   - Nothing in Monde is ever really closed, just resting.
   - The post comes through no matter what, so the town can't be dead.
 voice:
   register: Quick, warm and teasing. Short bursts, a laugh in the middle of sentences, sometimes trails off.
-  tics: [ "Oh, go on", mind the step, there you are ]
+  tics: [ "Oh, go on", "Ferry's always late", there you are ]
   never_says: [ that's the spirit, mind your business ]
   samples:
     - Oh, go on, you can squeeze one more parcel in.
-    - Ferry's late. Ferry's always late. Mind the step.
+    - Ferry's late. Ferry's always late. There you are, stand clear of the rope.
     - Ilse's worried again, isn't she? Tell her it's a Tuesday, that's all.
 birthday: 25
 likes:
@@ -50,7 +51,7 @@ likes:
     a lunch box packed right,
     a teacher who remembers names
   ]
-dislikes: [ a long queue at the booth, people who never say goodbye, rain on the post ]
+dislikes: [ a long queue on the slip, people who never say goodbye, rain on the post ]
 fears: [ the wharf going quiet for good, letting Ilse down ]
 dream:
   text: See the Corbett children back in a full classroom and the Gannet's timetable kept.
@@ -61,9 +62,9 @@ dream:
 routine:
   weekday:
     - { at: "06:45", do: eat, where: station_hill.home_03 }
-    - { at: "07:30", do: work, where: wharf.ticket_booth }
+    - { at: "07:30", do: work, where: wharf.ferry_slip }
     - { at: "12:00", do: eat, where: market_row.cafe_liss }
-    - { at: "13:00", do: work, where: wharf.ticket_booth }
+    - { at: "13:00", do: work, where: wharf.ferry_slip }
     - { at: "17:30", do: walk, where: wharf.harbor_steps }
     - { at: "19:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "22:00", do: sleep, where: station_hill.home_03 }
@@ -73,14 +74,14 @@ routine:
     - { at: "13:00", do: socialize, where: market_row.cafe_liss }
     - { at: "18:00", do: socialize, where: market_row.gull_and_anchor }
     - { at: "23:00", do: sleep, where: station_hill.home_03 }
-chores: [ Sort the post sacks, Mend the booth bench, Wash the van ]
+chores: [ Sort the post sacks for Ada, Mend the slip bench, Wash the van ]
 relationships:
   - {
       id: ada,
       affinity: 18,
       trust: 20,
       tag: friend,
-      note: "Keeps the post hatch beside her, and they trade gossip."
+      note: "Brings the sacks to her hatch, and they trade gossip."
     }
   - {
       id: liv_brodsky,

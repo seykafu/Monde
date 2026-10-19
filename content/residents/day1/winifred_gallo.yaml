@@ -4,8 +4,8 @@ name: Winifred Gallo
 age: 58
 pronouns: she/her
 kind: resident
-occupation: Baker at Fournier & Fille, makes the morning loaves and rye.
-workplace: market_row.bakery
+occupation: Home baker; sells rye and morning loaves at the Saturday market.
+workplace: market_row.home_10
 home: market_row.home_10
 portrait: lib_f56_099
 portrait_expressions: [ neutral, warm, sad, angry, surprised, worried ]
@@ -24,9 +24,10 @@ look:
   face: { freckles: true }
 backstory: Winifred ran a bakery in the back streets of Carrow for nineteen years before the rent doubled and
   her knees gave up on the early hours. She came to Monde at forty-three after answering a card in the Lantern
-  window about a flat above a shop. Odile hired her within a week, mostly because the bread from her old ovens
-  had been sold in Hessle Cross and someone remembered it. Her one regret is a sourdough starter she left
-  behind in Carrow, which she still thinks about when the rye goes flat.
+  window about a flat above a shop. Odile tasted her rye within a week, because the bread from her old ovens had
+  been sold in Hessle Cross and someone remembered it. Winifred bakes in the flat's own oven for the Saturday
+  market, and Odile still checks her loaves. Her one regret is a sourdough starter she left behind in Carrow,
+  which she still thinks about when the rye goes flat.
 personality:
   traits: [ practical, warm, stubborn, frank ]
   big5: { open: 45, conscientious: 82, extravert: 55, agreeable: 60, neurotic: 35 }
@@ -47,7 +48,7 @@ voice:
 birthday: 5
 likes: [ a hot oven at dawn, people who ask for seconds, rye flour, the sound of the harbour from the flat ]
 dislikes: [ skimping, cold kitchens, a bit of salt, people who eat standing up ]
-fears: [ the bakery closing, losing her sense of taste ]
+fears: [ the oven cracking in a hard frost, losing her sense of taste ]
 dream:
   text: Cook a Harvest Supper big enough to fill the Market Hall, the way the town used to do it.
   stages:
@@ -57,7 +58,7 @@ dream:
 routine:
   weekday:
     - { at: "04:00", do: wander, where: market_row.home_10 }
-    - { at: "04:30", do: work, where: market_row.bakery }
+    - { at: "04:30", do: work, where: market_row.home_10 }
     - { at: "08:30", do: eat, where: market_row.cafe_liss }
     - { at: "10:00", do: shop, where: market_row.general_store }
     - { at: "13:00", do: eat, where: market_row.home_10 }
@@ -74,7 +75,7 @@ routine:
     - { at: "22:00", do: sleep, where: market_row.home_10 }
 chores: [ feed the starter each morning, sweep the stair, mend the dungarees ]
 relationships:
-  - { id: odile, affinity: 20, trust: 18, tag: friend, note: Hired her and still checks her loaves. }
+  - { id: odile, affinity: 20, trust: 18, tag: friend, note: Tasted her first rye and still checks her loaves. }
   - { id: weasel, affinity: -12, trust: -8, tag: wary, note: Always listening at her door. }
   - { id: june, affinity: 14, trust: 10, tag: fond, note: Brings her coffee on the morning shift. }
 secrets:
