@@ -73,6 +73,9 @@ export function prepare(r: RegistryLike, id: ScuffleId, clock: Pick<Clock, 'day'
   const quitGang = Object.keys(townOf(r)?.tollmen?.quit ?? {});
   const battle = new Scuffle(id, arena, { enemies, grit: fellow?.skills.grit.level ?? 1, heart: fellow?.skills.heart.level ?? 1,
     scrapper: fellow?.profile?.background === 'scrapper', supplies, tools, allies: opts.offers,
+    // S03 points to Odile's umbrella stand. GDD-GAP: equip that borrowed tool before
+    // the first turn; the preparation screen currently has no tool selection input.
+    startingTool: id === 'sc_bakery_tutorial' ? 'umbrella' : undefined,
     coins: Wallet.parse(r.get('monde.coins') ?? {}).balance, quit });
   for (const u of battle.units) if (quitGang.includes(u.id)) { u.departed = true; u.state.alive = false; }
   battle.initiative.reseed(battle.units);

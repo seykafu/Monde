@@ -18,6 +18,13 @@ function adjacent(b: Scuffle): void {
 }
 
 describe('Monde tools and AP', () => {
+  it('equips an available starting tool without spending turn AP; other fights still start with a broom', () => {
+    const b = new Scuffle('sc_bakery_tutorial', arena(), { startingTool: 'umbrella' });
+    expect(b.current).toMatchObject({ tool: 'umbrella', weapon: 'shield', state: { apRemaining: 2 } });
+    expect(encounter('sc_market_saturday').current).toMatchObject({ tool: 'broom', weapon: 'spear' });
+    const unavailable = new Scuffle('sc_bakery_tutorial', arena(), { startingTool: 'slingshot' });
+    expect(unavailable.current?.tool).toBe('broom');
+  });
   it('preserves all six triangle directions; slingshots and empty hands are neutral', () => {
     for (const [a, b] of [['pan', 'broom'], ['broom', 'umbrella'], ['umbrella', 'pan']] as [Tool, Tool][]) { expect(triangle(a, b)).toBe(1.15); expect(triangle(b, a)).toBe(.85); }
     for (const a of ['pan', 'broom', 'umbrella', 'slingshot', 'none'] as Tool[]) { expect(triangle(a, a)).toBe(1); expect(triangle(a, 'slingshot')).toBe(1); expect(triangle('none', a)).toBe(1); }

@@ -12,9 +12,9 @@ export const SCUFFLES = {
 export type ScuffleId = keyof typeof SCUFFLES;
 export const isScuffleId = (id: string): id is ScuffleId => Object.hasOwn(SCUFFLES, id);
 export const TUTORIAL = [
-  'Odile: Pan beats broom, broom beats umbrella, umbrella beats pan. Choose an umbrella against Bru’s pan; an advantaged defender counters.',
-  'Odile: Blue tiles are a Move. Get close, but keep one AP for Brace or Ready. You can hold both.',
-  'Odile: There is another way. Beside someone, Talk Down costs two AP. Heart helps; their Nerve resists. Next turn, try words.',
-  'Nettie: I only ping the floor. Give me room and I’ll go. (Two neighbours make Nettie leave.)',
+  'Odile: You have my umbrella. Umbrella beats pan, pan beats broom, broom beats umbrella. Brace halves damage while your umbrella counters Bru. Tool buttons appear after you begin; switching costs one AP.',
+  'Odile: Blue tiles are a Move. Go around the counter. Get close, but keep one AP for Brace; it halves damage while your umbrella counters Bru. Ready and Brace can be held together.',
+  'Odile: There is another way. Beside someone, Talk Down costs two AP. Heart helps; their Nerve resists. Try words when you have two AP. Startled? Swing or Brace until you can.',
+  'Nettie: I only ping the floor! (Get beside Nettie so she cannot Ping you. Swing or Talk Down; with an ally, two adjacent opponents make her leave.)',
   'Odile: Bread helps. So does knowing when to leave. Step to the edge and Run. We’ll still have tea.'
 ] as const;

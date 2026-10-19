@@ -23,7 +23,7 @@ export const reach = (tool: Tool): [number, number] => tool === 'slingshot' ? [2
 export interface Fighter extends Unit { tool: Tool; nerve: number; startled: number; quit: number; departed: boolean; rumorUntil: number; gritSkill: number }
 export interface AllyOffer { id: 'augusta' | 'kasimir' | 'nell'; regard: number; willScuffle: boolean; willing: boolean }
 export const eligibleAllies = (offers: readonly AllyOffer[]): AllyOffer[] => offers.filter(a => a.regard >= 40 && a.willScuffle && a.willing).slice(0, 2);
-export interface Setup { enemies?: readonly string[]; grit?: number; heart?: number; scrapper?: boolean; allies?: AllyOffer[]; supplies?: Supply[]; coins?: number; quit?: Record<string, number>; tools?: Tool[]; random?: () => number }
+export interface Setup { enemies?: readonly string[]; grit?: number; heart?: number; scrapper?: boolean; allies?: AllyOffer[]; supplies?: Supply[]; coins?: number; quit?: Record<string, number>; tools?: Tool[]; startingTool?: Tool; random?: () => number }
 // GDD-GAP: §7.2 gives ranges, not complete stat lines. These are the MVP's provisional lines.
 const lines: Record<string, [Tool, number, number, number, number]> = {
   player: ['broom', 30, 7, 6, 5], augusta: ['umbrella', 35, 6, 5, 8], kasimir: ['pan', 40, 8, 3, 5], nell: ['broom', 30, 7, 7, 6],
@@ -71,6 +71,10 @@ export class Scuffle {
     this.units.forEach(u => { u.quit = setup.quit?.[u.id] ?? 0; });
     this.supplies = (setup.supplies ?? []).slice(0, 5); this.coins = setup.coins ?? 0;
     this.tools = setup.tools ?? ['broom', 'pan', 'umbrella'];
+    if (setup.startingTool && this.tools.includes(setup.startingTool)) {
+      const player = this.units[0]!;
+      player.tool = setup.startingTool; player.weapon = weapons[setup.startingTool];
+    }
     this.random = setup.random ?? Math.random;
     this.initiative.reseed(this.units); this.start();
   }
