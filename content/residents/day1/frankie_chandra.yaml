@@ -4,7 +4,7 @@ name: Frankie Chandra
 age: 69
 pronouns: they/them
 kind: resident
-occupation: Retired, formerly the Monde postmistress.
+occupation: Retired, formerly a sorter at the Monde post office.
 workplace: millbrook.home_20
 home: millbrook.home_20
 portrait: frankie_chandra
@@ -22,7 +22,7 @@ look:
   outfit: { cut: coat, top: 7, bottom: 14, bottom_style: trousers, shoes: 7 }
   accessory: { kind: glasses }
   glasses: round
-backstory: Frankie was born in the top room of a Millbrook terrace and ran the Monde post office counter for
+backstory: Frankie was born in the top room of a Millbrook terrace and sorted the mail under Ilona Szabo at the Monde post office for
   thirty-one years, until the Carrow mail stopped coming on the Gannet. They knew every household's
   handwriting and which letters were bad news before they were opened. Their husband Lee drowned off the
   breakwater before Frankie retired, and they have kept his thermos on the windowsill ever since, though
@@ -40,10 +40,10 @@ beliefs:
 voice:
   register: Unhurried and rambling, drifting off a thread and returning to it on purpose. Speaks warmly, with
     long pauses and old prices recalled exactly. Uses contractions freely and asks after people's families.
-  tics: [ Now where was I?, Back in my day, Mind the step ]
+  tics: [ Now where was I?, Back in my day, Mind the draught ]
   never_says: [ that's not my problem, hurry up, I don't know anyone ]
   samples:
-    - Now where was I? Ah, yes, the eggs were fourpence a dozen, and you'd not believe the fuss.
+    - Now where was I? Ah, yes, the eggs were two coins a dozen, and you'd not believe the fuss.
     - Oh, come in out of the wind, love. The kettle's been on since the ferry went.
     - Don't mind me. I'm only sitting with the window, same as always.
 birthday: 33
@@ -117,7 +117,7 @@ relationships:
       note: "Minutes every meeting, including the ones nobody wanted minuted."
     }
 secrets:
-  - text: Frankie still reads every postcard that reaches Monde before it is delivered, and feels guilty about it.
+  - text: Frankie still reads the postcards left on Ada's hatch shelf before anyone collects them, and feels guilty about it.
     reveal: { regard_min: 60 }
   - text: Lee wrote a sea shanty they never finished, and Frankie has the last verse hidden in the thermos lid.
     reveal: { regard_min: 70 }

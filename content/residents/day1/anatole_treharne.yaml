@@ -21,10 +21,10 @@ look:
   height: tall
   outfit: { cut: jumper, top: 5, bottom: 14, bottom_style: trousers, shoes: 8 }
   accessory: { kind: scarf, colour: 0 }
-backstory: Came to Monde at nineteen from the mill towns inland, after a job at Lissworth Mill that ended when
+backstory: Came to Monde at nineteen from the mill towns inland, to work at Lissworth Mill, a job that ended when
   the mill shut and his lungs gave out with the dust still in them. He spent years learning to fix boats with
   Florian's crew and was good at it until the breathing got too bad to stand over an engine. He stayed because
-  the rent was low and the sea air helped more than the doctors had. He had a wife, Lena, who left for Carrow
+  the rent was low and the sea air helped more than the doctors had. He had a wife, Sunniva, who left for Carrow
   when the baby was small and sends a card at Christmas. He believes the Tollmen collect because nobody has
   the nerve to stop them.
 personality:
@@ -38,7 +38,7 @@ beliefs:
 voice:
   register: Slow and plain, with long breaths between clauses. He says less than he means and lets silences
     work. Gruff but never unkind.
-  tics: [ right then, mind the step, that'll do ]
+  tics: [ Give me a minute., Sit down., Doesn't make it cheaper. ]
   never_says: [ I'm fine, don't fuss, it's nothing special ]
   samples:
     - Kettle's on. Sit down before it boils over, that's all I'm saying.
@@ -51,7 +51,7 @@ fears: [ the baby getting sick in winter, losing the house ]
 dream:
   text: One whole afternoon with nothing in it, the kids off at the pond and the kettle on.
   stages:
-    - Find a sitter for the afternoons Mara trusts.
+    - Find a sitter the children trust for the afternoons.
     - Take the children to the duck pond for a whole afternoon.
     - Sit down on the bench and finish an entire cup of tea.
 routine:
@@ -83,14 +83,14 @@ relationships:
   - { id: moss, affinity: 10, trust: 10, tag: fond, note: Old boat-mate; still nods when the Gannet passes. }
   - {
       id: laila_treharne,
-      affinity: 60,
-      trust: 40,
+      affinity: 90,
+      trust: 85,
       tag: daughter,
       note: His youngest; he watches her closely.
     }
-  - { id: freja_treharne, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
+  - { id: freja_treharne, affinity: 85, trust: 80, tag: daughter, note: "Daughter, under the same roof." }
 secrets:
-  - text: He still keeps Lena's letters in the tin under the stairs and reads them when the house is asleep.
+  - text: He still keeps Sunniva's letters in the tin under the stairs and reads them when the house is asleep.
     reveal: { regard_min: 65 }
 canon_locks: []
 story_role: none

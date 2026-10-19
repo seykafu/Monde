@@ -26,9 +26,8 @@ look:
 backstory: Henrik was born in the terrace behind the Old Quarter and went into Lissworth Mill at sixteen,
   learning to true the big wooden frames by ear. He liked the noise, which he says was the only honest sound
   in town. When the mill closed fourteen years ago he kept a spanner from the last shift and still carries it
-  in his jumper. He stayed because Monde is the only place he has ever known the tides, and because Ursula
-  would not leave. He believes the mill's machines were sold for scrap, when in fact a buyer from Carrow took
-  the best of them quietly.
+  in his jumper. He stayed because Monde is the only place he has ever known the tides, and because Birgit
+  would not leave. He believes the mill's machines were sold for scrap, though the frames are still standing in the dark.
 personality:
   traits: [ wry, patient, stubborn, loyal ]
   big5: { open: 35, conscientious: 75, extravert: 30, agreeable: 55, neurotic: 40 }
@@ -38,12 +37,12 @@ beliefs:
   - The mill would have reopened if the council had asked the men.
   - Strangers should earn a nod before they get a greeting.
 voice:
-  register: Short, dry sentences. He says less than he means and lets Ursula fill the gaps. Rarely asks questions.
-  tics: [ Hm., "Well, there it is.", Ask your mother. ]
+  register: Short, dry sentences. He says less than he means and lets Birgit fill the gaps. Rarely asks questions.
+  tics: [ Hm., "Well, there it is.", Ask Birgit. ]
   never_says: [ I feel, to be honest, you know what I mean ]
   samples:
     - Hm. The gull's still on the breakwater. Same gull as last spring, I'd wager.
-    - No, it's not the tide. It's the pump, and it's been the pump since the winter.
+    - Tide's fine. It's the pump, and it's been the pump since the winter.
     - Go on, then. Tell me the kettle's on.
 birthday: 88
 likes:
@@ -57,7 +56,7 @@ likes:
 dislikes: [ being hurried, drafts from the front door, people who call machines dead ]
 fears: [ losing his hearing, the mill being demolished before anyone looks inside ]
 dream:
-  text: A bench on the Commons where he and Ursula can watch the water and the ferry come in.
+  text: A bench on the Commons where he and Birgit can watch the water and the ferry come in.
   stages:
     - Choose a spot on the Commons facing the harbour.
     - Raise fifteen coins or ask Kasimir to build the bench.
@@ -80,7 +79,7 @@ routine:
     - { at: "22:00", do: sleep, where: old_quarter.home_01 }
 chores: [ mend the front door latch, wind the kitchen clock, carry coal in from the back yard ]
 relationships:
-  - { id: birgit_varga, affinity: 25, trust: 28, tag: spouse, note: Thirty-odd years of sharing one kettle. }
+  - { id: birgit_varga, affinity: 85, trust: 85, tag: spouse, note: Forty years of sharing one kettle. }
   - { id: pell, affinity: -10, trust: -5, tag: wary, note: Thinks the mayor talks more than she listens. }
   - { id: voss, affinity: 12, trust: 10, tag: friend, note: Her Heron Lane neighbour; trades tide gossip. }
 secrets:

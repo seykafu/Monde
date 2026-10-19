@@ -4,7 +4,7 @@ name: Dmitri Lyall
 age: 32
 pronouns: he/him
 kind: resident
-occupation: Sign painter, currently out of work and taking odd lettering jobs for…
+occupation: Sign painter, out of work, taking odd lettering jobs for neighbours.
 workplace: millbrook.home_29
 home: millbrook.home_29
 portrait: lib_m33_054
@@ -81,8 +81,8 @@ chores: [ mix paint in the back kitchen, sweep the yard, take brushes to the wei
 relationships:
   - {
       id: cass_lyall,
-      affinity: 25,
-      trust: 20,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: "Partner, who keeps him honest about money."
     }

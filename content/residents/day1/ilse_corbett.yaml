@@ -35,10 +35,10 @@ beliefs:
   - The Tollmen take more than they should, and I am sure they never ask anyone twice.
 voice:
   register: Brisk and organising. Lists of three, questions like a form, sentences that end on the schedule.
-  tics: [ "Right, then.", Which means, Before Tuesday ]
+  tics: [ "In order.", Which means, Before Tuesday ]
   never_says: [ don't worry, it'll be fine, trust me ]
   samples:
-    - Right, then. Lunch at twelve, Remy's form by Friday, and the ferry at four.
+    - In order. Lunch at twelve, Remy's form by Friday, and the ferry at four.
     - Which means you need the forms signed, or the roll stays at nine. Shall we?
     - Nine children. Felix can't do that alone, and neither can I.
 birthday: 43

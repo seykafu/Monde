@@ -48,8 +48,8 @@ likes:
     the duck pond,
     yellow ribbons,
     buttons in her biscuit tin,
-    tea that stays hot long enough to finish,
-    neighbors who knock before advising
+    bread crusts,
+    puddles
   ]
 dislikes: [ hats, going to bed early, wet socks ]
 fears: [ the dark clocktower, being left at the sitter's ]
@@ -74,7 +74,7 @@ routine:
     - { at: "19:00", do: sleep, where: market_row.home_05 }
 chores: [ Put her bottle tops back in the biscuit tin, Feed the duck crusts on Saturdays ]
 relationships:
-  - { id: linnea_talbot, affinity: 30, trust: 28, tag: mother, note: "Her mother, who always has tea." }
+  - { id: linnea_talbot, affinity: 90, trust: 85, tag: mother, note: "Her mother, who always has tea." }
   - {
       id: fabian_mcallister,
       affinity: 15,

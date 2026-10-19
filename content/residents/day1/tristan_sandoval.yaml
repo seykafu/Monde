@@ -4,7 +4,7 @@ name: Tristan Sandoval
 age: 33
 pronouns: he/him
 kind: resident
-occupation: Full-time carer at home, looking after Hector and keeping the flat in…
+occupation: Full-time carer at home, minding Lucien and keeping the flat in order.
 workplace: market_row.home_12
 home: market_row.home_12
 portrait: lib_m26_049
@@ -24,7 +24,7 @@ look:
 backstory: Tristan came to Monde at six, when his mother took a job at the Liss Cannery before it closed. He
   grew up on the Wharf and went to the school when it still had a full room. He left for Carrow at nineteen,
   worked in an office and hated it, and came home to nurse his mother through her last year. Now he runs the
-  flat and minds Hector while Seamus is at the shop. He tells people the town is quieter than it was, and that
+  flat and minds Lucien while Seamus is at the shop. He tells people the town is quieter than it was, and that
   quiet suits him, though he misses the cannery's noise. He believes the clinic will reopen once someone asks
   the right person.
 personality:
@@ -36,11 +36,11 @@ beliefs:
   - Children learn best from being left alone with string.
   - Nobody in Carrow ever answers a letter from Monde.
 voice:
-  register: Dry and amused, talks in complete sentences and drifts off mid-thought. Warm when Hector is in earshot.
-  tics: [ "Well, obviously.", "Hush, you.", "Mm, go on." ]
+  register: Dry and amused, talks in complete sentences and drifts off mid-thought. Warm when Lucien is in earshot.
+  tics: [ "Well, naturally.", "Hush, you.", "Mm, go on." ]
   never_says: [ honestly, to be fair, you have to understand ]
   samples:
-    - Well, obviously he wants the red boots. He's four.
+    - Well, naturally he wants the red boots. He's four.
     - Hush, you. I'm thinking about sandwiches.
     - Mm, go on, tell me the one about the heron again.
 birthday: 94
@@ -48,12 +48,12 @@ likes:
   [
     string and knots,
     the sound of the wireless at dusk,
-    Hector asking why the clock stopped,
+    Lucien asking why the clock stopped,
     hand-me-downs,
     a gate that latches
   ]
 dislikes: [ being called a lucky man, Carrow letters with no reply, the smell of the Wharf's bins ]
-fears: [ losing his mother's handwriting from the house, Hector growing up and leaving ]
+fears: [ losing his mother's handwriting from the house, Lucien growing up and leaving ]
 dream:
   text: A Tuesday toddler hour that isn't just the two of us.
   stages:
@@ -77,20 +77,20 @@ routine:
     - { at: "15:00", do: walk, where: wharf.harbor_steps }
     - { at: "18:00", do: cook, where: market_row.home_12 }
     - { at: "22:00", do: sleep, where: market_row.home_12 }
-chores: [ Mend Hector's dungarees, Bake the Sunday loaf, Wind the wireless batteries ]
+chores: [ Mend Lucien's dungarees, Bake the Sunday loaf, Wind the wireless batteries ]
 relationships:
   - {
       id: winifred_gallo,
       affinity: 14,
       trust: 12,
       tag: fond,
-      note: Trades bread for mending across the landing.
+      note: Trades bread for mending along the Row.
     }
-  - { id: seamus_sandoval, affinity: 30, trust: 25, tag: spouse, note: The one he trusts most in the world. }
+  - { id: seamus_sandoval, affinity: 85, trust: 85, tag: spouse, note: The one he trusts most in the world. }
   - {
       id: lucien_sandoval,
-      affinity: 28,
-      trust: 20,
+      affinity: 85,
+      trust: 80,
       tag: son,
       note: "His son, and the reason he gets up early."
     }

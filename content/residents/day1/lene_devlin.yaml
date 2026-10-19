@@ -83,8 +83,8 @@ chores: [ bake the Sunday loaf, mend the sheets, keep the windowboxes watered ]
 relationships:
   - {
       id: idris_pryce,
-      affinity: 22,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: partner,
       note: "Her husband, her anchor and her argument partner."
     }

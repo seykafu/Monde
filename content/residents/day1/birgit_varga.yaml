@@ -38,10 +38,10 @@ beliefs:
 voice:
   register: Quick, teasing, lots of questions and asides. Uses Henrik as a foil and rarely lets a silence last.
     Warm even when correcting.
-  tics: [ "Don't we, dear?", Well I never., Mind the step. ]
+  tics: [ Well I never., "Sit, sit.", "Tuesday, is it?" ]
   never_says: [ I'm busy, that's none of my business, in my opinion ]
   samples:
-    - Don't we, dear? He's got the look of a man about to fix something he shouldn't.
+    - He's got the look of a man about to fix something he shouldn't.
     - Oh, sit down, the pair of you. The kettle's only just boiled.
     - Tuesday, is it? Then the Gannet's in and I'm owed a biscuit from Odile.
 birthday: 95
@@ -83,8 +83,8 @@ chores: [ mend the Carrow girls' hems, sweep the front step, dust the parlour cl
 relationships:
   - {
       id: henrik_varga,
-      affinity: 25,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Husband of forty years; she still teases him for his silences.
     }

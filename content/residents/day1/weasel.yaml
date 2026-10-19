@@ -54,7 +54,7 @@ fears: [ being found out by someone kind, his name on the Lantern's front page, 
 dream:
   text: Be done with owing, and earn his keep carrying parcels on Market Row for pay, like the post round.
   stages:
-    - Say out loud what he owes, to one person (Regard ≥ 45)
+    - Say out loud what he owes, to one person (Regard ≥ 50)
     - Carry parcels for the Market Hall stalls on a Saturday, for pay and with no jar in sight
     - Pay the first hundred with coin he earned carrying
 routine:

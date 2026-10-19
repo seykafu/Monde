@@ -4,7 +4,7 @@ name: Gaspard Clancy
 age: 55
 pronouns: he/him
 kind: resident
-occupation: Retired early after years at the mill; now mostly keeps the house…
+occupation: Retired early after years at the mill; keeps the house.
 workplace: millbrook.home_27
 home: millbrook.home_27
 portrait: gaspard_clancy
@@ -22,10 +22,10 @@ look:
   outfit: { cut: coat, top: 4, bottom: 3, bottom_style: trousers, shoes: 11 }
   accessory: { kind: none }
   face: { moustache: true }
-backstory: Gaspard worked the looms at Lissworth Mill from nineteen until his chest gave out, the cotton dust
+backstory: Gaspard worked the looms at Lissworth Mill from twenty-nine until his chest gave out, the cotton dust
   settling into his lungs like fine snow. He met Anouk on the Carrow ferry when she was visiting an aunt, and
   when he proposed they both agreed Monde was far enough from the noise of Hessle Cross to breathe. They
-  bought a narrow house on Mill Lane for less than a motorbike costs now. He misses the ordered rhythm of the
+  took her late aunt's narrow house on Mill Lane, and have patched it ever since. He misses the ordered rhythm of the
   shift bell more than he will admit, and he is certain the mill will reopen one day because the frames are
   still there.
 personality:
@@ -39,14 +39,14 @@ beliefs:
 voice:
   register: Measured and wry, short sentences, a little old-fashioned. Speaks slowly when tired and warms up
     when asked about machines.
-  tics: [ Right then., "Well, there's that." ]
+  tics: [ Somebody only has to ask., "Well, there's that." ]
   never_says: [ I suppose, whatever you like, no harm done ]
   samples:
-    - Kettle's on. You'll have a cup, I think. Sit down before you fall down.
+    - You'll have a cup, I think. Pot's been warm since six, same as when the shift bell rang.
     - The frames are all still in there, you know. Every one. Somebody only has to ask.
     - Ah. Don't mind me. My chest is just having a conversation with the weather.
 birthday: 64
-likes: [ the morning paper, the mill's old frames, the ferry's horn, a morning paper, a kettle on the stove ]
+likes: [ pear drops, the mill's old frames, the ferry's horn, a morning paper, a kettle on the stove ]
 dislikes: [ stairs, drafts, people deciding things for him ]
 fears: [ being a burden on Anouk, another winter cough ]
 dream:
@@ -78,8 +78,8 @@ chores: [ Lights the stove each morning, Fetches the Lantern from the step, Mend
 relationships:
   - {
       id: anouk_clancy,
-      affinity: 30,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: His wife of twenty-six years; they finish each other's sentences.
     }

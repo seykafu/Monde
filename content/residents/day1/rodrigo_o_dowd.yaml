@@ -23,10 +23,10 @@ look:
   accessory: { kind: none }
   headwear: { kind: flat_cap, colour: 8 }
 backstory: He came to Monde at twenty-nine, when Lissworth Mill was still running three shifts and the frames
-  were loud enough to hear from the breakwater. He set looms for fourteen years and was good at it, quick with
+  were loud enough to hear from the breakwater. He set looms for ten years and was good at it, quick with
   a spanner and patient with the new lads. When the Mill shut he took what casual work there was, and for a
   while that meant the boathouse and whatever Kasimir could spare. Now he goes across on the Gannet on Tuesday
-  and comes back on Saturday, because Hessle Cross pays by the job and Monde pays in promises. He stays in
+  and comes back on Friday's boat, because Hessle Cross pays by the job and Monde pays in promises. He stays in
   Monde because the house is paid for and the tide sounds like something.
 personality:
   traits: [ steady, dry, stubborn, practical ]
@@ -40,7 +40,7 @@ beliefs:
 voice:
   register: "Plain and short. Knows the numbers: picks, bolts, hours. Says 'used to be' when talking about the
     Mill and drops it when talking about the job in front of him."
-  tics: [ used to be, right then, that's the lot ]
+  tics: [ used to be, by the bolt, that's the lot ]
   never_says: [ I feel, on purpose, it's a shame ]
   samples:
     - Four bolts by Friday, that's what I can do.

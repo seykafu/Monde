@@ -45,7 +45,7 @@ voice:
   samples:
     - Mm. The gate's sticking. Give it here.
     - Aye, well. Beans don't care who's watching.
-    - Could be the mill. Could be nothing. Let's see.
+    - Could be the mill. Could be nothing. We'll see.
 birthday: 42
 likes:
   [
@@ -85,8 +85,8 @@ chores: [ Dig the garden plots before the frost lifts., Oil the back gate hinges
 relationships:
   - {
       id: zuzanna_mcallister,
-      affinity: 20,
-      trust: 26,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: His wife; she keeps his accounts and his secrets badly.
     }

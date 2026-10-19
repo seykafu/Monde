@@ -22,8 +22,8 @@ look:
   outfit: { cut: jumper, top: 8, bottom: 13, bottom_style: skirt, shoes: 2 }
   accessory: { kind: scarf, colour: 0 }
 backstory: Born in the back bedroom of this house and has known no other home. She remembers the school with
-  thirty pupils and the cannery whistle, though the cannery closed when she was barely old enough to read. She
-  does lessons by post at the library desk on the days the class is too quiet, and she is clever enough to
+  thirty pupils and knows the cannery whistle only from stories, since the cannery closed when she was a baby. She
+  does extra sums at the library desk on the days the class is too quiet, and she is clever enough to
   notice that her father tires faster than he says. She wants the school to reach twenty so her class stays
   together. She believes adults keep bad news from children on purpose; she is partly right and partly wrong
   about who decides what.
@@ -43,17 +43,17 @@ voice:
   samples:
     - Hm. Felix says twenty, not nineteen. Someone should count again.
     - Fine. The ferry's late, so we'll post the sums.
-    - It's nothing, Dad. I fell off the wall. Obviously.
+    - It's nothing, Dad. I fell off the wall. The plaster's for show.
 birthday: 36
 likes: [ library books, the lighthouse at night, sums, the Gull's cider cake ]
 dislikes: [ being called little, the Saturday collection, wet satchels ]
 fears: [ the school closing, her father getting worse ]
 dream:
-  text: A week where the school run fits around her father's hours and nobody has to ask.
+  text: Finish her lighthouse story and hear it read aloud at the library.
   stages:
-    - Ask the shopkeeper for fixed morning hours.
-    - Swap school-run days with Florian's family.
-    - Write the timetable on the kitchen wall.
+    - Ask Honor Hedley or Maurice Lamont what a keeper's night is like.
+    - Show Margo the first chapters (Regard ≥ 50).
+    - Read the last chapter aloud at the library on a Saturday.
 routine:
   weekday:
     - { at: "07:30", do: eat, where: wharf.home_08 }
@@ -72,12 +72,12 @@ chores: [ fetch the post, help with Laila's bath, sweep the step ]
 relationships:
   - {
       id: anatole_treharne,
-      affinity: 55,
-      trust: 45,
+      affinity: 85,
+      trust: 80,
       tag: father,
       note: "Her father, whom she watches for tiredness."
     }
-  - { id: laila_treharne, affinity: 60, trust: 40, tag: sister, note: "Her baby sister, who she reads to." }
+  - { id: laila_treharne, affinity: 85, trust: 80, tag: sister, note: "Her baby sister, who she reads to." }
   - { id: florian_garvey, affinity: 25, trust: 20, tag: friend, note: Lends her his old atlas. }
 secrets:
   - text: She has been writing a serial story about the lighthouse keeper and hides it in her atlas.

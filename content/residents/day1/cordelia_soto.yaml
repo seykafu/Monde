@@ -4,7 +4,7 @@ name: Cordelia Soto
 age: 36
 pronouns: she/her
 kind: resident
-occupation: Full-time carer at home, unpaid; keeps the household running and the boys…
+occupation: Full-time carer at home, unpaid; keeps the house and the boys.
 workplace: millbrook.home_26
 home: millbrook.home_26
 portrait: cordelia_soto
@@ -24,7 +24,7 @@ look:
 backstory: "Cordelia grew up three streets from Mill Lane and left at nineteen to train as a clerk in Carrow.
   She came back when her mother fell ill and never quite went away again. Her mother died two winters ago, and
   Cordelia stayed on in the house with the boys while Ayesha took the Hessle Cross post. She runs a tight
-  week: lunch boxes packed the night before, a list on the fridge, the ferry timetable pinned beside it. She
+  week: lunch boxes packed the night before, a list on the larder door, the ferry timetable pinned beside it. She
   believes the school will last if enough people keep turning up to it. That is only partly true, and she has
   not yet admitted to herself that the roll is the real problem."
 personality:
@@ -36,9 +36,9 @@ beliefs:
   - If the school closes, the boys will fall behind for good.
   - People in Monde mean well, even when they don't follow through.
 voice:
-  register: Brisk and organising. Speaks in lists of three and asks questions like a form. Ends sentences on the
+  register: Anxious and exact. Reads the calendar aloud (ferry days, school days, who is home when) and answers a worry with the day it falls on. Ends sentences on the
     schedule.
-  tics: [ "Right, then.", Is that Tuesday or Thursday?, And after that? ]
+  tics: [ Which day?, Is that Tuesday or Thursday?, And after that? ]
   never_says: [ don't worry, it'll be fine, just relax ]
   samples:
     - Lunch, reading book, and the satchel by the door. Is that everything?
@@ -48,7 +48,7 @@ birthday: 13
 likes:
   [
     A lunch box packed right,
-    Teachers who remember names,
+    The ferry timetable pinned straight,
     The bench by the school gate,
     Ordered lists on the back of old envelopes,
     a teacher who remembers names
@@ -88,8 +88,8 @@ chores:
 relationships:
   - {
       id: ayesha_soto,
-      affinity: 18,
-      trust: 22,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: "Her wife, away in Hessle Cross all week."
     }

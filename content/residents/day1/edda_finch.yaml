@@ -22,7 +22,7 @@ look:
   outfit: { cut: apron, top: 7, bottom: 2, bottom_style: trousers, shoes: 13 }
   accessory: { kind: apron, colour: 6 }
 backstory: Edda worked the winding floor at Lissworth Mill from sixteen until the lungs gave out at
-  thirty-nine. She tells people it was the dust, which is true, but the doctor in Carrow also blamed her habit
+  thirty. She tells people it was the dust, which is true, but the doctor in Carrow also blamed her habit
   of climbing the frames without a mask. When the mill closed she had a choice of a flat in Carrow or the flat
   her late mother left on Well Row, and she chose Well Row because her brother had already moved in and she
   could not let him run the place alone. She still keeps the mill's old shift bell on the windowsill.
@@ -37,11 +37,11 @@ beliefs:
 voice:
   register: Short, decisive sentences. Gives instructions more often than opinions. Warm underneath, but rarely
     shows it.
-  tics: [ "Right, then.", Mind the step., Sit down before you fall down. ]
+  tics: [ Sit., Figures first., Ask me again in spring. ]
   never_says: [ I'm sorry for your loss, you should feel, it's all going to be fine ]
   samples:
-    - Right, then. Sit, and tell me what's wrong with it.
-    - Mind the step, the third one's loose and it always has been.
+    - Sit, and tell me what's wrong with it.
+    - Third step's loose and it always has been. Use the rail.
     - Ask me again in spring. I'll have the figures by then.
 birthday: 53
 likes:
@@ -59,7 +59,7 @@ dream:
     sentiment behind it.
   stages:
     - Visit Bertrand and ask him plainly what the clock needs.
-    - Find a missing part, probably in the mill's old stores.
+    - Take Bertrand's list of missing parts to Margo, who knows the Marks.
     - Present the working clock at the Town Hall steps.
 routine:
   weekday:
@@ -82,13 +82,13 @@ chores:
   [
     Balance the household accounts on Sundays,
     Mend the flat's kettle and lamps,
-    Carry water from the fountain square
+    Carry water up from the well on Well Row
   ]
 relationships:
   - {
       id: lucas_finch,
-      affinity: 12,
-      trust: 25,
+      affinity: 80,
+      trust: 85,
       tag: brother,
       note: "Her brother, who needs watching on the stairs."
     }

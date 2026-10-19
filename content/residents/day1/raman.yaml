@@ -55,7 +55,7 @@ fears: [ falling on the weir path where nobody would find him, becoming the reas
 dream:
   text: Walk the weir path to the end in daylight with Priya beside him, and tell her he has done it alone.
   stages:
-    - Walk the path's first mile with him at his own pace (Regard ≥ 30)
+    - Walk the path's first mile with him at his own pace (Regard ≥ 60)
     - Fetch him a proper stick from Kasimir, who won't ask who it's for
     - Be there when he tells Priya, and say nothing
 routine:

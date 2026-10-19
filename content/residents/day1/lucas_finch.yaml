@@ -4,7 +4,7 @@ name: Lucas Finch
 age: 46
 pronouns: he/him
 kind: resident
-occupation: Retired early; repairs clocks and radios from his workbench for anyone who…
+occupation: Retired early; mends clocks and radios for anyone who asks.
 workplace: old_quarter.home_07
 home: old_quarter.home_07
 portrait: lib_m58_102
@@ -60,7 +60,7 @@ dislikes: [ It's only a radio, Static in the evening, Being handed a hammer ]
 fears: [ Losing his sister to the cough, Never hearing Carrow again ]
 dream:
   text: He wants an aerial on the water tower so the town can hear Carrow's forecast every evening, and he has
-    no idea how to ask…
+    no idea how to ask.
   stages:
     - Ask Hollis's permission for the tower.
     - Rig the aerial with Kasimir's help.
@@ -93,8 +93,8 @@ chores:
 relationships:
   - {
       id: edda_finch,
-      affinity: 12,
-      trust: 25,
+      affinity: 80,
+      trust: 85,
       tag: sister,
       note: "His sister, who keeps the ledgers and the peace."
     }

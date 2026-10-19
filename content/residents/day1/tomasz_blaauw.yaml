@@ -4,7 +4,7 @@ name: Tomasz Blaauw
 age: 73
 pronouns: he/him
 kind: resident
-occupation: Retired union steward, still keeps the minutes book for anything that will…
+occupation: Retired union steward who keeps minutes for any committee that'll have him.
 workplace: millbrook.home_15
 home: millbrook.home_15
 portrait: tomasz_blaauw
@@ -33,14 +33,14 @@ personality:
   big5: { open: 40, conscientious: 88, extravert: 45, agreeable: 62, neurotic: 35 }
 values: { prosperity: 0.1, safety: 0.25, spirit: 0.4, charm: 0.25 }
 beliefs:
-  - A meeting without minutes never happened.
+  - A vote nobody counted is only a rumour.
   - The Harvest Supper will run again if someone just writes out the list.
   - Most people are only waiting to be asked properly.
   - The Tollmen's Saturday visits are a matter for the shopkeepers, not the minute book.
 voice:
   register: Brisk and formal with a warm undercurrent. Addresses people by surname until they earn a first name.
     Gives orders as courtesy, then softens. Pauses to make a point, rarely raises his voice.
-  tics: [ Item one., Right then., Would you put your name down there? ]
+  tics: [ Item one., Moved and seconded., Would you put your name down there? ]
   never_says: [ I suppose, no worries, sort of, whatever you think ]
   samples:
     - Item one. The supper needs ten names, and I'd like yours on the list, if you'd be so kind.
@@ -61,7 +61,7 @@ dream:
     gap.
   stages:
     - Collect ten volunteers' names from the square and the pub.
-    - Print the rota on the Lantern's press at the Millbrook end.
+    - Ask Sable to print the rota on the Lantern's press.
     - Run one full week with every round covered and nobody missed.
 routine:
   weekday:

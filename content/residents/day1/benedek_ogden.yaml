@@ -40,11 +40,11 @@ beliefs:
 voice:
   register: "Plain and short. He knows the numbers: picks, bolts, hours. He speaks in fragments and rarely
     offers more than he is asked."
-  tics: [ Used to be., "Right, then.", Mm. ]
+  tics: [ Used to be., Pass it here., Mm. ]
   never_says: [ I suppose, so to speak, you see ]
   samples:
     - Sixty bolts an hour, that's the rate. Used to be.
-    - Right, then. Pass me the spanner.
+    - Pass it here. The spanner, not the hammer.
     - Mm. Tea's in the tin.
 birthday: 75
 likes:
@@ -86,8 +86,8 @@ chores: [ Keeps the coal scuttle full, Mends the back gate, Oils the workbench t
 relationships:
   - {
       id: anders_ogden,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Husband of thirty-three years; cooks the Sunday dinner.
     }

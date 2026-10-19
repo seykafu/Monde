@@ -38,12 +38,12 @@ beliefs:
 voice:
   register: Small, direct, and often a single word. Repeats things he likes. Asks questions in the middle of
     other people's sentences.
-  tics: [ Why?, More., Look. ]
+  tics: [ Why?, More., Again. ]
   never_says: [ please, maybe later, I don't know ]
   samples:
     - Why's the clock tired?
     - More rye.
-    - Look, the heron's got a fish!
+    - Heron's got a fish. Fish, fish.
 birthday: 40
 likes: [ bottle tops, the wooden horse, the bakery counter, hand-me-downs, a gate that latches ]
 dislikes: [ hats in the wrong order, the sound of the foghorn, being left on the stairs ]
@@ -71,12 +71,12 @@ chores: [ Put the bottle tops back in the tin, Carry his own cup, Feed the heron
 relationships:
   - {
       id: seamus_sandoval,
-      affinity: 32,
-      trust: 28,
+      affinity: 85,
+      trust: 80,
       tag: father,
       note: Dad with the dry hands and the good pockets.
     }
-  - { id: tristan_sandoval, affinity: 30, trust: 26, tag: father, note: "Papa, who tells the best stories." }
+  - { id: tristan_sandoval, affinity: 85, trust: 80, tag: father, note: "Papa, who tells the best stories." }
   - { id: winifred_gallo, affinity: 18, trust: 14, tag: fond, note: Always gives him the end of the loaf. }
 secrets:
   - text: He has hidden one bottle top in his hat every day for a week, because he wants to give it to the clock.

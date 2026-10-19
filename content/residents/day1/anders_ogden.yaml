@@ -84,8 +84,8 @@ chores: [ Bakes bread for the lane twice a week, Keeps the kitchen spotless, Sew
 relationships:
   - {
       id: benedek_ogden,
-      affinity: 25,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Husband; the one who keeps the house steady.
     }

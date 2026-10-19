@@ -36,10 +36,10 @@ beliefs:
 voice:
   register: Clipped and efficient, with the occasional long breath. He answers questions with logistics and lets
     the humour slip out sideways.
-  tics: [ right then, that'll do, one thing at a time ]
+  tics: [ first things first, that'll do, one thing at a time ]
   never_says: [ I'm fine, don't pity me, I'm sorry for ]
   samples:
-    - Right then, shopping first, then the school gate. Two jobs, one trip.
+    - Shopping first, then the school gate. Two jobs, one trip.
     - Tea's hot if you want it. It won't stay that way.
     - No, I don't need advice on the children. I need someone to hold the bag.
 birthday: 16
@@ -74,7 +74,7 @@ routine:
 chores: [ school run and shopping, mend the back door latch, keep the coal ledger ]
 relationships:
   - { id: ilona, affinity: 60, trust: 55, tag: kin, note: His mother; she mends his shirts without asking. }
-  - { id: nettie, affinity: 45, trust: 40, tag: kin, note: His cousin; she always brings the wrong biscuits. }
+  - { id: nettie, affinity: 45, trust: 40, tag: kin, note: His niece; she always brings the wrong biscuits. }
   - { id: felix, affinity: 40, trust: 50, tag: friend, note: Felix keeps Maud's drawings and never charges. }
   - { id: maud, affinity: 75, trust: 70, tag: daughter, note: "Daughter, under the same roof." }
   - { id: sol_szabo, affinity: 75, trust: 70, tag: child, note: "Child, under the same roof." }

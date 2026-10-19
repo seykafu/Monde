@@ -4,7 +4,7 @@ name: Imke Kinsella
 age: 63
 pronouns: she/her
 kind: resident
-occupation: Retired postmistress, still sorts her own letters each morning
+occupation: Retired post office sorter, still sorts her own letters each morning
 workplace: station_hill.home_06
 home: station_hill.home_06
 portrait: imke_kinsella
@@ -24,7 +24,7 @@ look:
 backstory: Imke grew up in a mill town inland and took the post office counter job at Liss at nineteen, when
   the branch still had a telegraph key. She married Piet Kinsella, a fitter at the mill, and they came to
   Monde when she was thirty-four because the rent on Tower Lane was low and the sea air was supposed to be
-  good for his chest. Piet died eleven winters ago. She ran the Monde sorting office until it closed, then
+  good for his chest. Piet died eleven winters ago. She sorted the mail under Ilona Szabo at the Monde post office until it closed, then
   kept the letter-box key out of habit. Her one regret is that she never learned to drive the ferry timetable
   by heart, which she thinks makes her look foolish when visitors ask.
 personality:
@@ -39,10 +39,10 @@ beliefs:
 voice:
   register: Unhurried and wandering on purpose, she starts one story and drifts into another, often correcting
     herself. She remembers prices from forty years ago and quotes them without being asked.
-  tics: [ Now where was I?, "In my day,", Mind the step. ]
+  tics: [ Now where was I?, "In my day,", Mind the stove. ]
   never_says: [ sorry for the bother, whatever, in a hurry, modern ]
   samples:
-    - Now where was I? Oh yes, a loaf cost fourpence-coin then, and the baker would give you the crust for
+    - Now where was I? Oh yes, a loaf cost one coin then, and the baker would give you the crust for
       nothing.
     - Sit down, love, the kettle's nearly there. No, the other chair, the one with the good springs.
     - Piet liked it cold, the stove, I mean. Never mind. You'll have a cup of tea anyway.

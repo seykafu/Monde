@@ -4,7 +4,7 @@ name: Corentin Wylie
 age: 56
 pronouns: he/him
 kind: resident
-occupation: Mason and cook who works from the flat above Market Row, laying…
+occupation: Mason and cook, working from the flat above Market Row.
 workplace: market_row.home_11
 home: market_row.home_11
 portrait: lib_m50_096
@@ -40,12 +40,12 @@ beliefs:
 voice:
   register: Warm, booming and playful. Speaks with easy confidence and laughs at his own jokes. Cooks and builds
     in the same breath.
-  tics: [ come eat, my dear, that wall is listening ]
+  tics: [ come eat, taste this, that wall is listening ]
   never_says: [ I don't have time, that's not my problem, "sorry, we're closed" ]
   samples:
     - Come in, come in, there's stew on and nobody's leaving hungry.
-    - That crack's been there six years, my dear. It can wait one more Saturday.
-    - Ha! The gull on that statue has more sense than the Tollmen, I'd say.
+    - That crack's been there six years. It can wait one more Saturday.
+    - Ha. The gull on that statue has more sense than the Tollmen, I'd say.
 birthday: 62
 likes: [ fish stew, good stone, the Saturday market crowd, a warm kitchen, seasoned timber ]
 dislikes: [ raw fish left out, sour bread, people who skip meals ]
@@ -77,8 +77,8 @@ chores: [ bake the bread for the flat, scrub the stock pot, check the mortar buc
 relationships:
   - {
       id: hartley_wylie,
-      affinity: 28,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Husband; the steady hand to his big heart.
     }

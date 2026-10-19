@@ -22,10 +22,10 @@ look:
   outfit: { cut: coat, top: 0, bottom: 2, bottom_style: trousers, shoes: 3 }
   accessory: { kind: none }
 backstory: Lucien ran a small shop on the corner of Lamplighter Lane for his first decade in Monde, selling
-  stationery and repairs, and was the last tenant of the cottage before it was let to the pair of them. He had
+  stationery and repairs, and was the last tenant of the Lamplighter's Cottage before he and Hester took No. 48 up the lane. He had
   the front door keys cut twice after losing the first set in the harbour. When the shop failed, he took a
   clerking post across the water. The commute is long and the work dull, but the wages cover the mortgage on
-  the cottage and his wife's ambitions for the café. He misses the old shop and the lane's gas lamps, and
+  the house and his wife's ambitions for the café. He misses the old shop and the lane's gas lamps, and
   privately thinks Hester would be happier if they both moved to Carrow.
 personality:
   traits: [ patient, dry, tidy, wistful, loyal ]
@@ -54,7 +54,7 @@ likes:
     a till that rings
   ]
 dislikes: [ the Hessle Cross commute, keys that stick, cold ferry platforms, shops with no lights on ]
-fears: [ losing the cottage, growing old on the wrong side of the water ]
+fears: [ losing the house, growing old on the wrong side of the water ]
 dream:
   text: Hire a young apprentice for a small repair counter in the lane, so the old shop's lamp can be lit again.
   stages:
@@ -79,7 +79,7 @@ routine:
     - { at: "22:30", do: sleep, where: old_quarter.home_03 }
 chores:
   [
-    Mend the cottage's door latches,
+    Mend the house's door latches,
     Carry the shop's post home from the hatch,
     Clean the front step on Saturdays
   ]
@@ -101,7 +101,7 @@ relationships:
     }
 secrets:
   - text: He still has the first set of cottage keys, the ones he lost in the harbour, and checks the harbour
-      steps for them on ferry…
+      steps for them on ferry days.
     reveal: { regard_min: 50 }
 canon_locks: []
 story_role: none

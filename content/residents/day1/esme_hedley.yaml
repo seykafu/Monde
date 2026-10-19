@@ -76,8 +76,8 @@ chores: [ Dry and mend the nets, Carry the catch up the steps, Keep Honor's tea 
 relationships:
   - {
       id: honor_hedley,
-      affinity: 25,
-      trust: 30,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Her partner; the only person she lets the last word.
     }

@@ -77,7 +77,7 @@ routine:
     - { at: "23:00", do: sleep, where: millbrook.home_26 }
 chores: [ Bring home bread from the bakery, Take in the washing on Friday, Check the ferry tickets ]
 relationships:
-  - { id: cordelia_soto, affinity: 18, trust: 22, tag: spouse, note: "Her wife, the steady one at home." }
+  - { id: cordelia_soto, affinity: 85, trust: 85, tag: spouse, note: "Her wife, the steady one at home." }
   - { id: arvid_soto, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
   - { id: raoul_soto, affinity: 75, trust: 70, tag: son, note: "Son, under the same roof." }
 secrets:

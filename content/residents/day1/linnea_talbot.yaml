@@ -21,9 +21,9 @@ look:
   height: tall
   outfit: { cut: smock, top: 9, bottom: 6, bottom_style: trousers, shoes: 2 }
   accessory: { kind: scarf, colour: 4 }
-backstory: Linnea grew up in Carrow above a dry cleaner's and came to Monde at eighteen, drawn by a cheap room
-  and the idea of painting the sea. She got work at the Liss Cannery packing tins until it closed eleven years
-  ago, then at the Gull & Anchor pulling pints until a bad winter and a child on the way cost her the job.
+backstory: Linnea grew up in Carrow above a dry cleaner's and came to Monde at seventeen, drawn by a cheap room
+  and the idea of painting the sea. She got work at the Liss Cannery packing tins until it closed that same year,
+  then at the Gull & Anchor pulling pints until a bad winter and a child on the way cost her the job.
   Cecily was born in the back bedroom of No. 4. Linnea still paints every night after bedtime, mostly the
   breakwater, mostly badly. She tells herself she stayed for the light. Really she stayed because leaving
   would mean admitting the Cannery was never coming back.
@@ -38,10 +38,10 @@ beliefs:
 voice:
   register: Efficient and dry, with one eye on a small person. Short sentences, clipped, occasionally a long
     breath before a true thing. Uses contractions freely.
-  tics: [ right then, that's that, hang on ]
+  tics: [ Shoes on., that's that, hang on ]
   never_says: [ I'm fine, poor me, you don't understand ]
   samples:
-    - Right then, shoes on. Not the blue ones, we've been through this.
+    - Shoes on. Not the blue ones, we've been through this.
     - Tea's stewed. Drink it anyway, it's still tea.
     - No, I can manage. I've been managing since the cannery shut.
 birthday: 59
@@ -89,8 +89,8 @@ chores:
 relationships:
   - {
       id: cecily_talbot,
-      affinity: 30,
-      trust: 25,
+      affinity: 90,
+      trust: 90,
       tag: daughter,
       note: Her daughter; the centre of every plan.
     }

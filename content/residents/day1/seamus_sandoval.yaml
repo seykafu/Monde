@@ -24,7 +24,7 @@ look:
   face: { stubble: true }
 backstory: Born in Monde, Seamus left at seventeen to crew on a trawler out of Hessle Cross, then came home
   when his father's back gave out. He took the counter job at Dunmore's because it kept him near the water and
-  out of the wet. He and his partner Tristan share the flat above No. 5 and their son Hector, and he likes
+  out of the wet. He and his partner Tristan share the flat above No. 5 and their son Lucien, and he likes
   that the shop gets only the people who need it. He believes the Gannet will run every Tuesday forever. It
   was cancelled twice last winter, and he still thinks the ferry is the one thing the town can't lose.
 personality:
@@ -37,14 +37,14 @@ beliefs:
   - A shop is only as good as its back door.
 voice:
   register: Short, plain, with a sailor's habit of understatement. Says less when tired and more when he's teasing.
-  tics: [ "Right, then.", Mm., Mind the step. ]
+  tics: [ Second shelf., Mm., Not till Tuesday. ]
   never_says: [ I suppose, you know what I mean, it's a shame ]
   samples:
-    - Right, then. Tins are on the second shelf, sugar's behind the till.
+    - Tins are on the second shelf, sugar's behind the till.
     - Mm. Gannet's late. Again.
-    - Hector's asleep, and I'm not waking him for anybody but the Gannet.
+    - Lucien's asleep, and I'm not waking him for anybody but the Gannet.
 birthday: 27
-likes: [ the smell of tar and bread, a gate that latches, early mornings on the harbour steps, Hector's laugh ]
+likes: [ the smell of tar and bread, a gate that latches, early mornings on the harbour steps, Lucien's laugh ]
 dislikes: [ damp bedrooms, being told he's brave for coming back, shuttered shopfronts ]
 fears: [ the flat flooding in a winter storm ]
 dream:
@@ -80,8 +80,8 @@ relationships:
   - { id: weasel, affinity: -8, trust: -5, tag: wary, note: Doesn't like the way he listens at doors. }
   - {
       id: tristan_sandoval,
-      affinity: 30,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: His partner and the steadiest thing in the flat.
     }

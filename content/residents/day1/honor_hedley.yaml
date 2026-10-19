@@ -22,9 +22,9 @@ look:
   outfit: { cut: coat, top: 1, bottom: 15, bottom_style: trousers, shoes: 6 }
   accessory: { kind: none }
   headwear: { kind: peaked_cap, colour: 4 }
-backstory: Honor kept the light at Harrow Point for twenty-two years, winding the clockwork and logging the
-  wind every bell. She came to Monde at thirty-one when the Point was automated, and took the rooms on Well
-  Row because the sound of the water reminded her of the lamp room. The Point's lamp was replaced by a machine
+backstory: Honor kept the light at Tarn End for nine years, winding the clockwork and logging the
+  wind every bell. She came to Monde at thirty-one when the light was automated, and took the rooms on Well
+  Row because the sound of the water reminded her of the lamp room. The lamp was replaced by a machine
   that never once had to be wound by hand, and she still resents it a little. Her weather log has been kept
   without a gap for thirty-two years. She stays because Monde is the last town on this stretch of coast that
   still needs someone to read the sky.
@@ -39,10 +39,10 @@ beliefs:
 voice:
   register: Laconic and exact. She reports the weather first and the time in bells, and rarely adds more than
     she needs to. When she is pleased she says less, not more.
-  tics: [ Wind's backing., By the bell., Mm. ]
+  tics: [ Glass is dropping., By the bell., Mm. ]
   never_says: [ I feel, honestly, you know what I mean, it's not a big deal ]
   samples:
-    - Wind's backing. Rain by the second bell, I'd say.
+    - Glass is dropping. Rain by the second bell, I'd say.
     - Ferry's late. Tide's wrong, or the Gannet is.
     - Mm. Take the good cup, then. You've earned it.
 birthday: 26
@@ -79,8 +79,8 @@ chores: [ Wind the stove and fill the kettle, Post the weather log to the Lanter
 relationships:
   - {
       id: esme_hedley,
-      affinity: 25,
-      trust: 30,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Her partner of decades; they argue about tides and never about each other.
     }

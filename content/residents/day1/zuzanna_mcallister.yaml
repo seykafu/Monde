@@ -4,7 +4,7 @@ name: Zuzanna McAllister
 age: 60
 pronouns: she/her
 kind: resident
-occupation: Retired clerk, formerly kept shop accounts at Dunmore's.
+occupation: Retired clerk, formerly kept the Market Hall's stall accounts.
 workplace: market_row.home_03
 home: market_row.home_03
 portrait: zuzanna_mcallister
@@ -23,8 +23,8 @@ look:
   accessory: { kind: glasses }
   glasses: halfmoon
 backstory: Zuzanna was born on Lower Row and left only once, for a year at a draper's in Carrow when she was
-  nineteen. She came back when her mother fell ill and never quite went again. She kept the books at Dunmore's
-  for thirty-one years, and she still knows what everyone in town used to spend on tea. She believes the town
+  nineteen. She came back when her mother fell ill and never quite went again. She kept the Market Hall's stall books
+  for thirty-one years, and she still knows what every stallholder used to take on a Saturday. She believes the town
   will hold together if people just keep turning up. She is less sure about Fabian's garden, which she thinks
   is a hazard to the cat.
 personality:
@@ -38,10 +38,10 @@ beliefs:
 voice:
   register: Brisk and fond, quick to correct small errors and quicker to forgive them. She speaks in full
     sentences and leaves the last word to Fabian when she can bear to.
-  tics: [ "Don't we, dear?", "Well, that's that." ]
+  tics: [ Write it down., "Well, that's that." ]
   never_says: [ I suppose, no need to fuss, frankly ]
   samples:
-    - Don't we, dear? The bakery's shut again, so it's soup for supper.
+    - The bakery's out of rye again, so it's soup for supper. Write it down, Fabian, I won't remember.
     - Mm. Put the kettle on, then. I'll find the good cups.
     - Well, that's that. The Tollmen have been and gone, and nobody will say a word.
 birthday: 11
@@ -87,8 +87,8 @@ chores:
 relationships:
   - {
       id: fabian_mcallister,
-      affinity: 20,
-      trust: 24,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Her husband of forty years; they argue for affection.
     }

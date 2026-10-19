@@ -4,7 +4,7 @@ name: Hartley Wylie
 age: 58
 pronouns: he/him
 kind: resident
-occupation: Roofer who works from the flat above Market Row, taking jobs across…
+occupation: Roofer working from the flat above Market Row, taking jobs across Monde.
 workplace: market_row.home_11
 home: market_row.home_11
 portrait: hartley_wylie
@@ -75,10 +75,10 @@ chores: [ mend the flat's guttering, sharpen the chisels, sweep the workbench ]
 relationships:
   - {
       id: corentin_wylie,
-      affinity: 28,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
-      note: Husband of nearly thirty years; they finish each other's sentences.
+      note: Husband of seventeen years; they finish each other's sentences.
     }
   - {
       id: winifred_gallo,

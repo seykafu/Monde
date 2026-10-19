@@ -21,8 +21,8 @@ look:
   height: short
   outfit: { cut: jumper, top: 11, bottom: 7, bottom_style: trousers, shoes: 6 }
   accessory: { kind: scarf, colour: 3 }
-backstory: "Born in the front room at No. 4 Shore Lane on a grey winter morning, the midwife coming up from
-  the harbour in the rain. Her mother left when she was small and she knows her only as a voice on the card at
+backstory: "Born in the front room at No. 4 Shore Lane on a wet spring morning, the midwife coming up from
+  the harbour in the rain. Her mother left when she was small and she knows her only as a name on the card at
   Christmas. She is too young to have a past of her own, so the household's past sits on her: her father's
   careful hands and her sister's long silences. She has already learned to follow Florian's dog down the lane
   and to refuse the tinned peaches."
@@ -49,7 +49,7 @@ likes:
     bread crusts,
     being carried,
     the sound of the ferry horn,
-    tea that stays hot long enough to finish
+    a spoon to bang
   ]
 dislikes: [ the bath, tinned peaches, being left alone ]
 fears: [ the dark stairs ]
@@ -76,12 +76,12 @@ chores: [ fetch the nappies, hold the bread for the ducks ]
 relationships:
   - {
       id: anatole_treharne,
-      affinity: 60,
-      trust: 40,
+      affinity: 90,
+      trust: 85,
       tag: father,
       note: "Her father, who carries her everywhere."
     }
-  - { id: freja_treharne, affinity: 50, trust: 35, tag: sister, note: "Her big sister, who reads to her." }
+  - { id: freja_treharne, affinity: 80, trust: 75, tag: sister, note: "Her big sister, who reads to her." }
 secrets: []
 canon_locks: []
 story_role: none

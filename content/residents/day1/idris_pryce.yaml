@@ -4,7 +4,7 @@ name: Idris Pryce
 age: 57
 pronouns: he/him
 kind: resident
-occupation: Net mender on the harbour steps, odd jobs when the boats are…
+occupation: Net mender on the harbour steps; odd jobs between tides.
 workplace: wharf.harbor_steps
 home: station_hill.home_05
 portrait: idris_pryce
@@ -24,7 +24,7 @@ look:
 backstory: Came to Monde at 24 from a weaving town on the mainland, hired to set looms at Lissworth Mill
   within a month. He ran the floor for nine years before a shift pattern change left him on short hours. When
   the mill closed fourteen years ago he took whatever work the harbour offered, mostly mending nets for the
-  boats. He stayed because Lotte was here and because the town still felt like a place where a pair of hands
+  boats. He stayed because Lene was here and because the town still felt like a place where a pair of hands
   counted. He still reckons he could get the loom turning if someone let him.
 personality:
   traits: [ steady, practical, stubborn, dry ]
@@ -37,7 +37,7 @@ beliefs:
 voice:
   register: "Plain and short. Counts things: picks, bolts, hours. Says 'used to be' when remembering work and
     rarely anything else."
-  tics: [ used to be, that's the lot, right then ]
+  tics: [ used to be, that's the lot, hold the end ]
   never_says: [ I feel, my dream, in my heart ]
   samples:
     - Mended forty fathoms this week. Used to do that in a morning.
@@ -52,7 +52,7 @@ dream:
   stages:
     - Find the loom parts in the Mill yard before the damp gets them.
     - Oil and set them with Kasimir on a dry morning.
-    - Run the first bolt of cloth and let Lotte see it.
+    - Run the first bolt of cloth and let Lene see it.
 routine:
   weekday:
     - { at: "06:30", do: eat, where: station_hill.home_05 }
@@ -75,10 +75,10 @@ chores: [ mend the net bag, split kindling, check the back door latch ]
 relationships:
   - {
       id: lene_devlin,
-      affinity: 20,
-      trust: 25,
+      affinity: 85,
+      trust: 85,
       tag: partner,
-      note: Thirty-three years married and still argues about the tea.
+      note: Twenty-odd years married and still argues about the tea.
     }
   - {
       id: caspar_underhill,

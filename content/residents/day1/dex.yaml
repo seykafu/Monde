@@ -44,7 +44,7 @@ voice:
   tics: [ "What I mean is,", "As drawn.", "Count it." ]
   never_says: [ protection, no worries, awesome, or else ]
   samples:
-    - "Six doors, twelve minutes a door, the bakery last because she counts twice. Don't look at me like that, it's only arithmetic."
+    - "Six doors, twelve minutes a door, Dunmore's last because Barney counts twice. Don't look at me like that, it's only arithmetic."
     - "You were going to say unfair. Maybe so. But Saturday has an order, Fellow, and I drew it, and nobody's been kept waiting yet."
     - "Dom says I finish his sentences. I don't. I just get to the end first."
 birthday: 4

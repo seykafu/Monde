@@ -4,7 +4,7 @@ name: Yannick Noonan
 age: 29
 pronouns: he/him
 kind: resident
-occupation: Ferry deckhand on the Gannet and ticket booth at the slip.
+occupation: Ferry deckhand on the Gannet; helps at the slip.
 workplace: wharf.ferry_slip
 home: wharf.home_04
 portrait: lib_m22_080
@@ -53,8 +53,8 @@ dream:
   text: Pay my own way, sign the register at Town Hall as a resident, and stop being the lad who is just passing
     through.
   stages:
-    - Clear the twenty-coin debt I owe on the bunk.
-    - Fix the broken shutter on the Cannery Row boathouse.
+    - Pay the bunk's next year in advance, in coin.
+    - Fix the broken shutter on the boathouse.
     - Sign the register at Town Hall as a resident.
 routine:
   weekday:

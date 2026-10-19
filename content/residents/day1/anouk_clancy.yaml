@@ -77,8 +77,8 @@ chores: [ Bakes the Sunday loaf, Hems neighbours' trousers, Checks the house for
 relationships:
   - {
       id: gaspard_clancy,
-      affinity: 30,
-      trust: 28,
+      affinity: 85,
+      trust: 85,
       tag: spouse,
       note: Her husband; she teases him gently and worries when he coughs.
     }
