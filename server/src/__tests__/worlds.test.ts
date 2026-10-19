@@ -179,6 +179,13 @@ describe("the full Day-1 roster (212: the hand-written cast and the census's 188
     expect(couple.state.flags.some((f) => f.startsWith("married:"))).toBe(true);
 
     expect(await backfillRoster(database.db, world.id, roster.dir, FULL)).toEqual({ residents: 0, ties: 0 });
+    // A card edited in content since the world was made is refreshed; the resident's state stays the world's.
+    await database.db.update(residents).set({ card: { ...pell!.card, occupation: "An old line the census review fixed" } }).where(where("pell"));
+    expect(await backfillRoster(database.db, world.id, roster.dir, FULL)).toEqual({ residents: 0, ties: 0, cards: 1 });
+    const [refreshed] = await database.db.select().from(residents).where(where("pell"));
+    expect(refreshed!.card.occupation).toBe(cards.find((c) => c.id === "pell")!.occupation);
+    expect(refreshed!.state.regard).toBe(37);
+    expect(await backfillRoster(database.db, world.id, roster.dir, FULL)).toEqual({ residents: 0, ties: 0 });
     // The lazy path: one backfill per world per process, then a lookup. Someone who left on the ferry stays gone.
     const fresh = await createWorld(database.db, "device-old-2", "invite", roster.dir, { roster: "authored" });
     const leaver = cards.find((c) => c.generated_by)!.id;

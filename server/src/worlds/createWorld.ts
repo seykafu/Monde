@@ -72,7 +72,11 @@ export async function createWorld(db: WorldDatabase, deviceId: string, inviteCod
 // The roster backfill (MVP M-03 step 3)
 // ---------------------------------------------------------------------------------------------------------------
 
-export interface BackfillResult { residents: number; ties: number }
+export interface BackfillResult { residents: number; ties: number; /** Content residents whose card was refreshed. */ cards?: number }
+
+/** JSON with sorted keys: jsonb doesn't keep key order, so a card read back compares by value. */
+const canonical = (value: unknown): string => JSON.stringify(value, (_key, v: unknown) =>
+  v && typeof v === "object" && !Array.isArray(v) ? Object.fromEntries(Object.entries(v as Record<string, unknown>).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))) : v);
 
 /**
  * Add the content residents a world doesn't have yet (worlds created before the Day-1 census was written), with their
@@ -84,14 +88,21 @@ export interface BackfillResult { residents: number; ties: number }
 export async function backfillRoster(db: WorldDatabase, worldId: string, contentDirectory?: string, roster: RosterOptions = {}): Promise<BackfillResult> {
   const cards = await loadContent(contentDirectory, roster);
   const [rows, departures] = await Promise.all([
-    db.select({ id: residents.id }).from(residents).where(eq(residents.worldId, worldId)),
+    db.select({ id: residents.id, card: residents.card }).from(residents).where(eq(residents.worldId, worldId)),
     db.select({ who: events.who }).from(events).where(and(eq(events.worldId, worldId), eq(events.type, "departure"))),
   ]);
   const have = new Set(rows.map((r) => r.id));
   // Someone who left on the ferry is gone, not missing.
   const left = new Set(departures.flatMap((e) => e.who));
   const missing = cards.filter((c) => !have.has(c.id) && !left.has(c.id));
-  if (!missing.length) return { residents: 0, ties: 0 };
+  // Content edits reach worlds made before them (census review 2026-10-19). A content resident's card is its static
+  // persona: Regard, mood, memories and ties live in their own rows and stay the world's. Arrivals aren't content, so
+  // their cards are never touched. Prompt blocks 1-3 change once, so the next turn rebuilds the cache.
+  const content = new Map(cards.map((c) => [c.id, c]));
+  const stale = rows.filter((r) => content.has(r.id) && canonical(r.card) !== canonical(content.get(r.id)));
+  for (const r of stale) await db.update(residents).set({ card: content.get(r.id)! }).where(and(eq(residents.worldId, worldId), eq(residents.id, r.id)));
+  const refreshed = stale.length ? { cards: stale.length } : {};
+  if (!missing.length) return { residents: 0, ties: 0, ...refreshed };
   const added = new Set(missing.map((c) => c.id));
   const ties = tieRows(cards, worldId, (from, to) => added.has(from) || added.has(to));
   let insertedResidents = 0, insertedTies = 0;
@@ -106,7 +117,7 @@ export async function backfillRoster(db: WorldDatabase, worldId: string, content
       insertedTies += (await tx.insert(relationships).values(chunk).onConflictDoNothing().returning()).length;
     });
   });
-  return { residents: insertedResidents, ties: insertedTies };
+  return { residents: insertedResidents, ties: insertedTies, ...refreshed };
 }
 
 /** Worlds this process has already brought up to the content roster, by content root. */
