@@ -6,7 +6,7 @@ import { buildApp } from "../../app.js";
 import { parseConfig } from "../../config.js";
 import { createTestDatabase } from "../../db/testDatabase.js";
 import { events, memories, plans, residents, worlds } from "../../db/schema.js";
-import { createWorld } from "../../worlds/createWorld.js";
+import { createWorld, ensureRoster } from "../../worlds/createWorld.js";
 import { worldToken } from "../../worlds/routes.js";
 import { loadDialogueContext, loadResidentPrefix, prefixSystemBlocks } from "../context.js";
 import { DisabledMindClient } from "../mindClient.js";
@@ -22,6 +22,8 @@ afterAll(async () => { await database?.client.close(); });
 
 async function setup() {
   const world = await createWorld(database.db, randomUUID(), "invite");
+  // Bring the world up to the content roster first, as its first route would: tests below edit stored cards.
+  await ensureRoster(database.db, world.id);
   const mind = new DisabledMindClient();
   const runner = new NightRunner({ db: database.db, mind });
   const app = buildApp(parseConfig({ LOG_LEVEL: "silent" }), database.db, { mind, nightRunner: runner });
