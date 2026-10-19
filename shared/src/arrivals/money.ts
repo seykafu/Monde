@@ -19,7 +19,9 @@ export const foldApostrophes = (text: string): string => text.replace(/[’‘]/
 const NUMBER = "(?:\\d[\\d,.]*|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|few|several|many|half a|a few|a hundred|a thousand)";
 const POUND_NOT_MONEY = "(?!\\s*(?:of|heavier|lighter|in weight|weight|cake|cakes|loaf|loaves|bag|bags|sack|sacks|tin|tins)\\b)";
 export const CURRENCY: readonly string[] = [
-  "shillings?", "pence", "sixpences?", "threepences?", "thruppence", "tuppence", "ha'?pennies", "ha'?penny", "halfpenn(?:y|ies)",
+  "shillings?", "pence", "sixpences?", "threepences?", "thruppence", "tuppence",
+  // "fourpence", "ninepence" (the census review found "fourpence" on three cards: only the bare "pence" matched).
+  "(?:two|four|five|seven|eight|nine|ten|eleven|twelve|fifteen|twenty)pences?", "ha'?pennies", "ha'?penny", "halfpenn(?:y|ies)",
   "farthings?", "dollars?", "quid(?!\\s+pro\\s+quo)", "cents", "euros?", "francs?", "guineas?(?!\\s+(?:pigs?|fowl|hens?))",
   "pennies", "penny(?![\\s-]*(?:whistles?|farthings?|dropped|drops))",
   "(?:every|a|one|not\\s+a|single)\\s+cent",

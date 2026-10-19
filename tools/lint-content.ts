@@ -14,6 +14,7 @@ import {
   type PersonaCard as Card
 } from "@monde/shared";
 import { firstName, parseLineLibrary, type LineLibrary } from "../client/src/mind/quietMode.ts";
+import { borrowedFor, borrowedHits, type RosterVoice } from "../server/src/mind/voice.ts";
 import { loadCensusInput } from "./census-inputs.ts";
 import {
   SPRING_SCENE_ID, aiOpenCues, exchangePaths, fillScripted, parseScriptedLibrary, scriptedKey, type ScriptedLibrary
@@ -147,12 +148,36 @@ for (const file of fs.existsSync(day1Dir) ? fs.readdirSync(day1Dir).filter((f) =
   const home = householdOf.get(c.id), slot = home?.members.find(m => m.id === c.id)?.slot;
   const required = new Set(home && slot ? censusLinks(censusInputFor(), home).required.filter(l => l.slot === slot).map(l => l.id) : []);
   for (const problem of cardProblems(c, { canonName: c.id in censusPins.people, household: mates, required })) err(`${where}: ${problem}`);
+  // A line cut off mid-phrase ("Retired clerk, formerly kept…"). A sample may trail off; nothing else may.
+  const cut = (t: string) => /(?:…|\.\.\.)\s*$/.test(t);
+  for (const [label, text] of [["occupation", c.occupation], ["appearance", c.appearance], ["backstory", c.backstory], ["dream", c.dream.text],
+    ...c.dream.stages.map((t, i) => [`dream stage ${i + 1}`, t] as const), ...c.secrets.map((x, i) => [`secret ${i + 1}`, x.text] as const),
+    ...c.beliefs.map((t, i) => [`belief ${i + 1}`, t] as const), ...c.relationships.map(r => [`tie ${r.id}`, r.note] as const)] as const)
+    if (cut(text)) err(`${where}: ${label} is cut off ("…${text.slice(-30)}")`);
+  for (const sample of c.voice.samples) if (cut(sample)) warn(`${where}: a sample trails off ("…${sample.slice(-30)}")`);
+  // Kin left at the outsider cap (spouses at 25/25): the census review (2026-10-19) found 108 of 240 household ties under 50.
+  for (const r of c.relationships)
+    if (mates.has(r.id) && !required.has(r.id) && Math.min(r.affinity, r.trust) < 50 && !/estrang|apart|not speak|doesn't speak|resent|cold|feud/i.test(r.note))
+      warn(`${where}: household tie to ${r.id} at ${r.affinity}/${r.trust}, under 50 with nothing in the note to say why`);
   if (c.voice.mode !== "narrated_action") {
     const texts = [c.name, c.occupation, c.appearance, c.backstory, ...c.beliefs, c.voice.register, ...c.voice.tics, ...c.voice.samples, ...c.likes, ...c.dislikes,
       ...c.fears, c.dream.text, ...c.chores, ...c.relationships.map(r => r.note), ...c.secrets.map(x => x.text)];
     for (const hit of new Set(texts.flatMap(t => lexicalHits(t).map(h => `${h.group} "${h.term}"`)))) err(`${where}: V16 ${hit}`);
   }
 }
+// A generated card that uses a hand-written or curated card's catchphrase (a tic, or in a sample): the prompt tells the
+// resident to say it while the never-borrow list forbids it, and every use is a validator slip and a regeneration
+// (server/src/mind/voice.ts; census review 2026-10-19: "Mind the step." on 26 cards).
+{
+  const roster: RosterVoice[] = [...cards.values(), ...day1.values()].map(c => ({ id: c.id, kind: c.kind, tics: c.voice.tics, ...(c.generated_by && !c.curated ? { generated: true } : {}) }));
+  for (const c of day1.values()) {
+    if (!c.generated_by || c.curated || c.voice.mode === "narrated_action") continue;
+    const borrowed = borrowedFor(c, roster);
+    for (const [label, text] of [...c.voice.tics.map(t => ["tic", t] as const), ...c.voice.samples.map(t => ["sample", t] as const)])
+      for (const hit of borrowedHits(text, borrowed)) err(`residents/day1/${c.id}.yaml: ${label} uses ${hit.owner}'s catchphrase "${hit.phrase}" ("${text}")`);
+  }
+}
+
 // Against the skeleton: every written member's card, at the household's home, in the member's band, archetype and
 // portrait (the library id, or their own id for a procedural look, wearing it).
 const libraryWorn = new Map<string, string>();

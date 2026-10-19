@@ -229,6 +229,7 @@ describe("Monde's money is coins", () => {
       ["Ten pence the loaf.", "pence"], ["Fifty cents, if you're asking.", "cents"], ["Two dollars, mind.", "dollars"],
       ["A quid says it rains.", "quid"], ["It's £5 at the hatch.", "£5"], ["A pound a week, the Tollmen want.", "A pound"],
       ["Pennies, all of it.", "Pennies"], ["Not a cent from the Fund.", "Not a cent"],
+      ["Fourpence for the stamp.", "Fourpence"], ["A fourpence-coin in the jar.", "fourpence"], ["Ninepence, then.", "Ninepence"],
     ] as const) expect(currencyHit(line), line).toBe(term);
   });
 
