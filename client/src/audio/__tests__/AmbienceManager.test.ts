@@ -3,12 +3,12 @@ import { AmbienceManager } from '../AmbienceManager';
 import { setAudioSettings } from '../audioSettings';
 const flush = async () => { for (let n = 0; n < 30; n++) await Promise.resolve(); };
 function audio() {
-  const sources: { start: ReturnType<typeof vi.fn>; stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn>; loop: boolean }[] = [];
+  const sources: { start: ReturnType<typeof vi.fn>; stop: ReturnType<typeof vi.fn>; disconnect: ReturnType<typeof vi.fn>; loop: boolean; loopStart?: number; loopEnd?: number }[] = [];
   const gains: { gain: { value: number; setTargetAtTime: ReturnType<typeof vi.fn> } }[] = [];
   const ctx = { currentTime: 0,
     createBufferSource: () => { const source = { start: vi.fn(), stop: vi.fn(), disconnect: vi.fn(), connect: vi.fn(), loop: false }; sources.push(source); return source; },
     createGain: () => { const gain = { gain: { value: 0, setTargetAtTime: vi.fn() }, connect: vi.fn(), disconnect: vi.fn() }; gains.push(gain); return gain; },
-    decodeAudioData: vi.fn().mockResolvedValue({ duration: 60 }) };
+    decodeAudioData: vi.fn().mockResolvedValue({ numberOfChannels: 2, sampleRate: 10, getChannelData: () => new Float32Array([0, 0.1, 0.2, 0]) }) };
   return { ctx: ctx as unknown as AudioContext, sources, gains };
 }
 afterEach(() => { vi.unstubAllGlobals(); setAudioSettings({ sfx: 1 }); });
@@ -27,6 +27,8 @@ it('loops available files, crossfades gains, follows SFX settings, and releases 
   const { ctx, sources, gains } = audio(), manager = new AmbienceManager(ctx, {} as GainNode);
   manager.mix({ surf: 0.2 }); await flush();
   expect(sources).toHaveLength(1); expect(sources[0]!.loop).toBe(true);
+  expect(sources[0]!.loopStart).toBe(0.1); expect(sources[0]!.loopEnd).toBe(0.3);
+  expect(sources[0]!.start).toHaveBeenCalledWith(0, 0.1);
   expect(gains[0]!.gain.setTargetAtTime).toHaveBeenLastCalledWith(0.2, 0, 1);
   gains[0]!.gain.value = 0.2;
   setAudioSettings({ sfx: 0.5 });

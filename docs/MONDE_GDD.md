@@ -10429,9 +10429,10 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
   gets its own tune.
 - **The town chime:** C–E–A–G–D–C (PZ-07), on the clocktower or bandstand bells at 06:00 and 18:00 once
   restored. Its motif runs through the main theme. The player hears it before they can play it.
-- **SFX:** WebAudio-synthesized as in Ravage (`audio/Sfx.ts`), with recorded ambience beds: gulls,
+- **SFX:** WebAudio-synthesized as in Ravage (`audio/Sfx.ts`), with ambience beds: gulls,
   surf, rigging, rain on tin, the weir, wind on Station Hill, pub murmur, market chatter. Bed density
   scales with zone population, so the town *sounds* emptier at the start.
+  The beds are synthesised by `tools/make-ambience.py` (recorded beds can replace them later under the same file names).
 - **Voices:** no voice acting. Each resident has a **voice blip** (Ravage's `speakBlip`) whose pitch,
   rate and timbre come from their age, build and register. Core cast blips are tuned by hand.
 

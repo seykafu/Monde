@@ -1,3 +1,4 @@
+import { findLoopRegion } from './loopRegion';
 import { AMBIENCE, type Bed } from './ambienceDirector';
 import { getAudioSettings, subscribeAudioSettings } from './audioSettings';
 import { probeMusicFile } from './MusicManager';
@@ -49,7 +50,10 @@ export class AmbienceManager {
       if (this.disposed || !this.wanted[bed]) return;
       const source = this.ctx.createBufferSource(), gain = this.ctx.createGain();
       source.buffer = buffer; source.loop = true; source.connect(gain); gain.connect(this.output);
-      gain.gain.value = 0; source.start();
+      const region = findLoopRegion(
+        Array.from({ length: buffer.numberOfChannels }, (_, channel) => buffer.getChannelData(channel)), buffer.sampleRate);
+      source.loopStart = region.start; source.loopEnd = region.end;
+      gain.gain.value = 0; source.start(0, region.start);
       const target = this.wanted[bed]! * getAudioSettings().sfx;
       this.voices.set(bed, { source, gain, target, retireAt: Infinity });
       gain.gain.setTargetAtTime(target, this.ctx.currentTime, 1);
