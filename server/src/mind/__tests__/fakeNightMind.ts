@@ -14,7 +14,7 @@ export type NightReply =
   | { hang: true };
 
 export interface NightCall {
-  kind: "night" | "plan" | "reflect" | "gossip";
+  kind: "plan" | "reflect" | "gossip";
   /** The resident, or for an encounter the pair key ("june+odile"). */
   resident: string;
   body: Anthropic.MessageCreateParamsNonStreaming;
@@ -41,7 +41,7 @@ export function describeCall(body: Anthropic.MessageCreateParamsNonStreaming): O
     if (!a || !b) throw new Error("FakeNightMind: gossip without ids");
     return { kind: "gossip", resident: `${a}+${b}` };
   }
-  const kind = text.includes("<plan_request>") && text.includes("<reflect_request>") ? "night" : text.includes("<plan_request>") ? "plan" : text.includes("<reflect_request>") ? "reflect" : null;
+  const kind = text.includes("<plan_request>") ? "plan" : text.includes("<reflect_request>") ? "reflect" : null;
   if (!kind) throw new Error("FakeNightMind: not a plan or reflection request");
   const system = Array.isArray(body.system) ? body.system.map((b) => b.text).join("\n") : String(body.system);
   const resident = /<persona id="([a-z0-9_]+)">/.exec(system)?.[1];

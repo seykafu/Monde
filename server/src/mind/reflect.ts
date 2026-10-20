@@ -21,7 +21,7 @@ import {
 } from "@monde/shared";
 import { aiLog, favors, letters, memories, relationships, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
-import { callModel, type CallFailure, type ModelCall } from "./callModel.js";
+import { callModel, type CallFailure } from "./callModel.js";
 import { LIVE_FAVOR_STATUSES, loadResidentPrefix, type ResidentPrefix } from "./context.js";
 import type { CallRecord } from "./dialogue.js";
 import { lexicalHits } from "./filters.js";
@@ -425,9 +425,9 @@ export interface ReflectResult {
   adjustments: string[];
 }
 
-/** Prepare the prompt and shared validation/persistence path for a separate or combined call. */
-export async function prepareReflection(deps: NightJobDeps, world: NightWorld, residentId: string) {
-  const { db } = deps;
+/** Reflect one resident on `world.day`. Null if the resident doesn't exist. Throws only on database errors. */
+export async function reflectResident(deps: NightJobDeps, world: NightWorld, residentId: string): Promise<ReflectResult | null> {
+  const { db, mind } = deps;
   const prefix = await loadResidentPrefix(db, world.worldId, residentId);
   if (!prefix) return null;
   const today = await loadMemoriesForDay(db, world.worldId, residentId, world.day);
@@ -441,6 +441,7 @@ export async function prepareReflection(deps: NightJobDeps, world: NightWorld, r
     await persistReflection(db, { ...base, output: null, call });
     return { source: "fallback", reason, adjustments: [] };
   };
+  if (!mind.enabled) return fallback("unavailable", null);
 
   const itemIds = new Set((await loadItems()).map(i => i.id));
   const request = buildReflectRequest({
@@ -449,30 +450,22 @@ export async function prepareReflection(deps: NightJobDeps, world: NightWorld, r
     favorTemplates: PROPOSABLE_FAVORS, fellow: world.fellow,
   });
   request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${[...itemIds].join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
-  return { request, finish: async (result: ModelCall): Promise<ReflectResult> => {
-    if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);
-
-    const validated = validateReflection(result.text, {
-      residentId, residentIds: world.residentIds, relationshipIds: new Set(prefix.relationships.map((r) => r.id)),
-      itemIds, places: world.places.ids, stances: prefix.state.stances,
-    });
-    if (!validated.ok) return fallback("schema", { ...result.call, validation: validated.category }, validated.detail);
-
-    if (validated.output.favor && !await feasibleFavor(db,world.worldId,residentId,world.day,reflectionFavorId(residentId,world.day),validated.output.favor)) {
-      validated.output.favor = null; validated.adjustments.push('favor dropped (infeasible with current items, places or relationships)');
-    }
-    const dropped = await persistReflection(db, { ...base, output: validated.output, call: result.call });
-    const adjustments = [...validated.adjustments, ...dropped];
-    if (adjustments.length) deps.log.info({ residentId, day: world.day, adjustments }, "reflection adjusted");
-    return { source: "model", reason: "ok", adjustments };
-  } };
-}
-
-export async function reflectResident(deps: NightJobDeps, world: NightWorld, residentId: string): Promise<ReflectResult | null> {
-  const prepared = await prepareReflection(deps, world, residentId);
-  if (!prepared) return null;
-  const result = deps.mind.enabled ? await callModel(budgetMind(deps.db, deps.mind, world.worldId, residentId, "reflect", world.day), apiParams("reflect", prepared.request), {
+  const result = await callModel(budgetMind(db, mind, world.worldId, residentId, "reflect", world.day), apiParams("reflect", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
-  }) : { ok: false as const, failure: "unavailable" as const, call: null };
-  return prepared.finish(result);
+  });
+  if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);
+
+  const validated = validateReflection(result.text, {
+    residentId, residentIds: world.residentIds, relationshipIds: new Set(prefix.relationships.map((r) => r.id)),
+    itemIds, places: world.places.ids, stances: prefix.state.stances,
+  });
+  if (!validated.ok) return fallback("schema", { ...result.call, validation: validated.category }, validated.detail);
+
+  if (validated.output.favor && !await feasibleFavor(db,world.worldId,residentId,world.day,reflectionFavorId(residentId,world.day),validated.output.favor)) {
+    validated.output.favor = null; validated.adjustments.push('favor dropped (infeasible with current items, places or relationships)');
+  }
+  const dropped = await persistReflection(db, { ...base, output: validated.output, call: result.call });
+  const adjustments = [...validated.adjustments, ...dropped];
+  if (adjustments.length) deps.log.info({ residentId, day: world.day, adjustments }, "reflection adjusted");
+  return { source: "model", reason: "ok", adjustments };
 }

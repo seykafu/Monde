@@ -56,7 +56,7 @@ export interface NightJobDeps {
 
 /** The ai_log row for one night call (§19.6). An encounter's "resident" is the pair key ("june+odile"). */
 export function nightLogRow(
-  worldId: string, residentId: string, kind: "night" | "reflect" | "plan" | "gossip", version: string, call: CallRecord, fallback: boolean,
+  worldId: string, residentId: string, kind: "reflect" | "plan" | "gossip", version: string, call: CallRecord, fallback: boolean,
 ): typeof aiLog.$inferInsert {
   return aiLogRow({ worldId, residentId, kind, promptVersion: version, call, fallback });
 }

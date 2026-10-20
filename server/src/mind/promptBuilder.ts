@@ -21,7 +21,7 @@ import { join, resolve } from "node:path";
 import type Anthropic from "@anthropic-ai/sdk";
 import type { z } from "zod";
 import {
-  ANIMAL_VERBS, DialogueTurnOutput, GossipOutput, MVP_FAVOR_TEMPLATES, NightOutput, PlanOutput, ReflectionOutput, VERBS,
+  ANIMAL_VERBS, DialogueTurnOutput, GossipOutput, MVP_FAVOR_TEMPLATES, PlanOutput, ReflectionOutput, VERBS,
   evaluate, gameContext, modelOutputFormat, regardTier,
   type FavorTemplate, type Memory, type PersonaCard, type ResidentState, type TalkQuest, type Verb,
 } from "@monde/shared";
@@ -35,7 +35,7 @@ import { borrowedFor, borrowedLine, phraseKey, type RosterVoice, type Signature 
 // API settings (GDD §9.17 "API call settings"; AGENTS.md "Claude API rules")
 // ---------------------------------------------------------------------------------------------------------------
 
-export type MindCallKind = "night" | "dialogue" | "plan" | "reflect" | "gossip" | "precheck";
+export type MindCallKind = "dialogue" | "plan" | "reflect" | "gossip" | "precheck";
 
 export const MIND_MODEL: Anthropic.Model = "claude-haiku-5-5";
 
@@ -71,10 +71,6 @@ export function requestSettings(kind: MindCallKind): MindSettings {
       // GDD-GAP: §9.17 gives no max_tokens for the free-text pre-check. Its output is `{ok, category}` (≈20 tokens
       // in the §9.15 cost table); 64 leaves headroom without inviting prose.
       return { model: MIND_MODEL, max_tokens: 64, thinking: { type: "disabled" } };
-    case "night":
-      // GDD-GAP: §9.17 gives the combined call no limit. 1,800 cut off 3 of 19 in the first live night (2026-10-19), and a
-      // cut-off call is paid for and thrown away (both halves fall back); typical output is ~1,100.
-      return { model: MIND_MODEL, max_tokens: 3000, output_config: { effort: "low" } };
     case "plan":
     case "reflect":
       // §9.17 (raised from 900 after the 2026-10-19 soak: 900 cut off 26% of plans and 19% of reflections, each paid for
@@ -110,7 +106,7 @@ function outputConfig(kind: MindCallKind, schema: z.ZodType): MindRequest["outpu
 // ---------------------------------------------------------------------------------------------------------------
 
 const TEMPLATE_NAMES = [
-  "world_bible", "persona", "beliefs", "dialogue", "dialogue_hints", "plan", "reflect", "night", "gossip",
+  "world_bible", "persona", "beliefs", "dialogue", "dialogue_hints", "plan", "reflect", "gossip",
 ] as const;
 type TemplateName = (typeof TEMPLATE_NAMES)[number];
 type Templates = Readonly<Record<TemplateName, string>>;
@@ -915,17 +911,5 @@ export function buildGossipRequest(input: GossipInput): MindRequest {
     system: [cached(worldBible())],
     messages: [{ role: "user", content: user }],
     output_config: outputConfig("gossip", GossipOutput),
-  };
-}
-
-/** Reuse both rendered user prompts; the prefix remains the pre-reflection state. */
-export function buildNightRequest(reflection: MindRequest, plan: MindRequest): MindRequest {
-  return {
-    system: reflection.system,
-    messages: [{ role: "user", content: fillTemplate(loadTemplates().night, {
-      reflection: trusted(String(reflection.messages[0]!.content)),
-      plan: trusted(String(plan.messages[0]!.content)),
-    }) }],
-    output_config: outputConfig("night", NightOutput),
   };
 }

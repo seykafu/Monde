@@ -31,14 +31,11 @@ async function setup(mind: MindClient = new DisabledMindClient()) {
 }
 
 it("branches the complete saved mind, isolates later changes and can run the next night", async () => {
-  const reflection = {
+  const mind = new FakeNightMind((call) => call.kind === "reflect" ? { output: {
     mood_delta: { valence: 1, energy: 0, stress: 0 }, emotion: "content", beliefs: ["The Fellow helped."],
     relationship_deltas: [], stance_deltas: [], regard_delta: 1, dream_progress: null,
     favor: null, letter: null, diary: "A memory made after the save.",
-  };
-  const mind = new FakeNightMind((call) => call.kind === "night"
-    ? { output: { reflection, plan: {} } } : call.kind === "reflect" ? { output: reflection }
-      : { error: new Error("Use the deterministic plan fallback") });
+  } } : { error: new Error("Use the deterministic plan fallback") });
   const e = await setup(mind);
   const db = database.db;
   const worldId = e.world.id;
@@ -73,7 +70,7 @@ it("branches the complete saved mind, isolates later changes and can run the nex
   await db.update(s.residents).set({ state: { ...r.state, regard: 50 } }).where(and(eq(s.residents.worldId, worldId), eq(s.residents.id, r.id)));
   await e.runner.start(worldId, { day: 1 });
   await e.runner.idle(worldId);
-  expect(mind.calls.some((call) => call.kind === "night")).toBe(true);
+  expect(mind.calls.some((call) => call.kind === "reflect")).toBe(true);
   const [oldWorld] = await db.select().from(s.worlds).where(eq(s.worlds.id, worldId));
   const oldResidents = await db.select().from(s.residents).where(eq(s.residents.worldId, worldId));
   const oldMemories = await db.select().from(s.memories).where(eq(s.memories.worldId, worldId));

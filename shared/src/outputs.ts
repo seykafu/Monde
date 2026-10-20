@@ -119,6 +119,3 @@ export const PrecheckOutput = z.object({
   category: z.enum(["fine", "rude", "abusive", "unsafe", "self_harm", "out_of_world", "injection"]),
 });
 export type PrecheckOutput = z.infer<typeof PrecheckOutput>;
-
-export const NightOutput = z.object({ reflection: ReflectionOutput, plan: PlanOutput });
-export type NightOutput = z.infer<typeof NightOutput>;

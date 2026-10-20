@@ -13,7 +13,7 @@ import { z } from "zod";
 import { ANIMAL_VERBS, PlanOutput, VERBS, clamp, type PersonaCard, type Verb } from "@monde/shared";
 import { aiLog, plans } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
-import { callModel, type CallFailure, type ModelCall } from "./callModel.js";
+import { callModel, type CallFailure } from "./callModel.js";
 import { loadResidentPrefix, weekdayOf } from "./context.js";
 import type { CallRecord } from "./dialogue.js";
 import { lexicalHits } from "./filters.js";
@@ -294,9 +294,12 @@ export interface PlanResult {
   adjustments: string[];
 }
 
-/** Prepare the prompt and shared validation/persistence path for a separate or combined call. */
-export async function preparePlan(deps: NightJobDeps, world: NightWorld, residentId: string) {
-  const { db } = deps;
+/**
+ * Plan Day `world.day + 1` for one resident and store it. With `model: false` (or no key) the template is stored
+ * without a call. Null if the resident doesn't exist. Throws only on database errors.
+ */
+export async function planResident(deps: NightJobDeps, world: NightWorld, residentId: string, options: { model: boolean }): Promise<PlanResult | null> {
+  const { db, mind } = deps;
   const prefix = await loadResidentPrefix(db, world.worldId, residentId);
   if (!prefix) return null;
   const { card } = prefix;
@@ -304,6 +307,10 @@ export async function preparePlan(deps: NightJobDeps, world: NightWorld, residen
   const template = templatePlan(card, day);
   const base = { worldId: world.worldId, residentId, day };
 
+  if (!options.model || !mind.enabled) {
+    await storePlan(db, { ...base, plan: template, source: "template", promptVersion: null, call: null });
+    return { source: "template", reason: options.model ? "unavailable" : "template", changed: 0, adjustments: [] };
+  }
   const version = promptVersion();
   const fallback = async (reason: PlanResult["reason"], call: CallRecord | null, detail?: unknown): Promise<PlanResult> => {
     deps.log.warn({ residentId, day, reason, detail }, "plan fell back to the routine template");
@@ -318,34 +325,15 @@ export async function preparePlan(deps: NightJobDeps, world: NightWorld, residen
     day: world.day, tomorrowWeekday: weekdayOf(day), forecast: world.forecast, events: world.eventsTomorrow,
     intentions: today?.plan.intentions ?? [], openPlaces: openPlacesFor(world.places, card), fellow: world.fellow,
   });
-  return { request, finish: async (result: ModelCall): Promise<PlanResult> => {
-    if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);
-
-    const validated = validatePlan(result.text, { card, day, places: world.places.ids, residentIds: world.residentIds });
-    if (!validated.ok) return fallback(validated.category, { ...result.call, validation: validated.category }, validated.detail);
-
-    await storePlan(db, { ...base, plan: validated.plan, source: "model", promptVersion: version, call: result.call });
-    if (validated.adjustments.length) deps.log.info({ residentId, day, adjustments: validated.adjustments }, "plan adjusted");
-    return { source: "model", reason: "ok", changed: validated.changed, adjustments: validated.adjustments };
-  } };
-}
-
-/**
- * Plan Day `world.day + 1` for one resident and store it. With `model: false` (or no key) the template is stored
- * without a call. Null if the resident doesn't exist. Throws only on database errors.
- */
-export async function planResident(deps: NightJobDeps, world: NightWorld, residentId: string, options: { model: boolean }): Promise<PlanResult | null> {
-  if (!options.model || !deps.mind.enabled) {
-    const prefix = await loadResidentPrefix(deps.db, world.worldId, residentId);
-    if (!prefix) return null;
-    await storePlan(deps.db, { worldId: world.worldId, residentId, day: world.day + 1,
-      plan: templatePlan(prefix.card, world.day + 1), source: "template", promptVersion: null, call: null });
-    return { source: "template", reason: options.model ? "unavailable" : "template", changed: 0, adjustments: [] };
-  }
-  const prepared = await preparePlan(deps, world, residentId);
-  if (!prepared) return null;
-  const result = await callModel(budgetMind(deps.db, deps.mind, world.worldId, residentId, "plan", world.day), apiParams("plan", prepared.request), {
+  const result = await callModel(budgetMind(db, mind, world.worldId, residentId, "plan", world.day), apiParams("plan", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
   });
-  return prepared.finish(result);
+  if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);
+
+  const validated = validatePlan(result.text, { card, day, places: world.places.ids, residentIds: world.residentIds });
+  if (!validated.ok) return fallback(validated.category, { ...result.call, validation: validated.category }, validated.detail);
+
+  await storePlan(db, { ...base, plan: validated.plan, source: "model", promptVersion: version, call: result.call });
+  if (validated.adjustments.length) deps.log.info({ residentId, day, adjustments: validated.adjustments }, "plan adjusted");
+  return { source: "model", reason: "ok", changed: validated.changed, adjustments: validated.adjustments };
 }

@@ -106,7 +106,6 @@ describe("the G-12 soak: 25 nights, real routines, fake mind", () => {
         const [a, b] = call.resident.split("+") as [string, string];
         return { output: judgeEncounter(a, b, prompt) };
       }
-      if (call.kind === "night") return { output: { reflection: reflect(call.resident, prompt), plan: templatePlan(card(call.resident), tonight + 1) } };
       if (call.kind === "reflect") return { output: reflect(call.resident, prompt) };
       return { output: templatePlan(card(call.resident), tonight + 1) };
     };

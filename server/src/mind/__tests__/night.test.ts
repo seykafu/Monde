@@ -54,7 +54,7 @@ const met: GossipOutput = {
   lines: null, a_delta: { affinity: 1, trust: 0 }, b_delta: { affinity: 1, trust: 1 }, news_passed: [], feeling_change: null,
 };
 const happy = (call: NightCall): NightReply =>
-  call.kind === "night" ? { output: { reflection: reflection(call.resident), plan: plan(call.resident, 2) } } : call.kind === "reflect" ? { output: reflection(call.resident) } : call.kind === "gossip" ? { output: met } : { output: plan(call.resident, 2) };
+  call.kind === "reflect" ? { output: reflection(call.resident) } : call.kind === "gossip" ? { output: met } : { output: plan(call.resident, 2) };
 const residentCalls = (mind: FakeNightMind) => mind.calls.filter((c) => c.kind !== "gossip");
 
 function fake(respond: (call: NightCall) => NightReply = happy, delayMs = 0): FakeNightMind {
@@ -98,7 +98,7 @@ async function remember(worldId: string, residentId: string, day: number, import
 /**
  * How late the night's answer may be under a busy test run. vitest runs files in parallel, and timers fired 400-600 ms
  * late in full-suite runs (4,402 and 4,567 ms against a 4,000 ms budget). In the slow-model test a response that waited
- * for the night's work instead of answering at the budget takes 6 s or more (24 Core residents, one 2 s call each,
+ * for the night's work instead of answering at the budget takes 6 s or more (24 Core residents, two 1 s calls each,
  * eight at a time), so this still catches that regression.
  */
 const LOAD_SLACK_MS = 1250;
@@ -135,31 +135,29 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(pell.plan.blocks[1]).toMatchObject({ action: "walk", place: "commons.duck_pond" });
     expect(pell.plan.barks).toHaveLength(3);
 
-    expect(mind.callsFor("night").map((c) => c.resident).sort()).toEqual(core);
-    expect(mind.callsFor("plan")).toHaveLength(0);
-    expect(mind.callsFor("reflect")).toHaveLength(0);
+    expect(mind.callsFor("reflect").map((c) => c.resident).sort()).toEqual(core);
+    expect(mind.callsFor("plan").map((c) => c.resident).sort()).toEqual(core);
     // Town facts reach the reflection; the forecast and tomorrow's events reach the plan.
-    const reflectText = mind.callsFor("night", "pell")[0]!.body.messages[0]!.content as string;
+    const reflectText = mind.callsFor("reflect", "pell")[0]!.body.messages[0]!.content as string;
     expect(reflectText).toContain("Prosperity 19, safety 31, spirit 22, charm 26");
     expect(reflectText).toContain("Census 211");
     expect(reflectText).toContain("10:00 at old_quarter.fountain_square: The Fellow faced down two Tollmen");
-    expect(reflectText).toContain("ferry comes in");
-    const planText = mind.callsFor("night", "pell")[0]!.body.messages[0]!.content as string;
+    expect(reflectText).not.toContain("ferry comes in");
+    const planText = mind.callsFor("plan", "pell")[0]!.body.messages[0]!.content as string;
     expect(planText).toContain("Day 2 (Wed, spring)");
     expect(planText).toContain("Forecast: rain.");
     expect(planText).toContain("09:00 at wharf.ferry_slip: The ferry comes in from Carrow.");
     expect(planText).toContain("market_row.general_store (open 07:00-19:00)");
-    // The combined call uses the pre-reflection prefix and plans from its own reflection conclusions.
-    const planSystem = mind.callsFor("night", "pell")[0]!.body.system as Anthropic.TextBlockParam[];
-    expect(planSystem[2]!.text).not.toContain("pell thinks the Fellow means well.");
+    // Each resident's plan is built on tonight's beliefs. (Sharing the reflection's cached prefix was tried and
+    // measured in the 2026-10-19 soak: a different output_config.format invalidates the prompt cache, so it saved nothing.)
+    const planSystem = mind.callsFor("plan", "pell")[0]!.body.system as Anthropic.TextBlockParam[];
+    expect(planSystem[2]!.text).toContain("pell thinks the Fellow means well.");
     for (const call of residentCalls(mind)) expect(JSON.stringify(call.body.messages)).not.toContain("cache_control");
 
     const log = await database.db.select().from(aiLog).where(eq(aiLog.worldId, env.worldId));
     expect(log.filter((l) => l.kind === "reflect")).toHaveLength(core.length);
     expect(log.filter((l) => l.kind === "plan")).toHaveLength(core.length);
-    expect(log.filter(l => l.kind === "night")).toHaveLength(core.length);
-    expect(log.filter(l => l.kind === "night").every(l => Number(l.costUsd) > 0)).toBe(true);
-    expect(log.filter(l => l.kind === "plan" || l.kind === "reflect").every(l => !l.fallback && Number(l.costUsd) === 0)).toBe(true);
+    expect(log.filter(l => l.kind !== "press").every((l) => !l.fallback && Number(l.costUsd) > 0)).toBe(true);
   }, 15_000);
 
   it("runs Acquainted residents after Core, and Ambient ones only after an importance-6 memory", async () => {
@@ -175,8 +173,8 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(res.json()).toMatchObject({ tiers: { acquainted: 1 } });
     await env.runner.idle(env.worldId);
 
-    expect(mind.callsFor("night", "ada")).toHaveLength(1);
-    expect(mind.callsFor("plan", "ada")).toHaveLength(0);
+    expect(mind.callsFor("reflect", "ada")).toHaveLength(1);
+    expect(mind.callsFor("plan", "ada")).toHaveLength(1);
     expect(mind.callsFor("reflect", "bru")).toHaveLength(1);
     expect(mind.callsFor("plan", "bru")).toHaveLength(0);
     expect(mind.calls.some((c) => c.resident === "nettie")).toBe(false);
@@ -201,17 +199,8 @@ describe("POST /v1/worlds/:w/night", () => {
     expect((await storedPlans(env.worldId, 2)).map((p) => p.residentId)).not.toContain("bru");
   });
 
-  it.each([2, 3])("Acquainted uses a single plan on quiet Day 2 and a combined call on Day 3: %s", async day => {
-    const mind = fake();
-    const env = await setup(mind);
-    await talkedToday(env.worldId, "ada", day);
-    await night(env, { day });
-    await env.runner.idle(env.worldId);
-    expect(mind.calls.filter(c => c.resident === "ada").map(c => c.kind)).toEqual([day === 3 ? "night" : "plan"]);
-  });
-
   it("answers within the 4 s budget with a slow model, never runs more than 8 calls at once, and finishes in the background", async () => {
-    const mind = fake(happy, 2000);
+    const mind = fake(happy, 1000);
     const env = await setup(mind, { budgetMs: NIGHT_BUDGET_MS });
     const started = performance.now();
     const res = await night(env, { day: 1 });
@@ -245,16 +234,16 @@ describe("POST /v1/worlds/:w/night", () => {
     const encounters = mind.callsFor("gossip").length;
     const again = await night(env, { day: 1 });
     expect(again.json()).toMatchObject({ already: true, done: core.length, pending: 0, complete: true });
-    expect(residentCalls(mind)).toHaveLength(core.length);
+    expect(residentCalls(mind)).toHaveLength(core.length * 2);
     expect(mind.callsFor("gossip")).toHaveLength(encounters);
   }, 30_000);
 
   it("falls back per resident: template plans and mood drift, logged", async () => {
     const mind = fake((call) => {
-      if (call.resident === "pell" && call.kind === "night") return { output: "", stopReason: "refusal" };
-      if (call.resident === "odile" && call.kind === "night") {
+      if (call.resident === "pell") return call.kind === "reflect" ? { output: "nonsense" } : { output: "", stopReason: "refusal" };
+      if (call.resident === "odile" && call.kind === "plan") {
         const bad = plan("odile", 2);
-        return { output: { reflection: reflection("odile"), plan: { ...bad, blocks: [bad.blocks[0], { ...bad.blocks[1]!, start: "08:00" }, ...bad.blocks.slice(2)] } } };
+        return { output: { ...bad, blocks: [bad.blocks[0], { ...bad.blocks[1]!, start: "08:00" }, ...bad.blocks.slice(2)] } };
       }
       return happy(call);
     });
@@ -267,7 +256,7 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(pell).toMatchObject({ source: "template", plan: templatePlan(card("pell"), 2) });
     expect(odile).toMatchObject({ source: "template", plan: templatePlan(card("odile"), 2) });
     const log = await database.db.select().from(aiLog).where(eq(aiLog.worldId, env.worldId));
-    expect(log.find((l) => l.residentId === "pell" && l.kind === "reflect")).toMatchObject({ fallback: true, validation: "refusal" });
+    expect(log.find((l) => l.residentId === "pell" && l.kind === "reflect")).toMatchObject({ fallback: true, validation: "schema" });
     expect(log.find((l) => l.residentId === "pell" && l.kind === "plan")).toMatchObject({ fallback: true, validation: "refusal" });
     expect(log.find((l) => l.residentId === "odile" && l.kind === "plan")).toMatchObject({ fallback: true, validation: "overlap" });
     const [pellRow] = await database.db.select().from(residents).where(and(eq(residents.worldId, env.worldId), eq(residents.id, "pell")));
@@ -378,7 +367,7 @@ describe("night pass rules and hygiene", () => {
     expect(night.length).toBeGreaterThan(50);
     for (const body of night) {
       for (const key of ["temperature", "top_p", "top_k", "thinking", "stream"]) expect(body).not.toHaveProperty(key);
-      expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: JSON.stringify(body.messages).includes("Complete tonight in order") ? 3000 : 1500, output_config: { effort: "low" } });
+      expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 1500, output_config: { effort: "low" } });
       expect(body.output_config?.format?.type).toBe("json_schema");
       expect(body.messages.every((m) => m.role === "user")).toBe(true);
     }
@@ -427,7 +416,7 @@ it('compacts the day’s leftover sessions before reflections read memories', as
   };
   await night(env, { day: 1 });
   await env.runner.idle(env.worldId);
-  expect(mind.callsFor('night', 'pell').map(c => JSON.stringify(c.body.messages)).join()).toContain('brass bookmark');
+  expect(mind.callsFor('reflect', 'pell').map(c => JSON.stringify(c.body.messages)).join()).toContain('brass bookmark');
 }, 15_000);
 
 // ── The full Day-1 roster (MVP M-03 step 3) ──────────────────────────────────────────────────────────────────────
@@ -473,7 +462,7 @@ describe("the night pass on the full Day-1 roster (212)", () => {
     const stored = await storedPlans(env.worldId, 2);
     expect(stored.filter((p) => core.includes(p.residentId)).map((p) => p.residentId).sort()).toEqual(core);
     expect(stored.every((p) => p.source === "model")).toBe(true);
-    const reflected = new Set([...mind.callsFor("reflect"), ...mind.callsFor("night")].map((c) => c.resident));
+    const reflected = new Set(mind.callsFor("reflect").map((c) => c.resident));
     for (const id of core) expect(reflected.has(id), id).toBe(true);
     const ambientReflected = ambient.filter((c) => reflected.has(c.id)).map((c) => c.id);
     expect(ambientReflected).toHaveLength(AMBIENT_REFLECTIONS_PER_NIGHT);

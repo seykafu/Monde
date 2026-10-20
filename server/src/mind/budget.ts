@@ -101,7 +101,7 @@ export function budgetMind(db: WorldDatabase, mind: MindClient, worldId: string,
       // talking to them goes on until 200%, when only Core dialogue does. (Playtest 2026-10-18: Ambient residents fell
       // to written lines at 100%, half the budget the GDD gives their conversations.)
       || (resident?.tier === 'ambient' && !AMBIENT_TALK.has(kind) && spend >= cap.world)
-      || (resident?.tier === 'acquainted' && (kind === 'plan' || kind === 'night') && spend >= cap.world * 1.5)) throw new BudgetError('budget');
+      || (resident?.tier === 'acquainted' && kind === 'plan' && spend >= cap.world * 1.5)) throw new BudgetError('budget');
     return { worldId, day, kind };
   });
 }

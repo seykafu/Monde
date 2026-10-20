@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { ResidentState, type ReflectionOutput } from "@monde/shared";
 import { createTestDatabase } from "../../db/testDatabase.js";
-import { aiLog, favors, letters, memories, relationships, residents, plans, worlds } from "../../db/schema.js";
+import { aiLog, favors, letters, memories, relationships, residents } from "../../db/schema.js";
 import { createWorld } from "../../worlds/createWorld.js";
 import { DisabledMindClient, type MindClient } from "../mindClient.js";
 import { SILENT_LOG, type NightJobDeps, type NightWorld } from "../nightJob.js";
@@ -307,49 +307,3 @@ it('M-09 soak: 20 reflection-generated favors are completable with authored cont
     expect(again.regard).toEqual(first.regard);
   }
 },30_000);
-
-
-it.each(["ok", "reflection", "plan", "json", "refusal", "max_tokens", "api", "timeout"])("combined night: %s", async failure => {
-  const { combinedNight } = await import("../combinedNight.js");
-  const { prepareReflection } = await import("../reflect.js");
-  const { preparePlan } = await import("../plan.js");
-  const { templatePlan } = await import("../templatePlan.js");
-  const mind = new FakeNightMind(() => {
-    if (failure === "api") return { error: new Error("offline") };
-    if (failure === "timeout") return { hang: true };
-    if (failure === "refusal" || failure === "max_tokens") return { output: "do not read", stopReason: failure };
-    if (failure === "json") return { output: "not json" };
-    return { output: { reflection: failure === "reflection" ? {} : reflection(),
-      plan: failure === "plan" ? {} : templatePlan(resident.card, DAY + 1) } };
-  });
-  const e = await setup(mind, 100);
-  const [resident] = await database.db.select().from(residents).where(and(eq(residents.worldId, e.worldId), eq(residents.id, "pell")));
-  if (!resident) throw new Error("missing resident");
-  const r = await prepareReflection(e.deps, e.night, "pell");
-  const p = await preparePlan(e.deps, e.night, "pell");
-  await combinedNight(e.deps, e.night, "pell");
-  expect(mind.calls).toHaveLength(1);
-  expect(mind.calls[0]!.kind).toBe("night");
-  expect(mind.calls[0]!.body.system).toEqual(r!.request.system);
-  expect(mind.calls[0]!.body.system).toEqual(p!.request.system);
-  const whole = ["json", "refusal", "max_tokens", "api", "timeout"].includes(failure);
-  expect(await stateOf(e.worldId)).toEqual(whole || failure === "reflection"
-    ? driftMood(resident.state) : applyReflectionToState(resident.state, reflection()));
-  const [stored] = await database.db.select().from(plans).where(eq(plans.worldId, e.worldId));
-  expect(stored).toMatchObject({ day: DAY + 1, source: whole || failure === "plan" ? "template" : "model" });
-  const logs = await database.db.select().from(aiLog).where(eq(aiLog.worldId, e.worldId));
-  expect(logs.filter(l => l.kind === "night")).toHaveLength(1);
-  expect(logs.filter(l => l.kind !== "night").every(l => Number(l.costUsd) === 0 && l.inputTokens === 0)).toBe(true);
-});
-
-it("past 150% Acquainted reflects alone and stores a template without a combined API call", async () => {
-  const { combinedNight } = await import("../combinedNight.js");
-  const mind = new FakeNightMind(() => ({ output: reflection() }));
-  const e = await setup(mind);
-  await database.db.update(residents).set({ tier: "acquainted" }).where(eq(residents.worldId, e.worldId));
-  await database.db.update(worlds).set({ aiSpendDay: DAY, aiSpendUsd: "0.091" }).where(eq(worlds.id, e.worldId));
-  await combinedNight(e.deps, e.night, "pell");
-  expect(mind.calls.map(c => c.kind)).toEqual(["reflect"]);
-  const [stored] = await database.db.select().from(plans).where(eq(plans.worldId, e.worldId));
-  expect(stored).toMatchObject({ day: DAY + 1, source: "template" });
-});

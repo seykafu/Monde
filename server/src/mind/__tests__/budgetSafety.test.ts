@@ -168,28 +168,3 @@ it('lets Ambient residents keep talking between 100% and 200% of the day budget,
   await database.db.update(residents).set({ tier: 'ambient' }).where(eq(residents.worldId, w2.id));
   await expect(budgetMind(database.db, mind, w2.id, 'pell', 'dialogue').createMessage(params)).rejects.toThrow('budget');
 });
-
-it.each([
-  ["acquainted", "0.089", true], ["acquainted", "0.090", false],
-  ["ambient", "0.060", false], ["core", "0.090", true],
-] as const)("night admission: %s at %s", async (tier, spend, allowed) => {
-  const w = await world(), mind = new FakeMind();
-  configureBudget(database.db, parseConfig({}));
-  await database.db.update(residents).set({ tier }).where(eq(residents.worldId, w.id));
-  await database.db.update(worlds).set({ aiSpendUsd: spend, aiSpendDay: 1 }).where(eq(worlds.id, w.id));
-  const call = budgetMind(database.db, mind, w.id, "pell", "night", 1).createMessage({
-    model: "claude-haiku-5-5", max_tokens: 1800, messages: [{ role: "user", content: "test" }],
-  });
-  if (allowed) await call;
-  else await expect(call).rejects.toThrow("budget");
-  expect(mind.creates).toHaveLength(allowed ? 1 : 0);
-  if (allowed) {
-    const app = buildApp(parseConfig({ LOG_LEVEL: "silent", ADMIN_TOKEN: "secret" }), database.db);
-    try {
-      const report = await app.inject({ url: "/admin/costs.json", headers: { authorization: "Bearer secret" } });
-      expect(report.json().perWorldDay).toEqual(expect.arrayContaining([
-        expect.objectContaining({ worldId: w.id, day: 1, kind: "night" }),
-      ]));
-    } finally { await app.close(); }
-  }
-});
