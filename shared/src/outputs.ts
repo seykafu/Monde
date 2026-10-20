@@ -52,6 +52,7 @@ export type DialogueTurnOutput = z.infer<typeof DialogueTurnOutput>;
 const Hhmm = z.string().describe("HH:MM, 24h; times after midnight run to 26:00");
 
 export const PlanOutput = z.object({
+  // Only the changed blocks (at most 2): the server fills the rest of the day from the routine (server/src/mind/plan.ts).
   blocks: z.array(
     z.object({
       start: Hhmm,

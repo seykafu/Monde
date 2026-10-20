@@ -1531,10 +1531,12 @@ Reply as {name_of_resident}, answering the Fellow first.
 Plan tomorrow for {resident}. Routine: {routine}. Needs now: {needs}. Forecast: {weather}.
 Town events tomorrow: {events}. Your beliefs: {beliefs}. Open intentions: {intentions}.
 Places open tomorrow: {place ids with hours}. Use only these verbs: {verbs}.
-Keep most of the routine. Change at most 2 blocks, with a reason. Add at most 1 whim.
+Keep most of the routine. List only the blocks you change (at most 2), with a reason. Add at most 1 whim.
 Write 3 short barks you might say aloud tomorrow. Say if you want to find the Fellow, and why.
 ```
-Output: `{blocks[], whim|null, barks[3], seek_player|null, intentions[]}`.
+Output: `{blocks[], whim|null, barks[3], seek_player|null, intentions[]}`. `blocks` holds only the changes (none:
+the routine as it is); the server fills the rest of the day from the routine. Writing out the whole timetable made
+plans run long: 26% were cut off at 900 tokens, and 73 of a soak's plan-only calls at 1,500 (2026-10-19).
 
 **Reflect** (tonight, at `effort: "low"`, or Batch):
 ```

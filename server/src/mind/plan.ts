@@ -137,7 +137,7 @@ export function validatePlan(raw: string, ctx: PlanValidationContext): PlanValid
     return fail("schema", issue ? `${issue.path.join(".") || "(root)"}: ${issue.message}` : "invalid");
   }
   const loose = parsed.data;
-  if (loose.blocks.length === 0) return fail("empty", "no blocks");
+  // No blocks is "keep my routine" (the plan lists only its changes): the gaps below fill the whole day.
 
   const adjustments: string[] = [];
   const template = routineBlocks(ctx.card, ctx.day);
@@ -192,7 +192,7 @@ export function validatePlan(raw: string, ctx: PlanValidationContext): PlanValid
 
   // Blocks, with the gaps filled and the impossible ones swapped for the routine.
   const segments: Segment[] = [];
-  let cursor = Math.min(sorted[0]!.startMin, template[0]!.startMin);
+  let cursor = Math.min(sorted[0]?.startMin ?? Infinity, template[0]!.startMin);
   for (const b of sorted) {
     if (b.startMin > cursor) {
       adjustments.push(`${minutesToHhmm(cursor)}-${minutesToHhmm(b.startMin)} filled from the routine`);

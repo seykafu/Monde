@@ -95,7 +95,7 @@ describe("validatePlan", () => {
     expect(result.adjustments.join()).toContain("3 changed blocks");
   });
 
-  it("rejects overlapping blocks, bad times, empty plans and malformed JSON", () => {
+  it("rejects overlapping blocks, bad times and malformed JSON", () => {
     const overlapping = JSON.parse(modelPlan());
     overlapping.blocks[1].start = "08:30";
     expect(validatePlan(JSON.stringify(overlapping), ctx())).toMatchObject({ ok: false, category: "overlap" });
@@ -103,9 +103,20 @@ describe("validatePlan", () => {
     backwards.blocks[2].end = "12:00";
     expect(validatePlan(JSON.stringify(backwards), ctx())).toMatchObject({ ok: false, category: "times" });
     expect(validatePlan(modelPlan({ "13:00": { end: "27:00" } }), ctx())).toMatchObject({ ok: false, category: "times" });
-    expect(validatePlan(modelPlan({}, { blocks: [] }), ctx())).toMatchObject({ ok: false, category: "empty" });
     expect(validatePlan("{\"blocks\": [", ctx())).toMatchObject({ ok: false, category: "schema" });
     expect(validatePlan(JSON.stringify({ blocks: [] }), ctx())).toMatchObject({ ok: false, category: "schema" });
+  });
+
+  it("takes only the changed blocks and fills the rest of the day from the routine; no blocks keeps the routine", () => {
+    const kept = valid(modelPlan({}, { blocks: [] }));
+    expect(kept.changed).toBe(0);
+    expect(brief(kept.plan.blocks)).toEqual(brief(routine()));
+    const one = routine().find((b) => b.start === "14:00")!;
+    const changed = valid(JSON.stringify({ blocks: [{ ...one, action: "walk", place: "commons.duck_pond", note: "Air instead of a nap.", with: [] }],
+      whim: null, barks: [], seek_player: null, intentions: [] }));
+    expect(changed.changed).toBe(1);
+    expect(changed.plan.blocks.length).toBe(routine().length);
+    expect(changed.plan.blocks.find((b) => b.start === "14:00")).toMatchObject({ action: "walk", place: "commons.duck_pond" });
   });
 
   it("ends an evening block written through to the morning at 02:00, not a thrown-away plan", () => {
