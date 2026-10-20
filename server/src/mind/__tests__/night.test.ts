@@ -14,7 +14,7 @@ import { DisabledMindClient, type MindClient } from "../mindClient.js";
 import { AMBIENT_REFLECTIONS_PER_NIGHT, NIGHT_BUDGET_MS, NightRunner, acquaintedTurn, nightJobs, type NightRunnerOptions } from "../night.js";
 import { FULL, fullRosterContent } from "../../__tests__/fullRoster.js";
 import { templatePlan } from "../templatePlan.js";
-import { FakeNightMind, type NightCall, type NightReply } from "./fakeNightMind.js";
+import { describeCall, FakeNightMind, type NightCall, type NightReply } from "./fakeNightMind.js";
 
 let database: Awaited<ReturnType<typeof createTestDatabase>>;
 let cards: PersonaCard[];
@@ -67,7 +67,7 @@ const SEED_ADA_MEETS = 1;
 async function setup(mind: MindClient, runnerOptions: Partial<NightRunnerOptions> = {}) {
   const world = await createWorld(database.db, `device-${randomUUID()}`, "invite");
   const runner = new NightRunner({ db: database.db, mind, budgetMs: 2000, ...runnerOptions });
-  const app = buildApp(parseConfig({ LOG_LEVEL: "silent" }), database.db, { mind, nightRunner: runner });
+  const app = buildApp(parseConfig({ LOG_LEVEL: "silent", ADMIN_TOKEN: "batch-test" }), database.db, { mind, nightRunner: runner });
   apps.push(app);
   const headers = { authorization: `Bearer ${worldToken(world.id, world.deviceId, SECRET)}` };
   return { app, runner, worldId: world.id, headers };
@@ -173,9 +173,19 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(res.json()).toMatchObject({ tiers: { acquainted: 1 } });
     await env.runner.idle(env.worldId);
 
-    expect(mind.callsFor("reflect", "ada")).toHaveLength(1);
+    expect(mind.callsFor("reflect", "ada")).toHaveLength(0);
+    expect(mind.batches).toHaveLength(1);
+    expect(mind.batches[0]!.requests.map(r => describeCall(r.params).resident).sort()).toEqual(["ada", "bru"]);
+    expect(mind.batches[0]!.results).toBeUndefined();
+    expect((await dawn(env, 2)).json()).toMatchObject({ complete: true });
+    const costs = (await env.app.inject({ url: '/admin/costs.json', headers: { authorization: 'Bearer batch-test' } })).json();
+    expect(costs.pendingBatchesByWorld).toContainEqual({ worldId: env.worldId, count: 2 });
+    expect(costs.pendingBatchRequests).toBeGreaterThanOrEqual(2);
+    expect(mind.callsFor("plan", "ada")[0]!.body.system).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ text: expect.stringContaining(reflection("ada").beliefs[0]!) }),
+    ]));
     expect(mind.callsFor("plan", "ada")).toHaveLength(1);
-    expect(mind.callsFor("reflect", "bru")).toHaveLength(1);
+    expect(mind.callsFor("reflect", "bru")).toHaveLength(0);
     expect(mind.callsFor("plan", "bru")).toHaveLength(0);
     expect(mind.calls.some((c) => c.resident === "nettie")).toBe(false);
     // Core first (§9.8). Encounters queue before any reflection, at the priority of their better-detailed side, so
@@ -189,13 +199,13 @@ describe("POST /v1/worlds/:w/night", () => {
     const first = (id: string) => mind.calls.findIndex((c) => c.resident === id);
     expect(mind.callsFor("gossip").some((c) => sides(c).includes("ada"))).toBe(true);
     expect(first("ada")).toBeGreaterThan(lastEncounterWith(core));
-    expect(first("bru")).toBeGreaterThan(lastEncounterWith(new Set([...core, "ada"])));
+    // Ambient reflections are submitted together after encounters, outside the live queue.
     for (const [i, call] of mind.calls.entries()) {
       if (call.kind !== "reflect") continue;
       const own = mind.calls.map((c, j) => (c.kind === "gossip" && sides(c).includes(call.resident) ? j : -1)).filter((j) => j >= 0);
       for (const j of own) expect(j, `${call.resident} reflected before an encounter`).toBeLessThan(i);
     }
-    expect((await storedPlans(env.worldId, 2)).map((p) => p.residentId)).toContain("ada");
+    expect((await storedPlans(env.worldId, 2)).find(p => p.residentId === "ada")?.source).toBe("model");
     expect((await storedPlans(env.worldId, 2)).map((p) => p.residentId)).not.toContain("bru");
   });
 
@@ -433,7 +443,7 @@ describe("the night pass on the full Day-1 roster (212)", () => {
     const lines: { obj: Record<string, unknown>; msg?: string }[] = [];
     const log = { info: (obj: object, msg?: string) => { lines.push({ obj: obj as Record<string, unknown>, msg }); }, warn: () => undefined, error: (obj: object, msg?: string) => { lines.push({ obj: obj as Record<string, unknown>, msg }); } };
     const runner = new NightRunner({ db: database.db, mind, budgetMs: NIGHT_BUDGET_MS, log });
-    const app = buildApp(parseConfig({ LOG_LEVEL: "silent" }), database.db, { mind, nightRunner: runner });
+    const app = buildApp(parseConfig({ LOG_LEVEL: "silent", ADMIN_TOKEN: "batch-test" }), database.db, { mind, nightRunner: runner });
     apps.push(app);
     const headers = { authorization: `Bearer ${worldToken(world.id, world.deviceId, SECRET)}` };
     return { app, runner, worldId: world.id, headers, lines };
@@ -462,7 +472,7 @@ describe("the night pass on the full Day-1 roster (212)", () => {
     const stored = await storedPlans(env.worldId, 2);
     expect(stored.filter((p) => core.includes(p.residentId)).map((p) => p.residentId).sort()).toEqual(core);
     expect(stored.every((p) => p.source === "model")).toBe(true);
-    const reflected = new Set(mind.callsFor("reflect").map((c) => c.resident));
+    const reflected = new Set([...mind.callsFor("reflect").map((c) => c.resident), ...mind.batches.flatMap(b => b.requests.map(r => describeCall(r.params).resident))]);
     for (const id of core) expect(reflected.has(id), id).toBe(true);
     const ambientReflected = ambient.filter((c) => reflected.has(c.id)).map((c) => c.id);
     expect(ambientReflected).toHaveLength(AMBIENT_REFLECTIONS_PER_NIGHT);

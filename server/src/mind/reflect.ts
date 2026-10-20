@@ -19,9 +19,9 @@ import {
   MVP_FAVOR_TEMPLATES, ROMANTIC_FEELINGS, ReflectionOutput, ResidentState, applyAffinity, clamp, clampReflection,
   romanceEligible, type FavorTemplate, type Memory, type PersonaCard,
 } from "@monde/shared";
-import { aiLog, favors, letters, memories, relationships, residents, worlds } from "../db/schema.js";
+import { aiLog, budgetCalls, reflectionBatches, favors, letters, memories, relationships, residents, worlds } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
-import { callModel, type CallFailure } from "./callModel.js";
+import { callModel, type CallFailure, type ModelCall } from "./callModel.js";
 import { LIVE_FAVOR_STATUSES, loadResidentPrefix, type ResidentPrefix } from "./context.js";
 import type { CallRecord } from "./dialogue.js";
 import { lexicalHits } from "./filters.js";
@@ -315,6 +315,7 @@ export const reflectionFavorId = (residentId: string, day: number): string => `f
 export const letterId = (residentId: string, day: number): string => `letter_${residentId}_${day}`;
 
 interface PersistArgs {
+  batch?: { customId: string; status: string };
   worldId: string;
   residentId: string;
   day: number;
@@ -331,11 +332,23 @@ async function persistReflection(db: WorldDatabase, args: PersistArgs): Promise<
   const { worldId, residentId, day, output } = args;
   const dropped: string[] = [];
   await db.transaction(async (tx) => {
+    if (args.batch) {
+      const [batch] = await tx.select().from(reflectionBatches).where(eq(reflectionBatches.customId, args.batch.customId)).for("update");
+      if (!batch || batch.settledAt) return;
+      await tx.update(reflectionBatches).set({ status: args.batch.status, settledAt: new Date() }).where(eq(reflectionBatches.customId, batch.customId));
+      await tx.update(budgetCalls).set({ pending: false, costUsd: String(args.call?.costUsd ?? batch.reservationUsd) }).where(eq(budgetCalls.id, batch.reservationId));
+    }
     const where = and(eq(residents.worldId, worldId), eq(residents.id, residentId));
-    const [row] = await tx.select({ state: residents.state }).from(residents).where(where).for("update");
+    const [row] = await tx.select({ state: residents.state, lastReflectionDay: residents.lastReflectionDay }).from(residents).where(where).for("update");
+    if (args.batch && (!row || (row.lastReflectionDay !== null && row.lastReflectionDay >= day))) {
+      await tx.update(reflectionBatches).set({ status: "stale" }).where(eq(reflectionBatches.customId, args.batch.customId));
+      if (args.call) await tx.insert(aiLog).values(nightLogRow(worldId, residentId, "reflect", args.promptVersion,
+        { ...args.call, validation: "batch:stale" }, false));
+      return;
+    }
     if (!row) throw new Error(`resident ${residentId} vanished during the night`);
     const state = output ? applyReflectionToState(row.state, output) : driftMood(row.state);
-    await tx.update(residents).set({ state, updatedAt: new Date() }).where(where);
+    await tx.update(residents).set({ state, lastReflectionDay: day, updatedAt: new Date() }).where(where);
 
     if (output) {
       for (const delta of output.relationship_deltas) {
@@ -425,47 +438,64 @@ export interface ReflectResult {
   adjustments: string[];
 }
 
-/** Reflect one resident on `world.day`. Null if the resident doesn't exist. Throws only on database errors. */
-export async function reflectResident(deps: NightJobDeps, world: NightWorld, residentId: string): Promise<ReflectResult | null> {
-  const { db, mind } = deps;
-  const prefix = await loadResidentPrefix(db, world.worldId, residentId);
+/** JSON-safe submission snapshot: validation must not change while the batch is in flight. */
+export interface PreparedReflection {
+  base: Omit<PersistArgs, "output" | "call" | "batch">;
+  params: Parameters<import("./mindClient.js").MindClient["createMessage"]>[0];
+  context: { residentIds: string[]; relationshipIds: string[]; itemIds: string[]; places: string[]; stances: Record<string, number> };
+}
+
+export async function prepareReflection(deps: NightJobDeps, world: NightWorld, residentId: string): Promise<PreparedReflection | null> {
+  const prefix = await loadResidentPrefix(deps.db, world.worldId, residentId);
   if (!prefix) return null;
-  const today = await loadMemoriesForDay(db, world.worldId, residentId, world.day);
-  const version = promptVersion();
-  const base = { worldId: world.worldId, residentId, day: world.day, card: prefix.card, today, promptVersion: version };
-
-  const fallback = async (reason: ReflectResult["reason"], call: CallRecord | null, detail?: unknown): Promise<ReflectResult> => {
-    // No key is Quiet Mode (§9.14), not a fault: log it quietly.
-    (reason === "unavailable" ? deps.log.info : deps.log.warn).call(deps.log, { residentId, day: world.day, reason, detail },
-      "reflection fell back to the mood-drift rule");
-    await persistReflection(db, { ...base, output: null, call });
-    return { source: "fallback", reason, adjustments: [] };
-  };
-  if (!mind.enabled) return fallback("unavailable", null);
-
-  const itemIds = new Set((await loadItems()).map(i => i.id));
+  const today = await loadMemoriesForDay(deps.db, world.worldId, residentId, world.day);
+  const itemIds = (await loadItems()).map(i => i.id);
   const request = buildReflectRequest({
     card: prefix.card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names, voices: prefix.voices,
     day: world.day, memoriesToday: selectReflectionMemories(today, prefix, world.day), town: world.town,
     favorTemplates: PROPOSABLE_FAVORS, fellow: world.fellow,
   });
-  request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${[...itemIds].join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
-  const result = await callModel(budgetMind(db, mind, world.worldId, residentId, "reflect", world.day), apiParams("reflect", request), {
-    timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
-  });
-  if (!result.ok) return fallback(result.failure, result.call, result.error instanceof Error ? result.error.message : undefined);
+  request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${itemIds.join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
+  return {
+    base: { worldId: world.worldId, residentId, day: world.day, card: prefix.card, today, promptVersion: promptVersion() },
+    params: apiParams("reflect", request),
+    context: { residentIds: [...world.residentIds], relationshipIds: prefix.relationships.map(r => r.id),
+      itemIds, places: [...world.places.ids], stances: prefix.state.stances },
+  };
+}
 
+/** Shared live/batch validation and transaction. The caller checks stop_reason before supplying text. */
+export async function applyReflectionOutput(deps: NightJobDeps, prepared: PreparedReflection, result: ModelCall,
+  batch?: PersistArgs["batch"]): Promise<ReflectResult> {
+  const { base, context } = prepared;
+  const { residentId, day, worldId } = base;
+  const marked = (call: CallRecord | null) => call && batch ? { ...call, validation: `batch:${call.validation}` } : call;
+  const fallback = async (reason: ReflectResult["reason"], call: CallRecord | null): Promise<ReflectResult> => {
+    (reason === "unavailable" ? deps.log.info : deps.log.warn).call(deps.log, { residentId, day, reason }, "reflection fell back to the mood-drift rule");
+    await persistReflection(deps.db, { ...base, batch, output: null, call: marked(call) });
+    return { source: "fallback", reason, adjustments: [] };
+  };
+  if (!result.ok) return fallback(result.failure, result.call);
   const validated = validateReflection(result.text, {
-    residentId, residentIds: world.residentIds, relationshipIds: new Set(prefix.relationships.map((r) => r.id)),
-    itemIds, places: world.places.ids, stances: prefix.state.stances,
+    residentId, residentIds: new Set(context.residentIds), relationshipIds: new Set(context.relationshipIds),
+    itemIds: new Set(context.itemIds), places: new Set(context.places), stances: context.stances,
   });
-  if (!validated.ok) return fallback("schema", { ...result.call, validation: validated.category }, validated.detail);
-
-  if (validated.output.favor && !await feasibleFavor(db,world.worldId,residentId,world.day,reflectionFavorId(residentId,world.day),validated.output.favor)) {
+  if (!validated.ok) return fallback("schema", { ...result.call, validation: validated.category });
+  if (validated.output.favor && !await feasibleFavor(deps.db, worldId, residentId, day, reflectionFavorId(residentId, day), validated.output.favor)) {
     validated.output.favor = null; validated.adjustments.push('favor dropped (infeasible with current items, places or relationships)');
   }
-  const dropped = await persistReflection(db, { ...base, output: validated.output, call: result.call });
+  const dropped = await persistReflection(deps.db, { ...base, batch, output: validated.output, call: marked(result.call) });
   const adjustments = [...validated.adjustments, ...dropped];
-  if (adjustments.length) deps.log.info({ residentId, day: world.day, adjustments }, "reflection adjusted");
+  if (adjustments.length) deps.log.info({ residentId, day, adjustments }, "reflection adjusted");
   return { source: "model", reason: "ok", adjustments };
+}
+
+/** Reflect one resident live. Core reflections and Quiet Mode retain this path. */
+export async function reflectResident(deps: NightJobDeps, world: NightWorld, residentId: string): Promise<ReflectResult | null> {
+  const prepared = await prepareReflection(deps, world, residentId);
+  if (!prepared) return null;
+  const result = deps.mind.enabled ? await callModel(budgetMind(deps.db, deps.mind, world.worldId, residentId, "reflect", world.day), prepared.params, {
+    timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
+  }) : { ok: false as const, failure: "unavailable" as const, call: null };
+  return applyReflectionOutput(deps, prepared, result);
 }

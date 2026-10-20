@@ -1,3 +1,4 @@
+import { FakeBatches } from "./fakeBatches.js";
 /**
  * A scripted MindClient for tests. Each streamMessage call takes the next script; every request body is recorded
  * (also in `allBodies`, shared across a test file) so tests can assert what would have gone to the API.
@@ -40,7 +41,7 @@ export function message(text: string, stopReason: Anthropic.StopReason, usage: P
   } as unknown as Anthropic.Message;
 }
 
-export class FakeMind implements MindClient {
+export class FakeMind extends FakeBatches implements MindClient {
   readonly enabled = true;
   readonly streams: Anthropic.MessageCreateParamsNonStreaming[] = [];
   readonly creates: Anthropic.MessageCreateParamsNonStreaming[] = [];
@@ -49,7 +50,7 @@ export class FakeMind implements MindClient {
   /** Boot warm-ups (MindClient.warm). */
   warmed = 0;
 
-  constructor(private readonly scripts: Script[] = []) {}
+  constructor(private readonly scripts: Script[] = []) { super(); }
 
   enqueue(...scripts: Script[]): this {
     this.scripts.push(...scripts);

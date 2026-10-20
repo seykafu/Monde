@@ -1,3 +1,4 @@
+import { ReflectionBatchPoller, submitReflections } from "./reflectionBatches.js";
 import { LeavingFavorNotice } from "@monde/shared";
 import { feasibleFavor } from "./favorFeasibility.js";
 import { favors } from "../db/schema.js";
@@ -14,11 +15,11 @@ import { ArrivalRequest, NoticeIn, adoptHouseholds, commitArrivals, departReside
  *   2. recomputes the tiers (tiers.ts);
  *   3. queues the jobs, Core first, then Acquainted, then Ambient:
  *        core        reflect, then a model plan for N + 1
- *        acquainted  reflect if they had an importance-5+ memory today or it's their every-second-day turn,
+ *        acquainted  reflect if they had an importance-5+ memory today or it's their every-third-day turn,
  *                    then a model plan
  *        ambient     reflect only if an importance-6+ memory touched them today; their plan is the template,
  *                    computed at dawn
- *      Each resident's plan waits for their reflection (the plan reads the new beliefs). Model calls take a slot
+ *      Core plans wait for their reflection; Acquainted plans use yesterday's state while the batch runs. Model calls take a slot
  *      in the world's semaphore (8 in flight, §9.8), Core before Acquainted before Ambient;
  *      Before any of them, the friendship pass (G-13, §9.11; ties.ts, encounters.ts): neglect, weekly drift and
  *      tonight's encounters from Day N's plans. Encounter calls queue first, each at the priority of its better-
@@ -44,7 +45,7 @@ import { loadPlaceRegistry } from "./places.js";
 import { planResident } from "./plan.js";
 import { playerView, type PlayerProfile } from "./player.js";
 import { clockTime } from "./promptBuilder.js";
-import { reflectResident } from "./reflect.js";
+import { prepareReflection, type PreparedReflection, reflectResident } from "./reflect.js";
 import { WorldSemaphores } from "./semaphore.js";
 import { DAY_START } from "./templatePlan.js";
 import { prepareFriendship, recordMilestones, type FriendshipNight } from "./ties.js";
@@ -207,6 +208,7 @@ interface EventLine { id: string; day: number; minute: number; where: string; su
 const eventLine = (e: EventLine): string => `${clockTime(e.minute)} at ${e.where}: ${e.summary}`;
 
 export class NightRunner {
+  readonly batches: ReflectionBatchPoller;
   private readonly runs = new Map<string, Map<number, NightRun>>();
   private readonly active = new Set<NightRun>();
   private readonly gates: WorldSemaphores;
@@ -221,6 +223,7 @@ export class NightRunner {
     this.gates = new WorldSemaphores(options.concurrency ?? NIGHT_CONCURRENCY);
     this.log = options.log ?? SILENT_LOG;
     this.now = options.now ?? (() => performance.now());
+    this.batches = new ReflectionBatchPoller(this.deps("", 0));
   }
 
   /** Run the night for `body.day`. Resolves within the budget; unfinished work continues in the background. */
@@ -294,6 +297,7 @@ export class NightRunner {
   /** Stop taking nights, give background work `graceMs` to finish, then abort its calls (they fall back). */
   async close(graceMs = this.options.closeGraceMs ?? NIGHT_CLOSE_GRACE_MS): Promise<void> {
     this.closing = true;
+    await this.batches.close();
     if (this.active.size === 0 && this.refills.size === 0) return;
     const all = Promise.all([this.idle(), ...this.refills.values()]);
     await within(all, graceMs);
@@ -440,7 +444,10 @@ export class NightRunner {
       wait(encounter, work);
       return work;
     })];
-    await Promise.all([...encounters, ...jobs.map((job) => this.runJob(run, world, job, waits.get(job.residentId) ?? []))]);
+    const batch: PreparedReflection[] = [];
+    await Promise.all([...encounters, ...jobs.map((job) => this.runJob(run, world, job, waits.get(job.residentId) ?? [], batch))]);
+    await submitReflections(this.deps(worldId, 0), batch);
+    void this.batches.poll();
 
     // G-12: the romance ladder reads tonight's encounters and reflections; the Lantern below prints who is courting.
     await runRomance(db, worldId, day)
@@ -509,13 +516,16 @@ export class NightRunner {
       });
   }
 
-  private async runJob(run: NightRun, world: NightWorld, job: NightJob, encounters: readonly Promise<void>[]): Promise<void> {
+  private async runJob(run: NightRun, world: NightWorld, job: NightJob, encounters: readonly Promise<void>[], batch: PreparedReflection[]): Promise<void> {
     const deps = this.deps(run.worldId, TIER_ORDER[job.tier]);
     const context = { worldId: run.worldId, day: run.day, residentId: job.residentId, tier: job.tier };
     try {
       // Tonight's reflection reads tonight's encounters.
       await Promise.all(encounters);
-      if (job.reflect) {
+      if (job.reflect && job.tier !== "core" && deps.mind.enabled) {
+        const prepared = await prepareReflection(deps, world, job.residentId);
+        if (prepared) batch.push(prepared);
+      } else if (job.reflect) {
         await reflectResident(deps, world, job.residentId)
           .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); });
       }

@@ -1,3 +1,10 @@
+import { message } from './fakeMind.js';
+import { reflectionBatches, budgetCalls } from '../../db/schema.js';
+import { prepareReflection } from '../reflect.js';
+import { ReflectionBatchPoller, submitReflections } from '../reflectionBatches.js';
+import { reservationUsd } from '../budget.js';
+import { costUsd } from '../pricing.js';
+import type { BatchResult } from '../mindClient.js';
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { randomUUID } from "node:crypto";
 import { and, asc, eq } from "drizzle-orm";
@@ -307,3 +314,115 @@ it('M-09 soak: 20 reflection-generated favors are completable with authored cont
     expect(again.regard).toEqual(first.regard);
   }
 },30_000);
+
+describe('durable non-Core reflection batches', () => {
+  it('reserves at half price, resumes on startup, applies once and logs discounted cache usage', async () => {
+    const mind = new FakeNightMind(() => reply(reflection()));
+    const env = await setup(mind);
+    const prepared = (await prepareReflection(env.deps, env.night, 'pell'))!;
+    const before = await stateOf(env.worldId);
+    const output = reflection({
+      relationship_deltas: [{ id: 'june', affinity: 4, trust: 2, feeling: null }],
+      stance_deltas: [{ issue: 'port_vane', delta: 3 }],
+      dream_progress: { stage_done: false, note: 'The lamps held.' },
+      favor: { template: 'fetch', target: 'bun', text: 'Could you bring a bun?' },
+      letter: { to: 'player', text: 'Thank you for the bun.' },
+    });
+    await submitReflections(env.deps, [prepared]);
+    const [stored] = await database.db.select().from(reflectionBatches).where(eq(reflectionBatches.worldId, env.worldId));
+    expect(Number(stored!.reservationUsd)).toBe(reservationUsd(prepared.params) / 2);
+    const [reserved] = await database.db.select().from(budgetCalls).where(eq(budgetCalls.id, stored!.reservationId));
+    expect(reserved!.pending).toBe(true);
+    expect(Number(reserved!.costUsd)).toBe(Number(stored!.reservationUsd));
+    expect(await stateOf(env.worldId)).toEqual(before);
+    const body = mind.batches[0]!.requests[0]!.params;
+    expect(body.model).toBe('claude-haiku-5-5');
+    expect(body.output_config).toMatchObject({ effort: 'low', format: { type: 'json_schema' } });
+    for (const key of ['temperature', 'top_p', 'top_k']) expect(body).not.toHaveProperty(key);
+    expect(body.messages.every(m => m.role === 'user')).toBe(true);
+    mind.deliverBatch(mind.batches[0]!.id, [{ custom_id: stored!.customId, result: {
+      type: 'succeeded', message: message(JSON.stringify(output), 'end_turn', {
+        input_tokens: 100, output_tokens: 50, cache_read_input_tokens: 200, cache_creation_input_tokens: 300,
+      }),
+    } }]);
+    // A new process needs no in-memory night run; start() immediately polls durable rows.
+    const restarted = new ReflectionBatchPoller(env.deps);
+    restarted.start();
+    await restarted.poll();
+    await restarted.poll();
+    await restarted.close();
+    expect((await stateOf(env.worldId)).beliefs).toEqual(reflection().beliefs);
+    expect((await stateOf(env.worldId)).mood.valence).toBe(before.mood.valence + 4);
+    const rows = await logs(env.worldId);
+    expect(rows).toHaveLength(1);
+    expect(await stateOf(env.worldId)).toMatchObject({ regard: before.regard + 1, stances: { port_vane: 3 }, dream: { notes: 'The lamps held.' }, mood: { emotion: 'wistful' } });
+    expect(await edge(env.worldId, 'june')).toMatchObject({ affinity: 4, trust: 2 });
+    expect(await database.db.select().from(favors).where(eq(favors.worldId, env.worldId))).toHaveLength(1);
+    expect(await database.db.select().from(letters).where(eq(letters.worldId, env.worldId))).toHaveLength(1);
+    expect(await database.db.select().from(memories).where(and(eq(memories.worldId, env.worldId), eq(memories.id, diaryMemoryId('pell', DAY))))).toHaveLength(1);
+    expect(rows[0]).toMatchObject({ kind: 'reflect', validation: 'batch:ok', fallback: false });
+    const expected = costUsd({ input: 100, output: 50, cacheRead: 200, cacheWrite: 300 }) / 2;
+    expect(Number(rows[0]!.costUsd)).toBeCloseTo(expected, 10);
+    const [settled] = await database.db.select().from(budgetCalls).where(eq(budgetCalls.id, stored!.reservationId));
+    expect(settled!.pending).toBe(false);
+    expect(Number(settled!.costUsd)).toBe(expected);
+  });
+
+  it.each(['errored', 'expired', 'canceled', 'schema', 'refusal', 'max_tokens'] as const)('%s takes mood drift once', async kind => {
+    const mind = new FakeNightMind(() => reply(reflection()));
+    const env = await setup(mind);
+    await setState(env.worldId, s => ({ ...s, mood: { ...s.mood, valence: 30 } }));
+    const before = await stateOf(env.worldId);
+    await submitReflections(env.deps, [(await prepareReflection(env.deps, env.night, 'pell'))!]);
+    const request = mind.batches[0]!.requests[0]!;
+    const result: BatchResult['result'] = kind === 'errored' ? { type: kind, error: { type: 'error', request_id: null, error: { type: 'invalid_request_error', message: 'bad request' } } }
+      : kind === 'expired' || kind === 'canceled' ? { type: kind }
+        : { type: 'succeeded', message: message(kind === 'schema' ? 'not JSON' : JSON.stringify(reflection()), kind === 'schema' ? 'end_turn' : kind) };
+    mind.deliverBatch(mind.batches[0]!.id, [{ custom_id: request.custom_id, result }]);
+    const poller = new ReflectionBatchPoller(env.deps);
+    await poller.poll();
+    await poller.poll();
+    expect(await stateOf(env.worldId)).toEqual(driftMood(before));
+    expect(await logs(env.worldId)).toHaveLength(1);
+    expect((await logs(env.worldId))[0]!.fallback).toBe(true);
+  });
+
+  it('charges but skips stale results after a later live reflection', async () => {
+    const mind = new FakeNightMind(() => reply(reflection({ beliefs: ['A later day.'] })));
+    const env = await setup(mind);
+    await submitReflections(env.deps, [(await prepareReflection(env.deps, env.night, 'pell'))!]);
+    await reflectResident(env.deps, { ...env.night, day: DAY + 1 }, 'pell');
+    const before = await stateOf(env.worldId);
+    mind.deliverBatch(mind.batches[0]!.id, [{ custom_id: mind.batches[0]!.requests[0]!.custom_id,
+      result: { type: 'succeeded', message: message(JSON.stringify(reflection()), 'end_turn') } }]);
+    await new ReflectionBatchPoller(env.deps).poll();
+    expect(await stateOf(env.worldId)).toEqual(before);
+    const [row] = await database.db.select().from(reflectionBatches).where(eq(reflectionBatches.worldId, env.worldId));
+    expect(row!.status).toBe('stale');
+    expect((await logs(env.worldId)).find(r => r.validation === 'batch:stale')).toBeDefined();
+  });
+
+  it('recovers an accepted batch whose create response was lost without resubmitting', async () => {
+    const mind = new FakeNightMind(() => reply(reflection()));
+    const create = mind.createBatch.bind(mind);
+    mind.createBatch = async requests => { await create(requests); throw new Error('connection lost'); };
+    const env = await setup(mind);
+    await submitReflections(env.deps, [(await prepareReflection(env.deps, env.night, 'pell'))!]);
+    mind.deliverBatch(mind.batches[0]!.id, [{ custom_id: mind.batches[0]!.requests[0]!.custom_id,
+      result: { type: 'succeeded', message: message(JSON.stringify(reflection()), 'end_turn') } }]);
+    await new ReflectionBatchPoller(env.deps).poll();
+    expect(mind.batches).toHaveLength(1);
+    expect((await logs(env.worldId))[0]!.validation).toBe('batch:ok');
+  });
+
+  it('refuses Ambient work at the day cap before creating a batch', async () => {
+    const mind = new FakeNightMind(() => reply(reflection()));
+    const env = await setup(mind);
+    await database.db.update(residents).set({ tier: 'ambient' }).where(and(eq(residents.worldId, env.worldId), eq(residents.id, 'pell')));
+    await database.db.insert(budgetCalls).values({ id: randomUUID(), worldId: env.worldId, day: DAY, kind: 'dialogue', costUsd: '0.06', pending: false });
+    const before = await stateOf(env.worldId);
+    await submitReflections(env.deps, [(await prepareReflection(env.deps, env.night, 'pell'))!]);
+    expect(mind.batches).toHaveLength(0);
+    expect(await stateOf(env.worldId)).toEqual(driftMood(before));
+  });
+});

@@ -14,7 +14,16 @@ export interface StreamOptions {
   onText: (delta: string) => void;
 }
 
+export type BatchOptions = { signal?: AbortSignal };
+export type BatchRequest = { custom_id: string; params: Anthropic.MessageCreateParamsNonStreaming };
+export type BatchStatus = Pick<Anthropic.Messages.MessageBatch, "id" | "processing_status">;
+export type BatchResult = Anthropic.Messages.MessageBatchIndividualResponse;
+
 export interface MindClient {
+  listBatches(options?: BatchOptions): AsyncIterable<BatchStatus & { created_at: string }>;
+  createBatch(requests: BatchRequest[], options?: BatchOptions): Promise<BatchStatus>;
+  retrieveBatch(id: string, options?: BatchOptions): Promise<BatchStatus>;
+  batchResults(id: string, options?: BatchOptions): AsyncIterable<BatchResult>;
   /** False when no model is configured; callers skip straight to the authored fallback. */
   readonly enabled: boolean;
   /** `client.messages.stream(params)` → the final message. Never retried past the signal. */
@@ -75,6 +84,19 @@ export class AnthropicMindClient implements MindClient {
     return this.anthropic.messages.create(params, { signal: options.signal });
   }
 
+  async *listBatches(options?: BatchOptions): AsyncIterable<BatchStatus & { created_at: string }> {
+    yield* this.anthropic.messages.batches.list({}, { timeout: 30_000, signal: options?.signal });
+  }
+  createBatch(requests: BatchRequest[], options?: BatchOptions): Promise<BatchStatus> {
+    return this.anthropic.messages.batches.create({ requests }, { maxRetries: 0, timeout: 30_000, signal: options?.signal });
+  }
+  retrieveBatch(id: string, options?: BatchOptions): Promise<BatchStatus> {
+    return this.anthropic.messages.batches.retrieve(id, {}, { timeout: 30_000, signal: options?.signal });
+  }
+  async *batchResults(id: string, options?: BatchOptions): AsyncIterable<BatchResult> {
+    yield* await this.anthropic.messages.batches.results(id, {}, { timeout: 30_000, signal: options?.signal });
+  }
+
   /** A Models API lookup: free, and it leaves a warm connection behind for the first turn. */
   async warm(model: string = MIND_MODEL): Promise<void> {
     try {
@@ -88,6 +110,10 @@ export class AnthropicMindClient implements MindClient {
 /** No key configured: every call fails fast so the endpoints answer with authored fallbacks. */
 export class DisabledMindClient implements MindClient {
   readonly enabled = false;
+  listBatches(): AsyncIterable<BatchStatus & { created_at: string }> { throw new MindUnavailableError(); }
+  async createBatch(): Promise<BatchStatus> { throw new MindUnavailableError(); }
+  async retrieveBatch(): Promise<BatchStatus> { throw new MindUnavailableError(); }
+  batchResults(): AsyncIterable<BatchResult> { throw new MindUnavailableError(); }
   async streamMessage(): Promise<Anthropic.Message> { throw new MindUnavailableError(); }
   async createMessage(): Promise<Anthropic.Message> { throw new MindUnavailableError(); }
 }

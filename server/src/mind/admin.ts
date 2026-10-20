@@ -1,10 +1,10 @@
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
-import { and, desc, eq, gte, inArray, ne, sql } from 'drizzle-orm';
+import { and, count, isNull, desc, eq, gte, inArray, ne, sql } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { Press, REPORT_KINDS, isGeneratedLetterId, parseReportBody, type ReportBody } from '@monde/shared';
 import type { Config } from '../config.js';
 import type { WorldDatabase } from '../worlds/createWorld.js';
-import { aiLog, meta, budgetCalls, dialogueTurns, letters, reportedTurns, worlds } from '../db/schema.js';
+import { reflectionBatches, aiLog, meta, budgetCalls, dialogueTurns, letters, reportedTurns, worlds } from '../db/schema.js';
 import { budgetLimits, utcStart } from './budget.js';
 
 // GDD-GAP: §9.13 has no report rate or reason length. Ten reports/world/UTC day (every kind together), 500-character
@@ -35,7 +35,10 @@ export function registerAdminRoutes(app: FastifyInstance, config: Config, db?: W
       perWorldDay.filter(r => r.worldId === w.id && r.day === w.day).reduce((n, r) => n + Number(r.costUsd), 0)) >= cap.world * 2).map(w => w.id);
     const reports = (await db.select().from(reportedTurns).orderBy(desc(reportedTurns.createdAt))).map(reportView);
     const reportsByKind = Object.fromEntries(REPORT_KINDS.map(k => [k, reports.filter(r => r.kind === k).length]));
-    const data = { perWorldDay, global: { utcDay: utcStart().toISOString().slice(0, 10), spendUsd: globalUsd, capUsd: cap.global }, worldTargetUsd: cap.world, cappedWorlds, reportsByKind, reports };
+    const pendingBatchesByWorld = await db.select({ worldId: reflectionBatches.worldId, count: count() }).from(reflectionBatches)
+      .where(isNull(reflectionBatches.settledAt)).groupBy(reflectionBatches.worldId);
+    const pendingBatchRequests = pendingBatchesByWorld.reduce((n, r) => n + r.count, 0);
+    const data = { pendingBatchRequests, pendingBatchesByWorld, perWorldDay, global: { utcDay: utcStart().toISOString().slice(0, 10), spendUsd: globalUsd, capUsd: cap.global }, worldTargetUsd: cap.world, cappedWorlds, reportsByKind, reports };
     if (path.endsWith('.json')) return data;
     reply.header('content-security-policy', "default-src 'none'; frame-ancestors 'none'");
     return reply.type('text/html').send(`<!doctype html><html lang="en"><meta charset="utf-8"><title>Monde costs and review</title><h1>Monde costs and review</h1><p>Costs include outstanding reservations. Core dialogue remains available at the world cap. Historical calls before migration 0009 have no world-day attribution.</p><h2>Report queue</h2>${reportTable(reports)}<h2>Costs and report queue</h2><pre>${escape(JSON.stringify(data, null, 2))}</pre></html>`);

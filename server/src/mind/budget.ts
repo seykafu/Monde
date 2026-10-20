@@ -51,7 +51,7 @@ export function reservingMind(db: WorldDatabase, mind: MindClient, admit: (tx: B
   const run = async <T extends Awaited<ReturnType<MindClient['createMessage']>>>(params: Parameters<MindClient['createMessage']>[0], task: () => Promise<T>): Promise<T> => {
     const id = randomUUID();
     // GDD-GAP: reserve a conservative UTF-8-byte input bound + max output, at uncached/cache-write prices.
-    const reserve = Buffer.byteLength(JSON.stringify(params)) * 0.125 / 1e6 + params.max_tokens * 0.5 / 1e6;
+    const reserve = reservationUsd(params);
     await db.transaction(async tx => {
       const charge = await admit(tx, reserve);
       await tx.insert(budgetCalls).values({ id, worldId: charge.worldId, day: charge.day, kind: charge.kind, costUsd: String(reserve) });
@@ -66,7 +66,12 @@ export function reservingMind(db: WorldDatabase, mind: MindClient, admit: (tx: B
       throw error;
     }
   };
-  return { enabled: mind.enabled, warm: mind.warm?.bind(mind),
+  return {
+    enabled: mind.enabled, warm: mind.warm?.bind(mind),
+    // Batch admission must use submitReflections: this adapter cannot settle deferred usage.
+    createBatch: async () => { throw new Error('use submitReflections for budgeted batches'); },
+    listBatches: mind.listBatches.bind(mind),
+    retrieveBatch: mind.retrieveBatch.bind(mind), batchResults: mind.batchResults.bind(mind),
     createMessage: (params, options) => run(params, () => mind.createMessage(params, options)),
     streamMessage: (params, options) => run(params, () => mind.streamMessage(params, options)),
   };
@@ -74,7 +79,11 @@ export function reservingMind(db: WorldDatabase, mind: MindClient, admit: (tx: B
 
 /** Every charged API entry point uses this adapter, including retries and hedged streams. */
 export function budgetMind(db: WorldDatabase, mind: MindClient, worldId: string, residentId: string | null, kind: string, jobDay?: number): MindClient {
-  return reservingMind(db, mind, async (tx, reserve) => {
+  return reservingMind(db, mind, budgetAdmission(db, worldId, residentId, kind, jobDay));
+}
+
+export function budgetAdmission(db: WorldDatabase, worldId: string, residentId: string | null, kind: string, jobDay?: number) {
+  return async (tx: BudgetTx, reserve: number): Promise<Admission> => {
     // One world's calls are admitted one at a time (its own cap is exact); worlds never wait on each other. The global
     // cap is read without a lock, so concurrent admissions can overshoot it by at most the calls in flight.
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${worldId}))`);
@@ -103,5 +112,8 @@ export function budgetMind(db: WorldDatabase, mind: MindClient, worldId: string,
       || (resident?.tier === 'ambient' && !AMBIENT_TALK.has(kind) && spend >= cap.world)
       || (resident?.tier === 'acquainted' && kind === 'plan' && spend >= cap.world * 1.5)) throw new BudgetError('budget');
     return { worldId, day, kind };
-  });
+  };
 }
+
+export const reservationUsd = (params: Parameters<MindClient["createMessage"]>[0], factor = 1): number =>
+  (Buffer.byteLength(JSON.stringify(params)) * 0.125 / 1e6 + params.max_tokens * 0.5 / 1e6) * factor;

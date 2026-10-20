@@ -1,3 +1,4 @@
+import { FakeBatches } from "./fakeBatches.js";
 // G-02 on the server: the arrival buffer written ahead by the model (A.3.6–A.3.8), the ferry day's commit from it (or
 // from templates), the dawn package's households, Quiet Mode adoption, departures and Leaving Notice memories.
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -53,10 +54,10 @@ function answer(text: string, broken = false): ArrivalHouseholdOutput {
   return out;
 }
 
-class ArrivalMind implements MindClient {
+class ArrivalMind extends FakeBatches implements MindClient {
   readonly enabled = true;
   readonly bodies: Anthropic.MessageCreateParamsNonStreaming[] = [];
-  constructor(private readonly respond: (text: string, n: number) => { text: string; stop?: Anthropic.StopReason }) {}
+  constructor(private readonly respond: (text: string, n: number) => { text: string; stop?: Anthropic.StopReason }) { super(); }
   async streamMessage(): Promise<Anthropic.Message> { throw new Error("arrivals never stream"); }
   async createMessage(params: Anthropic.MessageCreateParamsNonStreaming): Promise<Anthropic.Message> {
     this.bodies.push(structuredClone(params));

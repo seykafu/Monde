@@ -25,6 +25,9 @@ async function run(outputs: DialogueTurnOutput[], chunk: number, validation = ct
   const stream = new StreamedTurn();
   const changes: string[] = [];
   const mind: MindClient = {
+    createBatch: async () => { throw new Error("unused"); },
+    retrieveBatch: async () => { throw new Error("unused"); },
+    async *batchResults() { yield* []; }, async *listBatches() { yield* []; },
     enabled: true, warm: async () => undefined,
     createMessage: async () => message('', 'end_turn'),
     streamMessage: async (_params, options) => {

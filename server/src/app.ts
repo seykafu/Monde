@@ -108,6 +108,7 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   const nightRunner = options.nightRunner
     ?? (db ? new NightRunner({ db, mind, contentDir: config.MONDE_CONTENT_DIR, log: app.log }) : undefined);
   registerNightRoutes(app, db, nightRunner);
+  app.addHook("onReady", async () => { nightRunner?.batches.start(); });
   registerEventRoutes(app, db, config.MONDE_CONTENT_DIR);
   registerSnapshotRoutes(app, config, db, nightRunner);
   // The roster (212 cards once the Day-1 census is written, MVP M-03) is read and checked once, before the first

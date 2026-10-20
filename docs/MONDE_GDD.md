@@ -961,12 +961,13 @@ the 2026-10-19 five-day staging soak (§9.15). Importance-5+ memories still trig
 | Tier | Who | Plan | Reflection | Live dialogue |
 |---|---|---|---|---|
 | **Core** | The 20 canon residents | Daily | Daily | Yes |
-| **Acquainted** | Up to 30 residents the player has talked to in the last 14 days, or who are tied to an open Favor, Project or story beat | Daily | Daily if they had an importance-5+ memory that day, otherwise every 3rd day (days divisible by 3; Batch planned) | Yes |
+| **Acquainted** | Up to 30 residents the player has talked to in the last 14 days, or who are tied to an open Favor, Project or story beat | Daily | Daily if they had an importance-5+ memory that day, otherwise every 3rd day (days divisible by 3; Batch) | Yes |
 | **Ambient** | Everyone else | Weekly, plus on life events | Only when an importance-6+ memory touches them (Batch) | Yes. Talking to them promotes them to Acquainted |
 
 - **Lag tolerance.** Batched reflections may return late (they're asynchronous). A resident whose
-  reflection isn't back by their plan time keeps yesterday's beliefs and gets a template plan from their
-  routine. Nobody notices, because nothing in the world waits on it.
+  reflection isn't back by their plan time keeps yesterday's state: Acquainted residents get a model
+  plan immediately from that state; Ambient residents keep their routine template. Night completion does
+  not wait for batches. Results older than a resident's latest applied reflection are discarded.
 - **Night pass budget.** When the player sleeps, the client shows the night transition for at most
   **4 seconds**, and the server finishes outstanding Core and Acquainted work in that window. Anything
   unfinished uses the template fallback. Target: ≥ 95% of Core/Acquainted plans ready before sleep,
@@ -1413,7 +1414,7 @@ committing a budget.** Claude Haiku 5.5: **$0.10 input / $0.50 output per millio
 disabled, and plans and reflections at `effort: "low"`.
 
 **Original planning estimates, before the 2026-10-19 soak and Q-03 tuning.** These assumed warm caches
-and batching that the live night runner does not yet implement.
+and batching that the night runner did not yet implement at the time (non-Core reflections now batch under lever 4).
 
 **Per-call estimates** (Haiku 5.5 tokens; its tokenizer counts about 30% more than Haiku 4.5):
 
@@ -1444,7 +1445,7 @@ and batching that the live night runner does not yet implement.
 1. **Applied after the 2026-10-19 soak:** cap Acquainted at 30, and reflect Acquainted residents on quiet days only every 3rd day.
 2. Compress the dynamic context: fewer retrieved memories (6) and summary relationships.
 3. Move more gossip to summary mode (live only within earshot, which it already is).
-4. Batch every reflection except Core (lag-tolerant by design, §9.8).
+4. **Applied (Q-03):** batch every reflection except Core (lag-tolerant by design, §9.8), including cache usage at 50% cost.
 
 **2026-10-19 soak (Q-03), measured.** Five staging days at 60 dialogue turns a day (`tools/soak-live.ts`):
 **$0.163 per in-game day** before tuning, **$0.136** after lever 1. Per call: plan ≈ $0.00107 (2.1K fresh in,
@@ -1460,7 +1461,7 @@ notes leaked planner language and lost the residents' voices. Plans now list onl
 overnight blocks end at 02:00, and plans and reflections have 1,500 tokens: in the same 5-day soak that brought the
 day to **$0.128**, every one of 227 model plans was kept (before, 45% fell back to the template: 26% cut off, 17%
 "times"), plan output fell from ~690 to ~490 tokens, and a blind A/B preferred the changes-only plans 26-16 (20 ties;
-clear 9-3). Remaining levers: batching non-Core reflections (lever 4), a compact persona block for night calls, then
+clear 9-3). Lever 4 is now applied; the next soak must measure settled batch spend. Remaining levers: a compact persona block for night calls, then
 levers 2 and 3. The $0.06/day target is not yet met.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,

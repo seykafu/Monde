@@ -38,7 +38,7 @@ it('persists one edition from yesterday’s real events, includes Lantern letter
   const { loadPlaceRegistry } = await import('../places.js');
   const { SILENT_LOG } = await import('../nightJob.js');
   const { runPress,readPress } = await import('../press.js');
-  const { message } = await import('./fakeMind.js');
+  const { FakeMind, message } = await import('./fakeMind.js');
   const database = await createTestDatabase();
   try {
     const world = await createWorld(database.db,'press-test','invite');
@@ -46,7 +46,8 @@ it('persists one edition from yesterday’s real events, includes Lantern letter
     await database.db.insert(letters).values({ worldId:world.id,id:'editor',fromId:'odile',toId:'lantern',day:2,text:'The broom is by the door.' });
     const copy = { headline:'MARKET ROW SWEPT',dek:'A broom and a morning.',stories:[{ event_id:'actual',title:'Market Row',text:'The Fellow swept Market Row.' },{ event_id:null,title:'Letters desk',text:'The letters desk is open.' }] };
     let calls = 0;
-    const mind = { enabled:true,createMessage:async () => { calls++; return message(JSON.stringify(copy),"end_turn"); },streamMessage:async () => { throw new Error('press must not stream'); } };
+    const mind = new FakeMind();
+    Object.assign(mind, { createMessage:async () => { calls++; return message(JSON.stringify(copy),"end_turn"); },streamMessage:async () => { throw new Error('press must not stream'); } });
     const deps = { db:database.db,mind,gate:<T>(work:() => Promise<T>) => work(),callTimeoutMs:1000,log:SILENT_LOG };
     const night = { worldId:world.id,day:1,residentIds:new Set(['sable']),places:await loadPlaceRegistry(),town:{ pillars:{ prosperity:18,safety:30,spirit:22,charm:25 },census:210,events:[] },forecast:'sun',eventsTomorrow:['Market today.'],flags:[] };
     await runPress(deps,night,100); await runPress(deps,night,100);

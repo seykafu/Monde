@@ -33,6 +33,8 @@ export const residents = pgTable("residents", {
   state: jsonb("state").$type<ResidentState>().notNull(),
   tier: text("tier").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  /** Latest applied reflection (including rule fallback); rejects late batch results. */
+  lastReflectionDay: integer("last_reflection_day"),
   /** §9.11.2 talk ledger (shared/friendship.ts TalkLedger): the day `talk_gain` counts, and the last day they spoke. */
   talkDay: integer("talk_day"),
   talkGain: integer("talk_gain").notNull().default(0),
@@ -257,3 +259,14 @@ export const reportedTurns = pgTable('reported_turns', {
   ref: text('ref'), text: text('text'),
   reason: text('reason').notNull(), createdAt: createdAt(),
 }, t => [index('reported_turns_world_idx').on(t.worldId, t.createdAt)]);
+
+/** Q-03: durable batch work, including the exact submission-time validation context. */
+export const reflectionBatches = pgTable('reflection_batches', {
+  customId: uuid('custom_id').primaryKey(), worldId: worldId(), residentId: text('resident_id').notNull(),
+  day: integer('day').notNull(), batchId: text('batch_id'),
+  status: text('status').notNull().default('submitting'),
+  reservationId: uuid('reservation_id').notNull().references(() => budgetCalls.id),
+  reservationUsd: numeric('reservation_usd').notNull(),
+  prepared: jsonb('prepared').$type<import('../mind/reflect.js').PreparedReflection>().notNull(),
+  createdAt: createdAt(), settledAt: timestamp('settled_at', { withTimezone: true }),
+}, t => [index('reflection_batches_pending_idx').on(t.settledAt, t.worldId)]);

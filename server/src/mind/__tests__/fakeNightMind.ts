@@ -1,3 +1,4 @@
+import { FakeBatches } from "./fakeBatches.js";
 /**
  * A MindClient for night-pass tests. Night calls run concurrently, so instead of a script queue (fakeMind.ts) a
  * responder function answers each createMessage by kind ("plan" | "reflect" | "gossip") and resident id (for an
@@ -49,13 +50,13 @@ export function describeCall(body: Anthropic.MessageCreateParamsNonStreaming): O
   return { kind, resident };
 }
 
-export class FakeNightMind implements MindClient {
+export class FakeNightMind extends FakeBatches implements MindClient {
   readonly enabled = true;
   readonly calls: NightCall[] = [];
   inFlight = 0;
   maxInFlight = 0;
 
-  constructor(private readonly respond: Responder, private readonly delayMs = 0) {}
+  constructor(private readonly respond: Responder, private readonly delayMs = 0) { super(); }
 
   async streamMessage(): Promise<Anthropic.Message> {
     throw new Error("FakeNightMind: night jobs never stream");

@@ -1,3 +1,4 @@
+import { FakeBatches } from "./fakeBatches.js";
 // MVP M-03 step 2 on the server: POST /admin/census/write (ADMIN_TOKEN, the request the server builds itself, the census
 // budget on one census world, ai_log), the whole run through it with a fake mind, the whims through the filters, and
 // the loaders reading content/residents/day1/ after the hand-written cards (step 3).
@@ -43,10 +44,10 @@ const census = (): CensusInput => ({
 });
 
 /** A fake mind for the census: answers each household the way Haiku would (a valid card), found by its home. */
-class CensusMind implements MindClient {
+class CensusMind extends FakeBatches implements MindClient {
   readonly enabled = true;
   readonly bodies: Anthropic.MessageCreateParamsNonStreaming[] = [];
-  constructor(private readonly input: CensusInput, private readonly reply?: (n: number) => { text: string; stop: Anthropic.StopReason } | null) {}
+  constructor(private readonly input: CensusInput, private readonly reply?: (n: number) => { text: string; stop: Anthropic.StopReason } | null) { super(); }
   async streamMessage(): Promise<Anthropic.Message> { throw new Error("the census never streams"); }
   async createMessage(params: Anthropic.MessageCreateParamsNonStreaming): Promise<Anthropic.Message> {
     this.bodies.push(structuredClone(params));

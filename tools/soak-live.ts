@@ -123,21 +123,37 @@ report += `| Day | Turns | Fallbacks | Errors | Turn p50 | Night |\n|---|---|---
 if (!admin) report += "No admin token: costs not read (ADMIN_TOKEN or ~/.config/monde/admin_token.txt).\n";
 else {
   await sleep(5000);
-  const costs = await (await fetch(`${BASE}/admin/costs.json`, { headers: { authorization: `Bearer ${admin}` } })).json() as {
+  const readCosts = async () => await (await fetch(`${BASE}/admin/costs.json`, { headers: { authorization: `Bearer ${admin}` } })).json() as {
+    pendingBatchesByWorld: { worldId: string; count: number }[];
     perWorldDay: { worldId: string; day: number; kind: string; costUsd: string }[]; worldTargetUsd: number; cappedWorlds: string[];
   };
-  const mine = costs.perWorldDay.filter((r) => r.worldId === worldId);
-  const kinds = [...new Set(mine.map((r) => r.kind))].sort();
-  const byDay = new Map<number, Map<string, number>>();
-  for (const r of mine) byDay.set(r.day, (byDay.get(r.day) ?? new Map()).set(r.kind, Number(r.costUsd)));
-  const totals = [...byDay.entries()].sort(([a], [b]) => a - b).map(([day, m]) => [day, [...m.values()].reduce((n, v) => n + v, 0)] as const);
-  report += `| Day | ${kinds.join(" | ")} | Total |\n|---|${kinds.map(() => "---|").join("")}---|\n`;
-  for (const [day, total] of totals) report += `| ${day} | ${kinds.map((k) => `$${(byDay.get(day)!.get(k) ?? 0).toFixed(4)}`).join(" | ")} | **$${total.toFixed(4)}** |\n`;
-  const played = totals.filter(([day]) => day <= DAYS);
-  const mean = played.reduce((n, [, t]) => n + t, 0) / Math.max(1, played.length);
-  report += `\nMean per in-game day: **$${mean.toFixed(4)}** (standard target $${STANDARD_USD}, §9.15 estimate $${ESTIMATE_USD}, this world's cap $${costs.worldTargetUsd} with the guard stepping in at 100/150/200%).`;
-  report += costs.cappedWorlds.includes(worldId) ? " The world is at its cap now.\n" : "\n";
-  console.log(`mean per in-game day: $${mean.toFixed(4)}`);
+  let costs = await readCosts();
+  const deadline = Date.now() + 15 * 60_000;
+  const pending = () => costs.pendingBatchesByWorld.find(r => r.worldId === worldId)?.count ?? 0;
+  while (pending() && Date.now() < deadline) {
+    console.log(`waiting for ${pending()} batched reflections`);
+    await sleep(10_000);
+    costs = await readCosts();
+  }
+  if (pending()) {
+    const note = `${pending()} batch requests still pending after 15 minutes. Costs are incomplete; reservations are not measured spend. Read /admin/costs.json for this world after settlement.`;
+    report += `${note}\n`;
+    console.error(note);
+    process.exitCode = 1;
+  } else {
+    const mine = costs.perWorldDay.filter((r) => r.worldId === worldId);
+    const kinds = [...new Set(mine.map((r) => r.kind))].sort();
+    const byDay = new Map<number, Map<string, number>>();
+    for (const r of mine) byDay.set(r.day, (byDay.get(r.day) ?? new Map()).set(r.kind, Number(r.costUsd)));
+    const totals = [...byDay.entries()].sort(([a], [b]) => a - b).map(([day, m]) => [day, [...m.values()].reduce((n, v) => n + v, 0)] as const);
+    report += `| Day | ${kinds.join(" | ")} | Total |\n|---|${kinds.map(() => "---|").join("")}---|\n`;
+    for (const [day, total] of totals) report += `| ${day} | ${kinds.map((k) => `$${(byDay.get(day)!.get(k) ?? 0).toFixed(4)}`).join(" | ")} | **$${total.toFixed(4)}** |\n`;
+    const played = totals.filter(([day]) => day <= DAYS);
+    const mean = played.reduce((n, [, t]) => n + t, 0) / Math.max(1, played.length);
+    report += `\nMean per in-game day: **$${mean.toFixed(4)}** (standard target $${STANDARD_USD}, §9.15 estimate $${ESTIMATE_USD}, this world's cap $${costs.worldTargetUsd} with the guard stepping in at 100/150/200%).`;
+    report += costs.cappedWorlds.includes(worldId) ? " The world is at its cap now.\n" : "\n";
+    console.log(`mean per in-game day: $${mean.toFixed(4)}`);
+  }
 }
 fs.mkdirSync(OUT, { recursive: true });
 const file = path.join(OUT, `soak_${worldId.slice(0, 8)}.md`);

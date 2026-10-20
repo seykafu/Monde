@@ -21,9 +21,11 @@ export interface CallTokens {
 
 export const NO_TOKENS: CallTokens = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
 
-export function costUsd(tokens: CallTokens, prices = HAIKU_55_PRICES_PER_MTOK): number {
+export const BATCH_FACTOR = 0.5;
+
+export function costUsd(tokens: CallTokens, prices = HAIKU_55_PRICES_PER_MTOK, factor = 1): number {
   return (tokens.input * prices.input + tokens.output * prices.output
-    + tokens.cacheRead * prices.cacheRead + tokens.cacheWrite * prices.cacheWrite) / 1_000_000;
+    + tokens.cacheRead * prices.cacheRead + tokens.cacheWrite * prices.cacheWrite) / 1_000_000 * factor;
 }
 
 /** For the `ai_log.cost_usd` numeric column: ten decimals keeps a single cache-read token visible. */

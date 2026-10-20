@@ -1,3 +1,4 @@
+import { FakeBatches } from "./fakeBatches.js";
 /**
  * G-13 acceptance soak (docs/MVP_PLAN.md): 25 nights on the real cast and routines with a deterministic fake mind.
  *
@@ -99,9 +100,9 @@ function turnOutput(day: number, turn: number, who: string, regard: number): Dia
   };
 }
 
-class SoakMind implements MindClient {
+class SoakMind extends FakeBatches implements MindClient {
   readonly enabled = true;
-  constructor(readonly talk: FakeMind, readonly nights: FakeNightMind) {}
+  constructor(readonly talk: FakeMind, readonly nights: FakeNightMind) { super(); }
   streamMessage(params: Anthropic.MessageCreateParamsNonStreaming, options: StreamOptions) { return this.talk.streamMessage(params, options); }
   createMessage(params: Anthropic.MessageCreateParamsNonStreaming, options?: { signal?: AbortSignal }) { return this.nights.createMessage(params, options); }
 }
