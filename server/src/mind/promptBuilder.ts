@@ -113,7 +113,7 @@ type Templates = Readonly<Record<TemplateName, string>>;
  * Bump when the code-side serialization below changes in a way the template files don't show (list formats,
  * field order), so the logged prompt version still changes.
  */
-const SERIALIZER_VERSION = "q03.1";
+const SERIALIZER_VERSION = "q01.6";
 
 /**
  * Where the templates live. Source runs read them next to this file. The bundled server (tsup → server/dist)
@@ -712,8 +712,6 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
 // ---------------------------------------------------------------------------------------------------------------
 
 export interface PlanInput {
-  /** Exact system prefix sent by this resident's reflection tonight. */
-  reflectionSystem?: MindRequest["system"];
   card: PersonaCard;
   state: ResidentState;
   relationships: readonly RelationshipView[];
@@ -767,13 +765,8 @@ export function buildPlanRequest(input: PlanInput): MindRequest {
     fellow: input.fellow ? fellowLine(input.fellow) : "",
   });
   return {
-    system: input.reflectionSystem ?? systemBlocks(card, state, input.relationships, ctx),
-    messages: [{ role: "user", content: input.reflectionSystem
-      ? `${user}\n<tonight>What you made of today. These current values supersede the earlier system beliefs, people and stances.\n${escapeSlot(JSON.stringify({
-        mood: state.mood, beliefs: state.beliefs, stances: state.stances,
-        relationships: topRelationships(input.relationships), regard: state.regard, dream: state.dream,
-      }))}\n</tonight>`
-      : user }],
+    system: systemBlocks(card, state, input.relationships, ctx),
+    messages: [{ role: "user", content: user }],
     output_config: outputConfig("plan", PlanOutput),
   };
 }

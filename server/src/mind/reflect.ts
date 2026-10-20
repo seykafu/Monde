@@ -26,7 +26,7 @@ import { LIVE_FAVOR_STATUSES, loadResidentPrefix, type ResidentPrefix } from "./
 import type { CallRecord } from "./dialogue.js";
 import { lexicalHits } from "./filters.js";
 import { nightLogRow, type NightJobDeps, type NightWorld } from "./nightJob.js";
-import { apiParams, buildReflectRequest, promptVersion, type MindRequest } from "./promptBuilder.js";
+import { apiParams, buildReflectRequest, promptVersion } from "./promptBuilder.js";
 import { contentWords, retrieveMemories } from "./retrieval.js";
 
 /** §9.6: the top 12 memories go into reflections. */
@@ -419,8 +419,6 @@ async function persistReflection(db: WorldDatabase, args: PersistArgs): Promise<
 // ---------------------------------------------------------------------------------------------------------------
 
 export interface ReflectResult {
-  /** Exact prefix used before reflection; reusable by tonight's plan even after a rule fallback. */
-  system?: MindRequest["system"];
   source: "model" | "fallback";
   /** "ok", or why the fallback ran (a call failure or a validation category). */
   reason: "ok" | CallFailure | "schema";
@@ -436,13 +434,12 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
   const version = promptVersion();
   const base = { worldId: world.worldId, residentId, day: world.day, card: prefix.card, today, promptVersion: version };
 
-  let system: MindRequest["system"] | undefined = undefined;
   const fallback = async (reason: ReflectResult["reason"], call: CallRecord | null, detail?: unknown): Promise<ReflectResult> => {
     // No key is Quiet Mode (§9.14), not a fault: log it quietly.
     (reason === "unavailable" ? deps.log.info : deps.log.warn).call(deps.log, { residentId, day: world.day, reason, detail },
       "reflection fell back to the mood-drift rule");
     await persistReflection(db, { ...base, output: null, call });
-    return { source: "fallback", reason, adjustments: [], system };
+    return { source: "fallback", reason, adjustments: [] };
   };
   if (!mind.enabled) return fallback("unavailable", null);
 
@@ -452,7 +449,6 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
     day: world.day, memoriesToday: selectReflectionMemories(today, prefix, world.day), town: world.town,
     favorTemplates: PROPOSABLE_FAVORS, fellow: world.fellow,
   });
-  system = request.system;
   request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${[...itemIds].join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
   const result = await callModel(budgetMind(db, mind, world.worldId, residentId, "reflect", world.day), apiParams("reflect", request), {
     timeoutMs: deps.callTimeoutMs, signal: deps.signal, gate: deps.gate, now: deps.now,
@@ -471,5 +467,5 @@ export async function reflectResident(deps: NightJobDeps, world: NightWorld, res
   const dropped = await persistReflection(db, { ...base, output: validated.output, call: result.call });
   const adjustments = [...validated.adjustments, ...dropped];
   if (adjustments.length) deps.log.info({ residentId, day: world.day, adjustments }, "reflection adjusted");
-  return { source: "model", reason: "ok", adjustments, system };
+  return { source: "model", reason: "ok", adjustments };
 }

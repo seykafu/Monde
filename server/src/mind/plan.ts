@@ -19,7 +19,7 @@ import type { CallRecord } from "./dialogue.js";
 import { lexicalHits } from "./filters.js";
 import { nightLogRow, type NightJobDeps, type NightWorld } from "./nightJob.js";
 import { openPlacesFor } from "./places.js";
-import { apiParams, buildPlanRequest, promptVersion, type MindRequest } from "./promptBuilder.js";
+import { apiParams, buildPlanRequest, promptVersion } from "./promptBuilder.js";
 import {
   MIDNIGHT, PASS_OUT, minutesToHhmm, overnight, routineBlocks, templatePlan, timedBlock, withoutMinutes,
   type RoutineCard, type TimedBlock,
@@ -289,7 +289,7 @@ export interface PlanResult {
  * Plan Day `world.day + 1` for one resident and store it. With `model: false` (or no key) the template is stored
  * without a call. Null if the resident doesn't exist. Throws only on database errors.
  */
-export async function planResident(deps: NightJobDeps, world: NightWorld, residentId: string, options: { model: boolean; reflectionSystem?: MindRequest["system"] }): Promise<PlanResult | null> {
+export async function planResident(deps: NightJobDeps, world: NightWorld, residentId: string, options: { model: boolean }): Promise<PlanResult | null> {
   const { db, mind } = deps;
   const prefix = await loadResidentPrefix(db, world.worldId, residentId);
   if (!prefix) return null;
@@ -312,7 +312,6 @@ export async function planResident(deps: NightJobDeps, world: NightWorld, reside
   const [today] = await db.select({ plan: plans.plan }).from(plans)
     .where(and(eq(plans.worldId, world.worldId), eq(plans.residentId, residentId), eq(plans.day, world.day)));
   const request = buildPlanRequest({
-    reflectionSystem: options.reflectionSystem,
     card, state: prefix.state, relationships: prefix.relationships, flags: world.flags, names: prefix.names, voices: prefix.voices,
     day: world.day, tomorrowWeekday: weekdayOf(day), forecast: world.forecast, events: world.eventsTomorrow,
     intentions: today?.plan.intentions ?? [], openPlaces: openPlacesFor(world.places, card), fellow: world.fellow,

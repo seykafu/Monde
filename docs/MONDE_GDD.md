@@ -1446,25 +1446,16 @@ and batching that the live night runner does not yet implement.
 3. Move more gossip to summary mode (live only within earshot, which it already is).
 4. Batch every reflection except Core (lag-tolerant by design, §9.8).
 
-**2026-10-19 soak correction (Q-03).** Five staging days measured $0.163/day, including
-$0.00111/plan and $0.00106/reflection: cold night prefixes made cache writes material.
-Reflection and its same-night plan now share the exact pre-reflection system blocks 1–3.
-The plan receives current mood, beliefs, relationships, stances, Regard and dream state in an
-escaped, uncached `<tonight>` element; needs and prior plan intentions remain dynamic.
-Plan-only nights keep their existing prefix. No dynamic plan/reflection text has a cache breakpoint.
-Lever 1 above is applied; lever 4 remains unimplemented.
-
-Using the soak token averages and the code's prices, converting a paired plan's 3,906 write
-tokens to reads estimates $0.000656 + $0.0000001 × T per plan, where T is the added
-`<tonight>` input tokens. Reflection remains $0.001055; unpaired plans remain $0.001105.
-With 24 Core and 30 Acquainted, quiet nights average 34 reflections and 54 plans across a
-three-day cycle: about $0.0803 + $0.0000034 × T per night for those two call kinds
-($0.0816 at an illustrative T=400). Quiet off-cadence nights are about $0.0752 and
-every-third nights $0.0945 at T=400. Importance-triggered Acquainted reflections move costs
-toward the latter. Ambient reflections (up to 15), gossip, compaction, press, arrivals and
-daytime dialogue/prewarm are additional. These are projections, not a new soak measurement;
-cache expiry, different structured-output schemas, output lengths and workload can affect hits.
-The $0.06/day target is not yet established.
+**2026-10-19 soak (Q-03), measured.** Five staging days at 60 dialogue turns a day (`tools/soak-live.ts`):
+**$0.163 per in-game day** before tuning, **$0.136** after lever 1. Per call: plan ≈ $0.00107 (2.1K fresh in,
+5.6K cache read, 3.4K cache write, 750 out), reflection ≈ $0.00100 (1K fresh, 5.4K read, 4.2K write, 650 out),
+dialogue turn ≈ $0.00035, gossip ≈ $0.00026, prewarm ≈ $0.0005, conversation summary ≈ $0.00035. Night calls are
+cold: each resident's persona and beliefs (≈ 3.5–4K tokens) are written to the cache once per call kind per night
+(5-minute TTL), which the estimates above leave out. A plan can't reuse its reflection's cache: a different
+`output_config.format` invalidates the prompt cache (tried and measured). The Core cast alone (24 residents, a
+plan and a reflection nightly) is ≈ $0.05 a night. Remaining levers, by expected saving: one combined night call for
+a resident who reflects and plans (one prefix write instead of two), batching non-Core reflections (lever 4), a
+compact persona block for night calls, then levers 2 and 3. The $0.06/day target is not yet met.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,
 Ambient work pauses. Past 150%, Acquainted drop to template plans. Past 200%, the world enters Quiet

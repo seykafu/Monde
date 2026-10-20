@@ -148,13 +148,10 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(planText).toContain("Forecast: rain.");
     expect(planText).toContain("09:00 at wharf.ferry_slip: The ferry comes in from Carrow.");
     expect(planText).toContain("market_row.general_store (open 07:00-19:00)");
-    // Reuse the exact pre-reflection prefix, with tonight's persisted outcome in dynamic text.
+    // Each resident's plan is built on tonight's beliefs. (Sharing the reflection's cached prefix was tried and
+    // measured in the 2026-10-19 soak: a different output_config.format invalidates the prompt cache, so it saved nothing.)
     const planSystem = mind.callsFor("plan", "pell")[0]!.body.system as Anthropic.TextBlockParam[];
-    expect(JSON.stringify(planSystem)).toBe(JSON.stringify(mind.callsFor("reflect", "pell")[0]!.body.system));
-    expect(planSystem[2]!.text).not.toContain("pell thinks the Fellow means well.");
-    expect(planText).toContain("<tonight>");
-    expect(planText).toContain("pell thinks the Fellow means well.");
-    expect(planText).toContain('"emotion":"content"');
+    expect(planSystem[2]!.text).toContain("pell thinks the Fellow means well.");
     for (const call of residentCalls(mind)) expect(JSON.stringify(call.body.messages)).not.toContain("cache_control");
 
     const log = await database.db.select().from(aiLog).where(eq(aiLog.worldId, env.worldId));

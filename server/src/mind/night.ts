@@ -515,13 +515,12 @@ export class NightRunner {
     try {
       // Tonight's reflection reads tonight's encounters.
       await Promise.all(encounters);
-      let reflectionSystem;
       if (job.reflect) {
-        reflectionSystem = (await reflectResident(deps, world, job.residentId)
-          .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); }))?.system;
+        await reflectResident(deps, world, job.residentId)
+          .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); });
       }
       if (job.plan) {
-        await planResident(deps, world, job.residentId, { model: true, reflectionSystem })
+        await planResident(deps, world, job.residentId, { model: true })
           .catch((error: unknown) => { this.log.error({ err: error, ...context }, "plan failed"); });
       }
     } finally {
