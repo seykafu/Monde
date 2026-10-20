@@ -1,3 +1,4 @@
+import { buildNightRequest } from "../promptBuilder.js";
 import { beforeAll, describe, expect, it } from "vitest";
 import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -402,6 +403,7 @@ function gossipRequest(): MindRequest {
 
 describe("API request rules", () => {
   const built = (): [MindCallKind, MindRequest][] => [
+    ["night", buildNightRequest(buildReflectRequest(reflectInput(card("pell"))), buildPlanRequest(planInput(card("pell"))))],
     ["dialogue", buildDialogueRequest(dialogueInput(card("pell")))],
     ["plan", buildPlanRequest(planInput(card("odile")))],
     ["reflect", buildReflectRequest(reflectInput(card("rook")))],

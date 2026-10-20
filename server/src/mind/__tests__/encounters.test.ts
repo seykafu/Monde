@@ -159,7 +159,7 @@ const quiet: GossipOutput = { lines: null, a_delta: { affinity: 0, trust: 0 }, b
 
 type Respond = (call: NightCall) => NightReply;
 const respond = (gossip: Respond = () => ({ output: quiet }), reflect: Respond = () => ({ output: reflection() })): Respond => (call) =>
-  call.kind === "gossip" ? gossip(call) : call.kind === "reflect" ? reflect(call) : { output: templatePlan(card(call.resident), 2) };
+  call.kind === "night" ? { output: { reflection: (reflect(call) as { output: unknown }).output, plan: templatePlan(card(call.resident), 2) } } : call.kind === "gossip" ? gossip(call) : call.kind === "reflect" ? reflect(call) : { output: templatePlan(card(call.resident), 2) };
 
 async function setup(mind: MindClient) {
   const world = await createWorld(database.db, `device-${randomUUID()}`, "invite");
@@ -223,7 +223,7 @@ describe("encounters in the night pass", () => {
     expect(mems[0]).toMatchObject({ residentId: "odile", kind: "did", who: ["june"], wherePlace: "market_row.gull_and_anchor", importance: 4, valence: 2, day: 1 });
     expect(mems[0]!.text).toBe('Ran into Juniper "June" Castellanos. We got on well.');
     // Odile's reflection ran after the encounter and saw it.
-    const reflect = mind.callsFor("reflect", "odile")[0]!.body.messages[0]!.content as string;
+    const reflect = mind.callsFor("night", "odile")[0]!.body.messages[0]!.content as string;
     expect(reflect).toContain("(did): Ran into Juniper \"June\" Castellanos. We got on well.");
     const [log] = await database.db.select().from(aiLog).where(and(eq(aiLog.worldId, env.worldId), eq(aiLog.residentId, "june+odile")));
     expect(log).toMatchObject({ kind: "gossip", fallback: false, validation: "ok" });

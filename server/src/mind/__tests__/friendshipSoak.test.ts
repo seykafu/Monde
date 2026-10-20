@@ -115,6 +115,7 @@ describe("the G-13 soak: 25 nights, real routines, fake mind", () => {
     const respond = (call: NightCall): NightReply => {
       const prompt = call.body.messages[0]!.content as string;
       if (call.kind === "gossip") return { output: judgeEncounter(prompt) };
+      if (call.kind === "night") return { output: { reflection: reflect(prompt, byName), plan: templatePlan(card(call.resident), tonight + 1) } };
       if (call.kind === "reflect") return { output: reflect(prompt, byName) };
       return { output: templatePlan(card(call.resident), tonight + 1) };
     };

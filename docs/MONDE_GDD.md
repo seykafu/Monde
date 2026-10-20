@@ -953,6 +953,13 @@ they stand round its social spots (§16.4.1), two or three to a spot. The client
 template day (`shared/src/gathering.ts`); a model's plan is still measured against the bare routine.
 GDD-GAP: the windows, lengths and the 70% are tuning, not design.
 
+When both steps run tonight, one structured `night` call returns `{reflection, plan}`: reflect first,
+then plan tomorrow in light of tonight's mood, beliefs and open intentions. Both complete templates and
+inputs are retained. System blocks 1–3 use the pre-reflection state, byte-identical to separate calls.
+The cap is 1,800 output tokens (900 + 900), at effort `low`. Each half uses its existing validator and
+persistence; a rejected half takes only its own fallback. A failed whole call takes mood drift and the
+template plan without retrying separate model calls.
+
 ### 9.8 Levels of detail and scheduling
 
 Q-03 applied the Acquainted cap of 30 and quiet-day reflection cadence of every 3rd day after
@@ -964,6 +971,7 @@ the 2026-10-19 five-day staging soak (§9.15). Importance-5+ memories still trig
 | **Acquainted** | Up to 30 residents the player has talked to in the last 14 days, or who are tied to an open Favor, Project or story beat | Daily | Daily if they had an importance-5+ memory that day, otherwise every 3rd day (days divisible by 3; Batch planned) | Yes |
 | **Ambient** | Everyone else | Weekly, plus on life events | Only when an importance-6+ memory touches them (Batch) | Yes. Talking to them promotes them to Acquainted |
 
+- **Combined night work (Q-03).** Core uses one combined call nightly; Acquainted uses it on reflection nights. Plan-only and reflection-only jobs keep their single calls. Past 150% budget, Acquainted reflects alone and gets a template plan; Ambient work still pauses at 100%. One `night` log carries usage and cost; per-half validation logs carry zero usage and cost.
 - **Lag tolerance.** Batched reflections may return late (they're asynchronous). A resident whose
   reflection isn't back by their plan time keeps yesterday's beliefs and gets a template plan from their
   routine. Nobody notices, because nothing in the world waits on it.
@@ -1453,8 +1461,7 @@ dialogue turn ≈ $0.00035, gossip ≈ $0.00026, prewarm ≈ $0.0005, conversati
 cold: each resident's persona and beliefs (≈ 3.5–4K tokens) are written to the cache once per call kind per night
 (5-minute TTL), which the estimates above leave out. A plan can't reuse its reflection's cache: a different
 `output_config.format` invalidates the prompt cache (tried and measured). The Core cast alone (24 residents, a
-plan and a reflection nightly) is ≈ $0.05 a night. Remaining levers, by expected saving: one combined night call for
-a resident who reflects and plans (one prefix write instead of two), batching non-Core reflections (lever 4), a
+plan and a reflection nightly) is ≈ $0.05 a night. **Applied Q-03:** one combined night call for a resident who reflects and plans replaces two cold prefix writes with one. Avoiding a 3.5–4K-token write at $0.125/M saves approximately $0.00044–$0.00050 per resident-night (21–24% of the $0.00207 pair), before any additional shared-input savings. For 24 Core residents that is about $0.0105–$0.012 per night. This is an estimate pending another live soak, not evidence that the $0.09 MVP target is met. Remaining levers: batching non-Core reflections (lever 4), a
 compact persona block for night calls, then levers 2 and 3. The $0.06/day target is not yet met.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,

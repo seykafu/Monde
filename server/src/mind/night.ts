@@ -14,11 +14,11 @@ import { ArrivalRequest, NoticeIn, adoptHouseholds, commitArrivals, departReside
  *   2. recomputes the tiers (tiers.ts);
  *   3. queues the jobs, Core first, then Acquainted, then Ambient:
  *        core        reflect, then a model plan for N + 1
- *        acquainted  reflect if they had an importance-5+ memory today or it's their every-second-day turn,
+ *        acquainted  reflect if they had an importance-5+ memory today or it's their every-third-day turn,
  *                    then a model plan
  *        ambient     reflect only if an importance-6+ memory touched them today; their plan is the template,
  *                    computed at dawn
- *      Each resident's plan waits for their reflection (the plan reads the new beliefs). Model calls take a slot
+ *      Residents doing both use one call: reflect first, then plan with tonight's conclusions. Model calls take a slot
  *      in the world's semaphore (8 in flight, §9.8), Core before Acquainted before Ambient;
  *      Before any of them, the friendship pass (G-13, §9.11; ties.ts, encounters.ts): neglect, weekly drift and
  *      tonight's encounters from Day N's plans. Encounter calls queue first, each at the priority of its better-
@@ -41,6 +41,7 @@ import { TIER_ORDER, persistRuleEncounters, resolveEncounter, ruleOutcome, type 
 import type { MindClient } from "./mindClient.js";
 import { SILENT_LOG, type NightJobDeps, type NightLog, type NightWorld } from "./nightJob.js";
 import { loadPlaceRegistry } from "./places.js";
+import { combinedNight } from "./combinedNight.js";
 import { planResident } from "./plan.js";
 import { playerView, type PlayerProfile } from "./player.js";
 import { clockTime } from "./promptBuilder.js";
@@ -515,6 +516,11 @@ export class NightRunner {
     try {
       // Tonight's reflection reads tonight's encounters.
       await Promise.all(encounters);
+      if (job.reflect && job.plan && deps.mind.enabled) {
+        await combinedNight(deps, world, job.residentId)
+          .catch((error: unknown) => { this.log.error({ err: error, ...context }, "combined night failed"); });
+        return;
+      }
       if (job.reflect) {
         await reflectResident(deps, world, job.residentId)
           .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); });
