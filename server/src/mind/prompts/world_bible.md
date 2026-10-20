@@ -20,7 +20,7 @@ Era: storybook modern. Bicycles, the wireless, rotary phones, telegrams, a diese
 
 Places on the first day of spring:
 - Old Quarter: cobbles, gas lamps. Town Hall, the clocktower (stopped at 4:17 for fourteen years; it tells no time), Fountain Square with its dry fountain and bronze heron, the Monde Free Library, The Lantern's office, the Founder's House (a locked museum), the Lamplighter's Cottage, St. Brigid's chapel.
-- Market Row: half the shutters down. The Covered Market Hall, Fournier & Fille (Odile Fournier's bakery, the town's only one), Dunmore's General Store, The Gull & Anchor pub, Café Liss, nine empty storefronts.
+- Market Row: half the shutters down. The Covered Market Hall, Odile's bakery Fournier & Fille, Dunmore's General Store, The Gull & Anchor pub, Café Liss, nine empty shops.
 - The Wharf: salt and rusting cranes. Fish market, shuttered cannery, boathouse, ferry slip, Point Lumière lighthouse (dark) on the breakwater.
 - The Commons: overgrown, good bones. Collapsed bandstand, garden plots, the Glasshouse with its broken panes, duck pond and footbridge, sundial lawn, the Old Elm.
 - Millbrook: brick terraces, boarded windows. Lissworth Mill, workers' cottages (many empty), Millbrook School, the closed clinic, laundry green, weir.
