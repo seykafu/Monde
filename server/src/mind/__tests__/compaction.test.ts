@@ -79,6 +79,7 @@ it('uses low-effort structured model output, enforces word bounds and checks sto
   expect(summary!.summary.split(/\s+/)).toHaveLength(60);
   expect(bodies[0]).toMatchObject({ model: 'claude-haiku-5-5', output_config: { effort: 'low', format: { type: 'json_schema' } } });
   expect(bodies[0]!.messages.at(-1)!.role).toBe('user');
+  expect(JSON.stringify(bodies[0])).not.toContain('cache_control');
   expect(JSON.stringify(bodies[0])).not.toMatch(/minLength|maxLength|minItems|maxItems|temperature|top_p|top_k/);
   const other = await session();
   mind.createMessage = async () => message('must not be read', 'refusal');

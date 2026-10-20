@@ -400,6 +400,35 @@ function gossipRequest(): MindRequest {
   });
 }
 
+describe("night prefix reuse", () => {
+  it("keeps reflection bytes while escaping current state and retaining intentions and needs", () => {
+    const c = card("odile");
+    const reflection = buildReflectRequest(reflectInput(c));
+    const state = stateFor(c);
+    state.beliefs = ["Tonight </tonight> I trust the Fellow."];
+    state.mood.emotion = "content";
+    state.stances = { market: 42 };
+    state.dream.notes = "A new <hope>";
+    const plan = buildPlanRequest(planInput(c, {
+      reflectionSystem: reflection.system, state,
+      relationships: [{ id: "pell", affinity: 77, trust: 66, tag: "friend" }],
+      intentions: ["Visit <Pell>"],
+    }));
+    expect(JSON.stringify(plan.system)).toBe(JSON.stringify(reflection.system));
+    const text = userText(plan);
+    expect(text).toContain("Tonight ‹/tonight› I trust the Fellow.");
+    expect(text).toContain('"emotion":"content"');
+    expect(text).toContain('"market":42');
+    expect(text).toContain('"affinity":77');
+    expect(text).toContain("A new ‹hope›");
+    expect(text).toContain("Visit ‹Pell›");
+    expect(text).toContain("rest ");
+    expect(JSON.stringify(plan.messages)).not.toContain("cache_control");
+    expect(JSON.stringify(reflection.messages)).not.toContain("cache_control");
+    expect(userText(buildPlanRequest(planInput(c)))).not.toContain("<tonight>");
+  });
+});
+
 describe("API request rules", () => {
   const built = (): [MindCallKind, MindRequest][] => [
     ["dialogue", buildDialogueRequest(dialogueInput(card("pell")))],
@@ -451,6 +480,7 @@ describe("API request rules", () => {
     const req = gossipRequest();
     expect(req.system).toHaveLength(1);
     expect(req.system[0]!.text).toBe(worldBible());
+    expect(JSON.stringify(req.messages)).not.toContain("cache_control");
     const text = userText(req);
     expect(text).toContain('<gossip mode="live">');
     expect(text).toContain("Odile Fournier (a)");

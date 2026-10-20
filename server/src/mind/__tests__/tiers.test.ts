@@ -23,13 +23,13 @@ describe("assignTiers", () => {
     expect(countTiers(tiers)).toEqual({ core: 1, acquainted: 3, ambient: 1 });
   });
 
-  it("caps Acquainted at 60, most recent first, ties by id", () => {
-    const candidates: TierCandidate[] = Array.from({ length: 70 }, (_, i) => ({
+  it("caps Acquainted at 30, most recent first, ties by id", () => {
+    const candidates: TierCandidate[] = Array.from({ length: 40 }, (_, i) => ({
       id: `r${String(i).padStart(2, "0")}`, kind: "resident", lastTalkDay: Math.floor(i / 2), favorDay: null,
     }));
     const tiers = assignTiers(candidates);
-    expect(ACQUAINTED_CAP).toBe(60);
-    expect(countTiers(tiers)).toEqual({ core: 0, acquainted: 60, ambient: 10 });
+    expect(ACQUAINTED_CAP).toBe(30);
+    expect(countTiers(tiers)).toEqual({ core: 0, acquainted: 30, ambient: 10 });
     // The ten oldest (days 0-4) drop to Ambient.
     expect([...tiers].filter(([, tier]) => tier === "ambient").map(([id]) => id)).toEqual(
       ["r00", "r01", "r02", "r03", "r04", "r05", "r06", "r07", "r08", "r09"],

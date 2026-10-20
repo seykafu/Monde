@@ -140,9 +140,14 @@ describe("POST /v1/worlds/:w/night", () => {
     expect(planText).toContain("Forecast: rain.");
     expect(planText).toContain("09:00 at wharf.ferry_slip: The ferry comes in from Carrow.");
     expect(planText).toContain("market_row.general_store (open 07:00-19:00)");
-    // Each resident's plan is built on tonight's beliefs.
+    // Reuse the exact pre-reflection prefix, with tonight's persisted outcome in dynamic text.
     const planSystem = mind.callsFor("plan", "pell")[0]!.body.system as Anthropic.TextBlockParam[];
-    expect(planSystem[2]!.text).toContain("pell thinks the Fellow means well.");
+    expect(JSON.stringify(planSystem)).toBe(JSON.stringify(mind.callsFor("reflect", "pell")[0]!.body.system));
+    expect(planSystem[2]!.text).not.toContain("pell thinks the Fellow means well.");
+    expect(planText).toContain("<tonight>");
+    expect(planText).toContain("pell thinks the Fellow means well.");
+    expect(planText).toContain('"emotion":"content"');
+    for (const call of residentCalls(mind)) expect(JSON.stringify(call.body.messages)).not.toContain("cache_control");
 
     const log = await database.db.select().from(aiLog).where(eq(aiLog.worldId, env.worldId));
     expect(log.filter((l) => l.kind === "reflect")).toHaveLength(core.length);
@@ -326,14 +331,14 @@ describe("night pass rules and hygiene", () => {
   it("picks who reflects tonight", () => {
     const tiers = new Map([["pell", "core"], ["ada", "acquainted"], ["moss", "acquainted"], ["bru", "ambient"], ["nettie", "ambient"]] as const);
     const top = new Map([["ada", 5], ["bru", 6], ["nettie", 5]]);
-    expect(acquaintedTurn(3)).toBe(false);
-    expect(nightJobs(tiers, top, 3)).toEqual([
+    expect([1, 2, 3, 4, 5, 6].map(acquaintedTurn)).toEqual([false, false, true, false, false, true]);
+    expect(nightJobs(tiers, top, 2)).toEqual([
       { residentId: "pell", tier: "core", reflect: true, plan: true },
       { residentId: "ada", tier: "acquainted", reflect: true, plan: true },
       { residentId: "moss", tier: "acquainted", reflect: false, plan: true },
       { residentId: "bru", tier: "ambient", reflect: true, plan: false },
     ]);
-    expect(nightJobs(tiers, top, 4).find((j) => j.residentId === "moss")).toMatchObject({ reflect: true });
+    expect(nightJobs(tiers, top, 3).find((j) => j.residentId === "moss")).toMatchObject({ reflect: true });
   });
 
   it("requires the world's own token on night and dawn", async () => {

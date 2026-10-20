@@ -2,7 +2,7 @@
  * Levels of detail (GDD §9.8), recomputed at the start of every night pass:
  *   core        the canon residents (card kind "canon")
  *   acquainted  residents the player talked to in the last 14 days, or tied to a live Favor (as asker or as the
- *               resident it's about), at most 60, most recent first
+ *               resident it's about), at most 30, most recent first
  *   ambient     everyone else
  * Story beats and Projects (§9.8 also lists them) have no server-side state yet; they join when they do.
  */
@@ -14,8 +14,8 @@ import { LIVE_FAVOR_STATUSES } from "./context.js";
 
 export type Tier = "core" | "acquainted" | "ambient";
 
-/** §9.8: up to 60 Acquainted residents. */
-export const ACQUAINTED_CAP = 60;
+/** §9.8: up to 30 Acquainted residents. */
+export const ACQUAINTED_CAP = 30;
 /** §9.8: talked to in the last 14 days (today and the 13 before it). */
 export const ACQUAINTED_WINDOW_DAYS = 14;
 

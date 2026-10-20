@@ -122,10 +122,10 @@ export interface NightJob {
 }
 
 /**
- * GDD-GAP: §9.8 has quiet Acquainted residents reflect "every 2nd day" without saying which; it's the even days,
- * so every quiet Acquainted resident reflects on the same nights and the odd nights stay cheap.
+ * §9.8 / Q-03: quiet Acquainted residents reflect on days divisible by three.
+ * Importance-triggered reflections still run on intervening nights.
  */
-export const acquaintedTurn = (day: number): boolean => day % 2 === 0;
+export const acquaintedTurn = (day: number): boolean => day % 3 === 0;
 
 /**
  * The night's jobs in queue order (Core, Acquainted, Ambient; by id within a tier). Ambient residents with nothing to
@@ -515,12 +515,13 @@ export class NightRunner {
     try {
       // Tonight's reflection reads tonight's encounters.
       await Promise.all(encounters);
+      let reflectionSystem;
       if (job.reflect) {
-        await reflectResident(deps, world, job.residentId)
-          .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); });
+        reflectionSystem = (await reflectResident(deps, world, job.residentId)
+          .catch((error: unknown) => { this.log.error({ err: error, ...context }, "reflection failed"); }))?.system;
       }
       if (job.plan) {
-        await planResident(deps, world, job.residentId, { model: true })
+        await planResident(deps, world, job.residentId, { model: true, reflectionSystem })
           .catch((error: unknown) => { this.log.error({ err: error, ...context }, "plan failed"); });
       }
     } finally {

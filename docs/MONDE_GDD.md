@@ -955,10 +955,13 @@ GDD-GAP: the windows, lengths and the 70% are tuning, not design.
 
 ### 9.8 Levels of detail and scheduling
 
+Q-03 applied the Acquainted cap of 30 and quiet-day reflection cadence of every 3rd day after
+the 2026-10-19 five-day staging soak (§9.15). Importance-5+ memories still trigger reflection that night.
+
 | Tier | Who | Plan | Reflection | Live dialogue |
 |---|---|---|---|---|
 | **Core** | The 20 canon residents | Daily | Daily | Yes |
-| **Acquainted** | Up to 60 residents the player has talked to in the last 14 days, or who are tied to an open Favor, Project or story beat | Daily | Daily if they had an importance-5+ memory that day, otherwise every 2nd day (Batch) | Yes |
+| **Acquainted** | Up to 30 residents the player has talked to in the last 14 days, or who are tied to an open Favor, Project or story beat | Daily | Daily if they had an importance-5+ memory that day, otherwise every 3rd day (days divisible by 3; Batch planned) | Yes |
 | **Ambient** | Everyone else | Weekly, plus on life events | Only when an importance-6+ memory touches them (Batch) | Yes. Talking to them promotes them to Acquainted |
 
 - **Lag tolerance.** Batched reflections may return late (they're asynchronous). A resident whose
@@ -1409,6 +1412,9 @@ committing a budget.** Claude Haiku 5.5: **$0.10 input / $0.50 output per millio
 **Message Batches at 50% off**. Thinking tokens bill as output, so dialogue runs with thinking
 disabled, and plans and reflections at `effort: "low"`.
 
+**Original planning estimates, before the 2026-10-19 soak and Q-03 tuning.** These assumed warm caches
+and batching that the live night runner does not yet implement.
+
 **Per-call estimates** (Haiku 5.5 tokens; its tokenizer counts about 30% more than Haiku 4.5):
 
 | Call | Cached in | Fresh in | Out (incl. thinking) | Cost |
@@ -1435,10 +1441,30 @@ disabled, and plans and reflections at `effort: "low"`.
 | **Total** (cache writes are small and amortized; excluded) | | **≈ $0.089 per in-game day ≈ $8.90 per 100-day run** |
 
 **Budget target: Standard ≤ $0.06 per in-game day (≈ $6 per run).** Levers, in order:
-1. Cap Acquainted at 30, and reflect Acquainted residents on quiet days only every 3rd day.
+1. **Applied after the 2026-10-19 soak:** cap Acquainted at 30, and reflect Acquainted residents on quiet days only every 3rd day.
 2. Compress the dynamic context: fewer retrieved memories (6) and summary relationships.
 3. Move more gossip to summary mode (live only within earshot, which it already is).
 4. Batch every reflection except Core (lag-tolerant by design, §9.8).
+
+**2026-10-19 soak correction (Q-03).** Five staging days measured $0.163/day, including
+$0.00111/plan and $0.00106/reflection: cold night prefixes made cache writes material.
+Reflection and its same-night plan now share the exact pre-reflection system blocks 1–3.
+The plan receives current mood, beliefs, relationships, stances, Regard and dream state in an
+escaped, uncached `<tonight>` element; needs and prior plan intentions remain dynamic.
+Plan-only nights keep their existing prefix. No dynamic plan/reflection text has a cache breakpoint.
+Lever 1 above is applied; lever 4 remains unimplemented.
+
+Using the soak token averages and the code's prices, converting a paired plan's 3,906 write
+tokens to reads estimates $0.000656 + $0.0000001 × T per plan, where T is the added
+`<tonight>` input tokens. Reflection remains $0.001055; unpaired plans remain $0.001105.
+With 24 Core and 30 Acquainted, quiet nights average 34 reflections and 54 plans across a
+three-day cycle: about $0.0803 + $0.0000034 × T per night for those two call kinds
+($0.0816 at an illustrative T=400). Quiet off-cadence nights are about $0.0752 and
+every-third nights $0.0945 at T=400. Importance-triggered Acquainted reflections move costs
+toward the latter. Ambient reflections (up to 15), gossip, compaction, press, arrivals and
+daytime dialogue/prewarm are additional. These are projections, not a new soak measurement;
+cache expiry, different structured-output schemas, output lengths and workload can affect hits.
+The $0.06/day target is not yet established.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,
 Ambient work pauses. Past 150%, Acquainted drop to template plans. Past 200%, the world enters Quiet
