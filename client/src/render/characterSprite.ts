@@ -24,7 +24,8 @@ const spritesBase = (): string => `${import.meta.env.BASE_URL}assets/sprites/`;
 
 /** The player's look: what character creation stored in the registry, or the default. */
 export function playerLook(registry: Phaser.Data.DataManager): CharacterLook {
-  return (registry.get(PLAYER_LOOK_KEY) as CharacterLook | undefined) ?? DEFAULT_PLAYER_LOOK;
+  const look = (registry.get(PLAYER_LOOK_KEY) as CharacterLook | undefined) ?? DEFAULT_PLAYER_LOOK;
+  return look.face === 'fellow' ? look : { ...look, face: 'fellow' };
 }
 
 /**

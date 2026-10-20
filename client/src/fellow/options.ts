@@ -84,7 +84,7 @@ export const DEFAULT_CHOICES: LookChoices = {
 export function lookFromChoices(c: LookChoices): CharacterLook {
   const slots = c.slots.map(i => CLOTH_COLOURS[i]!) as unknown as [number, number, number];
   return {
-    kind: 'human', build: c.build, height: c.height,
+    kind: 'human', face: 'fellow', build: c.build, height: c.height,
     skin: SKIN_TONES[c.skin]!, hair: HAIR_COLOURS[c.hair]!, hairStyle: c.hairStyle, eyes: EYE_COLOURS[c.eyes]!,
     ...OUTFITS[c.outfit].dress(slots)
   };

@@ -62,6 +62,8 @@ export const CLOTH_COLOURS = [
 const colour = z.number().int().min(0).max(0xffffff);
 
 export const CharacterLookData = z.object({
+  /** Absent: the resident face; old player saves opt in when loaded by playerLook. */
+  face: z.literal("fellow").optional(),
   kind: z.literal("human"),
   skin: colour,
   hair: colour,

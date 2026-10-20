@@ -16,6 +16,8 @@ export {
 export type { Accessory, BottomStyle, Build, HairStyle, HeadwearKind, Height, OutfitCut } from '@monde/shared';
 
 export interface CharacterLook {
+  /** The Fellow’s softer features. Absent: resident rendering, unchanged. */
+  face?: 'fellow';
   kind: 'human';
   /** Colours are 0xRRGGBB; the rig derives shade, light and outline tones from each. */
   skin: number;
@@ -75,7 +77,7 @@ const ACCENTS = [0xe8dcc0, 0xc0504d, 0xd9a93a, 0x6a8fb5, 0x8a6aa8, 0x5fa36a] as 
  * knitted jumper, brown trousers and boots. fellow/options.ts DEFAULT_CHOICES describes the same look.
  */
 export const DEFAULT_PLAYER_LOOK: CharacterLook = {
-  kind: 'human', skin: 0xf2d5b3, hair: 0x6b4a2b, hairStyle: 'short', eyes: 0x3a2a22,
+  kind: 'human', face: 'fellow', skin: 0xf2d5b3, hair: 0x6b4a2b, hairStyle: 'short', eyes: 0x3a2a22,
   top: 0x3f9e94, bottom: 0x6b4f3a, bottomStyle: 'trousers', shoes: 0x4a3428,
   accessory: 'none', accessoryColour: 0xe8dcc0,
   build: 'medium', height: 'tall', outfit: 'jumper'

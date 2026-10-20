@@ -200,6 +200,12 @@ function drawFrontBack(f: Frame, look: CharacterLook, t: Tones, fit: Fit, p: Pos
   const drawArm = (arm: (typeof arms)[number]) => {
     const cloth = fit.rolled ? Math.min(4, arm.len) : arm.len;
     const sleeve = f.mask().rect(arm.x, armTop, 3, cloth), skin = f.mask().rect(arm.x, armTop + cloth, 3, arm.len - cloth + 3);
+    if (look.face === 'fellow') {
+      // Round the outer shoulder and finish the palm with a softly shaded 2×2 block.
+      sleeve.cut(f.mask().set(arm.x === arms[0]!.x ? arm.x : arm.x + 2, armTop));
+      skin.cut(f.mask().rect(arm.x, armTop + arm.len, 3, 3))
+        .rect(arm.x, armTop + arm.len, 2, 2);
+    }
     f.paint(sleeve, lit(sleeve, t.body, { right: 1 }), t.body);
     f.paint(skin, lit(skin, t.skin, { right: 1, bottom: 1 }), t.skin);
     // Ribbed cuffs (the hand's edge takes the sleeve's last row).
@@ -256,7 +262,7 @@ function drawFrontBack(f: Frame, look: CharacterLook, t: Tones, fit: Fit, p: Pos
   arms.filter(a => !a.away).forEach(drawArm);
 
   // Head: the hair behind it first (long styles), then the face, then the hair over it.
-  const head = headMask(f, ht, 'down');
+  const head = headMask(f, ht, 'down', look.face === 'fellow');
   head.rect(6, ht + 8, 1, 3).rect(25, ht + 8, 1, 3); // ears
   f.paint(head, lit(head, t.skin, { right: 1, bottom: 1 }), t.skin);
   if (front) drawFace(f, look, t, ht, p.blink);
@@ -335,6 +341,10 @@ function drawSide(f: Frame, look: CharacterLook, t: Tones, fit: Fit, p: Pose): v
     const all = f.mask().strip(x, armTop, x - reach, end, 3);
     const split = fit.rolled ? armTop + 3 : end - 3;
     const sleeve = all.clone().band(0, split), hand = all.clone().band(split + 1, end);
+    if (look.face === 'fellow') {
+      sleeve.cut(f.mask().set(x + 2, armTop));
+      hand.cut(f.mask().rect(0, end - 1, FRAME_W, 2)).rect(x - reach, end - 1, 2, 2);
+    }
     f.paint(sleeve, lit(sleeve, tones.body, { right: 1 }), tones.body);
     f.paint(hand, lit(hand, tones.skin, { right: 1, bottom: 1 }), tones.skin);
   };
@@ -381,7 +391,7 @@ function drawSide(f: Frame, look: CharacterLook, t: Tones, fit: Fit, p: Pose): v
   }
   arm(14, p.arm[0], t);
 
-  const head = headMask(f, ht, 'left');
+  const head = headMask(f, ht, 'left', look.face === 'fellow');
   head.set(7, ht + 10); // nose
   f.paint(head, lit(head, t.skin, { right: 1, bottom: 1 }), t.skin);
   // Ear.
@@ -428,7 +438,15 @@ function drawCutSide(f: Frame, t: Tones, fit: Fit, shoulders: number, hem: numbe
   }
 }
 
-function headMask(f: Frame, ht: number, view: View): Mask {
+function headMask(f: Frame, ht: number, view: View, fellow = false): Mask {
+  if (fellow) {
+    const m = f.mask().rows(ht, view === 'left' ? [[[11, 20]], [[9, 22]]] : [[[10, 21]], [[8, 23]]]);
+    for (let r = 2; r <= 10; r++) m.span(ht + r, view === 'left' ? 8 : 7, view === 'left' ? 23 : 24);
+    // Full cheeks taper over four rows into a soft chin; the feet and head height stay fixed.
+    return m.rows(ht + 11, view === 'left'
+      ? [[[7, 23]], [[8, 22]], [[9, 21]], [[10, 20]], [[12, 18]]]
+      : [[[6, 25]], [[7, 24]], [[8, 23]], [[10, 21]], [[12, 19]]]);
+  }
   if (view === 'left') {
     const m = f.mask().rows(ht, [[[11, 20]], [[9, 22]]]);
     for (let i = 2; i <= 12; i++) m.span(ht + i, 8, 23);
@@ -440,6 +458,27 @@ function headMask(f: Frame, ht: number, view: View): Mask {
 }
 
 function drawFace(f: Frame, look: CharacterLook, t: Tones, ht: number, blink: boolean, side = false): void {
+  if (look.face === 'fellow') {
+    const iris = mix(look.eyes, INK, 0.15), cheek = mix(look.skin, BLUSH, 0.44), smile = mix(t.skin.inner, t.skin.line, 0.5);
+    const eye = (x: number, inner: number) => {
+      if (blink) f.decal(f.mask().set(x, ht + 9).set(x + 1, ht + 10).set(x + 2, ht + 9), iris);
+      else {
+        f.decal(f.mask().rect(x, ht + 8, 2, 3), iris);
+        f.dot(inner, ht + 8, GLINT);
+      }
+    };
+    if (side) {
+      eye(9, 10);
+      f.decal(f.mask().span(ht + 12, 11, 12), cheek);
+      f.decal(f.mask().span(ht + 14, 8, 9).set(10, ht + 13), smile);
+    } else {
+      eye(11, 12); eye(19, 19);
+      f.decal(f.mask().span(ht + 12, 9, 10).span(ht + 12, 21, 22), cheek);
+      // A 4 px "\_/" smile: a 3 px V read as a cat's ":3" at the game's 3x.
+      f.decal(f.mask().set(14, ht + 13).span(ht + 14, 15, 16).set(17, ht + 13), smile);
+    }
+    return;
+  }
   const dark = mix(look.eyes, INK, 0.6), iris = mix(look.eyes, INK, 0.15);
   const eye = (x: number) => {
     if (blink) { f.decal(f.mask().span(ht + 10, x, x + 1), t.skin.line); return; }
@@ -636,6 +675,30 @@ function drawHair(f: Frame, look: CharacterLook, t: Tones, view: View, ht: numbe
         break;
     }
   }
+  if (look.face === 'fellow' && view !== 'up') {
+    // Break the fringe into strands and keep both eyes clear, including the swept styles.
+    if (view === 'down') {
+      if (style !== 'buzz' && style !== 'cropped') {
+        set(5, [6, 10], [13, 15], [18, 20], [23, 25]);
+        set(6, [6, 8], [14, 14], [24, 25]);
+        set(7, [6, 7], [24, 25]);
+        // Keep the side part on short/swept cuts and the pulled-back brow on tied hair.
+        if (style === 'short' || style === 'swept') {
+          set(5, [7, 10], [13, 24]); set(6, [7, 8], [16, 24]); set(7, [7, 7], [22, 24]);
+        } else if (style === 'bun' || style === 'ponytail' || style === 'braids' || style === 'pigtails') {
+          set(5, [7, 10], [14, 14], [21, 24]); set(6, [7, 8], [23, 24]);
+        }
+      }
+      if (style === 'long' || style === 'bob' || style === 'swept') {
+        fill(8, 12, [5, 6], [25, 26]);
+        set(13, [5, 6], [25, 26]); set(14, [5, 7], [24, 26]); set(15, [6, 8], [23, 25]);
+      }
+    } else if (style !== 'buzz' && style !== 'cropped') {
+      set(5, [8, 9], [13, 24]); set(6, [15, 24]);
+      if (style === 'long' || style === 'bob' || style === 'curly' || style === 'swept')
+        fill(7, 13, [17, 25]);
+    }
+  }
   // Under a cap the hair starts below its lower edge (drawHeadwear covers the rest).
   const covered = coveredTo(look);
   for (let r = -6; r <= covered; r++) rows[r + 6] = null;
@@ -648,7 +711,9 @@ function drawHair(f: Frame, look: CharacterLook, t: Tones, view: View, ht: numbe
   if (extra) f.paint(extra, lit(extra, t.hair, { right: 1, bottom: 1 }), t.hair);
   f.paint(hair, lit(hair, t.hair, { right: 1, top: 1 }), t.hair);
   // A highlight streak across the crown, texture, and ties for tails, plaits and bunches.
-  const sheen = view === 'left' ? f.mask().span(ht, 12, 15).span(ht + 1, 11, 13) : f.mask().span(ht, 10, 14).span(ht + 1, 9, 11);
+  const sheen = look.face === 'fellow'
+    ? f.mask().set(10, ht + 1).span(ht, 11, 13)
+    : view === 'left' ? f.mask().span(ht, 12, 15).span(ht + 1, 11, 13) : f.mask().span(ht, 10, 14).span(ht + 1, 9, 11);
   f.decal(sheen.clip(hair), t.hair.light);
   f.decal(texture.clip(hair), t.hair.shade);
   if (style === 'ponytail' && view !== 'down') {
