@@ -433,7 +433,7 @@ describe("API request rules", () => {
     expect(params.gossip).toMatchObject({ max_tokens: 400, thinking: { type: "disabled" } });
     expect(requestSettings("precheck").thinking).toEqual({ type: "disabled" });
     for (const kind of ["plan", "reflect"]) {
-      expect(params[kind]).toMatchObject({ max_tokens: 900, output_config: { effort: "low", format: { type: "json_schema" } } });
+      expect(params[kind]).toMatchObject({ max_tokens: 1500, output_config: { effort: "low", format: { type: "json_schema" } } });
       expect(params[kind]!.thinking).toBeUndefined();
     }
     expect(params.dialogue!.output_config?.effort).toBeUndefined();

@@ -18,6 +18,7 @@ Places open tomorrow (use only these ids):
 {{places}}
 Use only these verbs: {{verbs}}.
 </plan_request>
+Times are HH:MM. Tomorrow runs from 06:00 to 02:00: write times after midnight as 00:00-02:00, and end the last block by 02:00 (sleep doesn't need to run to the morning).
 Keep most of the routine. Change at most 2 blocks, with the reason in the block's note. Add at most 1 whim, a spontaneous detour with a reason, or null.
 Write 3 short barks you might say aloud tomorrow, in your own voice.
 Say if you want to find the Fellow tomorrow, and why (seek_player), or null. List the intentions you carry into tomorrow.

@@ -72,10 +72,14 @@ export function requestSettings(kind: MindCallKind): MindSettings {
       // in the §9.15 cost table); 64 leaves headroom without inviting prose.
       return { model: MIND_MODEL, max_tokens: 64, thinking: { type: "disabled" } };
     case "night":
-      return { model: MIND_MODEL, max_tokens: 1800, output_config: { effort: "low" } };
+      // GDD-GAP: §9.17 gives the combined call no limit. 1,800 cut off 3 of 19 in the first live night (2026-10-19), and a
+      // cut-off call is paid for and thrown away (both halves fall back); typical output is ~1,100.
+      return { model: MIND_MODEL, max_tokens: 3000, output_config: { effort: "low" } };
     case "plan":
     case "reflect":
-      return { model: MIND_MODEL, max_tokens: 900, output_config: { effort: "low" } };
+      // §9.17 (raised from 900 after the 2026-10-19 soak: 900 cut off 26% of plans and 19% of reflections, each paid for
+      // and thrown away for the template or the rule fallback).
+      return { model: MIND_MODEL, max_tokens: 1500, output_config: { effort: "low" } };
   }
 }
 

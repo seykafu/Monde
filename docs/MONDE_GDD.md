@@ -1560,7 +1560,8 @@ Output: `{lines[]|null, A_delta, B_delta, news_passed[], feelings_change|null}`.
 `output_config.format` = the JSON schema; `thinking: {type: "disabled"}` for dialogue, gossip and
 pre-check; `output_config.effort: "low"` for plans and reflections; **no** `temperature`, `top_p` or
 `top_k` (Haiku 5.5 rejects non-default sampling with a 400); **no** assistant prefill (rejected);
-`max_tokens` 400 for dialogue, 900 for plans and reflections. Variety comes from persona, memory,
+`max_tokens` 400 for dialogue, 1,500 for plans and reflections, 3,000 for the combined night call (raised from
+900 and 1,800 after the 2026-10-19 soak: a cut-off call is paid for and thrown away). Variety comes from persona, memory,
 topic cards and a per-call **whim seed** (a random word or object from a 500-entry list in the dynamic
 block), not from sampling settings. SDK: `@anthropic-ai/sdk` (TypeScript), using typed errors,
 `stream.finalMessage()` and SDK types. Never hand-rolled HTTP.

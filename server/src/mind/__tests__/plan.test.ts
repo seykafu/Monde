@@ -108,6 +108,18 @@ describe("validatePlan", () => {
     expect(validatePlan(JSON.stringify({ blocks: [] }), ctx())).toMatchObject({ ok: false, category: "schema" });
   });
 
+  it("ends an evening block written through to the morning at 02:00, not a thrown-away plan", () => {
+    // Soak 2026-10-19: 17% of plans failed "times" on blocks like 21:30-06:00 (sleep, to tomorrow's wake time).
+    const last = routine().at(-1)!;
+    const result = valid(modelPlan({ [last.start]: { end: "06:00" } }));
+    expect(result.plan.blocks.at(-1)!.end).toBe("26:00"); // the engine writes the end of the day as 26:00
+    expect(result.adjustments).toContain(`block ${routine().length - 1} ends at 02:00 (was 06:00)`);
+    // A daytime block that ends before it starts is still wrong.
+    const backwards = JSON.parse(modelPlan());
+    backwards.blocks[2].end = "07:00";
+    expect(validatePlan(JSON.stringify(backwards), ctx())).toMatchObject({ ok: false, category: "times" });
+  });
+
   it("sorts blocks and fills gaps and the end of the day from the routine", () => {
     const blocks = JSON.parse(modelPlan()).blocks as Block[];
     // Out of order, with 13:00-16:00 and everything after 18:00 missing.

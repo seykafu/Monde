@@ -49,6 +49,9 @@ export function planVerbs(card: Pick<PersonaCard, "kind">): readonly Verb[] {
  * A model time → clock minutes, regardless of block order: 00:00-02:00 are after midnight (24:00-26:00, the end
  * of the game day), anything later is that morning or day. Null if unparseable or past 26:00.
  */
+/** An evening block (from 18:00) whose end is a morning time (up to noon) means "through the night" (validatePlan). */
+const OVERNIGHT_FROM = 18 * 60, OVERNIGHT_UNTIL = 12 * 60;
+
 export function modelMinutes(text: string): number | null {
   const m = /^(\d{1,2}):(\d{2})$/.exec(text.trim());
   if (!m) return null;
@@ -156,7 +159,13 @@ export function validatePlan(raw: string, ctx: PlanValidationContext): PlanValid
   const timed: (LooseBlock & { startMin: number; endMin: number; index: number })[] = [];
   for (const [index, b] of loose.blocks.entries()) {
     const startMin = modelMinutes(b.start);
-    const endMin = modelMinutes(b.end);
+    let endMin = modelMinutes(b.end);
+    // An evening block that runs into the next morning ("21:30-06:00", sleep) ends when the plan's day does (02:00):
+    // the model writes tomorrow's wake time. 17% of plans were thrown away for it (soak, 2026-10-19).
+    if (startMin !== null && endMin !== null && endMin <= startMin && startMin >= OVERNIGHT_FROM && endMin <= OVERNIGHT_UNTIL) {
+      endMin = PASS_OUT;
+      adjustments.push(`block ${index} ends at 02:00 (was ${b.end})`);
+    }
     if (startMin === null || endMin === null || endMin <= startMin) return fail("times", `block ${index}: ${b.start}-${b.end}`);
     timed.push({ ...b, startMin, endMin, index });
   }

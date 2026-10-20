@@ -130,7 +130,7 @@ describe("reflectResident", () => {
 
     // The request: effort low, structured output, no sampling, today's memories only, town facts.
     const body = mind.calls[0]!.body;
-    expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 900, output_config: { effort: "low" } });
+    expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: 1500, output_config: { effort: "low" } });
     expect(body.output_config?.format?.type).toBe("json_schema");
     for (const key of ["temperature", "top_p", "top_k", "thinking"]) expect(body).not.toHaveProperty(key);
     const user = body.messages[0]!.content as string;

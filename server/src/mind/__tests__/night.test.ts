@@ -378,7 +378,7 @@ describe("night pass rules and hygiene", () => {
     expect(night.length).toBeGreaterThan(50);
     for (const body of night) {
       for (const key of ["temperature", "top_p", "top_k", "thinking", "stream"]) expect(body).not.toHaveProperty(key);
-      expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: JSON.stringify(body.messages).includes("Complete tonight in order") ? 1800 : 900, output_config: { effort: "low" } });
+      expect(body).toMatchObject({ model: "claude-haiku-5-5", max_tokens: JSON.stringify(body.messages).includes("Complete tonight in order") ? 3000 : 1500, output_config: { effort: "low" } });
       expect(body.output_config?.format?.type).toBe("json_schema");
       expect(body.messages.every((m) => m.role === "user")).toBe(true);
     }
