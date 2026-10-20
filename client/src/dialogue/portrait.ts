@@ -1,8 +1,8 @@
 // The dialogue portrait (GDD §16.2, §18 Dialogue): a resident's bust in the VN panel, one of six expressions.
 //
-// Art first: if client/public/assets/portraits/manifest.json lists the resident, their PNGs load when the
-// conversation opens (lazily, once per session: textures outlive the scene) and the bust shows the file for
-// each expression (portraitModel.artExpression). Otherwise, and until the files arrive, it draws a
+// Art first: if client/public/assets/portraits/manifest.json lists the resident, their sheet (one WebP, a frame per
+// expression) loads when the conversation opens (lazily, once per session: textures outlive the scene) and the
+// bust shows the frame for each expression (portraitModel.artExpression). Otherwise, and until the files arrive, it draws a
 // procedural cartoon bust in the resident's colours: back hair, shoulders and collar, head and ears, front
 // hair and headwear (static), then a face layer per expression, then glasses, moustache and the frame.
 // Expression changes are quick and small: the face (or the art) crossfades over 110 ms with a slight squash,
@@ -11,8 +11,8 @@ import Phaser from 'phaser';
 import type { PortraitExpression } from '@monde/shared';
 import { FAMILY_BODY, RENDER_SCALE } from '../util/constants';
 import {
-  FACES, MANIFEST_PATH, PORTRAIT_H, PORTRAIT_W, artExpression, mixColour, parsePortraitManifest, portraitExpression,
-  portraitTextureKey, portraitUrl, shadeColour, type PortraitLook, type PortraitManifest
+  ART_H, ART_W, FACES, MANIFEST_PATH, PORTRAIT_H, PORTRAIT_W, artExpression, mixColour, parsePortraitManifest, portraitExpression,
+  portraitFrame, portraitTextureKey, portraitUrl, shadeColour, type PortraitLook, type PortraitManifest
 } from './portraitModel';
 
 type G = Phaser.GameObjects.Graphics;
@@ -818,7 +818,7 @@ export class Portrait {
     tweens.killTweensOf([...this.faces, ...this.images, this.body]);
     this.body.setScale(1).setPosition(W / 2, H);
     if (file) {
-      const image = this.images[next].setTexture(portraitTextureKey(this.opts.residentId, file)).setVisible(true);
+      const image = this.images[next].setTexture(portraitTextureKey(this.opts.residentId), portraitFrame(this.art[this.opts.residentId], file)).setVisible(true);
       image.setScale(Math.min(W / image.width, H / image.height)).setPosition(0, 0);
       this.faces.forEach(f => f.setVisible(false));
       this.bust.setVisible(false);
@@ -894,17 +894,18 @@ export class Portrait {
     const manifest = await loadPortraitManifest();
     const id = this.opts.residentId, exprs = manifest[id];
     if (this.destroyed || !exprs?.length) return;
-    const textures = this.scene.textures, load = this.scene.load;
-    const missing = exprs.filter(e => !textures.exists(portraitTextureKey(id, e)));
+    const textures = this.scene.textures, load = this.scene.load, sheet = portraitTextureKey(id);
     const ready = () => {
       if (this.destroyed) return;
-      const have = exprs.filter(e => textures.exists(portraitTextureKey(id, e)));
+      // Frame i of the sheet is the manifest's expression i (scripts/art/export_portraits.py writes both).
+      const frames = textures.exists(sheet) ? textures.get(sheet).frameTotal - 1 : 0;
+      const have = exprs.slice(0, frames);
       this.art = have.length ? { [id]: have } : {};
       this.shown = null;
       this.setExpression(this.wanted, true);
     };
-    if (!missing.length) { ready(); return; }
-    for (const e of missing) load.image(portraitTextureKey(id, e), portraitUrl(import.meta.env.BASE_URL, id, e));
+    if (textures.exists(sheet)) { ready(); return; }
+    load.spritesheet(sheet, portraitUrl(import.meta.env.BASE_URL, id), { frameWidth: ART_W, frameHeight: ART_H });
     load.once(Phaser.Loader.Events.COMPLETE, ready);
     load.start();
   }

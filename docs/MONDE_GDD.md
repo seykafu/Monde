@@ -10013,14 +10013,17 @@ conversation's emotion and topic. Signature expressions come back later, with mo
 
 #### 16.2.1 Portrait files: the contract
 
-- **Path:** `client/public/assets/portraits/<resident_id>/<expression>.png`, one file per expression:
-  the six by name, plus any signature or animal pose id later.
+- **Path:** `client/public/assets/portraits/<resident_id>.webp`, one sheet per resident: 460×540 frames left
+  to right, one per expression in the manifest's order (the six by name, plus any signature or animal pose id
+  later). One file per resident, not per expression: itch.io's browser games allow at most 1,000 files.
 - **Manifest:** `client/public/assets/portraits/manifest.json` maps each resident id to the
-  expressions that have a file, `{ "odile": ["neutral", "warm", …] }`. Only listed files are ever
-  requested, so nothing 404s; it ships as `{}`. A resident's files load when their conversation opens
-  and stay cached for the session.
-- **Format:** PNG, transparent background (keyed, straight alpha), sRGB. No frame, backdrop, name or
-  text: the panel draws its own frame in the resident's colour.
+  expressions their sheet holds, in frame order, `{ "odile": ["neutral", "warm", …] }`. Only listed sheets are
+  ever requested, so nothing 404s. A resident's sheet loads when their conversation opens and stays cached for
+  the session.
+- **Format:** WebP, transparent background (keyed, straight alpha), sRGB. Lossy quality 96, alpha quality 100,
+  method 6; raise quality in steps of 2 (up to 100) targeting 38 dB PSNR over black and mid-grey.
+  Use lossless WebP if chroma subsampling prevents reaching that target at quality 100. Source art stays PNG.
+  No frame, backdrop, name or text: the panel draws its own frame in the resident's colour.
 - **Size:** 460×540 px (23:27), the dialogue frame's 230×270 at the 2× render scale. Other sizes are
   scaled to fit, anchored at the bottom centre, so keep 23:27.
 - **Framing:** head and shoulders, identical across one resident's files so an expression change

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { HAIR_COLOURS, HAIR_STYLES, PORTRAIT_SET, PersonaCard, SKIN_TONES } from '@monde/shared';
 import {
   ART_H, ART_W, FACES, HAIR, MANIFEST_PATH, PORTRAIT_HAIR, PORTRAIT_HEADWEAR, SKIN, artExpression, parsePortraitManifest,
-  portraitExpression, portraitLook, portraitTextureKey, portraitUrl
+  portraitExpression, portraitFrame, portraitLook, portraitTextureKey, portraitUrl
 } from '../portraitModel';
 import { lookFromCard, luma } from '../../render/character/look';
 import { bottomFirst, visibleRange } from '../logLayout';
@@ -47,9 +47,18 @@ describe('the art manifest', () => {
   it('lists only files that ship, so nothing 404s', () => {
     const publicDir = resolve(import.meta.dirname, '../../../public');
     const shipped = parsePortraitManifest(JSON.parse(readFileSync(resolve(publicDir, MANIFEST_PATH), 'utf8')));
+    // One sheet per resident, a frame per listed expression (the WebP header's canvas size, VP8X or VP8L).
+    const size = (file: Buffer): [number, number] => {
+      const chunk = file.toString('ascii', 12, 16);
+      if (chunk === 'VP8X') return [1 + file.readUIntLE(24, 3), 1 + file.readUIntLE(27, 3)];
+      if (chunk === 'VP8L') { const b = file.readUInt32LE(21); return [(b & 0x3fff) + 1, ((b >>> 14) & 0x3fff) + 1]; }
+      return [file.readUInt16LE(26) & 0x3fff, file.readUInt16LE(28) & 0x3fff];
+    };
+    const files = readdirSync(resolve(publicDir, 'assets/portraits'));
+    expect(files.filter(file => file !== 'manifest.json' && !file.endsWith('.webp'))).toEqual([]);
     for (const [id, exprs] of Object.entries(shipped)) {
-      const files = readdirSync(resolve(publicDir, 'assets/portraits', id));
-      for (const expr of exprs) expect(files, `${id}/${expr}.png`).toContain(`${expr}.png`);
+      expect(files, `${id}.webp`).toContain(`${id}.webp`);
+      expect(size(readFileSync(resolve(publicDir, 'assets/portraits', `${id}.webp`))), id).toEqual([ART_W * exprs.length, ART_H]);
     }
     expect(artExpression({}, 'odile', 'warm')).toBeNull();
   });
@@ -74,9 +83,11 @@ describe('the art manifest', () => {
   });
 
   it('builds file URLs against the base, never a leading slash', () => {
-    expect(portraitUrl('./', 'odile', 'warm')).toBe('./assets/portraits/odile/warm.png');
-    expect(portraitUrl('/monde/', 'tib', 'sad')).toBe('/monde/assets/portraits/tib/sad.png');
-    expect(portraitTextureKey('tib', 'sad')).toBe('portrait:tib:sad');
+    expect(portraitUrl('./', 'odile')).toBe('./assets/portraits/odile.webp');
+    expect(portraitUrl('/monde/', 'tib')).toBe('/monde/assets/portraits/tib.webp');
+    expect(portraitTextureKey('tib')).toBe('portrait:tib');
+    expect(portraitFrame(['neutral', 'warm', 'sad'], 'sad')).toBe(2);
+    expect(portraitFrame(undefined, 'sad')).toBe(-1);
     expect([ART_W, ART_H]).toEqual([460, 540]);
   });
 });

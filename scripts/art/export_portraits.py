@@ -1,8 +1,12 @@
 """Export generated portraits to the game's portrait contract (GDD §16.2.1).
 
   art_sources/portraits/<id>/<expr>.png  (1024x1536, flat magenta background)
-    -> client/public/assets/portraits/<id>/<expr>.png  (460x540, transparent, identical framing per resident)
-    -> client/public/assets/portraits/manifest.json   ({id: [expr, ...]})
+    -> client/public/assets/portraits/<id>.webp     (one sheet per resident: 460x540 frames left to right, transparent,
+                                                      identical framing, in the manifest's order)
+    -> client/public/assets/portraits/manifest.json   ({id: [expr, ...]}: frame i is expression i)
+
+One sheet per resident, not one file per expression: itch.io's browser games allow at most 1,000 files, and the 144
+portrait identities alone were 864 (and one request per conversation instead of six).
 
 Keying: alpha from the distance to pure magenta, a soft edge between KEY_IN and KEY_OUT, and magenta spill
 removed from the edge pixels. Framing: one crop per resident, measured on their neutral, so an expression
@@ -61,6 +65,31 @@ def frame_for(neutral: Image.Image) -> tuple[int, int]:
     return (left, top)
 
 
+def save_webp(image: Image.Image, path: str) -> int | str:
+    """Lossy RGB, exact alpha. Target 38 dB on black/grey composites, up to quality 100; else lossless (returns 0).
+
+    Compare rounded sRGB pixels at the shipped resolution, including transparent areas.
+    Keep keying/despilling upstream of compression so re-exports use the same policy.
+    """
+    image = image.convert("RGBA")
+    source = np.asarray(image, dtype=np.float64)
+    alpha = source[..., 3:4] / 255.0
+    references = [np.round(source[..., :3] * alpha + bg * (1 - alpha)) for bg in (0, 128)]
+    for quality in (96, 98, 100):
+        image.save(path, format="WEBP", lossless=False, quality=quality, alpha_quality=100, method=6)
+        with Image.open(path) as decoded:
+            actual = np.asarray(decoded.convert("RGBA"), dtype=np.float64)
+        if not np.array_equal(source[..., 3], actual[..., 3]):
+            raise ValueError(f"WebP alpha changed: {path}")
+        errors = [np.mean((reference - np.round(actual[..., :3] * alpha + bg * (1 - alpha))) ** 2)
+                  for reference, bg in zip(references, (0, 128))]
+        if max(errors) <= 255 ** 2 / 10 ** (38 / 10):
+            return quality
+    # Lossy WebP's chroma subsampling caps a few fine-lined portraits near 37 dB even at quality 100: those ship lossless.
+    image.save(path, format="WEBP", lossless=True, quality=100, method=6)
+    return 0
+
+
 def export(rid: str) -> list[str]:
     folder = os.path.join(SRC, rid)
     exprs = [e for e in SIX if os.path.exists(os.path.join(folder, f"{e}.png"))]
@@ -71,12 +100,21 @@ def export(rid: str) -> list[str]:
     keyed = {e: key(Image.open(os.path.join(folder, f"{e}.png"))) for e in exprs}
     left, top = frame_for(keyed["neutral"])
     crop_w = round(CROP_H * OUT_W / OUT_H)
-    os.makedirs(os.path.join(DST, rid), exist_ok=True)
+    frames = []
     for e, im in keyed.items():
         canvas = Image.new("RGBA", (crop_w, CROP_H), (0, 0, 0, 0))
         canvas.paste(im.crop((left, max(0, top), left + crop_w, top + CROP_H)), (0, max(0, -top)))
-        canvas.resize((OUT_W, OUT_H), Image.LANCZOS).save(os.path.join(DST, rid, f"{e}.png"), optimize=True)
+        frames.append(canvas.resize((OUT_W, OUT_H), Image.LANCZOS))
+    save_sheet(frames, os.path.join(DST, f"{rid}.webp"))
     return exprs
+
+
+def save_sheet(frames: list[Image.Image], path: str) -> int | str:
+    """The resident's frames side by side, in manifest order, as one WebP (save_webp's quality policy)."""
+    sheet = Image.new("RGBA", (OUT_W * len(frames), OUT_H), (0, 0, 0, 0))
+    for i, frame in enumerate(frames):
+        sheet.paste(frame.convert("RGBA"), (i * OUT_W, 0))
+    return save_webp(sheet, path)
 
 
 def main() -> int:
@@ -100,8 +138,9 @@ def main() -> int:
         cell = (230, 270)
         sheet = Image.new("RGB", (cell[0] * 6, cell[1] * len(rows)), (60, 52, 70))
         for y, rid in enumerate(rows):
-            for x, e in enumerate(manifest[rid][:6]):
-                im = Image.open(os.path.join(DST, rid, f"{e}.png")).resize(cell, Image.LANCZOS)
+            strip = Image.open(os.path.join(DST, f"{rid}.webp")).convert("RGBA")
+            for x in range(min(6, len(manifest[rid]))):
+                im = strip.crop((x * OUT_W, 0, (x + 1) * OUT_W, OUT_H)).resize(cell, Image.LANCZOS)
                 sheet.paste(im, (x * cell[0], y * cell[1]), im)
         sheet.save(a.sheet, quality=85)
     return 0

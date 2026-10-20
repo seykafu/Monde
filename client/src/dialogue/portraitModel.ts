@@ -23,10 +23,15 @@ export const ART_W = PORTRAIT_W * 2;
 export const ART_H = PORTRAIT_H * 2;
 export const MANIFEST_PATH = 'assets/portraits/manifest.json';
 
-/** `<base>assets/portraits/<id>/<expr>.png`; `base` is import.meta.env.BASE_URL (never a leading /). */
-export const portraitUrl = (base: string, residentId: string, expr: string): string =>
-  `${base}assets/portraits/${residentId}/${expr}.png`;
-export const portraitTextureKey = (residentId: string, expr: string): string => `portrait:${residentId}:${expr}`;
+/**
+ * `<base>assets/portraits/<id>.webp`: the resident's sheet, one ART_W×ART_H frame per expression, left to right in the
+ * manifest's order (one file per resident: itch.io's browser games allow 1,000 files). `base` is
+ * import.meta.env.BASE_URL (never a leading /).
+ */
+export const portraitUrl = (base: string, residentId: string): string => `${base}assets/portraits/${residentId}.webp`;
+export const portraitTextureKey = (residentId: string): string => `portrait:${residentId}`;
+/** The sheet frame that holds `expr`, from the manifest's list for this resident; -1 when it has none. */
+export const portraitFrame = (exprs: readonly string[] | undefined, expr: string): number => exprs?.indexOf(expr) ?? -1;
 /**
  * Whose art a card shows: a generated resident wears a library bust (`lib_f42_009`, G-02, Appendix A.3.5), so its
  * files are the library entry's; everyone else's are under their own id.
