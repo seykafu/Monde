@@ -1461,8 +1461,14 @@ notes leaked planner language and lost the residents' voices. Plans now list onl
 overnight blocks end at 02:00, and plans and reflections have 1,500 tokens: in the same 5-day soak that brought the
 day to **$0.128**, every one of 227 model plans was kept (before, 45% fell back to the template: 26% cut off, 17%
 "times"), plan output fell from ~690 to ~490 tokens, and a blind A/B preferred the changes-only plans 26-16 (20 ties;
-clear 9-3). Lever 4 is now applied; the next soak must measure settled batch spend. Remaining levers: a compact persona block for night calls, then
-levers 2 and 3. The $0.06/day target is not yet met.
+clear 9-3). Lever 4 (non-Core reflections batched at half price) then measured $0.134/day, within the soak's noise:
+non-Core reflections were 30 of 124 model reflections in five days (Core's 24 stay live), so it saves ≈ $0.003 a
+day. Where a day's ≈ $0.13 goes now: plans ≈ $0.045 (24 Core and up to 30 Acquainted), Core reflections ≈ $0.022,
+dialogue ≈ $0.024 (60 turns), gossip ≈ $0.021, prewarm ≈ $0.009, conversation summaries ≈ $0.007, pre-checks
+≈ $0.003. The soak talks to ~20 different residents a day, which keeps Acquainted at its cap; a real day likely
+costs less. Further cuts are design trade-offs: Acquainted model plans less often, Core reflections batched (their
+plans would read yesterday's beliefs), gossip in summary mode (lever 3), a compact night persona. The $0.06/day
+target is not yet met.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,
 Ambient work pauses. Past 150%, Acquainted drop to template plans. Past 200%, the world enters Quiet
