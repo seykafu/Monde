@@ -310,7 +310,7 @@ describe("the dialogue turn leads with what the Fellow said", () => {
     expect(lines(text)[1]).toMatch(/^Respond to this first: answer what the Fellow asked/);
     expect(text.trimEnd().endsWith("Reply as Odile Fournier, answering the Fellow first.")).toBe(true);
     // Scene and mood stay, compact: one line.
-    expect(lines(text)[2]).toMatch(/^<scene> Day 4 \(Fri, spring\), 17:30, old_quarter\.library\. Weather: fog\. You: .+ Doing: .+ <\/scene>$/);
+    expect(lines(text)[2]).toMatch(/^<scene> Day 4 \(Fri, spring\), 17:30, Monde Free Library\. Weather: fog\. You: .+ Doing: .+ <\/scene>$/);
   });
 
   it("offers topic cards only on the opener or a lull, never while there's a line to answer", () => {

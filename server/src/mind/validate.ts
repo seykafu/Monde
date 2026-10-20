@@ -42,6 +42,7 @@
  * Canon checks (§9.13 step 3) are rules built from canon_locks and arrive with their content; nothing here
  * pretends to do them. Favor feasibility is M-09: favors are stored as "proposed".
  */
+import { namePlaces } from "./placeNames.js";
 import {
   DialogueTurnOutput, coinsFor, MVP_FAVOR_TEMPLATES, callName, clampDialogue, normalizeChoices, type Emotion, type PersonaCard,
 } from "@monde/shared";
@@ -359,7 +360,11 @@ export function repairDialogueLine(text: string, ctx: ValidationContext, adjustm
   if (agreed !== staged) adjustments.push(`address agreed with ${ctx.fellow!.pronouns}`);
   const money = coinsFor(agreed);
   if (money) adjustments.push(`currency repaired: ${JSON.stringify(money.swaps)}`);
-  return money?.text ?? agreed;
+  const said = money?.text ?? agreed;
+  // A place id read out of the prompt ("headed for market_row.market_street") becomes its name.
+  const named = namePlaces(said);
+  if (named !== said) adjustments.push("place id named");
+  return named;
 }
 
 /** Text the player will see (and that a riddle answer could leak through). */
@@ -400,7 +405,7 @@ export function validateTurn(raw: string, ctx: ValidationContext): ValidationRes
   }
 
   // 2. Clamps. Choices first, so a reply dropped as a repeat or a second goodbye can be replaced by a fourth.
-  const choices = normalizeChoices(parsed.data.choices, {
+  const choices = normalizeChoices(parsed.data.choices.map((c) => ({ ...c, text: namePlaces(c.text) })), {
     cue: { text: lines.at(-1)!.text }, name: ctx.card.name ? callName(ctx.card.name) : null,
   });
   const given = parsed.data.choices.map((c) => c.text.trim());

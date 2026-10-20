@@ -144,7 +144,7 @@ describe("POST /v1/worlds/:w/talk", () => {
     expect(request.output_config?.format?.type).toBe("json_schema");
     expect(request.system).toHaveLength(3);
     expect(userBlocks(request)[0]).toContain("Name: Fellow (they/them; never \"he\", \"she\", \"a man\" or \"a woman\")");
-    expect(userBlocks(request)[0]).toContain("Day 4 (Fri, spring), 17:30, old_quarter.fountain_square");
+    expect(userBlocks(request)[0]).toContain("Day 4 (Fri, spring), 17:30, Fountain Square");
   });
 
   it("writes an ai_log row per call with tokens, computed cost, latency and first-token time", async () => {

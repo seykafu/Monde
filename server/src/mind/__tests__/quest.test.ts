@@ -209,7 +209,11 @@ describe("the <quest> element in block 4", () => {
       expect(block).not.toContain(r.inscription.split("\n")[0]!.trim());
     }
     // The whole turn for an uninvolved resident who didn't ask carries none of it.
-    const odile = userText(buildDialogueRequest(input(card("odile"), { quest: { ...S07A, threads: [{ kind: "mark" }] } })));
+    // (In her bakery: the scene's own place is named now, and the default scene is the clocktower.)
+    const odile = userText(buildDialogueRequest(input(card("odile"), {
+      quest: { ...S07A, threads: [{ kind: "mark" }] }, doing: "work at market_row.bakery",
+      scene: { day: 14, weekday: "Mon", minute: 16 * 60 + 20, place: "market_row.bakery", weather: "bright spells" },
+    })));
     expect(odile).not.toContain("Clocktower");
   });
 

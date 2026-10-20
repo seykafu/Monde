@@ -1,5 +1,6 @@
 import { buildApp } from "./app.js";
 import { parseConfig } from "./config.js";
+import { loadPlaceNames } from "./mind/placeNames.js";
 
 const config = parseConfig();
 const app = buildApp(config);
@@ -18,6 +19,8 @@ async function shutdown(signal: string) {
 process.once("SIGTERM", () => void shutdown("SIGTERM"));
 process.once("SIGINT", () => void shutdown("SIGINT"));
 try {
+  // The homes' addresses, before any prompt is built, so the persona block's bytes never change mid-process.
+  await loadPlaceNames();
   await app.listen({ port: config.PORT, host: "0.0.0.0" });
 } catch (err) {
   app.log.error({ err }, "Startup failed");

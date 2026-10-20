@@ -28,6 +28,7 @@ import {
 import { promptExpressions } from "./expressions.js";
 import { addressFor, fellowLine, pronounNote, type FellowView } from "./naming.js";
 import { asksWhatToDo, questLines } from "./quest.js";
+import { namePlaces, placeName } from "./placeNames.js";
 import { townNowBlock } from "./townState.js";
 import { borrowedFor, borrowedLine, phraseKey, type RosterVoice, type Signature } from "./voice.js";
 
@@ -325,8 +326,9 @@ export function personaBlock(card: PersonaCard, ctx: CanonContext): string {
     pronouns: card.pronouns,
     kind: KIND_LINE[card.kind],
     occupation: prose(card.occupation),
-    home: card.home,
-    workplace: card.workplace,
+    // Names, not ids: residents say what the prompt says (playtest 2026-10-20, "market_row.market_street").
+    home: placeName(card.home),
+    workplace: placeName(card.workplace),
     appearance: prose(card.appearance),
     backstory: prose(card.backstory),
     traits: card.personality.traits.join(", "),
@@ -675,7 +677,7 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
     weekday: scene.weekday,
     season: seasonOf(scene.day),
     time: clockTime(scene.minute),
-    place: scene.placeDescription ? `${scene.place} (${prose(scene.placeDescription)})` : scene.place,
+    place: scene.placeDescription ? `${placeName(scene.place)} (${prose(scene.placeDescription)})` : placeName(scene.place),
     weather: clause(scene.weather),
     emotion: state.mood.emotion,
     intensity: String(round(state.mood.intensity)),
@@ -704,7 +706,8 @@ export function buildDialogueRequest(input: DialogueInput): MindRequest {
   });
   return {
     system: input.sessionSystem?.map(b => ({ type: 'text', text: b.text, cache_control: { type: 'ephemeral' } })) ?? systemBlocks(card, state, input.relationships, ctx),
-    messages: dialogueMessages(input, user),
+    // Any place id left in block 4 (doing, topics, memories, favors) is named: a resident repeats what it reads.
+    messages: dialogueMessages(input, namePlaces(user)),
     output_config: outputConfig("dialogue", DialogueTurnOutput),
   };
 }

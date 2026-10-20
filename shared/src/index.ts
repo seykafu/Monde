@@ -34,3 +34,4 @@ export * from './telemetry';
 export * from './census';
 export * from './reports';
 export * from './quest';
+export * from './placeNames';
