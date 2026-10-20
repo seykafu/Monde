@@ -95,6 +95,14 @@ async function remember(worldId: string, residentId: string, day: number, import
   });
 }
 
+/**
+ * How late the night's answer may be under a busy test run. vitest runs files in parallel, and timers fired 400-600 ms
+ * late in full-suite runs (4,402 and 4,567 ms against a 4,000 ms budget). In the slow-model test a response that waited
+ * for the night's work instead of answering at the budget takes 6 s or more (24 Core residents, two 1 s calls each,
+ * eight at a time), so this still catches that regression.
+ */
+const LOAD_SLACK_MS = 1250;
+
 describe("POST /v1/worlds/:w/night", () => {
   it("reflects and plans for Core, advances the day, and leaves Ambient residents on their routine", async () => {
     const mind = fake();
@@ -202,10 +210,10 @@ describe("POST /v1/worlds/:w/night", () => {
     const elapsed = performance.now() - started;
     expect(res.statusCode).toBe(200);
     expect(elapsed).toBeGreaterThanOrEqual(NIGHT_BUDGET_MS - 100);
-    expect(elapsed).toBeLessThan(NIGHT_BUDGET_MS + 1000);
+    expect(elapsed).toBeLessThan(NIGHT_BUDGET_MS + LOAD_SLACK_MS);
     const body = res.json();
     expect(body.elapsed_ms).toBeGreaterThanOrEqual(NIGHT_BUDGET_MS - 50);
-    expect(body.elapsed_ms).toBeLessThanOrEqual(NIGHT_BUDGET_MS + 250);
+    expect(body.elapsed_ms).toBeLessThanOrEqual(NIGHT_BUDGET_MS + LOAD_SLACK_MS);
     const core = coreIds();
     expect(body.complete).toBe(false);
     expect(body.pending).toBeGreaterThan(0);
@@ -447,7 +455,7 @@ describe("the night pass on the full Day-1 roster (212)", () => {
     const body = res.json();
     const core = full.filter((c) => c.kind === "canon").map((c) => c.id).sort();
     expect(body.tiers).toEqual({ core: core.length, acquainted: 0, ambient: 212 - core.length });
-    expect(elapsed).toBeLessThan(NIGHT_BUDGET_MS + 500);
+    expect(elapsed).toBeLessThan(NIGHT_BUDGET_MS + LOAD_SLACK_MS);
     await env.runner.idle(env.worldId);
     const total = performance.now() - started;
     const rule = env.lines.find((l) => l.msg === "rule encounters written");
