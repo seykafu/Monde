@@ -1456,9 +1456,12 @@ cold: each resident's persona and beliefs (≈ 3.5–4K tokens) are written to t
 plan and a reflection nightly) is ≈ $0.05 a night. One combined call per resident that reflects and plans was tried
 and dropped: it wrote ~1,940 output tokens against ~1,280 for the two calls, so it saved only ~5% a resident-night,
 and a blind A/B of 63 same-night pairs preferred the separate calls 38-13 (12 ties; clear wins 14-2): the combined
-notes leaked planner language and lost the residents' voices. Output is now the largest share: plans list only the
-blocks they change (§9.17). Remaining levers: batching non-Core reflections (lever 4), a compact persona block for
-night calls, then levers 2 and 3. The $0.06/day target is not yet met.
+notes leaked planner language and lost the residents' voices. Plans now list only the blocks they change (§9.17),
+overnight blocks end at 02:00, and plans and reflections have 1,500 tokens: in the same 5-day soak that brought the
+day to **$0.128**, every one of 227 model plans was kept (before, 45% fell back to the template: 26% cut off, 17%
+"times"), plan output fell from ~690 to ~490 tokens, and a blind A/B preferred the changes-only plans 26-16 (20 ties;
+clear 9-3). Remaining levers: batching non-Core reflections (lever 4), a compact persona block for night calls, then
+levers 2 and 3. The $0.06/day target is not yet met.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,
 Ambient work pauses. Past 150%, Acquainted drop to template plans. Past 200%, the world enters Quiet
