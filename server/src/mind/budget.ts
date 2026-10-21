@@ -58,11 +58,11 @@ export function reservingMind(db: WorldDatabase, mind: MindClient, admit: (tx: B
     });
     try {
       const message = await task();
-      await db.update(budgetCalls).set({ pending: false, costUsd: String(costUsd(tokensOf(message.usage))) }).where(eq(budgetCalls.id, id));
+      await db.update(budgetCalls).set({ pending: false, costUsd: String(costUsd(tokensOf(message.usage), params.model)) }).where(eq(budgetCalls.id, id));
       return message;
     } catch (error) {
       // Unknown usage keeps its reservation: losing a response must never reopen the budget.
-      if (error instanceof MindStreamError) await db.update(budgetCalls).set({ pending: false, costUsd: String(costUsd(error.tokens)) }).where(eq(budgetCalls.id, id));
+      if (error instanceof MindStreamError) await db.update(budgetCalls).set({ pending: false, costUsd: String(costUsd(error.tokens, params.model)) }).where(eq(budgetCalls.id, id));
       throw error;
     }
   };
@@ -116,4 +116,4 @@ export function budgetAdmission(db: WorldDatabase, worldId: string, residentId: 
 }
 
 export const reservationUsd = (params: Parameters<MindClient["createMessage"]>[0], factor = 1): number =>
-  (Buffer.byteLength(JSON.stringify(params)) * 0.125 / 1e6 + params.max_tokens * 0.5 / 1e6) * factor;
+  costUsd({ input: 0, cacheRead: 0, cacheWrite: Buffer.byteLength(JSON.stringify(params)), output: params.max_tokens }, params.model, factor);

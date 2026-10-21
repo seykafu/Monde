@@ -5,7 +5,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { Config } from "../config.js";
 import { NO_TOKENS, type CallTokens } from "./pricing.js";
-import { MIND_MODEL } from "./promptBuilder.js";
+import { DEFAULT_MODEL } from "./models.js";
 
 export interface StreamOptions {
   /** Aborts the call (deadline or client gone). The returned promise then rejects. */
@@ -34,7 +34,8 @@ export interface MindClient {
    * Open the connection to the API without spending tokens (DNS, TLS, the SDK's first request), so the first
    * dialogue turn after a deploy or a cold start doesn't pay for it. Optional; never rejects.
    */
-  warm?(): Promise<void>;
+  warm?(model?: string): Promise<void>;
+  retrieveModel?(id: string): Promise<unknown>;
 }
 
 /** GDD-GAP: the boot warm-up gets the prewarm's 5 s; it runs once, in the background. */
@@ -98,7 +99,11 @@ export class AnthropicMindClient implements MindClient {
   }
 
   /** A Models API lookup: free, and it leaves a warm connection behind for the first turn. */
-  async warm(model: string = MIND_MODEL): Promise<void> {
+  retrieveModel(id: string): Promise<unknown> {
+    return this.anthropic.models.retrieve(id, {}, { signal: AbortSignal.timeout(WARM_TIMEOUT_MS), maxRetries: 0 });
+  }
+
+  async warm(model: string = DEFAULT_MODEL): Promise<void> {
     try {
       await this.anthropic.models.retrieve(model, {}, { signal: AbortSignal.timeout(WARM_TIMEOUT_MS) });
     } catch {

@@ -1,3 +1,4 @@
+import { routerFor } from "./models.js";
 import { budgetMind, BudgetError } from "./budget.js";
 import { localPrecheck, precheck, safetyLine } from "./safety.js";
 import { favors } from "../db/schema.js";
@@ -119,7 +120,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
   app.addHook('onClose', async () => { await Promise.allSettled([...background]); });
   // A machine that has just started (a deploy, a cold start) opens its Anthropic connection now, not on the
   // first player's turn. Never blocks startup and never fails it.
-  app.addHook('onReady', async () => { void mind.warm?.().catch(() => undefined); });
+  app.addHook('onReady', async () => { void mind.warm?.(routerFor(db).resolve("dialogue").model).catch(() => undefined); });
 
   app.post<{ Params: { w: string } }>('/v1/worlds/:w/talk/close', async (request, reply) => {
     const parsed = z.object({ resident_id: ResidentId, conversation_id: z.uuid(), day: z.number().int().min(1), minute: z.number().int().min(360).max(1560) }).safeParse(request.body);
@@ -282,6 +283,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         try {
           const generating = body.input.kind === 'say' && localPrecheck(body.input.text) !== 'fine' ? null : generateTurn({
             mind: budgetMind(db!, mind, worldId, body.resident_id, 'dialogue'),
+            router: routerFor(db),
             request: built,
             notes: forced ? [WRAP_UP_NOTE] : [],
             validation: ctx.validation,
@@ -367,7 +369,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     const residentId = parsed.data.resident_id;
     if (!mind.enabled) return { warmed: false, reason: "disabled" };
 
-    const key = `${worldId}:${residentId}`;
+    const key = `${worldId}:${residentId}:${routerFor(db).resolve("dialogue").model}`;
     const at = now();
     const last = lastPrewarm.get(key);
     if (last !== undefined && at - last < interval) return { warmed: false, reason: "recent" };
@@ -380,7 +382,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     if (lastPrewarm.size > 10_000) for (const [k, t] of lastPrewarm) if (at - t >= interval) lastPrewarm.delete(k);
     lastPrewarm.set(key, at);
 
-    const params = prewarmParams(prefix, day, await historyFor(db!, worldId, residentId));
+    const params = prewarmParams(prefix, day, await historyFor(db!, worldId, residentId), routerFor(db));
     const started = performance.now();
     try {
       const message = await budgetMind(db!, mind, worldId, residentId, 'prewarm').createMessage(params, { signal: AbortSignal.timeout(options.prewarmTimeoutMs ?? 5000) });
@@ -389,7 +391,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
         await db!.insert(aiLog).values(aiLogRow({
           worldId, residentId, kind: "prewarm", promptVersion: promptVersion(), fallback: false,
           call: {
-            attempt: 1, model: params.model, tokens, costUsd: costUsd(tokens), latencyMs: Math.round(performance.now() - started),
+            attempt: 1, model: params.model, tokens, costUsd: costUsd(tokens, params.model), latencyMs: Math.round(performance.now() - started),
             firstTokenMs: null, stopReason: message.stop_reason ?? "none", validation: "ok",
           },
         }));

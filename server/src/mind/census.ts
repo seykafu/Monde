@@ -1,3 +1,4 @@
+import { modelParams, defaultRouter, routerFor } from "./models.js";
 /**
  * Writing the Day-1 residents (MVP M-03 step 2; GDD Appendix A.1.5: one Haiku call per household with A.3.6's prompt in
  * MODE: native). tools/gen-residents.ts drives the run and validates every answer itself; this endpoint only makes
@@ -42,9 +43,9 @@ export const CENSUS_CALL_TIMEOUT_MS = 120_000;
 
 export const CensusWriteBody = z.object({ draw: NativeDrawSchema, context: NativePromptContextSchema }).strict();
 
-/** The census request (A.3.6, MODE: native): fixed model and system blocks, the household's user message. */
-export function censusRequest(draw: HouseholdDraw, ctx: NativePromptContext): Anthropic.MessageCreateParamsNonStreaming {
-  return {
+/** The census request (A.3.6, MODE: native): arrival-role model, fixed system blocks, the household's user message. */
+export function censusRequest(draw: HouseholdDraw, ctx: NativePromptContext, router = defaultRouter): Anthropic.MessageCreateParamsNonStreaming {
+  return modelParams("arrival", {
     model: MIND_MODEL,
     max_tokens: nativeMaxTokens(draw.members.length),
     // The card contract rides in the cached system blocks, not output_config.format (householdJson.ts: the grammar is
@@ -55,7 +56,7 @@ export function censusRequest(draw: HouseholdDraw, ctx: NativePromptContext): An
     // max_tokens). GDD-GAP: A.3.6 says effort low; the effort setting stays, the thinking goes.
     thinking: { type: "disabled" },
     output_config: { effort: "low" },
-  };
+  }, router);
 }
 
 /** The census world and its device, once. */
@@ -97,7 +98,7 @@ export function registerCensusRoutes(app: FastifyInstance, config: Config, db: W
     const { draw, context } = parsed.data;
     await ensureCensusWorld(db);
     const cap = config.CENSUS_BUDGET_USD;
-    const call = await callModel(censusBudgetMind(db, mind, cap), censusRequest(draw, context), { timeoutMs: CENSUS_CALL_TIMEOUT_MS });
+    const call = await callModel(censusBudgetMind(db, mind, cap), censusRequest(draw, context, routerFor(db)), { timeoutMs: CENSUS_CALL_TIMEOUT_MS });
     if (!call.ok && call.failure === "budget") return reply.code(429).send({ error: "budget", spent_usd: await censusSpend(db), cap_usd: cap });
     if (call.call) {
       await db.insert(aiLog).values(aiLogRow({

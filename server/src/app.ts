@@ -1,4 +1,6 @@
+import { registerModelRoutes } from "./mind/modelRoutes.js";
 import { configureBudget } from "./mind/budget.js";
+import { registerUsageRoutes } from "./mind/usage.js";
 import { registerAdminRoutes } from "./mind/admin.js";
 import { registerCensusRoutes } from "./mind/census.js";
 import { registerTelemetryRoutes } from './telemetry/routes.js';
@@ -95,7 +97,9 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   const db = testDb ?? database?.db;
   if (db) configureBudget(db, config);
   registerAdminRoutes(app, config, db);
+  registerUsageRoutes(app, config, db);
   const mind = options.mind ?? createMindClient(config);
+  registerModelRoutes(app, config, db, mind);
   registerCensusRoutes(app, config, db, mind);
   registerWorldRoutes(app, config, db);
   registerTelemetryRoutes(app, config, db);

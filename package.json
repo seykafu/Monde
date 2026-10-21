@@ -13,6 +13,7 @@
     "node": ">=22"
   },
   "scripts": {
+    "dashboard": "node tools/dashboard/server.mjs",
     "dev": "npm run dev -w @monde/client",
     "dev:server": "npm run dev -w @monde/server",
     "typecheck": "tsc -p shared --noEmit && tsc -p client --noEmit && tsc -p server --noEmit && tsc -p desktop --noEmit",

@@ -39,7 +39,7 @@ export async function callModel(mind: MindClient, params: Anthropic.MessageCreat
   let started = 0;
   let timeout: AbortSignal | null = null;
   const record = (tokens: CallTokens, stopReason: string, validation: string): CallRecord => ({
-    attempt: 1, model: params.model, tokens, costUsd: costUsd(tokens), latencyMs: Math.round(now() - started),
+    attempt: 1, model: params.model, tokens, costUsd: costUsd(tokens, params.model), latencyMs: Math.round(now() - started),
     firstTokenMs: null, stopReason, validation,
   });
   try {

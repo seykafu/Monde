@@ -1407,6 +1407,9 @@ can't depend on it.
 
 ### 9.15 Cost model
 
+The estimates below assume Haiku 5.5. Each call role can instead use Sonnet 5.5, Opus 5.5 or Fable 5.1;
+actual costs and budget reservations use the selected model’s input, output and cache prices (and the batch discount).
+
 The pricing below is from Anthropic's cached model table (October 2026). **Re-check it live before
 committing a budget.** Claude Haiku 5.5: **$0.10 input / $0.50 output per million tokens** for prompts
 ≤ 100K tokens (every call here), **cache reads 0.1×** ($0.01/M), 5-minute cache writes 1.25×, and
@@ -1566,7 +1569,14 @@ Write a short exchange (2–6 lines) or, in summary mode, only the outcome.
 ```
 Output: `{lines[]|null, A_delta, B_delta, news_passed[], feelings_change|null}`.
 
-**API call settings (all live calls):** `model: "claude-haiku-5-5"`; streaming for dialogue;
+**API call settings (all live calls):** models are configurable per role: dialogue (including salvage and
+prewarm), precheck, plan, reflect, gossip, press, arrival (including census), and summary (including digests).
+Precedence: database admin override (`meta.model-routing`), `MIND_MODEL_<ROLE>`, `MIND_MODEL`, then
+`claude-haiku-5-5`. `GET /admin/models` inspects routing; `PUT /admin/models` sets `{role, model}` (null clears).
+Overrides refresh immediately on change and every minute. Thinking-off uses Haiku's `disabled`, Sonnet's
+`between_tools` with effort low, or no thinking field and effort low for always-on Opus/Fable; the Models API's
+capability report takes precedence, with registry defaults if unavailable. All four reject non-default sampling
+and assistant prefill. The following defaults and cost estimates assume Haiku. Streaming for dialogue;
 `output_config.format` = the JSON schema; `thinking: {type: "disabled"}` for dialogue, gossip and
 pre-check; `output_config.effort: "low"` for plans and reflections; **no** `temperature`, `top_p` or
 `top_k` (Haiku 5.5 rejects non-default sampling with a 400); **no** assistant prefill (rejected);

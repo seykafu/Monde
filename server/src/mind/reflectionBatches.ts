@@ -14,7 +14,7 @@ export function batchModelCall(prepared: PreparedReflection, result: BatchResult
   const message = result.type === 'succeeded' ? result.message : null;
   const tokens = message ? tokensOf(message.usage) : NO_TOKENS;
   const stop = message?.stop_reason ?? result.type;
-  const call = { attempt: 1, model: prepared.params.model, tokens, costUsd: costUsd(tokens, undefined, BATCH_FACTOR),
+  const call = { attempt: 1, model: prepared.params.model, tokens, costUsd: costUsd(tokens, prepared.params.model, BATCH_FACTOR),
     latencyMs: 0, firstTokenMs: null, stopReason: stop, validation: result.type };
   if (!message) return { ok: false, failure: 'api_error', call };
   if (stop === 'refusal' || stop === 'max_tokens') return { ok: false, failure: stop, call: { ...call, validation: stop } };

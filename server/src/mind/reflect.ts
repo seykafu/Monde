@@ -1,3 +1,4 @@
+import { routerFor } from "./models.js";
 import { budgetMind } from "./budget.js";
 import { loadItems } from "../content/loadContent.js";
 import { feasibleFavor } from "./favorFeasibility.js";
@@ -458,7 +459,7 @@ export async function prepareReflection(deps: NightJobDeps, world: NightWorld, r
   request.messages[0]!.content = `${String(request.messages[0]!.content)}\nObtainable favor item ids: ${itemIds.join(", ")}. For help_chore target yourself (${residentId}) or your home (${prefix.card.home}).`;
   return {
     base: { worldId: world.worldId, residentId, day: world.day, card: prefix.card, today, promptVersion: promptVersion() },
-    params: apiParams("reflect", request),
+    params: apiParams("reflect", request, routerFor(deps.db)),
     context: { residentIds: [...world.residentIds], relationshipIds: prefix.relationships.map(r => r.id),
       itemIds, places: [...world.places.ids], stances: prefix.state.stances },
   };

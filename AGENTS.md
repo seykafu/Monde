@@ -32,9 +32,14 @@ docs/     GDD and MVP plan
   missing, add a `// GDD-GAP:` comment and mention it in your summary.
 
 ## Claude API rules (server)
-- Model `claude-haiku-5-5` via `@anthropic-ai/sdk`. **No** `temperature` / `top_p` / `top_k`, **no** assistant
-  prefill (both are 400s on Haiku 5.5). Structured output via `output_config.format`. Dialogue uses
-  `thinking: {type: "disabled"}`; plans and reflections use `output_config: {effort: "low"}`.
+- The model is chosen per role, with `claude-haiku-5-5` as the default, via `@anthropic-ai/sdk`.
+  Supported LLMs: `claude-sonnet-5-5`, `claude-opus-5-5`, `claude-fable-5-1`. **No** non-default
+  `temperature` / `top_p` / `top_k`, **no** assistant prefill (all four reject them with a 400).
+  Structured output via `output_config.format`. For thinking-off calls, Haiku uses `thinking: {type: "disabled"}`;
+  Sonnet uses `thinking: {type: "between_tools"}` with no other thinking fields and effort low, medium or high
+  (never disabled). Opus and Fable have adaptive thinking always on: omit `thinking` and use effort `low`.
+  Prefer thinking capabilities reported by the Models API over registry defaults. Plans and reflections keep
+  `output_config: {effort: "low"}`. Build all call parameters through the model router.
 - Always check `stop_reason` before reading content (`refusal` has no server-side fallback on Haiku).
 - Prompt blocks 1–3 (World Bible, persona, beliefs) must be byte-stable for prompt caching (GDD §9.10.1).
 - The API key lives only in Fly secrets / local `.env`; never in the client.

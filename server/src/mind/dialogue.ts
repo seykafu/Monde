@@ -1,3 +1,4 @@
+import { modelParams, defaultRouter, type ModelRouter } from "./models.js";
 import { BudgetError } from "./budget.js";
 /**
  * One dialogue turn against the model (GDD §9.10 flow, §9.13 pipeline; MVP M-05).
@@ -112,6 +113,7 @@ export interface LineDelta {
 
 export interface GenerateOptions {
   mind: MindClient;
+  router?: ModelRouter;
   request: MindRequest;
   /** Extra instructions appended to the user message on every attempt (the forced wrap-up). */
   notes?: readonly string[];
@@ -143,8 +145,8 @@ const failure = (code: TurnFailureCode): TurnFailure => ({ code, message: FAILUR
  * The API body for a dialogue attempt: the builder's request with `notes` appended as extra text blocks in the
  * same (last, user) message. Never an assistant prefill, never sampling parameters, and blocks 1-3 untouched.
  */
-export function dialogueParams(request: MindRequest, notes: readonly string[] = []): Anthropic.MessageCreateParamsNonStreaming {
-  if (notes.length === 0) return apiParams("dialogue", request);
+export function dialogueParams(request: MindRequest, notes: readonly string[] = [], router = defaultRouter, selected = router.resolve("dialogue").model): Anthropic.MessageCreateParamsNonStreaming {
+  if (notes.length === 0) return apiParams("dialogue", request, router, selected);
   const messages = [...request.messages];
   const last = messages.pop();
   if (!last || last.role !== "user") throw new Error("dialogue request must end with a user message");
@@ -152,7 +154,7 @@ export function dialogueParams(request: MindRequest, notes: readonly string[] = 
     ? [{ type: "text", text: last.content }]
     : [...last.content];
   for (const note of notes) content.push({ type: "text", text: note });
-  return apiParams("dialogue", { ...request, messages: [...messages, { role: "user", content }] });
+  return apiParams("dialogue", { ...request, messages: [...messages, { role: "user", content }] }, router, selected);
 }
 
 /**
@@ -162,16 +164,16 @@ export function dialogueParams(request: MindRequest, notes: readonly string[] = 
  * (measured on staging 2026-10-14: a schema-less prewarm cached 5.8k tokens, the real turn then wrote 7.2k).
  * `max_tokens: 0` rejects a format, so the prewarm asks for one token and ignores it (stop_reason max_tokens).
  */
-export function prewarmParams(prefix: ResidentPrefix, day: number, history = ""): Anthropic.MessageCreateParamsNonStreaming {
+export function prewarmParams(prefix: ResidentPrefix, day: number, history = "", router = defaultRouter): Anthropic.MessageCreateParamsNonStreaming {
   const settings = requestSettings("dialogue");
-  return {
+  return modelParams("dialogue", {
     model: settings.model,
     max_tokens: 1,
     ...(settings.thinking ? { thinking: settings.thinking } : {}),
     system: prefixSystemBlocks(prefix, day),
     messages: [{ role: 'user', content: [{ type: 'text', text: historyBlock(history), cache_control: { type: 'ephemeral' } }] }, { role: 'user', content: 'warmup' }],
     output_config: { format: modelOutputFormat(DialogueTurnOutput) },
-  } as Anthropic.MessageCreateParamsNonStreaming;
+  } as Anthropic.MessageCreateParamsNonStreaming, router);
 }
 
 const textOf = (message: Anthropic.Message): string =>
@@ -359,6 +361,8 @@ function salvage(raw: string, validation: ValidationContext): { output: Dialogue
 }
 
 export async function generateTurn(options: GenerateOptions): Promise<GenerateResult> {
+  const router = options.router ?? defaultRouter;
+  const selectedModel = router.resolve("dialogue").model;
   const timings = { ...DEFAULT_TIMINGS, ...options.timings };
   const now = options.now ?? (() => performance.now());
   const notes = options.notes ?? [];
@@ -380,7 +384,7 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
     if (options.validation.riddle) return fail("riddle_authored");
     let corrective: string | null = null;
     for (let attempt = 1; attempt <= 2; attempt++) {
-      const params = dialogueParams(options.request, corrective ? [...notes, corrective] : notes);
+      const params = dialogueParams(options.request, corrective ? [...notes, corrective] : notes, router, selectedModel);
       const extractor = new LineTextExtractor();
       const shown: string[] = [];
       let raw = "";
@@ -424,11 +428,11 @@ export async function generateTurn(options: GenerateOptions): Promise<GenerateRe
       };
       const result = await callOnce(options.mind, params, timings, options.signal, onText, now);
       for (const extra of result.extra) {
-        calls.push({ attempt, model: params.model, costUsd: costUsd(extra.tokens), stopReason: "none", ...extra });
+        calls.push({ attempt, model: params.model, costUsd: costUsd(extra.tokens, params.model), stopReason: "none", ...extra });
       }
       const record = (tokens: CallTokens, stopReason: string, validation: string): void => {
         calls.push({
-          attempt, model: params.model, tokens, costUsd: costUsd(tokens), latencyMs: result.latencyMs,
+          attempt, model: params.model, tokens, costUsd: costUsd(tokens, params.model), latencyMs: result.latencyMs,
           firstTokenMs: result.firstTokenMs, stopReason, validation,
         });
       };

@@ -1,3 +1,4 @@
+import { modelParams, defaultRouter, routerFor } from "./models.js";
 import { budgetMind } from "./budget.js";
 /**
  * Arrivals and departures on the server (GDD §6.4, Appendix A.3; MVP G-02).
@@ -128,9 +129,9 @@ async function validationContext(db: Database, worldId: string, day: number) {
   };
 }
 
-/** One household's Haiku request (A.3.6): cached system prompt, the user message, low effort, the contract. */
-export function arrivalRequest(draw: HouseholdDraw, ctx: PromptContext) {
-  return {
+/** One household's arrival-role request (A.3.6): cached system prompt, the user message, low effort, the contract. */
+export function arrivalRequest(draw: HouseholdDraw, ctx: PromptContext, router = defaultRouter) {
+  return modelParams("arrival", {
     model: MIND_MODEL, max_tokens: arrivalMaxTokens(draw.members.length),
     // The card contract rides in the cached system prompt, not output_config.format (shared householdJson.ts: the API
     // rejects this schema's compiled grammar as too large, so the strict format failed every call).
@@ -139,7 +140,7 @@ export function arrivalRequest(draw: HouseholdDraw, ctx: PromptContext) {
     // Thinking off, as for the census (census.ts): thinking spent the card's token budget.
     thinking: { type: "disabled" as const },
     output_config: { effort: "low" as const },
-  };
+  }, router);
 }
 
 export interface Written {
@@ -170,7 +171,7 @@ export async function writeHousehold(deps: ArrivalDeps, worldId: string, draw: H
     const whim = whimFor(deps.seed, draw.id, attempt);
     const ctx = await promptContext(deps.db, worldId, request, whim, home);
     if (errors.length) ctx.validatorErrors = errors;
-    const call = await callModel(budgetMind(deps.db, deps.mind, worldId, null, "arrival", request.day), arrivalRequest(draw, ctx), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
+    const call = await callModel(budgetMind(deps.db, deps.mind, worldId, null, "arrival", request.day), arrivalRequest(draw, ctx, routerFor(deps.db)), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
     let verdict: ReturnType<typeof validateHousehold> | null = null;
     if (call.ok) {
       const raw = parseJsonObject(call.text);

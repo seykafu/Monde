@@ -1,3 +1,4 @@
+import { routerFor } from "./models.js";
 import { budgetMind } from "./budget.js";
 import { templatePlan, hhmmToMinutes } from './templatePlan.js';
 import { loadPlaceRegistry } from './places.js';
@@ -83,7 +84,7 @@ export function registerChatRoutes(app: FastifyInstance, db: WorldDatabase | und
           flags: a.flags, names: a.names, day: body.day, weekday: weekdayOf(body.day), minute: body.minute, place: body.place, mode: 'live',
           fellow: playerView(world?.player as PlayerProfile | null | undefined) }, body, a, b);
         for (let attempt = 0; attempt < 2; attempt++) {
-          const result = await callModel(budgetMind(db!, mind, worldId, `${body.a}+${body.b}`, "gossip"), apiParams('gossip', input), { timeoutMs: CHAT_TIMEOUT_MS });
+          const result = await callModel(budgetMind(db!, mind, worldId, `${body.a}+${body.b}`, "gossip"), apiParams('gossip', input, routerFor(db)), { timeoutMs: CHAT_TIMEOUT_MS });
           const valid = result.ok ? validateLiveGossip(result.text, a, b, new Set([...an, ...bn].map(n => n.id)), romanceAllowed) : null;
           if (result.call) {
             const call = result.call;

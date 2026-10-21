@@ -1,6 +1,17 @@
 import { z } from "zod";
+import { ModelIdSchema } from "./mind/models.js";
 
 const schema = z.object({
+  MIND_MODEL: ModelIdSchema.optional(),
+  MIND_MODEL_DIALOGUE: ModelIdSchema.optional(),
+  MIND_MODEL_PRECHECK: ModelIdSchema.optional(),
+  MIND_MODEL_PLAN: ModelIdSchema.optional(),
+  MIND_MODEL_REFLECT: ModelIdSchema.optional(),
+  MIND_MODEL_GOSSIP: ModelIdSchema.optional(),
+  MIND_MODEL_PRESS: ModelIdSchema.optional(),
+  MIND_MODEL_ARRIVAL: ModelIdSchema.optional(),
+  MIND_MODEL_SUMMARY: ModelIdSchema.optional(),
+
   ADMIN_TOKEN: z.string().min(1).optional(),
   WORLD_DAILY_BUDGET_USD: z.coerce.number().positive().default(0.06), // GDD §9.15
   // GDD-GAP: global UTC-day hard cap default; operator can change it.

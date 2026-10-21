@@ -1,3 +1,5 @@
+import type Anthropic from "@anthropic-ai/sdk";
+import { modelParams, routerFor, defaultRouter } from "./models.js";
 import { safePlayerText } from "./safetyText.js";
 import { budgetMind } from "./budget.js";
 /** Conversation summaries and rolling digest. No model work on the first-token path. */
@@ -41,10 +43,7 @@ export function templateSummary(turns: readonly (Pick<Turn, 'playerInput' | 'out
 async function structured<T>(deps: NightJobDeps, worldId: string, residentId: string, day: number, kind: string, schema: z.ZodType<T>, prompt: string): Promise<T | null> {
   const [world] = await deps.db.select().from(worlds).where(eq(worlds.id, worldId));
   if (!deps.mind.enabled || (world && world.aiSpendDay >= day && Number(world.aiSpendUsd) >= SUMMARY_BUDGET_USD)) return null;
-  const result = await callModel(budgetMind(deps.db, deps.mind, worldId, residentId, kind, day), { model: MIND_MODEL, max_tokens: SUMMARY_MAX_TOKENS,
-    output_config: { effort: 'low', format: modelOutputFormat(schema) },
-    messages: [{ role: 'user', content: prompt }],
-  }, { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
+  const result = await callModel(budgetMind(deps.db, deps.mind, worldId, residentId, kind, day), summaryRequest(schema, prompt, routerFor(deps.db)), { timeoutMs: deps.callTimeoutMs, gate: deps.gate, signal: deps.signal });
   let value: T | null = null;
   if (result.ok) {
     try { value = schema.parse(JSON.parse(result.text)); } catch { /* Template below. */ }
@@ -135,4 +134,11 @@ export async function rollDigest(deps: NightJobDeps, worldId: string, residentId
 }
 export async function compactNight(deps: NightJobDeps, worldId: string, day: number): Promise<void> {
   for (const session of await sessionsForNight(deps.db, worldId, day)) await compactSession(deps, worldId, session.id);
+}
+
+export function summaryRequest(schema: z.ZodType, prompt: string, router = defaultRouter): Anthropic.MessageCreateParamsNonStreaming {
+  return modelParams("summary", { model: MIND_MODEL, max_tokens: SUMMARY_MAX_TOKENS,
+    output_config: { effort: 'low', format: modelOutputFormat(schema) },
+    messages: [{ role: 'user', content: prompt }],
+  }, router);
 }

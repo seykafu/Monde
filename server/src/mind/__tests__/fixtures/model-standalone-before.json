@@ -1,0 +1,925 @@
+{
+  "draw": {
+    "id": "dunmore_barney",
+    "archetype": "shop_founder",
+    "day": 1,
+    "slot": 19,
+    "youth": false,
+    "beds": 2,
+    "prob": 1,
+    "members": [
+      {
+        "slot": "m1",
+        "role": "adult",
+        "age_min": 51,
+        "age_max": 51,
+        "age": 51,
+        "band": "adult",
+        "presentation": "m",
+        "pronoun_default": "he/him",
+        "portrait": "lib_m53_029",
+        "tags": {
+          "band": "adult",
+          "presentation": "m",
+          "skin": 3,
+          "skin_word": "tan",
+          "hair_word": "salt-and-pepper",
+          "hair_style": "short",
+          "attire": [
+            "cardigan",
+            "flat_cap",
+            "work_jacket"
+          ],
+          "build": "broad",
+          "caption": "A stocky man in his early fifties with salt-and-pepper hair under a brown flat cap, a nose broken long ago and set a little crooked, and a grey work cardigan with leather elbow patches. A long-suffering, dryly amused look."
+        },
+        "archetype": "shop_founder",
+        "native": {
+          "kind": "named",
+          "pinned": {
+            "id": "barney",
+            "name": "Barnaby \"Barney\" Dunmore"
+          },
+          "employment": "employed",
+          "job": {
+            "row": 5,
+            "title": "counter clerk",
+            "workplace": "market_row.general_store"
+          },
+          "saturday_job": null,
+          "minor": null,
+          "years_in_monde": 51,
+          "first_names": [],
+          "surname": "Dunmore",
+          "birthday": 57,
+          "seed": "Hands the Tollmen 20 coins from the till at the back door every Saturday and books it as 'sundries.' Nell doesn't know. Voice: Apologetic; counts change aloud; 'Mm, well.'"
+        }
+      }
+    ],
+    "native": {
+      "type": "D",
+      "zone": "market_row",
+      "home": {
+        "id": "market_row.dunmore_flat",
+        "line": "the flat over Dunmore's, upstairs",
+        "beds": 2
+      },
+      "surname": "Dunmore",
+      "housemates": [],
+      "ties": []
+    }
+  },
+  "native": {
+    "knownResidents": [
+      {
+        "id": "nell",
+        "name": "Nell Dunmore",
+        "line": "Fisher; runs Dunmore's General Store with her brother Barney"
+      },
+      {
+        "id": "bru",
+        "name": "Bru Haskett",
+        "line": "Tollman, the crew's bruiser; carves wooden birds"
+      },
+      {
+        "id": "ines",
+        "name": "Ines Delacroix",
+        "line": "Executive assistant to Silas Vane"
+      },
+      {
+        "id": "june",
+        "name": "Juniper \"June\" Castellanos",
+        "line": "Musician; morning shift at Café Liss"
+      },
+      {
+        "id": "odile",
+        "name": "Odile Fournier",
+        "line": "Baker; owner of Fournier & Fille"
+      },
+      {
+        "id": "rosalind",
+        "name": "Rosalind \"Roz\" Hale",
+        "line": "Publican, The Gull & Anchor"
+      }
+    ],
+    "requiredLinks": [
+      {
+        "slot": "m1",
+        "id": "nell",
+        "name": "Nell Dunmore",
+        "tag": "kin",
+        "hint": "Brother and sister (§12.4: Nell's brother). Nell Dunmore's card ties to them as \"brother\" (affinity 70, trust 80); return it"
+      },
+      {
+        "slot": "m1",
+        "id": "bru",
+        "name": "Bru Haskett",
+        "tag": null,
+        "hint": "Bru Haskett's card ties to them as \"embarrassed\" (affinity 40, trust 35); return it"
+      }
+    ],
+    "avoidFirst": [
+      "Bertrand",
+      "Ada",
+      "Bru",
+      "Augusta",
+      "Ines",
+      "Bastien",
+      "Delphine",
+      "Hollis",
+      "Mossimo",
+      "Moss",
+      "Juniper",
+      "June",
+      "Marguerite",
+      "Margo",
+      "Edwina",
+      "Felix",
+      "Nell",
+      "Odile",
+      "Sable",
+      "Kasimir",
+      "Priya",
+      "Rosalind",
+      "Roz",
+      "Nettie",
+      "Roland",
+      "Rook",
+      "Teodor",
+      "Teo",
+      "Silas",
+      "Tobias",
+      "Tib",
+      "Barnaby",
+      "Barney",
+      "Hester",
+      "Raman",
+      "Ilona",
+      "Alphonse",
+      "Ferdinand",
+      "Ignatia",
+      "Dolores",
+      "Dolly",
+      "Dex",
+      "Dom",
+      "Wendell",
+      "Marit",
+      "Cormac",
+      "Maud",
+      "Dunstan",
+      "Alma",
+      "Imogen",
+      "Arthur",
+      "Gil",
+      "Maren",
+      "Daniel",
+      "Odette",
+      "Teddy",
+      "Ivy",
+      "Chidi",
+      "Pippa",
+      "Saffron",
+      "Lyle",
+      "Ambrose",
+      "Fenwick",
+      "Cornelius",
+      "Hugo",
+      "Philomena",
+      "Hyacinth",
+      "Waldemar",
+      "Ilka",
+      "Claudine",
+      "Dennis",
+      "Gustav",
+      "Beatrix",
+      "Colm",
+      "Ruari",
+      "Maeve",
+      "Finn",
+      "Isla",
+      "Calder",
+      "Nadine",
+      "Sunny",
+      "Wick",
+      "Mateo",
+      "Lucía",
+      "Lucia",
+      "Marisol",
+      "Hazel",
+      "Posy",
+      "Robin"
+    ],
+    "avoidFull": [],
+    "whim": "teapot"
+  },
+  "arrival": {
+    "town": {
+      "day": 8,
+      "season": "spring",
+      "weekday": "Tue",
+      "pillars": {
+        "prosperity": 30,
+        "safety": 30,
+        "spirit": 30,
+        "charm": 30
+      },
+      "census": 212,
+      "shopsOpen": 10,
+      "pupils": 9,
+      "projectsDone": [],
+      "projectsActive": []
+    },
+    "mode": "arrival",
+    "home": null,
+    "knownResidents": [],
+    "avoidFirst": [],
+    "avoidFull": [],
+    "whim": "teapot"
+  },
+  "prefix": {
+    "card": {
+      "id": "pell",
+      "age": 71,
+      "home": "old_quarter.pell_house",
+      "kind": "canon",
+      "look": {
+        "eyes": 1,
+        "hair": {
+          "style": "bob",
+          "colour": "#c9cdd4"
+        },
+        "kind": "human",
+        "skin": 4,
+        "build": "narrow",
+        "height": "short",
+        "outfit": {
+          "cut": "jumper",
+          "top": "#3f8487",
+          "shoes": 2,
+          "bottom": 14,
+          "bottom_style": "skirt"
+        },
+        "glasses": "halfmoon",
+        "accessory": {
+          "kind": "glasses"
+        }
+      },
+      "name": "Edwina Pell",
+      "dream": {
+        "text": "Leave Monde better than she found it, which she doesn't believe she has.",
+        "stages": [
+          "Let someone else read the Fund ledgers (Favor: sort them with her; Regard ≥ 30)",
+          "Tell the truth about the lamps (Favor: carry her draft statement to Sable; needs flag.option_known)",
+          "Put the Charter before the council (Favor: bring Margo's fragments to a sitting; needs flag.charter_half)",
+          "Name who should hold the keys after her (Favor: walk the lamp round at dusk with her; needs flag.pell_retiring)"
+        ]
+      },
+      "fears": [
+        "the Wharf sold for a coin a metre",
+        "being the mayor who lost Monde",
+        "being found out by someone kind"
+      ],
+      "likes": [
+        "counting lamps",
+        "strong tea",
+        "ledgers that balance",
+        "Arthur's hammer by the door"
+      ],
+      "voice": {
+        "tics": [
+          "Now.",
+          "Heavens.",
+          "Let me see to the lamps first."
+        ],
+        "samples": [
+          "You'll want tea. I want tea. Sit, Fellow, and tell me what the Wharf looked like this morning.",
+          "Heavens, that's a fine drain. Twenty-six years I've asked for that grate and a stranger fixes it in a week. Now. What do you need from the Fund?",
+          "I walk the lamps at dusk. Eighty-one of a hundred and three still light. I count them. It's a habit, that's all."
+        ],
+        "register": "Warm, rounded sentences that begin formal and go quiet at the end. Lamp and ledger nouns: the Fund, the lamps, minuted, carried. \"Now.\" is how she changes the subject, and she does it whenever a question gets near money (the Fund, wages, fees, the town's books, how the town is doing): one plain fact, then \"Now.\" and a chore or a lamp count, in that order (\"The Fund's thin. Now. Lamplighter Lane wants walking before dusk.\"). \"Dear\" to the young, \"Fellow\" in public, the player's name in private once Regard passes 40. Never lies outright. \"Heavens\" is her oath. Tiredness shows as shorter sentences late in the day, never as sighing.\n",
+        "never_says": [
+          "I'm fine",
+          "it's complicated",
+          "obviously"
+        ]
+      },
+      "chores": [
+        "count the lamps at dusk",
+        "sort the Fund envelopes",
+        "water Arthur's tomato canes",
+        "answer every letter by hand"
+      ],
+      "sprite": "pell",
+      "values": {
+        "charm": 0.15,
+        "safety": 0.35,
+        "spirit": 0.25,
+        "prosperity": 0.25
+      },
+      "beliefs": [
+        "If the census holds above 200, the clause never matters and nobody has to be told.",
+        "Margo's Charter is a lovely story and a distraction from real money.",
+        "The lamps are the one promise she has kept."
+      ],
+      "routine": {
+        "weekday": [
+          {
+            "at": "06:00",
+            "do": "walk",
+            "where": "old_quarter.lamplighter_lane"
+          },
+          {
+            "at": "07:30",
+            "do": "eat",
+            "where": "old_quarter.pell_house"
+          },
+          {
+            "at": "08:30",
+            "do": "work",
+            "where": "old_quarter.mayor_office"
+          },
+          {
+            "at": "12:30",
+            "do": "eat",
+            "where": "market_row.cafe_liss"
+          },
+          {
+            "at": "13:30",
+            "do": "work",
+            "where": "old_quarter.town_hall"
+          },
+          {
+            "at": "17:00",
+            "do": "pray",
+            "where": "old_quarter.st_brigids"
+          },
+          {
+            "at": "18:00",
+            "do": "walk",
+            "where": "old_quarter.fountain_square"
+          },
+          {
+            "at": "21:30",
+            "do": "sleep",
+            "where": "old_quarter.pell_house"
+          }
+        ],
+        "weekend": [
+          {
+            "at": "07:30",
+            "do": "garden",
+            "where": "old_quarter.pell_house"
+          },
+          {
+            "at": "09:30",
+            "do": "attend",
+            "where": "old_quarter.st_brigids"
+          },
+          {
+            "at": "11:00",
+            "do": "shop",
+            "where": "market_row.market_hall"
+          },
+          {
+            "at": "13:00",
+            "do": "read",
+            "where": "old_quarter.pell_house"
+          },
+          {
+            "at": "16:00",
+            "do": "visit",
+            "where": "old_quarter.bertrand_house"
+          },
+          {
+            "at": "18:00",
+            "do": "walk",
+            "where": "old_quarter.lamplighter_lane"
+          },
+          {
+            "at": "21:30",
+            "do": "sleep",
+            "where": "old_quarter.pell_house"
+          }
+        ]
+      },
+      "secrets": [
+        {
+          "text": "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the archivist, keeps the key and has never opened that file.",
+          "reveal": {
+            "flag": "option_known"
+          }
+        },
+        {
+          "text": "A letter of resignation, dated the day before the Fellow arrived, is in her desk. Hiring the Fellow was her last try before she posted it.",
+          "reveal": {
+            "regard_min": 60
+          }
+        }
+      ],
+      "birthday": 8,
+      "dislikes": [
+        "being thanked for things she isn't proud of",
+        "Vane's pocket square",
+        "unanswered letters"
+      ],
+      "portrait": "pell",
+      "pronouns": "she/her",
+      "backstory": "Edwina kept the books at Pell's Hardware, so when the old mayor retired 26 years ago the council handed her the town's books too, and then the job. Arthur died six years ago; his claw hammer still hangs by her front door. Twelve years ago the mill payroll had four days of money left, and she found it. The lamps stayed lit, the wages were paid, and she has not slept a full night since. She walks the Old Quarter every dusk and counts the lamps aloud. She has told nobody how she found the money.\n",
+      "workplace": "old_quarter.mayor_office",
+      "appearance": "Small and upright, silver bob, half-moon glasses on a chain. Her cardigan is buttoned one hole off when she's rushed, and there is ink on her right cuff.\n",
+      "occupation": "Mayor of Monde (26 years); widow of Arthur Pell of Pell's Hardware",
+      "story_role": "Quest-giver and secret-keeper. D1 ferry greeting, D18 confession, D50 retirement announcement, D66 \"Pell's Choice.\" Hub of the relationship web.",
+      "canon_locks": [
+        {
+          "fact": "Only Pell knows about the loan and the Option Clause. She deflects (lamps, the Fund, tea) and never lies outright. She does not say 'Option' or 'Vane loan.'",
+          "while": "!flag.option_known"
+        },
+        {
+          "fact": "She has confessed to the player in private and asked for a week before the town is told. She does not blame Sable for finding it.",
+          "while": "flag.option_known && !flag.option_public"
+        },
+        {
+          "fact": "She has told no one she will stand down. She announces it at the end of the Regatta on Day 50.",
+          "while": "!flag.pell_retiring"
+        },
+        {
+          "fact": "She endorses no candidate in public. She waits until Day 66 to ask the player, in private, whether they will run.",
+          "while": "flag.pell_retiring && !flag.pell_asked_player"
+        }
+      ],
+      "personality": {
+        "big5": {
+          "open": 55,
+          "neurotic": 72,
+          "agreeable": 76,
+          "extravert": 48,
+          "conscientious": 92
+        },
+        "traits": [
+          "kind",
+          "evasive",
+          "dutiful",
+          "stubborn",
+          "tired"
+        ]
+      },
+      "relationships": [
+        {
+          "id": "vane",
+          "tag": "indebted",
+          "note": "Owes him the Wharf if the census slips. Smiles back anyway. Wants him to let the clause lapse and knows he won't.",
+          "trust": -55,
+          "affinity": -30
+        },
+        {
+          "id": "margo",
+          "tag": "patron",
+          "note": "Funds the library from a shrinking budget and calls the Marks lovely. Wants her to stop asking about the council archive.",
+          "trust": 55,
+          "affinity": 50
+        },
+        {
+          "id": "nell",
+          "tag": "rival",
+          "note": "Respects her more than she'll say. Can't tell her why the cannery money isn't there.",
+          "trust": 50,
+          "affinity": 35
+        },
+        {
+          "id": "sable",
+          "tag": "wary",
+          "note": "Reads every issue twice, once for errors and once to see whether Sable has found it yet.",
+          "trust": 15,
+          "affinity": -5
+        },
+        {
+          "id": "augusta",
+          "tag": "ally",
+          "note": "Gave her the title Captain six years ago in place of the raise she asked for. The one person who tells her no. Ignores the deputy requests because the Fund can't carry the wages.",
+          "trust": 70,
+          "affinity": 60
+        },
+        {
+          "id": "bertrand",
+          "tag": "old_friend",
+          "note": "Only he calls her Eddie, since Arthur. Wants him to see a doctor about his stairs and hasn't managed to say so.",
+          "trust": 60,
+          "affinity": 65
+        },
+        {
+          "id": "frye",
+          "tag": "clerk",
+          "note": "Keeps the archive key and has never opened the Streetlight file. Wants him to keep not opening it.",
+          "trust": 70,
+          "affinity": 50
+        },
+        {
+          "id": "moss",
+          "tag": "fond",
+          "note": "Meets every boat he skippers and says 'Moss.' before he finishes the sentence. Wants him to stop saying 'more ferry' until the Fund can carry the diesel.",
+          "trust": 50,
+          "affinity": 55
+        },
+        {
+          "id": "ada",
+          "tag": "friend",
+          "note": "Takes the Friday count from the booth every week and calls it a courtesy. Wants Ada to say, just once, that a boat will fill.",
+          "trust": 65,
+          "affinity": 60
+        }
+      ],
+      "portrait_expressions": [
+        "neutral",
+        "warm",
+        "laugh",
+        "sad",
+        "angry",
+        "surprised",
+        "worried",
+        "thinking",
+        "stiff_smile",
+        "ledger_stare"
+      ]
+    },
+    "state": {
+      "id": "pell",
+      "mood": {
+        "energy": 50,
+        "stress": 0,
+        "emotion": "content",
+        "valence": 0,
+        "intensity": 0
+      },
+      "stay": 50,
+      "tier": "core",
+      "dream": {
+        "notes": "",
+        "stage": 0
+      },
+      "flags": [],
+      "needs": {
+        "food": 70,
+        "rest": 70,
+        "social": 70,
+        "comfort": 70,
+        "purpose": 70
+      },
+      "regard": 0,
+      "beliefs": [
+        "If the census holds above 200, the clause never matters and nobody has to be told.",
+        "Margo's Charter is a lovely story and a distraction from real money.",
+        "The lamps are the one promise she has kept."
+      ],
+      "stances": {},
+      "location": "old_quarter.lamplighter_lane",
+      "world_id": "8fa83445-73bf-4f8c-9d91-860f465b1850",
+      "recent_topics": [],
+      "leaving_notice_since": null
+    },
+    "relationships": [
+      {
+        "id": "ada",
+        "affinity": 60,
+        "trust": 65,
+        "tag": "friend",
+        "feeling": null
+      },
+      {
+        "id": "augusta",
+        "affinity": 60,
+        "trust": 70,
+        "tag": "ally",
+        "feeling": null
+      },
+      {
+        "id": "bertrand",
+        "affinity": 65,
+        "trust": 60,
+        "tag": "old_friend",
+        "feeling": null
+      },
+      {
+        "id": "frye",
+        "affinity": 50,
+        "trust": 70,
+        "tag": "clerk",
+        "feeling": null
+      },
+      {
+        "id": "margo",
+        "affinity": 50,
+        "trust": 55,
+        "tag": "patron",
+        "feeling": null
+      },
+      {
+        "id": "moss",
+        "affinity": 55,
+        "trust": 50,
+        "tag": "fond",
+        "feeling": null
+      },
+      {
+        "id": "nell",
+        "affinity": 35,
+        "trust": 50,
+        "tag": "rival",
+        "feeling": null
+      },
+      {
+        "id": "sable",
+        "affinity": -5,
+        "trust": 15,
+        "tag": "wary",
+        "feeling": null
+      },
+      {
+        "id": "vane",
+        "affinity": -30,
+        "trust": -55,
+        "tag": "indebted",
+        "feeling": null
+      }
+    ],
+    "flags": [],
+    "names": {
+      "ada": "Ada Okafor",
+      "augusta": "Captain Augusta Reyes",
+      "bastien": "Bastien",
+      "bertrand": "Bertrand Achterberg",
+      "bru": "Bru Haskett",
+      "delphine": "Delphine Mercer",
+      "felix": "Felix Amari",
+      "hollis": "Hollis Brandt",
+      "ines": "Ines Delacroix",
+      "june": "Juniper \"June\" Castellanos",
+      "kasimir": "Kasimir Wolanski",
+      "margo": "Marguerite \"Margo\" Liang",
+      "moss": "Mossimo \"Old Moss\" Ferrante",
+      "nell": "Nell Dunmore",
+      "nettie": "Nettie Szabo",
+      "odile": "Odile Fournier",
+      "pell": "Edwina Pell",
+      "priya": "Priya Ramaswamy",
+      "rook": "Roland \"Rook\" Mercer",
+      "rosalind": "Rosalind \"Roz\" Hale",
+      "sable": "Sable Moreau",
+      "teo": "Teodor \"Teo\" Petrescu",
+      "tib": "Tobias \"Tib\" Okafor",
+      "vane": "Silas Vane"
+    },
+    "pronouns": {
+      "ada": "she/her",
+      "augusta": "she/her",
+      "bastien": "he/him",
+      "bertrand": "he/him",
+      "bru": "he/him",
+      "delphine": "she/her",
+      "felix": "he/him",
+      "hollis": "he/him",
+      "ines": "she/her",
+      "june": "she/her",
+      "kasimir": "he/him",
+      "margo": "she/her",
+      "moss": "he/him",
+      "nell": "she/her",
+      "nettie": "she/her",
+      "odile": "she/her",
+      "pell": "she/her",
+      "priya": "she/her",
+      "rook": "he/him",
+      "rosalind": "she/her",
+      "sable": "she/her",
+      "teo": "he/him",
+      "tib": "he/him",
+      "vane": "he/him"
+    },
+    "voices": [
+      {
+        "id": "ada",
+        "kind": "resident",
+        "tics": [
+          "That's a count.",
+          "Your money.",
+          "Stamped."
+        ]
+      },
+      {
+        "id": "augusta",
+        "kind": "canon",
+        "tics": [
+          "Noted.",
+          "For the record,",
+          "Right."
+        ]
+      },
+      {
+        "id": "bastien",
+        "kind": "animal",
+        "tics": [
+          "slow blink",
+          "tail wrapped round his front paws"
+        ]
+      },
+      {
+        "id": "bertrand",
+        "kind": "canon",
+        "tics": [
+          "My dear,",
+          "Going, or not going?",
+          "Where was I. Yes."
+        ]
+      },
+      {
+        "id": "bru",
+        "kind": "resident",
+        "tics": [
+          "Sorry.",
+          "That's what you asked.",
+          "It's what's here."
+        ]
+      },
+      {
+        "id": "delphine",
+        "kind": "canon",
+        "tics": [
+          "I'm quite well, thank you.",
+          "Mind the pins.",
+          "Roland."
+        ]
+      },
+      {
+        "id": "felix",
+        "kind": "canon",
+        "tics": [
+          "Let's see.",
+          "Show me.",
+          "Goodness."
+        ]
+      },
+      {
+        "id": "hollis",
+        "kind": "canon",
+        "tics": [
+          "Late.",
+          "By my watch.",
+          "That's not on the timetable."
+        ]
+      },
+      {
+        "id": "ines",
+        "kind": "canon",
+        "tics": [
+          "To be clear,",
+          "I'll see that it's minuted.",
+          "Forgive me."
+        ]
+      },
+      {
+        "id": "june",
+        "kind": "canon",
+        "tics": [
+          "Anyway.",
+          "Sure.",
+          "One, two,"
+        ]
+      },
+      {
+        "id": "kasimir",
+        "kind": "canon",
+        "tics": [
+          "Hm. Could be.",
+          "Give it a day.",
+          "Out of true."
+        ]
+      },
+      {
+        "id": "margo",
+        "kind": "canon",
+        "tics": [
+          "Technically,",
+          "Gloves.",
+          "Write that down."
+        ]
+      },
+      {
+        "id": "moss",
+        "kind": "resident",
+        "tics": [
+          "More ferry.",
+          "Mind the gap.",
+          "I'm only saying."
+        ]
+      },
+      {
+        "id": "nell",
+        "kind": "canon",
+        "tics": [
+          "Look.",
+          "And who pays for that?",
+          "Right, then."
+        ]
+      },
+      {
+        "id": "nettie",
+        "kind": "resident",
+        "tics": [
+          "Easy.",
+          "Visitor.",
+          "I never shoot at people."
+        ]
+      },
+      {
+        "id": "odile",
+        "kind": "canon",
+        "tics": [
+          "Hm.",
+          "Eat something.",
+          "Mind the step."
+        ]
+      },
+      {
+        "id": "pell",
+        "kind": "canon",
+        "tics": [
+          "Now.",
+          "Heavens.",
+          "Let me see to the lamps first."
+        ]
+      },
+      {
+        "id": "priya",
+        "kind": "canon",
+        "tics": [
+          "Right.",
+          "Let's have a look.",
+          "Sit. Sleeves up."
+        ]
+      },
+      {
+        "id": "rook",
+        "kind": "canon",
+        "tics": [
+          "Say what you came to say.",
+          "Don't.",
+          "Shift's over.",
+          "Rot."
+        ]
+      },
+      {
+        "id": "rosalind",
+        "kind": "canon",
+        "tics": [
+          "Between us.",
+          "I couldn't say, but.",
+          "Sit, pet."
+        ]
+      },
+      {
+        "id": "sable",
+        "kind": "canon",
+        "tics": [
+          "On the record?",
+          "Spell that.",
+          "Forme closes at midnight."
+        ]
+      },
+      {
+        "id": "teo",
+        "kind": "canon",
+        "tics": [
+          "Sorry.",
+          "It's, well.",
+          "Hortensia, hush.",
+          "Oh, bother."
+        ]
+      },
+      {
+        "id": "tib",
+        "kind": "canon",
+        "tics": [
+          "Obviously.",
+          "I'm not supposed to say, but.",
+          "Oh, and."
+        ]
+      },
+      {
+        "id": "vane",
+        "kind": "canon",
+        "tics": [
+          "May I be frank?",
+          "Let's be sensible.",
+          "Walk with me."
+        ]
+      }
+    ]
+  },
+  "hashes": {
+    "arrival": "ebffceee7a210053914f29d5f1fdf8b95ca9478102ef201406ab61cdadd14e90",
+    "census": "6f58f6a075c07d0427065bc1670d4ddc19f09f202bd19b7de4aaeff8f9b80a2d",
+    "prewarm": "a23be3a93837a0458a5c9264e628e7085317c73c384e43216d86fdc209d1421e",
+    "precheck": "6d04d857a5f5b3e029e0d0fb87417a4d1ee9df946a85f0fed8a3fd3a8c08bbd1",
+    "summary": "967c8f7cf10dcce4d099b9dbe01716932be2dcb22cd566d3963d6af86f303d60"
+  },
+  "_source": "Original request builders at 5ab38a9190be2d744dcae12cfa50a10e94ddcc9d; SHA-256 values hash JSON.stringify(request), including property order."
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Monde · Usage</title>
+<style>
+:root{color-scheme:dark;--cream:#fff0ce;--quiet:#cfc4a6;--brass:#e4c77f;--green:#bde0bf}*{box-sizing:border-box}body{margin:0;background:#101c18;color:var(--cream);font:16px/1.5 system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:32px 24px}header{display:flex;justify-content:space-between;align-items:baseline;gap:16px}h1,h2{font-family:Georgia,serif;font-weight:400}h1{font-size:28px;margin:0}h2{font-size:23px;margin:0 0 16px}p{margin:8px 0}.quiet,small{color:var(--quiet);font-size:13px}section{background:#1f2a22;border:1px solid #e4c77f30;border-radius:10px;padding:24px;margin-top:22px}.headlines{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.amount{font:42px/1.3 Georgia,serif;font-variant-numeric:tabular-nums}.tokens{margin-top:22px}table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}th{text-align:left;font-size:12px;font-weight:400;color:var(--quiet)}td,th{padding:10px 8px;border-bottom:1px solid #fff0ce12}td:first-child,th:first-child{padding-left:0}.num{text-align:right}.share{display:inline-block;height:3px;width:70px;background:#fff0ce18;vertical-align:middle;margin-left:8px}.share span{display:block;height:100%;background:var(--brass)}.under{color:var(--green)}.over{color:var(--brass)}select{background:#101c18;color:var(--cream);border:1px solid #e4c77f55;border-radius:4px;padding:7px;max-width:100%;font:inherit;font-size:14px}label{display:block}.models{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 30px}.role{display:flex;justify-content:space-between;align-items:center;gap:14px}.role select{width:65%}.scroll{overflow-x:auto}svg{display:block;width:100%;height:160px}.chart-labels{display:flex;justify-content:space-between}.chart-top{display:flex;justify-content:space-between;align-items:center;gap:12px}#status{min-height:20px}footer{margin:18px 0}.range-note{margin-bottom:10px}@media(max-width:650px){main{padding:20px 12px}section{padding:18px 14px}.headlines{gap:12px}.amount{font-size:28px}.models{grid-template-columns:1fr}header{display:block}td,th{padding:9px 5px}.share{width:35px}table{font-size:14px}}
+</style>
+<main>
+<header><h1>Monde <span class="quiet">/ Usage</span></h1><p id="status" class="quiet" role="status">Loading usage…</p></header>
+<section aria-label="Total cost"><div id="headlines" class="headlines"></div><p id="tokens" class="quiet tokens"></p></section>
+<section><div class="chart-top"><h2>Daily cost</h2><label class="quiet">Range <select id="days"><option value="7">7 days</option><option value="14" selected>14 days</option><option value="30">30 days</option></select></label></div><p id="chart-summary" class="quiet"></p><div id="chart"></div><div id="chart-labels" class="quiet chart-labels"></div></section>
+<section><h2>Where it goes</h2><p class="quiet range-note">Selected range · USD</p><div class="scroll"><table><thead><tr><th>Kind</th><th class="num">Cost / share</th><th class="num">Calls</th><th class="num">Per call</th></tr></thead><tbody id="kinds"></tbody></table></div></section>
+<section><h2>Worlds</h2><p class="quiet range-note">Selected range · target $0.09 per in-game day. Green is under target; amber is over.</p><div class="scroll"><table><thead><tr><th>Name / last active</th><th class="num">Cost</th><th class="num">Game days</th><th class="num">Per game day</th></tr></thead><tbody id="worlds"></tbody></table></div></section>
+<section><h2>Models</h2><div id="models" class="models"></div><p id="model-note" class="quiet"></p><p id="model-status" class="quiet" role="status"></p></section>
+<footer id="caps" class="quiet"></footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=(n,d=2)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
+const number=n=>new Intl.NumberFormat('en-US').format(n);
+const names={dialogue:'Dialogue',plan:'Night plans',reflect:'Reflections',gossip:'Gossip',prewarm:'Prewarm',summary:'Summaries',compaction:'Summaries',conversation_summary:'Summaries',conversation_digest:'Summaries',precheck:'Safety check',press:'Lantern',arrival:'Arrivals'};
+function relative(date){const seconds=Math.max(0,(Date.now()-new Date(date).getTime())/1000);for(const [unit,size] of [['day',86400],['hour',3600],['minute',60]]){if(seconds>=size){const n=Math.floor(seconds/size);return `${n} ${unit}${n===1?'':'s'} ago`;}}return 'just now';}
+let updated=null, busy=false, saving=false;
+function render(data){
+ $('headlines').innerHTML=[['today','Today'],['last7','Last 7 days'],['all','All time']].map(([key,label])=>`<div><div class="quiet">${label}</div><div class="amount">${money(data.totals[key].usd)}</div><small>${number(data.totals[key].calls)} calls</small></div>`).join('');
+ const t=data.totals.all.tokens;$('tokens').textContent=`All-time tokens · ${number(t.input)} input · ${number(t.cacheRead)} cached · ${number(t.cacheWrite)} cache writes · ${number(t.output)} output`;
+ const total=data.daily.reduce((n,r)=>n+r.usd,0), max=Math.max(...data.daily.map(r=>r.usd),0.001), w=1000/data.daily.length;
+ $('chart-summary').textContent=`${money(total)} over ${data.range.days} UTC days · highest day ${money(Math.max(...data.daily.map(r=>r.usd)),4)}`;
+ $('chart').innerHTML=`<svg viewBox="0 0 1000 160" preserveAspectRatio="none" role="img" aria-label="Daily cost in USD"><title>Daily cost, oldest to newest</title>${data.daily.map((r,i)=>`<rect x="${i*w+2}" y="${150-r.usd/max*140}" width="${Math.max(1,w-4)}" height="${Math.max(1,r.usd/max*140)}" fill="#e4c77f" opacity="${r.usd?0.8:0.15}"><title>${esc(r.day)}: ${money(r.usd,4)} · ${r.calls} calls</title></rect>`).join('')}</svg>`;
+ $('chart-labels').innerHTML=`<span>${esc(data.daily[0].day)}</span><span>${esc(data.daily.at(-1).day)}</span>`;
+ const grouped=new Map();for(const r of data.byKind){const kind=names[r.kind]??r.kind.replaceAll('_',' ');const prev=grouped.get(kind)??{kind,usd:0,calls:0};prev.usd+=r.usd;prev.calls+=r.calls;grouped.set(kind,prev);}
+ const rows=[...grouped.values()].sort((a,b)=>b.usd-a.usd), visible=rows.slice(0,6);if(rows.length>6)visible.push(rows.slice(6).reduce((a,r)=>({kind:'Other',usd:a.usd+r.usd,calls:a.calls+r.calls}),{kind:'Other',usd:0,calls:0}));
+ $('kinds').innerHTML=visible.map(r=>`<tr><td>${esc(r.kind)}</td><td class="num">${money(r.usd,4)} <small>${total?(r.usd/total*100).toFixed(0):0}%</small><span class="share"><span style="width:${total?r.usd/total*100:0}%"></span></span></td><td class="num">${number(r.calls)}</td><td class="num">${money(r.usd/r.calls,4)}</td></tr>`).join('')||'<tr><td colspan="4" class="quiet">No calls in this range.</td></tr>';
+ $('worlds').innerHTML=data.worlds.map(r=>`<tr><td>${esc(r.label)}<br><small>${relative(r.lastActive)}</small></td><td class="num">${money(r.usd,4)}</td><td class="num">${r.gameDays}</td><td class="num ${r.usdPerGameDay===null?'':r.usdPerGameDay<=0.09?'under':'over'}">${r.usdPerGameDay===null?'—':money(r.usdPerGameDay,4)}</td></tr>`).join('')||'<tr><td colspan="4" class="quiet">No active worlds in this range.</td></tr>';
+ $('caps').textContent=`Budget limits · ${money(data.caps.worldDailyUsd)} per world day · ${money(data.caps.globalTodayUsd)} / ${money(data.caps.globalDailyUsd)} globally today (includes reservations) · ${data.pendingBatches} pending batch requests`;
+ updated=data.generatedAt;$('status').textContent=`Updated ${relative(updated)}`;
+}
+async function loadModels(){
+ const response=await fetch('/api/models');
+ if(response.status===404){$('models').textContent="Model switching isn't available on this server yet";$('model-note').textContent='';return;}
+ if(!response.ok)throw new Error('Models unavailable');
+ const data=await response.json();
+ if(saving || $('models').contains(document.activeElement))return;
+ $('models').innerHTML=['dialogue','precheck','plan','reflect','gossip','press','arrival','summary'].map(role=>{const r=data.roles[role];if(!r)return '';return `<label class="role"><span>${names[role]}<br><small>${esc(r.source)} · ${esc(r.model)}</small></span><select data-role="${role}" aria-label="${names[role]} model"><option value="" ${r.source!=='admin'?'selected':''}>Automatic (env / default)</option>${data.models.map(m=>`<option value="${esc(m.id)}" ${r.source==='admin'&&r.model===m.id?'selected':''}>${esc(m.label)}</option>`).join('')}</select></label>`;}).join('');
+ const haiku=data.models.find(m=>/haiku/i.test(m.id)), llms=data.models.filter(m=>m.tier==='llm');
+ $('model-note').textContent=haiku&&llms.length?`Compared with Haiku, ${llms.map(m=>`${m.label} costs ${(m.input/haiku.input).toFixed(1)}× per input token and ${(m.output/haiku.output).toFixed(1)}× per output token`).join('; ')}.`:'Per-token price comparisons will appear when Haiku and LLM prices are available.';
+}
+$('models').addEventListener('change',async event=>{
+ const select=event.target;if(!select.dataset.role)return;saving=true;select.disabled=true;$('model-status').textContent='Saving model…';
+ try{const response=await fetch('/api/models',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({role:select.dataset.role,model:select.value||null})});if(!response.ok)throw new Error();$('model-status').textContent='Model saved.';}catch{$('model-status').textContent='Could not save model. Try again.';}finally{saving=false;select.disabled=false;select.blur();await loadModels().catch(()=>{$('model-status').textContent='Could not refresh models.';});}
+});
+async function refresh(){if(busy)return;busy=true;await Promise.all([
+ (async()=>{try{const response=await fetch(`/api/usage?days=${$('days').value}`);if(!response.ok)throw new Error();render(await response.json());}catch{$('status').textContent=`Could not refresh usage.${updated?' Last updated '+relative(updated)+'.':' Check the server and admin token.'}`;}})(),
+ loadModels().catch(()=>{$('model-status').textContent='Could not refresh models.';})
+]);busy=false;}
+$('days').addEventListener('change',refresh);refresh();setInterval(refresh,60000);
+</script>
+</html>

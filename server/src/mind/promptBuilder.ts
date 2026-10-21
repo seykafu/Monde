@@ -1,3 +1,4 @@
+import { modelParams, defaultRouter, DEFAULT_MODEL } from "./models.js";
 import { containsAnswer, MAX_SESSION_EXCHANGES } from "@monde/shared";
 /**
  * The prompt builder (GDD §9.10.1, §9.17; MVP task M-04).
@@ -38,7 +39,7 @@ import { borrowedFor, borrowedLine, phraseKey, type RosterVoice, type Signature 
 
 export type MindCallKind = "dialogue" | "plan" | "reflect" | "gossip" | "precheck";
 
-export const MIND_MODEL: Anthropic.Model = "claude-haiku-5-5";
+export const MIND_MODEL: Anthropic.Model = DEFAULT_MODEL;
 
 /** Model, token cap and reasoning settings for one call kind. Merge with a built request via `apiParams`. */
 export interface MindSettings {
@@ -57,6 +58,7 @@ export interface MindSettings {
 export const DIALOGUE_MAX_TOKENS = 900;
 
 /**
+ * Baseline settings; modelParams applies the selected model’s thinking rules without changing prompts or caps.
  * Haiku 5.5 rules: no temperature / top_p / top_k (non-default sampling is a 400) and no assistant prefill.
  * Dialogue, gossip and the pre-check run with thinking disabled (valid at the default effort) for latency;
  * plans and reflections keep adaptive thinking at effort "low". Variety comes from persona, memory, topic
@@ -88,14 +90,14 @@ export interface MindRequest {
 }
 
 /** The full API body for a call: settings + built request, with `output_config` merged (effort + format). */
-export function apiParams(kind: MindCallKind, request: MindRequest): Anthropic.MessageCreateParamsNonStreaming {
+export function apiParams(kind: MindCallKind, request: MindRequest, router = defaultRouter, selected = router.resolve(kind).model): Anthropic.MessageCreateParamsNonStreaming {
   const settings = requestSettings(kind);
-  return {
+  return modelParams(kind, {
     ...settings,
     system: request.system,
     messages: request.messages,
     output_config: { ...settings.output_config, ...request.output_config },
-  };
+  }, router, selected);
 }
 
 function outputConfig(kind: MindCallKind, schema: z.ZodType): MindRequest["output_config"] {
