@@ -961,7 +961,7 @@ the 2026-10-19 five-day staging soak (§9.15). Importance-5+ memories still trig
 | Tier | Who | Plan | Reflection | Live dialogue |
 |---|---|---|---|---|
 | **Core** | The 20 canon residents | Daily | Daily | Yes |
-| **Acquainted** | Up to 30 residents the player has talked to in the last 14 days, or who are tied to an open Favor, Project or story beat | Daily | Daily if they had an importance-5+ memory that day, otherwise every 3rd day (days divisible by 3; Batch) | Yes |
+| **Acquainted** | Up to 30 residents the player has talked to in the last 14 days, or who are tied to an open Favor, Project or story beat | Every other day (even days), and any night they reflect; otherwise their routine | Daily if they had an importance-5+ memory that day, otherwise every 3rd day (days divisible by 3; Batch) | Yes |
 | **Ambient** | Everyone else | Weekly, plus on life events | Only when an importance-6+ memory touches them (Batch) | Yes. Talking to them promotes them to Acquainted |
 
 - **Lag tolerance.** Batched reflections may return late (they're asynchronous). A resident whose
@@ -1466,9 +1466,10 @@ non-Core reflections were 30 of 124 model reflections in five days (Core's 24 st
 day. Where a day's ≈ $0.13 goes now: plans ≈ $0.045 (24 Core and up to 30 Acquainted), Core reflections ≈ $0.022,
 dialogue ≈ $0.024 (60 turns), gossip ≈ $0.021, prewarm ≈ $0.009, conversation summaries ≈ $0.007, pre-checks
 ≈ $0.003. The soak talks to ~20 different residents a day, which keeps Acquainted at its cap; a real day likely
-costs less. Further cuts are design trade-offs: Acquainted model plans less often, Core reflections batched (their
-plans would read yesterday's beliefs), gossip in summary mode (lever 3), a compact night persona. The $0.06/day
-target is not yet met.
+costs less. Kasey's calls (2026-10-20): Acquainted residents plan with the model every other day and any night they
+reflect (≈ −$0.013/day), and model-written night encounters are capped at 40 a night instead of 80, Core pairs first,
+the rest taking the Ambient rule (≈ −$0.01/day). Still open: Core reflections batched (their plans would read
+yesterday's beliefs), a compact night persona. The $0.06/day target is not yet met.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,
 Ambient work pauses. Past 150%, Acquainted drop to template plans. Past 200%, the world enters Quiet

@@ -33,8 +33,11 @@ import type { Tier } from "./tiers.js";
 
 /** GDD-GAP: §9.11.3 doesn't bound encounters per resident; 3 a day keeps a busy market from flooding one evening. */
 export const ENCOUNTERS_PER_RESIDENT = 3;
-/** GDD-GAP: §9.15 budgets 80 summary-mode gossips a day; past that, encounters take the Ambient rule. */
-export const MODEL_ENCOUNTERS_PER_NIGHT = 80;
+/**
+ * §9.15 budgeted 80 summary-mode gossips a night; Kasey cut it to 40 after the cost soaks (2026-10-20). Core pairs
+ * still go first; past the cap, encounters take the Ambient rule. Live chats the Fellow overhears aren't counted.
+ */
+export const MODEL_ENCOUNTERS_PER_NIGHT = 40;
 /** GDD-GAP: "the same place" needs a duration; half an hour together is a meeting, a nod in passing isn't. */
 export const MIN_OVERLAP_MINUTES = 30;
 /** Asleep or napping at the same address (June and Ines at the pub rooms) isn't meeting. */

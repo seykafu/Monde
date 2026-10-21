@@ -129,6 +129,13 @@ export interface NightJob {
 export const acquaintedTurn = (day: number): boolean => day % 3 === 0;
 
 /**
+ * §9.15 (Kasey, 2026-10-20, after the cost soaks): a quiet Acquainted resident plans with the model every other day
+ * (even days); on the others their routine stands (dawn's template). A night they reflect on always plans: something
+ * happened to them, so tomorrow should show it.
+ */
+export const acquaintedPlanTurn = (day: number): boolean => day % 2 === 0;
+
+/**
  * The night's jobs in queue order (Core, Acquainted, Ambient; by id within a tier). Ambient residents with nothing to
  * do are left out, and at most `ambientCap` reflect (AMBIENT_REFLECTIONS_PER_NIGHT, the most important first).
  */
@@ -139,7 +146,8 @@ export function nightJobs(tiers: ReadonlyMap<string, Tier>, topImportance: Reado
     const top = topImportance.get(residentId) ?? 0;
     if (tier === "core") jobs.push({ residentId, tier, reflect: true, plan: true });
     else if (tier === "acquainted") {
-      jobs.push({ residentId, tier, reflect: top >= ACQUAINTED_REFLECT_IMPORTANCE || acquaintedTurn(day), plan: true });
+      const reflect = top >= ACQUAINTED_REFLECT_IMPORTANCE || acquaintedTurn(day);
+      jobs.push({ residentId, tier, reflect, plan: reflect || acquaintedPlanTurn(day) });
     } else if (top >= AMBIENT_REFLECT_IMPORTANCE) ambient.push({ residentId, top });
   }
   ambient.sort((a, b) => b.top - a.top || (a.residentId < b.residentId ? -1 : 1));

@@ -11,7 +11,7 @@ import { aiLog, dialogueTurns, letters, memories, plans, relationships, resident
 import { createWorld } from "../../worlds/createWorld.js";
 import { worldToken } from "../../worlds/routes.js";
 import { DisabledMindClient, type MindClient } from "../mindClient.js";
-import { AMBIENT_REFLECTIONS_PER_NIGHT, NIGHT_BUDGET_MS, NightRunner, acquaintedTurn, nightJobs, type NightRunnerOptions } from "../night.js";
+import { AMBIENT_REFLECTIONS_PER_NIGHT, NIGHT_BUDGET_MS, NightRunner, acquaintedPlanTurn, acquaintedTurn, nightJobs, type NightRunnerOptions } from "../night.js";
 import { FULL, fullRosterContent } from "../../__tests__/fullRoster.js";
 import { templatePlan } from "../templatePlan.js";
 import { describeCall, FakeNightMind, type NightCall, type NightReply } from "./fakeNightMind.js";
@@ -354,6 +354,18 @@ describe("night pass rules and hygiene", () => {
       { residentId: "bru", tier: "ambient", reflect: true, plan: false },
     ]);
     expect(nightJobs(tiers, top, 3).find((j) => j.residentId === "moss")).toMatchObject({ reflect: true });
+  });
+
+  it("plans quiet Acquainted residents with the model every other day, and any night they reflect", () => {
+    // Kasey's §9.15 call (2026-10-20): on the other nights their routine stands (dawn's template).
+    const tiers = new Map([["pell", "core"], ["ada", "acquainted"], ["moss", "acquainted"]] as const);
+    const top = new Map([["ada", 5]]);
+    expect([1, 2, 3, 4].map(acquaintedPlanTurn)).toEqual([false, true, false, true]);
+    const night1 = nightJobs(tiers, top, 1);
+    expect(night1.find((j) => j.residentId === "moss")).toMatchObject({ reflect: false, plan: false });
+    expect(night1.find((j) => j.residentId === "ada")).toMatchObject({ reflect: true, plan: true });
+    expect(night1.find((j) => j.residentId === "pell")).toMatchObject({ reflect: true, plan: true });
+    expect(nightJobs(tiers, new Map(), 3).find((j) => j.residentId === "moss")).toMatchObject({ reflect: true, plan: true });
   });
 
   it("requires the world's own token on night and dawn", async () => {
