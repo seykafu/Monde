@@ -1,0 +1,43 @@
+# MVP Q-02: the real API, nightly, at low volume. Plays a fresh staging world for two in-game days (30 dialogue turns a
+# day, prewarm, nights) with tools/soak-live.ts and keeps its report (spend per day by call kind) as an artifact.
+# About $0.25 a run. It does nothing until both repository secrets exist:
+#   MONDE_INVITE_CODE  a staging invite code
+#   ADMIN_TOKEN        the staging server's ADMIN_TOKEN (for /admin/costs.json)
+name: Nightly soak
+on:
+  schedule:
+    - cron: "17 7 * * *"
+  workflow_dispatch:
+jobs:
+  soak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MONDE_INVITE_CODE: ${{ secrets.MONDE_INVITE_CODE }}
+      ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+    steps:
+      - name: Skip without secrets
+        id: gate
+        run: |
+          if [ -z "$MONDE_INVITE_CODE" ] || [ -z "$ADMIN_TOKEN" ]; then
+            echo "MONDE_INVITE_CODE or ADMIN_TOKEN isn't set: skipping the live soak."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.gate.outputs.run == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.gate.outputs.run == 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: steps.gate.outputs.run == 'true'
+      - run: npx tsx tools/soak-live.ts --days=2 --turns=30 --out-dir=soak-report
+        if: steps.gate.outputs.run == 'true'
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.gate.outputs.run == 'true'
+        with:
+          name: soak-report
+          path: soak-report/
