@@ -1468,8 +1468,9 @@ dialogue ≈ $0.024 (60 turns), gossip ≈ $0.021, prewarm ≈ $0.009, conversat
 ≈ $0.003. The soak talks to ~20 different residents a day, which keeps Acquainted at its cap; a real day likely
 costs less. Kasey's calls (2026-10-20): Acquainted residents plan with the model every other day and any night they
 reflect (≈ −$0.013/day), and model-written night encounters are capped at 40 a night instead of 80, Core pairs first,
-the rest taking the Ambient rule (≈ −$0.01/day). Still open: Core reflections batched (their plans would read
-yesterday's beliefs), a compact night persona. The $0.06/day target is not yet met.
+the rest taking the Ambient rule (≈ −$0.01/day). Measured after both: **$0.106 per in-game day** (5-day soak,
+2026-10-21; days from $0.080 to $0.143). Still open: Core reflections batched (their plans would read yesterday's
+beliefs), a compact night persona. The $0.06/day target is not yet met.
 
 **Per-world budget guard.** The gateway tracks spend per world per in-game day. Past 100% of budget,
 Ambient work pauses. Past 150%, Acquainted drop to template plans. Past 200%, the world enters Quiet
