@@ -58,7 +58,13 @@ describe('the art manifest', () => {
     expect(files.filter(file => file !== 'manifest.json' && !file.endsWith('.webp'))).toEqual([]);
     for (const [id, exprs] of Object.entries(shipped)) {
       expect(files, `${id}.webp`).toContain(`${id}.webp`);
-      expect(size(readFileSync(resolve(publicDir, 'assets/portraits', `${id}.webp`))), id).toEqual([ART_W * exprs.length, ART_H]);
+      const file = readFileSync(resolve(publicDir, 'assets/portraits', `${id}.webp`));
+      // CI checks out without Git LFS (its bandwidth quota): there the sheet is a pointer, so only its shape is checked.
+      if (file.toString('ascii', 0, 40).startsWith('version https://git-lfs')) {
+        expect(file.toString('utf8'), id).toMatch(/^oid sha256:[0-9a-f]{64}$/m);
+        continue;
+      }
+      expect(size(file), id).toEqual([ART_W * exprs.length, ART_H]);
     }
     expect(artExpression({}, 'odile', 'warm')).toBeNull();
   });
