@@ -21,6 +21,7 @@
     "verify:puzzles": "python3 tools/verify_puzzles.py",
     "build": "npm run build -w @monde/client && npm run build -w @monde/server",
     "build:itch": "npm run build:itch -w @monde/client",
+    "package:itch": "node tools/package-itch.mjs",
     "desktop:dev": "npm run dev -w @monde/desktop",
     "desktop:compile": "npm run build -w @monde/desktop",
     "desktop:build": "npm run build -w @monde/client && npm run desktop:compile",
