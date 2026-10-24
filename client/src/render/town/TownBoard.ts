@@ -3,7 +3,7 @@ import type { ZoneDef, TownBuilding, TownProp, Point } from '../../world/zoneFor
 import { TOWN_MANIFEST, metaOf, resolveState, spriteFile, type Restorable, type SpriteState, type TownLook } from '../../world/townSprites';
 import { buildingHomes, isLit } from '../../town/occupancy';
 import { homeDirectory } from '../../world/homes';
-import { LINE_SPRITES, lineMasks, paintLine, type LineKind } from './lineArt';
+import { LINE_GEOMETRY, LINE_SPRITES, lineMasks, paintLine, type LineKind } from './lineArt';
 import { letter, type LetterStyle } from './lettering';
 import { BEAM_HALF_ANGLE, beamHeading, beamHit, beamOnScreen, headingTo } from './beam';
 import { TERRAIN_INFO } from '../../world/townTerrain';
@@ -15,8 +15,9 @@ import { DEPTH, actorDepth, terrainDepth } from '../depth';
 import { DIORAMA_ELEV_STEP, DIORAMA_SLAB_DEPTH } from '../dioramaConfig';
 import { addTorchGlow } from '../diorama/Lighting';
 import { ensureDotTexture } from '../diorama/Atmosphere';
-import { castFrom, torchShadow, type Sun } from '../sun';
+import { SUN, castFrom, shadeTint, torchShadow, type Sun } from '../sun';
 import type { ObliqueProjection } from '../ObliqueProjection';
+import { boxShadow, buildingHeight, insidePolygon, lineRects, sunShear, type GroundRect, type Pt, type Shear } from './castShadow';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // The town board (GDD §16.4): a v2 zone drawn as a lived-in place on the ¾ diorama.
@@ -28,9 +29,13 @@ import type { ObliqueProjection } from '../ObliqueProjection';
 //   sprites    every building and prop a billboard on its anchor (bottom-centre on the footprint's front
 //              edge, or the base tile's middle), depth-sorted with the people by that ground line, culled
 //              to the camera; buildings and tall props fade to 35% while the player is behind them
-//   shadows    a soft contact shadow under everything; the sun's shadow from the clock: props lean their
-//              silhouette (render/sun castFrom), buildings shear theirs along the ground (a box's shadow,
-//              not a toppled one), redrawn when the sun has moved a few degrees; lamps throw shadows at night
+//   shadows    a soft contact shadow under every prop and the footprint's under every building (ambient light, so
+//              day and night), the walls darkening toward the ground; the sun's shadow from the clock, all of it on
+//              one layer so two shadows that overlap are no darker (castShadow.ts: props shear their silhouette
+//              about the foot, buildings, hedges and walls throw a box's), redrawn when the sun has moved a few
+//              degrees; inShade() tells the people who stands in it (and small props in a building's shadow take the
+//              shade); a building's corner toward the sun catches it, the far one turns into shade; lamps throw
+//              shadows at night
 //   night      lamp posts are lights (a pool on the ground, a halo at the head, a steady flicker); lived-in
 //              buildings get their windows lit (found in the art, windows.ts) and a pool at the door
 //   state      faded or restored art per townSprites.resolveState, swapped in place when the town changes;
@@ -79,6 +84,40 @@ const LANTERN: readonly [number, number] = [61, 62];
 const BEAM_LENGTH = 1100;
 const BEAM_TEX_W = 512;
 const BEAM_TEX_H = 192;
+/** Ambient occlusion round a building's footprint: how far it spreads (px) and how dark it is at the wall. Art tuning. */
+const FOOT_AO_SPREAD = 14;
+const FOOT_AO_ALPHA = 0.36;
+/** The walls darken toward the ground over this many px, to this alpha at the foot. Art tuning. */
+const WALL_AO_PX = 14;
+const WALL_AO_ALPHA = 0.3;
+/** A prop's depth north to south for its shadow, as a share of its width (a tree's crown is about as deep as wide). */
+const PROP_DEPTH = 0.6;
+/**
+ * The sun along a building's side edges: the corner toward the sun catches it (warm light added), the far corner
+ * turns into shade, most strongly with the sun low in the east or west and not at all at noon. Art tuning.
+ */
+const RIM_LIT = 0.34;
+const RIM_DARK = 0.22;
+const RIM_TINT = 0xffe2b0;
+
+/**
+ * A footprint's ambient occlusion: black under the footprint, fading out FOOT_AO_SPREAD px past its edges (less
+ * across the foreshortened ground north and south). Made once per size.
+ */
+function ensureFootTexture(scene: Phaser.Scene, w: number, d: number): string {
+  const key = `town:footao:${w}x${d}`;
+  if (scene.textures.exists(key)) return key;
+  const pad = FOOT_AO_SPREAD, tw = w + pad * 2, th = d + pad * 2, tex = scene.textures.createCanvas(key, tw, th)!;
+  const img = new ImageData(tw, th), aspect = TW / TH;
+  for (let y = 0; y < th; y++) for (let x = 0; x < tw; x++) {
+    const dx = Math.max(0, pad - x - 0.5, x + 0.5 - (pad + w)), dy = Math.max(0, pad - y - 0.5, y + 0.5 - (pad + d)) * aspect;
+    const t = Math.max(0, 1 - Math.hypot(dx, dy) / pad);
+    img.data[(y * tw + x) * 4 + 3] = Math.round(255 * t * t);
+  }
+  tex.getContext().putImageData(img, 0, 0);
+  tex.refresh();
+  return key;
+}
 
 /** A long soft wedge of light, brightest at its root: the beam's texture (made once). */
 function ensureBeamTexture(scene: Phaser.Scene): string {
@@ -132,8 +171,17 @@ export interface Billboard {
   state: SpriteState;
   lived: boolean;
   flip: boolean;
-  shadow: Phaser.GameObjects.Image | null;
-  shear: boolean;
+  /** Throws a sun shadow on the board's shadow layer: a building or a hedge a box's, a prop its sheared silhouette. */
+  casts: boolean;
+  /** Buildings: the ground under the box that throws the shadow (world px), and its height. */
+  foot?: GroundRect;
+  height?: number;
+  /** Buildings: the walls darkening toward the ground (rides with the billboard's fade). */
+  ao: Phaser.GameObjects.Image | null;
+  /** Buildings: the sunlit and the shaded side edge (render/town: RIM_LIT, RIM_DARK). */
+  rim: { lit: Phaser.GameObjects.Image; dark: Phaser.GameObjects.Image } | null;
+  /** A small prop standing in a building's shadow (it takes the shade, as the people do). */
+  shaded: boolean;
   lampShadow: { img: Phaser.GameObjects.Image; alpha: number } | null;
   windows: Phaser.GameObjects.Image | null;
   contact: Phaser.GameObjects.Image | null;
@@ -156,7 +204,11 @@ export interface Billboard {
 }
 
 /** A cell of a hedge, wall or fence run. */
-interface LineCell { img: Phaser.GameObjects.Image; rect: Rect }
+interface LineCell { img: Phaser.GameObjects.Image; rect: Rect; kind: LineKind; ground: GroundRect[] }
+/** A silhouette sheared along the ground: texture key, the foot's position in it and its size (px). */
+interface Sheared { key: string; ox: number; oy: number; w: number; h: number }
+/** A shadow just cast, for inShade(): a building's polygon (and how tall the building is), or a prop's sheared silhouette. */
+interface Shade { box: Rect; poly?: Pt[]; height?: number; prop?: { bill: Billboard; sweep: number } }
 
 interface Chunk { tx0: number; ty0: number; tx1: number; ty1: number; images: Phaser.GameObjects.Image[]; foam: Phaser.GameObjects.Image[]; done: boolean; rect: Rect }
 interface ChunkMeta { x: number; y: number; w: number; h: number; water: boolean; foam: boolean }
@@ -206,6 +258,15 @@ export class TownBoard {
     stones: { flash: Phaser.GameObjects.Image; heading: number }[] } | null = null;
   private readonly ctx: BakeContext;
   private readonly zoneKey: string;
+  /** Every sun shadow on one layer at the sun's alpha, so where two overlap the ground is no darker. */
+  private readonly sunLayer: Phaser.GameObjects.RenderTexture;
+  private readonly sunPen: Phaser.GameObjects.Graphics;
+  private readonly layerAt: { x: number; y: number };
+  private shades: Shade[] = [];
+  private sunShape: { angle: number; squash: number } | null = null;
+  /** Which screen side the sun lights the buildings from (−1 left, 1 right, 0 not yet), and how strongly (0..1). */
+  private rimSide = 0;
+  private rimLevel = 0;
   private time = 0;
   private rippleClock = 0;
   private lastSun = '';
@@ -225,6 +286,11 @@ export class TownBoard {
     const b = projection.bounds();
     scene.add.image(b.x + b.w / 2, b.y + b.h + 6, ensureDotTexture(scene)).setTint(0x000000).setAlpha(0.7)
       .setDisplaySize(b.w * 1.22, Math.max(70, b.h * 0.26)).setDepth(DEPTH.BOARD_SHADOW);
+    // The sun's shadows, clipped to the board: off its edge there is no ground to fall on.
+    this.layerAt = { x: Math.floor(b.x), y: Math.floor(b.y) };
+    this.sunLayer = scene.add.renderTexture(this.layerAt.x, this.layerAt.y, Math.ceil(b.w) + 1, Math.ceil(b.h) + 1)
+      .setOrigin(0, 0).setDepth(DEPTH.SHADOW - 0.1).setVisible(false);
+    this.sunPen = scene.make.graphics({}, false);
     this.buildGround();
     this.buildWater();
     const town = zone.town!;
@@ -415,7 +481,10 @@ export class TownBoard {
     const meta = metaOf(b.sprite);
     const col = meta.door ?? Math.floor(b.foot[0] / 2);
     const door: Point = b.door ?? [b.at[0] + (b.flip ? b.foot[0] - 1 - col : col), b.at[1] + b.foot[1]];
-    const bill = this.addBillboard({ sprite: b.sprite, kind: 'building', x, baseY, flip: b.flip,
+    // The box that throws its shadow: as wide as the walls are drawn, as deep as the footprint (render/town/castShadow).
+    const art = TOWN_MANIFEST[b.sprite]!, depth = b.foot[1] * TH, half = (art.w * 0.94) / 2;
+    const foot = { x0: x - half, y0: baseY - depth, x1: x + half, y1: baseY };
+    const bill = this.addBillboard({ sprite: b.sprite, kind: 'building', x, baseY, flip: b.flip, foot, height: buildingHeight(art.h, depth),
       restorable: { ...(b.id ? { id: b.id } : {}), sprite: b.sprite, state: b.state, ...(b.project ? { project: b.project } : {}), homes }, door, fade: true, homes });
     if (b.datestone !== undefined && meta.lintel) {
       if (!meta.lintel.plain) {
@@ -490,35 +559,41 @@ export class TownBoard {
         const gx = cx * TW + prop.dx + piece.ox, gy = this.groundY(cx, cy) + prop.dy + piece.oy;
         const img = this.scene.add.image(gx, gy, crisp(this.scene, key)).setOrigin(0, 0)
           .setDepth(actorDepth(this.groundY(cx, cy) + prop.dy + piece.foot) - 1e-6);
-        this.lineCells.push({ img, rect: { x0: gx, x1: gx + piece.w, y0: gy, y1: gy + piece.h } });
+        const left = cx * TW + prop.dx, top = this.groundY(cx, cy) + prop.dy;
+        const ground = lineRects(kind, masks[i]!).map(r => ({ x0: left + r.x0, y0: top + r.y0, x1: left + r.x1, y1: top + r.y1 }));
+        this.lineCells.push({ img, rect: { x0: gx, x1: gx + piece.w, y0: gy, y1: gy + piece.h }, kind, ground });
       });
     }
   }
 
-  private addBillboard(o: { sprite: string; kind: 'building' | 'prop'; x: number; baseY: number; lift?: number; flip: boolean; restorable: Restorable; door?: Point; fade: boolean; homes?: string[] }): Billboard {
+  private addBillboard(o: { sprite: string; kind: 'building' | 'prop'; x: number; baseY: number; lift?: number; flip: boolean; restorable: Restorable; door?: Point; fade: boolean; homes?: string[]; foot?: GroundRect; height?: number }): Billboard {
     const scene = this.scene, meta = metaOf(o.sprite), art = TOWN_MANIFEST[o.sprite]!;
     const lift = (meta.overhead ?? 0) + (o.lift ?? 0);
     const img = scene.add.image(o.x, o.baseY - lift, crisp(scene, townTexture(o.sprite))).setOrigin(0.5, 1).setFlipX(o.flip);
     // Overhead things (bunting) hang over the people; the footbridge and lilies lie under them.
     img.setDepth(meta.overhead ? DEPTH.UNIT_HUD - 0.5 : meta.under ? DEPTH.TERRAIN_FX + (meta.water ? 0 : 0.01) : actorDepth(o.baseY) - 1e-6);
     const bounds = { x0: o.x - art.w / 2, x1: o.x + art.w / 2, y0: o.baseY - lift - art.h, y1: o.baseY - lift + 4 };
-    const isLamp = !!meta.light;
-    // The ground it stands on darkens a little round its foot.
+    // The ground it stands on darkens a little round its foot; a building's all round its footprint, which shows past
+    // its walls on either side how deep it runs.
     let contact: Phaser.GameObjects.Image | null = null;
-    if (!meta.flat && !meta.water && !meta.under) {
+    if (o.foot) {
+      const w = Math.round(o.foot.x1 - o.foot.x0), d = Math.round(o.foot.y1 - o.foot.y0);
+      contact = scene.add.image(o.foot.x0 - FOOT_AO_SPREAD, o.foot.y0 - FOOT_AO_SPREAD, ensureFootTexture(scene, w, d))
+        .setOrigin(0, 0).setAlpha(FOOT_AO_ALPHA).setDepth(DEPTH.SHADOW - 0.05);
+    } else if (!meta.flat && !meta.water && !meta.under) {
       const [bw] = meta.block ?? [1, 1];
-      const w = o.kind === 'building' ? art.w * 0.92 : Math.min(art.w, Math.max(1, bw) * TW) * 0.8;
       contact = scene.add.image(o.x, o.baseY - 1, ensureDotTexture(scene)).setTint(0x000000)
-        .setAlpha(o.kind === 'building' ? 0.42 : 0.3).setDisplaySize(w, o.kind === 'building' ? 16 : 8).setDepth(DEPTH.SHADOW - 0.05);
+        .setAlpha(0.3).setDisplaySize(Math.min(art.w, Math.max(1, bw) * TW) * 0.8, 8).setDepth(DEPTH.SHADOW - 0.05);
     }
-    const shear = o.kind === 'building';
-    const shadow = meta.flat || meta.water || isLamp || meta.overhead || o.lift ? null
-      : scene.add.image(o.x, o.baseY, img.texture.key).setOrigin(0.5, 1).setTintFill(0x000000).setAlpha(0).setDepth(DEPTH.SHADOW - 0.1);
+    const ao = o.foot ? scene.add.image(img.x, img.y, this.wallShade(o.sprite, 'restored')).setOrigin(0.5, 1).setFlipX(o.flip).setDepth(img.depth + 5e-8) : null;
+    const edge = (depth: number) => scene.add.image(img.x, img.y, this.rimEdge(o.sprite, 'restored', 1)).setOrigin(0.5, 1).setDepth(img.depth + depth).setVisible(false);
+    const rim = o.foot ? { lit: edge(6e-8).setBlendMode(Phaser.BlendModes.ADD).setTint(RIM_TINT), dark: edge(7e-8).setTintFill(0x000000) } : null;
     const bill: Billboard = {
       img, sprite: o.sprite, kind: o.kind, x: o.x, baseY: o.baseY, bounds, fade: o.fade, alpha: 1,
-      restorable: o.restorable, state: 'restored', lived: false, flip: o.flip, shadow, shear, lampShadow: null,
+      restorable: o.restorable, state: 'restored', lived: false, flip: o.flip, lampShadow: null, ao, rim, shaded: false,
+      casts: !(meta.flat || meta.water || meta.overhead || meta.under || o.lift), ...(o.foot ? { foot: o.foot, height: o.height } : {}),
       windows: null, contact, sway: meta.sway ?? 0, phase: (o.x * 0.013 + o.baseY * 0.007) % (Math.PI * 2),
-      ...(o.door ? { door: o.door } : {}), chimneys: [], homes: o.homes ?? [], extras: [], hidden: false, lift: o.lift ?? 0
+      ...(o.door ? { door: o.door } : {}), chimneys: [], homes: o.homes ?? [], extras: ao ? [ao] : [], hidden: false, lift: o.lift ?? 0
     };
     this.billboards.push(bill);
     if (meta.light) this.addLamp(bill, meta.light);
@@ -527,7 +602,9 @@ export class TownBoard {
 
   /** The riddle system shows a Mark's plaque once it is revealed (§14.1), and hides those still to find. */
   setMarkVisible(id: string, visible: boolean): void {
-    for (const bill of this.billboards) if (bill.mark === id) bill.hidden = !visible;
+    let changed = false;
+    for (const bill of this.billboards) if (bill.mark === id && bill.hidden !== !visible) { bill.hidden = !visible; changed = true; }
+    if (changed && this.sunShape) this.castShadows(this.sunShape);
   }
 
   /** The Marks on this board and their plaques' world positions. */
@@ -552,7 +629,7 @@ export class TownBoard {
   /** Lamp shadows: every prop near a lamp gets one, faded in with the lamps (as ZoneScene did for the greybox). */
   private buildLampShadows(): void {
     for (const bill of this.billboards) {
-      if (!bill.shadow || bill.shear || bill.lampShadow) continue;
+      if (!bill.casts || bill.foot || bill.lampShadow) continue;
       const lit = torchShadow(bill.x, bill.baseY, this.lights);
       if (!lit) continue;
       const img = this.worldOnly(this.scene.add.image(bill.x, bill.baseY, bill.img.texture.key).setOrigin(0.5, 1).setFlipX(bill.flip)
@@ -582,7 +659,8 @@ export class TownBoard {
       if (changed) {
         const tex = crisp(this.scene, townTexture(spriteFile(bill.sprite, state)));
         bill.img.setTexture(tex);
-        if (bill.shadow && !bill.shear) bill.shadow.setTexture(tex);
+        bill.ao?.setTexture(this.wallShade(bill.sprite, state));
+        this.setRim(bill);
         bill.lampShadow?.img.setTexture(tex);
       }
       if (!relit) return;
@@ -703,46 +781,112 @@ export class TownBoard {
 
   // ── Light ─────────────────────────────────────────────────────────────────
 
-  /** The clock's light: sun shadows (re-sheared for buildings when the sun has moved), lamps and windows. */
+  /** The clock's light: the sun's shadow layer (recast when the sun has moved a few degrees), lamps and windows. */
   applyLight(env: LightEnv): void {
     this.lampLevel = env.lampLevel;
     this.sunAlpha = env.sun.alpha;
+    for (const bill of this.billboards) if (bill.lampShadow) bill.lampShadow.img.setAlpha(bill.lampShadow.alpha * env.lampLevel);
+    const on = env.sun.alpha > 0.004;
+    this.sunLayer.setAlpha(env.sun.alpha).setVisible(on);
+    // Shadows lean away from the sun: a lean to the left (morning) means the sun lights the buildings' right corners.
+    const lean = Math.sin(env.sun.angle * Math.PI / 180), side = lean < 0 ? 1 : -1;
+    this.rimLevel = on ? Math.min(1, Math.abs(lean)) * Math.min(1, env.sun.alpha / SUN.alpha) : 0;
+    if (side !== this.rimSide) { this.rimSide = side; for (const bill of this.billboards) this.setRim(bill); }
     const angle = Math.round(env.sun.angle / 3) * 3, squash = Math.round(env.sun.squash / 0.05) * 0.05;
     const sunKey = `${angle}:${squash.toFixed(2)}`;
-    for (const bill of this.billboards) {
-      if (!bill.shadow) continue;
-      if (!bill.shear) castFrom(bill.shadow, bill.img, env.sun);
-      bill.shadow.setAlpha(env.sun.alpha);
-      if (bill.lampShadow) bill.lampShadow.img.setAlpha(bill.lampShadow.alpha * env.lampLevel);
-    }
-    if (sunKey !== this.lastSun && env.sun.alpha > 0.004) {
+    if (on && sunKey !== this.lastSun) {
       this.lastSun = sunKey;
-      const rad = (angle * Math.PI) / 180;
-      const k1 = squash * Math.sin(rad), k2 = squash * Math.cos(rad);
-      const made = new Map<string, { ox: number; oy: number }>();
-      for (const bill of this.billboards) {
-        if (!bill.shadow || !bill.shear) continue;
-        const file = spriteFile(bill.sprite, bill.state);
-        const key = `townshadow:${file}:${bill.flip ? 1 : 0}`;
-        let origin = made.get(key);
-        if (!origin) { origin = this.shearShadow(file, key, bill.flip, k1, k2); made.set(key, origin); }
-        bill.shadow.setTexture(key).setOrigin(origin.ox, origin.oy).setScale(1).setAngle(0).setFlipX(false).clearTint().setTintFill(0x000000);
-      }
+      this.castShadows({ angle, squash });
+    }
+    const tint = shadeTint(env.sun.alpha);
+    for (const bill of this.billboards) if (bill.kind === 'prop') bill.img.setTint(on && bill.shaded ? tint : 0xffffff);
+  }
+
+  /**
+   * Every sun shadow, drawn afresh in black on the one layer (which shows at the sun's alpha): buildings and the
+   * hedge, wall and fence runs as boxes, the props as their silhouettes sheared along the ground.
+   */
+  private castShadows(sun: { angle: number; squash: number }): void {
+    this.sunShape = sun;
+    const s = sunShear(sun), pen = this.sunPen, at = this.layerAt, shades: Shade[] = [];
+    const box = (poly: Pt[]): Rect => ({ x0: Math.min(...poly.map(p => p.x)), x1: Math.max(...poly.map(p => p.x)), y0: Math.min(...poly.map(p => p.y)), y1: Math.max(...poly.map(p => p.y)) });
+    pen.clear().fillStyle(0x000000, 1);
+    for (const bill of this.billboards) {
+      if (!bill.casts || !bill.foot || bill.hidden) continue;
+      const poly = boxShadow(bill.foot, bill.height!, s);
+      pen.fillPoints(poly, true);
+      shades.push({ box: box(poly), poly, height: bill.height! });
+    }
+    for (const cell of this.lineCells) for (const r of cell.ground) pen.fillPoints(boxShadow(r, LINE_GEOMETRY[cell.kind].h, s), true);
+    const rt = this.sunLayer.clear();
+    rt.beginDraw();
+    rt.batchDraw(pen, -at.x, -at.y);
+    const made = new Map<string, Sheared>();
+    for (const bill of this.billboards) {
+      if (!bill.casts || bill.foot || bill.hidden) continue;
+      const file = spriteFile(bill.sprite, bill.state), key = `townshadow:${file}:${bill.flip ? 1 : 0}`;
+      let cast = made.get(key);
+      if (!cast) { cast = this.shearShadow(file, key, bill.flip, s); made.set(key, cast); }
+      const x = Math.round(bill.x - cast.ox), y = Math.round(bill.baseY - cast.oy);
+      // Swept a little north and south for the depth a tree's crown has: a flat cut-out seen edge-on throws no shadow.
+      const sweep = Math.round(Math.min(TOWN_MANIFEST[bill.sprite]!.w, 64) * PROP_DEPTH * (TH / TW) / 2);
+      for (let dy = -sweep; dy <= sweep; dy += 2) rt.batchDrawFrame(key, undefined, x - at.x, y + dy - at.y);
+      shades.push({ box: { x0: x, y0: y - sweep, x1: x + cast.w, y1: y + cast.h + sweep }, prop: { bill, sweep } });
+    }
+    rt.endDraw();
+    this.shades = shades;
+    // A small prop in a building's shadow (one taller than it) takes the shade; a tree that tops the roof doesn't.
+    for (const bill of this.billboards) {
+      if (bill.kind !== 'prop') continue;
+      const h = TOWN_MANIFEST[bill.sprite]!.h;
+      bill.shaded = shades.some(sh => !!sh.poly && sh.height! >= h && bill.x >= sh.box.x0 && bill.x < sh.box.x1 && bill.baseY >= sh.box.y0 && bill.baseY < sh.box.y1
+        && insidePolygon({ x: bill.x, y: bill.baseY - 1 }, sh.poly));
     }
   }
 
-  /** A building's silhouette laid on the ground: sheared away from the sun, its foot fixed. */
-  private shearShadow(file: string, key: string, flip: boolean, k1: number, k2: number): { ox: number; oy: number } {
+  /**
+   * Is ground point (x, y) in the sun's shadow of a building or a prop (the low runs don't count)? The people
+   * standing there lose their own sun shadow and take the shade (ZoneScene, scenes/zone/residents).
+   */
+  inShade(x: number, y: number): boolean {
+    if (this.sunAlpha <= 0.004) return false;
+    for (const sh of this.shades) {
+      if (x < sh.box.x0 || x >= sh.box.x1 || y < sh.box.y0 || y >= sh.box.y1) continue;
+      if (sh.poly ? insidePolygon({ x, y }, sh.poly) : this.underProp(sh.prop!.bill, sh.prop!.sweep, x, y)) return true;
+    }
+    return false;
+  }
+
+  /** Is (x, y) in this prop's sheared silhouette? Undo the shear back into the art (render/town/castShadow). */
+  private underProp(bill: Billboard, sweep: number, x: number, y: number): boolean {
+    const shape = this.sunShape, px = this.pixels(spriteFile(bill.sprite, bill.state));
+    if (!shape || !px) return false;
+    const { k1, k2 } = sunShear(shape);
+    // Nearly sideways, the shear can't be undone row by row (and the sun is low enough that the shadow is faint).
+    if (Math.abs(k2) < 0.05) return false;
+    const w = px.width, h = px.height, dx = x - bill.x;
+    for (let dy = -sweep; dy <= sweep; dy += 2) {
+      const up = -(y - bill.baseY - dy) / k2;
+      if (up < 0 || up > h) continue;
+      let u = Math.floor(dx - k1 * up + w / 2);
+      const v = Math.floor(h - up);
+      if (bill.flip) u = w - 1 - u;
+      if (u >= 0 && u < w && v >= 0 && v < h && px.data[(v * w + u) * 4 + 3]! > 127) return true;
+    }
+    return false;
+  }
+
+  /** A prop's silhouette sheared along the ground about its foot, away from the sun (render/town/castShadow). */
+  private shearShadow(file: string, key: string, flip: boolean, s: Shear): Sheared {
     const src = this.scene.textures.get(townTexture(file)).getSourceImage() as HTMLImageElement;
-    const w = src.width, h = src.height;
+    const w = src.width, h = src.height, { k1, k2 } = s;
     const xs = [0, w, k1 * h, w + k1 * h], ys = [0, -k2 * h];
     const minX = Math.floor(Math.min(...xs)), maxX = Math.ceil(Math.max(...xs));
     const minY = Math.floor(Math.min(...ys)), maxY = Math.ceil(Math.max(...ys));
     const cw = Math.max(1, maxX - minX), ch = Math.max(1, maxY - minY + 1);
     let tex = this.scene.textures.exists(key) ? this.scene.textures.get(key) as Phaser.Textures.CanvasTexture : null;
-    if (tex && (tex.width !== cw || tex.height !== ch)) { tex.setSize(cw, ch); }
-    if (!tex) tex = this.scene.textures.createCanvas(key, cw, ch);
-    if (!tex) return { ox: 0.5, oy: 1 };
+    if (tex && (tex.width !== cw || tex.height !== ch)) tex.setSize(cw, ch);
+    if (!tex) tex = this.scene.textures.createCanvas(key, cw, ch)!;
     const c = tex.getContext();
     c.setTransform(1, 0, 0, 1, 0, 0);
     c.clearRect(0, 0, cw, ch);
@@ -757,7 +901,57 @@ export class TownBoard {
     c.fillRect(0, 0, cw, ch);
     c.globalCompositeOperation = 'source-over';
     tex.refresh();
-    return { ox: (w / 2 - minX) / cw, oy: -minY / ch };
+    return { key, ox: w / 2 - minX, oy: -minY, w: cw, h: ch };
+  }
+
+  /** A building's walls darkening toward the ground: its silhouette, black at the foot, clear WALL_AO_PX up. */
+  private wallShade(sprite: string, state: SpriteState): string {
+    const file = spriteFile(sprite, state), key = `townwallao:${file}`;
+    if (this.scene.textures.exists(key)) return key;
+    const src = this.scene.textures.get(townTexture(file)).getSourceImage() as HTMLImageElement;
+    const tex = this.scene.textures.createCanvas(key, src.width, src.height)!;
+    const c = tex.getContext(), h = src.height;
+    c.drawImage(src, 0, 0);
+    c.globalCompositeOperation = 'source-in';
+    const g = c.createLinearGradient(0, h, 0, h - WALL_AO_PX);
+    g.addColorStop(0, `rgba(0,0,0,${WALL_AO_ALPHA})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, src.width, h);
+    tex.refresh();
+    tex.setFilter(NEAREST);
+    return key;
+  }
+
+  /** The edge texture on the sunlit side and the other on the shaded side, for the art this building shows now. */
+  private setRim(bill: Billboard): void {
+    if (!bill.rim || !this.rimSide) return;
+    // The edges are found in the unflipped art: a flipped building's right edge is its art's left.
+    const lit = (bill.flip ? -this.rimSide : this.rimSide) as 1 | -1;
+    bill.rim.lit.setTexture(this.rimEdge(bill.sprite, bill.state, lit)).setFlipX(bill.flip);
+    bill.rim.dark.setTexture(this.rimEdge(bill.sprite, bill.state, -lit as 1 | -1)).setFlipX(bill.flip);
+  }
+
+  /** The last two px of the art's silhouette on one side of each row (1 right, −1 left), white: a building's corner. */
+  private rimEdge(sprite: string, state: SpriteState, side: 1 | -1): string {
+    const file = spriteFile(sprite, state), key = `townrim:${file}:${side}`;
+    if (this.scene.textures.exists(key)) return key;
+    const px = this.pixels(file);
+    const w = px?.width ?? 1, h = px?.height ?? 1, tex = this.scene.textures.createCanvas(key, w, h)!;
+    if (px) {
+      const out = new ImageData(w, h), solid = (x: number, y: number) => x >= 0 && x < w && px.data[(y * w + x) * 4 + 3]! > 127;
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        if (!solid(x, y)) continue;
+        const a = !solid(x + side, y) ? 255 : !solid(x + 2 * side, y) ? 110 : 0;
+        if (!a) continue;
+        const i = (y * w + x) * 4;
+        out.data[i] = out.data[i + 1] = out.data[i + 2] = 255; out.data[i + 3] = a;
+      }
+      tex.getContext().putImageData(out, 0, 0);
+    }
+    tex.refresh();
+    tex.setFilter(NEAREST);
+    return key;
   }
 
   // ── Every frame ───────────────────────────────────────────────────────────
@@ -789,16 +983,20 @@ export class TownBoard {
     this.rippleClock += dt;
     if (this.rippleClock >= (this.opts.reduced ? 3 : 1) / RIPPLE_FPS) { this.rippleClock = 0; this.drawRipples(); }
 
-    const night = this.lampLevel > 0.005, sunOn = this.sunAlpha > 0.004;
+    const night = this.lampLevel > 0.005;
     const body: Rect = { x0: player.x - 12, x1: player.x + 12, y0: player.y - 52, y1: player.y };
     for (const cell of this.lineCells) cell.img.setVisible(overlaps(cell.rect, view));
     for (const bill of this.billboards) {
-      const on = !bill.hidden && (overlaps(bill.bounds, view) || (!!bill.shadow && sunOn && Math.abs(bill.x - (view.x0 + view.x1) / 2) < (view.x1 - view.x0) / 2 + 320 && bill.baseY > view.y0 && bill.baseY - 400 < view.y1));
+      const on = !bill.hidden && overlaps(bill.bounds, view);
       bill.img.setVisible(on);
-      bill.shadow?.setVisible(on && sunOn);
       bill.contact?.setVisible(on);
       bill.lampShadow?.img.setVisible(on && night);
       for (const e of bill.extras) e.setVisible(on).setAlpha(bill.alpha);
+      if (bill.rim) {
+        const lit = on && this.rimLevel > 0.01;
+        bill.rim.lit.setVisible(lit).setAlpha(bill.alpha * this.rimLevel * RIM_LIT);
+        bill.rim.dark.setVisible(lit).setAlpha(bill.alpha * this.rimLevel * RIM_DARK);
+      }
       if (!on) { bill.windows?.setVisible(false); continue; }
       if (bill.fade) {
         const behind = player.y < bill.baseY - 2 && overlaps(body, { x0: bill.bounds.x0 + 6, x1: bill.bounds.x1 - 6, y0: bill.bounds.y0 + 6, y1: bill.baseY });

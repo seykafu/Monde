@@ -75,9 +75,10 @@ it('world name tags and emotes step aside during a Project beat', async () => {
   const h = harness(); let beat = false;
   const label = h.display(), bubble = h.display();
   const actor = { state: { visible: true, moving: true }, pos: { x: 1, y: 1 }, alpha: 1, profile: { id: 'sable' },
-    avatar: { apply: vi.fn() }, sprite: h.display(), shadow: h.display(), label, bubble };
+    avatar: { apply: vi.fn() }, sprite: h.display(), shadow: h.display(), cast: h.display(), label, bubble };
   const context = { projection: { originX: 0, originY: 0, elevationAt: () => 0 },
-    scene: { scene: { isActive: () => beat } }, speaking: () => false, chatter: { partner: () => null } };
+    scene: { scene: { isActive: () => beat } }, speaking: () => false, chatter: { partner: () => null },
+    sun: { angle: 0, squash: 0, alpha: 0 }, inShade: () => false };
   const draw = Reflect.get(ResidentLayer.prototype, 'draw') as (a: unknown, p: unknown, pointer: null, dt: number) => void;
   draw.call(context, actor, { x: 1, y: 1 }, null, 16);
   expect(Reflect.get(label, 'visible')).toBe(true);

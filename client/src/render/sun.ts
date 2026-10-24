@@ -75,6 +75,15 @@ export const torchShadow = (
   };
 };
 
+/**
+ * The tint for a figure standing in a building's or a tree's shadow: as much darker as the ground under the
+ * board's shadow layer (which shows black at the sun's alpha), a touch cooler, since shade is lit by the sky.
+ */
+export const shadeTint = (sunAlpha: number): number => {
+  const ch = (k: number) => Math.round(255 * Math.max(0, 1 - sunAlpha * k));
+  return (ch(0.95) << 16) | (ch(0.9) << 8) | ch(0.7);
+};
+
 /** Lay a black silhouette of `src`'s current look on the ground. */
 export const castFrom = (
   shadow: Phaser.GameObjects.Image,

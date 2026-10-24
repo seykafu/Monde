@@ -10207,8 +10207,13 @@ spawn: [5, 22]
   place, more than 4 tiles from its place, named twice, with a radius outside 1–3, or with fewer than two
   cells to stand on.
 - **On the board.** Buildings and props are billboards sorted with the people by their ground line, and
-  fade to 35% while the player is behind them; contact shadows, sun shadows from the clock (props lean,
-  buildings shear along the ground) and lamp shadows at night; lamp pools and heads, lit windows found in
+  fade to 35% while the player is behind them; contact shadows (a building's all round its footprint, its walls
+  darkening toward the ground), sun shadows from the clock and lamp shadows at night. The sun's shadows lie on one
+  layer, so two that overlap are no darker: a building, hedge, wall or fence throws a box's shadow from its footprint
+  (so its side shadow runs the building's whole depth), a prop its silhouette sheared along the ground about its
+  foot; a building's corner toward the sun catches it and the far one turns into shade. Anyone standing in a
+  building's or a tree's shadow (and a small prop in a building's) takes the shade and loses their own sun shadow;
+  residents cast one as the player does. Lamp pools and heads, lit windows found in
   the art, and door pools and chimney smoke for lived-in homes only (who lives where, below); a workplace
   keeps a light on while it trades (not a faded one, an empty shop or one nobody is in after dark). Once the
   lighthouse is relit (`project_lighthouse_done`), at night a slow beam turns from its lantern room across

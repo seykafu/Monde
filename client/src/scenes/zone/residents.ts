@@ -26,6 +26,7 @@ import { cameraView } from '../../render/town/TownBoard';
 import Phaser from 'phaser';
 import type { ObliqueProjection } from '../../render/ObliqueProjection';
 import { DEPTH, actorDepth } from '../../render/depth';
+import { castFrom, shadeTint, type Sun } from '../../render/sun';
 import { DIORAMA_ELEV_STEP, DIORAMA_FOOT_DY, DIORAMA_PERSPECTIVE_K, DIORAMA_TILE_H, DIORAMA_TILE_W } from '../../render/dioramaConfig';
 import { screenToSource } from '../../render/keystone';
 import { FAMILY_BODY, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../../util/constants';
@@ -98,6 +99,8 @@ interface Actor {
   colour: number;
   sprite: Phaser.GameObjects.Image;
   shadow: Phaser.GameObjects.Ellipse;
+  /** The sun's shadow: the figure's silhouette laid on the ground, as the player's (gone in shade). */
+  cast: Phaser.GameObjects.Image;
   label: Phaser.GameObjects.Text;
   bubble: Phaser.GameObjects.Image;
   /** Sheet and walk/idle animation (facing, frames by distance walked). */
@@ -228,6 +231,15 @@ export class ResidentLayer {
   private emoteCheck = 0;
   /** In a room (W-03): who the routines have inside its building, at their spots (world/indoorResidents.ts). */
   private readonly indoor: IndoorView | null;
+  /** The scene's sun (kept up to date by it) and where its shadows lie: see setLight. */
+  private sun: Sun = { angle: 0, squash: 0, alpha: 0 };
+  private inShade: (x: number, y: number) => boolean = () => false;
+
+  /** The sun the scene lights the board with (the record it rewrites as the clock runs), and the shade on the ground. */
+  setLight(sun: Sun, inShade: (x: number, y: number) => boolean): void {
+    this.sun = sun;
+    this.inShade = inShade;
+  }
 
   /**
    * Actors only for the residents on this board's roster (or due on it within LOOKAHEAD_MIN) when the zone is built,
@@ -261,8 +273,9 @@ export class ResidentLayer {
     const avatar = new CharacterSprite(scene, profile.id, lookFor(profile, colour));
     const sprite = scene.add.image(0, 0, avatar.sheet.key).setVisible(false);
     avatar.apply(sprite);
+    const cast = scene.add.image(0, 0, avatar.sheet.key).setTintFill(0x000000).setDepth(DEPTH.SHADOW).setVisible(false);
     return Object.assign(actor, {
-      avatar, sprite,
+      avatar, sprite, cast,
       shadow: scene.add.ellipse(0, 0, animal ? 18 : 22, 7, 0x000000, 0.22).setDepth(DEPTH.SHADOW).setVisible(false),
       label: scene.add.text(0, 0, profile.name, { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#28372dcc', padding: { x: 3, y: 1 }, resolution: RENDER_SCALE })
         .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setVisible(false),
@@ -290,7 +303,7 @@ export class ResidentLayer {
     const actor = this.makeActor(profile);
     this.actors.push(actor);
     this.byId.set(profile.id, actor);
-    for (const cam of this.camerasToSkip()) cam.ignore([actor.sprite, actor.shadow, actor.label, actor.bubble]);
+    for (const cam of this.camerasToSkip()) cam.ignore([actor.sprite, actor.shadow, actor.cast, actor.label, actor.bubble]);
     return actor;
   }
 
@@ -683,8 +696,15 @@ export class ResidentLayer {
     // Squeezing past the player reads as a courtesy, not a collision: a little see-through while it lasts.
     const ghost = a.passing && Math.hypot(pos.x - player.x, pos.y - player.y) < BLOCK_RADIUS + 0.2 ? 0.6 : 1;
     a.avatar.apply(a.sprite);
-    a.sprite.setPosition(x, foot).setDepth(actorDepth(foot)).setAlpha(a.alpha * ghost).setVisible(true);
+    // The sun lays their shadow on the ground, as it does the player's; standing in a building's or a tree's, they take the shade.
+    const shaded = this.inShade(x, foot), sunAlpha = shaded ? 0 : this.sun.alpha;
+    a.sprite.setPosition(x, foot).setDepth(actorDepth(foot)).setAlpha(a.alpha * ghost).setTint(shaded ? shadeTint(this.sun.alpha) : 0xffffff).setVisible(true);
     a.shadow.setPosition(x, foot - 1).setAlpha(a.alpha).setVisible(true);
+    if (sunAlpha > 0.004) {
+      a.avatar.apply(a.cast, false);
+      castFrom(a.cast, a.sprite, this.sun);
+      a.cast.setPosition(x, foot).setAlpha(sunAlpha * a.alpha).setVisible(true);
+    } else a.cast.setVisible(false);
     const top = foot - (a.animal ? 26 : 50);
     const hovered = pointer !== null && Math.abs(pointer.x - x) < 15 && pointer.y > foot - (a.animal ? 26 : 48) && pointer.y < foot;
     const near = Math.hypot(pos.x - player.x, pos.y - player.y) <= NAME_RANGE;
@@ -702,7 +722,7 @@ export class ResidentLayer {
   }
 
   private hide(a: Actor, resetFade = true): void {
-    a.sprite.setVisible(false); a.shadow.setVisible(false); a.label.setVisible(false); a.bubble.setVisible(false);
+    a.sprite.setVisible(false); a.shadow.setVisible(false); a.cast.setVisible(false); a.label.setVisible(false); a.bubble.setVisible(false);
     if (resetFade) { a.alpha = 0; a.base = null; a.pos = null; a.state = null; a.offset.x = a.offset.y = 0; }
   }
 

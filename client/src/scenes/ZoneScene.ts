@@ -34,7 +34,7 @@ import { DIORAMA_TILE_W, DIORAMA_TILE_H, DIORAMA_ELEV_STEP, DIORAMA_SLAB_DEPTH, 
 import { BloomPipeline, BLOOM_PIPELINE } from '../render/BloomPipeline';
 import { PerspectivePipeline, PERSPECTIVE_PIPELINE } from '../render/PerspectivePipeline';
 import { attachPostPipeline } from '../render/postPipelines';
-import { SUN, castFrom, torchShadow, type Sun } from '../render/sun';
+import { SUN, castFrom, shadeTint, torchShadow, type Sun } from '../render/sun';
 import { sunShadow } from '../render/sunClock';
 import { DEPTH, actorDepth } from '../render/depth';
 import { CharacterSprite, PLAYER_LOOK_KEY, playerLook, preloadCharacterSheets } from '../render/characterSprite';
@@ -244,6 +244,8 @@ export class ZoneScene extends Phaser.Scene {
   private projection!: ObliqueProjection;
   private figure!: Phaser.GameObjects.Image;
   private shadow!: Phaser.GameObjects.Image;
+  /** The contact shadow under the player's feet, as the residents have (ambient light: day and night). */
+  private contact!: Phaser.GameObjects.Ellipse;
   /** The player's sheet and walk/idle animation (render/characterSprite); shown on both figure and shadow. */
   private avatar!: CharacterSprite;
   private prompt!: Phaser.GameObjects.Text;
@@ -395,6 +397,7 @@ export class ZoneScene extends Phaser.Scene {
     this.avatar = new CharacterSprite(this, 'player', playerLook(this.registry));
     this.figure = this.add.image(0, 0, this.avatar.sheet.key);
     this.shadow = this.add.image(0, 0, this.avatar.sheet.key).setTintFill(0).setAlpha(0).setDepth(DEPTH.SHADOW);
+    this.contact = this.add.ellipse(0, 0, 22, 7, 0x000000, 0.22).setDepth(DEPTH.SHADOW);
     this.avatar.apply(this.figure);
     this.avatar.apply(this.shadow, false);
     // A form signed while the town waits (the story's {charcreate}) re-dresses the player.
@@ -411,6 +414,7 @@ export class ZoneScene extends Phaser.Scene {
     this.syncFigure();
     // Before the world snapshot below, so every resident sprite belongs to the world camera.
     this.residents = new ResidentLayer(this, this.zone, this.projection, this.clock, DEV_KEYS);
+    this.residents.setLight(this.sun, (x, y) => this.town?.inShade(x, y) ?? false);
     // E beside a resident opens the dialogue panel over this scene; walking near one prewarms it (M-05).
     attachDialogue(this, { residents: this.residents, zone: this.zone, clock: this.clock, weather: () => this.now, playerPosition: () => this.position });
     this.story = attachStory(this, { zone: this.zone, clock: this.clock, residents: this.residents, position: () => this.position,
@@ -611,7 +615,10 @@ export class ZoneScene extends Phaser.Scene {
 
   /** The player's shadow: from the sun, or from the nearest lit lamp once that is the stronger light. */
   private castPlayerShadow(): void {
-    let light: Sun = this.sun, alpha = this.sun.alpha;
+    // In a building's or a tree's shadow the sun doesn't reach the player: no shadow of their own, and the shade on them.
+    const shaded = this.town?.inShade(this.figure.x, this.figure.y) ?? false;
+    this.figure.setTint(shaded ? shadeTint(this.sun.alpha) : 0xffffff);
+    let light: Sun = this.sun, alpha = shaded ? 0 : this.sun.alpha;
     if (this.lampLevel > 0) {
       const lit = torchShadow(this.figure.x, this.figure.y, this.lamps);
       if (lit && lit.alpha * this.lampLevel > alpha) { light = lit; alpha = lit.alpha * this.lampLevel; }
@@ -890,6 +897,7 @@ export class ZoneScene extends Phaser.Scene {
     const moved = p.x !== this.figure.x || footY !== this.figure.y;
     this.figure.setPosition(p.x, footY).setDepth(actorDepth(footY));
     this.shadow.setPosition(p.x, footY);
+    this.contact.setPosition(p.x, footY - 1);
     if (moved || this.shadowDirty) { this.shadowDirty = false; this.castPlayerShadow(); }
   }
   private followPlayer(): void {
