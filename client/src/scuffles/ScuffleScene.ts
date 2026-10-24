@@ -4,9 +4,11 @@ import { deploymentTiles } from '../combat/scuffle/arena';
 import { fighter } from '../combat/scuffle/engine';
 import { SUN } from '../render/sun';
 import Phaser from 'phaser';
-import { FAMILY_BODY, FAMILY_HEADING } from '../util/constants';
+import { FAMILY_BODY, FAMILY_HEADING, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { TownBoard, preloadTownSprites } from '../render/town/TownBoard';
 import { ObliqueProjection } from '../render/ObliqueProjection';
+import { DIORAMA_ELEV_STEP, DIORAMA_FOOT_DY, DIORAMA_SLAB_DEPTH, DIORAMA_TILE_H, DIORAMA_TILE_W } from '../render/dioramaConfig';
+import { frameArena } from './frame';
 import { CharacterSprite, playerLook } from '../render/characterSprite';
 import { residentLook, type Look } from '../render/character/look';
 import { drawFrame } from '../render/character/rig';
@@ -22,6 +24,16 @@ import type { Clock } from '../sim/clock';
 import type { TilePos } from '../combat/types';
 
 export const SCUFFLE_SCENE = 'Scuffle';
+const BACKDROP = 0x253c37;
+/** A fighter's frame height, px (the rig's 32×48; pose() draws the same). */
+const FIGURE_H = 48;
+/**
+ * The left page the arena is framed on (design px): under the title and round lines, above the enemies' intents, left
+ * of the panel at x 730. Layout tuning.
+ */
+const ARENA_PAGE = { x: 12, y: 92, w: 706, h: 398 };
+/** Clear above the back row: a fighter standing there. Never closer than a room is drawn (ZoneScene's INDOOR_ZOOM). */
+const ARENA_FIT = { maxZoom: 1.5, headroom: FIGURE_H - DIORAMA_TILE_H / 2 - DIORAMA_FOOT_DY, pad: 6 };
 interface Open { encounter: Encounter; host: string; clock: Clock; done(outcome: Outcome): void; cancel(): void; witnesses: string[] }
 export function openScuffle(host: Phaser.Scene, clock: Clock, id: string, opts: { key?: string; story?: boolean; zone?: string; centre?: TilePos } = {}): Promise<Outcome> {
   if (!isScuffleId(id)) return Promise.reject(new Error(`Scuffle ${id} is outside the Spring MVP.`));
@@ -43,6 +55,9 @@ export class ScuffleScene extends Phaser.Scene {
   private opening!: Open;
   private board!: TownBoard;
   private projection!: ObliqueProjection;
+  /** Draws the UI unzoomed over the world camera, which frames the board on the left page. */
+  private uiCamera!: Phaser.Cameras.Scene2D.Camera;
+  private zoom = 1;
   private ui!: Phaser.GameObjects.Container;
   private overlay!: Phaser.GameObjects.Container;
   private figures = new Map<string, Phaser.GameObjects.Image>();
@@ -66,15 +81,39 @@ export class ScuffleScene extends Phaser.Scene {
     const host = this.scene.get(this.opening.host), oldInput = host.input.enabled, oldKeys = host.input.keyboard?.enabled;
     host.input.enabled = false; if (host.input.keyboard) { host.input.keyboard.resetKeys(); host.input.keyboard.enabled = false; }
     this.opening.clock.pause('scuffle');
-    this.cameras.main.setBackgroundColor('#253c37');
     const arena = this.opening.encounter.battle.arena;
-    this.projection = new ObliqueProjection({ originX: 50, originY: 150, tileW: 64, tileH: 36, elevStep: 12, slabDepth: 20,
-      gridWidth: arena.width, gridHeight: arena.height, elevationAt: (x, y) => arena.tiles[y * arena.width + x]?.elev ?? 0 });
-    this.board = new TownBoard(this, { zone: arena, projection: this.projection, seed: 8, look: { flag: n => flagsOf(this.registry).has(n) }, focus: { x: 370, y: 300 } });
+    // The town's diorama grid from world (0, 0), which TownBoard bakes and places its art on: the art, the grid overlay
+    // and the fighters share this one projection.
+    this.projection = new ObliqueProjection({ originX: 0, originY: 0, tileW: DIORAMA_TILE_W, tileH: DIORAMA_TILE_H, elevStep: DIORAMA_ELEV_STEP,
+      slabDepth: DIORAMA_SLAB_DEPTH, gridWidth: arena.width, gridHeight: arena.height, elevationAt: (x, y) => arena.tiles[y * arena.width + x]?.elev ?? 0 });
+    // The world camera frames the board on the left page of the 1280×720 design (a top-left pivot, as util/renderScale
+    // sets every camera; set here too for RENDER_SCALE 1). Scrolled in whole device pixels, so no art pixel straddles two.
+    const bounds = this.projection.bounds(), frame = frameArena(bounds, ARENA_PAGE, ARENA_FIT), camera = this.cameras.main;
+    const zoom = RENDER_SCALE * frame.zoom, snap = (v: number) => Math.round(v * zoom) / zoom, page = ARENA_PAGE;
+    this.zoom = frame.zoom;
+    camera.setOrigin(0, 0).setZoom(zoom).setViewport(page.x * RENDER_SCALE, page.y * RENDER_SCALE, page.w * RENDER_SCALE, page.h * RENDER_SCALE)
+      .setScroll(snap(frame.scrollX), snap(frame.scrollY)).setBackgroundColor(BACKDROP);
+    this.board = new TownBoard(this, { zone: arena, projection: this.projection, seed: 8, look: { flag: n => flagsOf(this.registry).has(n) },
+      focus: { x: bounds.x + bounds.w / 2, y: bounds.y + bounds.h / 2 } });
     const dark = this.opening.clock.minute >= 1200 ? .75 : 0;
     this.board.applyLight({ sun: { ...SUN, alpha: dark ? 0 : SUN.alpha }, dark, lampLevel: dark });
-    // The arena occupies the left page of a fixed 1280×720 logical viewport, consistent with the town's UI.
-    this.overlay = this.add.container().setDepth(10000); this.ui = this.add.container().setDepth(20000);
+    // The UI camera ignores the board (TownBoard keeps what it makes later off it too) and everything world() marks.
+    const world = this.children.list.slice();
+    this.uiCamera = this.cameras.add(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    this.uiCamera.ignore(world);
+    // Round the page, the scene's own backdrop: the town is still drawn under this scene.
+    const backdrop = this.add.graphics().fillStyle(BACKDROP).setDepth(19000)
+      .fillRect(0, 0, GAME_WIDTH, page.y).fillRect(0, page.y + page.h, GAME_WIDTH, GAME_HEIGHT - page.y - page.h)
+      .fillRect(0, page.y, page.x, page.h).fillRect(page.x + page.w, page.y, GAME_WIDTH - page.x - page.w, page.h);
+    this.overlay = this.world(this.add.container().setDepth(10000)); this.ui = this.add.container().setDepth(20000);
+    camera.ignore([backdrop, this.ui]);
+    // A click on the board picks the tile drawn under it, raised ground included (ObliqueProjection.worldToTile).
+    this.input.on(Phaser.Input.Events.POINTER_DOWN, (pointer: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
+      if (over.length || this.busy || pointer.x < camera.x || pointer.y < camera.y || pointer.x >= camera.x + camera.width || pointer.y >= camera.y + camera.height) return;
+      const at = camera.getWorldPoint(pointer.x, pointer.y), tile = this.projection.worldToTile(at.x, at.y);
+      if (!tile) return;
+      this.cursor = tile; this.draw(); this.pick(tile);
+    });
     this.cursor = { ...this.opening.encounter.battle.current!.state.position };
     this.feedback = SCUFFLES[this.opening.encounter.battle.id].opening;
     this.draw();
@@ -101,7 +140,14 @@ export class ScuffleScene extends Phaser.Scene {
       if (!this.resolved) this.opening.cancel();
     });
   }
-  update(_time: number, dt: number): void { this.board?.update(dt, { x: 370, y: 300 }, 0); }
+  update(_time: number, dt: number): void {
+    if (!this.board) return;
+    // TownBoard fades what stands between the camera and the player's fighter.
+    const player = this.opening.encounter.battle.units.find(u => u.id === 'player'), p = this.projection.tileToWorld(player?.state.position ?? this.cursor);
+    this.board.update(dt, { x: p.x, y: p.y + DIORAMA_FOOT_DY }, 0);
+  }
+  /** Drawn by the world camera only. */
+  private world<T extends Phaser.GameObjects.GameObject>(obj: T): T { this.uiCamera.ignore(obj); return obj; }
   private text(x: number, y: number, value: string, size = 18): Phaser.GameObjects.Text {
     const t = this.add.text(x, y, value, { fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: '#f3e8ce', wordWrap: { width: 480 } }); this.ui.add(t); return t;
   }
@@ -115,21 +161,22 @@ export class ScuffleScene extends Phaser.Scene {
     this.text(40, 24, SCUFFLES[b.id].name, 30).setFontFamily(FAMILY_HEADING);
     this.text(40, 65, `Round ${b.initiative.round} · ${current?.faction === 'enemy' ? 'Tollmen / nuisances' : 'Your side'} · ${current?.name ?? ''}`);
     for (let y = 0; y < b.arena.height; y++) for (let x = 0; x < b.arena.width; x++) {
-      const p = { x, y }, point = this.projection.tileToWorld({ x, y });
+      const p = { x, y }, top = this.projection.topFace(p);
       const movable = current && current.faction !== 'enemy' && b.movesFor(current).some(t => same(t, p));
       const target = b.units.find(u => isAlive(u) && same(u.state.position, p));
       const attack = current && target && target.faction !== current.faction && b.inReach(current, target);
-      const tile = this.add.rectangle(point.x, point.y, 62, 34, attack ? 0xd18c65 : 0x83bdba, movable || attack ? .22 : .03).setStrokeStyle(same(p, this.cursor) ? 3 : 1, same(p, this.cursor) ? 0xffe7a3 : 0x587569, .7).setInteractive();
-      tile.on('pointerdown', () => { this.cursor = p; this.pick(p); }); this.overlay.add(tile);
+      this.overlay.add(this.add.rectangle(top.x + top.w / 2, top.y + top.h / 2, top.w - 2, top.h - 2, attack ? 0xd18c65 : 0x83bdba, movable || attack ? .22 : .03)
+        .setStrokeStyle(same(p, this.cursor) ? 3 : 1, same(p, this.cursor) ? 0xffe7a3 : 0x587569, .7));
     }
     for (const u of b.units) {
-      const p = this.projection.tileToWorld(u.state.position);
+      // Feet a little in front of the tile's centre, as the town stands people (DIORAMA_FOOT_DY); nearer rows draw over.
+      const centre = this.projection.tileToWorld(u.state.position), p = { x: centre.x, y: centre.y + DIORAMA_FOOT_DY };
       let img = this.figures.get(u.id);
-      if (!img) { img = this.add.image(p.x, p.y, '__WHITE').setDepth(11000); const sprite = new CharacterSprite(this, u.id, this.look(u)); sprite.apply(img); this.figures.set(u.id, img); }
-      img.setPosition(p.x, p.y).setVisible(!u.departed).setAlpha(isAlive(u) ? 1 : .65);
+      if (!img) { img = this.world(this.add.image(p.x, p.y, '__WHITE')); const sprite = new CharacterSprite(this, u.id, this.look(u)); sprite.apply(img); this.figures.set(u.id, img); }
+      img.setPosition(p.x, p.y).setDepth(11000 + p.y * 1e-3).setVisible(!u.departed).setAlpha(isAlive(u) ? 1 : .65);
       if (!isAlive(u) && !u.departed) this.pose(u, 'winded', 3);
       else if (isAlive(u)) { const sprite = new CharacterSprite(this, u.id, this.look(u)); sprite.apply(img); }
-      let label = this.labels.get(u.id); if (!label) { label = this.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: '12px', color: '#fff3da', backgroundColor: '#253c37' }).setOrigin(.5, 0).setDepth(12000); this.labels.set(u.id, label); }
+      let label = this.labels.get(u.id); if (!label) { label = this.world(this.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: '12px', color: '#fff3da', backgroundColor: '#253c37', resolution: RENDER_SCALE * this.zoom }).setOrigin(.5, 0).setDepth(12000)); this.labels.set(u.id, label); }
       label.setPosition(p.x, p.y + 3).setVisible(!u.departed).setText(`${u.name} ${u.state.hp}/${u.stats.hp}\n${u.tool}${u.state.stance !== 'none' ? ` · ${u.state.stance === 'defensive' ? 'brace' : u.state.stance}` : ''}`);
     }
     this.text(730, 24, this.feedback || b.log.slice(-2).join('\n'), 18);
@@ -203,7 +250,7 @@ export class ScuffleScene extends Phaser.Scene {
     if (b.id === 'sc_bakery_tutorial') this.tutorial = action.kind === 'tool' ? 1 : action.kind === 'move' ? 2 : action.kind === 'talk' ? 3 : this.tutorial;
     if (action.kind === 'swing') {
       this.busy = true;
-      for (let frame = 0; frame < 5; frame++) this.time.delayedCall(frame * 90, () => { this.pose(actor, 'swing', frame); if (frame === 2) { const target = b.units.find(u => u.id === action.target); if (target) { this.pose(target, 'hit', 0); const p = this.projection.tileToWorld(target.state.position); const puff = this.add.circle(p.x, p.y - 14, 14, 0xeee0bb, .7).setDepth(15000); this.tweens.add({ targets: puff, scale: 2, alpha: 0, duration: 350, onComplete: () => puff.destroy() }); } } });
+      for (let frame = 0; frame < 5; frame++) this.time.delayedCall(frame * 90, () => { this.pose(actor, 'swing', frame); if (frame === 2) { const target = b.units.find(u => u.id === action.target); if (target) { this.pose(target, 'hit', 0); const p = this.projection.tileToWorld(target.state.position); const puff = this.world(this.add.circle(p.x, p.y + DIORAMA_FOOT_DY - 14, 14, 0xeee0bb, .7).setDepth(15000)); this.tweens.add({ targets: puff, scale: 2, alpha: 0, duration: 350, onComplete: () => puff.destroy() }); } } });
       this.time.delayedCall(480, () => { this.busy = false; this.afterAction(); });
     } else this.afterAction();
   }
