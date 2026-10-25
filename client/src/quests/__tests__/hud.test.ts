@@ -23,7 +23,7 @@ function registry() {
 }
 
 describe('the first-steps card', () => {
-  it('after the cottage, says where the story picks up, and that the Quests page keeps track', () => {
+  it('after the cottage, says where the story picks up, and that the Tasks and the map keep track', () => {
     const flags = new FlagStore({ dev: true });
     for (const f of ['s01a_done', 's01b_done', 's01c_done', 'cottage_keys_given']) flags.set(f);
     const ctx = buildStoryContext({ day: 1, minute: 13 * 60, zone: 'old_quarter', place: 'old_quarter.lamplighter_cottage', town: createTownState({ day: 1 }) }, emptyLedger());
@@ -32,7 +32,7 @@ describe('the first-steps card', () => {
     expect(firstStepsLines(o)).toEqual([
       'The cottage is yours, and so is the rest of the day.',
       'Next: tomorrow, 10:00–12:00, Monde Free Library, Old Quarter. Margo is opening the Marks log.',
-      'Your Journal’s Quests page (J) keeps track of where to go. Until then, say hello to the neighbours (E).'
+      'Your Tasks (T) keep track of where to go, and the map (M) can take you there. Until then, say hello to the neighbours (E).'
     ]);
     expect(o.hud).toMatchObject({ header: 'MEANWHILE', title: 'Talk to residents around the Old Quarter', reason: 'Next: tomorrow, 10:00–12:00, Monde Free Library, Old Quarter.' });
   });

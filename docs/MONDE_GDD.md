@@ -10498,7 +10498,23 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
   **objective line**: the scene to catch today (where, when, why, and "→ Market Row" when it's on another
   board), or between beats something to do meanwhile with the next beat's day; hidden during scenes and menus,
   and switched off from the Journal's Quests page. After S01c a one-time first-steps card says where to go next
-  and that the Quests page keeps track.
+  and that the Tasks (T) and the map (M) keep track. A **marker** points where the objective line says: a pin
+  at the place, at the door to go in by, or over the person to see; in another district, at the edge toward
+  the next one ("→ Market Row"); indoors, at the room's way out; off screen, an arrow at the screen's edge. It
+  hides with the line. In the bottom right corner, buttons for the Bag, Tasks, Journal, Ledger and Map show
+  their keys.
+- **Tasks (T):** the checklist beside the Journal's Quests page, built from the same data. One row per thing to
+  do now: the main story's next beat (or a Project opening today), Favors taken on, someone with a Favor to
+  ask, each Project under way at its step's place, each dream the player knows, each Mark found and not yet
+  answered. Each row says what to do next, where (place and district) and when; side quests waiting on
+  something (a day, more trust, the story) come last, and the one on the objective line is marked. A toast
+  says when a task is given or done (dreams and beats keep their own news). Enter shows the task on the map.
+- **Map (M) and travel:** every district drawn tile by tile, laid out as the boards join, with the roads
+  between them, the named places, where the player is, and a pin at each place with tasks (red for the
+  objective's). Pick a place or a district and press Enter to travel there: the same fade as a door or an
+  edge, arriving inside the place's room when it has one (on the doorstep when the room is locked). Travel
+  waits for anything that stops time (§5.3: scenes, dialogue, puzzles, Scuffles, work). GDD-GAP: nothing set
+  a cost, so travel is free and takes no game time; districts are as open to travel as to walking (§2.3).
 - **Dawn Report:** a full-screen front page each morning, dismissed with one tap, re-readable in the
   Journal.
 - **Dialogue (VN panel):** a backdrop, the resident's portrait (left or right, one of six expressions
@@ -10511,7 +10527,7 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
 - **Journal tabs:** Quests (the main story's next step and the last beats done, Projects under way, Favors
   taken on, the dreams the player knows: §9.9) · Today (events, ferry, tides) · People (portrait book with Regard tier, likes they've
   told you, relationships you've learned, last seen) · Favors · Projects · Marks (riddles with
-  inscriptions, typed-answer field and hints) · Map · Letters · Town Ledger (Pillars, Appeal split,
+  inscriptions, typed-answer field and hints) · Map (its own screen, M) · Letters · Town Ledger (Pillars, Appeal split,
   census, housing, Fund) · Campaign (D70+).
 - **Accessibility:** text size (3 steps), dyslexia-friendly font option, typewriter speed (including
   instant), colorblind-safe Pillar colors and emotes, reduced motion (no camera bob or bloom

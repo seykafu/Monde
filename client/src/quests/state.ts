@@ -5,6 +5,8 @@ import { SavedQuests, emptyQuests } from '@monde/shared';
 export const QUESTS_KEY = 'monde.quests';
 /** The objectives the HUD last showed (quests/hud.ts): currentObjective reads them for the dialogue's context. */
 export const OBJECTIVE_KEY = 'monde.quests.objective';
+/** The Tasks menu's list as the HUD last worked it out (quests/tasks.ts): the map pins it. */
+export const TASKS_KEY = 'monde.quests.tasks';
 
 interface Registry { get(key: string): unknown; set(key: string, value: unknown): unknown }
 

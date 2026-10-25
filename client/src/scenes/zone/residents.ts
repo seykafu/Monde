@@ -373,6 +373,12 @@ export class ResidentLayer {
     this.sim.events.emit('talk-requested', { residentId: id, zone: this.zone.id, day: this.clock.day, minute: this.clock.exactMinute });
   }
 
+  /** Where a resident is drawn this frame (tiles), or null when they aren't to be seen on this board. */
+  positionOf(id: string): Vec | null {
+    const a = this.byId.get(id);
+    return a?.pos && a.alpha >= 0.5 && a.state?.visible && a.state.zone === this.zone.id ? { x: a.pos.x, y: a.pos.y } : null;
+  }
+
   /** A resident's routine state as drawn this frame (held while they're talking), or null off this board. */
   stateOf(id: string): ResidentState | null {
     return this.byId.get(id)?.state ?? null;

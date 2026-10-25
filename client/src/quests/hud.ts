@@ -8,20 +8,21 @@
 //   where an open scene is about to start, and when the Journal's Quests page turns it off (remembered on the device).
 //   The objectives it shows are published for the dialogue's context (quests/runtime.ts currentObjective).
 // - The first-steps card: once per save, when S01a–c have handed the player the cottage keys, two or three warm lines on
-//   where to go next and that the Journal's Quests page (J) keeps track. Enter or a click puts it away, as does
-//   opening the Journal.
-// - Toasts: a dream learned or moved on (quests/runtime.ts) shows in the zone's toast.
+//   where to go next and that the Tasks (T) and the map (M) keep track. Enter or a click puts it away, as does
+//   opening the Journal, the Tasks or the map.
+// - The Tasks menu's list (quests/tasks.ts) is worked out with the objectives and published for the map's pins.
+// - Toasts: a dream learned or moved on, and a task given or done (quests/runtime.ts), show in the zone's toast.
 import type Phaser from 'phaser';
 import { textSize, watchAccessibility } from '../accessibility/runtime';
 import type { ProjectsAttachment } from '../projects/attach';
 import type { StoryAttachment } from '../scenes/story/attach';
 import { FAMILY_BODY, RENDER_SCALE } from '../util/constants';
 import type { Objective, Objectives } from './objective';
-import { nextQuestToast, objectivesNow } from './runtime';
-import { OBJECTIVE_KEY, getQuests, objectiveShown, updateQuests, watchObjectiveShown } from './state';
+import { nextQuestToast, noteTasks, objectivesNow, tasksNow } from './runtime';
+import { OBJECTIVE_KEY, TASKS_KEY, getQuests, objectiveShown, updateQuests, watchObjectiveShown } from './state';
 
 /** Overlays that hide the objective line and the card (they're for walking about). */
-export const OBJECTIVE_HIDDEN_UNDER = ['Story', 'Dialogue', 'Fellowship', 'TownLedger', 'People', 'SaveMenu', 'DawnReport', 'SpringReport', 'StrawPoll', 'Survey'];
+export const OBJECTIVE_HIDDEN_UNDER = ['Story', 'Dialogue', 'Fellowship', 'TownLedger', 'People', 'SaveMenu', 'DawnReport', 'SpringReport', 'StrawPoll', 'Survey', 'Tasks', 'TownMap'];
 /** The HUD's Pillar strip toggle (TownLedgerScene STRIP_KEY): the line sits under the strip, or where it would be. */
 const STRIP_KEY = 'monde.hud.pillarStrip';
 /** How often the line looks again (real ms); the objectives themselves are recomputed once a game minute or on a change. */
@@ -49,7 +50,7 @@ export function firstStepsLines(o: Objectives): string[] {
   return [
     'The cottage is yours, and so is the rest of the day.',
     next ? `Next: ${next.when.replace(/^Tomorrow/, 'tomorrow')}, ${next.where}. ${next.reason}` : `For now: ${o.meanwhile.title}.`,
-    'Your Journal’s Quests page (J) keeps track of where to go. Until then, say hello to the neighbours (E).'
+    'Your Tasks (T) keep track of where to go, and the map (M) can take you there. Until then, say hello to the neighbours (E).'
   ];
 }
 
@@ -84,6 +85,10 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
       key = k;
       current = objectivesNow(registry, { ceremony: opts.projects.hint() });
       registry.set(OBJECTIVE_KEY, current);
+      // The Tasks menu's list, from the same objectives; a task given or done since the last list is news (a toast).
+      const tasks = tasksNow(registry, current);
+      noteTasks(registry, tasks);
+      registry.set(TASKS_KEY, tasks);
     }
     return current;
   };
@@ -126,7 +131,7 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
     cardUp = true;
     updateQuests(registry, q => ({ ...q, first_steps: true }));
   };
-  const onKey = (e: KeyboardEvent) => { if (cardUp && (e.key === 'Enter' || e.key === 'j' || e.key === 'J')) dismiss(); };
+  const onKey = (e: KeyboardEvent) => { if (cardUp && (e.key === 'Enter' || /^[jJtTmM]$/.test(e.key))) dismiss(); };
   scene.input.keyboard?.on('keydown', onKey);
 
   const firstStepsDue = (): boolean => {
@@ -143,7 +148,7 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
     if (time - at < REFRESH_MS) return;
     at = time;
     const covered = OBJECTIVE_HIDDEN_UNDER.some(k => scene.scene.isActive(k));
-    if (covered && cardUp && scene.scene.isActive('People')) dismiss();
+    if (covered && cardUp && ['People', 'Tasks', 'TownMap'].some(k => scene.scene.isActive(k))) dismiss();
     if (covered || opts.busy()) { layout(null, false); for (const o of card) o.setVisible(false); return; }
     if (time - toastAt > TOAST_GAP_MS) { const t = nextQuestToast(); if (t) { toastAt = time; opts.toast(t); } }
     const o = objectivesFor();

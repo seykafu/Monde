@@ -66,7 +66,14 @@ import { attachArrivals } from './zone/arrivals';
 import { attachFinale } from '../finale/attach';
 import { closingToast } from '../story/hint';
 import { attachQuestHud } from '../quests/hud';
-import { attachQuestsClock } from '../quests/runtime';
+import { attachQuestMarker } from '../quests/marker';
+import { attachQuestsClock, queueQuestToast } from '../quests/runtime';
+import { storySession } from '../puzzles/runtime';
+import { openBag } from '../economy/BagScene';
+import type { Destination, TravelState } from '../world/townMap';
+import { openTasks } from './TasksScene';
+import { openTownMap, type TravelHost } from './TownMapScene';
+import { attachHudButtons } from './zone/hudButtons';
 import { DIALOGUE_SCENE } from './DialogueScene';
 import { STORY_SCENE, FELLOWSHIP_SCENE } from './StoryScene';
 
@@ -96,6 +103,8 @@ const SIGN_DEFAULT_FELLOW = query.get('skiptitle') === '1' || query.get('demo') 
 const WARNED_KEY = 'monde.story.warned';
 /** Overlays that hold back the closing toast (it's for walking about). */
 const HINT_HIDDEN_UNDER = [STORY_SCENE, DIALOGUE_SCENE, FELLOWSHIP_SCENE, 'TownLedger', 'People', 'SaveMenu'];
+/** A line for the zone's toast once a map journey arrives (ZoneScene.travel). */
+const TRAVEL_TOAST_KEY = 'monde.travel.toast';
 /** render/diorama/Lighting's glow texture: how the board's lamp glows are found to switch them by night. */
 const TORCH_GLOW_KEY = 'torch_glow';
 
@@ -236,7 +245,7 @@ interface Hud {
   arrow: Phaser.GameObjects.Graphics;
 }
 
-export class ZoneScene extends Phaser.Scene {
+export class ZoneScene extends Phaser.Scene implements TravelHost {
   /** The game clock (shared through the registry; also reachable from window.__game). */
   clock!: Clock;
   private zone!: ZoneDef;
@@ -449,7 +458,7 @@ export class ZoneScene extends Phaser.Scene {
     // Drawn closer indoors: the world's words (name tags, speech bubbles, place names) render sharp at the zoom.
     if (zoom !== 1) for (const o of world) if (o instanceof Phaser.GameObjects.Text) o.setResolution(RENDER_SCALE * zoom);
     const title = this.add.text(24, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce', backgroundColor: '#28372d' });
-    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  I: bag  ·  L: ledger  ·  J: journal', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
+    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  I: bag  ·  T: tasks  ·  M: map  ·  L: ledger  ·  J: journal', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
     const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
     this.events.once('shutdown', watchAccessibility(() => this.toast?.setFontSize(textSize(17))));
@@ -458,6 +467,9 @@ export class ZoneScene extends Phaser.Scene {
     this.toast = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 84, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(17)}px`, wordWrap: { width: GAME_WIDTH - 120 }, fontStyle: 'italic', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 14, y: 7 }, resolution: RENDER_SCALE })
       .setOrigin(0.5, 1).setAlpha(0);
     camera.ignore([title, controls, devHelp, this.prompt, this.toast, ...this.buildHud(), ...this.residents.buildUi()]);
+    // A map journey's arrival (or why it stopped at the doorstep), ahead of any news waiting for the toast (quests/hud.ts).
+    const travelled = this.registry.get(TRAVEL_TOAST_KEY) as string | undefined;
+    if (travelled) { this.registry.remove(TRAVEL_TOAST_KEY); queueQuestToast(travelled, true); }
     this.economy = attachEconomy(this, this.clock, text => this.showToast(text), () => {
       // Home: inside the cottage, by the bed (W-03), else at its door.
       const home = placeArrival(zones, interiors, 'old_quarter.lamplighter_cottage') ?? { zone: 'old_quarter', arrive: zones.old_quarter!.spawn };
@@ -470,6 +482,17 @@ export class ZoneScene extends Phaser.Scene {
       refreshBoard: () => this.town?.refresh(this.townLook()), busy: () => this.transitioning });
     // The objective line under the clock, the first-steps card and the dreams' toasts (quests/hud.ts).
     attachQuestHud(this, { story: this.story, projects: this.projects, toast: text => this.showToast(text), busy: () => this.transitioning, x: GAME_WIDTH - 20 - 248, w: 248 });
+    // Where the objective line points: a pin on this board, or an arrow at the screen's edge (quests/marker.ts).
+    attachQuestMarker(this, { zone: this.zone, projection: this.projection, position: () => this.position, personAt: id => this.residents.positionOf(id),
+      story: this.story, busy: () => this.transitioning, zoom });
+    // The menus' buttons, bottom right (each opens what its key does).
+    camera.ignore(attachHudButtons(this, [
+      { key: 'I', label: 'Bag', run: () => { if (!this.clock.paused) openBag(this, this.clock); } },
+      { key: 'T', label: 'Tasks', run: () => openTasks(this, this.clock) },
+      { key: 'J', label: 'Journal', run: () => openPeople(this, this.clock) },
+      { key: 'L', label: 'Ledger', run: () => openTownLedger(this, this.clock) },
+      { key: 'M', label: 'Map', run: () => openTownMap(this, this.clock) }
+    ], () => this.transitioning));
     // G-02: newcomers off the ferry, leavers to the slip, and the Gannet's timetable on the Wharf.
     attachArrivals(this, { zone: this.zone, clock: this.clock, residents: this.residents, board: this.town,
       refreshBoard: () => this.town?.refresh(this.townLook()), toast: text => this.showToast(text) });
@@ -517,7 +540,8 @@ export class ZoneScene extends Phaser.Scene {
     // Friendship and the dawn package: the night's plans, ties and letters from the server at each dawn (G-13).
     this.events.on('update', () => {
       const paper = this.registry.get(PAPER_PENDING) as Press | undefined;
-      if (paper && !this.scene.isActive('Dialogue') && !this.scene.isActive('DawnReport')) {
+      // It waits for the Tasks menu and the map too: each gives the zone its input back when it closes.
+      if (paper && !['Dialogue', 'DawnReport', 'Tasks', 'TownMap'].some(k => this.scene.isActive(k))) {
         this.registry.remove(PAPER_PENDING); openPaper(this, { paper, clock, seed: this.saveWeatherSeed() });
       }
     });
@@ -527,7 +551,10 @@ export class ZoneScene extends Phaser.Scene {
     return clock;
   }
 
-  /** L opens the Town Ledger and J the People page (each holds the clock while open); P shows or hides the HUD Pillar strip. */
+  /**
+   * L opens the Town Ledger, J the People page, T the Tasks and M the map (each holds the clock while open); P shows or
+   * hides the HUD Pillar strip.
+   */
   private installTownKeys(): void {
     const seen = new WeakSet<KeyboardEvent>();
     const onKey = (event: KeyboardEvent) => {
@@ -535,6 +562,8 @@ export class ZoneScene extends Phaser.Scene {
       seen.add(event);
       if (event.code === 'KeyL' || event.key === 'l' || event.key === 'L') openTownLedger(this, this.clock);
       else if (event.code === 'KeyJ' || event.key === 'j' || event.key === 'J') openPeople(this, this.clock);
+      else if (event.code === 'KeyT' || event.key === 't' || event.key === 'T') openTasks(this, this.clock);
+      else if (event.code === 'KeyM' || event.key === 'm' || event.key === 'M') openTownMap(this, this.clock);
       else if (event.code === 'KeyP' || event.key === 'p' || event.key === 'P') this.pillarStrip.toggle();
       else if ((event.code === 'KeyH' || event.key === 'h' || event.key === 'H') && !this.clock.paused) this.askAction?.run();
     };
@@ -1047,6 +1076,31 @@ export class ZoneScene extends Phaser.Scene {
       if (this.zone.interior) playSfx('door_close');
       this.transitionTo(edge.zone, edge.arrive);
     }
+  }
+
+  // ── Travel by the map (scenes/TownMapScene.ts) ──────────────────────────────
+
+  boardId(): string { return this.zone.id; }
+  playerPosition(): { x: number; y: number } { return { ...this.position }; }
+
+  /** What the map checks before travel (world/townMap.ts travelBlocked). */
+  travelState(): TravelState {
+    return {
+      pauses: this.clock.pauseReasons,
+      scenes: this.scene.manager.getScenes(true).map(s => s.scene.key).filter(k => k !== this.scene.key),
+      storyActive: !!storySession(this.registry)?.active,
+      moving: this.transitioning
+    };
+  }
+
+  /**
+   * A map journey: the same fade as a door or an edge (§16.4), restarting at the place's arrival tile. GDD-GAP: nothing
+   * says what travel costs; it is free and takes no game time (the map held the clock while it was open).
+   */
+  travel(dest: Destination, name: string): void {
+    if (this.transitioning || !boards[dest.zone]) return;
+    this.registry.set(TRAVEL_TOAST_KEY, dest.note ? `${dest.note} You wait on the doorstep.` : `You make your way to ${name}.`);
+    this.transitionTo(dest.zone, dest.arrive);
   }
 
   /** Shared transition boundary, also used by the opt-in performance tour. */

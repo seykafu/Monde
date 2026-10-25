@@ -36,6 +36,7 @@ import { checkDreams, dreamRules, dueDreamFavors, type DreamCheck, type DreamRul
 import { objectives, type DreamThread, type FavorThread, type Objective, type Objectives, type ProjectThread } from './objective';
 import { beatTitle, dreamNextStep, questLog, type DreamNames, type QuestLog } from './questLog';
 import { OBJECTIVE_KEY, getQuests, updateQuests } from './state';
+import { taskNews, tasksFrom, type Task, type TaskOutcome } from './tasks';
 
 type Registry = Phaser.Data.DataManager;
 interface Now { day: number; minute: number }
@@ -128,6 +129,8 @@ const toasts: string[] = [];
 /** GDD-GAP: how many wait at most (a dawn can move several dreams at once); the oldest go first. */
 export const QUEST_TOASTS_KEPT = 6;
 const toast = (text: string): void => { toasts.push(text); toasts.splice(0, Math.max(0, toasts.length - QUEST_TOASTS_KEPT)); };
+/** Queue a line for the zone's toast with the dreams' (a task given or done; `first`: ahead of the rest, a journey's arrival). */
+export const queueQuestToast = (text: string, first = false): void => { if (first) toasts.unshift(text); else toast(text); };
 /** The next toast to show, if any. */
 export const nextQuestToast = (): string | undefined => toasts.shift();
 
@@ -319,17 +322,56 @@ function beatLines(scenes: readonly CompiledScene[], completed: readonly string[
   return completed.flatMap(id => { const s = byId.get(id); return s?.header && !s.header.calledFrom ? [{ id, title: beatTitle(s.title ?? id) }] : []; });
 }
 
-/** The Journal's Quests page now (a Project opening today kept from the HUD's last objectives: the Journal has no zone). */
-export function questLogNow(r: Registry): QuestLog {
+/**
+ * The Journal's Quests page now (a Project opening today kept from the HUD's last objectives: the Journal has no zone).
+ * The HUD passes the objectives it has just worked out.
+ */
+export function questLogNow(r: Registry, objectivesHere?: Objectives): QuestLog {
   const session = storySession(r);
   const clock = r.get('monde.clock') as Clock | undefined;
   const day = clock?.day ?? 1, minute = clock?.minute ?? 360;
   const world = dreamWorld(r, day);
-  const fresh = objectivesNow(r), shown = r.get(OBJECTIVE_KEY) as Objectives | undefined;
+  const fresh = objectivesHere ?? objectivesNow(r), shown = r.get(OBJECTIVE_KEY) as Objectives | undefined;
   return questLog({
     objectives: !fresh.main && shown?.main?.kind === 'ceremony' ? shown : fresh,
     beats: session ? beatLines(session.scenes, session.director.serialize().completed) : [],
     projects: projectThreads(r, { day, minute }), favors: favorThreads(r, day), dreams: getQuests(r).dreams, rules: rulesFor, world, names: DREAM_NAMES,
     favorBook: favorBook(r)
   });
+}
+
+// ── The Tasks menu ──────────────────────────────────────────────────────────
+
+const TASK_NAMES = { zoneName: (id: string) => zones[id]?.name ?? id, placeName: fullPlaceName };
+
+/** The Tasks menu now (quests/tasks.ts), from the same Quest Log as the Journal's Quests page. */
+export function tasksNow(r: Registry, objectivesHere?: Objectives): Task[] {
+  const entries = marks(r).entries;
+  return tasksFrom({
+    log: questLogNow(r, objectivesHere),
+    marks: SPRING_RIDDLES.filter(m => entries[m.id]?.status === 'found').map(m => ({ id: m.id, title: m.title })),
+    names: TASK_NAMES
+  });
+}
+
+/** What became of a task gone from the list: a Favor completed, a Project opened, a Mark answered. */
+function taskOutcome(r: Registry, t: Task): TaskOutcome {
+  const [kind, ...rest] = t.id.split(':'), id = rest.join(':');
+  if (kind === 'favor') return favorBook(r).find(f => f.id === id)?.status === 'completed' ? 'done' : 'gone';
+  if (kind === 'project') return projectsOf(r).projects[id]?.opened != null ? 'done' : 'gone';
+  if (kind === 'mark') return marks(r).entries[id]?.status === 'solved' ? 'done' : 'gone';
+  return 'gone';
+}
+
+/** The last list seen, per game (a new or loaded game has a new Clock): its changes are news. */
+const seenTasks = new WeakMap<Clock, Task[]>();
+
+/** Note the list now; queue a toast for each task given or done since the last one this game. Returns the news. */
+export function noteTasks(r: Registry, tasks: Task[]): string[] {
+  const clock = r.get('monde.clock') as Clock | undefined;
+  if (!clock) return [];
+  const news = taskNews(seenTasks.get(clock) ?? null, tasks, t => taskOutcome(r, t));
+  seenTasks.set(clock, tasks);
+  for (const n of news) toast(n);
+  return news;
 }
