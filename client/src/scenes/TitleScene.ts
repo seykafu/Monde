@@ -6,16 +6,14 @@ import { browserStorage } from '../mind/api';
 import { chooseTelemetry, telemetryChoice } from '../telemetry/runtime';
 import Phaser from 'phaser';
 import { FAMILY_BODY, FAMILY_DISPLAY, GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from '../util/constants';
-import { finishSaving, loadGame, resetGame, saveGame, saveStorage } from '../save/runtime';
+import { finishSaving, saveStorage } from '../save/store';
 import { IndexedDBSaveStorage } from '../save/storage';
 import { formatSummary, MANUAL_SLOTS, sortForMenu, type SaveEntry } from '../save/slots';
 import { getMind } from '../mind/api';
 import { maskInvite, statusDetail, validInvite } from '../mind/connection';
 import { getMusic } from '../audio/Music';
 import { trackLoad } from '../boot/loadingScreen';
-import { prefetchTownSprites } from '../render/town/TownBoard';
-import { boardNeighbours, boards } from '../world/zones';
-import { OPENING_BOARD } from '../story/session';
+import { awaitGameCode, gameCode, type GameCode } from '../boot/gameCode';
 
 import { menuLayout, menuEllipsis, menuTextResolution, type MenuMode } from '../ui/menuLayout';
 
@@ -51,6 +49,8 @@ class SaveMenuBase extends Phaser.Scene {
   }
   private focus = 0;
   private busy = false;
+  /** On the way into the town (enter): the title's song no longer starts. */
+  private leaving = false;
   private message!: Phaser.GameObjects.Text;
   private back: () => void = () => undefined;
   /** Settings' invite-code field (a DOM input over the canvas), while it's open. */
@@ -59,8 +59,15 @@ class SaveMenuBase extends Phaser.Scene {
   constructor(key: string) { super(key); }
   create(): void {
     this.busy = false;
-    // The title plays the town's song (docs/AUDIO.md); the pause menu keeps whatever the town was playing.
-    if (!this.pausedGame) getMusic(this).play('main_theme');
+    this.leaving = false;
+    // The title plays the town's song (docs/AUDIO.md); the pause menu keeps whatever the town was playing. The song
+    // (3.8 MB) waits for the town's code and doesn't start once the player is on the way in: on a slow link it would
+    // share the line with what they're waiting for.
+    if (!this.pausedGame) {
+      const music = getMusic(this);
+      const song = () => { if (this.sys.isActive() && !this.leaving) music.play('main_theme'); };
+      void gameCode().then(song, song);
+    }
     this.cameras.main.setZoom(RENDER_SCALE).setOrigin(0, 0);
     this.cameras.main.roundPixels = true;
     if (this.pausedGame) {
@@ -117,7 +124,11 @@ class SaveMenuBase extends Phaser.Scene {
   private error(error: unknown): void { this.message.setText(`Could not complete that: ${error instanceof Error ? error.message : String(error)}`); }
   private activate(index: number): void {
     const action = this.choices[index]?.run;
-    if (!action || this.busy) return;
+    if (action) this.perform(action);
+  }
+  /** One action at a time: keys and clicks wait while it runs (New Game may wait on the town's code). */
+  private perform(action: () => void | Promise<void>): void {
+    if (this.busy) return;
     this.busy = true;
     void Promise.resolve().then(action).catch(error => this.error(error)).finally(() => { this.busy = false; });
   }
@@ -190,16 +201,14 @@ class SaveMenuBase extends Phaser.Scene {
     const entries = sortForMenu(await saveStorage.list());
     if (!this.sys.isActive()) return;
     this.message.setText(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Temporary saves only — storage is unavailable in this browser session.' : '↑ ↓ to choose · Enter to select · Esc to go back');
-    // While the title waits, the town's art comes in: the board Continue opens on, else New Game's two (the Old Quarter,
-    // then the ferry slip its opening scene moves to), then the rest.
+    // While the title waits, the town's code comes in (game.ts), then its art (prefetchForTitle).
     if (!this.pausedGame) {
-      const first = [entries[0]?.save.player.zone, 'old_quarter', OPENING_BOARD].filter((id): id is string => !!id);
-      prefetchTownSprites(this, boards, boardNeighbours, ...first);
+      void gameCode().then(code => { if (this.sys.isActive()) code.prefetchForTitle(this, entries[0]?.save.player.zone); }, () => undefined);
     }
     if (this.pausedGame) {
       this.show([
         ...MANUAL_SLOTS.map((slot, i) => ({ text: `Save to slot ${i + 1}`, detail: entries.find(e => e.slot === slot) ? this.saveDescription(entries.find(e => e.slot === slot)!) : 'Empty slot', run: async () => {
-          await saveGame(slot, 'manual', `Slot ${i + 1}`);
+          await (await awaitGameCode()).saveGame(slot, 'manual', `Slot ${i + 1}`);
           await this.home();
           this.message.setText(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Saved (temporary — this browser session only)' : 'Saved');
         } })),
@@ -210,7 +219,7 @@ class SaveMenuBase extends Phaser.Scene {
       ], () => this.resume(), 'pause', 'A quiet moment');
     } else {
       this.show([
-        { text: 'Continue', run: entries[0] ? () => loadGame(this, entries[0]!.save, entries[0]!.slot) : undefined },
+        { text: 'Continue', run: entries[0] ? () => this.enter(code => code.loadGame(this, entries[0]!.save, entries[0]!.slot)) : undefined },
         // Q-06: the one-time sharing question comes before the first New Game (and on a first visit to Settings).
         { text: 'New Game', run: () => (telemetryChoice() === null ? this.askSharing(() => this.newGame()) : this.newGame()) },
         { text: 'Load', run: async () => this.loadList(sortForMenu(await saveStorage.list())) },
@@ -223,10 +232,10 @@ class SaveMenuBase extends Phaser.Scene {
    * reachable server) they speak written lines. The desktop app passes `--invite=`; here it can be typed instead.
    */
   /** Q-06: off unless the player says yes; Esc keeps it off. Asked once per install. */
-  private askSharing(then: () => void): void {
+  private askSharing(then: () => void | Promise<void>): void {
     this.message.setText('Share play events and optional surveys? They carry a random ID for this install, never your name, invite code or dialogue. Only the optional survey note sends typed text. Nothing is sent in Offline mode. Change this in Settings anytime.');
-    this.show([{ text: 'Keep sharing off', run: () => { chooseTelemetry(false); then(); } },
-      { text: 'Yes, help improve Monde', run: () => { chooseTelemetry(true); then(); } }], () => { chooseTelemetry(false); then(); }, 'list', 'Make yourself at home');
+    this.show([{ text: 'Keep sharing off', run: () => { chooseTelemetry(false); return then(); } },
+      { text: 'Yes, help improve Monde', run: () => { chooseTelemetry(true); return then(); } }], () => this.perform(() => { chooseTelemetry(false); return then(); }), 'list', 'Make yourself at home');
   }
   private settings(): void {
     if (telemetryChoice() === null) { this.askSharing(() => this.settings()); return; }
@@ -307,7 +316,14 @@ class SaveMenuBase extends Phaser.Scene {
    * New Game: straight to the ferry slip at 09:50 (scenes/story/attach.ts), where S01a plays and Pell hands over the
    * Fellowship application at its {charcreate} cue (GDD §11.1).
    */
-  private newGame(): void { resetGame(this); this.scene.start('Zone'); }
+  private newGame(): Promise<void> {
+    return this.enter(code => { code.resetGame(this); this.scene.start('Zone'); });
+  }
+  /** Into the town (New Game, Continue, Load): its code first, the loading screen showing the wait if it lasts. */
+  private async enter(go: (code: GameCode) => void | Promise<void>): Promise<void> {
+    this.leaving = true;
+    try { await go(await awaitGameCode()); } catch (error) { this.leaving = false; throw error; }
+  }
   private confirm(text: string, yes: () => void | Promise<void>, no: () => void = () => { void this.home().catch(error => this.error(error)); }): void {
     this.message.setText(text);
     this.show([{ text: 'Cancel', run: no }, { text: 'Confirm', run: yes }], no, 'list', 'One more thing');
@@ -328,7 +344,7 @@ class SaveMenuBase extends Phaser.Scene {
     const back = () => this.loadList(entries, page);
     this.message.setText(formatSummary(entry.save));
     this.show([
-      { text: `Load ${entry.save.label}`, run: () => loadGame(this, entry.save, entry.slot) },
+      { text: `Load ${entry.save.label}`, run: () => this.enter(code => code.loadGame(this, entry.save, entry.slot)) },
       { text: 'Delete', run: () => this.confirm(`Delete ${entry.save.label}? This cannot be undone.`, async () => {
         await saveStorage.delete(entry.slot); this.loadList(sortForMenu(await saveStorage.list()));
       }, back) },

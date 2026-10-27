@@ -10,18 +10,16 @@ import type { Clock } from '../sim/clock';
 import type { TownState } from '../town/pillars';
 import { collect } from './collect';
 import { restore } from './restore';
-import { createSaveStorage } from './storage';
+import { finishSaving, queueSave, saveStorage } from './store';
 import { checkpointSlot, chooseAutosaveSlot } from './slots';
 import { quietStorage } from './session';
 import { mergeReported } from '../press/report';
 
-export const saveStorage = createSaveStorage();
+export { finishSaving, saveStorage };
 let capture: (() => ReturnType<typeof collect>) | undefined;
-let queue: Promise<unknown> = Promise.resolve();
 let dawnSave: SaveGame | undefined;
 /** The save this session last wrote or loaded: the one a reload would bring back, so a report amends it (§9.13). */
 let lastSave: { slot: string; saved_at: string } | undefined;
-export async function finishSaving(): Promise<void> { await queue; }
 /** Capture synchronously before networking, serialize writes so simultaneous requests cannot lose a slot. */
 export function saveGame(slot: string | null, kind: SaveGame['kind'], label: string): Promise<void> {
   if (!capture) return Promise.reject(new Error('No active game'));
@@ -37,9 +35,7 @@ export function saveGame(slot: string | null, kind: SaveGame['kind'], label: str
       await saveStorage.write(checkpointSlot('campaign_season'), { ...save, kind: 'checkpoint', label: 'Campaign Season' });
     }
   };
-  const result = queue.then(work);
-  queue = result.catch(() => undefined);
-  return result;
+  return queueSave(work);
 }
 /**
  * §9.13: a reported paper item or letter stays withdrawn after a reload too. The dawn autosave (what Continue loads)
@@ -54,15 +50,13 @@ export function amendLastSave(reported: readonly string[]): Promise<void> {
     if (!save || save.saved_at !== last.saved_at || reported.every(k => save.friendship.reported.includes(k))) return;
     await saveStorage.write(last.slot, { ...save, friendship: { ...save.friendship, reported: mergeReported(save.friendship.reported, reported) } });
   };
-  const result = queue.then(work);
-  queue = result.catch(() => undefined);
-  return result;
+  return queueSave(work);
 }
 /** Story {checkpoint}: campaign_season always means Day 70 at 06:00, never the later cue time. */
 export async function requestCheckpoint(key: string): Promise<void> {
   const slot = checkpointSlot(key);
   if (key !== 'campaign_season') return saveGame(slot, 'checkpoint', key.replaceAll('_', ' '));
-  await queue;
+  await finishSaving();
   if (await saveStorage.read(slot)) return;
   if (dawnSave?.clock.day === 70 && dawnSave.clock.minute === 360) {
     await saveStorage.write(slot, { ...dawnSave, kind: 'checkpoint', label: 'Campaign Season' });
@@ -82,7 +76,7 @@ export async function loadGame(scene: Phaser.Scene, save: SaveGame, slot?: strin
   if (!zone || state.player.x < 0 || state.player.y < 0 || state.player.x >= zone.width || state.player.y >= zone.height) {
     throw new Error('This save refers to an unavailable location');
   }
-  await queue;
+  await finishSaving();
   await getMind().restoreSnapshot(save.mind);
   scene.scene.stop('Zone');
   resetGame(scene);

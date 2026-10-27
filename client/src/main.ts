@@ -1,21 +1,21 @@
-import { TitleScene, SaveMenuScene } from "./scenes/TitleScene";
+import { TitleScene } from "./scenes/TitleScene";
 import Phaser from "phaser";
-import { ZoneScene } from "./scenes/ZoneScene";
-import { DioramaDemoScene } from "./scenes/DioramaDemoScene";
-import { DialogueScene } from "./scenes/DialogueScene";
-import { TownLedgerScene } from "./scenes/TownLedgerScene";
-import { PeopleScene } from "./scenes/PeopleScene";
-import { StoryScene } from "./scenes/StoryScene";
-import { FellowshipScene } from "./scenes/FellowshipScene";
-import { LooksGalleryScene } from "./scenes/LooksGalleryScene";
 import { getMind } from "./mind/api";
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE } from "./util/constants";
 import { installRenderScale } from "./util/renderScale";
-import { TownBoard } from "./render/town/TownBoard";
-import { applySpringPreset, springPresetFromQuery } from "./finale/devPreset";
-import { parseClock } from "./sim/clock";
 import { installTextureFetch } from "./boot/textureFetch";
-import { endBootOnFirstFrame } from "./boot/loadingScreen";
+import { bootFailed, endBootOnFirstFrame } from "./boot/loadingScreen";
+import { gameCode, onGameCode } from "./boot/gameCode";
+
+const query = new URLSearchParams(window.location.search);
+// Dev-only `?looks=1`: the residents' sprite and bust contact sheet (scenes/LooksGalleryScene.ts).
+const looks = import.meta.env.DEV && query.get("looks") === "1";
+// The scene the game opens on. Skipping the title skips the Fellowship form too: ZoneScene signs a default application
+// (fellow/state.ts ensureFellow).
+const first = looks ? "LooksGallery"
+  : query.get("demo") === "1" ? "DioramaDemo"
+  : query.get("skiptitle") === "1" || query.has("puzzle") || query.has("scuffle") ? "Zone"
+  : "Title";
 
 installRenderScale();
 const game = new Phaser.Game({
@@ -26,25 +26,18 @@ const game = new Phaser.Game({
   backgroundColor: "#202820",
   pixelArt: false,
   scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
-  // Dev-only `?looks=1`: the residents' sprite and bust contact sheet (scenes/LooksGalleryScene.ts).
-  scene: import.meta.env.DEV && new URLSearchParams(window.location.search).get("looks") === "1"
-    ? [LooksGalleryScene]
-    : new URLSearchParams(window.location.search).get("demo") === "1"
-    ? [DioramaDemoScene, TitleScene, FellowshipScene, ZoneScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
-    : (new URLSearchParams(window.location.search).get("skiptitle") === "1" || new URLSearchParams(window.location.search).has("puzzle") || new URLSearchParams(window.location.search).has("scuffle"))
-      // Skips the Fellowship form too: ZoneScene signs a default application (fellow/state.ts ensureFellow).
-      ? [ZoneScene, TitleScene, FellowshipScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
-      : [TitleScene, FellowshipScene, ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
+  // The first download is Phaser and the title; the rest of the game's code (game.ts) adds its scenes when it arrives.
+  scene: first === "Title" ? [TitleScene] : []
 });
 // The page's loading screen (index.html) gives way to the first scene's first frame; a hidden scene fetches art ahead.
 installTextureFetch(game);
-endBootOnFirstFrame(game);
-
-// Dev (`?spring=strong|social|builder|lapsed|passive`, a dev build or `?dev`): start on Day 25 with that Spring behind
-// it (finale/devPreset.ts), for the Bloom Fair, the Straw Poll and the End-of-Spring report.
-const springQuery = new URLSearchParams(window.location.search);
-const springStyle = import.meta.env.DEV || springQuery.has("dev") ? springPresetFromQuery(springQuery) : null;
-if (springStyle) applySpringPreset(game.registry, springStyle, Number(springQuery.get("day")) || 25, parseClock(springQuery.get("time") ?? "") ?? 9 * 60);
+const firstFrame = endBootOnFirstFrame(game);
+onGameCode(code => code.addScenes(game, first));
+// The title fetches the rest while it idles (New Game and Continue wait for it if they have to); anywhere else waits for
+// it behind the loading screen.
+if (looks) void import("./scenes/LooksGalleryScene").then(({ LooksGalleryScene }) => game.scene.add(first, LooksGalleryScene, true));
+else if (first === "Title") void firstFrame.then(gameCode).catch(() => undefined);
+else void gameCode().catch(bootFailed);
 
 // Join (or create) this device's world on monde-mind; without an invite code the game plays in Quiet Mode.
 const mind = getMind();
@@ -52,4 +45,4 @@ const mind = getMind();
 void mind.ensureWorld().then(() => mind.syncPlayer());
 
 // Dev-only handle for debugging and the capture harness.
-if (import.meta.env.DEV) Object.assign(window as unknown as Record<string, unknown>, { __game: game, __mind: mind, __townBake: TownBoard.bakeLog });
+if (import.meta.env.DEV) Object.assign(window as unknown as Record<string, unknown>, { __game: game, __mind: mind });

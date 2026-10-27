@@ -6,6 +6,8 @@
 //          code's bytes counted in), and on the first scene's first frame it fades out into the title or the town.
 //   zone   a later load (a district or a room the background fetch hasn't reached, boot/textureFetch.ts) that takes
 //          longer than a beat: the panel alone over the faded-out board, "On the way to …", gone on the first frame.
+//          Also a player's wait for the town's code (boot/gameCode.ts: New Game before it has arrived), the bar
+//          shimmering since a module's download reports no progress; the load that follows carries on from it.
 //
 // Fades are the zone fade's 400 ms (GDD §16.4), set in index.html's CSS.
 import Phaser from 'phaser';
@@ -34,6 +36,8 @@ let booting = true;
 /** The current zone-mode showing, so a newer load's hide doesn't cut an older one short. */
 let showing = 0;
 let hideTimer: ReturnType<typeof setTimeout> | undefined;
+/** Since when the player has waited on the town's code (showCodeWait), for the next load's bar to count it in. */
+let codeWaitSince: number | null = null;
 
 function draw(s: Screen, fraction: number, status: string): void {
   s.root.classList.remove('waiting');
@@ -48,14 +52,20 @@ function fadeOut(s: Screen): void {
   hideTimer = setTimeout(() => { s.root.hidden = true; }, FADE_MS);
 }
 
-/** Fade the page's screen out on the game's first frame of a running scene (main.ts; any first scene, tracked or not). */
-export function endBootOnFirstFrame(game: Phaser.Game): void {
+/**
+ * Fade the page's screen out on the game's first frame of a running scene (main.ts; any first scene, tracked or not).
+ * Resolves then.
+ */
+export function endBootOnFirstFrame(game: Phaser.Game): Promise<void> {
+  let firstFrame!: () => void;
+  const drawn = new Promise<void>(resolve => { firstFrame = resolve; });
   const check = () => {
     // The fetch scene runs from the start but draws nothing.
     if (!game.scene.getScenes(true).some(scene => scene.scene.key !== FETCH_SCENE)) return;
     game.events.off(Phaser.Core.Events.POST_RENDER, check);
     // For measuring the first launch (docs/PERF.md): the moment the player first sees the game.
     performance.mark('monde:first-frame');
+    firstFrame();
     const s = screen();
     booting = false;
     if (!s) return;
@@ -65,6 +75,43 @@ export function endBootOnFirstFrame(game: Phaser.Game): void {
     setTimeout(() => s.root.classList.replace('boot', 'zone'), FADE_MS);
   };
   game.events.on(Phaser.Core.Events.POST_RENDER, check);
+  return drawn;
+}
+
+/** The game's code didn't arrive (opening straight into the town): say so instead of shimmering on. */
+export function bootFailed(): void {
+  const s = screen();
+  if (!s || !booting) return;
+  s.status.textContent = 'Could not fetch the game. Check the connection and reload.';
+}
+
+/**
+ * A player waiting on the town's code (boot/gameCode.ts): past a beat, the panel with its bar shimmering. Once the code
+ * is in, the scene it opens takes the screen over without a blink (trackLoad, the code's bytes counted as done); if it
+ * has nothing to load, the screen fades a beat later.
+ */
+export function showCodeWait<T>(work: Promise<T>): Promise<T> {
+  const s = screen();
+  if (!s || booting) return work;
+  const since = performance.now();
+  let id = 0;
+  const timer = setTimeout(() => {
+    id = ++showing;
+    codeWaitSince = since;
+    clearTimeout(hideTimer);
+    s.root.classList.remove('boot', 'out');
+    s.root.classList.add('zone', 'waiting');
+    s.label.textContent = 'On the way to Monde';
+    s.status.textContent = 'Fetching the town…';
+    s.fill.style.transform = 'scaleX(0)';
+    s.root.hidden = false;
+  }, BEAT_MS);
+  const settled = () => {
+    clearTimeout(timer);
+    if (id) setTimeout(() => { if (id === showing) { codeWaitSince = null; fadeOut(s); } }, BEAT_MS);
+  };
+  void work.then(settled, settled);
+  return work;
 }
 
 /**
@@ -75,7 +122,11 @@ export function trackLoad(scene: Phaser.Scene, place?: string): void {
   const s = screen();
   if (!s) return;
   const load = scene.load, boot = booting;
-  const meter = new LoadMeter(boot ? codeBytes(performance.getEntriesByType('resource') as PerformanceResourceTiming[]) : 0);
+  // The code the player has waited for (all of it on the first launch; after a wait for the town's, what came in
+  // meanwhile) counts as done bytes up front: on a slow link it is most of the wait.
+  const since = boot ? 0 : codeWaitSince;
+  codeWaitSince = null;
+  const meter = new LoadMeter(since === null ? 0 : codeBytes((performance.getEntriesByType('resource') as PerformanceResourceTiming[]).filter(e => e.responseEnd >= since)));
   let shown = boot, started = false, done = false, id = 0;
   const update = () => {
     // Not while preload is still queueing: a part-known list would read as nearly done, and the bar never goes back.

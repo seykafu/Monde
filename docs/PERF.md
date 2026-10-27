@@ -86,34 +86,53 @@ What a player waits for before the first screen, and what the loading screen (`c
 app's CSP allows no inline script): the title's heading and footer over a dusk, and a bar that shimmers while the code
 downloads. Once a scene's preload starts the bar counts real bytes (`boot/loadMeter.ts`, the code's bytes included), and
 it fades into the title or the town on their first frame. A later load that takes longer than 250 ms (a district or room
-the background fetch hasn't reached) shows the panel alone, "On the way to …".
+the background fetch hasn't reached) shows the panel alone, "On the way to …". So does New Game, Continue or Load while
+the town's code is still on its way (below).
 
 What loads up front:
 
-- **Code:** three chunks, 1.25 MB over the wire (index 624 KB, phaser 340 KB, residents 286 KB). On slow 4G that is
-  7 s of the title's 8.4 s. Only splitting the code would shorten it.
-- **Title:** the harbour backdrop, 216 KB. The fifteen music HEAD probes now happen when each track first plays, not at boot.
+- **Code:** the title's own, 0.43 MB over the wire: index 88 KB (the title, the save list, the mind client) and phaser
+  340 KB. The rest of the game (`client/src/game.ts`: the town and its scenes, the stories, the save runtime, 536 KB,
+  and the resident roster, 286 KB) is a dynamic import (`boot/gameCode.ts`) that the title starts as it draws, ahead of
+  the town's art. New Game, Continue and Load wait for it if they have to. Past 250 ms the panel reads "On the way to
+  Monde" with the bar shimmering (a module's download reports no progress), and the board's load carries on from there
+  with the code's bytes counted as done. `?skiptitle`, `?puzzle`, `?scuffle` and `?demo` fetch it at once behind the
+  boot screen. `@monde/shared` is marked side-effect free, so the title takes only the schemas it uses (zod is most of
+  its 88 KB).
+- **Title:** the harbour backdrop, 216 KB, fetched by the title's preload once the code is in: 1.3 s of the title's
+  4.1 s on slow 4G. The fifteen music HEAD probes now happen when each track first plays, not at boot.
 - **Town:** only the board's own sprites (`world/boardAssets.ts`): the Old Quarter is 52 files and 1.07 MB of the 160
   files and 3.24 MB. The other boards follow in idle time, nearest first (`boot/textureFetch.ts`). The title starts on
   Continue's board, else the Old Quarter and the ferry slip a New Game hops to.
 - **Portraits** (94 MB in all) were already lazy. A core or acquainted resident's sheet is now fetched as the player
   walks up to them, so the conversation opens on the art. Ambient residents' still load when a conversation opens: a
   sheet is about 6 MB of texture memory that stays.
-- **Music and ambience** load after the first key or click, one track at a time. The title theme (3.8 MB) then shares a
-  slow link with whatever the player opens next.
+- **Music and ambience** load after the first key or click, one track at a time. The title theme (3.8 MB) also waits for
+  the town's code and doesn't start once the player is on the way in; otherwise it shares a slow link with the town's
+  art. Before that hold, a New Game chosen 1.5 s after the title got its code 1.8 s later (10.2 s instead of 8.4 s).
 
 Measured 2026-10-26 on the M1 Max: Chrome 156 headless at 1280×720, cache off, `vite preview` of the production build,
 `?offline`. "Slow 4G" is Lighthouse's profile (150 ms RTT, 1.6 Mbit/s down). The first four rows are medians of 2–3
-runs, the rest single runs; the last two were on the dev server, throttled after boot. The page marks
-`monde:first-frame` when the first scene draws.
+runs, the rest single runs; the New Game and district rows of the loading-screen column were on the dev server,
+throttled after boot. The page marks `monde:first-frame` when the first scene draws. The code split's New Game rows
+(and their 74e59e2 numbers, re-measured the same day) throttle from the first byte instead, since the split moves code
+after the title and throttling after boot would hide it: press New Game, then "Keep sharing off", and time to the ferry
+slip's first frame. In brackets: the same moment counted from opening the page.
 
-| | before (0760d53) | after |
-|---|---|---|
-| Something on screen (first contentful paint), slow 4G | 7.0 s (blank page) | 0.2 s (loading screen) |
-| Title's first frame, slow 4G | 8.4 s, 1.47 MB | 8.4 s, 1.47 MB |
-| Town with `?skiptitle=1`, slow 4G | 25.2 s, 4.49 MB, 165 requests | 13.9 s, 2.34 MB, 57 requests |
-| Title / town first frame, no throttling | 0.68 s / 1.74 s | 0.68 s / 1.69 s |
-| New Game → ferry slip, slow 4G, chosen 1.5 s after the title | 23.7 s | 11.2 s |
-| New Game → ferry slip, slow 4G, after 15 s on the title | 23.7 s | 2.2 s |
-| District never visited (the Commons), slow 4G, cold | (all loaded at start) | 4.9 s behind the loading screen |
-| A district after 20 s of idle fetching | (all loaded at start) | 1.0 s (the 0.4 s fade and the bake) |
+| | before (0760d53) | loading screen (74e59e2) | code split |
+|---|---|---|---|
+| Something on screen (first contentful paint), slow 4G | 7.0 s (blank page) | 0.2 s (loading screen) | 0.2 s |
+| Title's first frame, slow 4G | 8.4 s, 1.47 MB | 8.4 s, 1.47 MB | 4.1 s, 0.65 MB |
+| Town with `?skiptitle=1`, slow 4G | 25.2 s, 4.49 MB, 165 requests | 13.9 s, 2.34 MB, 57 requests | 14.0 s, 2.34 MB, 58 requests |
+| Title / town first frame, no throttling | 0.68 s / 1.74 s | 0.68 s / 1.69 s | 0.49 s / 1.62 s |
+| New Game → ferry slip, slow 4G after boot, chosen 1.5 s after the title | 23.7 s | 11.2 s | (not re-measured) |
+| New Game → ferry slip, slow 4G after boot, after 15 s on the title | 23.7 s | 2.2 s | (not re-measured) |
+| New Game → ferry slip, slow 4G from the first byte, chosen 1.5 s after the title | | 12.2 s (22.2 s) | 14.3 s (19.9 s) |
+| New Game → ferry slip, slow 4G from the first byte, after 15 s on the title | | 2.2 s (25.7 s) | 2.2 s (21.5 s) |
+| District never visited (the Commons), slow 4G, cold | (all loaded at start) | 4.9 s behind the loading screen | (same path) |
+| A district after 20 s of idle fetching | (all loaded at start) | 1.0 s (the 0.4 s fade and the bake) | (same path) |
+
+The split doesn't change how many bytes the town needs, only their order. `?skiptitle` waits as long as before: the link
+sits idle for 0.3 s while Phaser runs and asks for the town's chunk, and is busy the rest of the time either way. A New
+Game chosen right after the title now waits about 2 s longer from the press, since 0.82 MB of code that used to come
+before the title comes after it. It still reaches the ferry slip 2.3 s sooner from opening the page.
