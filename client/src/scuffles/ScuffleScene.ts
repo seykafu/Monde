@@ -76,7 +76,7 @@ export class ScuffleScene extends Phaser.Scene {
   private feedback = '';
   constructor() { super(SCUFFLE_SCENE); }
   init(open: Open): void { this.opening = open; this.figures = new Map(); this.labels = new Map(); this.focus = 0; this.mode = 'move'; this.tutorial = 0; this.busy = false; this.resolved = false; this.feedback = ''; this.preparing = true; this.asked = new Set(); this.inviteAbort = new AbortController(); }
-  preload(): void { preloadTownSprites(this); }
+  preload(): void { preloadTownSprites(this, this.opening.encounter.battle.arena); }
   create(): void {
     const host = this.scene.get(this.opening.host), oldInput = host.input.enabled, oldKeys = host.input.keyboard?.enabled;
     host.input.enabled = false; if (host.input.keyboard) { host.input.keyboard.resetKeys(); host.input.keyboard.enabled = false; }

@@ -4,6 +4,7 @@ import wharf from '../../../content/zones/wharf.zone.yaml?raw';
 import commons from '../../../content/zones/commons.zone.yaml?raw';
 import { compileZone, validateZoneLinks, type ZoneDef } from './zoneFormat';
 import { linkInteriors, type DoorLink } from './interiors';
+import { boardLinks } from './boardAssets';
 /** The town's outdoor boards (the zone graph residents walk). */
 export const zones = Object.fromEntries([oldQuarter, marketRow, wharf, commons].map(text => { const zone = compileZone(text); return [zone.id, zone]; }));
 validateZoneLinks(zones);
@@ -18,3 +19,7 @@ export const interiors: Readonly<Record<string, ZoneDef>> = Object.fromEntries(O
 export const doorLinks: readonly DoorLink[] = linkInteriors(zones, interiors);
 /** Every board the player can stand on: the districts and the rooms. */
 export const boards: Readonly<Record<string, ZoneDef>> = { ...zones, ...interiors };
+/** Which boards open onto which (edges and doors), for fetching the next ones' art ahead (world/boardAssets.ts). */
+export const boardNeighbours: ReadonlyMap<string, readonly string[]> = boardLinks(boards, doorLinks);
+/** The board a zone id names; the Old Quarter for none or an unknown one (a fresh game starts there). */
+export const boardFor = (id?: string): ZoneDef => boards[id ?? 'old_quarter'] ?? zones.old_quarter!;

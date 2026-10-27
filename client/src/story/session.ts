@@ -19,6 +19,8 @@ if (compiled.version !== 1) throw new Error(`scenes.gen.json version ${compiled.
 export const ALL_SCENES: readonly CompiledScene[] = Object.values(compiled.scenes);
 /** The MVP calendar ("Spring in Monde", Days 1–25): S01–S10, as MVP_PLAN G-10 ships them. */
 export const SPRING_SCENES: readonly CompiledScene[] = ALL_SCENES.filter(s => s.kind === 'insert_library' || /^s(0\d|10)[a-z]?_/.test(s.id));
+/** The board a New Game opens on: S01a's place (scenes/story/attach.ts takes a fresh game straight there). */
+export const OPENING_BOARD: string | undefined = ALL_SCENES.find(s => s.id === 's01a_ferry')?.header?.place.split('.')[0];
 
 /**
  * GDD-GAP: §13.3 doesn't say how long a declined summons waits before it asks again; half an hour of game

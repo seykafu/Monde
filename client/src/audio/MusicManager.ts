@@ -1,7 +1,7 @@
 import { AmbienceManager } from './AmbienceManager';
 import type { Bed } from './ambienceDirector';
 import { getAudioSettings, subscribeAudioSettings } from './audioSettings';
-import { TRACK_KEYS, resolveMusicCue, trackFiles, type TrackFile, type TrackKey } from './musicTracks';
+import { resolveMusicCue, trackFiles, type TrackFile, type TrackKey } from './musicTracks';
 import { generateNoteSchedule, placeholderDuration, schedulePlaceholderNote } from './placeholderMusic';
 export type MusicSource = 'file' | 'placeholder';
 interface Voice { bus: GainNode; nodes: Set<AudioScheduledSourceNode>; tick: (until: number) => void; retireAt: number }
@@ -37,7 +37,7 @@ export class MusicManager {
   private unlocked = false;
   private timer: ReturnType<typeof setInterval>;
   private abort = new AbortController();
-  /** Per file: does it exist? Probed once at startup for every take of every track. */
+  /** Per file: does it exist? Probed the first time its track plays (not all fifteen at startup, ahead of the first screen). */
   private availability = new Map<string, Promise<boolean>>();
   private buffers = new Map<string, AudioBuffer>();
   /** Which take each track played last, so alternate takes rotate. */
@@ -46,7 +46,6 @@ export class MusicManager {
   currentTrack: TrackKey | null = null;
   source: MusicSource | null = null;
   constructor() {
-    for (const track of TRACK_KEYS) for (const take of trackFiles(track)) this.availability.set(take.file, probeMusicFile(this.url(take.file), this.abort.signal));
     document.addEventListener('pointerdown', this.unlock);
     document.addEventListener('keydown', this.unlock);
     document.addEventListener('visibilitychange', this.visibility);
@@ -54,11 +53,16 @@ export class MusicManager {
     this.timer = setInterval(() => this.tick(), 100);
   }
   private url(file: string): string { return `${import.meta.env.BASE_URL}audio/music/${file}`; }
+  private exists(file: string): Promise<boolean> {
+    let probe = this.availability.get(file);
+    if (!probe) this.availability.set(file, probe = probeMusicFile(this.url(file), this.abort.signal));
+    return probe;
+  }
   /** The next take of a track that exists (rotating through alternates), or null for the placeholder. */
   private async pickTake(track: TrackKey): Promise<TrackFile | null> {
     const files = trackFiles(track);
-    const present: TrackFile[] = [];
-    for (const take of files) if (await this.availability.get(take.file)) present.push(take);
+    const found = await Promise.all(files.map(take => this.exists(take.file)));
+    const present = files.filter((_, i) => found[i]);
     if (!present.length) return null;
     const next = ((this.takes.get(track) ?? -1) + 1) % present.length;
     this.takes.set(track, next);

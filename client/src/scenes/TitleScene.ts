@@ -12,6 +12,10 @@ import { formatSummary, MANUAL_SLOTS, sortForMenu, type SaveEntry } from '../sav
 import { getMind } from '../mind/api';
 import { maskInvite, statusDetail, validInvite } from '../mind/connection';
 import { getMusic } from '../audio/Music';
+import { trackLoad } from '../boot/loadingScreen';
+import { prefetchTownSprites } from '../render/town/TownBoard';
+import { boardNeighbours, boards } from '../world/zones';
+import { OPENING_BOARD } from '../story/session';
 
 import { menuLayout, menuEllipsis, menuTextResolution, type MenuMode } from '../ui/menuLayout';
 
@@ -39,7 +43,9 @@ class SaveMenuBase extends Phaser.Scene {
     })).join('\n'));
   }
   preload(): void {
-    if (!this.pausedGame && !this.textures.exists('menu:harbour')) {
+    if (this.pausedGame) return;
+    trackLoad(this);
+    if (!this.textures.exists('menu:harbour')) {
       this.load.image('menu:harbour', `${import.meta.env.BASE_URL}assets/backdrops/bg_harbor_steps_dusk.jpg`);
     }
   }
@@ -184,6 +190,12 @@ class SaveMenuBase extends Phaser.Scene {
     const entries = sortForMenu(await saveStorage.list());
     if (!this.sys.isActive()) return;
     this.message.setText(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Temporary saves only — storage is unavailable in this browser session.' : '↑ ↓ to choose · Enter to select · Esc to go back');
+    // While the title waits, the town's art comes in: the board Continue opens on, else New Game's two (the Old Quarter,
+    // then the ferry slip its opening scene moves to), then the rest.
+    if (!this.pausedGame) {
+      const first = [entries[0]?.save.player.zone, 'old_quarter', OPENING_BOARD].filter((id): id is string => !!id);
+      prefetchTownSprites(this, boards, boardNeighbours, ...first);
+    }
     if (this.pausedGame) {
       this.show([
         ...MANUAL_SLOTS.map((slot, i) => ({ text: `Save to slot ${i + 1}`, detail: entries.find(e => e.slot === slot) ? this.saveDescription(entries.find(e => e.slot === slot)!) : 'Empty slot', run: async () => {

@@ -1,15 +1,17 @@
 // The dialogue portrait (GDD §16.2, §18 Dialogue): a resident's bust in the VN panel, one of six expressions.
 //
 // Art first: if client/public/assets/portraits/manifest.json lists the resident, their sheet (one WebP, a frame per
-// expression) loads when the conversation opens (lazily, once per session: textures outlive the scene) and the
-// bust shows the frame for each expression (portraitModel.artExpression). Otherwise, and until the files arrive, it draws a
-// procedural cartoon bust in the resident's colours: back hair, shoulders and collar, head and ears, front
-// hair and headwear (static), then a face layer per expression, then glasses, moustache and the frame.
+// expression) loads as the player walks up to them (core and acquainted residents) or else when the conversation
+// opens (lazily, once per session: textures outlive the scene; boot/textureFetch.ts) and the bust shows the frame for
+// each expression (portraitModel.artExpression). Otherwise, and until the files arrive, it draws a procedural cartoon
+// bust in the resident's colours: back hair, shoulders and collar, head and ears, front hair and headwear (static),
+// then a face layer per expression, then glasses, moustache and the frame.
 // Expression changes are quick and small: the face (or the art) crossfades over 110 ms with a slight squash,
 // a surprise hops and anger shakes, all inside 150 ms.
 import Phaser from 'phaser';
 import type { PortraitExpression } from '@monde/shared';
 import { FAMILY_BODY, RENDER_SCALE } from '../util/constants';
+import { textureFetch, type TextureSpec } from '../boot/textureFetch';
 import {
   ART_H, ART_W, FACES, MANIFEST_PATH, PORTRAIT_H, PORTRAIT_W, artExpression, mixColour, parsePortraitManifest, portraitExpression,
   portraitFrame, portraitTextureKey, portraitUrl, shadeColour, type PortraitLook, type PortraitManifest
@@ -889,24 +891,34 @@ export class Portrait {
     this.scene.tweens.add({ targets: prev, alpha: 0, duration: SWAP_MS, ease: 'Sine.easeIn', onComplete: () => prev.setVisible(false) });
   }
 
-  /** Load the resident's art (if the manifest lists any) and switch to it once it's in. */
+  /** Load the resident's art (if the manifest lists any; already in if it was prefetched) and switch to it once it's in. */
   private async loadArt(): Promise<void> {
     const manifest = await loadPortraitManifest();
     const id = this.opts.residentId, exprs = manifest[id];
     if (this.destroyed || !exprs?.length) return;
-    const textures = this.scene.textures, load = this.scene.load, sheet = portraitTextureKey(id);
-    const ready = () => {
-      if (this.destroyed) return;
-      // Frame i of the sheet is the manifest's expression i (scripts/art/export_portraits.py writes both).
-      const frames = textures.exists(sheet) ? textures.get(sheet).frameTotal - 1 : 0;
-      const have = exprs.slice(0, frames);
-      this.art = have.length ? { [id]: have } : {};
-      this.shown = null;
-      this.setExpression(this.wanted, true);
-    };
-    if (textures.exists(sheet)) { ready(); return; }
-    load.spritesheet(sheet, portraitUrl(import.meta.env.BASE_URL, id), { frameWidth: ART_W, frameHeight: ART_H });
-    load.once(Phaser.Loader.Events.COMPLETE, ready);
-    load.start();
+    const textures = this.scene.textures, sheet = portraitTextureKey(id);
+    await textureFetch(this.scene).fetch(portraitSheet(id), 'now');
+    if (this.destroyed) return;
+    // Frame i of the sheet is the manifest's expression i (scripts/art/export_portraits.py writes both).
+    const frames = textures.exists(sheet) ? textures.get(sheet).frameTotal - 1 : 0;
+    const have = exprs.slice(0, frames);
+    this.art = have.length ? { [id]: have } : {};
+    this.shown = null;
+    this.setExpression(this.wanted, true);
   }
+}
+
+/** A resident's portrait sheet: one ART_W×ART_H frame per expression. */
+const portraitSheet = (residentId: string): TextureSpec => ({
+  key: portraitTextureKey(residentId), url: portraitUrl(import.meta.env.BASE_URL, residentId), frame: { frameWidth: ART_W, frameHeight: ART_H }
+});
+
+/**
+ * Fetch a resident's sheet ahead of a conversation (the player walking up to them), so the bust opens on the art rather
+ * than the drawn stand-in. Only residents the manifest lists; nothing if it's in already.
+ */
+export function prefetchPortrait(scene: Phaser.Scene, residentId: string): void {
+  void loadPortraitManifest().then(manifest => {
+    if (manifest[residentId]?.length) void textureFetch(scene).fetch(portraitSheet(residentId), 'soon');
+  });
 }

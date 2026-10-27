@@ -61,7 +61,7 @@ import { talkQuest } from '../mind/questSources';
 import { firstName, quietContext, quietTurn, QUIET_CHOICES, type QuietState } from '../mind/quietMode';
 import { DialogueReader, MS_PER_CHAR, TEXT_SPEEDS, type TextSpeed } from '../mind/reader';
 import type { TalkChoice, TalkContext, TalkInput, TalkTurn } from '../mind/types';
-import { Portrait } from '../dialogue/portrait';
+import { Portrait, prefetchPortrait } from '../dialogue/portrait';
 import { PORTRAIT_H, PORTRAIT_W, portraitArtId, portraitLook, shadeColour, type PortraitLook } from '../dialogue/portraitModel';
 import { rosterEntry } from '../world/roster';
 import { prewarmRange, prewarmTier } from '../mind/prewarm';
@@ -117,7 +117,14 @@ export function attachDialogue(host: Phaser.Scene, opts: { residents: ResidentLa
   // Ambient residents (most of the Day-1 census, MVP M-03) prewarm closer and fewer a day (mind/prewarm.ts).
   const tier = (id: string) => prewarmTier(CARDS.get(id)?.card.kind, (host.registry.get('monde.friendship') as SavedFriendship | undefined)?.tiers?.[id]);
   opts.residents.approachRange = id => prewarmRange(tier(id));
-  opts.residents.onApproach = id => { if (CARDS.has(id)) getMind().prewarmNear(id, opts.clock.day, opts.clock.minute, tier(id)); };
+  opts.residents.onApproach = id => {
+    const card = CARDS.get(id)?.card;
+    if (!card) return;
+    getMind().prewarmNear(id, opts.clock.day, opts.clock.minute, tier(id));
+    // The likely ones' portraits too, so the conversation opens on the art. Not every passer-by's: a sheet is ~6 MB of
+    // texture memory that stays, so Ambient residents' load when a conversation opens, as before.
+    if (tier(id) !== 'ambient') prefetchPortrait(host, portraitArtId(card));
+  };
   host.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { off(); opts.residents.onApproach = undefined; opts.residents.approachRange = undefined; });
 }
 

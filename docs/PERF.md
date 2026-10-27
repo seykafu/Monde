@@ -78,3 +78,42 @@ Save the JSON with laptop model, CPU/GPU, RAM, OS, browser/Electron version, pow
 | 2026-10-17 | MacBook Pro, M1 Max, 120 Hz, packaged desktop app | ca6b381 | 60 visible | 120 / 108 | 9.2 / 9.5 ms | 0 | 0.51–0.85 s (four districts, the bakery) | ~88 MB |
 
 The M1 Max runs at its display refresh with headroom; the MVP sign-off still needs a mid-range laptop (Q-04).
+
+## First launch (web build)
+
+What a player waits for before the first screen, and what the loading screen (`client/index.html` `#loading`,
+`client/src/boot/`) shows meanwhile. Before any code runs the page shows the screen in plain HTML and CSS (the desktop
+app's CSP allows no inline script): the title's heading and footer over a dusk, and a bar that shimmers while the code
+downloads. Once a scene's preload starts the bar counts real bytes (`boot/loadMeter.ts`, the code's bytes included), and
+it fades into the title or the town on their first frame. A later load that takes longer than 250 ms (a district or room
+the background fetch hasn't reached) shows the panel alone, "On the way to …".
+
+What loads up front:
+
+- **Code:** three chunks, 1.25 MB over the wire (index 624 KB, phaser 340 KB, residents 286 KB). On slow 4G that is
+  7 s of the title's 8.4 s. Only splitting the code would shorten it.
+- **Title:** the harbour backdrop, 216 KB. The fifteen music HEAD probes now happen when each track first plays, not at boot.
+- **Town:** only the board's own sprites (`world/boardAssets.ts`): the Old Quarter is 52 files and 1.07 MB of the 160
+  files and 3.24 MB. The other boards follow in idle time, nearest first (`boot/textureFetch.ts`). The title starts on
+  Continue's board, else the Old Quarter and the ferry slip a New Game hops to.
+- **Portraits** (94 MB in all) were already lazy. A core or acquainted resident's sheet is now fetched as the player
+  walks up to them, so the conversation opens on the art. Ambient residents' still load when a conversation opens: a
+  sheet is about 6 MB of texture memory that stays.
+- **Music and ambience** load after the first key or click, one track at a time. The title theme (3.8 MB) then shares a
+  slow link with whatever the player opens next.
+
+Measured 2026-10-26 on the M1 Max: Chrome 156 headless at 1280×720, cache off, `vite preview` of the production build,
+`?offline`. "Slow 4G" is Lighthouse's profile (150 ms RTT, 1.6 Mbit/s down). The first four rows are medians of 2–3
+runs, the rest single runs; the last two were on the dev server, throttled after boot. The page marks
+`monde:first-frame` when the first scene draws.
+
+| | before (0760d53) | after |
+|---|---|---|
+| Something on screen (first contentful paint), slow 4G | 7.0 s (blank page) | 0.2 s (loading screen) |
+| Title's first frame, slow 4G | 8.4 s, 1.47 MB | 8.4 s, 1.47 MB |
+| Town with `?skiptitle=1`, slow 4G | 25.2 s, 4.49 MB, 165 requests | 13.9 s, 2.34 MB, 57 requests |
+| Title / town first frame, no throttling | 0.68 s / 1.74 s | 0.68 s / 1.69 s |
+| New Game → ferry slip, slow 4G, chosen 1.5 s after the title | 23.7 s | 11.2 s |
+| New Game → ferry slip, slow 4G, after 15 s on the title | 23.7 s | 2.2 s |
+| District never visited (the Commons), slow 4G, cold | (all loaded at start) | 4.9 s behind the loading screen |
+| A district after 20 s of idle fetching | (all loaded at start) | 1.0 s (the 0.4 s fade and the bake) |

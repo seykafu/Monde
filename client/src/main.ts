@@ -14,6 +14,8 @@ import { installRenderScale } from "./util/renderScale";
 import { TownBoard } from "./render/town/TownBoard";
 import { applySpringPreset, springPresetFromQuery } from "./finale/devPreset";
 import { parseClock } from "./sim/clock";
+import { installTextureFetch } from "./boot/textureFetch";
+import { endBootOnFirstFrame } from "./boot/loadingScreen";
 
 installRenderScale();
 const game = new Phaser.Game({
@@ -34,6 +36,9 @@ const game = new Phaser.Game({
       ? [ZoneScene, TitleScene, FellowshipScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
       : [TitleScene, FellowshipScene, ZoneScene, DioramaDemoScene, DialogueScene, TownLedgerScene, PeopleScene, StoryScene, SaveMenuScene]
 });
+// The page's loading screen (index.html) gives way to the first scene's first frame; a hidden scene fetches art ahead.
+installTextureFetch(game);
+endBootOnFirstFrame(game);
 
 // Dev (`?spring=strong|social|builder|lapsed|passive`, a dev build or `?dev`): start on Day 25 with that Spring behind
 // it (finale/devPreset.ts), for the Bloom Fair, the Straw Poll and the End-of-Spring report.

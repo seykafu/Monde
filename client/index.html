@@ -7,10 +7,88 @@
     <style>
       html, body { margin: 0; height: 100%; background: #14110f; overflow: hidden; }
       #game { width: 100%; height: 100%; }
+
+      /*
+       * The loading screen (src/boot/loadingScreen.ts): shown from the first byte, before any code (the desktop app's CSP
+       * allows no inline script, so this part is HTML and CSS alone). Laid out in the game's 1280×720 design pixels
+       * (--u) on a stage that fits the window like the canvas does; the panel, heading and footer sit where the title
+       * draws its own, in the menus' colours (scenes/TitleScene.ts).
+       */
+      #loading { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #14110f;
+        font-family: Georgia, "Times New Roman", serif; transition: opacity 400ms ease; }
+      #loading.out { opacity: 0; pointer-events: none; }
+      #loading[hidden] { display: none; }
+      #loading .stage { position: relative; width: min(100vw, calc(100vh * 16 / 9)); height: min(100vh, calc(100vw * 9 / 16));
+        container-type: size; overflow: hidden; --u: calc(100cqw / 1280); }
+      /* A dusk over the harbour, darkened from the left like the title's shade over its painting. */
+      #loading .sky { position: absolute; inset: 0; background:
+        linear-gradient(90deg, rgb(16 28 24 / 1) 0%, rgb(16 28 24 / .62) 25%, rgb(16 28 24 / .34) 50%, rgb(16 28 24 / .18) 75%, rgb(16 28 24 / .12) 100%),
+        radial-gradient(42% 30% at 63% 29%, rgb(246 172 104 / .5), rgb(246 172 104 / 0) 72%),
+        linear-gradient(180deg, #4b4f86 0%, #8a6f9a 17%, #d39a86 28.5%, #5b6aa6 30%, #3b4a82 46%, #4a4f6e 62%, #9c8068 64%, #b49372 100%); }
+      #loading .title { position: absolute; left: calc(84 * var(--u)); top: calc(36 * var(--u)); margin: 0; font: 400 calc(96 * var(--u)) / 1.15 "Times New Roman", serif;
+        color: #ffe3a0; }
+      #loading .panel { position: absolute; left: calc(64 * var(--u)); top: calc(246 * var(--u)); width: calc(480 * var(--u)); box-sizing: border-box;
+        padding: calc(20 * var(--u)) calc(26 * var(--u)) calc(16 * var(--u)); background: rgb(31 42 34 / .97);
+        border: calc(2 * var(--u)) solid rgb(228 199 127 / .8); border-radius: calc(12 * var(--u)); }
+      #loading .panel::before { content: ""; position: absolute; inset: calc(4 * var(--u)); border: calc(1 * var(--u)) solid rgb(228 199 127 / .25);
+        border-radius: calc(8 * var(--u)); pointer-events: none; }
+      /* The stitched cloth edge the menus share. */
+      #loading .panel::after { content: ""; position: absolute; left: calc(8 * var(--u)); top: calc(16 * var(--u)); bottom: calc(12 * var(--u));
+        width: calc(1 * var(--u)); background: repeating-linear-gradient(180deg, rgb(228 199 127 / .2) 0 calc(5 * var(--u)), transparent 0 calc(12 * var(--u))); }
+      #loading .label { margin: 0; font-size: calc(14 * var(--u)); letter-spacing: .08em; text-transform: uppercase; color: #e4c77f; }
+      #loading .bar { position: relative; margin-top: calc(12 * var(--u)); height: calc(12 * var(--u)); border-radius: calc(6 * var(--u));
+        background: #15251e; box-shadow: inset 0 0 0 calc(1 * var(--u)) rgb(228 199 127 / .4); overflow: hidden; }
+      #loading .fill { position: absolute; inset: calc(2 * var(--u)); border-radius: calc(4 * var(--u)); background: linear-gradient(180deg, #ffe3a0, #e4c77f);
+        transform-origin: left center; transform: scaleX(0); transition: transform 240ms ease-out; }
+      /* Before the code is in there is nothing to count: a slow glint says it is coming. */
+      #loading.waiting .fill { opacity: 0; }
+      #loading.waiting .bar::after { content: ""; position: absolute; top: 0; bottom: 0; left: -30%; width: 30%;
+        background: linear-gradient(90deg, transparent, rgb(255 227 160 / .45), transparent); animation: loading-glint 1.8s ease-in-out infinite; }
+      @keyframes loading-glint { to { left: 100%; } }
+      #loading .status { margin: calc(10 * var(--u)) 0 0; min-height: 1.3em; font-size: calc(14 * var(--u)); color: #cfc4a6; font-variant-numeric: tabular-nums; }
+      #loading .footer { position: absolute; left: calc(64 * var(--u)); top: calc(604 * var(--u)); width: calc(1152 * var(--u)); height: calc(104 * var(--u));
+        border-radius: calc(8 * var(--u)); background: rgb(31 42 34 / .95); }
+      /* One line at a time where the title writes its own, six seconds each. */
+      #loading .tip { position: absolute; left: calc(20 * var(--u)); top: calc(8 * var(--u)); margin: 0; font-size: calc(15 * var(--u)); color: #fff0ce;
+        opacity: 0; animation: loading-tip 30s infinite both; }
+      #loading .tip:nth-child(2) { animation-delay: 6s; }
+      #loading .tip:nth-child(3) { animation-delay: 12s; }
+      #loading .tip:nth-child(4) { animation-delay: 18s; }
+      #loading .tip:nth-child(5) { animation-delay: 24s; }
+      @keyframes loading-tip { 0% { opacity: 0; } 3%, 17% { opacity: 1; } 20%, 100% { opacity: 0; } }
+      /* A later load, over the faded-out board: the panel alone, in the middle. */
+      #loading.zone { background: rgb(16 24 20 / .5); }
+      #loading.zone .sky, #loading.zone .title, #loading.zone .footer { display: none; }
+      #loading.zone .panel { left: calc(400 * var(--u)); top: calc(300 * var(--u)); }
+      @media (prefers-reduced-motion: reduce) {
+        #loading.waiting .bar::after { animation: none; left: 35%; }
+        #loading .fill { transition: none; }
+        #loading .tip { animation-timing-function: steps(1, end); }
+      }
     </style>
   </head>
   <body>
     <div id="game"></div>
+    <div id="loading" class="boot waiting">
+      <div class="stage">
+        <div class="sky"></div>
+        <h1 class="title">Monde</h1>
+        <section class="panel">
+          <p class="label" data-part="label">Waking the town</p>
+          <div class="bar" data-part="bar" role="progressbar" aria-label="Loading Monde" aria-valuemin="0" aria-valuemax="100">
+            <div class="fill" data-part="fill"></div>
+          </div>
+          <p class="status" data-part="status">Fetching the game…</p>
+        </section>
+        <div class="footer" aria-hidden="true">
+          <p class="tip">The town is waking up.</p>
+          <p class="tip">WASD or the arrow keys to walk · E beside someone to talk</p>
+          <p class="tip">T for your tasks · M for the map of Monde, to travel by</p>
+          <p class="tip">J for the Journal · L for the Town Ledger · I for your bag</p>
+          <p class="tip">Esc for the menu: save, load and settings</p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

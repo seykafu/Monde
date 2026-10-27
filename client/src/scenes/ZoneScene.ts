@@ -22,7 +22,8 @@ import { attachSaves } from '../save/runtime';
 import Phaser from 'phaser';
 import { Grid } from '../combat/Grid';
 import { buildDiorama, type DioramaResult } from '../render/diorama/Diorama';
-import { TownBoard, preloadTownSprites } from '../render/town/TownBoard';
+import { TownBoard, prefetchTownSprites, preloadTownSprites } from '../render/town/TownBoard';
+import { trackLoad } from '../boot/loadingScreen';
 import { TownLife, reducedMotion } from '../accessibility/townLife';
 import type { TownLook } from '../world/townSprites';
 import type { TownFlag } from '../town/pillars';
@@ -41,7 +42,7 @@ import { FOLLOW, FOLLOW_REDUCED, placeFollow, stepFollow, toDevicePixel, type Fo
 import { CharacterSprite, PLAYER_LOOK_KEY, playerLook, preloadCharacterSheets } from '../render/characterSprite';
 import { ensureFellow } from '../fellow/state';
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from '../util/constants';
-import { boards, doorLinks, interiors, zones } from '../world/zones';
+import { boardFor, boardNeighbours, boards, doorLinks, interiors, zones } from '../world/zones';
 import { districtOf, type Point, type ZoneDef } from '../world/zoneFormat';
 import { doorAt, placeArrival, walkingIn } from '../world/interiors';
 import { InteriorRoom } from '../render/town/InteriorRoom';
@@ -101,6 +102,8 @@ const DEV_KEYS = import.meta.env.DEV || query.has('dev');
  * arrives unsigned and signs at S01a's {charcreate} on the ferry slip (§11.1).
  */
 const SIGN_DEFAULT_FELLOW = query.get('skiptitle') === '1' || query.get('demo') === '1';
+/** How long a board settles (its bake, the music starting) before the other boards' art is fetched behind it. */
+const PREFETCH_AFTER_MS = 1500;
 /** Scene windows already warned about (story/hint.ts closingToast), per game: `sceneId@day`. */
 const WARNED_KEY = 'monde.story.warned';
 /** Overlays that hold back the closing toast (it's for walking about). */
@@ -322,8 +325,13 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
   private follow!: FollowState;
   constructor() { super('Zone'); }
 
-  /** Drawn character sheets listed in assets/sprites/manifest.json, and the town's sprites. */
-  preload(): void { preloadCharacterSheets(this); preloadTownSprites(this); }
+  /** Drawn character sheets listed in assets/sprites/manifest.json, and this board's sprites (on the loading screen if slow). */
+  preload(): void {
+    const zone = boardFor((this.sys.settings.data as { zone?: string } | undefined)?.zone);
+    trackLoad(this, zone.name);
+    preloadCharacterSheets(this);
+    preloadTownSprites(this, zone);
+  }
 
   create(data: { zone?: string; arrive?: Point; savedPlayer?: SaveGame['player'] } = {}): void {
     const perfEnabled = import.meta.env.DEV || query.get('perf') === '1';
@@ -334,7 +342,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       this.game.events.once('postrender', rendered);
       this.events.once('shutdown', () => this.game.events.off('postrender', rendered));
     }) : null;
-    this.zone = boards[data.zone ?? 'old_quarter'] ?? zones.old_quarter!;
+    this.zone = boardFor(data.zone);
     this.transitioning = false;
     // Choose the music at once (a room plays softer than the street; the title plays full again).
     this.musicCheckedAt = -Infinity;
@@ -513,6 +521,8 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     this.applyLight(true);
     this.installClockHooks();
     camera.fadeIn(400); // GDD §16.4.
+    // Once the board has settled, the boards next door (then the rest) arrive in idle time, so a door rarely waits.
+    this.time.delayedCall(PREFETCH_AFTER_MS, () => prefetchTownSprites(this, boards, boardNeighbours, this.zone.id));
     if (import.meta.env.DEV || query.get('perf') === '1') {
       let stopped = false;
       this.events.once('shutdown', () => { stopped = true; });

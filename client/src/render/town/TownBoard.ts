@@ -18,6 +18,8 @@ import { ensureDotTexture } from '../diorama/Atmosphere';
 import { SUN, castFrom, shadeTint, torchShadow, type Sun } from '../sun';
 import type { ObliqueProjection } from '../ObliqueProjection';
 import { boxShadow, buildingHeight, insidePolygon, lineRects, sunShear, type GroundRect, type Pt, type Shear } from './castShadow';
+import { boardSpriteFiles, prefetchOrder } from '../../world/boardAssets';
+import { preloadTexture, textureFetch, type TextureSpec } from '../../boot/textureFetch';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // The town board (GDD §16.4): a v2 zone drawn as a lived-in place on the ¾ diorama.
@@ -51,13 +53,29 @@ import { boxShadow, buildingHeight, insidePolygon, lineRects, sunShear, type Gro
 
 export const townTexture = (file: string): string => `town:${file}`;
 
-/** Queue every town sprite (cheap after the first time: textures persist across scene restarts). */
-export function preloadTownSprites(scene: Phaser.Scene): void {
-  const base = `${import.meta.env.BASE_URL}assets/town/`;
-  for (const [id, entry] of Object.entries(TOWN_MANIFEST)) for (const state of entry.states) {
-    const file = spriteFile(id, state);
-    if (!scene.textures.exists(townTexture(file))) scene.load.image(townTexture(file), `${base}${file}.png`);
-  }
+/** A town sprite file's texture and where it lives. */
+export const townSprite = (file: string): TextureSpec => ({ key: townTexture(file), url: `${import.meta.env.BASE_URL}assets/town/${file}.png` });
+
+/**
+ * Queue the sprites this board draws (world/boardAssets.ts), not the whole town's: cheap after the first time, since
+ * textures persist across scene restarts, and the rest arrive in idle time (prefetchTownSprites). Idle fetches wait
+ * while the board loads.
+ */
+export function preloadTownSprites(scene: Phaser.Scene, zone: ZoneDef): void {
+  const fetcher = textureFetch(scene);
+  const specs = boardSpriteFiles(zone).map(townSprite);
+  const flying = fetcher.claim(specs.map(spec => spec.key));
+  for (const spec of specs) preloadTexture(scene, spec, flying);
+  const release = fetcher.hold();
+  scene.load.once(Phaser.Loader.Events.COMPLETE, release);
+  scene.events.once(Phaser.Scenes.Events.CREATE, release);
+  scene.events.once(Phaser.Scenes.Events.SHUTDOWN, release);
+}
+
+/** Fetch these boards' sprites in idle time, these boards first and then the rest nearest first, in place of any earlier list. */
+export function prefetchTownSprites(scene: Phaser.Scene, boards: Readonly<Record<string, ZoneDef>>, links: ReadonlyMap<string, readonly string[]>, ...first: string[]): void {
+  const ids = [...new Set([...first, ...prefetchOrder(first[0]!, boards, links)])];
+  textureFetch(scene).prefetch(ids.flatMap(id => (boards[id] ? boardSpriteFiles(boards[id]) : [])).map(townSprite));
 }
 
 const NEAREST = Phaser.Textures.FilterMode.NEAREST;
