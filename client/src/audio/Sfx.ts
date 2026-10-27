@@ -215,13 +215,50 @@ export const sfxCancel = (): void => {
 
 // ---- Movement ----
 
-export const sfxStep = (): void => {
+export const sfxStep = (p = rand(0.85, 1.15), v = rand(0.75, 1)): void => {
   // Soft footfall, humanized — every step lands at a slightly different
   // pitch and weight so a walk never sounds like a looped sample.
-  const p = rand(0.85, 1.15);
-  noise({ duration: 0.055, vol: rand(0.03, 0.045), freq: 480 * p, freqEnd: 160 * p });
-  thump(120 * p, 70 * p, 0.05, 0.02);
+  noise({ duration: 0.055, vol: 0.045 * v, freq: 480 * p, freqEnd: 160 * p });
+  thump(120 * p, 70 * p, 0.05, 0.02 * v);
 };
+
+// Town footsteps (scenes/zone/footsteps.ts plays one on each footfall, picked by
+// the ground underfoot: audio/footsteps.ts). `pitch` and `level` arrive already
+// varied per step; without them each sound humanizes itself.
+const stepVoice = (o: SfxOptions = {}): [number, number] => [o.pitch ?? rand(0.92, 1.08), o.level ?? rand(0.8, 1)];
+const footsteps = {
+  // Stone: the soft footfall with a small heel click on top.
+  footstep_cobble: (o?: SfxOptions) => {
+    const [p, v] = stepVoice(o);
+    sfxStep(p, v);
+    noise({ duration: 0.022, vol: 0.04 * v, filterType: 'bandpass', freq: 2400 * p, q: 1.2 });
+  },
+  footstep_boards: (o?: SfxOptions) => {
+    const [p, v] = stepVoice(o);
+    thump(180 * p, 95 * p, 0.09, 0.034 * v);
+    noise({ duration: 0.05, vol: 0.03 * v, freq: 1000 * p });
+  },
+  footstep_grass: (o?: SfxOptions) => {
+    const [p, v] = stepVoice(o);
+    noise({ duration: 0.1, vol: 0.036 * v, freq: 1600 * p, freqEnd: 600 * p });
+  },
+  // Sand, dirt and a rug: a muffled press with no click to it.
+  footstep_soft: (o?: SfxOptions) => {
+    const [p, v] = stepVoice(o);
+    noise({ duration: 0.09, vol: 0.05 * v, freq: 700 * p, freqEnd: 220 * p, attack: 0.008 });
+    thump(95 * p, 60 * p, 0.06, 0.015 * v);
+  },
+  // Shingle and gravel: a few small stones shifting, over a dull press.
+  footstep_gravel: (o?: SfxOptions) => {
+    const [p, v] = stepVoice(o);
+    noise({ duration: 0.06, vol: 0.03 * v, freq: 600 * p, freqEnd: 200 * p });
+    let at = 0;
+    for (let i = 0; i < 3; i++) {
+      noise({ duration: 0.025, vol: (0.032 - i * 0.008) * v, filterType: 'bandpass', freq: (2100 + i * 500) * p * rand(0.9, 1.1), q: 1.4, at });
+      at += rand(0.011, 0.02);
+    }
+  }
+} satisfies Record<string, (opts?: SfxOptions) => void>;
 
 // ---- Combat ----
 
@@ -398,7 +435,7 @@ export const sfxCineCannon = (): void => {
   tone({ freq: 2400, freqEnd: 700, duration: 0.7, type: "sine", vol: 0.012, at: 0.12, send: 0.5 });
 };
 
-export interface SfxOptions { level?: number; resident?: string; frequency?: number; type?: OscillatorType }
+export interface SfxOptions { level?: number; resident?: string; frequency?: number; type?: OscillatorType; pitch?: number }
 const crowd = (duration: number, vol: number, freq: number, pulses = 4): void => {
   for (let i = 0; i < pulses; i++) noise({ duration: duration / 2, vol, freq, freqEnd: freq * 0.7,
     filterType: 'bandpass', q: 0.6, attack: duration / 12, at: i * duration / pulses, send: 0.15 });
@@ -416,9 +453,7 @@ const effects = {
     let hash = 0; for (const c of opts.resident ?? 'narrator') hash = (Math.imul(hash, 31) + c.charCodeAt(0)) >>> 0;
     sfxVoiceBlip(opts.frequency ?? 150 + hash % 190, opts.type ?? 'triangle');
   },
-  footstep_cobble: sfxStep,
-  footstep_boards: () => { thump(180, 95, 0.09, 0.04); noise({ duration: 0.05, vol: 0.035, freq: 1000 }); },
-  footstep_grass: () => noise({ duration: 0.1, vol: 0.045, freq: 1600, freqEnd: 600 }),
+  ...footsteps,
   door_open: () => { tone({ freq: 220, freqEnd: 330, duration: 0.3, type: 'triangle', vol: 0.025 }); sfxClick(); },
   door_close: () => thump(160, 55, 0.18, 0.09),
   door_bang: () => { thump(200, 45, 0.3, 0.14); noise({ duration: 0.13, vol: 0.1, freq: 1200 }); },

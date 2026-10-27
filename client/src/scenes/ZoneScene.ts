@@ -37,6 +37,7 @@ import { attachPostPipeline } from '../render/postPipelines';
 import { SUN, castFrom, shadeTint, torchShadow, type Sun } from '../render/sun';
 import { sunShadow } from '../render/sunClock';
 import { DEPTH, actorDepth } from '../render/depth';
+import { FOLLOW, FOLLOW_REDUCED, placeFollow, stepFollow, toDevicePixel, type FollowState, type Vec } from '../render/cameraFollow';
 import { CharacterSprite, PLAYER_LOOK_KEY, playerLook, preloadCharacterSheets } from '../render/characterSprite';
 import { ensureFellow } from '../fellow/state';
 import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from '../util/constants';
@@ -52,6 +53,7 @@ import { Clock, DAY_START, SOLAR_NOON, formatClock, formatDate, formatGameTime, 
 import { WEATHER_KINDS, dailyWeather, describeWeather, weatherAt, windToward, type DailyWeather, type WeatherKind, type WeatherNow } from '../sim/weather';
 import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
 import { ResidentLayer } from './zone/residents';
+import { stepAt } from './zone/footsteps';
 import { attachDialogue } from './DialogueScene';
 import { PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
 import { MindStatusDot } from '../ui/mindStatus';
@@ -316,6 +318,8 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
   private room?: InteriorRoom;
   /** When a locked door last said so (scene ms). */
   private lockedAt = -Infinity;
+  /** The camera's eased follow of the player (render/cameraFollow); placed afresh by every create(). */
+  private follow!: FollowState;
   constructor() { super('Zone'); }
 
   /** Drawn character sheets listed in assets/sprites/manifest.json, and the town's sprites. */
@@ -929,12 +933,21 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     this.contact.setPosition(p.x, footY - 1);
     if (moved || this.shadowDirty) { this.shadowDirty = false; this.castPlayerShadow(); }
   }
-  private followPlayer(): void {
+  /**
+   * Point the camera at the player: placed at once without `dtMs` (create(): a new zone, a door, a map journey), else
+   * eased after them with a little look-ahead the way they `moved` (tiles) this frame (render/cameraFollow).
+   */
+  private followPlayer(dtMs?: number, moved: Vec = { x: 0, y: 0 }): void {
     // Explicit follow uses the patch's top-left zoom pivot and bounds clamp.
-    const camera = this.cameras.main;
+    const camera = this.cameras.main, w = camera.displayWidth, h = camera.displayHeight;
+    // A camera centre kept where the bounds allow (rooms smaller than the screen sit in the middle of it).
+    const within = (c: Vec): Vec => ({ x: camera.clampX(c.x - w / 2) + w / 2, y: camera.clampY(c.y - h / 2) + h / 2 });
+    const player = { x: this.figure.x, y: this.figure.y };
+    if (dtMs === undefined) this.follow = placeFollow(within(player));
+    else stepFollow(this.follow, player, { x: moved.x * DIORAMA_TILE_W, y: moved.y * DIORAMA_TILE_H }, dtMs, reducedMotion() ? FOLLOW_REDUCED : FOLLOW, within);
     // On the town's pixel art, scroll in whole device pixels so no art pixel ever shimmers between widths.
-    const snap = this.town ? (v: number) => Math.round(v * camera.zoom) / camera.zoom : (v: number) => v;
-    camera.setScroll(snap(camera.clampX(this.figure.x - camera.displayWidth / 2)), snap(camera.clampY(this.figure.y - camera.displayHeight / 2)));
+    const snap = this.town ? (v: number) => toDevicePixel(v, camera.zoom) : (v: number) => v;
+    camera.setScroll(snap(camera.clampX(this.follow.x - w / 2)), snap(camera.clampY(this.follow.y - h / 2)));
   }
   /** When the town last chose its music (ms of scene time); checked about once a second. */
   private musicCheckedAt = -Infinity;
@@ -1026,17 +1039,21 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       }
     }
     if (time - this.hintAt > 250) { this.hintAt = time; this.refreshHint(); }
-    if (this.transitioning || !this.keys || this.clock.paused) return;
+    // Held (a menu, a talk, a fade): the camera still settles where the player stopped.
+    if (this.transitioning || !this.keys || this.clock.paused) { this.followPlayer(dt); return; }
     const down = (...names: string[]) => names.some(name => this.keys[name]!.isDown) ? 1 : 0;
     const input = { x: down('D', 'RIGHT') - down('A', 'LEFT'), y: down('S', 'DOWN') - down('W', 'UP') };
     const from = this.position;
     const result = movePlayer(this.zone, this.position, input, delta / 1000);
     this.position = result.position;
     // Facing from the keys; walk frames from the distance actually covered (none while pushing a wall).
-    this.avatar.step({ intent: input, moved: { x: this.position.x - from.x, y: this.position.y - from.y }, dtMs: dt });
+    const moved = { x: this.position.x - from.x, y: this.position.y - from.y };
+    this.avatar.step({ intent: input, moved, dtMs: dt });
     this.avatar.apply(this.figure);
     this.avatar.apply(this.shadow, false);
-    this.syncFigure(); this.followPlayer();
+    // A step on each footfall of the walk, from the ground underfoot (scenes/zone/footsteps.ts).
+    if (this.avatar.anim.footfalls) stepAt(this.zone, this.position, this.avatar.anim.foot);
+    this.syncFigure(); this.followPlayer(dt, moved);
     this.story.update(this.position);
     // Residents take precedence over doors.
     const talk = this.residents.talkTarget(this.position);

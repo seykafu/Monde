@@ -11,6 +11,8 @@
 // foot. Stopping holds the last frame for a moment (so a one-frame hitch doesn't flash to idle),
 // brings the feet together on a passing frame, then settles into the idle.
 // Idle breathes at the sheet's idle rate and, where the sheet has one, blinks every few seconds.
+// A footfall is a foot coming down: the walk reaching a contact pose (starting a walk plants one), so
+// footstep sounds land on the frames the feet do.
 // Pure: no Phaser, no DOM.
 
 import type { Facing, FrameKind, SheetLayout } from './sheet';
@@ -62,6 +64,10 @@ export class CharacterAnimator {
   gait: Gait = 'walk';
   /** Walk frames advanced (fractional); the frame is floor(phase) mod walk. */
   phase = 0;
+  /** Feet that came down during the last step() (almost always 0 or 1). */
+  footfalls = 0;
+  /** Which foot came down last: 0 on the walk's first contact pose, 1 on the one halfway through. */
+  foot: 0 | 1 = 0;
   private idleMs: number;
   private stillMs = 0;
   private settleFrame = 1;
@@ -82,6 +88,7 @@ export class CharacterAnimator {
   /** Advance one update. */
   step(input: AnimInput): this {
     const dt = Math.max(0, input.dtMs);
+    this.footfalls = 0;
     const moved = input.moved, dist = Math.hypot(moved.x, moved.y);
     const teleported = dist > ANIM_TUNING.teleport;
     this.face(input.intent ?? null, teleported ? { x: 0, y: 0 } : moved);
@@ -138,17 +145,30 @@ export class CharacterAnimator {
     const T = ANIM_TUNING, L = this.layout;
     if (speed >= T.runSpeed) this.gait = 'run';
     else if (speed < T.runSpeed * T.runHysteresis) this.gait = 'walk';
+    const half = L.walk / 2;
     if (this.mode !== 'walk') {
       // Start on the next contact pose after where the last walk stopped, so the feet alternate.
-      const half = L.walk / 2, at = Math.floor(this.phase);
+      const at = Math.floor(this.phase);
       this.phase = Math.ceil((at + (this.mode === 'settle' ? 1 : 0)) / half) * half;
       this.mode = 'walk';
+      this.land(this.phase / half);
     }
     this.stillMs = 0;
     this.idleMs = 0;
     this.blinkLeftMs = 0;
     const stride = L.stride * (this.gait === 'run' ? T.runStrideScale : 1);
-    this.phase = (this.phase + dist / stride) % (L.walk * 64);
+    // Contacts sit at every multiple of `half`; the wrap below is a whole number of cycles, so none is skipped or doubled.
+    const before = Math.floor(this.phase / half);
+    this.phase += dist / stride;
+    const after = Math.floor(this.phase / half);
+    if (after > before) this.land(after, after - before);
+    this.phase %= L.walk * 64;
+  }
+
+  /** A foot comes down on contact number `contact` (counted in half cycles). */
+  private land(contact: number, count = 1): void {
+    this.footfalls += count;
+    this.foot = (Math.round(contact) % 2) as 0 | 1;
   }
 
   private rest(dt: number, teleported: boolean): void {

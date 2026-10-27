@@ -184,6 +184,65 @@ describe('walk frames', () => {
   });
 });
 
+describe('footfalls', () => {
+  /** Walk `ms`, noting each frame's footfalls, foot and shown frame. */
+  function steps(a: CharacterAnimator, dir: Vec2, ms: number, speed = PLAYER_SPEED) {
+    const out: { t: number; falls: number; foot: 0 | 1; frame: string }[] = [];
+    let t = 0;
+    for (; t < ms; t += FRAME) {
+      const d = (speed * FRAME) / 1000;
+      tick(a, dir, { x: dir.x * d, y: dir.y * d });
+      out.push({ t, falls: a.footfalls, foot: a.foot, frame: `${a.frame.kind}${a.frame.index}` });
+    }
+    return out;
+  }
+
+  it('land on the contact poses, two per walk cycle, starting with the first frame of a walk', () => {
+    for (const layout of [PROCEDURAL_LAYOUT, { ...DEFAULT_LAYOUT, walk: 6, stride: 4 / 12 }, { ...DEFAULT_LAYOUT, walk: 8, stride: 4 / 14 }]) {
+      const a = animator(layout);
+      const frames = steps(a, { x: 1, y: 0 }, 3000);
+      expect(frames[0]!.falls).toBe(1);
+      const falls = frames.filter(f => f.falls > 0);
+      for (const f of falls) {
+        expect(f.falls).toBe(1);
+        expect([`walk0`, `walk${layout.walk / 2}`]).toContain(f.frame);
+      }
+      // Two contacts per cycle of `walk` frames, a frame per `stride` tiles: 3 s at 4 tiles/s.
+      const expected = 1 + Math.floor((3 * PLAYER_SPEED) / (layout.stride * layout.walk / 2));
+      expect(Math.abs(falls.length - expected)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('alternate feet, and the next walk starts on the other foot', () => {
+    const a = animator();
+    const feet = steps(a, { x: 0, y: 1 }, 2000).filter(f => f.falls).map(f => f.foot);
+    feet.forEach((foot, i) => { if (i) expect(foot).not.toBe(feet[i - 1]); });
+    for (let t = 0; t < 600; t += FRAME) tick(a, null);
+    const next = steps(a, { x: 0, y: 1 }, 100).find(f => f.falls)!;
+    expect(next.foot).not.toBe(feet[feet.length - 1]);
+  });
+
+  it('none while pushing a wall, standing, or across a teleport', () => {
+    const a = animator();
+    walk(a, { x: 1, y: 0 }, 400, PLAYER_SPEED, true, true);
+    expect(a.footfalls).toBe(0);
+    for (let t = 0; t < 500; t += FRAME) { tick(a, null); expect(a.footfalls).toBe(0); }
+    tick(a, { x: 1, y: 0 }, { x: 6, y: 0 });
+    expect(a.footfalls).toBe(0);
+  });
+
+  it('no extra step for a one-frame hitch mid-walk', () => {
+    const a = animator();
+    const before = steps(a, { x: 1, y: 0 }, 1000).filter(f => f.falls).length;
+    tick(a, { x: 1, y: 0 });
+    expect(a.footfalls).toBe(0);
+    const frames = steps(a, { x: 1, y: 0 }, 1000);
+    // The hitch didn't restart the walk, so no fresh contact on its first frame back.
+    expect(frames[0]!.falls).toBe(0);
+    expect(Math.abs(frames.filter(f => f.falls).length - before)).toBeLessThanOrEqual(1);
+  });
+});
+
 describe('idle', () => {
   it('breathes slowly and blinks briefly now and then', () => {
     const a = animator();

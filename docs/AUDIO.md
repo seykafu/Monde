@@ -141,7 +141,8 @@ for later chapters fall back to the nearest MVP track until their own tracks exi
 ## Sound effects (synthesized)
 
 UI: click, hover, confirm, cancel, page turn, typewriter tick, voice blips (per resident).
-World: footsteps (cobble, boards, grass), door open/close/bang, gull cry, waves, coin, paper rustle, stamp
+World: footsteps (cobble, boards, grass, soft for sand, dirt and rugs, gravel for shingle), played on each footfall of
+the walk from the ground underfoot, residents' quieter with distance; door open/close/bang, gull cry, waves, coin, paper rustle, stamp
 thud, bell, clock tick, clock chime (the town chime notes), splash, crate scrape, brakes squeal, train horn
 (distant), air hiss, cough behind a door.
 Scuffle: pan clang, broom swish, umbrella pop, slingshot ping, winded thump.

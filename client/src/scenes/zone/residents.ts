@@ -50,6 +50,8 @@ import { pairEmote } from '../../friendship/knownTies';
 import type { EmoteIcon } from '../../friendship/icons';
 import { emoteTexture } from '../../ui/hearts';
 import { learnSeen, livePlansFor, tieMap } from '../friendship';
+import { STEP_TUNING, residentStepLevel } from '../../audio/footsteps';
+import { stepAt } from './footsteps';
 
 const SIM_KEY = 'monde.residents';
 /** Off-screen tick: one executor sample per resident per real second (§19.2). */
@@ -204,6 +206,8 @@ export class ResidentLayer {
   private readonly staged = new Map<string, Vec>();
   private stagedMs = 0;
   private lastPlayer: Position | null = null;
+  /** When a resident's step last sounded (scene ms). */
+  private lastStepMs = -Infinity;
   /** This frame: the social spot each standing on-board resident is at (zone `social:`), or null. */
   private readonly spots = new Map<Actor, string | null>();
   private readonly actors: Actor[];
@@ -407,6 +411,7 @@ export class ResidentLayer {
     this.spots.clear();
     if (this.zone.social.length) for (const a of live) if (a.base && !a.state?.moving) this.spots.set(a, spotAt(this.zone.social, a.base));
     for (const a of live) this.place(a, live, player, sec, dtMs);
+    this.footsteps(live, player);
     const pointer = this.pointerWorld();
     for (const a of live) this.draw(a, player, pointer, dtMs);
     if (this.overlayOn) this.drawOverlay(live);
@@ -419,6 +424,23 @@ export class ResidentLayer {
     this.greetings.update(dtMs, talkers, player, view, id => this.chatter.partner(id) !== null || this.chatter.speaking(id));
     this.lastPlayer = player;
     if (this.staged.size) this.unstageWhenDone(dtMs);
+  }
+
+  /**
+   * Nearby residents' footfalls, quieter with distance (audio/footsteps.ts); animals pad silently. At most one every
+   * `residentGapMs`, so a crowd stays a patter.
+   */
+  private footsteps(live: readonly Actor[], player: Position): void {
+    const now = this.scene.time.now;
+    if (now - this.lastStepMs < STEP_TUNING.residentGapMs) return;
+    for (const a of live) {
+      if (!a.avatar.anim.footfalls || a.animal || !a.pos || a.alpha < 0.5 || !a.state?.visible) continue;
+      const level = residentStepLevel(Math.hypot(a.pos.x - player.x, a.pos.y - player.y));
+      if (level < 0.01) continue;
+      this.lastStepMs = now;
+      stepAt(this.zone, a.pos, a.avatar.anim.foot, level);
+      return;
+    }
   }
 
   /**
