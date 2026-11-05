@@ -9,6 +9,22 @@
   "laugh",
   "thinking"
  ],
+ "anatole_treharne": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "annick_olsen": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "augusta": [
   "neutral",
   "warm",
@@ -37,6 +53,22 @@
   "laugh",
   "thinking"
  ],
+ "birgit_varga": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "bram_lindgren": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "bru": [
   "neutral",
   "warm",
@@ -57,6 +89,62 @@
   "laugh",
   "thinking"
  ],
+ "dorian_vale": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "edmund_mcbride": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "effie_zielinski": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "efua_drummond": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "einar_chalmers": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "elin_fleury": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "emrys_eze": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "felix": [
   "neutral",
   "warm",
@@ -66,6 +154,30 @@
   "worried",
   "laugh",
   "thinking"
+ ],
+ "fenna_renard": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "hana_okonjo": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "hartley_wylie": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
  ],
  "hollis": [
   "neutral",
@@ -78,6 +190,22 @@
   "laugh",
   "thinking",
   "watch_check"
+ ],
+ "honor_hedley": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "idris_pryce": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
  ],
  "ines": [
   "neutral",
@@ -1071,6 +1199,14 @@
   "surprised",
   "worried"
  ],
+ "lucien_quill": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "margo": [
   "neutral",
   "warm",
@@ -1080,6 +1216,22 @@
   "worried",
   "laugh",
   "thinking"
+ ],
+ "maurice_lamont": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "meera_lindgren": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
  ],
  "moss": [
   "neutral",
@@ -1123,6 +1275,22 @@
   "laugh",
   "thinking"
  ],
+ "oona_santos": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "ottilie_verhoeven": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "pell": [
   "neutral",
   "warm",
@@ -1142,6 +1310,14 @@
   "worried",
   "laugh",
   "thinking"
+ ],
+ "radek_mendel": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
  ],
  "rook": [
   "neutral",
@@ -1176,6 +1352,22 @@
   "laugh",
   "thinking"
  ],
+ "solveig_gallagher": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "soren_falk": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "teo": [
   "neutral",
   "warm",
@@ -1185,6 +1377,22 @@
   "worried",
   "laugh",
   "thinking"
+ ],
+ "thora_brodsky": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "thora_lombardi": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
  ],
  "tib": [
   "neutral",
@@ -1197,6 +1405,14 @@
   "laugh",
   "thinking"
  ],
+ "ulla_ferreira": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
  "vane": [
   "neutral",
   "warm",
@@ -1206,5 +1422,29 @@
   "worried",
   "laugh",
   "thinking"
+ ],
+ "vera_sheehan": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "yusuf_sorensen": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
+ ],
+ "zuzanna_mcallister": [
+  "neutral",
+  "warm",
+  "sad",
+  "angry",
+  "surprised",
+  "worried"
  ]
 }

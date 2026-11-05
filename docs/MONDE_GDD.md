@@ -10586,6 +10586,7 @@ most after the six, and the signature expressions the scripts use have art.*
 | Core cast (§4), cel-shaded cartoon busts (§16.1) | 20 (Bastien: 6 cat poses) | the six, laugh and thinking (Bastien: the six poses), plus the signatures the scripts use | 120 + 56 |
 | Featured supporting (Tollmen ×5, Old Moss, Ada, Raman, Claudine, plus about 6 others from §12.4) | ~15 | the six | ≈ 90 |
 | **Resident library** (Day-1 residents + arrivals) | 200 master busts × 3 color variants = **600 identities** | the six | **3,600** |
+| **Day-1 residents with procedural looks** (no library bust: D1, A.1) | 78 after the 2026-11-05 trim; 30 drawn so far | the six | 180 of 468 |
 
 - **The six:** neutral, warm, sad, angry, surprised, worried. Every person has all six. The live
   dialogue prompt offers only these. A scripted line may ask for any id its speaker's card lists: the
@@ -10616,6 +10617,14 @@ most after the six, and the signature expressions the scripts use have art.*
   the expression. **Color variants** are edits that change only hair and clothing colors. Every render
   is on flat magenta (#FF00FF) and keyed out by `process_portrait_art.py`, which also crops and scales
   the 1024×1536 render to the runtime file below.
+- **Day-1 residents with procedural looks** (the census gave 98 of them no library bust, D1; 78 since the trim) get
+  portraits of their own as art allows, filed under their own id (`portraits/<resident_id>.webp`; the card's
+  `portrait` is already its id, so nothing else changes). Each is drawn from the card's appearance, which was written
+  from the same look the walking sprite wears, plus the census's skin word for it
+  (`scripts/art/gen_portraits.py --day1 <ids>`). The first 30 (2026-11-05) are the people the player meets most:
+  everyone with a procedural look who lives on the Spring boards (24: the Old Quarter, Market Row and the Wharf, since
+  nobody lives on the Commons; one baby left out) and six of the seven from Millbrook and Station Hill whose work is on
+  the Wharf or the Commons.
 - **Until the art exists** the panel draws a procedural cartoon bust for each of the six
   (`client/src/dialogue/portrait.ts`), in the resident's sprite colours, with what the card's
   appearance names: hair colour and style, a cap, glasses, a moustache, freckles.

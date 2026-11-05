@@ -20,6 +20,7 @@ Images are scheduled as soon as the image they are drawn from exists, so --worke
 Usage:
   python3 scripts/art/gen_portraits.py [id,id,...] [--out art_sources/portraits] [--workers 4]
   python3 scripts/art/gen_portraits.py --library [lib_id,...] [--workers 4] [--dry-run]
+  python3 scripts/art/gen_portraits.py --day1 id,id,... [--workers 2] [--dry-run]   (Day-1 residents with procedural looks)
 """
 import argparse
 import collections
@@ -44,6 +45,23 @@ def load_cards(ids: list[str] | None) -> list[dict]:
               ".map(f=>Y.parse(fs.readFileSync(p.join(d,f),'utf8')))))")
     cards = json.loads(subprocess.run(["node", "-e", script], cwd=ROOT, capture_output=True, text=True, check=True).stdout)
     return [c for c in cards if ids is None or c["id"] in ids]
+
+
+def load_day1(ids: list[str]) -> list[dict]:
+    """Day-1 census residents with a procedural look (content/residents/day1/<id>.yaml), drawn under their own id.
+    Each card's appearance was written from its look; the census's skin word for that look (the same word a library
+    bust carries) is added so the bust and the walking sprite agree. Only the ids asked for: never the whole census."""
+    script = ("const fs=require('fs'),Y=require('yaml');const ids=JSON.parse(process.argv[1]);"
+              "const sk=Y.parse(fs.readFileSync('content/census/day1.yaml','utf8'));const tags={};"
+              "for(const h of sk.households)for(const m of h.members)if(m.portrait&&m.portrait.tags)tags[m.id]=m.portrait.tags;"
+              "console.log(JSON.stringify(ids.map(i=>({...Y.parse(fs.readFileSync('content/residents/day1/'+i+'.yaml','utf8')),"
+              "tags:tags[i]||null}))))")
+    cards = json.loads(subprocess.run(["node", "-e", script, json.dumps(ids)], cwd=ROOT, capture_output=True, text=True,
+                                      check=True).stdout)
+    for c in cards:
+        if c["portrait"] != c["id"]:
+            raise SystemExit(f"{c['id']} wears {c['portrait']}: only a procedural look is drawn under its own id")
+    return cards
 
 
 LIBRARY = os.path.join(ROOT, "content", "portraits", "library.json")
@@ -74,6 +92,9 @@ def describe(card: dict) -> str:
                 f"described). {appearance}")
     if card.get("kind") == "animal":
         return f"{card['name']}, an animal who lives in the town. {appearance}"
+    skin = (card.get("tags") or {}).get("skin_word")
+    if skin:
+        appearance += f" Skin tone: {skin} (draw it clearly that shade)."
     return f"{card['name']}, {card['age']}, {card.get('occupation', 'a townsperson')}. {appearance}"
 
 
@@ -167,10 +188,13 @@ def main() -> int:
     ap.add_argument("--out", default=os.path.join(ROOT, "art_sources", "portraits"))
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--library", action="store_true", help="draw the portrait library (content/portraits/library.json)")
+    ap.add_argument("--day1", action="store_true", help="draw these Day-1 census residents (procedural looks) under their own ids")
     ap.add_argument("--dry-run", action="store_true", help="list the images that would be drawn, and draw nothing")
     a = ap.parse_args()
     wanted = [i for i in a.ids.split(",") if i] or None
-    cards = load_library(wanted) if a.library else load_cards(wanted)
+    if a.day1 and not wanted:
+        raise SystemExit("--day1 draws the residents named, never the whole census: pass their ids")
+    cards = load_library(wanted) if a.library else load_day1(wanted) if a.day1 else load_cards(wanted)
     out = os.path.abspath(a.out)
     target = lambda cid, expr: os.path.join(out, cid, f"{expr}.png")  # noqa: E731
 
