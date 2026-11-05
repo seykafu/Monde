@@ -1,7 +1,7 @@
 import { evaluate, type CompiledScene } from "@monde/shared";
 import { FlagStore } from "./flags";
 import { StoryRuntime, type StoryHost, type StoryStep } from "./runtime";
-import { eligibleScenes, expressionContext, isSummoned, sceneDone } from "./triggers";
+import { eligibleScenes, expressionContext, isSummoned, occurrence, sceneDone } from "./triggers";
 
 interface QueuedScene { id: string; from?: string; restart?: boolean }
 export interface StorySave {
@@ -18,6 +18,8 @@ export class StoryDirector {
   private completed = new Set<string>();
   private runtime?: StoryRuntime;
   private initialFlags: string[] = [];
+  /** The day the current scene started on: a repeating scene is done for that day (triggers.ts occurrence). */
+  private startedDay = 0;
   private busy = false;
   private readonly byId: Map<string, CompiledScene>;
 
@@ -45,7 +47,7 @@ export class StoryDirector {
       const context = this.host.context();
       if (context.asleep || context.inScuffle) { this.queue.unshift(entry); return; }
       if (!entry.restart) {
-        if (sceneDone(scene, this.flags, this.completed)) continue;
+        if (sceneDone(scene, this.flags, this.completed, context.day)) continue;
         if (entry.from && ((scene.header.calledFrom && scene.header.calledFrom !== entry.from)
           || !evaluate(scene.header.trigger, expressionContext(context, this.flags)))) continue;
       }
@@ -53,7 +55,10 @@ export class StoryDirector {
         this.queue.unshift(entry); return;
       }
       this.initialFlags = this.flags.serialize();
-      this.runtime = new StoryRuntime(scene, this.flags, this.host, this.scenes);
+      this.startedDay = context.day;
+      // A repeating scene's effects apply again each day it plays: its cue keys carry the day (runtime.ts).
+      this.runtime = new StoryRuntime(scene, this.flags, this.host, this.scenes,
+        scene.header.repeats ? { occurrence: String(context.day) } : {});
       return;
     }
   }
@@ -61,7 +66,7 @@ export class StoryDirector {
   private finish(step: StoryStep): void {
     if (step.kind !== "end" || !this.runtime) return;
     const id = this.runtime.scene.id;
-    if (!step.checkpointLoaded) this.completed.add(id);
+    if (!step.checkpointLoaded) this.completed.add(this.runtime.scene.header?.repeats ? occurrence(id, this.startedDay) : id);
     this.runtime = undefined;
     if (step.checkpointLoaded) { this.queue = []; return; }
     if (step.gotoScene) {

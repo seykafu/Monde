@@ -247,9 +247,10 @@ export function compileScene(ast: SceneAst, reg: SceneRegistry): CompileResult {
     for (const c of scene.cast)
       if (!residentKnown(c)) err(hl("cast"), `cast: unknown resident '${c}'${hint(c)}`);
     if (!placeKnown(reg, scene.place)) warn(hl("place"), `place '${scene.place}' is not in content/places/places.yaml`);
-    // A trigger guarded by !flag.x must be able to switch itself off, or the scene replays.
+    // A trigger guarded by !flag.x must be able to switch itself off, or the scene replays. A repeating scene
+    // (`repeats: true`, the weekly rhythm) is meant to play again, and its guards are other scenes' flags.
     const guards = [...scene.trigger.matchAll(/!\s*flag\.([a-z0-9_]+)/g)].map((m) => m[1]!);
-    if (guards.length && !guards.some((g) => flagsWritten.has(g)))
+    if (!scene.repeats && guards.length && !guards.some((g) => flagsWritten.has(g)))
       err(hl("trigger"), `trigger waits for ${guards.map((g) => `!flag.${g}`).join(" && ")} but the scene never sets ${guards.length > 1 ? "any of them" : "it"}, so it would replay (add {set: ${guards[0]}})`);
     const neverSet = scene.sets.filter((f) => !flagsWritten.has(f));
     if (neverSet.length) warn(hl("sets"), `header sets ${neverSet.join(", ")} but the body never does ({set: …})`);

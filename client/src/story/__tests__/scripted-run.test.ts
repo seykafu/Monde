@@ -20,7 +20,7 @@ const spring = compiled.scenes.filter((s) => s.header && /^s(0\d|10)/.test(s.id)
 const expected = ["s01a_ferry", "s01b_walk", "s01c_cottage", "s02_marks", "s03_tolls", "s04_water_again", "s05_first_arrival",
   "s06_good_coat", "s07b_chime_loan", "s08_option", "s09_pell_confession", "s10a_bloom_open", "s10b_bloom_close", "s10c_straw_poll"];
 
-it("compiles all 38 scripts with zero diagnostics", () => { expect(compiled.scenes).toHaveLength(38); expect(compiled.diagnostics).toEqual([]); });
+it("compiles all 41 scripts with zero diagnostics", () => { expect(compiled.scenes).toHaveLength(41); expect(compiled.diagnostics).toEqual([]); });
 
 describe.each(["first", "last"] as const)("Days 1–25, %s choices", (choice) => {
   it("fires all ten beats in calendar order with live handoffs and persistent flags", async () => {

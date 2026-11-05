@@ -39,7 +39,11 @@ export const SCENE_REASONS: Readonly<Record<string, string>> = {
   s08_option: 'Sable has found the Option in the town records.',
   s09_pell_confession: 'Pell is waiting to talk about the Option.',
   s10a_bloom_open: 'The Bloom Fair is opening.', // D25: Bloom Fair.
-  s10b_bloom_close: 'The Bloom Fair is closing.'
+  s10b_bloom_close: 'The Bloom Fair is closing.',
+  // §13.2's standing weekly rhythm.
+  wk_saturday_ask: 'Odile wants a word.', // S03: "Saturday's Saturday." §9.9 stand_up: "Saturday. Would you just be here?"
+  wk_saturday_round: 'The Tollmen collect on Market Row on Saturdays.', // "Tollmen collect 20 coins from each open shop."
+  wk_pub_quiz: 'Quiz night at the Gull & Anchor.' // "Wednesday (from D9): pub quiz at the Gull & Anchor, 20:00."
 };
 
 /**
@@ -91,7 +95,7 @@ export function catchableToday(scenes: readonly CompiledScene[], context: StoryC
   const out: Candidate[] = [];
   for (const scene of scenes) {
     const h = scene.header;
-    if (!h || h.calledFrom || scene.id === active || context.day < h.day || sceneDone(scene, flags, completed)) continue;
+    if (!h || h.calledFrom || scene.id === active || context.day < h.day || sceneDone(scene, flags, completed, context.day)) continue;
     const start = minutes(h.time.start), end = minutes(h.time.end);
     if (context.minute >= end) continue;
     const [zone = ''] = h.place.split('.');
@@ -174,7 +178,7 @@ export function upcomingBeat(scenes: readonly CompiledScene[], context: StoryCon
     const found: Candidate[] = [];
     for (const scene of scenes) {
       const h = scene.header;
-      if (!h || h.calledFrom || scene.id === active || d < h.day || sceneDone(scene, flags, completed)) continue;
+      if (!h || h.calledFrom || scene.id === active || d < h.day || sceneDone(scene, flags, completed, d)) continue;
       const start = minutes(h.time.start), end = minutes(h.time.end);
       const [zone = ''] = h.place.split('.');
       const values = { ...context.values, ...(opts.ferryDay ? { ferry_day: opts.ferryDay(d) } : {}) };

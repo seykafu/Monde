@@ -48,10 +48,12 @@ async function playOut(session: StorySession): Promise<StoryLine[]> {
 }
 
 describe('StorySession', () => {
-  it('ships the ten Spring beats, and the Straw Poll that closes them (G-11)', () => {
+  it('ships the ten Spring beats, the Straw Poll that closes them (G-11), and the weekly rhythm (§13.2)', () => {
     const ids = SPRING_SCENES.filter(s => s.header).map(s => s.id);
     expect(ids).toEqual(['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's05_first_arrival', 's05b_empty_boat',
-      's06_good_coat', 's07a_chime_runs', 's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']);
+      's06_good_coat', 's07a_chime_runs', 's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll',
+      'wk_pub_quiz', 'wk_saturday_ask', 'wk_saturday_round']);
+    expect(SPRING_SCENES.filter(s => s.header?.repeats).map(s => s.id)).toEqual(['wk_pub_quiz', 'wk_saturday_round']);
   });
 
   it('plays Day 1 as one walk: S01a on the ferry slip at 09:50, then straight on to the fountain and the cottage', async () => {

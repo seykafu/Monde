@@ -27,6 +27,7 @@ import { trackLoad } from '../boot/loadingScreen';
 import { TownLife, reducedMotion } from '../accessibility/townLife';
 import type { TownLook } from '../world/townSprites';
 import type { TownFlag } from '../town/pillars';
+import { MARKET_DAY_LOOK, marketOpen } from '../town/market';
 import { addTorchGlow } from '../render/diorama/Lighting';
 import { ensureDotTexture } from '../render/diorama/Atmosphere';
 import { ObliqueProjection } from '../render/ObliqueProjection';
@@ -589,11 +590,15 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     return (this.registry.get('monde.save.weather') as SaveGame['weather'] | undefined)?.seed ?? WORLD_SEED;
   }
 
-  /** What decides each restorable sprite's art: the story's flags (the save's record) and the town engine's. */
+  /**
+   * What decides each restorable sprite's art: the story's flags (the save's record) and the town engine's, and the
+   * Saturday market on Market Row's flags (town/market.ts: the stalls fill in market hours).
+   */
   private townLook(): TownLook {
     const story = (this.registry.get('monde.story.flags') ?? {}) as Record<string, unknown>;
     const town = getTown(this.registry);
-    return { flag: f => story[f] === true || town?.flags[f as TownFlag] === true };
+    const market = this.zone.id === 'market_row' && marketOpen(this.clock.day, this.clock.minute);
+    return { flag: f => (f === MARKET_DAY_LOOK ? market : story[f] === true || town?.flags[f as TownFlag] === true) };
   }
 
   private resetLight(): void {

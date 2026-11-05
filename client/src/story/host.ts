@@ -9,7 +9,8 @@ import type { Outcome as ScuffleOutcome } from '../combat/scuffle/engine';
 //   StoryWorld (scenes/story/attach.ts). Anything without somewhere to go warns in development and continues.
 // - encodeStory/decodeStory: the director and ledger inside the save's existing `story_flags` record.
 // - placeAt: which `zone.place` the player is at, for place triggers.
-import type { ClientEvent, SaveGame, SceneHeader } from '@monde/shared';
+import { emptyTollmen, type ClientEvent, type SaveGame, type SceneHeader } from '@monde/shared';
+import { tollmenLevel } from '../combat/scuffle/tollmen';
 import { scriptedMemory, scriptedRegard, townEvent } from '../mind/events';
 import { weekdayOf } from '../sim/clock';
 import { computeAppeal } from '../town/appeal';
@@ -131,6 +132,8 @@ export function buildStoryContext(world: WorldNow, ledger: StoryLedger, outcomes
       census: town.census,
       appeal: computeAppeal(town).appeal,
       ferry_day: isFerryDay(world.day, town.flags),
+      // Market Row's Tollmen level by day (§7, 0–3): the Saturday round (wk_saturday_round) fights only at 2 or more.
+      tollmen: tollmenLevel(town.tollmen ?? emptyTollmen(), 'market_row', world.day),
       coins: ledger.coins,
       arrival: { ...(world.arrival ?? ARRIVAL_STANDIN) },
       ...outcomes

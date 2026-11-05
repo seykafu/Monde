@@ -33,6 +33,7 @@ import { liveLine } from '../story/live';
 import type { StoryHint } from '../story/hint';
 import { homeDirectory } from '../world/homes';
 import { homeKey, homeKind, isOccupied } from '../town/occupancy';
+import { marketKey, marketPlans } from '../town/market';
 import { nearbyPlace, placeName, type Position } from '../world/player';
 import { districtOf, type ZoneDef } from '../world/zoneFormat';
 import { zones } from '../world/zones';
@@ -114,6 +115,9 @@ export function installShifts(sim: ResidentSim, registry: Registry): void {
   if (adjusted.has(sim)) return;
   adjusted.add(sim);
   sim.setAdjuster({ key: day => shiftsFor(registry, day).key, apply: (plans, day) => withShifts(plans, shiftsFor(registry, day).shifts) });
+  // The Saturday market on Market Row's flags until the hall reopens (town/market.ts), after the Project shifts.
+  const hallOpen = () => flagsOf(registry).has('project_market_hall_done');
+  sim.setAdjuster({ key: day => marketKey(day, hallOpen()), apply: (plans, day) => marketPlans(plans, day, hallOpen()) }, 'market');
 }
 
 // ── Textures ────────────────────────────────────────────────────────────────

@@ -35,7 +35,15 @@ export function isSummoned(scene: CompiledScene): boolean {
   return ["s10a_bloom_open", "s10b_bloom_close", "s10c_straw_poll", "s11_station"].includes(scene.id);
 }
 
-export function sceneDone(scene: CompiledScene, flags: FlagStore, completed: ReadonlySet<string>): boolean {
+/**
+ * A repeating scene's entry in the director's completed list: one per day it played (`wk_pub_quiz@9`), so it is done
+ * for that day only and comes back on the next day its trigger holds (§13.2's weekly rhythm).
+ */
+export const occurrence = (id: string, day: number): string => `${id}@${day}`;
+
+/** Done for good, or (a `repeats` scene) done on `day`, which a repeating scene needs to be asked about. */
+export function sceneDone(scene: CompiledScene, flags: FlagStore, completed: ReadonlySet<string>, day?: number): boolean {
+  if (scene.header?.repeats) return day !== undefined && completed.has(occurrence(scene.id, day));
   if (completed.has(scene.id)) return true;
   // Header sets is a manifest, not an instruction to apply every possible branch effect.
   return !!scene.header?.sets.some((flag) => /^s\d{2}[a-z]?_done$/.test(flag) && flags.has(flag));
@@ -53,7 +61,7 @@ export function eligibleScenes(
   if (context.asleep || context.inScuffle) return [];
   return scenes.filter((scene) => {
     const h = scene.header;
-    if (!h || h.calledFrom || sceneDone(scene, flags, completed) || context.day < h.day) return false;
+    if (!h || h.calledFrom || sceneDone(scene, flags, completed, context.day) || context.day < h.day) return false;
     // GDD-GAP: window endpoint inclusivity is unspecified; use [start, end) to avoid overlap.
     if (context.minute < minutes(h.time.start) || context.minute >= minutes(h.time.end)) return false;
     if (!isSummoned(scene) && context.place !== h.place) return false;

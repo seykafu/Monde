@@ -150,7 +150,8 @@ export const SPRITE_META: Readonly<Record<string, SpriteMeta>> = {
   bicycle: { block: [1, 1] },
   fence: { block: [1, 1] },
   stone_wall: { block: [1, 1] },
-  market_stall: { block: [2, 1], project: 'market_hall' },
+  // Restored by its Project, and on Market Row in Saturday market hours (town/market.ts MARKET_DAY_LOOK).
+  market_stall: { block: [2, 1], project: 'market_hall', restoredBy: ['market_day'] },
   bunting: { block: [0, 0], overhead: 78, flat: true },
   picnic_table: { block: [2, 1] },
   // ── landmarks ──

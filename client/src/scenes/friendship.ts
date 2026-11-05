@@ -8,7 +8,8 @@ import { getTown } from "./TownLedgerScene";
 import { leavingFavors, localLastChances, localTemplateFavors } from "../friendship/favors";
 import { adoptDawnArrivals, nightArrivals, paperMovements } from "./migration";
 import { generatedCards } from "../world/roster";
-import { projectPaper } from "../projects/runtime";
+import { flagsOf, projectPaper } from "../projects/runtime";
+import { rhythmPaper } from "../town/rhythm";
 import { ensureStrawPoll, withStrawPoll } from "../finale/take";
 import { REPORT_DAY } from "../finale/state";
 import YAML from "yaml";
@@ -240,6 +241,8 @@ export function attachDawnSync(registry: Registry, clock: Clock, opts: DawnSyncO
     edition = optionCalendar(registry, day, edition);
     // The dreams the player helped along since the last paper (quests/paper.ts), among the notices.
     edition = dreamPaper(registry, day, edition, id => townNames()[id] ?? id);
+    // §13.2's weekly rhythm: the quiz on Wednesdays, the service and Saturday's round on Sundays (town/rhythm.ts).
+    edition = rhythmPaper(edition, day, { completed: new Set(storySession(registry)?.director.serialize().completed ?? []), flags: flagsOf(registry) });
     // G-11: the morning after the Bloom Fair the Lantern prints the Straw Poll (counted now if the player missed the trestle).
     if (day === REPORT_DAY) {
       const finale = ensureStrawPoll(registry, id => regardFor(registry, id), opts.weatherSeed());

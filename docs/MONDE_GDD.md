@@ -4280,6 +4280,11 @@ sets: [s03_done, met_rook, met_tollmen]
 ```
 ````
 
+A scene of the standing weekly rhythm (§13.2) adds `repeats: true`: it isn't done for good when it ends, but plays
+again on any later day its trigger holds, at most once a day, and its effects (Regard, memories, Pillars, a Scuffle)
+apply again each time. Its trigger names the weekday (`weekday == 'sat'`), and its guards may be other scenes' flags
+(`!flag.tollmen_broken`). The weekly scenes are in §13.3, "The weekly rhythm".
+
 **Body lines**
 
 | Syntax | Meaning |
@@ -4317,6 +4322,7 @@ sets: [s03_done, met_rook, met_tollmen]
 | `{tally: district}` | Reveals one district's count on Lantern Night and fills `{d.player}`, `{d.vane}`, `{d.moss}`, `{run.*}` and `tally.*` (§10.5). |
 | `speaker: auto:<default>` | In `{ai_line}`: the engine picks the resident with the strongest open concern on the topic; Quiet Mode uses the default. |
 | Expressions `coins`, `player.place`, `vote.winner`, `vote.share`, `vote.margin`, `count.regard_ge_40`, `tally.*` | Read-only engine values. |
+| Expressions `weekday` (`'mon'` … `'sun'`), `tollmen` | The day of the week, and Market Row's Tollmen level today (0–3, §7). |
 | Interpolations `{census}`, `{day}`, `{signatures}`, `{romance_pair_N.a}` / `.b` | Filled at runtime. |
 | `// comment` | Author's note. Not shown, not compiled. |
 
@@ -4344,6 +4350,20 @@ Day 1 is a **Tuesday**. Weekdays repeat on a fixed seven-day cycle, so **D8, D15
 | Beats | `S01–S13` are scripted in §13.3. `S14–S23` are scripted in §13.4. Bracketed rows `[cond]` only fire if the stated flag or state holds. |
 
 **Standing weekly rhythm** (not repeated in every row unless something changes). **Saturday:** market in the Covered Market Hall, Tollmen collect 20 coins from each open shop, the grey van meets the Tollmen at the crane yard at 22:00 (while Greyline is active). **Sunday:** service at St. Brigid's at 10:00. **Wednesday (from D9):** pub quiz at the Gull & Anchor, 20:00. **Tue/Fri:** ferry and Dawn Report arrivals roll.
+
+*In the MVP* (Kasey's playtest, 2026-11-04: Days 4, 6, 7 and 9 had nothing on them, and Rook's "Saturday." went
+nowhere). The Friday after S03, Odile asks the Fellow to be there on Saturday (`wk_saturday_ask`, the `stand_up`
+Favor's "Saturday. Would you just be here?" as a scene). Every Saturday from D5 the Tollmen's round reaches the
+bakery between 10:00 and 13:00 (`wk_saturday_round`): the Fellow can stand in the doorway (a Scuffle at Tollmen
+level 2 or more, else their presence is enough), pay the bakery's twenty, or watch. Every Wednesday from D9 Roz runs
+her quiz (`wk_pub_quiz`), three questions on what the Fellow has seen so far, and June plays the interval. These
+three scenes are in §13.3, "The weekly rhythm"; the HUD's Next line points at them when nothing else is due. Until
+the `market_hall` Project reopens the hall, the Saturday market is held out on Market Row's flags from 08:00 to
+14:00 (GDD-GAP: no hours were given; S04 at 09:00 hears the trestles going up): the stalls are stocked, and everyone
+bound for the hall shops and sells among them (`client/src/town/market.ts`). The Lantern prints the quiz on
+Wednesdays and its result on Thursday, the service at St. Brigid's on Sundays, and Saturday's round on Sundays,
+which leads a quiet paper when the Fellow was at the bakery (`client/src/town/rhythm.ts`). Not yet built: the
+shakedowns' Prosperity cost (§6.1, −0.5 per shop paying), the grey van, the jumble sale and school sports.
 
 | Day | Weekday | Season | Scripted beat(s) | Festival / event | Ferry | Tollmen | Vane | Notes |
 |---|---|---|---|---|---|---|---|---|
@@ -6483,6 +6503,519 @@ N: Nettie, on her ledge, watches you all the way to the wall. Bru raises the wre
 
 ---
 
+#### The weekly rhythm
+
+§13.2's standing weekly rhythm as the MVP plays it: Odile's ask, the Tollmen's Saturday round and Roz's Wednesday
+quiz. The round and the quiz repeat (`repeats: true`, §13.1). The quiz's three question sets follow the Spring:
+Day 9 asks about S01–S04, Day 16 about S06, and Day 23 (the Bastien census night) about S07, so every answer is
+something every player has seen. There is no pub backdrop yet (`bg_gull_and_anchor_evening` shows the titled
+stand-in).
+
+#### Weekly · Odile Asks
+```yaml
+id: wk_saturday_ask
+day: 4
+time: "06:00-13:00"
+place: market_row.bakery
+trigger: "flag.s03_done && !flag.odile_asked_saturday && !flag.saturday_round_seen && weekday != 'sat' && day < 12"   # before the second Saturday
+backdrop: bg_bakery_interior
+music: cottage_warm
+cast: [odile]
+sets: [odile_asked_saturday]   # plus promised_odile if the Fellow promises
+```
+```script
+{fade}
+N: The bakery before the rush. The case is full and the floor is swept, all but the corner by the umbrella stand.
+[[if flag.sc_tutorial_won]]
+ODILE [neutral]: (doesn't turn from the trays) The Haskett boy's been past twice. Doesn't come in. Looks at the umbrella stand.
+[[elif flag.sc_tutorial_lost]]
+ODILE [neutral]: (doesn't turn from the trays) Flour's out of the grain of the floor. Mostly. You'll still find some in March.
+[[else]]
+ODILE [neutral]: (doesn't turn from the trays) Door.
+[[end]]
+N: She slides a heel of rye along the counter. You take it. That is the whole greeting.
+[[if flag.s03_paid]]
+ODILE [neutral]: That twenty you put down on Thursday. I haven't forgotten whose it was.
+N: It doesn't sound like a thank you. She never says thank you. It sounds like a sum she hasn't finished.
+[[end]]
+ODILE [neutral]: Saturday.
+N: She wipes the counter where it is already clean.
+ODILE [neutral]: They come after ten. Haskett, Szabo. The other one stays on the street, under the lamp. They take twenty and they go. Been going eleven years.
+ODILE [neutral]: I don't want a fight. Pan, broom, umbrella, I've had my fill of that. I want someone in the doorway.
+ODILE [neutral]: A witness. Somebody who'll stand there and be seen to have seen.
+N: She looks at you for the first time. It's a baker's look: does it rise.
+ODILE [neutral]: Saturday. Would you just be here?
+>> CHOICE
+- "I'll be here." → {set: promised_odile}; {regard: odile +3}; goto promised
+- "I can't promise that." → goto no_promise
+
+:: promised
+ODILE [neutral]: Hm.
+N: She turns a tray that doesn't need turning. Then she takes a currant bun out of the case and puts it in a paper bag and puts the bag in your hand.
+ODILE [neutral]: After ten. Don't be early, you'll only stand about. Don't be late.
+{memory: odile, "Asked the Fellow to be in the doorway on Saturday when the Tollmen come for the twenty. They said they'd be here. Eleven years and I asked a stranger. I gave them a bun so I wouldn't have to say anything else.", importance: 7}
+{goto: the_end}
+
+:: no_promise
+ODILE [neutral]: Hm. Wise. Never promise a baker a Saturday.
+ODILE [neutral]: If you're passing, the door's a door. If you're not, the twenty's still twenty.
+N: She says it lightly. The tray she picks up next she puts down again.
+{memory: odile, "Asked the Fellow to be here on Saturday for the Tollmen. They wouldn't promise. Fair. I said never promise a baker a Saturday. I'd have liked to hear yes.", importance: 6}
+{goto: the_end}
+
+:: the_end
+N: Bastien watches the whole thing from the doorstep and then, to show he took no side, leaves.
+{set: odile_asked_saturday}
+```
+
+#### Weekly · The Saturday Round
+```yaml
+id: wk_saturday_round
+day: 5
+time: "10:00-13:00"
+place: market_row.bakery
+trigger: "flag.s03_done && !flag.tollmen_broken && !flag.s10c_done && weekday == 'sat'"   # the MVP's Spring ends with the Straw Poll
+backdrop: bg_bakery_interior
+music: tension_light
+cast: [odile, bru, nettie, rook]
+sets: [saturday_round_seen]   # plus round_stood, stood_with_odile | round_paid | round_watched (one per visit; the round_* flags are cleared before each choice)
+repeats: true
+```
+```script
+{fade}
+[[if !flag.saturday_round_seen]]
+N: Saturday on Market Row. Trestles going up, a crate dropped, somebody arguing about eels. The bakery case is half empty. It is half empty every Saturday by ten.
+N: From the doorway you can see down the north side of the street. The crew works it in order, like a postman.
+N: Dunmore's back door first. Barney Dunmore counts twenty from the till with his lips moving and writes it in a book. SUNDRIES, it says. Out on the flags his sister Nell is weighing herring at her stall and doesn't turn round.
+N: The Gull & Anchor next. Roz pays through the hatch without being asked, and wipes a glass afterwards that is already dry.
+N: Café Liss pays last and slowest, with the face of milk about to turn.
+N: Across the street a lean man in a grey mill cap leans on the lamppost. The brass whistle hangs at his chest. He watches the Row the way you watch weather. He doesn't come in.
+[[if flag.promised_odile]]
+ODILE [neutral]: (not looking round) You came.
+ODILE [neutral]: Hm. Stand where you like. Not in front of the case.
+[[else]]
+ODILE [neutral]: (not looking round) Door. You may as well come in or go out.
+[[end]]
+N: The bell rings. This time they mean it.
+BRU [worried]: Morning, Madame. Sorry about the bell.
+NETTIE [neutral]: Saturday's Saturday. Twenty.
+[[else]]
+[[if flag.round_stood]]
+BRU [worried]: (the bell rings; he takes his cap off) You again. Sorry. Good morning, Madame.
+NETTIE [neutral]: (eyeing the doorway) Same spot as last week, Fellow. Fine. Row's clear.
+[[elif flag.round_paid]]
+NETTIE [laugh]: (the bell rings) Fellow. Brought your purse again?
+ODILE [angry]: I pay my own fines, Szabo.
+BRU [worried]: Sorry, Madame.
+[[elif flag.round_watched]]
+NETTIE [neutral]: (the bell rings; she nods at the counter) Same seat as last week, Fellow. Enjoying the view?
+BRU [worried]: Twenty, Madame. Sorry.
+[[else]]
+BRU [worried]: (the bell rings; he takes his cap off) Morning, Madame. Sorry about the bell.
+NETTIE [neutral]: Saturday's Saturday. Twenty.
+[[end]]
+[[if flag.promised_odile && !flag.stood_with_odile]]
+ODILE [neutral]: (low, to you) You came. Hm.
+[[end]]
+[[end]]
+N: Across the street, under the lamp, Rook hasn't moved.
+N: Odile opens the till and counts out twenty coins one at a time. She sets them in a row on the counter like a hand of cards. She doesn't push them across. She waits.
+{unset: round_stood}
+{unset: round_paid}
+{unset: round_watched}
+>> CHOICE
+- "Step into the doorway beside Odile." → goto stand
+- "Put your own twenty down. Leave her out of it." → goto pay
+- "Stay by the counter and watch." → goto watch
+
+:: stand
+N: You take the two steps to the doorway and stand next to Odile. It is a short walk and it feels like a long one.
+NETTIE [sidelong]: Oh, she's got a doorstop now.
+[[if tollmen >= 2]]
+BRU [worried]: (to the floor) Please don't, Fellow. I'd rather you didn't.
+NETTIE [neutral]: (thumbs a pebble into the slingshot) Bru. Do it quick.
+BRU [worried]: Sorry. Sorry. (lifts Odile's pan from its hook, very gently) It's what's here.
+ODILE [neutral]: Pan beats broom. Broom beats umbrella. You know it.
+{sfx: pan_clang}
+{cam: shake}
+{scuffle: sc_market_saturday}
+[[if scuffle.won]]
+[[if scuffle.talked_down]]
+N: Bru hangs the pan on its hook by the handle. Nettie lets the pebble fall into her pocket.
+BRU [worried]: All right. We can leave it, Madame. Just today.
+ODILE [neutral]: Today's a fine place to start.
+[[else]]
+N: Bru sits down in the doorway, winded, cap over one eye, and holds the pan out to Odile handle first.
+BRU [worried]: Sorry, Madame.
+NETTIE [angry]: Blast. This isn't over.
+ODILE [neutral]: Take the loaf behind. It's yesterday's.
+[[end]]
+{regard: odile +6}
+N: Odile's twenty sit in their row. She counts them twice and puts them back in the till. Across the street Rook pushes off the lamp and walks away, and doesn't look back.
+{memory: odile, "A Saturday. The Fellow stood in my doorway and the crew went home with nothing from my till. Eleven years. I fed the Fellow and didn't say a word about it.", importance: 9}
+{memory: bru, "Went for the bakery's twenty. The Fellow stood in the door and we went the other way. Sorry about the pan.", importance: 6}
+{memory: nettie, "The Fellow stood with the baker and beat us. Row's not what it was. Rook just walked off. Blast.", importance: 6}
+{memory: rook, "Watched from the lamp. The Fellow stood in the bakery door and my crew came away empty. I went before anyone could look at me.", importance: 8}
+[[else]]
+[[if scuffle.fled]]
+N: You step out of the doorway. Odile watches you go, and doesn't say anything.
+[[else]]
+N: The floor arrives first. Then a sack of flour, which bursts, which is how you find out it was a good sack.
+[[end]]
+{regard: odile +3}
+N: Nettie palms the twenty off the counter. Odile watches her do it with a face like closed shutters.
+ODILE [neutral]: (to you, quietly) You were here. That's more than Thursday.
+{memory: odile, "Saturday. The Fellow stood in my door and it didn't hold. They were here, though. That's more than I expected of a Fellow. I gave them tea afterward.", importance: 7}
+{memory: bru, "Went for the bakery's twenty. The Fellow stood in the door and lost. Said sorry about eight times.", importance: 5}
+{memory: nettie, "Took the baker's twenty. The Fellow stood in the door and went down. Easy, I said. It felt wrong again.", importance: 5}
+{memory: rook, "Watched from the lamp. The Fellow stood in the baker's door and lost to my crew. They got up on their own.", importance: 6}
+[[end]]
+[[else]]
+N: Nobody reaches for a pan. Bru looks at the doorway, then at Nettie. Nettie looks at you, and at Odile, and at the street through the window.
+N: Across the street Rook lifts two fingers off the lamp, a sign so small you wouldn't see it if you hadn't been watching for one.
+NETTIE [neutral]: (to the row of coins, not to you) Keep it, Madame. For this week.
+BRU [worried]: Next week, Madame. Sorry.
+ODILE [neutral]: Hm. Don't be sorry, Haskett. Be late.
+N: They go, and the bell rings after them. Bru touches his cap to the doorframe, as if it might mind.
+{pillar: safety +1}
+{regard: odile +5}
+{memory: odile, "A Saturday. The crew came for the twenty, saw the Fellow in my door, and went home without it. Nobody lifted a pan. Rook made a sign across the street. Next week, Haskett said. I am not a fool.", importance: 8}
+{memory: bru, "Went for the bakery's twenty. The Fellow stood in the door, so we left. I said next week. Sorry, Madame.", importance: 5}
+{memory: nettie, "Walked out of the bakery with nothing because of a Fellow in a doorway. Rook gave the sign. I'll say the Row was too busy.", importance: 6}
+{memory: rook, "Gave the sign. The baker's twenty stays in the till this week because of the Fellow. Said nothing. Will hear about it from the others.", importance: 7}
+[[end]]
+{set: round_stood}
+{set: stood_with_odile}
+{goto: close}
+
+:: pay
+N: You put twenty coins on the counter, in the row beside Odile's.
+{coins: -20}
+ODILE [angry]: (the knife-edge quiet that is her loud) No.
+NETTIE [laugh]: (scooping the lot) Easy. The new ones are always easy.
+ODILE [angry]: I pay my own fines, Fellow. I don't need rescuing in my own shop.
+N: She puts her own twenty back in the till. She doesn't look at you again until Bru and Nettie have gone, and the bell has stopped.
+ODILE [neutral]: (at last) It wasn't a kindness. Don't let anyone tell you it was.
+{regard: odile -2}
+{regard: nell -2}
+{memory: odile, "A Saturday. The Fellow put twenty on my counter before I could. I pay my own fines. I put mine back in the till. It wasn't a kindness. I think it was meant as one.", importance: 7}
+{memory: nell, "Heard it from the street: the Fellow paid the baker's Tollmen twenty on a Saturday. Barney says that's how the Row ends up. I don't know whether to thank them or not.", importance: 5}
+{memory: nettie, "Fellow paid for the baker. Easy, I said. The baker looked at the Fellow like they'd spat in the dough.", importance: 5}
+{memory: bru, "The Fellow paid twenty in the bakery. Madame didn't take it kindly. Sorry. I don't think anyone did.", importance: 5}
+{set: round_paid}
+{goto: close}
+
+:: watch
+N: You stay by the counter, with the heel of rye, where you can see the lot.
+N: Odile pushes the row of coins across with one finger at a time. Bru takes them with two hands, like eggs. Nettie counts them again, aloud, and the baker waits for her to reach twenty.
+ODILE [neutral]: Twenty.
+NETTIE [neutral]: Twenty. Row's clear, Madame. See you next Saturday.
+N: It takes under two minutes. Nobody raises a voice. It is the quietest thing you have seen on Market Row, and you watch it all, down to Nettie's sleeve on the glass and the crumb in Odile's jaw.
+N: Across the street Rook turns from the lamp and, for an instant, looks at the window.
+ODILE [neutral]: (after the bell, to the counter) That's how it works. Now you've seen it.
+{memory: odile, "A Saturday. The Fellow stood at the counter and watched me pay. Said nothing. Now they know how it's done. I wanted them to and I didn't.", importance: 6}
+{memory: rook, "Watched from the lamp. The Fellow stood by the counter and watched the baker pay, all of it. They were looking at the window when I looked.", importance: 5}
+{set: round_watched}
+{goto: close}
+
+:: close
+N: The flour settles. Bastien comes in with the cold and sits where the bell can't reach him.
+ODILE [neutral]: Eat something.
+{set: saturday_round_seen}
+```
+
+#### Weekly · Roz's Quiz
+```yaml
+id: wk_pub_quiz
+day: 9
+time: "20:00-22:00"
+place: market_row.gull_and_anchor
+trigger: "weekday == 'wed' && !flag.s10c_done"   # the MVP's Spring ends with the Straw Poll
+backdrop: bg_gull_and_anchor_evening
+music: harvest_fiddle
+cast: [rosalind, june, moss, sable, hollis, kasimir, tib, rook]
+sets: [quiz_night_seen, quiz_q1, quiz_q2, quiz_q3, quiz_won, quiz_bastien_joke_seen]   # quiz_won only on a win; quiz_bastien_joke_seen on the first Day 23+ night
+repeats: true
+```
+```script
+{fade}
+{unset: quiz_q1}
+{unset: quiz_q2}
+{unset: quiz_q3}
+[[if !flag.quiz_night_seen]]
+N: Wednesday, eight o'clock, and the slate over the bar has been rubbed out and rewritten. QUIZ. WEDNESDAYS. TEA INCLUDED. Underneath, smaller: Please.
+ROSALIND [warm]: (wiping a glass that is already dry) Sit, pet. I'm restarting the quiz. The pub is quiet and I'm not.
+N: Four regulars, four tables, one fire. Moss and Kasimir have pushed two tables together without a word, which is how they do everything. Sable has a pencil behind each ear and a Lantern proof folded in her cardigan. Hollis sits exactly under the clock.
+HOLLIS [watch_check]: (thumbs his watch) Twenty hundred. Roz, you said eight.
+ROSALIND [laugh]: It is eight, Hollis.
+HOLLIS [grumble]: Twenty hundred is the correct way to say it.
+N: By the fire, in the chair with its back to the wall, sits Rook, cap low, a pint he hasn't touched. He is not playing. Roz put the pint down without asking and he let her.
+SABLE [ink_smudge]: (leaning over with a spare pencil) Rook. We're a man short.
+N: Rook looks at the pencil as if it were a summons. He shakes his head once. Sable withdraws it with dignity.
+SABLE [ink_smudge]: (to you) You'll join us, then. Hollis, move up.
+HOLLIS [grumble]: I'm on time. I'm not moving.
+N: The sheet is a torn-off page. Sable writes the team name. Hollis crosses it out and writes another. Sable writes the first one back, smaller, in brackets.
+N: STOP PRESS (ON TIME). You, Sable and Hollis. Across from you, Moss and Kasimir have named theirs THE SLOWEST BOAT.
+[[else]]
+N: Wednesday, eight o'clock. The slate says QUIZ and, under it, in Roz's hand, a second Please that wasn't there last week.
+ROSALIND [warm]: Sit, pet. Same teams as before if nobody's got ideas.
+N: Moss and Kasimir hold the long table. Sable has her pencils. Hollis sits exactly under the clock and has checked it against his watch twice.
+[[if flag.quiz_won]]
+HOLLIS [grumble]: Last week we won. I'm not saying it was on the timetable. I'm saying it was on time.
+[[else]]
+SABLE [ink_smudge]: Last week we lost. I've counted the wrong answers. There were more than I'd like on the record.
+[[end]]
+N: By the fire, Rook has the chair with its back to the wall. The pint is full. It will still be full at ten.
+[[end]]
+[[if day >= 23]]
+{goto: set3}
+[[elif day >= 16]]
+{goto: set2}
+[[else]]
+{goto: set1}
+[[end]]
+
+:: set1
+ROSALIND [warm]: Three rounds, three questions. Teas at the interval. Pens down at the bell.
+ROSALIND [warm]: Question one. The clocktower has said the same time for fourteen years. What time?
+>> CHOICE
+- "Seventeen past four." → {set: quiz_q1}; goto s1q1a
+- "Twenty to eleven." → goto s1q1b
+- "Whenever Hollis says it is." → goto s1q1c
+
+:: s1q1a
+HOLLIS [watch_check]: Sixteen seventeen. Correct. By my watch.
+{goto: s1q2}
+
+:: s1q1b
+ROSALIND [knowing_look]: That's your own watch, pet. The tower has more patience.
+{goto: s1q2}
+
+:: s1q1c
+HOLLIS [grumble]: That's not on the timetable.
+ROSALIND [laugh]: It's half a point for the compliment, Hollis. I'm not giving it.
+{goto: s1q2}
+
+:: s1q2
+ROSALIND [warm]: Question two. Fournier and Fille. What does a loaf of rye cost?
+>> CHOICE
+- "Three coins." → goto s1q2b
+- "Whatever Odile decides when she sees your face." → goto s1q2c
+- "Two coins." → {set: quiz_q2}; goto s1q2a
+
+:: s1q2a
+SABLE [ink_smudge]: Two. White's three. I'll print that. On the record, rye is cheap and the baker is not.
+{goto: interval}
+
+:: s1q2b
+ROSALIND [warm]: Three's the white, pet. Rye's two. She'll know if you buy the wrong one.
+{goto: interval}
+
+:: s1q2c
+ROSALIND [laugh]: Nearest to the truth all night, and I'm still marking it wrong.
+{goto: interval}
+
+:: s1q3
+ROSALIND [warm]: Question three, and it's for the carpenter. The fountain in Fountain Square needs how many pipe fittings?
+>> CHOICE
+- "Four." → {set: quiz_q3}; goto s1q3a
+- "Two. Dunmore's say the rest are spoken for." → goto s1q3b
+- "Two hundred." → goto s1q3c
+
+:: s1q3a
+KASIMIR [neutral]: Four. (taps the table twice) Wrote it on a plank.
+MOSS [engine_ear]: More fountain.
+{goto: scoring}
+
+:: s1q3b
+KASIMIR [neutral]: They're not spoken for.
+ROSALIND [warm]: Two's what Barney's got. It isn't what the fountain wants, pet.
+{goto: scoring}
+
+:: s1q3c
+KASIMIR [sheepish]: Two hundred is the Fund. Coins. Not fittings.
+ROSALIND [laugh]: Kasimir's explaining. Mark that down, Sable. First time since March.
+{goto: scoring}
+
+:: set2
+ROSALIND [warm]: Three questions. This week's are about people. Gently.
+ROSALIND [warm]: Question one. A gentleman in a long grey car offered the Fellow fifty coins a week. In return for what?
+>> CHOICE
+- "Carrying Ms. Delacroix's folder." → goto s2q1b
+- "Telling him what Monde needs, over coffee." → {set: quiz_q1}; goto s2q1a
+- "Standing very still on his bonnet." → goto s2q1c
+
+:: s2q1a
+SABLE [ink_smudge]: Coffee. Weekly. Honest opinions, particularly the unflattering ones. I'd pay for the unflattering ones myself.
+{goto: s2q2}
+
+:: s2q1b
+ROSALIND [knowing_look]: That's Delacroix's job, and from what I hear she'd say it's heavy.
+{goto: s2q2}
+
+:: s2q1c
+MOSS [engine_ear]: Bilge.
+ROSALIND [laugh]: The bonnet had an occupant already. Which brings me to question two.
+{goto: s2q2}
+
+:: s2q2
+ROSALIND [warm]: Which of Monde's residents stepped onto that bonnet before the car had stopped?
+>> CHOICE
+- "Bastien." → {set: quiz_q2}; goto s2q2a
+- "Old Moss, looking for the gap." → goto s2q2b
+- "The bronze heron, on one leg." → goto s2q2c
+
+:: s2q2a
+SABLE [ink_smudge]: Left one paw print on the grey paint. I've considered a front page.
+{goto: interval}
+
+:: s2q2b
+MOSS [neutral]: Mind the gap. (pause) There isn't one.
+ROSALIND [laugh]: You'll get no argument from me, Moss. You're still wrong.
+{goto: interval}
+
+:: s2q2c
+HOLLIS [grumble]: It's cast bronze. It does not step. It is not on the timetable.
+{goto: interval}
+
+:: s2q3
+ROSALIND [warm]: Question three. Ms. Delacroix says her door is on the second floor of which building?
+>> CHOICE
+- "The Town Hall." → goto s2q3b
+- "The Gull & Anchor." → {set: quiz_q3}; goto s2q3a
+- "The clocktower. Third stair." → goto s2q3c
+
+:: s2q3a
+ROSALIND [knowing_look]: Second floor. Over my head, weekdays. I couldn't say what she types. Between us.
+SABLE [coffee_stare]: She types late. I've counted.
+{goto: scoring}
+
+:: s2q3b
+ROSALIND [warm]: Edwina has the Town Hall and a tin of lamp wicks. No spare floor, pet.
+{goto: scoring}
+
+:: s2q3c
+HOLLIS [watch_check]: The third stair strikes a flat G. It does not strike second floors.
+{goto: scoring}
+
+:: set3
+[[if !flag.quiz_bastien_joke_seen]]
+N: Before the first question, there's a commotion by the long table. Tib has appeared with the team sheet and a pencil nearly as long as his arm. Bastien sits on a stool by the stove, washing a paw, and looks as if he would like it noted that he came of his own accord.
+TIB [gap_grin]: Moss and Kasimir are a man short. So I put Bastien down. Obviously.
+TIB [neutral]: I did it properly. Census number two hundred and twelve. Resident.
+ROSALIND [knowing_look]: (puts down the glass) Tib. Bastien is a cat.
+TIB [neutral]: The census says every resident's an agent. Mum says Pell counts everyone. Bastien's an agent. Obviously he's counted. I read the form.
+ROSALIND [warm]: (looks at the cat, then at the ceiling) He's a person for quiz purposes only. Ruling's final. He answers if he wants to.
+SABLE [ink_smudge]: (already writing) I'll print a correction. "The Lantern regrets that the census count of two hundred and ten omitted the cat."
+N: Bastien finishes the paw and does not look at anybody.
+{set: quiz_bastien_joke_seen}
+[[else]]
+N: Bastien is back on his stool by the stove. Tib has written 212 on the team sheet again, in ink this time.
+[[end]]
+ROSALIND [warm]: Three questions, all about the tower. Pens ready.
+ROSALIND [warm]: Question one. How many steps up the clocktower to the works under the face?
+>> CHOICE
+- "Fourteen, with a drainpipe." → goto s3q1b
+- "Four-seventeen." → goto s3q1c
+- "Ninety-six." → {set: quiz_q1}; goto s3q1a
+
+:: s3q1a
+TIB [gap_grin]: Ninety-six! I counted twice. Obviously.
+{goto: s3q2}
+
+:: s3q1b
+TIB [surprised]: That's the alley! Fourteen steps and a drainpipe is the ALLEY!
+{goto: s3q2}
+
+:: s3q1c
+HOLLIS [watch_check]: That is a time, not a number of steps. I'll allow that it is a time.
+{goto: s3q2}
+
+:: s3q2
+ROSALIND [warm]: Question two. Which stair in the tower strikes a flat G?
+>> CHOICE
+- "The ninety-sixth." → goto s3q2b
+- "The third." → {set: quiz_q2}; goto s3q2a
+- "The one Hollis stands on." → goto s3q2c
+
+:: s3q2a
+N: In her corner, June finds the note on the fiddle on the first go and holds it, humming.
+JUNE [humming]: Flat G. Mm. Lovely stair. Anyway.
+{goto: interval}
+
+:: s3q2b
+ROSALIND [laugh]: The ninety-sixth is the top. At the top you're mostly out of breath, pet. No note.
+{goto: interval}
+
+:: s3q2c
+HOLLIS [grumble]: I stand on nothing in that tower. I have been up it once. It was on time.
+{goto: interval}
+
+:: s3q3
+ROSALIND [warm]: Question three. Margo found the lantern stamp on part of the clock. Which part?
+>> CHOICE
+- "The underside of the reading-room table." → goto s3q3b
+- "Bertrand's loupe." → goto s3q3c
+- "The escapement cover." → {set: quiz_q3}; goto s3q3a
+
+:: s3q3a
+SABLE [ink_smudge]: The escapement cover. Margo said write that down. Tib wrote it on his arm. I took it from the arm.
+{goto: scoring}
+
+:: s3q3b
+ROSALIND [warm]: That's the first stamp. Different question, pet. Right town, wrong lantern.
+{goto: scoring}
+
+:: s3q3c
+KASIMIR [neutral]: Loupe's glass. Doesn't take a stamp.
+{goto: scoring}
+
+:: interval
+ROSALIND [warm]: Interval! Teas up. June, pet, if you would.
+N: June takes the stool by the stove, tucks the fiddle under her chin, and says "One, two," to nobody. The first bar is low and slow. Then it picks up and walks.
+N: The room goes quiet in the good way. Moss taps a boot. Kasimir watches the bow. Hollis checks his watch and, for once, doesn't mind how long it takes.
+N: By the fire, Rook keeps his eyes on the flames. At the end of the tune his boot has been tapping for a quarter of a minute without his knowing it. He notices. It stops.
+[[if day >= 23]]
+{goto: s3q3}
+[[elif day >= 16]]
+{goto: s2q3}
+[[else]]
+{goto: s1q3}
+[[end]]
+
+:: scoring
+ROSALIND [warm]: Pens down! Sable, Kasimir, hand them in.
+[[if (flag.quiz_q1 && flag.quiz_q2) || (flag.quiz_q1 && flag.quiz_q3) || (flag.quiz_q2 && flag.quiz_q3)]]
+{set: quiz_won}
+N: Roz reads the sheets aloud, slowly, for the drama. STOP PRESS (ON TIME) takes it by a head.
+ROSALIND [laugh]: Stop Press, with brackets! Prize is a pie on the house. Sable, stop crying into the proof.
+HOLLIS [watch_check]: Twenty-one fourteen. We won in good time.
+SABLE [ink_smudge]: On the record, I'd like it known I always knew we would.
+MOSS [neutral]: Slowest Boat. Lost. (pause) More quiz.
+{regard: rosalind +2}
+{regard: sable +2}
+{regard: hollis +2}
+{memory: rosalind, "Wednesday quiz. The Fellow's team, Stop Press (On Time), won. The room was full of laughing and the fire was warm and it was past ten before anyone remembered to go home. Pub's not quiet.", importance: 6}
+{memory: sable, "Quiz night at Roz's. The Fellow's team won. I wrote the headline in my head before the last answer. Hollis said we won in good time.", importance: 5}
+{memory: hollis, "Quiz at the Gull & Anchor, Wednesday. The Fellow's team won by a head. Twenty-one fourteen. I did not say late.", importance: 5}
+[[else]]
+{unset: quiz_won}
+N: Roz reads the sheets aloud. It's a close thing, which is to say it isn't.
+ROSALIND [laugh]: Slowest Boat takes it. Moss, you've won something. Don't look so alarmed.
+MOSS [neutral]: (looks at the pie) Hm. Ferry's faster.
+HOLLIS [grumble]: Twenty-one fourteen. We lost in good time.
+SABLE [ink_smudge]: Next week. Same team. Fewer brackets.
+{memory: rosalind, "Wednesday quiz. The Fellow's team lost to Moss and Kasimir. Nobody minded. The snug was half full and the fire was warm. Pub's not quiet.", importance: 5}
+{memory: sable, "Quiz night at Roz's. The Fellow's team lost to the Slowest Boat. It was funnier than it should have been.", importance: 4}
+{memory: hollis, "Quiz at the Gull & Anchor, Wednesday. We lost. I'd like it entered that the losing was on time.", importance: 4}
+[[end]]
+{pillar: spirit +1}
+N: Roz puts a kettle on at the end of the bar. Rook is gone from the fire, and the chair is turned back to face the room.
+{set: quiz_night_seen}
+```
+
+---
+
 ### 13.3a Flags and new canon (Acts I–II)
 
 #### Flags set or read in S01–S13
@@ -6545,6 +7078,10 @@ N: Nettie, on her ledge, watches you all the way to the wall. Bru raises the wre
 | `sc_quarry_won` / `sc_quarry_lost` | Outcome of `sc_quarry_first`. | S13 | Rook, Bru, Nettie, Dex, Dom cards |
 | `quarry_jars_returned`, `quarry_odile_jar`, `quarry_jars_left` | What happened to the Saturday jars after a win. | S13 | Rook card (`quarry_odile_jar` unlocks a Rook line about Odile), Nell, Odile, Roz cards |
 | `rook_asked_who_pays` | The Fellow asked Rook who pays him. | S13 | Rook AI card |
+| `odile_asked_saturday`, `promised_odile` | Odile asked the Fellow to be there on Saturday / they promised. | `wk_saturday_ask` | `wk_saturday_round` |
+| `saturday_round_seen`, `stood_with_odile` | The Fellow has seen a Saturday round / has stood in the bakery door once. | `wk_saturday_round` | its own later visits; `wk_saturday_ask` |
+| `round_stood` / `round_paid` / `round_watched` | What the Fellow did at the last round they saw (cleared before each choice). | `wk_saturday_round` | the next round; Sunday's Lantern |
+| `quiz_night_seen`, `quiz_q1`–`quiz_q3`, `quiz_won`, `quiz_bastien_joke_seen` | Roz's quiz: played once, this week's right answers, the last result, the census joke told. | `wk_pub_quiz` | its own later nights; Thursday's Lantern |
 
 **Persona-card flags this section does not set** (named so the writers of §12.2 and §13.4 know they are theirs): `pell_retiring`, `pell_asked_player`, `charter_half`, `hollis_bertrand_mended`, `claudine_written`, `bakery_ovens_fixed`, `school_saved`, `june_staying`, `tollmen_broken`, `rook_turned`.
 

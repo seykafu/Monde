@@ -36,6 +36,9 @@ const BEATS = {
   social: ['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's07a_chime_runs', 's05_first_arrival',
     's06_good_coat', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']
 } as const;
+// §13.2's weekly rhythm, which every script follows the Next line to: Odile's ask (Day 4), the Tollmen's round on the
+// Saturdays (5, 12, 19) and Roz's quiz on the Wednesdays (9, 16, 23).
+const WEEKLY = ['wk_saturday_ask', 'wk_saturday_round', 'wk_pub_quiz', 'wk_saturday_round', 'wk_pub_quiz', 'wk_saturday_round', 'wk_pub_quiz'];
 
 describe('the Spring soak bot', () => {
   const shares: number[] = [];
@@ -61,7 +64,8 @@ describe('the Spring soak bot', () => {
       expect(res.issues).toEqual([]);
       // Day 1 is one walk (S01a → S01b → S01c), so the first objective comes after the cottage.
       expect(res.objectives.length).toBeGreaterThanOrEqual(20);
-      expect(res.played).toEqual(BEATS[script]);
+      expect(res.played.filter(id => !id.startsWith('wk_'))).toEqual(BEATS[script]);
+      expect(res.played.filter(id => id.startsWith('wk_'))).toEqual(WEEKLY);
       for (const flag of ['s10c_done', 'spring_poll_taken', 'option_known', 'pell_confessed', 'bloom_fair_closed']) expect(res.flags, flag).toContain(flag);
       // Every dawn saved; the strong and social players reload every dawn save (and a few afternoon saves).
       expect(res.saves).toBe(25);

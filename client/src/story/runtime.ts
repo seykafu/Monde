@@ -47,6 +47,11 @@ export type StoryStep =
 
 interface Frame { scene: CompiledScene; pc: number }
 
+export interface RuntimeOptions extends StoryDiagnostics {
+  /** A repeating scene's day (`repeats: true`): appended to every cue key, so its effects apply again each time. */
+  occurrence?: string;
+}
+
 /** One op per next(): even a malformed jump cycle cannot lock up the presentation thread. */
 export class StoryRuntime {
   private frame: Frame;
@@ -59,14 +64,16 @@ export class StoryRuntime {
   private ended?: Extract<StoryStep, { kind: "end" }>;
   private readonly dev: boolean;
   private readonly warn: (message: string) => void;
+  private readonly occurrence?: string;
 
   constructor(
     readonly scene: CompiledScene, readonly flags: FlagStore, readonly host: StoryHost,
-    private readonly libraries: readonly CompiledScene[] = [], options: StoryDiagnostics = {},
+    private readonly libraries: readonly CompiledScene[] = [], options: RuntimeOptions = {},
   ) {
     this.frame = { scene, pc: 0 };
     this.dev = options.dev ?? flags.dev;
     this.warn = options.warn ?? flags.warn;
+    this.occurrence = options.occurrence;
   }
 
   private warning(message: string): void { if (this.dev) this.warn(message); }
@@ -88,7 +95,10 @@ export class StoryRuntime {
     };
   }
 
-  private async dispatch(cue: HostCue, key: string): Promise<void> {
+  private async dispatch(cue: HostCue, cueKey: string): Promise<void> {
+    // A repeating scene (§13.2's weekly rhythm) plays its cues afresh each day: the ledger, the event log and a
+    // Scuffle's encounter key all key on this.
+    const key = this.occurrence ? `${cueKey}@${this.occurrence}` : cueKey;
     const handler = this.host.handlers?.[cue.cmd] as
       ((cue: HostCue, context: CueContext) => MaybePromise<readonly StoryLine[] | void>) | undefined;
     let lines: readonly StoryLine[] | void = undefined;

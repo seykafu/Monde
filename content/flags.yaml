@@ -97,6 +97,7 @@ flags:
   - moss_candidate
   - moss_spoke_debate
   - odile_apprentice
+  - odile_asked_saturday
   - odile_fille_hint_seen
   - olive_branch
   - option_kept_secret
@@ -129,6 +130,7 @@ flags:
   - project_failed
   - promised_first_week
   - promised_full_boat
+  - promised_odile
   - pz01_deferred
   - pz01_solved
   - pz03_deferred
@@ -145,6 +147,12 @@ flags:
   - quarry_jars_returned
   - quarry_known
   - quarry_odile_jar
+  - quiz_bastien_joke_seen
+  - quiz_night_seen
+  - quiz_q1
+  - quiz_q2
+  - quiz_q3
+  - quiz_won
   - recount_public
   - registered
   - remembered_chime
@@ -156,6 +164,9 @@ flags:
   - rook_first_talk
   - rook_track_open
   - rook_turned
+  - round_paid
+  - round_stood
+  - round_watched
   - roz_hired_help
   - run_no
   - run_notyet
@@ -192,6 +203,7 @@ flags:
   - sat_with_felix
   - sat_with_nell
   - sat_with_roz
+  - saturday_round_seen
   - saw_tollmen_idle
   - sc_quarry_lost
   - sc_quarry_won
@@ -203,6 +215,7 @@ flags:
   - station_hill_open
   - station_open
   - station_project_active
+  - stood_with_odile
   - teo_ines_dating
   - tib_trail_done
   - told_vane_town

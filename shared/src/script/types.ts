@@ -84,6 +84,12 @@ export interface SceneHeader {
   music: string;
   cast: string[];
   sets: string[];
+  /**
+   * The weekly rhythm (§13.2: Saturday's collection, Wednesday's quiz): the scene isn't done for good when it ends.
+   * It plays again on any later day its trigger holds (the trigger names the weekday), at most once a day, and its
+   * durable effects apply again each time.
+   */
+  repeats?: true;
 }
 
 /** `kind: insert_library` (§13.5): a bag of `:: label` blocks other scenes splice in with `{insert: label}`. */

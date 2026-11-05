@@ -57,3 +57,22 @@ it("defers declined summons and clears stale queued scenes on movement", async (
   const local = new StoryDirector([scene([])], flags(), { context: () => game });
   local.refresh(); game.place = "elsewhere"; expect(await local.next()).toBeNull();
 });
+
+it("plays a repeating scene once a day its trigger holds, with fresh cue keys each time (the weekly rhythm)", async () => {
+  const game = context(); game.weekday = "sat"; game.day = 5;
+  const regard = vi.fn();
+  const quiz = scene([{ op: "cmd", line: 1, cmd: { cmd: "regard", resident: "roz", delta: 2 } }], "wk_pub_quiz");
+  quiz.header!.repeats = true; quiz.header!.trigger = "weekday == 'sat'";
+  const director = new StoryDirector([quiz], flags(), { context: () => game, handlers: { regard: (_cue, ctx) => { regard(ctx.key); } } });
+  const play = async () => { for (let n = 0; n < 6; n++) if ((await director.next())?.kind === "end") return true; return false; };
+  expect(await play()).toBe(true);
+  expect(director.serialize().completed).toEqual(["wk_pub_quiz@5"]);
+  // Done for Day 5: it doesn't play twice in a day.
+  director.refresh(); expect(director.queued).toEqual([]);
+  // Not on a Sunday; back the next Saturday, its cue keyed afresh.
+  Object.assign(game, { day: 6, weekday: "sun" }); director.refresh(); expect(director.queued).toEqual([]);
+  Object.assign(game, { day: 12, weekday: "sat" }); director.refresh(); expect(director.queued).toEqual(["wk_pub_quiz"]);
+  expect(await play()).toBe(true);
+  expect(director.serialize().completed).toEqual(["wk_pub_quiz@5", "wk_pub_quiz@12"]);
+  expect(regard.mock.calls.map(c => c[0])).toEqual(["wk_pub_quiz:0@5", "wk_pub_quiz:0@12"]);
+});

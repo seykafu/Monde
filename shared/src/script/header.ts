@@ -28,6 +28,8 @@ const SceneHeaderSchema = z
     music: Id,
     cast: z.array(Id),
     sets: z.array(Id),
+    // The weekly rhythm (§13.2): the scene plays again on any later day its trigger holds, at most once a day.
+    repeats: z.boolean().optional(),
   })
   .strict();
 
@@ -101,6 +103,7 @@ export function parseHeader(
     music: h.music,
     cast: h.cast,
     sets: h.sets,
+    ...(h.repeats ? { repeats: true } : {}),
   };
   return { header, keyLines };
 }

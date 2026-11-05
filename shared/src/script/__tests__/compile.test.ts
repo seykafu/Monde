@@ -85,6 +85,13 @@ describe("validation", () => {
     expect(errorsOf("[[if day > 4]]\n{set: t_done}\n[[end]]", header)).toEqual([]);
   });
 
+  it("lets a repeating scene (the weekly rhythm) wait on another scene's flag, and keeps `repeats` in its header", () => {
+    const header = HEADER.replace('trigger: "day >= 3"', 'trigger: "!flag.t_done && day >= 3"').replace("sets: []", "sets: []\nrepeats: true");
+    expect(errorsOf("N: x", header)).toEqual([]);
+    expect(ok("N: x", header).header?.repeats).toBe(true);
+    expect(ok("N: x").header?.repeats).toBeUndefined();
+  });
+
   it("checks speakers and their portrait expressions", () => {
     expect(errorsOf("PELL [ledger_stare]: x\nBRU [angry]: y\nTIB [thinking]: z")).toEqual([]);
     expect(errorsOf("PELL [gruff]: x\nBRU [ledger_stare]: y\nPEL [warm]: z\nGHOST: boo")).toEqual([

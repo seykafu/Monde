@@ -5,7 +5,7 @@ import { placeName } from '../../world/player';
 import { zones } from '../../world/zones';
 import { FlagStore } from '../flags';
 import { CLOSING_WARNING_MINUTES, SCENE_REASONS, catchableToday, closingToast, storyHint, upcomingBeat, zoneRoute } from '../hint';
-import { minutes } from '../triggers';
+import { minutes, occurrence } from '../triggers';
 import { isFerryDay } from '../../town/migration';
 import { buildStoryContext, emptyLedger, type WorldNow } from '../host';
 import { SPRING_SCENES } from '../session';
@@ -111,9 +111,12 @@ describe('between beats: the next beat on a later day', () => {
     });
   });
 
-  it('on Day 4 points at the fountain on Day 5, and after Pell’s confession at the Bloom Fair', () => {
+  it('on Day 4 points at the fountain on Day 5, and after Pell’s confession at the quiz and then the Bloom Fair', () => {
     expect(next({ day: 4, minute: 600, zone: 'market_row', place: '' }, [...S01, 's02_done', 's03_done'])).toMatchObject({ sceneId: 's04_water_again', day: 5, dayText: 'Tomorrow' });
-    expect(next({ day: 19, minute: 600, zone: 'market_row', place: '' }, [...TO_S07, 's08_done', 's09_done'])).toMatchObject({ sceneId: 's10a_bloom_open', day: 25, dayText: 'Day 25', summoned: true });
+    // §13.2's weekly rhythm comes first: Wednesday's quiz on Day 23 (wk_pub_quiz), then the fair.
+    expect(next({ day: 19, minute: 600, zone: 'market_row', place: '' }, [...TO_S07, 's08_done', 's09_done'])).toMatchObject({ sceneId: 'wk_pub_quiz', day: 23, dayText: 'Day 23', when: 'Day 23, 20:00–22:00' });
+    expect(next({ day: 19, minute: 600, zone: 'market_row', place: '' }, [...TO_S07, 's08_done', 's09_done'], [occurrence('wk_pub_quiz', 23)]))
+      .toMatchObject({ sceneId: 's10a_bloom_open', day: 25, dayText: 'Day 25', summoned: true });
   });
 
   it('is nothing once the Spring’s last scene is done', () => {
@@ -136,7 +139,7 @@ describe('between beats: the next beat on a later day', () => {
         // Play what's open now (as the director would, the player standing there).
         for (const scene of catchableToday(SPRING_SCENES, ctx, f, completed)) {
           if (minute < minutes(scene.scene.header!.time.start)) continue;
-          completed.add(scene.scene.id);
+          completed.add(scene.scene.header!.repeats ? occurrence(scene.scene.id, day) : scene.scene.id);
           for (const flag of scene.scene.header!.sets) f.set(flag);
         }
       }
@@ -144,7 +147,8 @@ describe('between beats: the next beat on a later day', () => {
     expect(hours).toBeGreaterThan(800);
     expect(gaps).toEqual([]);
     expect(f.has('s10c_done')).toBe(true);
-    expect([...completed]).toEqual(['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's05b_empty_boat', 's06_good_coat',
-      's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']);
+    expect([...completed]).toEqual(['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 'wk_saturday_ask', 's04_water_again',
+      'wk_saturday_round@5', 's05b_empty_boat', 'wk_pub_quiz@9', 's06_good_coat', 'wk_saturday_round@12', 's07b_chime_loan', 'wk_pub_quiz@16',
+      's08_option', 's09_pell_confession', 'wk_saturday_round@19', 'wk_pub_quiz@23', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']);
   });
 });
