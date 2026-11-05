@@ -21,13 +21,29 @@ describe('25-day soak (MVP Days 1–25, GDD §6.2 narrative)', () => {
     expect(strong.days[3]).toMatchObject({ day: 4, weekday: 'Fri', outcome: 'appeal_below_35' });
   });
 
-  it('the strong week raises the Pillars about 10 on average by Day 8, and Appeal crosses 35 then', () => {
+  it('this strong week (the first week plus the clocktower) raises the Pillars about 10 on average by Day 8, past 35 for the Day 8 boat', () => {
     const d1 = strong.days[0]!, d8 = strong.days[7]!;
     const gain = (['prosperity', 'safety', 'spirit', 'charm'] as const).reduce((sum, p) => sum + d8.pillars[p] - d1.pillars[p], 0) / 4;
     expect(gain).toBeGreaterThan(8);
     expect(gain).toBeLessThan(12);
-    expect(strong.days[6]!.appeal).toBeLessThan(ARRIVAL_APPEAL);
+    expect(strong.days[5]!.appeal).toBeLessThan(ARRIVAL_APPEAL);
+    expect(strong.days[6]!.appeal).toBeGreaterThanOrEqual(ARRIVAL_APPEAL);
     expect(d8.appeal).toBeGreaterThanOrEqual(ARRIVAL_APPEAL);
+  });
+
+  it("§6.2's worked example closes: fountain, bakery, a Scuffle win, early Marks and steady work give Appeal about 36–38 over Days 7–9", () => {
+    const week = runSoak('firstWeek');
+    const d1 = week.days[0]!, d8 = week.days[7]!;
+    const gain = (['prosperity', 'safety', 'spirit', 'charm'] as const).reduce((sum, p) => sum + d8.pillars[p] - d1.pillars[p], 0) / 4;
+    // "about 5–6 points on average"
+    expect(gain).toBeGreaterThan(5);
+    expect(gain).toBeLessThan(6.5);
+    for (const d of week.days.slice(6, 9)) {
+      expect(d.appeal).toBeGreaterThanOrEqual(ARRIVAL_APPEAL);
+      expect(d.appeal).toBeLessThan(38.5);
+    }
+    expect(week.days[5]!.appeal).toBeLessThan(ARRIVAL_APPEAL);
+    expect(week.firstArrivalDay).toBe(8);
   });
 
   it('arrivals only ever land on sailing days, inside the free homes', () => {

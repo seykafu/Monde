@@ -384,14 +384,20 @@ YouthAppeal = 0.35·Prosperity + 0.30·Charm + 0.25·Spirit + 0.10·Safety
               + 10 (station open) + 5 (ferry daily) + min(10, 0.5 · open_jobs)
 ElderAppeal = 0.35·Safety + 0.25·Spirit + 0.20·Charm + 0.20·Prosperity
               + 10 (clinic open) + 5 (ferry daily) + 3 (streetlights done)
-Momentum    = min(10, 0.6 · mean 7-day gain across the four Pillars)    // word of mouth
+Momentum    = min(10, 1.4 · mean 7-day gain across the four Pillars)    // word of mouth
 Appeal      = (YouthAppeal + ElderAppeal) / 2 + Momentum
 ```
 
 - Day 1: Youth 22.3, Elder 24.6, Momentum 0, so **Appeal ≈ 23**.
 - **Arrivals begin at Appeal ≥ 35.** A strong first week (fountain, bakery, a Scuffle win, early Marks,
-  steady community work) raises the Pillars about 10–12 points on average. With Momentum that's about
-  35–37 around Day 7–9, which triggers S05 "First Arrival."
+  steady community work) raises the Pillars about 5–6 points on average: the fountain's Charm +6 and Spirit +2,
+  the bakery's Prosperity +3, a Scuffle win's Safety +1, four Marks' Charm +4, a week of work (about Charm +3,
+  Spirit +2) and Spirit's drift. That lifts the two halves about +5.8, and Momentum adds about +8, so Appeal is
+  about 36–38 over Days 7–9 and the Day 8 boat brings S05 "First Arrival." A week that finishes both early
+  Projects reaches about 35; a week of story alone stays near 23.
+- **Momentum's factor** is 1.4. It was 0.6 until the Spring playtest, when the week above came to about 32.5 and
+  the Spring bot's social player (Marks, Favors and talk, no Projects) never saw an arrival. The cap of 10 is unchanged: word of mouth comes
+  sooner, not bigger, and it fades once the town stops changing.
 - The **arrival mix** follows the two audiences: the chance that an arriving household is
   youth-leaning (young adults, young families, apprentices) is `YouthAppeal / (YouthAppeal + ElderAppeal)`.
   Archetype selection is in Appendix A.3.

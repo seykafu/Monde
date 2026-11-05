@@ -80,16 +80,16 @@ describe('Momentum (§6.2)', () => {
     return { ...town, pillars: now, history };
   };
 
-  it('is 0.6 × the mean 7-day gain across the four Pillars', () => {
-    const now = plus(DAY1_PILLARS, { prosperity: 10, safety: 4, spirit: 8, charm: 15 });
+  it('is 1.4 × the mean 7-day gain across the four Pillars', () => {
+    const now = plus(DAY1_PILLARS, { prosperity: 5, safety: 2, spirit: 4, charm: 7 });
     // Day 10: the history holds Days 3–10; the base is Day 3's dawn.
     const town = withHistory(10, 3, DAY1_PILLARS, now);
     expect(momentumBase(town.history, 10)?.day).toBe(3);
-    expect(sevenDayGains(town)).toEqual({ prosperity: 10, safety: 4, spirit: 8, charm: 15 });
+    expect(sevenDayGains(town)).toEqual({ prosperity: 5, safety: 2, spirit: 4, charm: 7 });
     const a = computeAppeal(town);
-    expect(a.meanGain7).toBeCloseTo(9.25);
-    expect(a.momentum).toBeCloseTo(5.55);
-    expect(a.appeal).toBeCloseTo((youthAppeal(now) + elderAppeal(now)) / 2 + 5.55);
+    expect(a.meanGain7).toBeCloseTo(4.5);
+    expect(a.momentum).toBeCloseTo(6.3);
+    expect(a.appeal).toBeCloseTo((youthAppeal(now) + elderAppeal(now)) / 2 + 6.3);
   });
 
   it('only counts the last seven days', () => {
@@ -100,22 +100,23 @@ describe('Momentum (§6.2)', () => {
     const now = plus(old, { spirit: 7 });
     // Day 20 measures from Day 13: Charm's rise was before it; Spirit +7 since.
     expect(momentumBase(history, 20)?.day).toBe(13);
-    expect(computeAppeal({ ...town, history, pillars: now }).momentum).toBeCloseTo(0.6 * 7 / 4);
+    expect(computeAppeal({ ...town, history, pillars: now }).momentum).toBeCloseTo(1.4 * 7 / 4);
   });
 
   it('measures from Day 1 during the first week', () => {
     const town = withHistory(4, 1, DAY1_PILLARS, plus(DAY1_PILLARS, { charm: 8 }));
     expect(momentumBase(town.history, 4)?.day).toBe(1);
-    expect(computeAppeal(town).momentum).toBeCloseTo(0.6 * 2);
+    expect(computeAppeal(town).momentum).toBeCloseTo(1.4 * 2);
   });
 
   it('is capped at 10', () => {
     expect(momentumFrom({ prosperity: 20, safety: 20, spirit: 20, charm: 20 })).toBe(10);
-    expect(momentumFrom({ prosperity: 16, safety: 16, spirit: 17, charm: 17 })).toBeCloseTo(9.9);
+    expect(momentumFrom({ prosperity: 7, safety: 7, spirit: 7, charm: 7 })).toBeCloseTo(9.8);
+    expect(momentumFrom({ prosperity: 8, safety: 7, spirit: 7, charm: 7 })).toBe(10);
   });
 
   it('nets losses against gains, and is never negative (GDD-GAP reading)', () => {
-    expect(momentumFrom({ prosperity: 6, safety: -2, spirit: 0, charm: 0 })).toBeCloseTo(0.6);
+    expect(momentumFrom({ prosperity: 6, safety: -2, spirit: 0, charm: 0 })).toBeCloseTo(1.4);
     expect(momentumFrom({ prosperity: -8, safety: 0, spirit: -4, charm: 0 })).toBe(0);
   });
 

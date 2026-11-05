@@ -4,13 +4,14 @@
 //                 + 10 (station open) + 5 (ferry daily) + min(10, 0.5 · open_jobs)
 //   ElderAppeal = 0.35·Safety + 0.25·Spirit + 0.20·Charm + 0.20·Prosperity
 //                 + 10 (clinic open) + 5 (ferry daily) + 3 (streetlights done)
-//   Momentum    = min(10, 0.6 · mean 7-day gain across the four Pillars)    // word of mouth
+//   Momentum    = min(10, 1.4 · mean 7-day gain across the four Pillars)    // word of mouth
 //   Appeal      = (YouthAppeal + ElderAppeal) / 2 + Momentum
 //
 // Day 1: Youth 22.3, Elder 24.6, Momentum 0, Appeal 23.45.
 import { mapPillars, meanPillars, roundPillar, HISTORY_DAYS, type PillarSnapshot, type Pillars, type TownFlags, type TownState } from './pillars';
 
-export const MOMENTUM_FACTOR = 0.6;
+/** §6.2, retuned from 0.6 after the Spring playtest so a strong first week passes 35 by Day 7 (see momentumFrom). */
+export const MOMENTUM_FACTOR = 1.4;
 export const MOMENTUM_MAX = 10;
 /** §6.3, the `school` row: 20 pupils by Day 51 gives YouthAppeal +5. */
 export const SCHOOL_SAVED_YOUTH_BONUS = 5;
@@ -71,10 +72,13 @@ export const sevenDayGains = (state: Pick<TownState, 'day' | 'pillars' | 'histor
  *    that rose: word of mouth is about the town as a whole.
  *  - Momentum is never negative. The glossary calls it "the word-of-mouth bonus to Appeal from recent Pillar
  *    gains", so a falling town gets no Momentum rather than a penalty: max(0, ·).
- * Note that §6.2's worked example ("raises the Pillars about 10–12 points on average. With Momentum that's
- * about 35–37") doesn't close under either reading of the window: +10–12 gives about 39–43 read as written,
- * or 34–36.5 read as a daily mean. Either way the first arrival lands on the first ferry day on or after D7
- * (D8) for a strong first week; see the soak test.
+ *
+ * The factor was 0.6, and §6.2's own strong first week (fountain, bakery, a Scuffle win, early Marks, steady
+ * community work: a mean gain of about 5.6 with these rewards) came to about 32.5, short of the 35 arrivals
+ * need. At 1.4 the same week comes to about 36–38 over Days 7–9 (soak.test.ts, the `firstWeek` run), a week that finishes both early Projects comes to about 35, and
+ * a story-only week stays near 23.5. The cap of 10 is unchanged, so the factor makes the word of mouth arrive
+ * sooner without raising the ceiling. The first arrival lands on the first ferry day on or after D7 (D8) for a
+ * strong first week; see the soak test.
  */
 export const momentumFrom = (gains7: Pillars): number =>
   Math.min(MOMENTUM_MAX, Math.max(0, MOMENTUM_FACTOR * meanPillars(gains7)));

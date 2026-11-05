@@ -67,6 +67,20 @@ const STRONG: Record<number, Act[]> = {
   24: [gain('riddle', { charm: 1 }, 'WF-2')]
 };
 
+/**
+ * §6.2's worked example exactly as written, and nothing else: the bakery and the fountain, a Scuffle win (S03's
+ * {pillar: safety +1}; the tutorial bout itself gives no Scuffle Safety), four early Marks and steady community work.
+ */
+const FIRST_WEEK: Record<number, Act[]> = {
+  1: [gain('riddle', { charm: 1 }, 'OQ-1')],
+  2: [gain('riddle', { charm: 1 }, 'OQ-2')],
+  3: [gain('story', { safety: 1 }, 'S03 Tolls')],
+  4: [gain('project', { prosperity: 3 }, 'bakery_ovens')],
+  5: [gain('riddle', { charm: 1 }, 'OQ-3')],
+  6: [gain('project', { charm: 6, spirit: 2 }, 'fountain')],
+  7: [gain('riddle', { charm: 1 }, 'OQ-4')]
+};
+
 /** A passive player: no tasks, Projects or riddles. Only the beats that play regardless. */
 const PASSIVE: Record<number, Act[]> = {
   14: [gain('story', { spirit: 2, charm: 1 }, 'S07 Quarter Chime (B, the borrowed chime)')]
@@ -97,7 +111,7 @@ export interface SoakResult {
   final: TownState;
 }
 
-export const SCENARIOS = { strong: STRONG, passive: PASSIVE } as const;
+export const SCENARIOS = { strong: STRONG, firstWeek: FIRST_WEEK, passive: PASSIVE } as const;
 export type ScenarioName = keyof typeof SCENARIOS;
 
 /** Days 1–25: dawn (from Day 2), arrivals booked in at 08:00, then the day's events. */
@@ -127,7 +141,7 @@ export const runSoak = (name: ScenarioName, lastDay = 25): SoakResult => {
       freeHomes: s.homes.restored_free, households: arriving, outcome, census: s.census, fund: s.fund
     });
     s = setTollmenLevelMax(s, tollmenBaseline(day));
-    const acts = [...(STORY[day] ?? []), ...(script[day] ?? []), ...(name === 'strong' ? routine(day) : [])];
+    const acts = [...(STORY[day] ?? []), ...(script[day] ?? []), ...(name === 'passive' ? [] : routine(day))];
     for (const act of acts) s = act(s);
   }
   return { days, firstArrivalDay, households, final: s };

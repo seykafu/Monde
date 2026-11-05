@@ -61,7 +61,8 @@ describe('G-02 25-day mock soak', () => {
     const kept = SEEDS.map(seed => runMigrationSoak('lapsed', 25, { seed, lastChance: true }));
     for (const r of [...strongs, ...lapsed, ...kept]) checkRules(r);
     expect(strongs.every(r => r.households.length === 6 && r.departures === 0)).toBe(true);
-    expect(lapsed.every(r => r.households.length === 2)).toBe(true);
+    // A household in each home the lapsed player readied (the Sunday house and the two it paid for) before it stopped.
+    expect(lapsed.every(r => r.households.length === 3)).toBe(true);
     const lost = lapsed.reduce((s, r) => s + r.departures, 0);
     expect(lost).toBeGreaterThan(0);
     expect(lost).toBeLessThan(lapsed.reduce((s, r) => s + r.people, 0) / 2);

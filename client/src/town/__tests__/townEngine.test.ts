@@ -35,7 +35,7 @@ describe('runDawn', () => {
     // Appeal on the drifted Pillars, Momentum from Day 1.
     expect(report.appeal.youth).toBeCloseTo(22.35);
     expect(report.appeal.elder).toBeCloseTo(24.65);
-    expect(report.appeal.momentum).toBeCloseTo(0.6 * 0.05);
+    expect(report.appeal.momentum).toBeCloseTo(1.4 * 0.05);
     // Wednesday: no sailing.
     expect(report.arrivals).toMatchObject({ eligible: false, households: 0, outcome: 'no_sailing' });
     // Day 1's books: 123 households.

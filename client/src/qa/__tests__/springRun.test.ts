@@ -33,7 +33,7 @@ const BEATS = {
     's06_good_coat', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll'],
   lazy: ['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's05b_empty_boat', 's06_good_coat',
     's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll'],
-  social: ['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's07a_chime_runs', 's05b_empty_boat',
+  social: ['s01a_ferry', 's01b_walk', 's01c_cottage', 's02_marks', 's03_tolls', 's04_water_again', 's07a_chime_runs', 's05_first_arrival',
     's06_good_coat', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']
 } as const;
 
@@ -94,6 +94,17 @@ describe('the Spring soak bot', () => {
       expect(res.favors.some(f => f.id.startsWith('dream_') && f.status === 'completed')).toBe(true);
       // Bertrand's clock runs in this script (S07a), and with it his dream.
       expect(res.dreams.find(d => d.resident === 'bertrand')).toMatchObject({ stage: 4, total: 4 });
+    });
+
+    // MVP H3 (Appeal 35 by Day 10): a player who talks, does Favors and reads Marks gets there and meets the first
+    // arrival in week two; a story-only player doesn't (GDD §6.2, Momentum 1.4).
+    if (script === 'social') it('reaches Appeal 35 by Day 10 without building, and meets the first arrival', () => {
+      expect(Math.max(...res.days.filter(d => d.day <= 10).map(d => d.appeal))).toBeGreaterThanOrEqual(35);
+      expect(res.arrivals).toBeGreaterThan(0);
+    });
+    if (script === 'lazy') it('stays well short of 35 on the story alone', () => {
+      expect(Math.max(...res.days.map(d => d.appeal))).toBeLessThan(30);
+      expect(res.arrivals).toBe(0);
     });
 
     if (script === 'social') it('does the Favors it is asked, including a chore at a home upstairs', () => {
