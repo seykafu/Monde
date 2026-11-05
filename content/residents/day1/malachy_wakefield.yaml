@@ -97,13 +97,6 @@ relationships:
       note: Wife; teases him about the unfinished wall.
     }
   - {
-      id: klara_fairweather,
-      affinity: 12,
-      trust: 8,
-      tag: curious,
-      note: Proofreads his Lantern notices and corrects his spelling.
-    }
-  - {
       id: signe_starling,
       affinity: 8,
       trust: 6,

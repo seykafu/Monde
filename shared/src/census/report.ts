@@ -3,9 +3,10 @@
 import { ARCHETYPE_IDS, type ArchetypeId } from "../arrivals/archetypes";
 import type { AgeBand } from "../arrivals/library";
 import {
-  ARCHETYPE_QUOTAS, CENSUS_BANDS, BAND_TABLE, CENSUS_ZONES, COMMUTER_ROW, HOMES_BY_ZONE, HOUSEHOLDS, HOUSEHOLD_TYPES, JOB_ROWS, MINORS_BY_ZONE,
-  PUPIL_AGES, STATUS_TABLE, TEEN_SATURDAY_JOBS, TYPES_BY_ZONE, bandIndex, type CensusZone, type HouseholdType, type MinorKind,
+  ARCHETYPE_QUOTAS, CENSUS_BANDS, CENSUS_ZONES, COMMUTER_ROW, HOUSEHOLD_TYPES, JOB_ROWS, MINORS_BY_ZONE,
+  PUPIL_AGES, STATUS_TABLE, TEEN_SATURDAY_JOBS, bandIndex, type CensusZone, type HouseholdType, type MinorKind,
 } from "./day1Tables";
+import { DAY1_TARGETS, type CensusTargets } from "./trim";
 import { homeZone, isVacantHome, type HomeRegistry } from "./homes";
 import type { Day1Skeleton } from "./skeleton";
 
@@ -67,20 +68,23 @@ export function censusTables(sk: Day1Skeleton, homes: HomeRegistry): CensusTable
   return t;
 }
 
-/** Everything that doesn't match A.1 (empty when every table closes). */
-export function censusMismatches(t: CensusTables): string[] {
+/**
+ * Everything that doesn't match A.1 (empty when every table closes). `want` is A.1 as it stands (the frozen Day-1 file),
+ * or trim.ts GENERATION_TARGETS for a skeleton straight from the generator.
+ */
+export function censusMismatches(t: CensusTables, want: CensusTargets = DAY1_TARGETS): string[] {
   const out: string[] = [];
   const eq = (what: string, got: unknown, want: unknown) => { if (JSON.stringify(got) !== JSON.stringify(want)) out.push(`${what}: ${JSON.stringify(got)}, A.1 says ${JSON.stringify(want)}`); };
-  eq("households", t.households, HOUSEHOLDS);
-  for (const b of CENSUS_BANDS) eq(`A.1.1 ${b}`, t.bands[b], BAND_TABLE[b]);
+  eq("households", t.households, want.households);
+  for (const b of CENSUS_BANDS) eq(`A.1.1 ${b}`, t.bands[b], want.bands[b]);
   for (const z of CENSUS_ZONES) eq(`A.1.1 minors in ${z}`, t.minors[z], MINORS_BY_ZONE[z]);
   eq("A.1.1 pupil ages", t.pupilAges, PUPIL_AGES);
-  for (const k of HOUSEHOLD_TYPES) for (const z of CENSUS_ZONES) eq(`A.1.2 type ${k} in ${z}`, t.types[k][z] ?? 0, TYPES_BY_ZONE[k][z] ?? 0);
-  for (const z of CENSUS_ZONES) eq(`A.1.3 ${z}`, t.homes[z], HOMES_BY_ZONE[z]);
+  for (const k of HOUSEHOLD_TYPES) for (const z of CENSUS_ZONES) eq(`A.1.2 type ${k} in ${z}`, t.types[k][z] ?? 0, want.types[k][z] ?? 0);
+  for (const z of CENSUS_ZONES) eq(`A.1.3 ${z}`, t.homes[z], want.homes[z]);
   for (const r of JOB_ROWS) eq(`A.1.4 row ${r.row} (${r.workplace})`, t.jobs[r.row], r.bands);
-  for (const [k, v] of Object.entries(STATUS_TABLE)) eq(`A.1.4 ${k}`, t.statuses[k as keyof CensusTables["statuses"]], v);
+  for (const [k, v] of Object.entries(want.statuses)) eq(`A.1.4 ${k}`, t.statuses[k as keyof CensusTables["statuses"]], v);
   eq("A.1.4 teens with Saturday jobs", t.saturdayJobs, TEEN_SATURDAY_JOBS);
-  for (const a of ARCHETYPE_IDS) eq(`A.1.5 ${a}`, t.archetypes[a], ARCHETYPE_QUOTAS[a]);
+  for (const a of ARCHETYPE_IDS) eq(`A.1.5 ${a}`, t.archetypes[a], want.archetypes[a]);
   return out;
 }
 

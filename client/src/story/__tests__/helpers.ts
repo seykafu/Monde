@@ -6,7 +6,7 @@ export function context(): StoryContext {
   return { day: 1, minute: 600, weekday: "tue", zone: "old_quarter", place: "old_quarter.library",
     pillar: { prosperity: 50, safety: 50, spirit: 50, charm: 50 }, regard: {},
     values: { name: "Alex", they: "they", them: "them", their: "their", theyre: "they're",
-      player: { background: "local", why: "to_help" }, census: 210, coins: 1000, appeal: 40,
+      player: { background: "local", why: "to_help" }, census: 190, coins: 1000, appeal: 40,
       arrival: { name: "Robin", trade: "baker", reason: "a fresh start" },
     },
   };

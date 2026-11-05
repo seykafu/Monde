@@ -104,7 +104,7 @@ export const regardFor = (registry: Registry, id: string): number =>
 
 /**
  * regardFor for many residents at once: one read of the mirror and one pass over the event log, the same numbers. The
- * story's context asks for every card's on each refresh (MVP M-03: 212 of them once the census is written).
+ * story's context asks for every card's on each refresh (MVP M-03: 192 of them with the Day-1 census).
  */
 export function regardMap(registry: Registry, ids: readonly string[]): Record<string, number> {
   const friendship = getFriendship(registry), background = getMind().player?.background;

@@ -15,10 +15,10 @@ describe('Day 1 (GDD §2.4, §6.2)', () => {
   it('starts with the §2.4 numbers', () => {
     expect(town.day).toBe(1);
     expect(town.pillars).toEqual({ prosperity: 18, safety: 30, spirit: 22, charm: 25 });
-    expect(town.census).toBe(210);
+    expect(town.census).toBe(190);
     expect(town.fund).toBe(1800);
-    expect(town.homes).toEqual({ occupied: 123, vacant_restorable: 61, restored_free: 0 });
-    expect([DAY1_CENSUS, DAY1_FUND, DAY1_HOMES.vacant_restorable]).toEqual([210, 1800, 61]);
+    expect(town.homes).toEqual({ occupied: 107, vacant_restorable: 77, restored_free: 0 });
+    expect([DAY1_CENSUS, DAY1_FUND, DAY1_HOMES.vacant_restorable]).toEqual([190, 1800, 77]);
     expect(town.tollmenLevelMax).toBe(1);
   });
 

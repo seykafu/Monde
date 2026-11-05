@@ -20,7 +20,11 @@ import { SeededRng } from "./rng";
 /** Logged with every census call (ai_log.prompt_version) and stored on every household's generation record. */
 export const NATIVE_PROMPT_VERSION = "census-v1";
 
-/** A.1 and §2.4's Day 1: the first day of spring, a Tuesday (the ferry day the Fellow lands). */
+/**
+ * A.1 and §2.4's Day 1: the first day of spring, a Tuesday (the ferry day the Fellow lands). The 188 Day-1 cards were written
+ * from this and MONDE_DAY1_BLOCK at 210; the 2026-11-05 trim (census/trim.ts) took the town to 190 afterwards. Both stay as
+ * written: they are the census-v1 prompt the cards were drawn from (and arrivals.ts sends the live census).
+ */
 export const DAY1_TOWN: PromptTown = {
   day: 1, season: "Spring", weekday: "Tuesday", pillars: { prosperity: 18, safety: 30, spirit: 22, charm: 25 },
   census: 210, shopsOpen: 6, pupils: 9, projectsDone: [], projectsActive: [],

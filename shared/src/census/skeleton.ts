@@ -1,6 +1,7 @@
 // The Day-1 census skeleton (MVP M-03 step 1; GDD Appendix A.1, A.1.5, A.2, A.3.3–A.3.5): the 123 households and 210
-// homed residents before anyone's card is written, built to close every A.1 table. Pure and seeded: the same seed,
-// pins, homes, library and cards give the same skeleton (content/census/day1.yaml is one, frozen).
+// homed residents as first generated, before anyone's card is written, built to close every A.1 table as it then stood
+// (trim.ts GENERATION_TARGETS). Pure and seeded: the same seed, pins, homes, library and cards give the same skeleton.
+// day1Skeleton() is that less the 2026-11-05 trim (107 households, 190 residents): content/census/day1.yaml, frozen.
 //
 // buildSkeleton, step by step (each step draws from its own seeded stream, so changing one leaves the others be):
 //   1. layout     the pinned households (content/census/pins.yaml), then A.1.2's remaining types × zones.
@@ -21,13 +22,15 @@ import { FAMILY_NAMES, FAMOUS_NAMES, FIRST_NAMES, RESERVED_FAMILY_NAMES, RESERVE
 import { SeededRng } from "../arrivals/rng";
 import type { CardLook } from "../look";
 import {
-  ARCHETYPE_QUOTAS, CENSUS_BANDS, CENSUS_ZONES, COMMUTER_ROW, CORE_HOMED, CORE_JOBS, HOUSEHOLD_TYPES, JOB_ROWS, MINORS_BY_ZONE, OUT_OF_WORK_MILL_HANDS,
-  PUPIL_AGES, STATUS_TABLE, TEEN_SATURDAY_JOBS, TYPES_BY_ZONE, TYPE_IDENTITY, rowJobs, shapeOf,
+  CENSUS_BANDS, CENSUS_ZONES, COMMUTER_ROW, CORE_HOMED, CORE_JOBS, HOUSEHOLD_TYPES, JOB_ROWS, MINORS_BY_ZONE, OUT_OF_WORK_MILL_HANDS,
+  PUPIL_AGES, TEEN_SATURDAY_JOBS, TYPE_IDENTITY, rowJobs, shapeOf,
   type CensusZone, type Employment, type HouseholdType, type CensusRole, type MinorKind,
 } from "./day1Tables";
 import { bedsNeeded, homeZone, isVacantHome, type HomeRegistry } from "./homes";
 import { isNamedPin, type PinMember, type Pins } from "./pins";
 import { planPortraits, type PortraitChoice, type PortraitPerson } from "./portraitPlan";
+// The generator builds the town as first generated (210); trim.ts takes the 2026-11-05 trim out afterwards.
+import { GENERATION_TARGETS, homesAsGenerated, trimSkeleton } from "./trim";
 
 // ── Output ──────────────────────────────────────────────────────────────────
 
@@ -215,7 +218,7 @@ function layout(pins: Pins, cards: ReadonlyMap<string, CensusCard>): DraftHouseh
     pinnedCount.set(`${h.type}|${h.zone}`, (pinnedCount.get(`${h.type}|${h.zone}`) ?? 0) + 1);
   }
   for (const type of HOUSEHOLD_TYPES) for (const zone of CENSUS_ZONES) {
-    const want = TYPES_BY_ZONE[type][zone] ?? 0, pinned = pinnedCount.get(`${type}|${zone}`) ?? 0;
+    const want = GENERATION_TARGETS.types[type][zone] ?? 0, pinned = pinnedCount.get(`${type}|${zone}`) ?? 0;
     if (pinned > want) fail(`${pinned} pinned type ${type} households in ${zone}; A.1.2 has ${want}`);
     for (let n = 1; n <= want - pinned; n++) {
       const id = `${ZONE_SHORT[zone]}_${type.toLowerCase()}${String(n).padStart(2, "0")}`;
@@ -289,7 +292,7 @@ const qkey = (a: ArchetypeId, band: AgeBand) => `${a}|${band}`;
 
 function quotaLeft(households: readonly DraftHousehold[]): Quota {
   const q: Quota = new Map();
-  for (const [a, row] of Object.entries(ARCHETYPE_QUOTAS) as [ArchetypeId, readonly number[]][])
+  for (const [a, row] of Object.entries(GENERATION_TARGETS.archetypes) as [ArchetypeId, readonly number[]][])
     CENSUS_BANDS.forEach((b, i) => { if (row[i]) q.set(qkey(a, b), row[i]!); });
   for (const h of households) for (const m of h.members) {
     if (m.kind === "core" || !m.archetype || (m.band === "minor" && m.minor === null)) continue;
@@ -563,7 +566,7 @@ function assignWork(households: DraftHousehold[], pins: Pins, rng: SeededRng): v
   const all = households.flatMap(h => h.members.map(m => ({ h, m })));
   const jobsLeft = new Map(JOB_ROWS.map(r => [r.row, rowJobs(r)]));
   const bandsLeft = new Map(JOB_ROWS.map(r => [r.row, [...r.bands]]));
-  const status = new Map<string, number[]>(Object.entries(STATUS_TABLE).map(([k, v]) => [k, [...v]]));
+  const status = new Map<string, number[]>(Object.entries(GENERATION_TARGETS.statuses).map(([k, v]) => [k, [...v]]));
   const take = (m: Draft, row: number, title?: string, workplace?: string) => {
     const left = bandsLeft.get(row)!, bi = ADULT_BAND_INDEX[memberBand(m)];
     if (bi === undefined || left[bi]! <= 0) fail(`${m.id ?? m.slot}: no ${memberBand(m)} job left in A.1.4 row ${row}`);
@@ -616,9 +619,9 @@ function assignWork(households: DraftHousehold[], pins: Pins, rng: SeededRng): v
     }
     if (k < n) fail(`only ${k} of ${n} ${band} carers placed`);
   };
-  carers("young_adult", STATUS_TABLE.carer[0], h => h.type === "J" || h.type === "K", h => (h.type === "J" ? 3 : 1));
+  carers("young_adult", GENERATION_TARGETS.statuses.carer[0], h => h.type === "J" || h.type === "K", h => (h.type === "J" ? 3 : 1));
   // Adults care for children or a parent (A.1.4): households with minors or an elder.
-  carers("adult", STATUS_TABLE.carer[1], h => ["C", "L", "M", "N", "P"].includes(h.type), h => ({ P: 4, N: 3, C: 2, L: 2, M: 1 } as Record<string, number>)[h.type] ?? 1);
+  carers("adult", GENERATION_TARGETS.statuses.carer[1], h => ["C", "L", "M", "N", "P"].includes(h.type), h => ({ P: 4, N: 3, C: 2, L: 2, M: 1 } as Record<string, number>)[h.type] ?? 1);
   // 3. The job rows, most specific first: the best-suited person of each band, one commuter per household at most.
   const commuting = new Set<string>();
   for (const rowNo of ROW_ORDER) {
@@ -864,4 +867,12 @@ export function buildSkeleton(seed: string, pins: Pins, homes: HomeRegistry, lib
     library: { rows: library.length, assigned: [...plan.choices.values()].filter(c => c.source === "library").length, reserve: plan.reserve },
     households: out, links,
   };
+}
+
+/**
+ * content/census/day1.yaml as built: the town as first generated, from homes.yaml as it then stood (the trimmed homes
+ * under their old ids), less the 2026-11-05 trim (trim.ts).
+ */
+export function day1Skeleton(seed: string, pins: Pins, homes: HomeRegistry, library: readonly PortraitEntry[], cardList: readonly CensusCard[]): Day1Skeleton {
+  return trimSkeleton(buildSkeleton(seed, pins, homesAsGenerated(homes), library, cardList));
 }

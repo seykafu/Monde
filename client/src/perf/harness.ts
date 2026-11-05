@@ -11,7 +11,7 @@ const report = {
   version: 1, createdAt: new Date().toISOString(), userAgent: navigator.userAgent,
   viewport: { width: innerWidth, height: innerHeight, dpr: devicePixelRatio },
   targets: { fps: 60, visibleResidents: 60, zoneLoadMs: 1500, memoryBytes: 1_500_000_000 },
-  /** The resident roster read at boot (MVP M-03: 212 cards once the census is written), and how long it took. */
+  /** The resident roster read at boot (MVP M-03: 192 cards with the Day-1 census), and how long it took. */
   roster: { cards: personaCards.length, parseMs: Math.round(rosterParseMs * 10) / 10 },
   zoneLoads: [] as { zone: string; kind: string; ms: number; boundary: string }[],
   captures: [] as Capture[],

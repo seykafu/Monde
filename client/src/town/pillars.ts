@@ -78,7 +78,7 @@ export interface TownState {
   pillars: Pillars;
   /** The Pillars when today began, before the dawn's drift. Today's change is `pillars − dayStart`. */
   dayStart: Pillars;
-  /** Residents with a bed in Monde (Appendix A.1 ruling: 210 on Day 1; Vane joins on Day 48). */
+  /** Residents with a bed in Monde (Appendix A.1 ruling: 190 on Day 1; Vane joins on Day 48). */
   census: number;
   /** The Town Fund, in coins. */
   fund: number;
@@ -102,16 +102,16 @@ export interface TownState {
 
 /** §2.4 / §6.1: Prosperity 18 · Safety 30 · Spirit 22 · Charm 25. */
 export const DAY1_PILLARS: Readonly<Pillars> = Object.freeze({ prosperity: 18, safety: 30, spirit: 22, charm: 25 });
-/** §2.4 and the Appendix A.1 ruling: the census reads 210 (211 once the player signs the Fellowship form). */
-export const DAY1_CENSUS = 210;
+/** §2.4 and the Appendix A.1 ruling: the census reads 190 (191 once the player signs the Fellowship form). */
+export const DAY1_CENSUS = 190;
 /** §2.4: 1,800 coins. */
 export const DAY1_FUND = 1800;
 /**
- * Appendix A.1.2: 123 households in 123 occupied homes, plus §2.4's 61 vacant homes (184 in all). None of the
- * 61 is restored on Day 1 (§6.4: they "need restoring before anyone can live in them").
- * GDD-GAP: §6.3 puts Day-1 rates at "about 110" coins a day; with A.1.2's 123 households it is 123.
+ * Appendix A.1.2: 107 households in 107 occupied homes, plus §2.4's 77 vacant homes (184 in all; 61 and 123 before the
+ * 2026-11-05 census trim emptied sixteen). None of the 77 is restored on Day 1 (§6.4: they "need restoring before
+ * anyone can live in them"). §6.3 puts Day-1 rates at "about 110" coins a day; with A.1.2's 107 households it is 107.
  */
-export const DAY1_HOMES: Readonly<Homes> = Object.freeze({ occupied: 123, vacant_restorable: 61, restored_free: 0 });
+export const DAY1_HOMES: Readonly<Homes> = Object.freeze({ occupied: 107, vacant_restorable: 77, restored_free: 0 });
 /** §13.2: the Tollmen baseline on Day 1 is 1 (loitering). */
 export const DAY1_TOLLMEN_LEVEL_MAX = 1;
 /** No open jobs on Day 1: §6.2's Day-1 YouthAppeal of 22.3 has no jobs term. */

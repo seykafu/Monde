@@ -31,9 +31,9 @@ SABLE [angry]: I was wrong. It's worse.
 N: She wipes both hands properly this time, takes a folder from under the stone, and lays it on the desk like something that might wake.
 SABLE [neutral]: Council archive, basement, bottom drawer. The lock on that drawer gave out years ago. Frye still keeps the key. The label says STREETLIGHT CONTRACT. It is a streetlight contract, for eight pages. Then it's page nine.
 N: A typed sheet, foxed at the edges and signed in two hands. One is E. Pell, Mayor, in blue ink, careful, slightly slanting. The other is a long, confident S. Vane.
-SABLE [neutral]: (reads, flat and fast) "Should the census of the Municipality fall below two hundred persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
+SABLE [neutral]: (reads, flat and fast) "Should the census of the Municipality fall below one hundred and eighty persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
 SABLE [neutral]: Forty thousand coins, twelve years ago. The lamps stayed lit. And a coin a metre.
-N: A new line appears at the top of your Town Ledger, in a hand you didn't write: CENSUS, then today's count, then FLOOR 200. Under it, a small gauge, and a counter for days. The counter reads zero.
+N: A new line appears at the top of your Town Ledger, in a hand you didn't write: CENSUS, then today's count, then FLOOR 180. Under it, a small gauge, and a counter for days. The counter reads zero.
 {set: option_known}
 SABLE [neutral]: I did the sums on the back of a galley. We're not far over. Not far enough. Two bad winters and a ferry strike.
 N: The fish market, the cannery, the boathouse, the slip you came off. All the Wharf. Where Nell's boats tie up. You read the clause again to see if the words will change.
@@ -50,7 +50,7 @@ SABLE [neutral]: Take the week. Then think about page nine.
 
 :: coin_after
 SABLE [neutral]: Ask. I've an hour before I set the front page.
-{ai_open: sable, topic: "The Option Clause as Sable found it: the council archive folder labelled STREETLIGHT CONTRACT, the 40,000-coin loan from Vane Consolidated twelve years ago, Clause 9 (census under 200 for seven consecutive days lets the Lender buy the whole Wharf at a coin per metre of frontage), the two signatures, and why she gave Pell three days before printing. Sable is fast and clipped and answers questions with questions. She does not know why Pell signed, how the money was spent beyond the lamps and payroll, or anything about Greyline or the Tollmen. She never speculates about Pell's motives on the record.", turns: 3}
+{ai_open: sable, topic: "The Option Clause as Sable found it: the council archive folder labelled STREETLIGHT CONTRACT, the 40,000-coin loan from Vane Consolidated twelve years ago, Clause 9 (census under 180 for seven consecutive days lets the Lender buy the whole Wharf at a coin per metre of frontage), the two signatures, and why she gave Pell three days before printing. Sable is fast and clipped and answers questions with questions. She does not know why Pell signed, how the money was spent beyond the lamps and payroll, or anything about Greyline or the Tollmen. She never speculates about Pell's motives on the record.", turns: 3}
 SABLE [neutral]: I put a note under Pell's door at noon. Typed. Three days. That's what I give. Then it's in the forme and in the street.
 SABLE [neutral]: She'll have read it by now. Go and see her. Tonight.
 SABLE [neutral]: Not for her sake. I want to know what you do when you know.

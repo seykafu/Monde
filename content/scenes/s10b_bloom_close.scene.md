@@ -52,7 +52,7 @@ N: Nearly everyone you know, and a good many you don't, spread across the lawn a
 N: June plays. The Commons sings the chorus of the first song before she's reached the second line. She looks up, laughs, and lets them have it.
 N: Bertrand dances with Pell, a stiff, careful waltz with a great deal of attention paid to the cobbles. Hollis doesn't dance. Hollis checks his watch, which is a kind of dancing.
 N: By the Old Elm a man in a grey wool cap has been standing for an hour with his hands in his pockets, buying nothing. When June starts the last song, he's gone.
-TIB [surprised]: A hundred and ninety! And Bastien! That's almost everyone!
+TIB [surprised]: A hundred and seventy-two! And Bastien! That's almost everyone!
 JUNE [surprised]: (very quietly, to the fiddle) Huh.
 {set: june_hope}
 {pillar: spirit +4}

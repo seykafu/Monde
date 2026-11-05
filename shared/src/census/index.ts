@@ -6,5 +6,6 @@ export * from "./pins";
 export * from "./portraitPlan";
 export * from "./skeleton";
 export * from "./report";
+export * from "./trim";
 export * from "./skeletonYaml";
 export * from "./generate";

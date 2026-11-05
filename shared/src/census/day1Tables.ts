@@ -1,5 +1,6 @@
-// The Day-1 census (GDD Appendix A.1, 210 homed residents in 123 households) as data, so the skeleton generator
-// (skeleton.ts) can build to it and the report (report.ts) can check a frozen skeleton against it. Pure data.
+// The Day-1 census (GDD Appendix A.1, 190 homed residents in 107 households) as data, so the report (report.ts) can
+// check the frozen skeleton against it and the skeleton generator (skeleton.ts) can build to it: the generator builds
+// the town as first generated (210 in 123), these tables plus the 2026-11-05 trim (trim.ts GENERATION_TARGETS). Pure data.
 //
 // Every number here is A.1's. Where a table leaves something to arithmetic (how the eight people of type M split, which
 // minors live in which household type), the derivation is written next to it.
@@ -25,10 +26,11 @@ export const BAND_TABLE: Readonly<Record<AgeBand, { core: number; generated: num
   teen: { core: 0, generated: 9 },
   young_adult: { core: 6, generated: 21 },
   adult: { core: 6, generated: 68 },
-  elder: { core: 5, generated: 81 },
+  elder: { core: 5, generated: 61 },
 };
-export const HOMED = 210;
-export const GENERATED = 192;
+export const HOMED = 190;
+/** The Day-1 census's generated residents (192 as first generated, less the trim's 20). */
+export const GENERATED = 172;
 
 /** "The nine pupils are aged 5, 7, 7, 8, 9, 10, 10, 11 (tib) and 12." */
 export const PUPIL_AGES: readonly number[] = [5, 7, 7, 8, 9, 10, 10, 11, 12];
@@ -102,8 +104,8 @@ export const M_MINORS: Readonly<Partial<Record<CensusZone, readonly RoleSlot[]>>
 
 /** A.1.2: households of each type by zone. */
 export const TYPES_BY_ZONE: Readonly<Record<HouseholdType, Readonly<Partial<Record<CensusZone, number>>>>> = {
-  A: { millbrook: 12, old_quarter: 10, market_row: 4, wharf: 5, station_hill: 4, commons: 1 },
-  B: { millbrook: 7, old_quarter: 5, market_row: 2, wharf: 2, station_hill: 1, commons: 1 },
+  A: { millbrook: 2, old_quarter: 10, market_row: 4, wharf: 5, station_hill: 2, commons: 1 },
+  B: { millbrook: 4, old_quarter: 5, market_row: 2, wharf: 2, commons: 1 },
   C: { millbrook: 2, old_quarter: 2, market_row: 1, wharf: 1 },
   D: { millbrook: 6, old_quarter: 5, market_row: 5, wharf: 3, station_hill: 1 },
   E: { millbrook: 5, old_quarter: 2, market_row: 2, wharf: 3, station_hill: 1 },
@@ -119,7 +121,7 @@ export const TYPES_BY_ZONE: Readonly<Record<HouseholdType, Readonly<Partial<Reco
   O: { millbrook: 3 },
   P: { old_quarter: 1 },
 };
-export const HOUSEHOLDS = 123;
+export const HOUSEHOLDS = 107;
 
 /** The slots of one household of a type in a zone. */
 export const shapeOf = (type: HouseholdType, zone: CensusZone): readonly RoleSlot[] =>
@@ -128,11 +130,11 @@ export const shapeOf = (type: HouseholdType, zone: CensusZone): readonly RoleSlo
 // ── A.1.3 Where they live ───────────────────────────────────────────────────
 
 export const HOMES_BY_ZONE: Readonly<Record<CensusZone, { households: number; residents: number; vacant: number; total: number }>> = {
-  millbrook: { households: 45, residents: 85, vacant: 38, total: 83 },
+  millbrook: { households: 32, residents: 69, vacant: 51, total: 83 },
   old_quarter: { households: 29, residents: 42, vacant: 9, total: 38 },
   wharf: { households: 19, residents: 36, vacant: 8, total: 27 },
   market_row: { households: 19, residents: 30, vacant: 0, total: 19 },
-  station_hill: { households: 8, residents: 13, vacant: 6, total: 14 },
+  station_hill: { households: 5, residents: 9, vacant: 9, total: 14 },
   commons: { households: 3, residents: 4, vacant: 0, total: 3 },
 };
 export const HOMES_TOTAL = 184;
@@ -198,12 +200,12 @@ export const PUBLIC_ROWS: ReadonlySet<number> = new Set([1, 2, 4, 5, 6, 7, 8, 9,
 
 export const EMPLOYMENT = ["employed", "out_of_work", "carer", "retired", "unable", "pupil", "lessons", "under_five"] as const;
 export type Employment = (typeof EMPLOYMENT)[number];
-/** A.1.4's status table for the 187 aged 18+: young adults, adults, elders. */
+/** A.1.4's status table for the 167 aged 18+: young adults, adults, elders. */
 export const STATUS_TABLE: Readonly<Record<"employed" | "out_of_work" | "carer" | "retired" | "unable", readonly [number, number, number]>> = {
   employed: [20, 49, 21],
   out_of_work: [4, 9, 0],
   carer: [3, 5, 0],
-  retired: [0, 0, 65],
+  retired: [0, 0, 45],
   unable: [0, 11, 0],
 };
 /** "Mill hands (18) … nine of them are the unemployed adults in A.1.4" (A.1.5). */
@@ -236,9 +238,9 @@ export const CORE_JOBS: Readonly<Record<string, { row: number; title: string; wo
 /** The core cast with a bed in Monde (A.1: 20 core less vane and bastien). */
 export const CORE_HOMED: readonly string[] = Object.keys(CORE_JOBS);
 
-// ── A.1.5 How the 192 were generated ────────────────────────────────────────
+// ── A.1.5 How the 192 were generated (172 since the trim) ───────────────────
 
-/** People per archetype by band among the 192: children, teens, young adults, adults, elders. */
+/** People per archetype by band among the 172 (the 192 less the trim): children, teens, young adults, adults, elders. */
 export const ARCHETYPE_QUOTAS: Readonly<Record<ArchetypeId, readonly [number, number, number, number, number]>> = {
   young_family: [3, 0, 6, 0, 0],
   school_family: [6, 5, 0, 14, 4],
@@ -255,15 +257,15 @@ export const ARCHETYPE_QUOTAS: Readonly<Record<ArchetypeId, readonly [number, nu
   mill_hand: [0, 0, 0, 13, 5],
   clinician: [0, 0, 0, 0, 0],
   schoolteacher: [0, 0, 0, 0, 0],
-  retired_couple: [0, 0, 0, 4, 30],
-  widowed_elder: [0, 0, 0, 0, 22],
+  retired_couple: [0, 0, 0, 4, 22],
+  widowed_elder: [0, 0, 0, 0, 12],
   retired_keeper: [0, 0, 0, 0, 3],
-  retired_organizer: [0, 0, 0, 2, 5],
+  retired_organizer: [0, 0, 0, 2, 4],
   returnee: [0, 0, 0, 0, 0],
   birdwatcher: [0, 0, 0, 1, 1],
   retired_magician: [0, 0, 0, 0, 1],
   cartographer: [0, 0, 0, 1, 1],
-  radio_tinkerer: [0, 0, 0, 2, 2],
+  radio_tinkerer: [0, 0, 0, 2, 1],
 };
 export const bandIndex = (band: AgeBand): number => CENSUS_BANDS.indexOf(band);
 

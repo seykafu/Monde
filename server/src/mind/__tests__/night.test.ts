@@ -443,13 +443,13 @@ it('compacts the day’s leftover sessions before reflections read memories', as
 
 // ── The full Day-1 roster (MVP M-03 step 3) ──────────────────────────────────────────────────────────────────────
 
-describe("the night pass on the full Day-1 roster (212)", () => {
+describe("the night pass on the full Day-1 roster (192)", () => {
   let roster: Awaited<ReturnType<typeof fullRosterContent>>;
   let full: PersonaCard[];
   beforeAll(async () => { roster = await fullRosterContent(); full = await loadContent(roster.dir, FULL); }, 30_000);
   afterAll(() => roster?.cleanup());
 
-  /** A world with all 212, its runner and app; `log` collects the runner's info lines. */
+  /** A world with all 192, its runner and app; `log` collects the runner's info lines. */
   async function setupFull(mind: MindClient) {
     const world = await createWorld(database.db, `device-${randomUUID()}`, "invite", roster.dir, FULL);
     const lines: { obj: Record<string, unknown>; msg?: string }[] = [];
@@ -473,12 +473,12 @@ describe("the night pass on the full Day-1 roster (212)", () => {
     expect(res.statusCode).toBe(200);
     const body = res.json();
     const core = full.filter((c) => c.kind === "canon").map((c) => c.id).sort();
-    expect(body.tiers).toEqual({ core: core.length, acquainted: 0, ambient: 212 - core.length });
+    expect(body.tiers).toEqual({ core: core.length, acquainted: 0, ambient: 192 - core.length });
     expect(elapsed).toBeLessThan(NIGHT_BUDGET_MS + LOAD_SLACK_MS);
     await env.runner.idle(env.worldId);
     const total = performance.now() - started;
     const rule = env.lines.find((l) => l.msg === "rule encounters written");
-    console.info(`Night pass, full roster (212), 150 ms model: response ${elapsed.toFixed(0)} ms (budget ${NIGHT_BUDGET_MS}), `
+    console.info(`Night pass, full roster (192), 150 ms model: response ${elapsed.toFixed(0)} ms (budget ${NIGHT_BUDGET_MS}), `
       + `done ${body.done} pending ${body.pending}; all work ${total.toFixed(0)} ms; ${mind.callsFor("gossip").length} model encounters, `
       + `${rule?.obj.encounters ?? 0} rule encounters in one transaction (${rule?.obj.ms ?? "?"} ms); ${mind.calls.length} calls`);
     const stored = await storedPlans(env.worldId, 2);
@@ -503,7 +503,7 @@ describe("the night pass on the full Day-1 roster (212)", () => {
     const rule = env.lines.find((l) => l.msg === "rule encounters written")!;
     expect(rule).toBeDefined();
     const encounters = Number(rule.obj.encounters);
-    console.info(`Night pass, full roster (212), no API key: ${res.json().elapsed_ms} ms response, ${total.toFixed(0)} ms in all; `
+    console.info(`Night pass, full roster (192), no API key: ${res.json().elapsed_ms} ms response, ${total.toFixed(0)} ms in all; `
       + `${encounters} rule encounters in one transaction (${rule.obj.ms} ms)`);
     expect(encounters).toBeGreaterThan(20);
     // Each side of each encounter has its memory, and the pair's rows count it.

@@ -8,6 +8,7 @@
 import { FAIR_HEADCOUNT, seededUnit, type FairBand } from '@monde/shared';
 import { minutesToHhmm } from '../sim/plans';
 import type { Shift } from '../sim/volunteers';
+import { DAY1_CENSUS } from '../town/pillars';
 
 export const FAIR_DAY = 25;
 /** §13.2 Day 24: "Fair set-up on the Commons". GDD-GAP: no hour; the trestles go up after lunch. */
@@ -105,8 +106,8 @@ export const lampsLit = (phase: FairPhase): boolean => phase === 'dusk';
 export const FAIR_CAST: readonly string[] = ['pell', 'june', 'kasimir', 'teo', 'margo', 'tib', 'rosalind', 'odile', 'nell', 'hollis', 'bertrand', 'felix', 'bastien'];
 /** Residents who aren't at the fair: Vane sends tulips (§13.2: "Gift: a crate of tulips"); Rook calls a truce. */
 export const NOT_AT_FAIR: ReadonlySet<string> = new Set(['vane', 'rook', 'bru', 'nettie']);
-/** §13.3a headcounts over the census (210): the share of everyone else who comes. */
-export const attendShare = (band: FairBand): number => Math.min(1, FAIR_HEADCOUNT[band] / 210);
+/** §13.3a headcounts over the Day-1 census (190): the share of everyone else who comes. */
+export const attendShare = (band: FairBand): number => Math.min(1, FAIR_HEADCOUNT[band] / DAY1_CENSUS);
 
 export function fairAttendees(residents: readonly string[], band: FairBand, seed: number | string): string[] {
   return residents.filter(id => !NOT_AT_FAIR.has(id)

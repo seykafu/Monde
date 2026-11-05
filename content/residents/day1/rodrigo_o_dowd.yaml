@@ -90,13 +90,6 @@ relationships:
       note: Shares tools and the odd rough joke about Mill men.
     }
   - {
-      id: tomasz_blaauw,
-      affinity: 12,
-      trust: 10,
-      tag: fond,
-      note: Neighbour who keeps minutes; once argued him into a union vote.
-    }
-  - {
       id: delphine,
       affinity: 8,
       trust: 6,

@@ -82,14 +82,14 @@ describe('moving in and out (G-02)', () => {
       look('project_vacant_house_46_done', 'project_vacant_house_47_done'));
     expect(free).toEqual(['old_quarter.vacant_house_46', 'old_quarter.vacant_house_47']);
     const after = settleArrivalsAt(town, [{ home: 'old_quarter.vacant_house_47', size: 2 }]);
-    expect(after.census).toBe(212);
-    expect(after.homes).toEqual({ occupied: 124, vacant_restorable: 59, restored_free: 1 });
+    expect(after.census).toBe(192);
+    expect(after.homes).toEqual({ occupied: 108, vacant_restorable: 59, restored_free: 1 });
     expect(isOccupied('old_quarter.vacant_house_47', dir, townLook(after))).toBe(true);
     // More households than free homes: the rest are not housed.
-    expect(settleArrivalsAt(town, [1, 1, 1].map((size, i) => ({ home: `old_quarter.home_0${i + 1}`, size }))).homes.occupied).toBe(125);
+    expect(settleArrivalsAt(town, [1, 1, 1].map((size, i) => ({ home: `old_quarter.home_0${i + 1}`, size }))).homes.occupied).toBe(109);
     const left = settleDeparturesFrom(after, ['someone', 'their_partner'], ['old_quarter.vacant_house_47']);
-    expect(left.census).toBe(210);
-    expect(left.homes).toEqual({ occupied: 123, vacant_restorable: 59, restored_free: 2 });
+    expect(left.census).toBe(190);
+    expect(left.homes).toEqual({ occupied: 107, vacant_restorable: 59, restored_free: 2 });
     expect(isOccupied('old_quarter.vacant_house_47', dir, townLook(left))).toBe(false);
     expect(freeHomes(['old_quarter.vacant_house_47'], dir, townLook(left, 'project_vacant_house_47_done'))).toEqual(['old_quarter.vacant_house_47']);
   });

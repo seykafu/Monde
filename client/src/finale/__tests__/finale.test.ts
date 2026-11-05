@@ -124,7 +124,7 @@ describe('the poll in the game', () => {
     const r = spring('social');
     expect(finaleOf(r).poll).toBeNull();
     const first = ensureStrawPoll(r, regardIn(r), 5)!;
-    expect(first.poll!.ballots).toBe(65);
+    expect(first.poll!.ballots).toBe(64);
     expect(first.quotes.length).toBe(3);
     expect(ensureStrawPoll(r, () => 100, 5)).toEqual(first); // never recounted
     const id = first.quotes[0]!.id;
@@ -135,7 +135,7 @@ describe('the poll in the game', () => {
     const poll = springPoll(springWorldOf(spring('strong'), regardIn(spring('strong')), 5)!);
     const v = voteOutcome(poll);
     expect(v.share + v.vane + v.moss).toBe(100);
-    expect(v.margin).toBe(12);
+    expect(v.margin).toBe(13);
     expect(v.winner).toBe('fellow');
     expect(v.clear).toBe(true);
     const passive = voteOutcome(springPoll(springWorldOf(spring('passive'), () => 0, 5)!));

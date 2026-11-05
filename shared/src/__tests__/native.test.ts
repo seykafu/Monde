@@ -104,7 +104,7 @@ describe("the native validation profile (A.3.7, each difference GDD-GAP)", () =>
     other.members[0]!.name = `${maud.draw.members[0]!.native!.first_names[0]} Fournier`;
     expect(codes(validateHousehold(other, maud.draw, maud.vctx))).toEqual(expect.arrayContaining([expect.stringMatching(/^V03 .*surname "Fournier" belongs to another household/)]));
     // A surname the census gave a household not written yet is that household's too.
-    const theirs = maud.input.skeleton.households.find(x => x.id === "mb_a01")!.surname!;
+    const theirs = maud.input.skeleton.households.find(x => x.id === "mb_a03")!.surname!;
     other.members[0]!.name = `${maud.draw.members[0]!.native!.first_names[0]} ${theirs}`;
     expect(codes(validateHousehold(other, maud.draw, maud.vctx))).toEqual(expect.arrayContaining([expect.stringMatching(new RegExp(`^V03 .*surname "${theirs}" belongs to another household`))]));
   });

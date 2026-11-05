@@ -98,7 +98,7 @@ it("rejects invalid cards clearly and rolls back a failed template insertion", a
 
 // ── The full Day-1 roster (MVP M-03 step 3) ──────────────────────────────────────────────────────────────────────
 
-describe("the full Day-1 roster (212: the hand-written cast and the census's 188)", () => {
+describe("the full Day-1 roster (192: the hand-written cast and the census's 168)", () => {
   let roster: Awaited<ReturnType<typeof fullRosterContent>>;
   beforeAll(async () => { roster = await fullRosterContent(); }, 30_000);
   afterAll(() => roster?.cleanup());
@@ -106,7 +106,7 @@ describe("the full Day-1 roster (212: the hand-written cast and the census's 188
   it("loads the census's cards after the hand-written ones, by id; MONDE_ROSTER=authored leaves them out", async () => {
     const full = await loadContent(roster.dir, FULL);
     const hand = await loadContent(roster.dir, { roster: "authored" });
-    expect(full).toHaveLength(212);
+    expect(full).toHaveLength(192);
     expect(hand).toHaveLength(24);
     expect(full.slice(0, 24).map((c) => c.id)).toEqual(hand.map((c) => c.id));
     const day1 = full.slice(24).map((c) => c.id);
@@ -116,23 +116,23 @@ describe("the full Day-1 roster (212: the hand-written cast and the census's 188
     expect(await loadContent(roster.dir)).toHaveLength(24);
   });
 
-  it("clones Day 1 with all 212 in under two seconds, in chunks of 100", async () => {
+  it("clones Day 1 with all 192 in under two seconds, in chunks of 100", async () => {
     const start = performance.now();
     const world = await createWorld(database.db, "device-full", "invite", roster.dir, FULL);
     const elapsed = performance.now() - start;
-    console.info(`Day-1 creation, full roster (212 residents): ${elapsed.toFixed(0)} ms`);
+    console.info(`Day-1 creation, full roster (192 residents): ${elapsed.toFixed(0)} ms`);
     expect(elapsed).toBeLessThan(2000);
     const cards = await loadContent(roster.dir, FULL);
     const rows = await database.db.select().from(residents).where(eq(residents.worldId, world.id));
-    expect(rows).toHaveLength(212);
+    expect(rows).toHaveLength(192);
     const edges = await database.db.select().from(relationships).where(eq(relationships.worldId, world.id));
     expect(edges).toHaveLength(cards.reduce((n, card) => n + card.relationships.length, 0));
     expect(rows.filter((r) => r.tier === "core")).toHaveLength(cards.filter((c) => c.kind === "canon").length);
     // Voice ownership reads which cards are the census's (context.ts): they own no catchphrase.
     const census = cards.find((c) => c.generated_by)!;
     const prefix = (await loadResidentPrefix(database.db, world.id, census.id))!;
-    expect(prefix.voices).toHaveLength(212);
-    expect(prefix.voices.filter((v) => v.generated)).toHaveLength(188);
+    expect(prefix.voices).toHaveLength(192);
+    expect(prefix.voices.filter((v) => v.generated)).toHaveLength(168);
     expect(prefix.voices.find((v) => v.id === "odile")!.generated).toBeUndefined();
   });
 
@@ -165,10 +165,10 @@ describe("the full Day-1 roster (212: the hand-written cast and the census's 188
     const before = await database.db.select().from(relationships).where(eq(relationships.worldId, world.id));
 
     const first = await backfillRoster(database.db, world.id, roster.dir, FULL);
-    expect(first.residents).toBe(188);
-    expect(first.ties).toBeGreaterThan(300);
+    expect(first.residents).toBe(168);
+    expect(first.ties).toBeGreaterThan(250);
     const rows = await database.db.select().from(residents).where(eq(residents.worldId, world.id));
-    expect(rows).toHaveLength(212);
+    expect(rows).toHaveLength(192);
     expect(rows.find((r) => r.id === "pell")!.state.regard).toBe(37);
     const after = await database.db.select().from(relationships).where(eq(relationships.worldId, world.id));
     for (const e of before) expect(after).toContainEqual(e);
@@ -193,7 +193,7 @@ describe("the full Day-1 roster (212: the hand-written cast and the census's 188
       wherePlace: "wharf.ferry_slip", who: [leaver], importance: 5, tags: ["departure"], summary: "Left on the Gannet." });
     const once = ensureRoster(database.db, fresh.id, roster.dir, FULL);
     expect(ensureRoster(database.db, fresh.id, roster.dir, FULL)).toBe(once);
-    expect(await once).toMatchObject({ residents: 187 });
+    expect(await once).toMatchObject({ residents: 167 });
     expect(await database.db.select().from(residents).where(and(eq(residents.worldId, fresh.id), eq(residents.id, leaver)))).toEqual([]);
   }, 30_000);
 });

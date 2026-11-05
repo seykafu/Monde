@@ -56,7 +56,7 @@ dream:
   stages:
     - "Teach Elodie Osei to caulk a whole seam before the Regatta"
     - "Give the Wharf a safety talk on the slipway before launch day"
-    - "Sit on Nell's Regatta committee, with Tomasz taking the minutes"
+    - "Sit on Nell's Regatta committee and get her item into the minutes"
 routine:
   weekday:
     - { at: "06:30", do: eat, where: millbrook.home_16 }
@@ -81,7 +81,6 @@ chores: [ oil the steam-box hinges, keep the committee tin, scrub the doorstep o
 relationships:
   - { id: corentin_frazer, affinity: 80, trust: 70, tag: partner, note: "Thirty years of supper at half past five, and she sets two places on the nights he says he'll be late. Wants him on days, beside her, where she can count him." }
   - { id: ruth_doherty, affinity: 50, trust: 55, tag: friend, note: "Caulks beside her and shares the tea tin. Wants her to say whether the second bench is for a mate or an apprentice." }
-  - { id: tomasz_blaauw, affinity: -10, trust: 20, tag: rival, note: "At No. 1 Loom Street, keeps minutes of everything she says. Wants him to let one meeting close without a second Item." }
   - { id: elodie_osei, affinity: 40, trust: 45, tag: fond, note: "Comes Saturdays and holds the plank wrong with total confidence. Wants to watch her finish a seam alone." }
 secrets:
   - text: "She took her loom's shuttle on the last night and keeps it in her blazer. Corentin has searched the mill yard for one."

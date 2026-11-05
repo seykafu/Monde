@@ -115,7 +115,7 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   app.addHook("onReady", async () => { nightRunner?.batches.start(); });
   registerEventRoutes(app, db, config.MONDE_CONTENT_DIR);
   registerSnapshotRoutes(app, config, db, nightRunner);
-  // The roster (212 cards once the Day-1 census is written, MVP M-03) is read and checked once, before the first
+  // The roster (192 cards with the Day-1 census, MVP M-03) is read and checked once, before the first
   // request: a broken card fails the boot, and no world creation pays for the read.
   app.addHook("onReady", async () => { await loadContent(config.MONDE_CONTENT_DIR); });
   return app;

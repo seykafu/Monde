@@ -68,13 +68,6 @@ routine:
     - { at: "19:00", do: sleep, where: millbrook.home_41 }
 chores: [ hand Mama the peg bag, feed the ducks crusts, sweep the step with a spoon ]
 relationships:
-  - {
-      id: selma_lachance,
-      affinity: 18,
-      trust: 12,
-      tag: fond,
-      note: The old lady who gives her radio knobs to play with.
-    }
   - { id: vera_rourke, affinity: 90, trust: 85, tag: mother, note: Mama. Always watching. }
   - {
       id: dorian_rourke,

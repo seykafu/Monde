@@ -81,7 +81,6 @@ relationships:
   - { id: josef_nesbitt, affinity: 85, trust: 70, tag: grandson, note: "Counts potatoes and stairs with her. Wants him to eat the crust." }
   - { id: corentin_frazer, affinity: 15, trust: 20, tag: wary, note: "Holds the mill key and says 'Not yet.' Wants him to open the canteen door, even once, for the pots." }
   - { id: anselm_osei, affinity: 20, trust: 30, tag: rival, note: "Cooks the school's soup and her grandson's dinner. Wants him to ask her about the salt." }
-  - { id: sinead_rios, affinity: 45, trust: 50, tag: friend, note: "The only other cook in the Row who knows what a forty-quart pot weighs. Wants her to bake for the Supper." }
 secrets:
   - text: "She keeps the canteen's last tally slip, three hundred and eleven dinners, folded in her recipe tin. It was the closing day."
     reveal: { regard_min: 50 }

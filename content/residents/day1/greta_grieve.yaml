@@ -95,13 +95,6 @@ relationships:
       note: Neighbour across the lane; trades seed and gossip.
     }
   - {
-      id: birgit_almeida,
-      affinity: 6,
-      trust: 5,
-      tag: curious,
-      note: Knows her from the hem-mending on Mill Lane.
-    }
-  - {
       id: ayesha_soto,
       affinity: -4,
       trust: 2,

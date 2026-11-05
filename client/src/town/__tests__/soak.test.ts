@@ -51,14 +51,14 @@ describe('25-day soak (MVP Days 1–25, GDD §6.2 narrative)', () => {
       if (d.households > 0) expect(['Tue', 'Fri']).toContain(d.weekday);
     }
     expect(strong.households).toBeGreaterThan(1);
-    expect(strong.final.census).toBeGreaterThan(210);
+    expect(strong.final.census).toBeGreaterThan(190);
     expect(strong.final.homes.restored_free).toBeGreaterThanOrEqual(0);
   });
 
   it('a passive player gets no arrivals in 25 days, with a free home waiting from Day 6', () => {
     expect(passive.firstArrivalDay).toBeNull();
     expect(passive.households).toBe(0);
-    expect(passive.final.census).toBe(210);
+    expect(passive.final.census).toBe(190);
     expect(Math.max(...passive.days.map(d => d.appeal))).toBeLessThan(30);
     expect(passive.days.filter(d => d.weekday === 'Tue' || d.weekday === 'Fri').slice(1).every(d => d.outcome === 'appeal_below_35')).toBe(true);
   });

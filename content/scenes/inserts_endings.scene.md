@@ -18,8 +18,8 @@ MARGO [surprised]: He's right, you know. That's the strangest part.
 N: She holds the satchel a little tighter.
 [[else]]
 MARGO [sad]: I never found the sixth piece. I'd like that said tonight, in case anyone asks. Five of six. The Folly is still shut.
-[[if census >= 200]]
-MARGO [thinking]: The Option's still in the archive. As long as we stay above two hundred it can't bite. We're at {census}.
+[[if census >= 180]]
+MARGO [thinking]: The Option's still in the archive. As long as we stay above a hundred and eighty it can't bite. We're at {census}.
 [[else]]
 MARGO [worried]: The Option's still in the archive, and we're at {census}.
 [[end]]

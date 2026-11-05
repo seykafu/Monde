@@ -21,7 +21,7 @@ describe('buildStoryContext', () => {
     expect(ctx.regard).toEqual({ arrival: 5 });
     expect(ctx.values).toMatchObject({
       name: 'Fellow', they: 'they', them: 'them', their: 'their', theyre: "they're",
-      player: { name: 'Fellow', background: 'tinkerer', why: 'curious' }, census: 210, ferry_day: true, coins: 0,
+      player: { name: 'Fellow', background: 'tinkerer', why: 'curious' }, census: 190, ferry_day: true, coins: 0,
       arrival: { ...ARRIVAL_STANDIN }
     });
     expect(typeof ctx.values!.appeal).toBe('number');

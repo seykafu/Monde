@@ -84,7 +84,6 @@ relationships:
   - { id: alun_osei, affinity: 85, trust: 70, tag: son, note: "Eats the school's dinner while his father watches from the pass." }
   - { id: leila_nesbitt, affinity: 20, trust: 30, tag: rival, note: "Inspects his gravy from the school gate at eleven. Wants her to say what is wrong with it." }
   - { id: felix, affinity: 55, trust: 60, tag: fond, note: "Calls the pudding structured and eats two. Wants him to say the number when the roll is signed." }
-  - { id: sinead_rios, affinity: 30, trust: 40, tag: friend, note: "Kept a notebook of every child's allergies for twenty-eight years. Wants to borrow it for a week." }
 secrets:
   - text: "He cooks a tenth bowl every day in case a new pupil arrives, and carries it home to Tilde when none does."
     reveal: { regard_min: 50 }

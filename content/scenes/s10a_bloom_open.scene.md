@@ -45,7 +45,7 @@ JUNE [laugh]: (plays eight bars) Sure. Go on, ask for the pirate one.
 :: band_high
 {set: fair_band_high}
 N: Twenty stalls and a queue for the queue. Paper flags on every post. The lawn is a crowd in spring clothes, and the Old Elm has a child in it.
-N: A hundred and fifty, two hundred. You stop counting because Pell has stopped, and Pell is counting nothing at all. She stands in the middle of it with her mouth slightly open.
+N: A hundred, a hundred and fifty. You stop counting because Pell has stopped, and Pell is counting nothing at all. She stands in the middle of it with her mouth slightly open.
 {ai_line: fair_roz_high, speaker: rosalind, brief: "Roz Hale, run off her feet at the fair's cider tent, says one delighted, breathless sentence about running out of cups. 'I couldn't say, but' is allowed. No mention of Vane, the Option Clause or the Tollmen."}
 {fallback: "I couldn't say, but I've run out of cups. Run out, pet. I never run out."}
 N: Kasimir's flatbed has a crowd around it three deep. June hasn't noticed. She's looking at her hands.

@@ -119,7 +119,7 @@ describe('every Spring Project, unlock to opening (MVP G-03)', () => {
     g.solve('PZ-02');
     let pell = signWithPell(g.r, g.now, 'bakery_ovens');
     expect(pell.ok).toBe(true);
-    expect(g.town.fund).toBe(1800 + 3 * 123 - 150);
+    expect(g.town.fund).toBe(1800 + 3 * 107 - 150);
     g.buy('firebrick', 10);
     expect(handOverAt(g.r, g.now, 'bakery_ovens')).toEqual({ firebrick: 10 });
     expect(g.stage('bakery_ovens')).toBe('building');
@@ -227,7 +227,7 @@ describe('every Spring Project, unlock to opening (MVP G-03)', () => {
     // The streetlights' upkeep comes out of tomorrow's books.
     const fund10 = g.town.fund;
     g.sleep(); // Day 11
-    expect(g.town.fund).toBe(fund10 + 123 - 10);
+    expect(g.town.fund).toBe(fund10 + 107 - 10);
 
     // ── Day 10–14: homes, one house at a time (repeatable). ──
     for (const house of ['old_quarter.vacant_house_39', 'wharf.vacant_house_48']) {
@@ -246,7 +246,7 @@ describe('every Spring Project, unlock to opening (MVP G-03)', () => {
       opened.push(id);
       g.sleep();
     }
-    expect(g.town.homes).toMatchObject({ restored_free: 2, vacant_restorable: 59 });
+    expect(g.town.homes).toMatchObject({ restored_free: 2, vacant_restorable: 75 });
 
     // ── Day 13–14: the Market Hall (Day 12). ──
     g.until(13);

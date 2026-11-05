@@ -1,6 +1,7 @@
 import type { Press } from '@monde/shared';
 import type { StorySession } from './session';
 import { appendEvent } from '../scenes/events';
+import { OPTION_CENSUS_LINE } from '../town/optionClause';
 import type Phaser from 'phaser';
 
 /** Spring calendar: Sable prints facts from the contract, never guesses Pell's motives. */
@@ -19,7 +20,7 @@ export function optionCalendar(registry: Phaser.Data.DataManager, day: number, p
   }
   if (!due && !(day === 19 && flags.option_public)) return paper;
   const headline = 'THE WHARF HAS AN OPTION ON IT';
-  const text = 'Clause nine of the streetlight loan lets Vane Consolidated buy the Wharf if the census stays below 200 for seven consecutive days. The price: one coin per metre of frontage.';
+  const text = `Clause nine of the streetlight loan lets Vane Consolidated buy the Wharf if the census stays below ${OPTION_CENSUS_LINE} for seven consecutive days. The price: one coin per metre of frontage.`;
   return { ...paper, headline, dek: 'The Lantern prints the clause in the council’s streetlight contract.',
     stories: [{ event_id: null, title: 'Page nine', text }, ...paper.stories].slice(0, 3) };
 }

@@ -248,7 +248,7 @@ export class ResidentLayer {
   /**
    * Actors only for the residents on this board's roster (or due on it within LOOKAHEAD_MIN) when the zone is built,
    * so they belong to the world camera; anyone who turns up later gets theirs on the 1 Hz tick (`syncActors`), the UI
-   * camera told to skip it. MVP M-03: with the Day-1 census the town is 212, and a board shows a few dozen of them.
+   * camera told to skip it. MVP M-03: with the Day-1 census the town is 192, and a board shows a few dozen of them.
    */
   constructor(private readonly scene: Phaser.Scene, private readonly zone: ZoneDef, private readonly projection: ObliqueProjection,
     private readonly clock: Clock, private readonly dev: boolean) {

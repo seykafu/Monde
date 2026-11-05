@@ -100,7 +100,7 @@ off the people bleeding it dry, and when I asked the town to trust me with it, t
 
 ### 2.1 Setting
 
-**Monde** (pop. 210 on Day 1, down from 4,800 at its 1971 peak) sits where the **River Liss** empties
+**Monde** (pop. 190 on Day 1, down from 4,800 at its 1971 peak) sits where the **River Liss** empties
 into the **Grey Bay**. It was founded in 1838 by **Aurélien Monde** (1791–1866), a clockmaker and
 mapmaker who laid out the streets, built the clocktower and, in his last years, hid the town's
 founding **Commons Charter** in six pieces behind a trail of riddles engraved on small brass plaques
@@ -132,7 +132,7 @@ emptying.
 
 **The Option Clause.** Twelve years ago, with the mill gone and the town broke, Mayor Pell signed an
 option agreement with Vane Consolidated in exchange for a loan that kept the lights on. If Monde's
-census stays **below 200 for 7 days in a row**, Vane may buy the entire Wharf at a fixed, tiny price.
+census stays **below 180 for 7 days in a row**, Vane may buy the entire Wharf at a fixed, tiny price.
 Pell has told no one. Sable Moreau digs it up on Day 18 (§3, Act II).
 
 **The remedy.** Aurélien Monde's **Commons Charter** declares the Wharf and the Commons *"a commons
@@ -162,8 +162,8 @@ that isn't story-locked at any time. Each zone is a ¾ diorama map (see §16.4 f
 
 | Stat | Day 1 | Notes |
 |---|---|---|
-| Census | 210 residents (211 once the player signs the Fellowship form) | Every resident is a live agent (§9). The agent roster is 212: the census leaves out Vane (not a resident until Day 48) and Bastien (a cat). |
-| Vacant homes | 61 | Restoring them creates housing capacity for arrivals (§6.4). |
+| Census | 190 residents (191 once the player signs the Fellowship form) | Every resident is a live agent (§9). The agent roster is 192: the census leaves out Vane (not a resident until Day 48) and Bastien (a cat). *2026-11-05: 210, 211 and 212 before the census trim (A.1).* |
+| Vacant homes | 77 | Restoring them creates housing capacity for arrivals (§6.4). |
 | Open shops | 6 of 15 | |
 | Prosperity / Safety / Spirit / Charm | 18 / 30 / 22 / 25 | The four Pillars, 0–100 (§6.1). |
 | Town Fund | 1,800 coins | The town treasury that pays for Projects. |
@@ -212,7 +212,7 @@ the AI residents.
   clocktower for one chime. It's the first real sign that the Marks are real. Act I ends.
 
 **Act II: Roots (Days 15–40)**
-- **D18 "The Option."** Sable finds the Option Clause in the council archive. The 200-census threat goes
+- **D18 "The Option."** Sable finds the Option Clause in the council archive. The 180-census threat goes
   on screen (§6.5). Pell confesses in a private scene.
 - **D20 "Into the Briars."** Briar Woods opens. Foraging, and the first hint of where the Tollmen
   operate from.
@@ -442,10 +442,10 @@ clinic 15/day once open).
 
 ### 6.4 Housing, arrivals and departures
 
-**Housing.** Day 1 has **61 vacant homes**, which need restoring before anyone can live in them
+**Housing.** Day 1 has **77 vacant homes**, which need restoring before anyone can live in them
 (`homes` Project, 150 coins each). Later Projects add more: station cottages +8, cannery lofts +6, mill
 lofts +20, and rooms above reopened shops (+1 per storefront reopened, up to 9). That's a total
-potential of about **104 restorable homes**. Free restored homes are the **hard cap** on arrivals.
+potential of about **120 restorable homes**. Free restored homes are the **hard cap** on arrivals.
 
 **Arrivals** (rolled at dawn):
 
@@ -484,13 +484,14 @@ Projects tends to hover around 200–240.
 ### 6.5 The Option Clause
 
 - Active from Day 1, but known to the player only from Day 18 (S08), or earlier if it triggers.
-- **Trigger:** the census is **under 200 for 7 consecutive dawns**. Vane exercises the option. The Wharf
+- **Trigger:** the census is **under 180 for 7 consecutive dawns** (200 until the 2026-11-05 census trim took Day 1
+  from 210 to 190; the floor moved with it, keeping the ten-resident cushion). Vane exercises the option. The Wharf
   becomes a "Port Vane survey site": the fish market and boathouse close, Prosperity −8, Spirit −4, and
   Nell's and every fisher's Regard toward Pell drops to Wary. Wharf Projects pause.
 - **Undo:** the Charter's Article III voids the sale. When S21 completes, the Wharf reopens at once
   (Spirit +6 on top of the Charter's bonus).
-- **UI:** once the clause is known, the Town Ledger shows a census gauge with a 200 line and a 7-day
-  counter whenever the census is under 205.
+- **UI:** once the clause is known, the Town Ledger shows a census gauge with a 180 line and a 7-day
+  counter whenever the census is under 185.
 
 ### 6.6 The Dawn Report
 
@@ -1668,13 +1669,13 @@ Fellow stood". At the Bloom Fair's close (S10c) Sable sets three of Odile's jam 
 OLD MOSS) and every grown-up in the crowd drops one bean. The rulings that fill the gaps for Spring
 (`shared/src/election`):
 
-- **Who is asked.** The fair's crowd by S10a's band (31 / 73 / 190, §13.3a) times the share of the town that is 18+
-  (187 of 210, A.1.4): 28, 65 or 169 ballots, drawn as a seeded sample of the eligible voters. Each ballot is a §10.3
+- **Who is asked.** The fair's crowd by S10a's band (31 / 73 / 172, §13.3a) times the share of the town that is 18+
+  (167 of 190, A.1.4): 27, 64 or 151 ballots, drawn as a seeded sample of the eligible voters. Each ballot is a §10.3
   vote (scores plus jitter, no turnout: they were asked). The paper prints the shares with an honest margin of error,
-  1/√n (±19, ±12 or ±8 points). The same model is also counted over the whole electorate with turnout, for testing.
+  1/√n (±19, ±13 or ±8 points). The same model is also counted over the whole electorate with turnout, for testing.
 - **Eligibility.** §10.3's rule scaled to the poll day: 18+ and 10+ days in Monde by Day 25 (so arrivals up to Day 15).
 - **The electorate.** Everyone with a card: the hand-written cast (less Vane, who lives off the map until Day 48) and
-  the Day-1 census's 188 (MVP M-03: Appendix A.1.5's 192 less the four with hand-written cards), so 210 people, 187 of
+  the Day-1 census's 168 (MVP M-03: Appendix A.1.5's 172 less the four with hand-written cards), so 190 people, 167 of
   them grown-ups; and the generated arrivals. There are no stand-ins: who fishes (A.2's `fisher` archetype, or a
   fishing or ferry trade), who collects for the Tollmen (the trade, or the hideout as workplace), who is out of work
   (A.1.4's employment) and who is a mill hand or a retired organizer (the archetype) are read from the cards. Each
@@ -1717,7 +1718,7 @@ fry** (vreg + with Wharf voters, unless the cannery co-op is open), **Pressure**
 fear +; needs Greyline funding), **Smear** (attacks a real weakness in the player's record: `vanes_coin`,
 a failed or abandoned Project, low Safety, `option_kept_secret`), **Charm offensive** (canvasses Core
 residents with low Regard for the player), **Legal threat** (if the Option Clause is live and the census
-is under 210: "Vote for me or lose the Wharf anyway"). The model writes his moves and lines; the
+is under 190: "Vote for me or lose the Wharf anyway"). The model writes his moves and lines; the
 engine applies fixed effects per move.
 
 ### 10.5 Lantern Night and the endings
@@ -1835,7 +1836,7 @@ the Journal, Town Ledger and Campaign screens live.
 
 Every resident of Monde is a Claude Haiku agent whose prompt is built from a Persona Card (§9.3). The
 cards in §12.2 are the characters at runtime: Haiku reads them before every conversation, plan and
-reflection. This section holds the three things that keep 212 agents from sounding like one: the
+reflection. This section holds the three things that keep 192 agents from sounding like one: the
 voice bible (§12.1), the twenty hand-authored cards (§12.2), and the web of who feels what about whom
 (§12.3, §12.4). §12.5 lists every fact this section invents so the lead designer can approve or strike
 it.
@@ -2161,7 +2162,7 @@ personality:
   big5: { open: 55, conscientious: 92, extravert: 48, agreeable: 76, neurotic: 72 }
 values: { prosperity: 0.25, safety: 0.35, spirit: 0.25, charm: 0.15 }
 beliefs:
-  - "If the census holds above 200, the clause never matters and nobody has to be told."   # wrong: any seven-day dip triggers it, and she controls neither ferries nor weather
+  - "If the census holds above 180, the clause never matters and nobody has to be told."   # wrong: any seven-day dip triggers it, and she controls neither ferries nor weather
   - "Margo's Charter is a lovely story and a distraction from real money."   # wrong
   - "The lamps are the one promise she has kept."
 voice:
@@ -2217,7 +2218,7 @@ relationships:
   - { id: bertrand, affinity: 65, trust: 60, tag: old_friend, note: "Only he calls her Eddie, since Arthur. Wants him to see a doctor about his stairs and hasn't managed to say so." }
   - { id: frye, affinity: 50, trust: 70, tag: clerk, note: "Keeps the archive key and has never opened the Streetlight file. Wants him to keep not opening it." }
 secrets:
-  - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the archivist, keeps the key and has never opened that file."
+  - text: "She signed the Option Clause: if the census stays under 180 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the archivist, keeps the key and has never opened that file."
     reveal: { flag: option_known }
   - text: "A letter of resignation, dated the day before the Fellow arrived, is in her desk. Hiring the Fellow was her last try before she posted it."
     reveal: { regard_min: 60 }
@@ -4384,12 +4385,12 @@ shakedowns' Prosperity cost (§6.1, −0.5 per shop paying), the grey van, the j
 | 15 | Tue | Spring | — | — | Y | 2 | FO | **Act II begins.** Tollmen start shaking down the new stalls. |
 | 16 | Wed | Spring | — | Pub quiz | — | 2 | — | |
 | 17 | Thu | Spring | — | — | — | 2 | FO | Last day to accept Vane's retainer if you deferred on D10 (`vane_offer_open`). |
-| 18 | Fri | Spring | **S08 The Option** · **S09 Pell's Confession** (evening) | — | Y | 2 | — | `option_known`. Census floor (200) appears on the HUD. |
+| 18 | Fri | Spring | **S08 The Option** · **S09 Pell's Confession** (evening) | — | Y | 2 | — | `option_known`. Census floor (180) appears on the HUD. |
 | 19 | Sat | Spring | [cond S09 choice 3, `option_public`] The Lantern leads with the Option | Market day · [cond `pell_announce_together`] Pell tells the Gull & Anchor, 19:30 | — | 2 | FO | Reactions are generated from the residents' own memory of the story. Pell is in the room if she announces. Setting `option_public` also sets `option_public`. |
 | 20 | Sun | Spring | Into the Briars (system beat, no scene) | Service | — | 2 | — | Briar Woods opens: foraging, charcoal clearing. Teo posts a forage Favor. |
 | 21 | Mon | Spring | [cond `option_kept_secret` and not `sable_week_granted`] Sable's three days run out: the Lantern prints the Option at 06:00 | — | — | 2 | — | Sets `option_public`, `pell_promise_broken`; `regard.pell` −10. Talking Sable round first (Favor `fv_sable_week`, Regard ≥ 20) sets `sable_week_granted` and holds the story to D25. |
 | 22 | Tue | Spring | — | — | Y | 2 | FO | |
-| 23 | Wed | Spring | — | Pub quiz: **the Bastien census joke** | — | 2 | — | Tib enters Bastien on the team sheet as "resident 212". Roz rules him "a person for quiz purposes only". Sable prints a mock correction. |
+| 23 | Wed | Spring | — | Pub quiz: **the Bastien census joke** | — | 2 | — | Tib enters Bastien on the team sheet as "resident 192". Roz rules him "a person for quiz purposes only". Sable prints a mock correction. |
 | 24 | Thu | Spring | — | Fair set-up on the Commons | — | 2 | FO | |
 | 25 | Fri | Spring | **S10a Bloom Fair (opening) · S10b Bloom Fair (closing) · S10c The Straw Poll** | **Bloom Fair** | Y | 1 (fair truce) | Gift: a crate of tulips | Spring ends. Rook calls a one-day truce. Vane's tulips arrive "with Mr. Vane's compliments". Sable's jam-jar Straw Poll after the last song (MVP G-11); the D26 Dawn Report prints it. |
 | 26 | Sat | Summer | — | Market day | — | 2 | FO | Summer (Bloom) begins. [cond `sable_week_granted`] Pell's week is up; her Favor "Tell the truth about the lamps" opens. |
@@ -4474,7 +4475,7 @@ Deadlines never produce a fail screen before Day 100. They close doors that the 
 
 | Day | Deadline | What closes | What it feeds |
 |---|---|---|---|
-| Continuous | **Census floor.** Census must not sit below 200 for 7 days in a row once `option_known`. | The Wharf, if it does. | Port Vane. The Option is void if the Charter is assembled. |
+| Continuous | **Census floor.** Census must not sit below 180 for 7 days in a row once `option_known`. | The Wharf, if it does. | Port Vane. The Option is void if the Charter is assembled. |
 | 17 | Vane's retainer, if deferred on D10 | `vane_offer_open` (Ines carries the letter of engagement) | Vane's Coin (debate attack on D95) |
 | 21 | Sable's three days run out | The Lantern prints the Option at 06:00 unless Sable was talked round (`sable_week_granted`) | Pell's Regard; `option_kept_secret` vs `option_public` (Vane's Smear, endorsements) |
 | 25 | Pell's week (only if `sable_week_granted`) | Sable's hold on the story | Pell's Favor "Tell the truth about the lamps" |
@@ -4546,7 +4547,7 @@ PELL [warm]: Nobody's teased me in a while. Arthur used to.
 {goto: form}
 
 :: bunting_count
-PELL [neutral]: Two hundred and ten. Eleven, if you're staying. I counted this morning.
+PELL [neutral]: A hundred and ninety. Ninety-one, if you're staying. I counted this morning.
 PELL [worried]: (turns the clipboard over) That's no way to greet someone off a boat. Forgive me.
 {goto: form}
 
@@ -5702,9 +5703,9 @@ SABLE [angry]: I was wrong. It's worse.
 N: She wipes both hands properly this time, takes a folder from under the stone, and lays it on the desk like something that might wake.
 SABLE [neutral]: Council archive, basement, bottom drawer. The lock on that drawer gave out years ago. Frye still keeps the key. The label says STREETLIGHT CONTRACT. It is a streetlight contract, for eight pages. Then it's page nine.
 N: A typed sheet, foxed at the edges and signed in two hands. One is E. Pell, Mayor, in blue ink, careful, slightly slanting. The other is a long, confident S. Vane.
-SABLE [neutral]: (reads, flat and fast) "Should the census of the Municipality fall below two hundred persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
+SABLE [neutral]: (reads, flat and fast) "Should the census of the Municipality fall below one hundred and eighty persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
 SABLE [neutral]: Forty thousand coins, twelve years ago. The lamps stayed lit. And a coin a metre.
-N: A new line appears at the top of your Town Ledger, in a hand you didn't write: CENSUS, then today's count, then FLOOR 200. Under it, a small gauge, and a counter for days. The counter reads zero.
+N: A new line appears at the top of your Town Ledger, in a hand you didn't write: CENSUS, then today's count, then FLOOR 180. Under it, a small gauge, and a counter for days. The counter reads zero.
 {set: option_known}
 SABLE [neutral]: I did the sums on the back of a galley. We're not far over. Not far enough. Two bad winters and a ferry strike.
 N: The fish market, the cannery, the boathouse, the slip you came off. All the Wharf. Where Nell's boats tie up. You read the clause again to see if the words will change.
@@ -5721,7 +5722,7 @@ SABLE [neutral]: Take the week. Then think about page nine.
 
 :: coin_after
 SABLE [neutral]: Ask. I've an hour before I set the front page.
-{ai_open: sable, topic: "The Option Clause as Sable found it: the council archive folder labelled STREETLIGHT CONTRACT, the 40,000-coin loan from Vane Consolidated twelve years ago, Clause 9 (census under 200 for seven consecutive days lets the Lender buy the whole Wharf at a coin per metre of frontage), the two signatures, and why she gave Pell three days before printing. Sable is fast and clipped and answers questions with questions. She does not know why Pell signed, how the money was spent beyond the lamps and payroll, or anything about Greyline or the Tollmen. She never speculates about Pell's motives on the record.", turns: 3}
+{ai_open: sable, topic: "The Option Clause as Sable found it: the council archive folder labelled STREETLIGHT CONTRACT, the 40,000-coin loan from Vane Consolidated twelve years ago, Clause 9 (census under 180 for seven consecutive days lets the Lender buy the whole Wharf at a coin per metre of frontage), the two signatures, and why she gave Pell three days before printing. Sable is fast and clipped and answers questions with questions. She does not know why Pell signed, how the money was spent beyond the lamps and payroll, or anything about Greyline or the Tollmen. She never speculates about Pell's motives on the record.", turns: 3}
 SABLE [neutral]: I put a note under Pell's door at noon. Typed. Three days. That's what I give. Then it's in the forme and in the street.
 SABLE [neutral]: She'll have read it by now. Go and see her. Tonight.
 SABLE [neutral]: Not for her sake. I want to know what you do when you know.
@@ -5770,7 +5771,7 @@ PELL [sad]: You asked me on the slip how bad it was. I counted lamps at you. I'm
 [[elif flag.pell_deflected_count]]
 PELL [sad]: You asked why I count. I said habit. It's a habit now. It wasn't at the start.
 [[elif flag.pell_told_census]]
-PELL [sad]: I told you two hundred and ten in the first hour, on the slip. I didn't say why.
+PELL [sad]: I told you a hundred and ninety in the first hour, on the slip. I didn't say why.
 [[end]]
 [[if flag.vanes_coin]]
 PELL [worried]: Silas offered you something at the fountain. I saw the letter in her folder. I'd have said so if I were braver.
@@ -5779,10 +5780,10 @@ PELL [neutral]: Twelve years ago the payroll had four days of money in it. The l
 PELL [neutral]: The bank in the city wouldn't lend. Then a young man came off the Tuesday boat with a case of sandwiches and a very good coat.
 PELL [neutral]: Thirty-six. Ham sandwiches, enough for the whole council. He read the books at that table all night, and at four in the morning he said, "May I be frank, Mrs. Pell? The mill isn't coming back."
 PELL [sad]: He was right. That was the worst of it. He was right, and he was kind.
-PELL [neutral]: Forty thousand coins. The lamps stayed lit and the wages were paid. I signed page nine because it was three in the morning and it said two hundred, and we were nine hundred and something, and two hundred looked like the bottom of the sea.
+PELL [neutral]: Forty thousand coins. The lamps stayed lit and the wages were paid. I signed page nine because it was three in the morning and it said a hundred and eighty, and we were nine hundred and something, and a hundred and eighty looked like the bottom of the sea.
 PELL [sad]: Arthur read it over my shoulder. He said it would never come to anything. He died believing that. I let him.
 N: She squares the ledger by a quarter inch that didn't need squaring.
-PELL [neutral]: I told no one, because the moment I say two hundred out loud, everyone starts counting. I know what counting does. It did it to me.
+PELL [neutral]: I told no one, because the moment I say a hundred and eighty out loud, everyone starts counting. I know what counting does. It did it to me.
 PELL [sad]: Old Mr. Haldane passed in February. I counted before I sent the card.
 N: She looks at you the way she looks at a lamp that's gone out and might only want a new wick.
 >> CHOICE
@@ -5894,7 +5895,7 @@ JUNE [laugh]: (plays eight bars) Sure. Go on, ask for the pirate one.
 :: band_high
 {set: fair_band_high}
 N: Twenty stalls and a queue for the queue. Paper flags on every post. The lawn is a crowd in spring clothes, and the Old Elm has a child in it.
-N: A hundred and fifty, two hundred. You stop counting because Pell has stopped, and Pell is counting nothing at all. She stands in the middle of it with her mouth slightly open.
+N: A hundred, a hundred and fifty. You stop counting because Pell has stopped, and Pell is counting nothing at all. She stands in the middle of it with her mouth slightly open.
 {ai_line: fair_roz_high, speaker: rosalind, brief: "Roz Hale, run off her feet at the fair's cider tent, says one delighted, breathless sentence about running out of cups. 'I couldn't say, but' is allowed. No mention of Vane, the Option Clause or the Tollmen."}
 {fallback: "I couldn't say, but I've run out of cups. Run out, pet. I never run out."}
 N: Kasimir's flatbed has a crowd around it three deep. June hasn't noticed. She's looking at her hands.
@@ -6012,7 +6013,7 @@ N: Nearly everyone you know, and a good many you don't, spread across the lawn a
 N: June plays. The Commons sings the chorus of the first song before she's reached the second line. She looks up, laughs, and lets them have it.
 N: Bertrand dances with Pell, a stiff, careful waltz with a great deal of attention paid to the cobbles. Hollis doesn't dance. Hollis checks his watch, which is a kind of dancing.
 N: By the Old Elm a man in a grey wool cap has been standing for an hour with his hands in his pockets, buying nothing. When June starts the last song, he's gone.
-TIB [surprised]: A hundred and ninety! And Bastien! That's almost everyone!
+TIB [surprised]: A hundred and seventy-two! And Bastien! That's almost everyone!
 JUNE [surprised]: (very quietly, to the fiddle) Huh.
 {set: june_hope}
 {pillar: spirit +4}
@@ -6902,15 +6903,15 @@ HOLLIS [watch_check]: The third stair strikes a flat G. It does not strike secon
 [[if !flag.quiz_bastien_joke_seen]]
 N: Before the first question, there's a commotion by the long table. Tib has appeared with the team sheet and a pencil nearly as long as his arm. Bastien sits on a stool by the stove, washing a paw, and looks as if he would like it noted that he came of his own accord.
 TIB [gap_grin]: Moss and Kasimir are a man short. So I put Bastien down. Obviously.
-TIB [neutral]: I did it properly. Census number two hundred and twelve. Resident.
+TIB [neutral]: I did it properly. Census number a hundred and ninety-two. Resident.
 ROSALIND [knowing_look]: (puts down the glass) Tib. Bastien is a cat.
 TIB [neutral]: The census says every resident's an agent. Mum says Pell counts everyone. Bastien's an agent. Obviously he's counted. I read the form.
 ROSALIND [warm]: (looks at the cat, then at the ceiling) He's a person for quiz purposes only. Ruling's final. He answers if he wants to.
-SABLE [ink_smudge]: (already writing) I'll print a correction. "The Lantern regrets that the census count of two hundred and ten omitted the cat."
+SABLE [ink_smudge]: (already writing) I'll print a correction. "The Lantern regrets that the census count of a hundred and ninety omitted the cat."
 N: Bastien finishes the paw and does not look at anybody.
 {set: quiz_bastien_joke_seen}
 [[else]]
-N: Bastien is back on his stool by the stove. Tib has written 212 on the team sheet again, in ink this time.
+N: Bastien is back on his stool by the stove. Tib has written 192 on the team sheet again, in ink this time.
 [[end]]
 ROSALIND [warm]: Three questions, all about the tower. Pens ready.
 ROSALIND [warm]: Question one. How many steps up the clocktower to the works under the face?
@@ -7028,7 +7029,7 @@ N: Roz puts a kettle on at the end of the bar. Rook is gone from the fire, and t
 | `s05_b_seen` | The empty-boat variant has played once. It does **not** finish S05, so S05 re-arms. | S05b | S05, S05b triggers |
 | `met_pell`, `met_moss`, `met_ada`, `met_bertrand`, `met_margo`, `met_tib`, `met_tollmen`, `met_rook`*, `met_kasimir`, `met_vane`, `met_ines`, `met_sable`, `met_hollis` | First on-screen meeting. `met_rook` is set in S03 and again in S13 as a safety. | S01–S13 | S14 trigger (`met_rook`) |
 | `return_ticket_kept` / `return_ticket_torn` | The Fellow kept or tore the return half of the ferry ticket on Day 1. | S01a | Ada's lines; Lantern Night inserts (optional) |
-| `pell_told_census` | The Fellow asked how many people live in Monde on Day 1; Pell said 210. | S01a | S09 |
+| `pell_told_census` | The Fellow asked how many people live in Monde on Day 1; Pell said 190. | S01a | S09 |
 | `pell_remembers_player`, `bertrand_remembers_player` | Homecomer recognized on arrival. | S01a, S01b | persona prompts (§11.1 "the [name] kid") |
 | `saw_tollmen_idle` | The Fellow saw two Tollmen on the Market Row bench on Day 1. | S01b | AI prompts (Tollmen awareness) |
 | `bertrand_pinion_hint` | The Fellow asked whether the clock can be fixed and heard about the lantern pinion. | S01b | Bertrand's AI topic cards |
@@ -7113,7 +7114,7 @@ N: Roz puts a kettle on at the end of the bar. Rook is gone from the fire, and t
 **People and places**
 - **Mr. and Mrs. Quill.** Mr. Quill ran a shop on the corner of Lamplighter Lane and was the cottage's last tenant (he had the keys cut twice). Mrs. Quill has a cat (from Tib's card). Both are residents, offstage.
 - **Old Mr. Haldane** died in February. Pell counted before she sent the card.
-- **Twelve years ago** the town was "nine hundred and something" (so a floor of 200 once looked like "the bottom of the sea"). The census has fallen about 700 in twelve years.
+- **Twelve years ago** the town was "nine hundred and something" (so a floor of 180 once looked like "the bottom of the sea"). The census has fallen about 700 in twelve years.
 - **Vane at 36** came to Monde on a Tuesday boat with a case of ham sandwiches, read the books overnight at Pell's kitchen table, and said "May I be frank, Mrs. Pell? The mill isn't coming back." Arthur Pell read the clause over her shoulder, said it would never come to anything, and died believing that.
 - **Lissworth closed on a Friday at ten in the morning** with a whistle and no explanation. Forty frames, six hundred workers. Rook was a doffer. On the Monday a man (Gil Mercer, unnamed in the scene) stood at the mill gate at six with his lunch pail. Rook stood with him a while and went home.
 - **Bru** carves a wooden wren and apologizes to objects ("Sorry, Madame"; to the frying pan). **Nettie** never shoots at people (card canon) and says so aloud. **Dex and Dom** drum on an oil drum with spoons. **Weasel** keeps the Saturday take in labeled jam jars (one per shop) and says "arrangement" and "contribution schedule".
@@ -7128,12 +7129,12 @@ N: Roz puts a kettle on at the end of the bar. Rook is gone from the fire, and t
 - **Ines** writes in a small notebook, lives on the second floor of the Gull & Anchor (card) and offers to "minute" anything for the Fellow. She calls June "Miss Castellanos".
 - **Sable** put a typed note under Pell's door: "I have page nine. Three days. S.M." She found the loan under "STREETLIGHT CONTRACT" in the council archive basement; the drawer's lock gave out years ago (Frye only ever kept the key) and nobody locked the cabinet. The loan runs to eight pages before page nine.
 - **Hollis** keeps a log with a line per day: "Service: none". On D30 he writes "Visitor: one" for the first time. The Branch Board wants a platform, a working signal and "forty on the morning train".
-- **Bloom Fair** details: the council's heritage ribbon has been cut eleven years running (the same ribbon); Tib's riddle trail has twelve clues and eleven jam sandwiches; Teo plants Vane's tulips by the duck pond if asked; headcounts 31 / 73 / 190 by Spirit band; Kasimir's flatbed becomes June's stage.
+- **Bloom Fair** details: the council's heritage ribbon has been cut eleven years running (the same ribbon); Tib's riddle trail has twelve clues and eleven jam sandwiches; Teo plants Vane's tulips by the duck pond if asked; headcounts 31 / 73 / 172 by Spirit band (the high band was 190 before the 2026-11-05 census trim); Kasimir's flatbed becomes June's stage.
 - **Tollmen detail:** Rook calls a one-day truce on D25 (he stands by the Old Elm, buys nothing and leaves before the last song).
 
 **Authored texts (need §14 / legal sign-off)**
 - **Aurélien's letter**, read by Margo in S02: "To whoever is still here. I have put the Charter in six pieces and the pieces in six places, that no single hand may carry it off. Mark well the lantern. It is the only thing in this town that has never lied about the time." (No contractions, per his voice.)
-- **Clause 9 of the "Streetlight Contract"**, read by Sable in S08: "Should the census of the Municipality fall below two hundred persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
+- **Clause 9 of the "Streetlight Contract"**, read by Sable in S08: "Should the census of the Municipality fall below one hundred and eighty persons on seven consecutive days, the Lender may at its sole election purchase the Wharf in its entirety, being all land, quays, buildings and works between the River Liss and the breakwater, at a price of one coin per metre of frontage."
 - **The Greyline invoice** (S12): "GREYLINE SECURITY. Billed to: Vane Consolidated, Field Office, Monde. Item: site security, Monde. 2,400 coins per month. Payable weekly, in cash, Saturdays, c/o the crane yard. Authorized by:" and a blank.
 
 **Rules and judgment calls**
@@ -8209,7 +8210,7 @@ PLAYER: Captain Reyes has one bicycle and one deputy. Give her six, and a lamp o
 PLAYER: The clinic, the school, the station. What closed, we reopen. In that order, with a date on each.
 [[end]]
 [[if flag.plank_young]]
-PLAYER: Sixty-one empty houses. Rent them cheap to anyone under thirty who'll stay and work. Fill the bandstand on weekends.
+PLAYER: Seventy-seven empty houses. Rent them cheap to anyone under thirty who'll stay and work. Fill the bandstand on weekends.
 [[end]]
 [[if flag.plank_commons]]
 PLAYER: The Wharf and the Commons stay what they are. Nobody sells the elm. Nobody paves the pond.
@@ -8389,7 +8390,7 @@ VANE [warm]: A candidate who hides a friend's debt will hide a town's. That's al
 [[if regard.pell >= 30]]
 N: Pell stands at the card table. She puts the bell down, very carefully, next to her glass of water.
 PELL [neutral]: He's right about the loan. He's right that I signed. I should have told you. The Fellow told me to, a long while ago.
-PELL [angry]: There's a clause in that paper that lets Silas buy the Wharf if we stay under two hundred. We're at {census}. I'm the moderator, Silas. Sit down.
+PELL [angry]: There's a clause in that paper that lets Silas buy the Wharf if we stay under a hundred and eighty. We're at {census}. I'm the moderator, Silas. Sit down.
 N: There is a moment where nobody breathes. Then the whole hall is on its feet, and not for Vane.
 {debate_score: +4}
 {regard: pell +4}
@@ -9079,8 +9080,8 @@ MARGO [surprised]: He's right, you know. That's the strangest part.
 N: She holds the satchel a little tighter.
 [[else]]
 MARGO [sad]: I never found the sixth piece. I'd like that said tonight, in case anyone asks. Five of six. The Folly is still shut.
-[[if census >= 200]]
-MARGO [thinking]: The Option's still in the archive. As long as we stay above two hundred it can't bite. We're at {census}.
+[[if census >= 180]]
+MARGO [thinking]: The Option's still in the archive. As long as we stay above a hundred and eighty it can't bite. We're at {census}.
 [[else]]
 MARGO [worried]: The Option's still in the archive, and we're at {census}.
 [[end]]
@@ -10792,7 +10793,7 @@ spawn: [5, 22]
 
 **Who lives where (town fixes).** Every house on a board has an occupancy source (`client/src/town/occupancy.ts`):
 a named resident's home (their card's `home`; a flat inside a building, like `margo_flat` over the library),
-the Fellow's cottage (from `cottage_keys_given`, S01c), a **census household** (one of Appendix A.1.2's 123,
+the Fellow's cottage (from `cottage_keys_given`, S01c), a **census household** (one of Appendix A.1.2's 107,
 off-screen in the sim, `home_NN` per A.1.3), or **vacant** (`vacant_house_NN`, or a plain vacant home).
 Vacant homes show their faded art, dark; occupied ones their restored art, with smoke and lit windows at
 night. Vane has no bed in town until `vane_resident` (Day 48), so the Harbormaster's House stands dark until
@@ -11299,7 +11300,7 @@ Marks → library size 120 masters.
 4. **After Day 100:** does the game end at the inauguration, or continue as a "first term" sandbox?
 5. **Player romance:** confirm none. Or add a "best friend" capstone with one Core resident?
 6. **Languages at launch:** Haiku can speak them, but authored content needs translation. Which ones?
-7. **Day-1 residents:** fully hand-curate all 192, or spot-check a sample?
+7. **Day-1 residents:** fully hand-curate all 172, or spot-check a sample?
 8. **Portrait library size** against GPT-6 image cost. Need a per-image cost quote.
 9. **Bastien:** adoptable by the player? (He'd still wander.)
 10. **Store AI policy:** confirm Steam's and itch.io's current rules for live-generated content at M2.
@@ -11311,7 +11312,7 @@ All of them are **accepted**, with these rulings:
 
 | Item | Ruling |
 |---|---|
-| Census: Vane and Bastien | The census counts residents with a bed in Monde: **210** on Day 1, 211 once the player signs on. The agent roster is 212. |
+| Census: Vane and Bastien | The census counts residents with a bed in Monde: **190** on Day 1, 191 once the player signs on. The agent roster is 192 (210, 211 and 212 before the 2026-11-05 trim, A.1). |
 | School ages | Ages 5–12 count toward the 20 pupils. Teens don't. |
 | The mainland city | It's named **Carrow**. Hessle Cross, Port Sallow and the other A.6 places are canon. |
 | The Tollmen's pay | The shop money is split six ways, and the wage comes separately from the van. It matches the PZ-16 ledger (the "guard wages" are the van wage under ghost names). |
@@ -11332,37 +11333,39 @@ All of them are **accepted**, with these rulings:
 
 This appendix defines who lives in Monde on Day 1, the 24 archetypes every resident and arrival is built from, the rules the arrival generator follows, the Departed who can come home, and the letters they write first. Vocabulary follows §2 (zones and Day-1 numbers), §6 (Pillars, Appeal, Census, Projects), §9.3 (the Persona Card) and §9.5 (the place registry). Pillars are written P / S / Sp / C (Prosperity, Safety, Spirit, Charm). Every name, number and place here is fictional.
 
-### A.1 The Day-1 census (210 residents, 212 agents)
+### A.1 The Day-1 census (190 residents, 192 agents)
 
-**How the 212 is counted.** The Day-1 roster is 212 live agents: the 20 hand-written core cast (§4) plus 192 pre-generated residents, each curated by a human. Eighteen of the core cast and all 192 generated residents sleep in Monde. The other two core agents do not: `vane` is not a resident until Day 48 (§9.5), and `bastien` is a cat. So every age, household, job and housing table below covers the **210 homed residents**, and the arithmetic closes like this:
+**The 2026-11-05 trim (Kasey).** The census was generated at 210 homed residents in 123 households (192 generated), and its cards were written from that skeleton. Twenty were then taken out, so that Monde feels like a town with people in it rather than a crowd: retired elders with no portrait of their own (procedural looks), ten living alone and three couples in Millbrook, and two living alone and one couple on Station Hill (the two zones the player can't walk in Spring). None had a job, a child, a hand-written card, a library portrait, a tie anyone else's card needed, or a line in any scene. Their sixteen homes stand empty (`vacant_house_62`–`77`), and the Option Clause line moved from 200 to 180 so the ten-resident cushion holds (§6.5). Every table below is the town after the trim. `shared/src/census/trim.ts` records it: the generator still builds the 210 from its seed, and the trim comes off afterwards, so `content/census/day1.yaml` still reproduces.
+
+**How the 192 is counted.** The Day-1 roster is 192 live agents: the 20 hand-written core cast (§4) plus 172 pre-generated residents, each curated by a human. Eighteen of the core cast and all 172 generated residents sleep in Monde. The other two core agents do not: `vane` is not a resident until Day 48 (§9.5), and `bastien` is a cat. So every age, household, job and housing table below covers the **190 homed residents**, and the arithmetic closes like this:
 
 | Group | Count |
 |---|---|
 | Core cast with a bed in Monde (20 core, minus `vane` and `bastien`) | 18 |
-| Pre-generated, curated residents | 192 |
-| **Homed residents (the people in every table below)** | **210** |
+| Pre-generated, curated residents | 172 |
+| **Homed residents (the people in every table below)** | **190** |
 | `vane` (core, non-resident until Day 48) | 1 |
 | `bastien` (core, animal agent) | 1 |
-| **Day-1 agent roster** (the census counter reads **210**, §2.4) | **212** |
+| **Day-1 agent roster** (the census counter reads **190**, §2.4) | **192** |
 
-**Ruling (lead designer):** `census` counts residents with a bed in Monde, so it reads **210** on Day 1, and the Option Clause line at 200 has a 10-resident cushion. Vane joins the census on Day 48; Bastien never does, despite Sable's annual campaign.
+**Ruling (lead designer):** `census` counts residents with a bed in Monde, so it reads **190** on Day 1, and the Option Clause line at 180 has a 10-resident cushion. Vane joins the census on Day 48; Bastien never does, despite Sable's annual campaign.
 
 #### A.1.1 Age bands
 
-| Band | Ages | Core | Generated | Total | Share of 210 |
+| Band | Ages | Core | Generated | Total | Share of 190 |
 |---|---|---|---|---|---|
-| Children | 0–12 | 1 | 13 | 14 | 6.7% |
-| Teens | 13–17 | 0 | 9 | 9 | 4.3% |
-| Young adults | 18–35 | 6 | 21 | 27 | 12.9% |
-| Adults | 36–59 | 6 | 68 | 74 | 35.2% |
-| Elders | 60+ | 5 | 81 | 86 | 41.0% |
-| **Total** | | **18** | **192** | **210** | 100% (shares are rounded) |
+| Children | 0–12 | 1 | 13 | 14 | 7.4% |
+| Teens | 13–17 | 0 | 9 | 9 | 4.7% |
+| Young adults | 18–35 | 6 | 21 | 27 | 14.2% |
+| Adults | 36–59 | 6 | 68 | 74 | 38.9% |
+| Elders | 60+ | 5 | 61 | 66 | 34.7% |
+| **Total** | | **18** | **172** | **190** | 100% (shares are rounded) |
 
 Core cast by band: children `tib`; young adults `rook`, `margo`, `priya`, `june`, `ines`, `teo`; adults `sable`, `kasimir`, `nell`, `augusta`, `felix`, `roz`; elders `pell`, `odile`, `hollis`, `bertrand`, `delphine`.
 
-**Arithmetic:** 14 + 9 + 27 + 74 + 86 = 210. Core 1 + 0 + 6 + 6 + 5 = 18. Generated 13 + 9 + 21 + 68 + 81 = 192. 210 + 2 roster-only agents = 212.
+**Arithmetic:** 14 + 9 + 27 + 74 + 66 = 190. Core 1 + 0 + 6 + 6 + 5 = 18. Generated 13 + 9 + 21 + 68 + 61 = 172. 190 + 2 roster-only agents = 192.
 
-**The shape of it.** Median age is about 54. Two residents in five are over 60. One in eight is aged 18–35. One in nine is under 18. The young-adult band is thin on purpose, and thinner than it looks: of the 27, six are Tollmen, four are out of work, three are full-time parents and three work away from Tuesday to Friday. Only **11** hold ordinary jobs in town. That gap is the story the player is hired to close.
+**The shape of it.** Median age is about 52. About one resident in three is over 60. One in seven is aged 18–35. One in eight is under 18. The young-adult band is thin on purpose, and thinner than it looks: of the 27, six are Tollmen, four are out of work, three are full-time parents and three work away from Tuesday to Friday. Only **11** hold ordinary jobs in town. That gap is the story the player is hired to close.
 
 **School and the nine pupils.** Millbrook School takes children aged 5 to 12 in a single room, taught by `felix`. The 14 children are **5 under-fives (ages 0–4) and 9 pupils (ages 5–12)**. The nine pupils are aged 5, 7, 7, 8, 9, 10, 10, 11 (`tib`) and 12. Monde has no secondary school: the nine teens take lessons by post through the library desk and at Felix's Thursday-evening class. That class does not count toward the 20-pupil target, so the target counts ages 5–12 only (see A.6, open question 2).
 
@@ -11377,12 +11380,12 @@ Core cast by band: children `tib`; young adults `rook`, `margo`, `priya`, `june`
 
 #### A.1.2 Households
 
-123 households house the 210. Average household size is 1.71. Sixty-one households (49.6%) are one person living alone. Only 14 households (11.4%) contain anyone under 18.
+107 households house the 190. Average household size is 1.78. Forty-nine households (45.8%) are one person living alone. Only 14 households (13.1%) contain anyone under 18.
 
 | Type | Household | Households | People | Millbrook | Old Quarter | Market Row | Wharf | Station Hill | Commons |
 |---|---|---|---|---|---|---|---|---|---|
-| A | Elder living alone | 36 | 36 | 12 | 10 | 4 | 5 | 4 | 1 |
-| B | Elder couple | 18 | 36 | 7 | 5 | 2 | 2 | 1 | 1 |
+| A | Elder living alone | 24 | 24 | 2 | 10 | 4 | 5 | 2 | 1 |
+| B | Elder couple | 14 | 28 | 4 | 5 | 2 | 2 | 0 | 1 |
 | C | Adult + elder partner | 6 | 12 | 2 | 2 | 1 | 1 | 0 | 0 |
 | D | Adult living alone | 20 | 20 | 6 | 5 | 5 | 3 | 1 | 0 |
 | E | Adult couple, no children at home | 13 | 26 | 5 | 2 | 2 | 3 | 1 | 0 |
@@ -11397,10 +11400,10 @@ Core cast by band: children `tib`; young adults `rook`, `margo`, `priya`, `june`
 | N | Three generations (elder + 2 adults + 2 minors) | 4 | 20 | 3 | 0 | 0 | 1 | 0 | 0 |
 | O | Young adult carer + elder parent or grandparent | 3 | 6 | 3 | 0 | 0 | 0 | 0 | 0 |
 | P | Adult + elder parent | 1 | 2 | 0 | 1 | 0 | 0 | 0 | 0 |
-| | **Total households** | **123** | | **45** | **29** | **19** | **19** | **8** | **3** |
-| | **Total people** | | **210** | **85** | **42** | **30** | **36** | **13** | **4** |
+| | **Total households** | **107** | | **32** | **29** | **19** | **19** | **5** | **3** |
+| | **Total people** | | **190** | **69** | **42** | **30** | **36** | **9** | **4** |
 
-Row check: 36 + 18 + 6 + 20 + 13 + 2 + 5 + 2 + 3 + 3 + 1 + 3 + 3 + 4 + 3 + 1 = 123. People: 36 + 36 + 12 + 20 + 26 + 4 + 5 + 6 + 6 + 9 + 2 + 12 + 8 + 20 + 6 + 2 = 210. Types J to N hold all 23 minors (3 + 1 + 6 + 5 + 8). Named households: `tib` and Ada Okafor are the Old Quarter row of type M; `priya` and Raman, `rook` and `delphine`, and Nettie Szabo and her grandmother Ilona are the three type O rows in Millbrook; `june`, `ines` and one more lodger are the Market Row row of type H (`pub_rooms`); the Calloway twins and a cousin are the Wharf row of type H (the old cannery bunkhouse).
+Row check: 24 + 14 + 6 + 20 + 13 + 2 + 5 + 2 + 3 + 3 + 1 + 3 + 3 + 4 + 3 + 1 = 107. People: 24 + 28 + 12 + 20 + 26 + 4 + 5 + 6 + 6 + 9 + 2 + 12 + 8 + 20 + 6 + 2 = 190. Types J to N hold all 23 minors (3 + 1 + 6 + 5 + 8). Named households: `tib` and Ada Okafor are the Old Quarter row of type M; `priya` and Raman, `rook` and `delphine`, and Nettie Szabo and her grandmother Ilona are the three type O rows in Millbrook; `june`, `ines` and one more lodger are the Market Row row of type H (`pub_rooms`); the Calloway twins and a cousin are the Wharf row of type H (the old cannery bunkhouse).
 
 #### A.1.3 Where they live
 
@@ -11408,16 +11411,16 @@ Millbrook has the most housing, as the registry promises. Briar Woods has no hom
 
 | Zone | Households | Residents | Share | Vacant homes (§2.4) | Homes in total | % vacant |
 |---|---|---|---|---|---|---|
-| Millbrook | 45 | 85 | 40.5% | 38 | 83 | 46% |
-| Old Quarter | 29 | 42 | 20.0% | 9 | 38 | 24% |
-| Wharf | 19 | 36 | 17.1% | 8 | 27 | 30% |
-| Market Row | 19 | 30 | 14.3% | 0 | 19 | 0% |
-| Station Hill | 8 | 13 | 6.2% | 6 | 14 | 43% |
-| The Commons | 3 | 4 | 1.9% | 0 | 3 | 0% |
+| Millbrook | 32 | 69 | 36.3% | 51 | 83 | 61% |
+| Old Quarter | 29 | 42 | 22.1% | 9 | 38 | 24% |
+| Wharf | 19 | 36 | 18.9% | 8 | 27 | 30% |
+| Market Row | 19 | 30 | 15.8% | 0 | 19 | 0% |
+| Station Hill | 5 | 9 | 4.7% | 9 | 14 | 64% |
+| The Commons | 3 | 4 | 2.1% | 0 | 3 | 0% |
 | Briar Woods | 0 | 0 | 0.0% | 0 | 0 | n/a |
-| **Total** | **123** | **210** | **100.0%** | **61** | **184** | **33%** |
+| **Total** | **107** | **190** | **100.0%** | **77** | **184** | **42%** |
 
-45 + 29 + 19 + 19 + 8 + 3 = 123 households. 85 + 42 + 30 + 36 + 13 + 4 = 210 residents. 123 occupied + 61 vacant = 184 homes. Market Row's flats over shops count as occupied homes; its nine empty storefronts are shops, not housing. Occupied homes not named in §9.5 take ids of the form `<zone>.home_NN` (A.6). Vacant houses keep their `vacant_house_NN` ids, numbered 01–38 Millbrook, 39–47 Old Quarter, 48–55 Wharf, 56–61 Station Hill.
+32 + 29 + 19 + 19 + 5 + 3 = 107 households. 69 + 42 + 30 + 36 + 9 + 4 = 190 residents. 107 occupied + 77 vacant = 184 homes. Market Row's flats over shops count as occupied homes; its nine empty storefronts are shops, not housing. Occupied homes not named in §9.5 take ids of the form `<zone>.home_NN` (A.6). Vacant houses keep their `vacant_house_NN` ids, numbered 01–38 Millbrook, 39–47 Old Quarter, 48–55 Wharf, 56–61 Station Hill, then 62–74 Millbrook and 75–77 Station Hill for the homes the trim emptied (each where its household's `home_NN` stood).
 
 #### A.1.4 Occupations
 
@@ -11458,19 +11461,19 @@ Of the 90, 12 are away most of the week and 6 are Tollmen, so **72** are ordinar
 | Employed (table above) | 20 | 49 | 21 | 90 |
 | Out of work, looking (mostly ex-mill and ex-cannery) | 4 | 9 | 0 | 13 |
 | Full-time unpaid carers (children, parents) | 3 | 5 | 0 | 8 |
-| Retired (60+) | 0 | 0 | 65 | 65 |
+| Retired (60+) | 0 | 0 | 45 | 45 |
 | Retired early or unable to work (mill lung, injuries) | 0 | 11 | 0 | 11 |
-| **Aged 18+** | **27** | **74** | **86** | **187** |
+| **Aged 18+** | **27** | **74** | **66** | **167** |
 | Pupils aged 5–12 | | | | 9 |
 | Teens in lessons (four have Saturday jobs) | | | | 9 |
 | Under-fives | | | | 5 |
-| **All homed residents** | | | | **210** |
+| **All homed residents** | | | | **190** |
 
-187 + 9 + 9 + 5 = 210. Of the 187 adults, 90 (48%) have paid work, 76 (41%) are retired, 13 (7%) are looking and 8 (4%) are caring. Among the 101 people aged 18–59, 13 are out of work (12.9%).
+167 + 9 + 9 + 5 = 190. Of the 167 adults, 90 (54%) have paid work, 56 (34%) are retired, 13 (8%) are looking and 8 (5%) are caring. Among the 101 people aged 18–59, 13 are out of work (12.9%).
 
-#### A.1.5 How the 192 were generated
+#### A.1.5 How the 192 were generated (172 since the trim)
 
-The 192 were generated offline from the 24 archetypes in A.2, one Haiku call per household, using the same prompt as arrivals (A.3.6) with `MODE: native`. Quotas below are people per archetype by band, and they were checked against the household and job tables above. A human curator then edited every card (names, relationships, secrets, routines) so the town reads as a place with history, not a lottery.
+The 192 were generated offline from the 24 archetypes in A.2, one Haiku call per household, using the same prompt as arrivals (A.3.6) with `MODE: native`. Quotas below are people per archetype by band, and they were checked against the household and job tables above. A human curator then edited every card (names, relationships, secrets, routines) so the town reads as a place with history, not a lottery. The table is the town after the 2026-11-05 trim (A.1); as generated, the elders were `retired_couple` 30, `widowed_elder` 22, `retired_organizer` 5 and `radio_tinkerer` 2 (81 elders, 192 in all).
 
 | Archetype | Children | Teens | Young adults | Adults | Elders | Total |
 |---|---|---|---|---|---|---|
@@ -11489,20 +11492,20 @@ The 192 were generated offline from the 24 archetypes in A.2, one Haiku call per
 | `mill_hand` | 0 | 0 | 0 | 13 | 5 | 18 |
 | `clinician` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `schoolteacher` | 0 | 0 | 0 | 0 | 0 | 0 |
-| `retired_couple` | 0 | 0 | 0 | 4 | 30 | 34 |
-| `widowed_elder` | 0 | 0 | 0 | 0 | 22 | 22 |
+| `retired_couple` | 0 | 0 | 0 | 4 | 22 | 26 |
+| `widowed_elder` | 0 | 0 | 0 | 0 | 12 | 12 |
 | `retired_keeper` | 0 | 0 | 0 | 0 | 3 | 3 |
-| `retired_organizer` | 0 | 0 | 0 | 2 | 5 | 7 |
+| `retired_organizer` | 0 | 0 | 0 | 2 | 4 | 6 |
 | `returnee` | 0 | 0 | 0 | 0 | 0 | 0 |
 | `birdwatcher` | 0 | 0 | 0 | 1 | 1 | 2 |
 | `retired_magician` | 0 | 0 | 0 | 0 | 1 | 1 |
 | `cartographer` | 0 | 0 | 0 | 1 | 1 | 2 |
-| `radio_tinkerer` | 0 | 0 | 0 | 2 | 2 | 4 |
-| **Total** | **13** | **9** | **21** | **68** | **81** | **192** |
+| `radio_tinkerer` | 0 | 0 | 0 | 2 | 1 | 3 |
+| **Total** | **13** | **9** | **21** | **68** | **61** | **172** |
 
-Column check: 13 + 9 + 21 + 68 + 81 = 192, matching the generated column of A.1.1. The town starts with no `clinician` or `schoolteacher` and no `returnee` on purpose: those are the gaps the player fills. Mill hands (18) are the largest group of working-age adults, and nine of them are the unemployed adults in A.1.4.
+Column check: 13 + 9 + 21 + 68 + 61 = 172, matching the generated column of A.1.1. The town starts with no `clinician` or `schoolteacher` and no `returnee` on purpose: those are the gaps the player fills. Mill hands (18) are the largest group of working-age adults, and nine of them are the unemployed adults in A.1.4.
 
-**Named people inside the 192** (generated from the nearest archetype, then hand-edited): the five Tollmen, Bru Haskett (`drifter`), Dex and Dom Calloway (`drifter`), Wendell "Weasel" Pike (`drifter`) and Nettie Szabo (`apprentice`); Barnaby "Barney" Dunmore, Nell's brother (`shop_founder`; canon, §12.4); Hester Quill, owner of Café Liss (`shop_founder`; canon, §12.4); Ada Okafor, Tib's mother (`single_parent`); Raman Ramaswamy, Priya's father, and Ilona Szabo, Nettie's grandmother (`widowed_elder`); Mossimo "Old Moss" Ferrante (`fisher`). Four Day-1 oddballs, for flavor: Alphonse Quist, 68, a `birdwatcher` who lives by the duck pond; Ferdinand Marchetti, 73, a `retired_magician` in the Old Quarter; Ignatia Voss, 58, a `cartographer` who is never lost and always late; and Dolores "Dolly" Frane, 61, a `radio_tinkerer` on Market Row.
+**Named people inside the 172** (generated from the nearest archetype, then hand-edited): the five Tollmen, Bru Haskett (`drifter`), Dex and Dom Calloway (`drifter`), Wendell "Weasel" Pike (`drifter`) and Nettie Szabo (`apprentice`); Barnaby "Barney" Dunmore, Nell's brother (`shop_founder`; canon, §12.4); Hester Quill, owner of Café Liss (`shop_founder`; canon, §12.4); Ada Okafor, Tib's mother (`single_parent`); Raman Ramaswamy, Priya's father, and Ilona Szabo, Nettie's grandmother (`widowed_elder`); Mossimo "Old Moss" Ferrante (`fisher`). Four Day-1 oddballs, for flavor: Alphonse Quist, 68, a `birdwatcher` who lives by the duck pond; Ferdinand Marchetti, 73, a `retired_magician` in the Old Quarter; Ignatia Voss, 58, a `cartographer` who is never lost and always late; and Dolores "Dolly" Frane, 61, a `radio_tinkerer` on Market Row.
 
 ### A.2 Archetypes
 
@@ -11537,16 +11540,16 @@ An archetype is the seed of a Persona Card: a bundle of age range, look, work, P
 | 13 | `mill_hand` | Former mill hand | 44–66 (M) | 48 / 50 / 2 | 0.75 / 0.15 / 0.05 / 0.05 | 0.55 / 0.20 / 0.10 / 0.15 | 0.9 | 18 |
 | 14 | `clinician` | Doctor or nurse | 29–55 (M) | 62 / 34 / 4 | 0.10 / 0.65 / 0.20 / 0.05 | 0.15 / 0.40 / 0.30 / 0.15 | 0.3 | 0 |
 | 15 | `schoolteacher` | Schoolteacher | 25–60 (M) | 66 / 30 / 4 | 0.10 / 0.30 / 0.50 / 0.10 | 0.15 / 0.25 / 0.40 / 0.20 | 0.3 | 0 |
-| 16 | `retired_couple` | Retired couple | 60–78 (O) | 50 / 50 / 0 | 0.05 / 0.40 / 0.10 / 0.45 | 0.10 / 0.35 / 0.20 / 0.35 | 1.0 | 34 |
-| 17 | `widowed_elder` | Widowed elder | 63–88 (O) | 72 / 26 / 2 | 0.05 / 0.35 / 0.45 / 0.15 | 0.10 / 0.40 / 0.30 / 0.20 | 0.8 | 22 |
+| 16 | `retired_couple` | Retired couple | 60–78 (O) | 50 / 50 / 0 | 0.05 / 0.40 / 0.10 / 0.45 | 0.10 / 0.35 / 0.20 / 0.35 | 1.0 | 26 |
+| 17 | `widowed_elder` | Widowed elder | 63–88 (O) | 72 / 26 / 2 | 0.05 / 0.35 / 0.45 / 0.15 | 0.10 / 0.40 / 0.30 / 0.20 | 0.8 | 12 |
 | 18 | `retired_keeper` | Retired keeper of lights | 62–80 (O) | 30 / 68 / 2 | 0.05 / 0.45 / 0.30 / 0.20 | 0.15 / 0.40 / 0.25 / 0.20 | 0.4 | 3 |
-| 19 | `retired_organizer` | Retired organizer | 58–76 (O) | 55 / 42 / 3 | 0.05 / 0.10 / 0.70 / 0.15 | 0.15 / 0.15 / 0.50 / 0.20 | 0.5 | 7 |
+| 19 | `retired_organizer` | Retired organizer | 58–76 (O) | 55 / 42 / 3 | 0.05 / 0.10 / 0.70 / 0.15 | 0.15 / 0.15 / 0.50 / 0.20 | 0.5 | 6 |
 | 20 | `returnee` | Returnee | 18–82, by entry (M) | 50 / 46 / 4 | 0.25 / 0.25 / 0.35 / 0.15 | 0.20 / 0.25 / 0.30 / 0.25 | 0.6 | 0 |
 | 21 | `birdwatcher` | Birdwatcher | 32–82 (O) | 45 / 50 / 5 | 0.05 / 0.15 / 0.25 / 0.55 | 0.05 / 0.25 / 0.30 / 0.40 | 0.4 | 2 |
 | 22 | `retired_magician` | Semi-retired magician | 58–82 (O) | 30 / 65 / 5 | 0.05 / 0.05 / 0.40 / 0.50 | 0.10 / 0.10 / 0.35 / 0.45 | 0.3 | 1 |
 | 23 | `cartographer` | Cartographer | 30–72 (M) | 50 / 42 / 8 | 0.20 / 0.10 / 0.25 / 0.45 | 0.20 / 0.15 / 0.25 / 0.40 | 0.3 | 2 |
-| 24 | `radio_tinkerer` | Radio and clock tinkerer | 40–80 (O) | 40 / 55 / 5 | 0.20 / 0.10 / 0.40 / 0.30 | 0.20 / 0.15 / 0.30 / 0.35 | 0.4 | 4 |
-| | | | | | | | **Total** | **192** |
+| 24 | `radio_tinkerer` | Radio and clock tinkerer | 40–80 (O) | 40 / 55 / 5 | 0.20 / 0.10 / 0.40 / 0.30 | 0.20 / 0.15 / 0.30 / 0.35 | 0.4 | 3 |
+| | | | | | | | **Total** | **172** |
 
 Dream stages read `template → stage 1 › stage 2 › stage 3`.
 
@@ -12465,7 +12468,7 @@ Rows are `kind: greet`.
 | GR-062 | r:=Wary m:low | Hello. I'd rather not talk, if it's all the same. |
 | GR-063 | r:=Wary m:even | {player}. Can I help you, or are you just passing? |
 | GR-064 | r:=Wary m:bright | Hm. Hello. I'm in a good mood, so don't spoil it. |
-| GR-065 | r:=Wary m:glowing | Well. Even I can't stay cross on a day like this. Hello. |
+| GR-065 | r:=Wary m:glowing | Well. Even I won't stay cross on a day like this. Hello. |
 | GR-066 | r:=Stranger m:glum | Hello. I'm {name}, if you need it. Not much company today. |
 | GR-067 | r:=Stranger m:low | Hello. I'm {name}. We haven't really talked, have we? |
 | GR-068 | r:=Stranger m:even | Hello. I'm {name}. You're the Fellow, aren't you? |
@@ -12481,7 +12484,7 @@ Rows are `kind: greet`.
 | GR-078 | r:=Friend m:even | {player}! There you are. I was hoping you'd come by. |
 | GR-079 | r:=Friend m:bright | {player}! I was just thinking about you. Come here. |
 | GR-080 | r:=Friend m:glowing | {player}! My favorite person in Monde today, and I mean it. |
-| GR-081 | r:=Confidant m:glum | {player}. Stay a while. I can't pretend with you. |
+| GR-081 | r:=Confidant m:glum | {player}. Stay a while. No pretending with you. |
 | GR-082 | r:=Confidant m:low | Oh, {player}. Good. I needed someone who wouldn't fuss. |
 | GR-083 | r:=Confidant m:even | {player}. How are you, really? Take your time. |
 | GR-084 | r:=Confidant m:bright | {player}! Come here, you. It's been a good day, and it's better now. |
@@ -12570,11 +12573,11 @@ All rows are `kind: ctx`. They are used for ambient barks as the player passes, 
 |---|---|---|
 | CX-001 | w:sun | Proper sun today. The whole town looks freshly washed. |
 | CX-002 | w:sun | Sun's out. Even the gulls are being civil. |
-| CX-003 | w:sun m:glum,low | Bright out. Somehow that makes it worse. Don't mind me. |
+| CX-003 | w:sun m:glum,low | Bright out. Somehow that makes it worse. |
 | CX-004 | w:sun m:bright,glowing | Look at that sky! Nobody could have a bad day under it. |
 | CX-005 | w:cloud | Grey and soft today. Good weather for getting on with things. |
 | CX-006 | w:cloud | The clouds can't make up their minds. Neither can I. |
-| CX-007 | w:cloud m:glum,low | Lid's on the sky again. Suits my mood, to be honest. |
+| CX-007 | w:cloud m:glum,low | Lid's on the sky again. Suits my mood. |
 | CX-008 | w:cloud m:bright,glowing | Cloudy, but the kind with silver edges. I like those. |
 | CX-009 | w:rain | Rain again. The gutters are getting their money's worth. |
 | CX-010 | w:rain | Mind the puddles on {place}. Some are deeper than they look. |
@@ -12586,7 +12589,7 @@ All rows are `kind: ctx`. They are used for ambient barks as the player passes, 
 | CX-016 | w:fog m:bright,glowing | Fog! The whole town's turned into a secret. I adore it. |
 | CX-017 | w:wind | Wind's up. Hold your hat, and anything else you're fond of. |
 | CX-018 | w:wind | That wind has opinions today. Mostly about hats. |
-| CX-019 | w:wind m:glum,low | Wind in my ears all day. I can't think straight. |
+| CX-019 | w:wind m:glum,low | Wind in my ears all day. Thoughts won't sit still. |
 | CX-020 | w:wind m:bright,glowing | Windy! Good for kites, washing and clearing the head. |
 | CX-021 | w:snow | Snow. Everything's gone quiet, even the gulls. |
 | CX-022 | w:snow | Mind your feet. Snow hides the cobbles but not the ice. |
@@ -12854,7 +12857,7 @@ Everything below is new in Appendices A and B (the list sits at the end of the f
 - **Mechanics defined here:** the volunteer pool (each volunteer is one free helper on community work and Projects; cap 12), job slots (`apprentice`, `maker`, `mill_floor`), events (`toddler_hour`, `teen_class`, `listening_night`, `festival_turn`, `survey_day`, the Heron Count), the `print_name` field on core cards, mood bands (glum / low / even / bright / glowing at 0–19 / 20–39 / 40–59 / 60–79 / 80–100) and the `Wary` Regard tier already in the shared vocabulary.
 
 **Open questions for the integrator**
-1. **Census counting.** *Resolved: the census reads 210 (A.1).* The Day-1 roster is 212 agents (20 core + 192), of whom 210 sleep in Monde. Does `census` count `vane` and `bastien`? If census counts only people with a bed, Day 1 reads 210, the Option Clause's 200 line has a 10-resident cushion instead of 12, and the generated count would need to rise from 192 to 194 to keep 212.
+1. **Census counting.** *Resolved: the census reads 210 (A.1); 190 since the 2026-11-05 trim, with the Option Clause line moved to 180.* The Day-1 roster is 212 agents (20 core + 192), of whom 210 sleep in Monde. Does `census` count `vane` and `bastien`? If census counts only people with a bed, Day 1 reads 210, the Option Clause's 200 line has a 10-resident cushion instead of 12, and the generated count would need to rise from 192 to 194 to keep 212.
 2. **School ages.** *Resolved: ages 5–12, matching §6.7.* This appendix puts pupils at ages 5–12 (nine of them) and treats teens as outside the 20-pupil target. If §6.3 counts teens, the Day-1 pupil count would be 18, not 9.
 3. **The six open shops.** Assumed to be the bakery, Dunmore's General Store, The Gull & Anchor, Café Liss, the fish market and Kasimir's workshop.
 4. **Commuters.** Twelve residents are away Tue–Fri. That also means 12 fewer active agents on those days, which is a useful cost lever.
@@ -12880,7 +12883,7 @@ Everything below is new in Appendices A and B (the list sits at the end of the f
 | **Lantern Night** | Day 100: the election and the lantern festival (§10.5). |
 | **Mark** | A brass riddle plaque left by the founder (§14). |
 | **Momentum** | The word-of-mouth bonus to Appeal from recent Pillar gains (§6.2). |
-| **Option Clause** | Pell's secret deal: under 200 residents for 7 days and Vane can buy the Wharf (§6.5). |
+| **Option Clause** | Pell's secret deal: under 180 residents for 7 days and Vane can buy the Wharf (§6.5). |
 | **Pillars** | Prosperity, Safety, Spirit, Charm, each 0–100 (§6.1). |
 | **Project** | A multi-day restoration that permanently changes the town (§6.3). |
 | **Quiet Mode** | The offline fallback, in which authored lines and templates replace live AI (§9.14). |

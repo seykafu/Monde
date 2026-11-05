@@ -11,10 +11,10 @@ import { loadFullRoster } from '../../../sim/__tests__/content';
 vi.mock('phaser', () => ({ default: {} }));
 
 describe('Fellow facelift', () => {
-  it('preserves pre-facelift RGBA hashes for all 212 residents and hair/outfit/cap coverage', async () => {
+  it('preserves pre-facelift RGBA hashes for all 192 residents and hair/outfit/cap coverage', async () => {
     // Recorded from the unmodified rig before adding face; never regenerate to approve a Fellow change.
     const roster = await loadFullRoster();
-    expect(roster).toHaveLength(212);
+    expect(roster).toHaveLength(192);
     const looks = roster.map(c => ({ id: c.id, look: c.look ? lookFromCard(c.look, 0x5fa36a) : residentLook(c.id, 0x5fa36a) }));
     for (const id of ['odile', 'pell', 'margo', 'teo', 'augusta'])
       looks.push({ id: `hash-${id}`, look: residentLook(id, 0xaa735c) });
@@ -24,7 +24,7 @@ describe('Fellow facelift', () => {
         outfit: { cut: outfit, top: 4, bottom: 15, bottom_style: 'trousers', shoes: 2, trim: 9 },
         accessory: { kind: 'none' }, headwear: { kind: headwear }
       }, 0x5fa36a) });
-    expect(looks).toHaveLength(553);
+    expect(looks).toHaveLength(533);
     expect(Object.keys(baseline)).toHaveLength(looks.length);
     for (const { id, look } of looks)
       expect(createHash('sha256').update(renderSheet(look).data).digest('hex'), id)

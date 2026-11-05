@@ -192,13 +192,13 @@ describe("the census's supporting pieces", () => {
     expect(personaBlock(generated, { flags: [], day: 1 })).toBe(personaBlock(pell, { flags: [], day: 1 }));
   });
 
-  it("npm run census:write -- --template-only --out <dir> writes all 188 template cards there, no call, the skeleton untouched", () => {
+  it("npm run census:write -- --template-only --out <dir> writes all 168 template cards there, no call, the skeleton untouched", () => {
     const out = mkdtempSync(join(tmpdir(), "monde-day1-"));
     const before = read("content/census/day1.yaml");
     const log = execFileSync(process.execPath, ["--import", "tsx", "tools/gen-residents.ts", "--template-only", "--out", out], { cwd: root, encoding: "utf8", env: { ...process.env, ADMIN_TOKEN: "", ANTHROPIC_API_KEY: "" } });
-    expect(log).toMatch(/107 households written as template cards \(188 cards\)/);
+    expect(log).toMatch(/91 households written as template cards \(168 cards\)/);
     const files = readdirSync(out).filter(f => f.endsWith(".yaml"));
-    expect(files).toHaveLength(188);
+    expect(files).toHaveLength(168);
     for (const f of files.slice(0, 20)) expect(PersonaCard.parse(YAML.parse(readFileSync(join(out, f), "utf8")))).toMatchObject({ generated_by: "template", kind: "resident" });
     expect(read("content/census/day1.yaml")).toBe(before);
   }, 60_000);

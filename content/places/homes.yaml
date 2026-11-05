@@ -1,5 +1,6 @@
-# Every home in Monde (GDD Appendix A.1.3, A.3.4 rule 1, A.6; Kasey's D3 for M-03): the 123 lived in on Day 1 and
-# the 61 vacant, 184 in all. Each has an address, the A.3.4 attributes (beds, ground_floor, bench) and a host, where
+# Every home in Monde (GDD Appendix A.1.3, A.3.4 rule 1, A.6; Kasey's D3 for M-03): the 107 lived in on Day 1 and
+# the 77 vacant, 184 in all (vacant_house_62–77 were emptied by the 2026-11-05 census trim, shared/src/census/trim.ts,
+# each where its household's home_NN stood). Each has an address, the A.3.4 attributes (beds, ground_floor, bench) and a host, where
 # it stands (shared/src/census/homes.ts):
 #   { building: x }  inside the building on its zone's board whose id is x or whose `home:` names x (its door);
 #   { lane: [x, y] } on a street the board doesn't draw: residents walk to that edge cell and step off;
@@ -118,7 +119,7 @@ homes:
   commons.teo_cottage: { street: "Glasshouse Walk", number: 1, name: "Teo's cottage", beds: 1, ground_floor: true, bench: true, host: { building: "teo_cottage" } }
   commons.home_01: { street: "Pond Lane", number: 1, beds: 1, ground_floor: true, bench: true, host: { lane: [0, 20] } }
   commons.home_02: { street: "Railings Lane", number: 1, beds: 2, ground_floor: true, bench: false, host: { lane: [47, 28] } }
-  # Millbrook: 45 lived in, 38 vacant (A.1.3), none of it on a board yet (offboard). GDD-GAP: §9.5 names only Terrace
+  # Millbrook: 32 lived in, 51 vacant (A.1.3), none of it on a board yet (offboard). GDD-GAP: §9.5 names only Terrace
   # Row; the other streets are the skeleton's. Terrace Row is the mill terrace, two up two down; Weir Road and School
   # Lane have the bigger houses.
   # Terrace Row (Bru at No. 7, Nettie and her grandmother at No. 12, Maud a few doors on at No. 15).
@@ -130,9 +131,9 @@ homes:
   millbrook.vacant_house_05: { street: "Terrace Row", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_02: { street: "Terrace Row", number: 7, beds: 2, ground_floor: true, bench: true, host: offboard }
   millbrook.vacant_house_06: { street: "Terrace Row", number: 8, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_03: { street: "Terrace Row", number: 9, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_63: { street: "Terrace Row", number: 9, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_07: { street: "Terrace Row", number: 10, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_04: { street: "Terrace Row", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_69: { street: "Terrace Row", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_05: { street: "Terrace Row", number: 12, beds: 2, ground_floor: false, bench: true, host: offboard }
   millbrook.vacant_house_08: { street: "Terrace Row", number: 13, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_06: { street: "Terrace Row", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
@@ -144,29 +145,29 @@ homes:
   millbrook.vacant_house_11: { street: "Terrace Row", number: 20, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_10: { street: "Terrace Row", number: 21, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_12: { street: "Terrace Row", number: 22, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_11: { street: "Terrace Row", number: 23, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_73: { street: "Terrace Row", number: 23, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_13: { street: "Terrace Row", number: 24, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_12: { street: "Terrace Row", number: 25, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_66: { street: "Terrace Row", number: 25, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_14: { street: "Terrace Row", number: 26, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_13: { street: "Terrace Row", number: 27, beds: 2, ground_floor: true, bench: true, host: offboard }
   millbrook.vacant_house_15: { street: "Terrace Row", number: 28, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_16: { street: "Terrace Row", number: 29, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_14: { street: "Terrace Row", number: 30, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_72: { street: "Terrace Row", number: 30, beds: 2, ground_floor: true, bench: false, host: offboard }
   # Loom Street.
-  millbrook.home_15: { street: "Loom Street", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_68: { street: "Loom Street", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_17: { street: "Loom Street", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_16: { street: "Loom Street", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_18: { street: "Loom Street", number: 4, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_17: { street: "Loom Street", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_18: { street: "Loom Street", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_64: { street: "Loom Street", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_71: { street: "Loom Street", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_19: { street: "Loom Street", number: 7, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_19: { street: "Loom Street", number: 8, beds: 2, ground_floor: false, bench: false, host: offboard }
   millbrook.vacant_house_20: { street: "Loom Street", number: 9, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_21: { street: "Loom Street", number: 10, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_20: { street: "Loom Street", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_67: { street: "Loom Street", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_22: { street: "Loom Street", number: 12, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_21: { street: "Loom Street", number: 13, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_22: { street: "Loom Street", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_74: { street: "Loom Street", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_23: { street: "Loom Street", number: 15, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_23: { street: "Loom Street", number: 16, beds: 2, ground_floor: false, bench: false, host: offboard }
   # Mill Lane.
@@ -182,8 +183,8 @@ homes:
   millbrook.vacant_house_28: { street: "Mill Lane", number: 10, beds: 1, ground_floor: true, bench: false, host: offboard }
   millbrook.home_29: { street: "Mill Lane", number: 11, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.vacant_house_29: { street: "Mill Lane", number: 12, beds: 1, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_30: { street: "Mill Lane", number: 13, beds: 2, ground_floor: true, bench: false, host: offboard }
-  millbrook.home_31: { street: "Mill Lane", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_65: { street: "Mill Lane", number: 13, beds: 2, ground_floor: true, bench: false, host: offboard }
+  millbrook.vacant_house_70: { street: "Mill Lane", number: 14, beds: 2, ground_floor: true, bench: false, host: offboard }
   # Weir Road (the Ramaswamys at No. 2: Raman walks the weir path).
   millbrook.home_32: { street: "Weir Road", number: 1, beds: 3, ground_floor: true, bench: false, host: offboard }
   millbrook.priya_house: { street: "Weir Road", number: 2, name: "the Ramaswamys' house on Weir Road", beds: 2, ground_floor: true, bench: false, host: offboard }
@@ -205,22 +206,22 @@ homes:
   millbrook.vacant_house_36: { street: "School Lane", number: 7, beds: 3, ground_floor: true, bench: false, host: offboard }
   # Laundry Green (the Mercers at No. 1).
   millbrook.mercer_house: { street: "Laundry Green", number: 1, name: "the Mercer house on Laundry Green", beds: 2, ground_floor: true, bench: true, host: offboard }
-  millbrook.home_40: { street: "Laundry Green", number: 2, beds: 2, ground_floor: true, bench: true, host: offboard }
+  millbrook.vacant_house_62: { street: "Laundry Green", number: 2, beds: 2, ground_floor: true, bench: true, host: offboard }
   millbrook.vacant_house_37: { street: "Laundry Green", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
   millbrook.home_41: { street: "Laundry Green", number: 4, beds: 2, ground_floor: false, bench: false, host: offboard }
   millbrook.vacant_house_38: { street: "Laundry Green", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
   # Mill Yard.
   millbrook.kasimir_workshop: { street: "Mill Yard", number: 1, name: "Wolanski's workshop in Mill Yard", beds: 1, ground_floor: true, bench: true, host: offboard }
-  # Station Hill: 8 lived in, 6 vacant (A.1.3), offboard. GDD-GAP: the streets are the skeleton's.
+  # Station Hill: 5 lived in, 9 vacant (A.1.3), offboard. GDD-GAP: the streets are the skeleton's.
   station_hill.hollis_house: { street: "Station Road", number: 1, name: "the signalman's cottage", beds: 1, ground_floor: true, bench: true, host: offboard }
-  station_hill.home_01: { street: "Station Road", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.vacant_house_75: { street: "Station Road", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
   station_hill.vacant_house_56: { street: "Station Road", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
-  station_hill.home_02: { street: "Station Road", number: 4, beds: 2, ground_floor: true, bench: true, host: offboard }
+  station_hill.vacant_house_77: { street: "Station Road", number: 4, beds: 2, ground_floor: true, bench: true, host: offboard }
   station_hill.vacant_house_57: { street: "Station Road", number: 5, beds: 2, ground_floor: true, bench: false, host: offboard }
   station_hill.home_03: { street: "Station Road", number: 6, beds: 2, ground_floor: true, bench: false, host: offboard }
   station_hill.vacant_house_58: { street: "Station Road", number: 7, beds: 2, ground_floor: true, bench: false, host: offboard }
   station_hill.vacant_house_59: { street: "Station Road", number: 8, beds: 2, ground_floor: true, bench: false, host: offboard }
-  station_hill.home_04: { street: "Tower Lane", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
+  station_hill.vacant_house_76: { street: "Tower Lane", number: 1, beds: 2, ground_floor: true, bench: false, host: offboard }
   station_hill.home_05: { street: "Tower Lane", number: 2, beds: 2, ground_floor: true, bench: false, host: offboard }
   station_hill.vacant_house_60: { street: "Tower Lane", number: 3, beds: 2, ground_floor: true, bench: false, host: offboard }
   station_hill.home_06: { street: "Tower Lane", number: 4, beds: 2, ground_floor: true, bench: true, host: offboard }

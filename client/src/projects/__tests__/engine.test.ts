@@ -260,7 +260,7 @@ describe('the opening (§6.3 step 6)', () => {
     if (!signed.ok) throw new Error('unsigned');
     s = signed.state;
     const done = E.completeProject(d, s, id, signed.town, { day: 12, place: 'old_quarter.vacant_house_39', attendees: [] });
-    expect(done.town.homes).toMatchObject({ vacant_restorable: 60, restored_free: 1 });
+    expect(done.town.homes).toMatchObject({ vacant_restorable: 76, restored_free: 1 });
     expect(done.flags).toEqual(['project_vacant_house_39_done']);
     expect(done.town.flags).toMatchObject({ project_vacant_house_39_done: true });
     expect(E.activeHomes(done.state)).toBeNull();

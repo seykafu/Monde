@@ -91,13 +91,6 @@ chores:
   ]
 relationships:
   - {
-      id: esme_hallam,
-      affinity: 12,
-      trust: 8,
-      tag: fond,
-      note: Neighbour on Tower Lane who sews with her on Thursdays.
-    }
-  - {
       id: hollis,
       affinity: 6,
       trust: 5,

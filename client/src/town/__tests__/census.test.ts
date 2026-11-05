@@ -13,14 +13,14 @@ const all = [...hand, ...day1];
 const homed = all.filter(c => c.kind !== 'animal' && !c.home.startsWith('offmap.'));
 
 describe('the Day-1 census, from the cards (A.1)', () => {
-  it('is 210 homed residents in 123 households, nine of them pupils: the town engine\'s Day 1', () => {
+  it('is 190 homed residents in 107 households, nine of them pupils: the town engine\'s Day 1', () => {
     expect(day1).toHaveLength(GENERATED - 4);
-    expect(all).toHaveLength(212);
+    expect(all).toHaveLength(192);
     expect(homed).toHaveLength(HOMED);
     expect(DAY1_CENSUS).toBe(HOMED);
-    // A household to a home (A.1.3): the census's 107 written households and the 16 the hand-written cards hold.
+    // A household to a home (A.1.3): the census's 91 written households and the 16 the hand-written cards hold.
     expect(new Set(homed.map(c => c.home)).size).toBe(HOUSEHOLDS);
-    expect(new Set(day1.map(c => c.household))).toHaveProperty('size', 107);
+    expect(new Set(day1.map(c => c.household))).toHaveProperty('size', 91);
     const pupils = homed.filter(c => c.age >= 5 && c.age <= 12);
     expect(pupils).toHaveLength(DAY1_PUPILS);
     expect(pupils.filter(c => c.employment).every(c => c.employment === 'pupil')).toBe(true);

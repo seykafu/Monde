@@ -7,10 +7,10 @@
 //   resident    a named resident's home: their persona card's `home` (§9.5), or a flat inside a building
 //               (`margo_flat` above the library). Lived in while one of them has a bed there.
 //   player      the Lamplighter's Cottage, the Fellow's from S01c (`cottage_keys_given`, §11.5).
-//   household   a census household nobody has met yet: one of A.1.2's 123, off-screen in the sim. Occupied
+//   household   a census household nobody has met yet: one of A.1.2's 107, off-screen in the sim. Occupied
 //               homes not named in §9.5 take `home_NN` ids (A.1.3); a named flat with no card (`dunmore_flat`,
 //               the Calloways' `home_bunkhouse`) is one too. Lived in from Day 1.
-//   vacant      housing stock (`vacant_house_NN`, the 61 of §2.4) or a plain vacant home: faded and dark until
+//   vacant      housing stock (`vacant_house_NN`, the 77 of §2.4) or a plain vacant home: faded and dark until
 //               restored (`project_<id>_done`, the `homes` Project) and moved into.
 //
 // Moving in and out is per door, kept in the town engine's flags (TownState.flags, saved as SavedTown.flags):
@@ -29,7 +29,7 @@ export type HomeKind = 'resident' | 'player' | 'household' | 'vacant';
 export type HomeKey = string;
 export const homeKey = (zone: string, home: string): HomeKey => `${zone}.${home}`;
 
-/** A plain vacant home: not one of the numbered 61, so nobody moves in until a zone names it. */
+/** A plain vacant home: not one of the numbered 77, so nobody moves in until a zone names it. */
 export const PLAIN_VACANT = 'vacant';
 const VACANT_STOCK = /^vacant_house_\d+$/;
 /** Census households not named in §9.5 (A.1.3, A.6). */

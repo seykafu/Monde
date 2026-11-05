@@ -24,7 +24,7 @@ import { formatClock, formatDate, gameTime, weekdayOf, type Clock } from '../sim
 import { computeAppeal } from '../town/appeal';
 import { MARKET_DAY_STALL_FEES, UPKEEP_RULES, dailyRates } from '../town/fund';
 import { ARRIVAL_APPEAL, householdsForAppeal, isArrivalDay, isFerryDay } from '../town/migration';
-import { optionGauge } from '../town/optionClause';
+import { OPTION_CENSUS_LINE, optionGauge } from '../town/optionClause';
 import { PILLARS, communityWorkRoom, createTownState, todayChange, COMMUNITY_WORK_WEEKLY_CAP, type Pillar, type TownState } from '../town/pillars';
 import { runDawnsThrough, type DawnReport } from '../town/townEngine';
 import { DIALOGUE_SCENE } from './DialogueScene';
@@ -234,8 +234,8 @@ const YOUTH = 0x56b4e9;
 const ELDER = 0xd55e00;
 /** The Appeal bar's scale. */
 const APPEAL_SCALE = 60;
-/** The Option Clause gauge's census range. */
-const GAUGE_MIN = 180, GAUGE_MAX = 220;
+/** The Option Clause gauge's census range: twenty either side of the line. */
+const GAUGE_MIN = OPTION_CENSUS_LINE - 20, GAUGE_MAX = OPTION_CENSUS_LINE + 20;
 
 export class TownLedgerScene extends Phaser.Scene {
   private open!: LedgerOpen;

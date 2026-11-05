@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { emptyEventLog, emptyFriendship } from '@monde/shared';
 import { getFellow, setFellow, unsignedFellow } from '../../fellow/state';
 import { createTownState } from '../../town/pillars';
+import { OPTION_CENSUS_LINE } from '../../town/optionClause';
 import { flagsOf, projectCue, projectsOf, syncProjects, workAt, shiftsFor } from '../runtime';
 
 function registry() {
@@ -77,7 +78,7 @@ it('pauses Wharf Projects and targeted Wharf homes through save/restore, then re
   const { worldOf, projectsDawn, openProject } = await import('../runtime');
   const r = registry();
   const now = { day: 16, minute: 600 };
-  const town = runDawnsThrough({ ...createTownState(), census: 199 }, 16).state;
+  const town = runDawnsThrough({ ...createTownState(), census: OPTION_CENSUS_LINE - 1 }, 16).state;
   r.set('monde.town', restore(serialize(town)));
   const unlocked = E.unlockDue(PROJECTS, emptyProjects(), worldOf(r, now)).state;
   const p = unlocked.projects.lighthouse!;

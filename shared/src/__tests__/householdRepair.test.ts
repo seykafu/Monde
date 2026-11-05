@@ -12,13 +12,19 @@ import { censusInput, handCards, household, modelAnswer } from "./censusFixtures
 
 const codes = (v: ReturnType<typeof validateHousehold>) => (v.ok ? [] : v.errors);
 const rules = (v: ReturnType<typeof validateHousehold>) => [...new Set(codes(v).map(e => e.split(" ")[0]))].sort();
-const native = (id: string) => {
+const native = (id: string, edit?: (h: SkeletonHousehold) => void) => {
   const input = censusInput();
   const h = household(input, id);
+  edit?.(h);
   const draw = nativeDrawFor(input, h);
   const vctx = nativeValidationContext(input, h, draw);
   return { input, h, draw, vctx, out: modelAnswer(input, h, draw) };
 };
+/**
+ * A lone retired Millbrook elder. The 2026-11-05 census trim took out every one the census had (shared/src/census/trim.ts),
+ * so mb_a03, the mill's night watchman (62), stands in, retired for the test.
+ */
+const RETIRED = (h: SkeletonHousehold): void => { h.members[0]!.employment = "retired"; h.members[0]!.job = null; };
 const repair = (out: unknown, draw: HouseholdDraw, vctx: ValidationContext) => {
   const r = repairHousehold(out, draw, vctx);
   return { ...r, card: r.output as ArrivalHouseholdOutput };
@@ -903,7 +909,7 @@ describe("ties to people who aren't in Monde (V14)", () => {
   });
 
   it("with nobody at home: a neutral tie to the first neighbour in their zone or at their work (ctx.neighbours), else left for V14", () => {
-    const lone = native("mb_a02");
+    const lone = native("mb_a03", RETIRED);
     lone.out.members[0]!.relationships = [stranger("old_tom")];
     // No neighbours in the context: nothing to tie to, so the tie stays and V14 names it.
     const left = repair(lone.out, lone.draw, { ...lone.vctx, neighbours: [] });
@@ -997,7 +1003,7 @@ describe("a Millbrook day on an open board (V13n)", () => {
   ];
 
   it("moves the most suitable block to the open-board place for its verb, keeping its time, on either day", () => {
-    const { draw, vctx, out, h } = native("mb_a02");
+    const { draw, vctx, out, h } = native("mb_a03", RETIRED);
     const m = out.members[0]!;
     m.routine.weekday = MILLBROOK_DAY(h.home);
     m.routine.weekend = MILLBROOK_DAY(h.home);
@@ -1022,7 +1028,7 @@ describe("a Millbrook day on an open board (V13n)", () => {
       ["socialize", "market_row.gull_and_anchor"], ["read", "old_quarter.library"], ["pray", "old_quarter.st_brigids"], ["attend", "old_quarter.town_hall"],
       ["visit", "market_row.market_street"], ["sit", "market_row.market_street"],
     ] as const) {
-      const { draw, vctx, out, h } = native("mb_a02");
+      const { draw, vctx, out, h } = native("mb_a03", RETIRED);
       out.members[0]!.routine.weekday = [at("07:30", "eat", h.home), at("10:00", verb, "millbrook.weir"), at("12:30", "eat", h.home), at("18:00", "eat", h.home), at("21:30", "sleep", h.home)];
       const r = repair(out, draw, vctx);
       expect(r.card.members[0]!.routine.weekday[1], verb).toEqual(at("10:00", verb, place));
@@ -1031,13 +1037,13 @@ describe("a Millbrook day on an open board (V13n)", () => {
   });
 
   it("leaves a day with nothing to move for V13n, and never moves the housebound's", () => {
-    const { draw, vctx, out, h } = native("mb_a02");
+    const { draw, vctx, out, h } = native("mb_a03", RETIRED);
     out.members[0]!.routine.weekday = [at("07:30", "eat", h.home), at("10:00", "garden", "millbrook.laundry_green"), at("12:30", "eat", h.home), at("14:00", "fish", "millbrook.weir"), at("18:00", "eat", h.home), at("21:30", "sleep", h.home)];
     const r = repair(out, draw, vctx);
     expect(r.adjustments).toEqual([]);
     expect(codes(validateHousehold(r.output, draw, vctx))).toEqual(["V13n members[0].routine.weekday needs at least one block on an open board (old_quarter, market_row, wharf, commons)"]);
-    // mb_a05's m1 is 88: housebound (HOUSEBOUND_AGE), so V13n doesn't ask.
-    const old = native("mb_a05");
+    // At 88 they are housebound (HOUSEBOUND_AGE), so V13n doesn't ask.
+    const old = native("mb_a03", h => { RETIRED(h); h.members[0]!.age = 88; h.members[0]!.age_range = [88, 88]; });
     old.out.members[0]!.routine.weekday = MILLBROOK_DAY(old.h.home);
     expect(repair(old.out, old.draw, old.vctx).adjustments).toEqual([]);
     expect(codes(validateHousehold(old.out, old.draw, old.vctx))).toEqual([]);

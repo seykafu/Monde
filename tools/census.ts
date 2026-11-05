@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import YAML from "yaml";
 import {
-  PORTRAIT_LIBRARY, PersonaCard, buildSkeleton, censusMismatches, censusProgressReset, censusTables, formatCensusReport, parseHomes, parsePins,
+  PORTRAIT_LIBRARY, PersonaCard, censusMismatches, day1Skeleton, censusProgressReset, censusTables, formatCensusReport, parseHomes, parsePins,
   stringifySkeleton, type CensusCard, type Day1Skeleton,
 } from "@monde/shared";
 
@@ -52,7 +52,7 @@ function skeleton(args: string[]): void {
   }
   const seed = at >= 0 ? args[at + 1] ?? DEFAULT_SEED : existing?.seed ?? DEFAULT_SEED;
   const { pins, homes, cards } = inputs();
-  const sk = buildSkeleton(seed, pins, homes, PORTRAIT_LIBRARY, cards);
+  const sk = day1Skeleton(seed, pins, homes, PORTRAIT_LIBRARY, cards);
   const bad = censusMismatches(censusTables(sk, homes));
   if (bad.length) { console.error(formatCensusReport(sk, homes)); process.exit(1); }
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -70,7 +70,7 @@ function report(): void {
   let same = false;
   // M-03 step 2's progress (statuses, generation records, the written members' ids and names) isn't the seed's.
   const asBuilt = censusProgressReset(sk, new Set(pins.households.map(h => h.id)));
-  try { same = JSON.stringify(buildSkeleton(sk.seed, pins, homes, PORTRAIT_LIBRARY, cards)) === JSON.stringify(asBuilt); } catch (e) { console.log(`rebuild failed: ${(e as Error).message}`); }
+  try { same = JSON.stringify(day1Skeleton(sk.seed, pins, homes, PORTRAIT_LIBRARY, cards)) === JSON.stringify(asBuilt); } catch (e) { console.log(`rebuild failed: ${(e as Error).message}`); }
   console.log(same ? `Reproduces from seed ${sk.seed}.` : `Does NOT reproduce from seed ${sk.seed} (pins, homes, library or cards changed since): rebuild with --reseed.`);
   process.exit(censusMismatches(censusTables(sk, homes)).length ? 1 : 0);
 }

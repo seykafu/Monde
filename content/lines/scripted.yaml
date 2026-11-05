@@ -246,7 +246,7 @@ exchanges:
 
       clause:
         lines:
-          - { expr: neutral, text: "Census under two hundred on seven days running. Seven in a row, no gaps." }
+          - { expr: neutral, text: "Census under a hundred and eighty on seven days running. Seven in a row, no gaps." }
           - { expr: angry, text: "Then the Lender may, at its sole election, buy the Wharf. Sole election means its choice and nobody else's. Not the council's, not the town's." }
         replies:
           - { text: "Do you know why she signed it?", intent: curious, next: pell }

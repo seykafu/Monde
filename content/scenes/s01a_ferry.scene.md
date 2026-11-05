@@ -38,7 +38,7 @@ PELL [warm]: Nobody's teased me in a while. Arthur used to.
 {goto: form}
 
 :: bunting_count
-PELL [neutral]: Two hundred and ten. Eleven, if you're staying. I counted this morning.
+PELL [neutral]: A hundred and ninety. Ninety-one, if you're staying. I counted this morning.
 PELL [worried]: (turns the clipboard over) That's no way to greet someone off a boat. Forgive me.
 {goto: form}
 

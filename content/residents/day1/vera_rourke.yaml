@@ -72,13 +72,6 @@ routine:
     - { at: "21:30", do: sleep, where: millbrook.home_41 }
 chores: [ hang the washing on the green, mend hand-me-downs, keep the accounts in a ledger ]
 relationships:
-  - {
-      id: selma_lachance,
-      affinity: 12,
-      trust: 8,
-      tag: fond,
-      note: Brings radio parts round and never asks for payment.
-    }
   - { id: dorian_rourke, affinity: 85, trust: 85, tag: spouse, note: "Her husband, away most of the week." }
   - {
       id: selma_rourke,

@@ -896,7 +896,7 @@ lines:
         - Wary
       m:
         - glowing
-    text: Well. Even I can't stay cross on a day like this. Hello.
+    text: Well. Even I won't stay cross on a day like this. Hello.
     replies:
       - text: Hello. It is a good day.
         intent: kind
@@ -1136,7 +1136,7 @@ lines:
         - Confidant
       m:
         - glum
-    text: "{player}. Stay a while. I can't pretend with you."
+    text: "{player}. Stay a while. No pretending with you."
     replies:
       - text: Then don't. I'm listening.
         intent: kind
@@ -1682,7 +1682,7 @@ lines:
       m:
         - glum
         - low
-    text: Bright out. Somehow that makes it worse. Don't mind me.
+    text: Bright out. Somehow that makes it worse.
   - id: CX-004
     kind: ctx
     when:
@@ -1712,7 +1712,7 @@ lines:
       m:
         - glum
         - low
-    text: Lid's on the sky again. Suits my mood, to be honest.
+    text: Lid's on the sky again. Suits my mood.
   - id: CX-008
     kind: ctx
     when:
@@ -1802,7 +1802,7 @@ lines:
       m:
         - glum
         - low
-    text: Wind in my ears all day. I can't think straight.
+    text: Wind in my ears all day. Thoughts won't sit still.
   - id: CX-020
     kind: ctx
     when:

@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { isFerryDay } from '../migration';
 import { MAX_DEPARTURES_PER_FERRY } from '../people';
+import { DAY1_CENSUS } from '../pillars';
 import { runMigrationSoak, soakTable, type MigrationSoakResult } from './migrationSoak';
 import { loadCards } from '../../sim/__tests__/content';
 
@@ -18,7 +19,7 @@ function checkRules(r: MigrationSoakResult): void {
     for (const id of [...d.notices, ...d.leaving, ...d.departed]) expect(cast.has(id)).toBe(false);
     expect(d.freeHomes).toBeGreaterThanOrEqual(0);
   }
-  expect(r.final.census).toBe(210 + r.people - r.days.reduce((s, d) => s + d.departed.length, 0));
+  expect(r.final.census).toBe(DAY1_CENSUS + r.people - r.days.reduce((s, d) => s + d.departed.length, 0));
   // Every household was written by the (fake) model; the broken first answers were sent back and fixed.
   expect(r.templates).toBe(0);
 }
@@ -40,7 +41,7 @@ describe('G-02 25-day mock soak', () => {
     expect(strong.people).toBeLessThanOrEqual(20);
     expect(strong.departures).toBe(0);
     expect(strong.retried).toBeGreaterThan(0);
-    expect(strong.final.census).toBe(210 + strong.people);
+    expect(strong.final.census).toBe(DAY1_CENSUS + strong.people);
     // Both audiences come (§6.2): someone young and someone 60 or over.
     const ages = strong.households.flatMap(h => h.residents.map(r => r.card.age));
     expect(ages.some(a => a < 40)).toBe(true);
@@ -52,7 +53,7 @@ describe('G-02 25-day mock soak', () => {
     expect(passive.firstArrivalDay).toBeNull();
     expect(passive.households).toHaveLength(0);
     expect(passive.departures).toBe(0);
-    expect(passive.final.census).toBe(210);
+    expect(passive.final.census).toBe(DAY1_CENSUS);
   });
 
   it('across 8 worlds: strong runs keep everyone; lapsed runs lose some newcomers, and Last Chance Favors keep them', () => {

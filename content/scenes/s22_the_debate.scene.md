@@ -47,7 +47,7 @@ PLAYER: Captain Reyes has one bicycle and one deputy. Give her six, and a lamp o
 PLAYER: The clinic, the school, the station. What closed, we reopen. In that order, with a date on each.
 [[end]]
 [[if flag.plank_young]]
-PLAYER: Sixty-one empty houses. Rent them cheap to anyone under thirty who'll stay and work. Fill the bandstand on weekends.
+PLAYER: Seventy-seven empty houses. Rent them cheap to anyone under thirty who'll stay and work. Fill the bandstand on weekends.
 [[end]]
 [[if flag.plank_commons]]
 PLAYER: The Wharf and the Commons stay what they are. Nobody sells the elm. Nobody paves the pond.
@@ -227,7 +227,7 @@ VANE [warm]: A candidate who hides a friend's debt will hide a town's. That's al
 [[if regard.pell >= 30]]
 N: Pell stands at the card table. She puts the bell down, very carefully, next to her glass of water.
 PELL [neutral]: He's right about the loan. He's right that I signed. I should have told you. The Fellow told me to, a long while ago.
-PELL [angry]: There's a clause in that paper that lets Silas buy the Wharf if we stay under two hundred. We're at {census}. I'm the moderator, Silas. Sit down.
+PELL [angry]: There's a clause in that paper that lets Silas buy the Wharf if we stay under a hundred and eighty. We're at {census}. I'm the moderator, Silas. Sit down.
 N: There is a moment where nobody breathes. Then the whole hall is on its feet, and not for Vane.
 {debate_score: +4}
 {regard: pell +4}

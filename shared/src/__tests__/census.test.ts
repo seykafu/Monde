@@ -7,8 +7,8 @@ import YAML from "yaml";
 import {
   ARCHETYPE_QUOTAS, BAND_TABLE, CENSUS_ZONES, CORE_HOMED, FIRST_NAMES, FAMILY_NAMES, FAMOUS_NAMES, HOUSEHOLDS, JOB_ROWS, MINORS_BY_ZONE,
   PORTRAIT_LIBRARY, PUPIL_AGES, PersonaCard, RESERVED_FAMILY_NAMES, RESERVED_FIRST_NAMES, STATUS_TABLE, TYPES_BY_ZONE, bandAllowance, bandOf,
-  bedsNeeded, buildSkeleton, cardLookProblems, censusMismatches, censusProgressReset, censusTables, foldName, formatCensusReport, homeZone, isNamedPin, isVacantHome,
-  masterOf, parseHomes, parsePins, tagsFromLook, type CensusCard, type Day1Skeleton, type SkeletonMember,
+  CENSUS_TRIM, GENERATION_TARGETS, TRIMMED_RESIDENTS, bedsNeeded, buildSkeleton, cardLookProblems, censusMismatches, censusProgressReset, censusTables, day1Skeleton,
+  foldName, formatCensusReport, homeZone, homesAsGenerated, isNamedPin, isVacantHome, masterOf, parseHomes, parsePins, tagsFromLook, type CensusCard, type Day1Skeleton, type SkeletonMember,
 } from "../index";
 
 const root = resolve(import.meta.dirname, "../../..");
@@ -29,11 +29,11 @@ const libraryById = new Map(PORTRAIT_LIBRARY.map(e => [e.id, e]));
 const key = (h: { id: string }, m: SkeletonMember) => m.id ?? `${h.id}/${m.slot}`;
 
 describe("the Day-1 census skeleton closes Appendix A.1", () => {
-  it("has 123 households and 210 homed residents: 18 core cast and the 192", () => {
+  it("has 107 households and 190 homed residents: 18 core cast and the 172 (the 2026-11-05 trim took out 20)", () => {
     expect(sk.households).toHaveLength(HOUSEHOLDS);
-    expect(people).toHaveLength(210);
+    expect(people).toHaveLength(190);
     expect(people.filter(p => p.m.kind === "core").map(p => p.m.id).sort()).toEqual([...CORE_HOMED].sort());
-    expect(generated).toHaveLength(192);
+    expect(generated).toHaveLength(172);
     expect(generated.filter(p => p.m.kind === "carded").map(p => p.m.id).sort()).toEqual(["ada", "bru", "moss", "nettie"]);
     expect(generated.filter(p => p.m.kind === "named")).toHaveLength(14);
   });
@@ -54,7 +54,7 @@ describe("the Day-1 census skeleton closes Appendix A.1", () => {
   it("A.1.2 and A.1.3: households of each type by zone, and the homes", () => {
     for (const [type, zones] of Object.entries(TYPES_BY_ZONE)) for (const z of CENSUS_ZONES) expect(tables.types[type as keyof typeof tables.types][z] ?? 0, `${type} ${z}`).toBe(zones[z] ?? 0);
     expect(Object.values(tables.homes).reduce((s, z) => s + z.total, 0)).toBe(184);
-    expect(Object.values(tables.homes).reduce((s, z) => s + z.vacant, 0)).toBe(61);
+    expect(Object.values(tables.homes).reduce((s, z) => s + z.vacant, 0)).toBe(77);
   });
 
   it("A.1.4: every job row by band, the statuses, twelve commuters and four Saturday jobs", () => {
@@ -140,7 +140,7 @@ describe("the people in it", () => {
     expect(Math.max(...firsts.values())).toBeLessThanOrEqual(2);
   });
 
-  it("gives the 192 a birthday each on the 100-day calendar, at most two a day, every day one, twins together", () => {
+  it("gives the 172 a birthday each on the 100-day calendar, at most two a day, every day one, twins together", () => {
     const days = new Map<number, number>();
     for (const { h, m } of people) {
       if (m.kind === "core") { expect(m.birthday).toBeNull(); continue; }
@@ -283,15 +283,44 @@ describe("the portraits (D1)", () => {
 });
 
 describe("the generator", () => {
-  it("reproduces the committed skeleton from its seed", () => {
-    const again = buildSkeleton(sk.seed, pins, homes, PORTRAIT_LIBRARY, cards);
+  it("reproduces the committed skeleton from its seed, less the trim", () => {
+    const again = day1Skeleton(sk.seed, pins, homes, PORTRAIT_LIBRARY, cards);
     expect(JSON.parse(JSON.stringify(again))).toEqual(sk);
   });
 
-  it("closes every table for other seeds too", () => {
+  it("closes every table as first generated (210) for other seeds too", () => {
+    const asGenerated = homesAsGenerated(homes);
     for (const seed of ["census-a", "census-b", "census-c"]) {
-      const other = buildSkeleton(seed, pins, homes, PORTRAIT_LIBRARY, cards);
-      expect(censusMismatches(censusTables(other, homes)), seed).toEqual([]);
+      const other = buildSkeleton(seed, pins, asGenerated, PORTRAIT_LIBRARY, cards);
+      expect(other.households.flatMap(h => h.members), seed).toHaveLength(210);
+      expect(censusMismatches(censusTables(other, asGenerated), GENERATION_TARGETS), seed).toEqual([]);
     }
+  });
+});
+
+describe("the 2026-11-05 trim (shared/src/census/trim.ts)", () => {
+  const asBuilt = buildSkeleton(sk.seed, pins, homesAsGenerated(homes), PORTRAIT_LIBRARY, cards);
+  const trimmed = asBuilt.households.filter(h => CENSUS_TRIM.some(t => t.household === h.id));
+
+  it("took out 20 retired elders with procedural looks, in 16 households of Millbrook and Station Hill, no one else", () => {
+    expect(TRIMMED_RESIDENTS).toBe(20);
+    expect(trimmed).toHaveLength(16);
+    const gone = trimmed.flatMap(h => h.members);
+    expect(gone).toHaveLength(20);
+    for (const m of gone) {
+      expect([m.band, m.employment, m.portrait.source, m.kind, m.job, m.minor]).toEqual(["elder", "retired", "procedural", "anonymous", null, null]);
+    }
+    expect(new Set(trimmed.map(h => h.zone))).toEqual(new Set(["millbrook", "station_hill"]));
+    expect(asBuilt.households.length - sk.households.length).toBe(16);
+  });
+
+  it("left their homes empty under new vacant numbers, where the old ones stood", () => {
+    for (const t of CENSUS_TRIM) {
+      expect(homes.has(t.home), t.home).toBe(false);
+      expect(homes.has(t.vacant), t.vacant).toBe(true);
+      expect(isVacantHome(t.vacant)).toBe(true);
+      expect(homeZone(t.vacant)).toBe(t.zone);
+    }
+    expect([...homesAsGenerated(homes).keys()].indexOf(CENSUS_TRIM[0]!.home)).toBe([...homes.keys()].indexOf(CENSUS_TRIM[0]!.vacant));
   });
 });

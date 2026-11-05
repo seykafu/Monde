@@ -28,7 +28,7 @@ describe('runDawn', () => {
   it('runs drift → appeal → arrivals → option clause → fund, and reports it', () => {
     const { state, report } = runDawn(createTownState(), { day: 2 });
     expect(state.day).toBe(2);
-    expect(report).toMatchObject({ day: 2, weekday: 'Wed', date: 'Wed · Spring 2', census: 210 });
+    expect(report).toMatchObject({ day: 2, weekday: 'Wed', date: 'Wed · Spring 2', census: 190 });
     // Drift: Spirit +0.2 (the Tollmen level was 1 on Day 1, so Safety holds).
     expect(report.pillarChanges.spirit).toEqual({ from: 22, to: 22.2, delta: 0.2, drift: 0.2 });
     expect(report.pillarChanges.safety).toEqual({ from: 30, to: 30, delta: 0, drift: 0 });
@@ -38,9 +38,9 @@ describe('runDawn', () => {
     expect(report.appeal.momentum).toBeCloseTo(1.4 * 0.05);
     // Wednesday: no sailing.
     expect(report.arrivals).toMatchObject({ eligible: false, households: 0, outcome: 'no_sailing' });
-    // Day 1's books: 123 households.
-    expect(report.fund).toMatchObject({ before: 1800, after: 1923 });
-    expect(state.fund).toBe(1923);
+    // Day 1's books: 107 households.
+    expect(report.fund).toMatchObject({ before: 1800, after: 1907 });
+    expect(state.fund).toBe(1907);
     expect(report.optionClause).toMatchObject({ dawnsUnder: 0, triggered: false, exercised: false });
     expect(report.optionClause.gauge.visible).toBe(false);
   });
@@ -76,7 +76,7 @@ describe('runDawn', () => {
     const { state, reports } = runDawnsThrough(createTownState(), 6);
     expect(reports.map(r => r.day)).toEqual([2, 3, 4, 5, 6]);
     expect(state.pillars.spirit).toBe(23);
-    expect(state.fund).toBe(1800 + 5 * 123 + MARKET_DAY_STALL_FEES);
+    expect(state.fund).toBe(1800 + 5 * 107 + MARKET_DAY_STALL_FEES);
   });
 
   it('decides arrivals on the dawn’s Appeal and free homes, without booking anyone in', () => {
@@ -89,7 +89,7 @@ describe('runDawn', () => {
     expect(report.appeal.appeal).toBeGreaterThan(35);
     expect(report.arrivals).toMatchObject({ eligible: true, wanted: 2, households: 2, outcome: 'arrivals' });
     expect(report.arrivals.youthShare).toBeCloseTo(report.appeal.youth / (report.appeal.youth + report.appeal.elder));
-    expect(state.census).toBe(210);
+    expect(state.census).toBe(190);
     expect(state.homes.restored_free).toBe(2);
   });
 
@@ -97,6 +97,6 @@ describe('runDawn', () => {
     const s = setTownFlag(createTownState(), 'project_streetlights_done');
     const { report } = runDawn(s, { day: 2 });
     expect(report.appeal.elder).toBeCloseTo(24.65 + 3);
-    expect(report.fund.books.net).toBe(123 - 10);
+    expect(report.fund.books.net).toBe(107 - 10);
   });
 });

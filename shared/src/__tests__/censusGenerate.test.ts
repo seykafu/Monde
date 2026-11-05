@@ -79,7 +79,7 @@ describe("the census run (M-03 step 2)", () => {
   it("writes the named people's households first, then zone by zone and street by street", () => {
     const input = censusInput();
     const order = censusOrder(input.skeleton, input.homes, input.pins).map(h => h.id);
-    expect(order).toHaveLength(107);
+    expect(order).toHaveLength(91);
     expect(order.slice(0, 14)).toEqual(input.pins.households.filter(p => input.skeleton.households.find(h => h.id === p.id)?.generation).map(p => p.id));
     const zones = order.slice(14).map(id => household(input, id).zone);
     expect([...new Set(zones)]).toEqual(["old_quarter", "market_row", "wharf", "commons", "millbrook", "station_hill"]);
@@ -90,11 +90,11 @@ describe("the census run (M-03 step 2)", () => {
     const mind = fakeMind(input);
     const first = await runCensus(input, { writer: mind.writer, store, now: () => new Date("2026-10-17T12:00:00Z") });
     expect(first.failed).toEqual([]);
-    expect(first.written).toHaveLength(107);
+    expect(first.written).toHaveLength(91);
     expect(first.written.every(w => w.source === "model")).toBe(true);
-    expect(files.size).toBe(188);
-    expect(counts.writes).toBe(107);
-    expect(new Set([...input.written.keys()]).size).toBe(188);
+    expect(files.size).toBe(168);
+    expect(counts.writes).toBe(91);
+    expect(new Set([...input.written.keys()]).size).toBe(168);
     for (const id of first.pending) {
       const h = household(input, id);
       expect(h.status).toBe("drafted");
@@ -114,7 +114,7 @@ describe("the census run (M-03 step 2)", () => {
     expect(again.calls).toHaveLength(0);
     expect([counts.writes, counts.saves]).toEqual([writes, saves]);
     expect(second.pending).toEqual([]);
-    expect(second.skipped).toHaveLength(107);
+    expect(second.skipped).toHaveLength(91);
     expect(second.stale).toEqual([]);
   }, 60_000);
 
@@ -246,9 +246,9 @@ describe("the census run (M-03 step 2)", () => {
     const r = await runCensus(input, { store, templateOnly: true, concurrency: 1 });
     expect(r.failed).toEqual([]);
     expect(r.calls).toBe(0);
-    expect(r.written).toHaveLength(107);
+    expect(r.written).toHaveLength(91);
     expect(r.written.every(w => w.source === "template" && w.attempts === 0)).toBe(true);
-    expect(files.size).toBe(188);
+    expect(files.size).toBe(168);
     expect([...files.values()].every(f => f.includes("generated_by: template"))).toBe(true);
     // The same cards every time: ids, names and all.
     const again = setup();
@@ -260,12 +260,12 @@ describe("the census run (M-03 step 2)", () => {
   it("--dry-run builds every prompt and estimates the cost, calling and writing nothing", async () => {
     const { input, store, counts } = setup();
     const r = await runCensus(input, { store, dryRun: true, prices: DEFAULT_CENSUS_PRICES });
-    expect(r.prompts).toHaveLength(107);
+    expect(r.prompts).toHaveLength(91);
     expect(r.prompts.every(p => p.text.startsWith("DAY 1 · Spring · Tuesday") && p.text.includes("MODE: native"))).toBe(true);
     expect(counts.writes + counts.saves).toBe(0);
     const e = r.estimate!;
-    expect(e).toMatchObject({ households: 107, members: 188 });
-    expect(e.calls).toBe(Math.round(107 * 1.3));
+    expect(e).toMatchObject({ households: 91, members: 168 });
+    expect(e.calls).toBe(Math.round(91 * 1.3));
     expect(e.cost_usd).toBeGreaterThan(0.05);
     expect(e.cost_usd).toBeLessThan(0.5);
     expect(e.worst_cost_usd).toBeGreaterThan(e.cost_usd);

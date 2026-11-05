@@ -35,7 +35,7 @@ personality:
   big5: { open: 55, conscientious: 92, extravert: 48, agreeable: 76, neurotic: 72 }
 values: { prosperity: 0.25, safety: 0.35, spirit: 0.25, charm: 0.15 }
 beliefs:
-  - "If the census holds above 200, the clause never matters and nobody has to be told."   # wrong: any seven-day dip triggers it, and she controls neither ferries nor weather
+  - "If the census holds above 180, the clause never matters and nobody has to be told."   # wrong: any seven-day dip triggers it, and she controls neither ferries nor weather
   - "Margo's Charter is a lovely story and a distraction from real money."   # wrong
   - "The lamps are the one promise she has kept."
 voice:
@@ -94,7 +94,7 @@ relationships:
   - { id: moss, affinity: 55, trust: 50, tag: fond, note: "Meets every boat he skippers and says 'Moss.' before he finishes the sentence. Wants him to stop saying 'more ferry' until the Fund can carry the diesel." }
   - { id: ada, affinity: 60, trust: 65, tag: friend, note: "Takes the Friday count from the booth every week and calls it a courtesy. Wants Ada to say, just once, that a boat will fill." }
 secrets:
-  - text: "She signed the Option Clause: if the census stays under 200 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the archivist, keeps the key and has never opened that file."
+  - text: "She signed the Option Clause: if the census stays under 180 for 7 days in a row, Vane Consolidated may buy the whole Wharf for a coin a metre. The loan was 40,000 coins, and the paper sits in the archive as 'Streetlight Contract.' Dunstan Frye, the archivist, keeps the key and has never opened that file."
     reveal: { flag: option_known }
   - text: "A letter of resignation, dated the day before the Fellow arrived, is in her desk. Hiring the Fellow was her last try before she posted it."
     reveal: { regard_min: 60 }

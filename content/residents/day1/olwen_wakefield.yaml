@@ -94,13 +94,6 @@ relationships:
       note: Husband; she trusts his eye and doubts his deadlines.
     }
   - {
-      id: nkechi_fairweather,
-      affinity: 10,
-      trust: 12,
-      tag: fond,
-      note: Sorts thread at the kitchen table and says her sums are sound.
-    }
-  - {
       id: hamish_ortega,
       affinity: 6,
       trust: 10,

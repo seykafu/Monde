@@ -157,11 +157,11 @@ const elector = (c: PersonaCard): ElectorCard => ({
 const TOWN: ElectorCard[] = [...handCards, ...await templateRoster()].map(elector);
 
 describe("the Spring electorate", () => {
-  it("is Monde's 187 grown-ups (A.1.4), every one a card: the hand-written cast and the census's", () => {
-    expect(TOWN).toHaveLength(212);
+  it("is Monde's 167 grown-ups (A.1.4), every one a card: the hand-written cast and the census's", () => {
+    expect(TOWN).toHaveLength(192);
     const people = electorate();
     const adults = people.filter(v => isEligible(v, { day: 25 }));
-    expect(adults).toHaveLength(187);
+    expect(adults).toHaveLength(167);
     expect(people.some(v => v.id === "vane" || v.id === "bastien")).toBe(false);
     expect(people.find(v => v.id === "tib")!.age).toBe(11);
     expect(people.find(v => v.id === "moss")!.candidate).toBe("moss");
@@ -216,19 +216,19 @@ describe("the Spring electorate", () => {
 });
 
 describe("the Spring Straw Poll", () => {
-  it("takes one bean per grown-up at the fair: 28 / 65 / 169", () => {
-    expect([fairBallots("low"), fairBallots("mid"), fairBallots("high")]).toEqual([28, 65, 169]);
-    expect(FAIR_HEADCOUNT).toEqual({ low: 31, mid: 73, high: 190 });
+  it("takes one bean per grown-up at the fair: 27 / 64 / 151", () => {
+    expect([fairBallots("low"), fairBallots("mid"), fairBallots("high")]).toEqual([27, 64, 151]);
+    expect(FAIR_HEADCOUNT).toEqual({ low: 31, mid: 73, high: 172 });
     expect([fairBand(34.9), fairBand(35), fairBand(59.9), fairBand(60)]).toEqual(["low", "mid", "mid", "high"]);
   });
 
   it("prints whole percentages that add to 100, and the carded voters' leans", () => {
     const r = strawPoll(electorate({ regard: 30, met: true }), town({ prosperity: 25, safety: 32, spirit: 40, charm: 38 }), "mid");
-    expect(r.ballots).toBe(65);
+    expect(r.ballots).toBe(64);
     const pct = percentages(r.shares);
     expect(pct.fellow + pct.vane + pct.moss).toBe(100);
-    expect(r.margin).toBeCloseTo(1 / Math.sqrt(65), 3);
-    expect(r.leans.length).toBe(186); // 187 grown-ups, less Moss (a candidate)
+    expect(r.margin).toBeCloseTo(1 / Math.sqrt(64), 3);
+    expect(r.leans.length).toBe(166); // 167 grown-ups, less Moss (a candidate)
     expect(r.leans.every(l => quoteBand({ choice: l.choice, margin: 1 }) !== "torn")).toBe(true);
   });
 

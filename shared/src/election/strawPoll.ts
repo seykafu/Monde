@@ -9,11 +9,11 @@
 import { z } from "zod";
 import { CANDIDATES, ballot, count, isEligible, marginOfError, poll, scoreAll, type Ballot, type Candidate, type ModelTown, type Voter } from "./voterModel";
 
-/** §13.3a: Bloom Fair headcounts by Spirit band (31 / 73 / 190). */
-export const FAIR_HEADCOUNT = { low: 31, mid: 73, high: 190 } as const;
+/** §13.3a: Bloom Fair headcounts by Spirit band (31 / 73 / 172; the high band was 190 before the 2026-11-05 census trim). */
+export const FAIR_HEADCOUNT = { low: 31, mid: 73, high: 172 } as const;
 export type FairBand = keyof typeof FAIR_HEADCOUNT;
-/** A.1.4: 187 of the 210 are 18+. The jars take one bean per grown-up in the crowd. */
-export const ADULT_SHARE = 187 / 210;
+/** A.1.4: 167 of the 190 are 18+. The jars take one bean per grown-up in the crowd. */
+export const ADULT_SHARE = 167 / 190;
 /** S10a's bands: Spirit < 35 low, < 60 mid, else high. */
 export const fairBand = (spirit: number): FairBand => (spirit < 35 ? "low" : spirit < 60 ? "mid" : "high");
 export const fairBallots = (band: FairBand): number => Math.round(FAIR_HEADCOUNT[band] * ADULT_SHARE);

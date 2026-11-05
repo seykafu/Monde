@@ -74,16 +74,16 @@ describe('households per dawn (§6.4)', () => {
 
 describe('booking arrivals and departures in', () => {
   it('arrivals take free homes and grow the census by household size', () => {
-    const town = { ...createTownState(), homes: { occupied: 123, vacant_restorable: 58, restored_free: 3 } };
+    const town = { ...createTownState(), homes: { occupied: 107, vacant_restorable: 74, restored_free: 3 } };
     const s = settleArrivals(town, [2, 1]);
-    expect(s.census).toBe(213);
-    expect(s.homes).toEqual({ occupied: 125, vacant_restorable: 58, restored_free: 1 });
+    expect(s.census).toBe(193);
+    expect(s.homes).toEqual({ occupied: 109, vacant_restorable: 74, restored_free: 1 });
     expect(settleArrivals(town, [2, 1, 3, 4]).homes.restored_free).toBe(0); // only three homes to give
   });
   it('departures shrink the census and free the homes they empty', () => {
     const s = settleDepartures(createTownState(), ['a', 'b'], 1);
-    expect(s.census).toBe(208);
-    expect(s.homes).toEqual({ occupied: 122, vacant_restorable: 61, restored_free: 1 });
+    expect(s.census).toBe(188);
+    expect(s.homes).toEqual({ occupied: 106, vacant_restorable: 77, restored_free: 1 });
   });
 });
 

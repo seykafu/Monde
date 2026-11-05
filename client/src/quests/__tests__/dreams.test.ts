@@ -30,10 +30,10 @@ describe('every card’s dream stages', () => {
     const all = personaCards.flatMap(c => dreamStages(c).map(s => ({ id: c.id, ...s })));
     const fallback = all.filter(s => s.fallback);
     const readable = all.filter(s => !s.fallback);
-    // The report (MVP §4 hand-off): 212 cards, 660 stages.
+    // The report (MVP §4 hand-off): 192 cards, 600 stages (212 and 660 before the 2026-11-05 census trim).
     console.log(`dream stages: ${all.length} on ${personaCards.length} cards · ${readable.length} with conditions the engine reads · ${fallback.length} worked as Favors (no machine-readable condition)`);
-    expect(personaCards).toHaveLength(212);
-    expect(all.length).toBe(660);
+    expect(personaCards).toHaveLength(192);
+    expect(all.length).toBe(600);
     expect(readable.length + fallback.length).toBe(all.length);
     // Every stage gets a rule, and a fallback stage is always a Favor.
     for (const c of personaCards) {

@@ -29,7 +29,7 @@ PELL [sad]: You asked me on the slip how bad it was. I counted lamps at you. I'm
 [[elif flag.pell_deflected_count]]
 PELL [sad]: You asked why I count. I said habit. It's a habit now. It wasn't at the start.
 [[elif flag.pell_told_census]]
-PELL [sad]: I told you two hundred and ten in the first hour, on the slip. I didn't say why.
+PELL [sad]: I told you a hundred and ninety in the first hour, on the slip. I didn't say why.
 [[end]]
 [[if flag.vanes_coin]]
 PELL [worried]: Silas offered you something at the fountain. I saw the letter in her folder. I'd have said so if I were braver.
@@ -38,10 +38,10 @@ PELL [neutral]: Twelve years ago the payroll had four days of money in it. The l
 PELL [neutral]: The bank in the city wouldn't lend. Then a young man came off the Tuesday boat with a case of sandwiches and a very good coat.
 PELL [neutral]: Thirty-six. Ham sandwiches, enough for the whole council. He read the books at that table all night, and at four in the morning he said, "May I be frank, Mrs. Pell? The mill isn't coming back."
 PELL [sad]: He was right. That was the worst of it. He was right, and he was kind.
-PELL [neutral]: Forty thousand coins. The lamps stayed lit and the wages were paid. I signed page nine because it was three in the morning and it said two hundred, and we were nine hundred and something, and two hundred looked like the bottom of the sea.
+PELL [neutral]: Forty thousand coins. The lamps stayed lit and the wages were paid. I signed page nine because it was three in the morning and it said a hundred and eighty, and we were nine hundred and something, and a hundred and eighty looked like the bottom of the sea.
 PELL [sad]: Arthur read it over my shoulder. He said it would never come to anything. He died believing that. I let him.
 N: She squares the ledger by a quarter inch that didn't need squaring.
-PELL [neutral]: I told no one, because the moment I say two hundred out loud, everyone starts counting. I know what counting does. It did it to me.
+PELL [neutral]: I told no one, because the moment I say a hundred and eighty out loud, everyone starts counting. I know what counting does. It did it to me.
 PELL [sad]: Old Mr. Haldane passed in February. I counted before I sent the card.
 N: She looks at you the way she looks at a lamp that's gone out and might only want a new wick.
 >> CHOICE

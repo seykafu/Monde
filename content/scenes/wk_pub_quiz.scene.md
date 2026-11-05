@@ -176,15 +176,15 @@ HOLLIS [watch_check]: The third stair strikes a flat G. It does not strike secon
 [[if !flag.quiz_bastien_joke_seen]]
 N: Before the first question, there's a commotion by the long table. Tib has appeared with the team sheet and a pencil nearly as long as his arm. Bastien sits on a stool by the stove, washing a paw, and looks as if he would like it noted that he came of his own accord.
 TIB [gap_grin]: Moss and Kasimir are a man short. So I put Bastien down. Obviously.
-TIB [neutral]: I did it properly. Census number two hundred and twelve. Resident.
+TIB [neutral]: I did it properly. Census number a hundred and ninety-two. Resident.
 ROSALIND [knowing_look]: (puts down the glass) Tib. Bastien is a cat.
 TIB [neutral]: The census says every resident's an agent. Mum says Pell counts everyone. Bastien's an agent. Obviously he's counted. I read the form.
 ROSALIND [warm]: (looks at the cat, then at the ceiling) He's a person for quiz purposes only. Ruling's final. He answers if he wants to.
-SABLE [ink_smudge]: (already writing) I'll print a correction. "The Lantern regrets that the census count of two hundred and ten omitted the cat."
+SABLE [ink_smudge]: (already writing) I'll print a correction. "The Lantern regrets that the census count of a hundred and ninety omitted the cat."
 N: Bastien finishes the paw and does not look at anybody.
 {set: quiz_bastien_joke_seen}
 [[else]]
-N: Bastien is back on his stool by the stove. Tib has written 212 on the team sheet again, in ink this time.
+N: Bastien is back on his stool by the stove. Tib has written 192 on the team sheet again, in ink this time.
 [[end]]
 ROSALIND [warm]: Three questions, all about the tower. Pens ready.
 ROSALIND [warm]: Question one. How many steps up the clocktower to the works under the face?

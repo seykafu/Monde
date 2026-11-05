@@ -19,20 +19,20 @@ const dawns = (censuses: number[], oc = fresh) => {
 };
 
 describe('the Option Clause counter (GDD §6.5)', () => {
-  it('triggers on the 7th consecutive dawn under 200', () => {
-    const six = dawns([199, 199, 198, 197, 199, 199]);
+  it('triggers on the 7th consecutive dawn under 180', () => {
+    const six = dawns([179, 179, 178, 177, 179, 179]);
     expect(six.oc).toEqual({ dawnsUnder: 6, exercised: false, exercisedDay: null });
     expect(six.triggeredOn).toEqual([]);
-    const seven = dawns([199, 199, 198, 197, 199, 199, 199]);
+    const seven = dawns([179, 179, 178, 177, 179, 179, 179]);
     expect(seven.triggeredOn).toEqual([8]);
     expect(seven.oc).toEqual({ dawnsUnder: OPTION_DAWNS, exercised: true, exercisedDay: 8 });
   });
 
-  it('resets when the census recovers to 200', () => {
-    const r = dawns([199, 199, 199, 199, 199, 199, 200, 199, 199, 199, 199, 199, 199]);
+  it('resets when the census recovers to 180', () => {
+    const r = dawns([179, 179, 179, 179, 179, 179, 180, 179, 179, 179, 179, 179, 179]);
     expect(r.triggeredOn).toEqual([]);
     expect(r.oc.dawnsUnder).toBe(6);
-    expect(dawns([199, 199, 199, 199, 199, 199, 200, 199, 199, 199, 199, 199, 199, 199]).triggeredOn).toEqual([15]);
+    expect(dawns([179, 179, 179, 179, 179, 179, 180, 179, 179, 179, 179, 179, 179, 179]).triggeredOn).toEqual([15]);
   });
 
   it('triggers once, and stops counting after', () => {
@@ -50,7 +50,7 @@ describe('the Option Clause counter (GDD §6.5)', () => {
   });
 
   it('runs inside runDawn on the census at dawn', () => {
-    let s: TownState = { ...createTownState(), census: 196 };
+    let s: TownState = { ...createTownState(), census: 176 };
     const triggered: boolean[] = [];
     for (let d = 2; d <= 9; d++) {
       const r = runDawn(s, { day: d });
@@ -69,26 +69,26 @@ describe('the census gauge (§6.5 UI)', () => {
   };
 
   it('stays hidden until the clause is known (S08, Day 18)', () => {
-    expect(optionGauge(town(190, false)).visible).toBe(false);
+    expect(optionGauge(town(170, false)).visible).toBe(false);
   });
-  it('shows once known, whenever the census is under 205', () => {
-    expect(optionGauge(town(210, true)).visible).toBe(false);
-    expect(optionGauge(town(205, true)).visible).toBe(false);
-    expect(optionGauge(town(204, true))).toMatchObject({ visible: true, census: 204, line: 200, dawnsUnder: 0, dawnsNeeded: 7 });
+  it('shows once known, whenever the census is under 185', () => {
+    expect(optionGauge(town(190, true)).visible).toBe(false);
+    expect(optionGauge(town(185, true)).visible).toBe(false);
+    expect(optionGauge(town(184, true))).toMatchObject({ visible: true, census: 184, line: 180, dawnsUnder: 0, dawnsNeeded: 7 });
   });
   it('becomes known when it triggers', () => {
-    const s: TownState = { ...town(190, false), optionClause: { dawnsUnder: 7, exercised: true, exercisedDay: 12 } };
+    const s: TownState = { ...town(170, false), optionClause: { dawnsUnder: 7, exercised: true, exercisedDay: 12 } };
     expect(optionGauge(s)).toMatchObject({ visible: true, known: true, exercised: true, exercisedDay: 12 });
   });
   it('goes away once the Charter voids the clause', () => {
-    expect(optionGauge(setTownFlag(town(190, true), 'charter_found')).visible).toBe(false);
+    expect(optionGauge(setTownFlag(town(170, true), 'charter_found')).visible).toBe(false);
   });
 });
 
 it('G-04: a forced census drop triggers the Wharf setback once, survives save/restore, and the Charter reopens it', () => {
-  let s = { ...createTownState(), census: 199 };
+  let s = { ...createTownState(), census: 179 };
   for (let day = 2; day <= 7; day++) s = restore(serialize(runDawn(s, { day }).state));
-  const baseline = runDawn({ ...s, census: 200 }, { day: 8 }).state;
+  const baseline = runDawn({ ...s, census: 180 }, { day: 8 }).state;
   s = runDawn(s, { day: 8 }).state;
   expect(s.pillars.prosperity).toBeCloseTo(baseline.pillars.prosperity - 8);
   expect(s.pillars.spirit).toBeCloseTo(baseline.pillars.spirit - 4);

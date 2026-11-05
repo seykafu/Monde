@@ -98,13 +98,6 @@ relationships:
       tag: curious,
       note: Shares Market Row and an opinion on bread.
     }
-  - {
-      id: astrid_reid,
-      affinity: 14,
-      trust: 12,
-      tag: fond,
-      note: Brings him buttonholes to mend on Terrace Row.
-    }
 secrets:
   - text: He still knits small scarves at night and gives them to the school children without saying who made them.
     reveal: { regard_min: 60 }

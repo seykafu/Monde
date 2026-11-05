@@ -109,13 +109,6 @@ relationships:
       tag: curious,
       note: Asks too many questions about the old frames.
     }
-  - {
-      id: iain_marchant,
-      affinity: -6,
-      trust: -4,
-      tag: wary,
-      note: Tallied her wages at the Mill and got one figure wrong.
-    }
 secrets:
   - text: She still has Emil's thermos and fills it some nights, then pours it onto the harbour steps before dawn.
     reveal: { regard_min: 60 }

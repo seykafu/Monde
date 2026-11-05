@@ -94,13 +94,6 @@ relationships:
       tag: curious,
       note: Runs the library desk; he is slowly learning her filing system.
     }
-  - {
-      id: ursula_gorski,
-      affinity: 16,
-      trust: 14,
-      tag: fond,
-      note: Neighbour; she mends his waistcoats for a pot of tea.
-    }
 secrets:
   - text: He waltzes alone in the front room on Sunday nights, to the wireless, counting the steps under his breath so he won't tread on Cedric.
     reveal: { regard_min: 50 }

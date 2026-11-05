@@ -1,20 +1,21 @@
 // The Option Clause (GDD §6.5): Vane's option on the Wharf.
 //
 // - Active from Day 1, known to the player from S08 (Day 18, flag `option_known`), or earlier if it triggers.
-// - Trigger: the census is under 200 for 7 consecutive dawns. Vane exercises the option.
+// - Trigger: the census is under 180 for 7 consecutive dawns. Vane exercises the option. (The floor was 200 until the
+//   2026-11-05 census trim took Day 1 from 210 to 190; it moved with it, keeping the ten-resident cushion.)
 // - Undo: the Charter's Article III voids it (`charter_found`, S21).
-// - UI: once known, the Town Ledger shows a census gauge with a 200 line and a 7-day counter whenever the
-//   census is under 205.
+// - UI: once known, the Town Ledger shows a census gauge with a 180 line and a 7-day counter whenever the
+//   census is under 185.
 // Consequences use the saved exercised state; the Charter reopens the sites immediately.
 import type { TownFlags, TownState } from './pillars';
 
-export const OPTION_CENSUS_LINE = 200;
+export const OPTION_CENSUS_LINE = 180;
 export const OPTION_DAWNS = 7;
 /** The gauge shows while the census is under this. */
-export const OPTION_GAUGE_BELOW = 205;
+export const OPTION_GAUGE_BELOW = 185;
 
 export interface OptionClauseState {
-  /** Consecutive dawns with the census under 200. */
+  /** Consecutive dawns with the census under 180. */
   dawnsUnder: number;
   reopened?: boolean;
   exercised: boolean;
@@ -33,8 +34,8 @@ export interface OptionDawnResult {
 }
 
 /**
- * One dawn's count, on the census at dawn. Seven dawns in a row under 200 trigger the clause (once). A dawn at
- * 200 or more resets the count. Nothing is counted once the clause is exercised or void.
+ * One dawn's count, on the census at dawn. Seven dawns in a row under 180 trigger the clause (once). A dawn at
+ * 180 or more resets the count. Nothing is counted once the clause is exercised or void.
  */
 export const optionClauseDawn = (oc: OptionClauseState, census: number, day: number, flags: TownFlags = {}): OptionDawnResult => {
   if (oc.exercised || optionVoid(flags)) return { state: { ...oc, dawnsUnder: oc.exercised ? oc.dawnsUnder : 0 }, triggered: false };
@@ -45,7 +46,7 @@ export const optionClauseDawn = (oc: OptionClauseState, census: number, day: num
 };
 
 export interface OptionGauge {
-  /** Show the census gauge (known, not void, census under 205; or already exercised). */
+  /** Show the census gauge (known, not void, census under 185; or already exercised). */
   visible: boolean;
   known: boolean;
   census: number;

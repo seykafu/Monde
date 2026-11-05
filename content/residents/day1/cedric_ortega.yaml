@@ -87,13 +87,6 @@ relationships:
       tag: spouse,
       note: Partner of thirteen years; they argue like brothers.
     }
-  - {
-      id: tomasz_blaauw,
-      affinity: 12,
-      trust: 10,
-      tag: friend,
-      note: Keeps the minutes at the Loom Street talks; Cedric helps him carry the chairs.
-    }
   - { id: kasimir, affinity: 14, trust: 18, tag: fond, note: Trades net repairs for timber scraps. }
 secrets:
   - text: He still sends a postcard each spring to the Carrow dock foreman he used to fight with.

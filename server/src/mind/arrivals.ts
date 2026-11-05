@@ -102,7 +102,7 @@ async function promptContext(db: Database, worldId: string, request: ArrivalRequ
   return {
     town: {
       day: request.day, season: seasonOf(request.day), weekday: weekdayOf(request.day), pillars: request.pillars,
-      census: request.census ?? 210, shopsOpen: 6, pupils: request.pupils ?? 9, projectsDone, projectsActive,
+      census: request.census ?? 190, shopsOpen: 6, pupils: request.pupils ?? 9, projectsDone, projectsActive,
     },
     mode: "arrival", home, knownResidents: known,
     avoidFirst: [...RESERVED_FIRST_NAMES, ...rows.map(r => r.card.name.replace(/"[^"]*"\s*/g, "").split(" ")[0]!)].filter((v, i, a) => a.indexOf(v) === i),

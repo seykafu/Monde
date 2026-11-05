@@ -191,29 +191,30 @@ millbrook:
   - vacant_house_36
   - vacant_house_37
   - vacant_house_38
-  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`), and in their places the
+  # homes the 2026-11-05 census trim emptied (vacant_house_62–77).
   - home_01
   - home_02
-  - home_03
-  - home_04
+  - vacant_house_63
+  - vacant_house_69
   - home_05
   - home_06
   - home_07
   - home_08
   - home_09
   - home_10
-  - home_11
-  - home_12
+  - vacant_house_73
+  - vacant_house_66
   - home_13
-  - home_14
-  - home_15
+  - vacant_house_72
+  - vacant_house_68
   - home_16
-  - home_17
-  - home_18
+  - vacant_house_64
+  - vacant_house_71
   - home_19
-  - home_20
+  - vacant_house_67
   - home_21
-  - home_22
+  - vacant_house_74
   - home_23
   - home_24
   - home_25
@@ -221,8 +222,8 @@ millbrook:
   - home_27
   - home_28
   - home_29
-  - home_30
-  - home_31
+  - vacant_house_65
+  - vacant_house_70
   - home_32
   - home_33
   - home_34
@@ -231,7 +232,7 @@ millbrook:
   - home_37
   - home_38
   - home_39
-  - home_40
+  - vacant_house_62
   - home_41
 station_hill:
   - station
@@ -247,11 +248,12 @@ station_hill:
   - vacant_house_59
   - vacant_house_60
   - vacant_house_61
-  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`).
-  - home_01
-  - home_02
+  # The census households' homes (content/places/homes.yaml; A.1.3, A.6 `<zone>.home_NN`), and in their places the
+  # homes the 2026-11-05 census trim emptied (vacant_house_62–77).
+  - vacant_house_75
+  - vacant_house_77
   - home_03
-  - home_04
+  - vacant_house_76
   - home_05
   - home_06
   - home_07

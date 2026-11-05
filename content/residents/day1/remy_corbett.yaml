@@ -85,7 +85,6 @@ relationships:
       tag: fond,
       note: Teaches them to set type and lets them ink the proofs.
     }
-  - { id: omar_quarrie, affinity: 15, trust: 15, tag: fond, note: Lets them watch him fix the old clocks. }
   - { id: ilse_corbett, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
   - { id: ottilie_verhoeven, affinity: 75, trust: 70, tag: mother, note: "Mother, under the same roof." }
   - { id: iain_corbett, affinity: 65, trust: 60, tag: brother, note: "Brother, under the same roof." }
