@@ -2,7 +2,7 @@
 ```yaml
 id: s01b_walk
 day: 1
-time: "10:40-11:30"
+time: "10:40-20:00"                      # S01a hands straight on to it; open all day for a game saved in between
 place: old_quarter.fountain_square
 trigger: "flag.s01a_done && !flag.s01b_done"
 backdrop: bg_fountain_square_dry
@@ -76,4 +76,6 @@ N: Behind you the heron stands on one leg, fishing in nothing, and the clock say
 [[end]]
 {set: s01b_done}
 {set: met_bertrand}
+// Pell walks the Fellow on to the cottage: straight into S01c.
+{goto_scene: s01c_cottage}
 ```

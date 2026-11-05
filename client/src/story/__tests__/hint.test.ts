@@ -26,23 +26,23 @@ describe('the Next hint', () => {
     const hint = storyHint(SPRING_SCENES, at({ minute: 592 }), flags(...AFTER_S01A), places);
     expect(hint).toMatchObject({
       sceneId: 's01b_walk', place: 'old_quarter.fountain_square', placeName: 'Fountain Square', zoneName: 'Old Quarter', via: 'Market Row',
-      start: 640, end: 690, open: false, summoned: false, where: 'Market Row, then Fountain Square', when: '10:40–11:30', reason: 'Pell is waiting.'
+      start: 640, end: 1200, open: false, summoned: false, where: 'Market Row, then Fountain Square', when: '10:40–20:00', reason: 'Pell is waiting.'
     });
-    expect(hint!.text).toBe('Market Row, then Fountain Square, 10:40–11:30 — Pell is waiting');
+    expect(hint!.text).toBe('Market Row, then Fountain Square, 10:40–20:00 — Pell is waiting');
   });
 
   it('names the zone from next door, the place alone once there, and "before" once the window is open', () => {
     const fromMarket = storyHint(SPRING_SCENES, at({ minute: 650, zone: 'market_row', place: '' }), flags(...AFTER_S01A), places);
-    expect(fromMarket).toMatchObject({ where: 'Fountain Square, Old Quarter', when: 'before 11:30', open: true, via: null });
+    expect(fromMarket).toMatchObject({ where: 'Fountain Square, Old Quarter', when: 'before 20:00', open: true, via: null });
     const there = storyHint(SPRING_SCENES, at({ minute: 650, zone: 'old_quarter', place: 'old_quarter.library' }), flags(...AFTER_S01A), places);
-    expect(there).toMatchObject({ where: 'Fountain Square', text: 'Fountain Square, before 11:30 — Pell is waiting' });
+    expect(there).toMatchObject({ where: 'Fountain Square', text: 'Fountain Square, before 20:00 — Pell is waiting' });
   });
 
   it('moves on to the cottage after S01b, and to nothing once the day has nothing left', () => {
     const cottage = storyHint(SPRING_SCENES, at({ minute: 680, zone: 'old_quarter', place: '' }), flags(...AFTER_S01A, 's01b_done'), places);
-    expect(cottage).toMatchObject({ sceneId: 's01c_cottage', when: '11:30–13:00', reason: SCENE_REASONS.s01c_cottage });
-    // S01b missed: its window has closed and S01c waits on it, so nothing more today…
-    expect(storyHint(SPRING_SCENES, at({ minute: 700, zone: 'old_quarter', place: '' }), flags(...AFTER_S01A), places)).toBeNull();
+    expect(cottage).toMatchObject({ sceneId: 's01c_cottage', when: '11:30–20:00', reason: SCENE_REASONS.s01c_cottage });
+    // S01b missed (a game saved between the parts, left until after 20:00): S01c waits on it, so nothing more today…
+    expect(storyHint(SPRING_SCENES, at({ minute: 1210, zone: 'old_quarter', place: '' }), flags(...AFTER_S01A), places)).toBeNull();
     // …and the next morning it's S01b again (a scene's day is its earliest).
     expect(storyHint(SPRING_SCENES, at({ day: 2, minute: 400, zone: 'old_quarter', place: '' }), flags(...AFTER_S01A), places)).toMatchObject({ sceneId: 's01b_walk' });
   });
@@ -68,15 +68,15 @@ describe('the Next hint', () => {
 });
 
 describe('the closing toast', () => {
-  const open = () => storyHint(SPRING_SCENES, at({ minute: 670, zone: 'market_row', place: '' }), flags(...AFTER_S01A), places);
+  const open = () => storyHint(SPRING_SCENES, at({ minute: 1150, zone: 'market_row', place: '' }), flags(...AFTER_S01A), places);
 
   it(`warns once, ${CLOSING_WARNING_MINUTES} minutes or less before an open window closes, when the player isn't there`, () => {
     const warned = new Set<string>();
-    expect(closingToast(open(), { day: 1, minute: 650, place: '' }, warned)).toBeNull(); // 40 minutes left
-    expect(closingToast(open(), { day: 1, minute: 670, place: '' }, warned)).toBe('Nearly 11:30. Fountain Square: Pell is waiting.');
-    expect(closingToast(open(), { day: 1, minute: 675, place: '' }, warned)).toBeNull(); // once
-    expect(closingToast(open(), { day: 1, minute: 675, place: 'old_quarter.fountain_square' }, new Set())).toBeNull(); // already there
-    expect(closingToast(null, { day: 1, minute: 675, place: '' }, new Set())).toBeNull();
+    expect(closingToast(open(), { day: 1, minute: 1160, place: '' }, warned)).toBeNull(); // 40 minutes left
+    expect(closingToast(open(), { day: 1, minute: 1180, place: '' }, warned)).toBe('Nearly 20:00. Fountain Square: Pell is waiting.');
+    expect(closingToast(open(), { day: 1, minute: 1185, place: '' }, warned)).toBeNull(); // once
+    expect(closingToast(open(), { day: 1, minute: 1185, place: 'old_quarter.fountain_square' }, new Set())).toBeNull(); // already there
+    expect(closingToast(null, { day: 1, minute: 1185, place: '' }, new Set())).toBeNull();
   });
 
   it('keeps S08 specific in its closing toast', () => {

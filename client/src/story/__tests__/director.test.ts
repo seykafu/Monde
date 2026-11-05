@@ -37,12 +37,23 @@ it("hands off called scenes without requiring their place/time and does not auto
   expect(await director.next()).toBeNull();
 });
 
+it("tells the host which scene handed off, so it carries the player along instead of summoning", async () => {
+  const game = context(); const enter = vi.fn().mockResolvedValue(true);
+  const a = scene([{ op: "cmd", line: 1, cmd: { cmd: "goto_scene", scene: "s02_test" } }]);
+  const b = scene([], "s02_test"); b.header!.place = "old_quarter.fountain_square";
+  const director = new StoryDirector([a, b], flags(), { context: () => game, enter });
+  for (let n = 0; n < 6 && director.current?.scene.id !== b.id; n++) await director.next();
+  expect(director.current?.scene.id).toBe(b.id);
+  expect(enter).toHaveBeenNthCalledWith(1, a.header, false, undefined);
+  expect(enter).toHaveBeenLastCalledWith(b.header, false, a.id);
+});
+
 it("defers declined summons and clears stale queued scenes on movement", async () => {
   const game = context(); const enter = vi.fn().mockResolvedValueOnce(false).mockResolvedValue(true);
   const fair = scene([], "s10a_bloom_open");
   const director = new StoryDirector([fair], flags(), { context: () => game, enter });
   expect(await director.next()).toBeNull();
-  await director.next(); expect(enter).toHaveBeenLastCalledWith(fair.header, true);
+  await director.next(); expect(enter).toHaveBeenLastCalledWith(fair.header, true, undefined);
   const local = new StoryDirector([scene([])], flags(), { context: () => game });
   local.refresh(); game.place = "elsewhere"; expect(await local.next()).toBeNull();
 });

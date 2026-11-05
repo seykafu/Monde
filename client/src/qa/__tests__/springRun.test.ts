@@ -59,7 +59,8 @@ describe('the Spring soak bot', () => {
       console.log(`${script} poll: ${JSON.stringify(res.report?.poll?.shares)}`);
       // The objective line was never empty, and named a story beat until the Straw Poll (springBot checkObjective).
       expect(res.issues).toEqual([]);
-      expect(res.objectives.length).toBeGreaterThan(20);
+      // Day 1 is one walk (S01a → S01b → S01c), so the first objective comes after the cottage.
+      expect(res.objectives.length).toBeGreaterThanOrEqual(20);
       expect(res.played).toEqual(BEATS[script]);
       for (const flag of ['s10c_done', 'spring_poll_taken', 'option_known', 'pell_confessed', 'bloom_fair_closed']) expect(res.flags, flag).toContain(flag);
       // Every dawn saved; the strong and social players reload every dawn save (and a few afternoon saves).

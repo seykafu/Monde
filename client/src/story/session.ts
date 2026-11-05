@@ -8,7 +8,7 @@ import {
   type StoryLedger, type StoryPresenter, type StoryWorld
 } from './host';
 import type { StoryHost } from './runtime';
-import type { StoryContext } from './triggers';
+import { minutes, type StoryContext } from './triggers';
 import scenesJson from './scenes.gen.json?raw';
 
 interface ScenesFile { version: number; scenes: Record<string, CompiledScene> }
@@ -127,6 +127,22 @@ export class StorySession {
     return !!now && absMinute(now.day, now.minute) < until;
   }
 
+  /**
+   * A `{goto_scene}` handoff (S01a → S01b → S01c, Day 1's one walk with Pell): no summons, the player is already
+   * in the story. The clock moves on to the part's hour if it hasn't come yet (the walk takes time; scenes hold the
+   * clock), and the player goes with the scene to its place. The part's own opening `{fade}` covers the move.
+   */
+  private handoff(header: SceneHeader): void {
+    const world = this.world;
+    const now = world?.now();
+    if (!world || !now) return;
+    const wait = minutes(header.time.start) - now.minute;
+    if (wait > 0) world.passTime?.(wait);
+    if (now.place === header.place) return;
+    world.travel(header.place);
+    this.staged = { zone: header.place.split('.')[0]!, place: header.place };
+  }
+
   private host(): StoryHost {
     return {
       context: () => this.context(),
@@ -138,7 +154,8 @@ export class StorySession {
         setOutcome: (name, value) => { this.outcomes = { ...this.outcomes, [name]: value }; },
         scenePlace: id => this.headers.get(id)?.place ?? ''
       }),
-      enter: async (header, summoned) => {
+      enter: async (header, summoned, from) => {
+        if (from) { this.handoff(header); return true; }
         if (!summoned) return true;
         if (this.cooling(header.id)) return false;
         const world = this.world, presenter = this.presenter;

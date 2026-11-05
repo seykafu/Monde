@@ -127,4 +127,6 @@ N: Bastien jumps off the bollard and leads the way up the slip.
 {set: met_pell}
 {set: met_moss}
 {set: met_ada}
+// Day 1 is one walk with Pell: up the slip and straight on into S01b.
+{goto_scene: s01b_walk}
 ```

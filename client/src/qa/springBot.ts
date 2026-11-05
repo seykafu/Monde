@@ -441,6 +441,7 @@ export class SpringBot {
       },
       checkpoint: async key => { this.log(`checkpoint ${key}`); },
       travel: place => { this.moveTo(place, { summoned: true }); },
+      passTime: mins => { this.advance(mins); },
       zoneName: id => zones[id]?.name ?? id,
       projectCue: (id, sceneId) => {
         const known = (() => {

@@ -155,6 +155,8 @@ export function attachStory(scene: Phaser.Scene, opts: StoryAttachOptions): Stor
       if (!to) { console.warn(`[story] can't travel to ${place}`); return; }
       scene.scene.restart({ zone: to.zone, arrive: to.arrive });
     },
+    // A handoff's walk (S01a → S01b → S01c): the residents keep to their day while the story holds the clock.
+    passTime: mins => { clock.advanceMinutes(mins); },
     zoneName: id => zones[id]?.name ?? id,
     projectCue: (id, sceneId) => projectCue(registry, { day: clock.day, minute: clock.minute }, id, sceneId),
     // {coins}: the purse the HUD, the shop and the Projects use (economy/runtime.ts), never below empty.

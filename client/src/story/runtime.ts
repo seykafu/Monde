@@ -33,8 +33,11 @@ export interface StoryHost {
   /** Read afresh after every cue, including puzzle/scuffle/character-creation outcomes. */
   context(): StoryContext;
   handlers?: StoryHandlers;
-  /** Confirm and stage summoned appointments here; false defers them. */
-  enter?(header: SceneHeader, summoned: boolean): MaybePromise<boolean | void>;
+  /**
+   * Confirm and stage summoned appointments here; false defers them. `from` is the scene that handed off to this
+   * one with `{goto_scene}`: the player is already in the story, so the host carries them along without asking.
+   */
+  enter?(header: SceneHeader, summoned: boolean, from?: string): MaybePromise<boolean | void>;
 }
 export type StoryStep =
   | { kind: "line"; line: StoryLine }

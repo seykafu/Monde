@@ -4466,6 +4466,10 @@ Deadlines never produce a fail screen before Day 100. They close doors that the 
 All scenes use the §13.1 format and the same reading conventions as §13.4: each body sits in a `script` fence for readability, and lines that start `//` are authoring comments the compiler strips. If the compiler can't take fences, remove the fence lines mechanically; nothing else changes. Notes for the build:
 
 - **Lettered parts.** Where one beat needs more than one backdrop or has mutually exclusive variants (S01, S05, S07, S10), it is written as separate scenes with their own headers and triggers: `S01a/b/c` chain by `sets`; `S05`/`S05b` and `S07a`/`S07b` are exclusive by trigger.
+- **Day 1 is one walk.** S01a and S01b end in `{goto_scene}` to the next part. A handoff asks nothing: the engine carries the
+  player to the part's place under its opening `{fade}` and runs the clock on to the part's hour if it hasn't come (scenes
+  hold the clock, so the walk is where the morning goes: off the boat at 09:50, the fountain at 10:40, the cottage at 11:30).
+  S01b and S01c stay open until 20:00, so a game saved between parts picks up at the place.
 - **Branch convergence.** Choice options use `→` and run effects in order, ending in `goto label`. Branches that rejoin end with the standalone cue `{goto: label}` (the same cue §13.4 uses). Labels are scene-scoped. No label sits inside an `[[if]]` block; scenes with divergent middles dispatch with `[[if]]` + `{goto: …}` at the top level.
 - **Regard.** `{regard: x +n}` is clamped by the tier gates in §9.4. New residents start at the Regard the persona cards give them; `arrival` starts at +5 (Appendix A).
 - **Memories** are written in the resident's own voice, first person, so the nightly reflection can use them verbatim.
@@ -4605,13 +4609,15 @@ N: Bastien jumps off the bollard and leads the way up the slip.
 {set: met_pell}
 {set: met_moss}
 {set: met_ada}
+// Day 1 is one walk with Pell: up the slip and straight on into S01b.
+{goto_scene: s01b_walk}
 ```
 
 #### S01b · The Walk
 ```yaml
 id: s01b_walk
 day: 1
-time: "10:40-11:30"
+time: "10:40-20:00"                      # S01a hands straight on to it; open all day for a game saved in between
 place: old_quarter.fountain_square
 trigger: "flag.s01a_done && !flag.s01b_done"
 backdrop: bg_fountain_square_dry
@@ -4685,13 +4691,15 @@ N: Behind you the heron stands on one leg, fishing in nothing, and the clock say
 [[end]]
 {set: s01b_done}
 {set: met_bertrand}
+// Pell walks the Fellow on to the cottage: straight into S01c.
+{goto_scene: s01c_cottage}
 ```
 
 #### S01c · The Cottage
 ```yaml
 id: s01c_cottage
 day: 1
-time: "11:30-13:00"
+time: "11:30-20:00"                      # S01b hands straight on to it; open all day for a game saved in between
 place: old_quarter.lamplighter_cottage
 trigger: "flag.s01b_done && !flag.s01c_done"
 backdrop: bg_cottage_door

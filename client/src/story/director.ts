@@ -49,7 +49,7 @@ export class StoryDirector {
         if (entry.from && ((scene.header.calledFrom && scene.header.calledFrom !== entry.from)
           || !evaluate(scene.header.trigger, expressionContext(context, this.flags)))) continue;
       }
-      if (await this.host.enter?.(scene.header, isSummoned(scene)) === false) {
+      if (await this.host.enter?.(scene.header, isSummoned(scene), entry.from) === false) {
         this.queue.unshift(entry); return;
       }
       this.initialFlags = this.flags.serialize();

@@ -20,6 +20,7 @@ function fakeWorld(start: Partial<WorldNow> = {}) {
     persist: vi.fn(),
     checkpoint: vi.fn(async () => {}),
     travel: vi.fn((place: string) => { state.zone = place.split('.')[0]!; state.place = place; }),
+    passTime: vi.fn((mins: number) => { state.minute += mins; }),
     zoneName: id => (id === 'commons' ? 'The Commons' : id),
     aiLine: vi.fn(async (): Promise<readonly StoryLine[]> => [])
   };
@@ -53,25 +54,35 @@ describe('StorySession', () => {
       's06_good_coat', 's07a_chime_runs', 's07b_chime_loan', 's08_option', 's09_pell_confession', 's10a_bloom_open', 's10b_bloom_close', 's10c_straw_poll']);
   });
 
-  it('plays S01a on the ferry slip at 09:50 on Day 1 with every cue landing somewhere', async () => {
-    const { world, events } = fakeWorld();
+  it('plays Day 1 as one walk: S01a on the ferry slip at 09:50, then straight on to the fountain and the cottage', async () => {
+    const { world, events, state } = fakeWorld();
     const warn = vi.fn();
     const session = new StorySession({ world, dev: true, warn });
     const presenter = fakePresenter();
     session.presenter = presenter;
     expect(session.ready()).toBe(true);
     const lines = await playOut(session);
-    expect(session.flags.serialize()).toEqual(expect.arrayContaining(['s01a_done', 'met_pell', 'met_moss', 'met_ada', 'return_ticket_kept']));
+    expect(session.flags.serialize()).toEqual(expect.arrayContaining(['s01a_done', 'met_pell', 'met_moss', 'met_ada', 'return_ticket_kept',
+      's01b_done', 'met_bertrand', 'saw_tollmen_idle', 's01c_done', 'cottage_keys_given']));
+    // No summons between the parts: the walk carries the player along, and the clock on to each part's hour.
+    expect(presenter.confirm).not.toHaveBeenCalled();
+    expect(world.travel).toHaveBeenNthCalledWith(1, 'old_quarter.fountain_square');
+    expect(world.travel).toHaveBeenNthCalledWith(2, 'old_quarter.lamplighter_cottage');
+    expect(world.passTime).toHaveBeenNthCalledWith(1, 50);
+    expect(world.passTime).toHaveBeenNthCalledWith(2, 50);
+    expect(state).toMatchObject({ minute: 11 * 60 + 30, place: 'old_quarter.lamplighter_cottage' });
+    expect(lines.some(l => l.text.startsWith('Market Row first.'))).toBe(true);
+    expect(lines.some(l => l.text.startsWith('Lamplighter Lane is the narrowest street'))).toBe(true);
     expect(presenter.backdrop).toHaveBeenCalledWith('bg_ferry_slip_morning');
     expect(presenter.music).toHaveBeenCalledWith('arrival_theme');
     expect(presenter.charcreate).toHaveBeenCalledTimes(1);
     expect(session.ledger.regard).toMatchObject({ pell: 3, ada: 1 });
-    expect(events.filter(e => e.kind === 'scripted_memory').map(e => 'resident' in e && e.resident)).toEqual(['pell', 'moss', 'ada']);
+    expect(events.filter(e => e.kind === 'scripted_memory').map(e => 'resident' in e && e.resident)).toEqual(['pell', 'moss', 'ada', 'bertrand', 'pell', 'pell']);
     expect(events.every(e => ClientEventSchema.safeParse(e).success)).toBe(true);
     expect(lines.find(l => l.text.includes('{'))).toBeUndefined();
     expect(lines.some(l => l.text.startsWith('Fellow. Good.'))).toBe(true);
     expect(warn).not.toHaveBeenCalled();
-    // Done: nothing more on the slip today.
+    // Done: nothing more today.
     expect(session.ready()).toBe(false);
   });
 

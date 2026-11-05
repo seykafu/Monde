@@ -2,7 +2,7 @@
 ```yaml
 id: s01c_cottage
 day: 1
-time: "11:30-13:00"
+time: "11:30-20:00"                      # S01b hands straight on to it; open all day for a game saved in between
 place: old_quarter.lamplighter_cottage
 trigger: "flag.s01b_done && !flag.s01c_done"
 backdrop: bg_cottage_door

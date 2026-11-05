@@ -233,6 +233,11 @@ export interface StoryWorld {
   checkpoint(key: string): Promise<void>;
   /** Move the player to a summoned scene's place. */
   travel(place: string): void;
+  /**
+   * Run the clock forward `minutes`, firing its events on the way (the walk between two parts of one beat, when
+   * a `{goto_scene}` handoff reaches a part whose hour hasn't come yet).
+   */
+  passTime?(minutes: number): void;
   zoneName(zone: string): string;
   /** One live line for {ai_line}; [] means use the authored fallback. */
   aiLine(residentId: string, brief: string): Promise<readonly StoryLine[]>;
