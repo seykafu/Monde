@@ -4,7 +4,9 @@ style, then the other five expressions drawn against that key so only the face c
   neutral  -> references the approved style key (art_sources/style_bible_v2/portrait_odile.png)
   warm, sad, angry, surprised, worried -> reference that character's own neutral
 
-People get the six; animals get the expressions their card lists (mapped onto the same prompts where they can).
+People get the six, and a core card also laugh, thinking and the signatures its scripts use (EXTRA, SIGNATURES below);
+animals get the expressions their card lists (mapped onto the same prompts where they can).
+MONDE_IMAGE_MODEL picks the Codex model (gpt-5.6-sol drew the 2026-11-05 batch while gpt-6-astra was rate-limited).
 Already-generated files are skipped, so the script can be re-run after a usage limit or a rejected image
 (delete the file to redo it).
 
@@ -100,10 +102,50 @@ def recolour_prompt(card: dict) -> str:
         "For reference, the person after the change: " + card["caption"] + "\n\nNo text, no border, no frame.")
 
 
+# Beyond the six (GDD §16.2, revised 2026-11-05: signature expressions are back where the scripts use them). A core
+# card gets laugh and thinking when its `portrait_expressions` lists them (the scripts' most-used tags after the six),
+# plus each signature below that it lists. Library and generated residents keep the six.
+EXTRA = {
+    "laugh": "laughing: eyes squeezed into happy crescents, mouth wide open in a big laugh showing the teeth, cheeks pushed "
+             "up, head tipped back a little.",
+    "thinking": "thinking: eyes turned up and to one side, brows slightly knit, mouth pushed to one side in a small "
+                "pucker, quietly working something out.",
+}
+SIGNATURES = {
+    ("sable", "ink_smudge"): "brisk and satisfied: a fresh smudge of black printer's ink across one cheekbone where she "
+                             "has just rubbed it, one eyebrow up, the dry half-smile of someone who has got the quote.",
+    ("sable", "coffee_stare"): "the morning stare before coffee: a flat, unblinking look straight ahead, heavy lids, "
+                               "mouth a straight line, no expression to spare.",
+    ("hollis", "grumble"): "grumbling: brows lowered, the heavy grey moustache pushed out by a pout, mouth turned down at "
+                           "one side mid-mutter, eyes looking off to the side.",
+    ("hollis", "watch_check"): "checking his watch before he answers: eyes down at the pocket watch on its chain, held up "
+                               "in one hand at chest height, brows level, mouth set.",
+    ("rosalind", "knowing_look"): "a knowing look: one eyebrow raised, eyes slid sideways, a small closed-mouth smile at one "
+                                  "corner, as if she knows exactly who said what and won't say.",
+    ("tib", "gap_grin"): "a huge gap-toothed grin: mouth wide open showing a gap where a front milk tooth is missing, eyes "
+                         "bright and crinkled, cheeks pushed up.",
+    ("moss", "engine_ear"): "listening to an engine: head tilted, one ear turned toward the sound, eyes half-closed and "
+                            "unfocused, lips pursed, the rest of the world switched off.",
+    ("nettie", "sidelong"): "a sidelong look: eyes slid hard to one side under lowered lids, one corner of the mouth lifted "
+                            "in a sarcastic smirk, chin up.",
+    ("kasimir", "sheepish"): "sheepish: a lopsided embarrassed smile, eyes down and to one side, brows raised in the "
+                             "middle, a touch of red in the cheeks, shoulders a little hunched.",
+    ("june", "humming"): "humming: eyes closed, a small contented smile with the lips gently together, brows relaxed, "
+                         "head tilted a little as if keeping time.",
+}
+
+
+def describe_expression(card: dict, expr: str) -> str:
+    return EXPRESSIONS.get(expr) or EXTRA.get(expr) or SIGNATURES[(card["id"], expr)]
+
+
 def expressions_for(card: dict) -> list[str]:
     if card.get("kind") == "animal":
         return [e for e in card.get("portrait_expressions", []) if e in EXPRESSIONS]
-    return list(EXPRESSIONS)
+    if card.get("kind") == "library":
+        return list(EXPRESSIONS)
+    listed = card.get("portrait_expressions", [])
+    return list(EXPRESSIONS) + [e for e in listed if e in EXTRA or (card["id"], e) in SIGNATURES]
 
 
 def plan(cards: list[dict]) -> list[tuple[dict, str, tuple[str, str] | None]]:
@@ -149,7 +191,7 @@ def main() -> int:
         if not os.path.exists(ref):
             return f"{label}: SKIPPED (no neutral key)"
         name = "this townsperson" if card.get("kind") == "library" else card["name"].split()[0]
-        return run_job(label, expression_variant(name, EXPRESSIONS[expr]), ref, dest)
+        return run_job(label, expression_variant(name, describe_expression(card, expr)), ref, dest)
 
     tasks = plan(cards)
     if a.dry_run:

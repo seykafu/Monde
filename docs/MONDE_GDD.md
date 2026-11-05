@@ -10577,17 +10577,29 @@ and litter and graffiti decals clear as Charm rises.
 *Revised 2026-10-14 at Kasey's direction: six expressions per character, chosen line by line from the
 conversation's emotion and topic. Signature expressions come back later, with more art.*
 
+*Revised 2026-11-05 at Kasey's direction: the core cast also has laugh and thinking, the two tags the scripts use
+most after the six, and the signature expressions the scripts use have art.*
+
 | Group | Count | Expressions | Images |
 |---|---|---|---|
-| Core cast (§4), cel-shaded cartoon busts (§16.1) | 20 (Bastien: 6 cat poses) | the six | 120 |
+| Core cast (§4), cel-shaded cartoon busts (§16.1) | 20 (Bastien: 6 cat poses) | the six, laugh and thinking (Bastien: the six poses), plus the signatures the scripts use | 120 + 56 |
 | Featured supporting (Tollmen ×5, Old Moss, Ada, Raman, Claudine, plus about 6 others from §12.4) | ~15 | the six | ≈ 90 |
 | **Resident library** (Day-1 residents + arrivals) | 200 master busts × 3 color variants = **600 identities** | the six | **3,600** |
 
-- **The six:** neutral, warm, sad, angry, surprised, worried. Every person has all six. The dialogue
-  prompt offers only these, and the engine maps anything else onto them (laugh → warm, thinking →
-  neutral; an unknown id comes from the resident's emotion on the server and is neutral on the
-  client). Cards keep their longer `portrait_expressions` lists (the old standard 8 plus signatures)
-  for when signature art exists. Bastien's six are cat poses: sitting, slow blink, drooped ears, flat
+- **The six:** neutral, warm, sad, angry, surprised, worried. Every person has all six. The live
+  dialogue prompt offers only these. A scripted line may ask for any id its speaker's card lists: the
+  engine shows that frame when the resident's sheet has it, and otherwise maps it onto the six (laugh →
+  warm, thinking → neutral; an unknown id comes from the resident's emotion on the server and is
+  neutral on the client). Cards keep their longer `portrait_expressions` lists (the old standard 8 plus
+  signatures); art arrives for an id once the scripts use it.
+- **Beyond the six (core cast, 2026-11-05):** every core person also has **laugh** (eyes squeezed shut,
+  mouth wide open) and **thinking** (eyes up and aside, mouth pushed to one side). Signatures with art,
+  each one a tag the scripts already use: Sable `ink_smudge` (a fresh ink smudge on the cheek, the dry
+  half-smile of someone who has the quote) and `coffee_stare`; Hollis `grumble` and `watch_check` (eyes
+  down at the watch on its chain); Roz `knowing_look`; Tib `gap_grin` (a missing milk tooth); Moss
+  `engine_ear` (head tilted, listening to an engine); Nettie `sidelong`; Kasimir `sheepish`; June
+  `humming` (eyes closed, keeping time). The prompts live in `scripts/art/gen_portraits.py` (`EXTRA`,
+  `SIGNATURES`). The other signatures on the cards wait for a script to use them. Bastien's six are cat poses: sitting, slow blink, drooped ears, flat
   ears, round eyes, ears back.
 - **How each one reads** (direction for the art, and what the procedural bust draws): **neutral**
   calm eyes, relaxed brows, closed mouth · **warm** smiling eyes, open smile, blush · **sad** brows up

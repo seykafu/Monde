@@ -5,7 +5,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "augusta": [
   "neutral",
@@ -13,7 +15,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "bastien": [
   "neutral",
@@ -29,7 +33,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "bru": [
   "neutral",
@@ -37,7 +43,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "delphine": [
   "neutral",
@@ -45,7 +53,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "felix": [
   "neutral",
@@ -53,7 +63,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "hollis": [
   "neutral",
@@ -61,7 +73,11 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "grumble",
+  "laugh",
+  "thinking",
+  "watch_check"
  ],
  "ines": [
   "neutral",
@@ -69,7 +85,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "june": [
   "neutral",
@@ -77,7 +95,10 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "humming",
+  "laugh",
+  "thinking"
  ],
  "kasimir": [
   "neutral",
@@ -85,7 +106,10 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "sheepish",
+  "thinking"
  ],
  "lib_a15_003": [
   "neutral",
@@ -1053,7 +1077,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "moss": [
   "neutral",
@@ -1061,7 +1087,10 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "engine_ear",
+  "laugh",
+  "thinking"
  ],
  "nell": [
   "neutral",
@@ -1069,7 +1098,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "nettie": [
   "neutral",
@@ -1077,7 +1108,10 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "sidelong",
+  "thinking"
  ],
  "odile": [
   "neutral",
@@ -1085,7 +1119,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "pell": [
   "neutral",
@@ -1093,7 +1129,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "priya": [
   "neutral",
@@ -1101,7 +1139,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "rook": [
   "neutral",
@@ -1109,7 +1149,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "rosalind": [
   "neutral",
@@ -1117,7 +1159,10 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "knowing_look",
+  "laugh",
+  "thinking"
  ],
  "sable": [
   "neutral",
@@ -1125,7 +1170,11 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "coffee_stare",
+  "ink_smudge",
+  "laugh",
+  "thinking"
  ],
  "teo": [
   "neutral",
@@ -1133,7 +1182,9 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ],
  "tib": [
   "neutral",
@@ -1141,7 +1192,10 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "gap_grin",
+  "laugh",
+  "thinking"
  ],
  "vane": [
   "neutral",
@@ -1149,6 +1203,8 @@
   "sad",
   "angry",
   "surprised",
-  "worried"
+  "worried",
+  "laugh",
+  "thinking"
  ]
 }
