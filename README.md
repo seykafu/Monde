@@ -957,7 +957,7 @@ Residents and scenes are edited in `content/`, then `npm run lint:content` and `
   that area.
 
 **Credits.** Creative direction: Kasey. Design, AI layer and prompts: Claude Opus 5.5. Cast, scripts and appendices:
-Claude Sonnet 5.5. Implementation: GPT-6 Astra through Codex, and Claude. Art: GPT-6 image generation, curated by
+Claude Sonnet 5.5. Implementation: GPT-6 and GPT-6.2 Astra through Codex, and Claude. Art: GPT-6 image generation, curated by
 hand. Music: Suno, by Kasey. Runtime residents: Claude Haiku 5.5. Rendering and combat are ported from
 [Ravage](https://github.com/seykafu/Ravage). No open-source licence is set; the desktop package is marked
 `UNLICENSED`.

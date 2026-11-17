@@ -132,7 +132,7 @@ tools/   verify_puzzles.py, card linter, script compiler
 |---|---|---|
 | Creative director | **Kasey** | Approves scope, the style bible, card spot-checks and copy; plays every gate build; decides open questions |
 | Orchestrator and reviewer | **Claude Opus 5.5** | Turns these tasks into focused Codex tasks, reviews every change (typecheck, tests, capture screenshots), owns the AI layer's prompts, validators and evals |
-| Heavy implementation | **GPT-6 Astra via Codex** (`/codex:rescue`) | Most engine, client and server tasks below. Each task has named files and acceptance criteria. |
+| Heavy implementation | **GPT-6.2 Astra via Codex** (`/codex:rescue`) | Most engine, client and server tasks below. Each task has named files and acceptance criteria. |
 | Integration-heavy implementation | **Claude Opus 5.5** subagents | The prompt builder, reflection/plan jobs, the voter model, cross-cutting fixes |
 | Art | **GPT-6 image generation** through the Codex CLI | Everything in §7 Phase A, through the Ravage-style `scripts/art/` pipeline |
 | Writing | **Claude Sonnet 5.5** | Extracting cards and scenes into `content/`, Quiet Mode tuning, Dawn Report templates, store and survey copy |
@@ -150,7 +150,7 @@ next phase until its gate passes.
 
 ## 7. Phases and tasks
 
-Owners: **CX** = Codex (GPT-6 Astra) · **OP** = Opus · **SN** = Sonnet · **IMG** = GPT-6 images ·
+Owners: **CX** = Codex (GPT-6.2 Astra) · **OP** = Opus · **SN** = Sonnet · **IMG** = GPT-6 images ·
 **K** = Kasey. "Dep" = depends on.
 
 ### Phase K: Before week 1 (Kasey, about 1 hour)
