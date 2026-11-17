@@ -6,12 +6,12 @@
 // world/wayfinding.ts picks the target. Hidden whenever the objective line is (scenes, dialogue, menus, a door's fade,
 // the Journal's O switch), when the objective is anywhere at all, and once the player stands at it.
 import type Phaser from 'phaser';
-import { reducedMotion } from '../accessibility/runtime';
+import { reducedMotion, textSize } from '../accessibility/runtime';
 import type { ObliqueProjection } from '../render/ObliqueProjection';
 import { DEPTH } from '../render/depth';
 import { DIORAMA_ELEV_STEP, DIORAMA_FOOT_DY, DIORAMA_TILE_H } from '../render/dioramaConfig';
 import type { StoryAttachment } from '../scenes/story/attach';
-import { FAMILY_BODY, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
+import { FAMILY_UI, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { residentName, sitePlaceName } from '../projects/runtime';
 import { townNames } from '../scenes/friendship';
 import type { Position } from '../world/player';
@@ -70,7 +70,7 @@ export function attachQuestMarker(scene: Phaser.Scene, opts: QuestMarkerOptions)
   pin.fillStyle(INK, 1).fillTriangle(-6, -14, 6, -14, 0, 0).fillCircle(0, -17, 9);
   pin.fillStyle(GOLD, 1).fillTriangle(-4, -14, 4, -14, 0, -2).fillCircle(0, -17, 7);
   pin.fillStyle(INK, 1).fillCircle(0, -17, 2.6);
-  const pinLabel = scene.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: '12px', color: '#ffe7a6', backgroundColor: '#28372dee', padding: { x: 5, y: 2 }, resolution: RENDER_SCALE * opts.zoom })
+  const pinLabel = scene.add.text(0, 0, '', { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: '#ffe7a6', backgroundColor: '#28372dee', padding: { x: 5, y: 2 }, resolution: RENDER_SCALE * opts.zoom })
     .setOrigin(0.5, 1);
   pin.setScale(1.5).setDepth(DEPTH.OVER_DARK + 0.5);
   pinLabel.setDepth(DEPTH.OVER_DARK + 0.6);
@@ -79,7 +79,7 @@ export function attachQuestMarker(scene: Phaser.Scene, opts: QuestMarkerOptions)
   const arrow = scene.add.graphics();
   arrow.fillStyle(INK, 0.9).fillCircle(0, 0, 17).lineStyle(2, GOLD, 0.85).strokeCircle(0, 0, 17);
   arrow.fillStyle(GOLD, 1).fillTriangle(13, 0, -6, -9, -6, 9);
-  const arrowLabel = scene.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#ffe7a6', backgroundColor: '#28372dee', padding: { x: 6, y: 3 }, resolution: RENDER_SCALE });
+  const arrowLabel = scene.add.text(0, 0, '', { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: '#ffe7a6', backgroundColor: '#28372dee', padding: { x: 6, y: 3 }, resolution: RENDER_SCALE });
   cam.ignore([arrow, arrowLabel]);
   const all = [pin, pinLabel, arrow, arrowLabel];
   for (const o of all) o.setVisible(false);

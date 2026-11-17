@@ -19,7 +19,7 @@ import { marks } from './riddles';
 // Placeholder art in the brass / paper / newsprint direction (§16.6): drawn shapes for the Pillar icons
 // (coin, lamp, heart, flower) and system serif fonts until A-08 brings the real UI art.
 import Phaser from 'phaser';
-import { FAMILY_BODY, FAMILY_DISPLAY, FAMILY_HEADING, FAMILY_UI, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
+import { FAMILY_BODY, FAMILY_PRESS, FAMILY_UI, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { formatClock, formatDate, gameTime, weekdayOf, type Clock } from '../sim/clock';
 import { computeAppeal } from '../town/appeal';
 import { MARKET_DAY_STALL_FEES, UPKEEP_RULES, dailyRates } from '../town/fund';
@@ -157,7 +157,7 @@ export class PillarStrip {
     bg.lineStyle(2, 0xe4c77f, 0.55).strokeRoundedRect(x, y, w, h, 8);
     const icons = scene.add.graphics();
     const style = (size: number, color: string): Phaser.Types.GameObjects.Text.TextStyle =>
-      ({ fontFamily: FAMILY_UI, fontSize: `${textSize(size)}px`, color, resolution: RENDER_SCALE });
+      ({ fontFamily: FAMILY_UI, fontSize: `${textSize(Math.max(14, size))}px`, color, resolution: RENDER_SCALE });
     PILLARS.forEach((p, i) => {
       const cx = x + cell * i + 16;
       drawPillarIcon(icons, p, cx, y + h / 2, 7.5, PILLAR_COLOR[p], 0x28372d);
@@ -311,14 +311,14 @@ export class TownLedgerScene extends Phaser.Scene {
     }
     // Masthead and its newsprint double rule.
     this.add.text(PX + PW / 2, PY + 22, 'The Town Ledger', {
-      fontFamily: FAMILY_DISPLAY, fontSize: '40px', color: INK_CSS, resolution: RENDER_SCALE
+      fontFamily: FAMILY_PRESS, fontSize: '40px', color: INK_CSS, resolution: RENDER_SCALE
     }).setOrigin(0.5, 0);
     g.fillStyle(INK, 1).fillRect(PX + 40, PY + 76, PW - 80, 2.5).fillRect(PX + 40, PY + 81, PW - 80, 1);
   }
 
   private text(x: number, y: number, s: string, size: number, opts: { color?: string; family?: string; italic?: boolean; bold?: boolean; align?: 'left' | 'right' | 'center'; wrap?: number } = {}): Phaser.GameObjects.Text {
     const t = this.add.text(x, y, s, {
-      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${textSize(size)}px`, color: opts.color ?? INK_CSS,
+      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${textSize(Math.max(14, size))}px`, color: opts.color ?? INK_CSS,
       fontStyle: [opts.italic ? 'italic' : '', opts.bold ? 'bold' : ''].join(' ').trim() || 'normal',
       resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap } } : {})
     }).setOrigin(opts.align === 'right' ? 1 : opts.align === 'center' ? 0.5 : 0, 0);
@@ -351,7 +351,7 @@ export class TownLedgerScene extends Phaser.Scene {
   }
 
   private header(x: number, y: number, s: string): void {
-    this.text(x, y, s.toUpperCase(), 13, { family: FAMILY_UI, color: BRASS_CSS, bold: true });
+    this.text(x, y, s.toUpperCase(), 15, { family: FAMILY_PRESS, color: BRASS_CSS, bold: true });
   }
 
   /** Rebuild everything that depends on the town (the town changes at most a few times a day). */
@@ -372,7 +372,7 @@ export class TownLedgerScene extends Phaser.Scene {
     if (this.page === 'projects') {
       // G-03: every Spring Project, on the whole sheet.
       this.header(LX, PY + 122, `Projects · fund, gather, volunteer, solve, open · Town Fund ${coins(town.fund)} coins`);
-      const families = { ui: FAMILY_UI, heading: FAMILY_HEADING, body: FAMILY_BODY } as const;
+      const families = { ui: FAMILY_UI, heading: FAMILY_PRESS, body: FAMILY_BODY } as const;
       drawProjectsPage({
         g, text: (x, y, s, size, o = {}) => this.text(x, y, s, size, { ...o, family: o.family ? families[o.family] : undefined })
       }, this.registry, { day: town.day, minute: clock.minute }, { x: LX, y: PY + 142, w: PW - 88, h: PH - 186 });
@@ -392,7 +392,7 @@ export class TownLedgerScene extends Phaser.Scene {
     const riddleNews = marks(this.registry).headlines.filter(h => h.day === town.day - 1).map(h => h.text);
     const morning = [...riddleNews, report && report.day === town.day ? `${dawnLine(report)}.` : null, ...ties.slice(0, 2), ties.length > 2 ? `And ${ties.length - 2} more.` : null]
       .filter((s): s is string => !!s).join(' ');
-    if (morning) this.text(PX + 44, PY + PH - 22, morning, 14, { italic: true, color: MUTED, wrap: 620 }).setOrigin(0, 1);
+    if (morning) this.text(PX + 44, PY + PH - 22, morning, 14, { family: FAMILY_PRESS, italic: true, color: MUTED, wrap: 620 }).setOrigin(0, 1);
     this.text(PX + PW - 44, PY + PH - 38, `Tab: Projects  ·  L or Esc to close${DEV_KEYS ? '  ·  dev ]: +1 hour' : ''}`, 14, { family: FAMILY_UI, color: MUTED, align: 'right' });
     this.text(PX + PW - 44, PY + PH - 56, projectsSummary(this.registry, { day: town.day, minute: clock.minute }), 13, { family: FAMILY_UI, color: BRASS_CSS, align: 'right' });
   }
@@ -407,7 +407,7 @@ export class TownLedgerScene extends Phaser.Scene {
       g.fillStyle(color, 1).fillCircle(LX + 26, y + 28, 25);
       g.lineStyle(2, BRASS, 0.8).strokeCircle(LX + 26, y + 28, 25);
       drawPillarIcon(g, p, LX + 26, y + 28, 13, 0xfffaf0, color);
-      this.text(barX, y + 2, PILLAR_NAME[p], 24, { family: FAMILY_HEADING });
+      this.text(barX, y + 2, PILLAR_NAME[p], 24, { family: FAMILY_PRESS });
       this.text(barX, y + 32, PILLAR_MEASURES[p], 14, { italic: true, color: MUTED });
       this.text(LX + LW, y + 2, town.pillars[p].toFixed(1), 26, { family: FAMILY_UI, align: 'right' });
       const a = arrow(change[p]);

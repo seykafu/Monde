@@ -1,3 +1,4 @@
+import { textSize } from '../../accessibility/runtime';
 import { accessibility, reducedMotion } from '../../accessibility/runtime';
 import { PROJECT_BEAT } from '../../projects/BeatScene';
 import { Chatter, type ChatterActor } from './chatter';
@@ -281,7 +282,7 @@ export class ResidentLayer {
     return Object.assign(actor, {
       avatar, sprite, cast,
       shadow: scene.add.ellipse(0, 0, animal ? 18 : 22, 7, 0x000000, 0.22).setDepth(DEPTH.SHADOW).setVisible(false),
-      label: scene.add.text(0, 0, profile.name, { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#28372dcc', padding: { x: 3, y: 1 }, resolution: RENDER_SCALE })
+      label: scene.add.text(0, 0, profile.name, { fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: '#fff0ce', backgroundColor: '#28372dcc', padding: { x: 3, y: 1 }, resolution: RENDER_SCALE })
         .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setVisible(false),
       bubble: scene.add.image(0, 0, '__DEFAULT').setOrigin(0.2, 1).setDepth(DEPTH.OVER_DARK - 0.01).setVisible(false),
       delay: 0, blockedMs: 0, passing: false, talking: false,
@@ -347,7 +348,7 @@ export class ResidentLayer {
   /** Screen-space dev readout (for the UI camera); empty outside dev builds. */
   buildUi(): Phaser.GameObjects.GameObject[] {
     if (!this.dev) return [];
-    this.readout = this.scene.add.text(24, 108, '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d', resolution: RENDER_SCALE });
+    this.readout = this.scene.add.text(24, 114, '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d', resolution: RENDER_SCALE });
     return [this.readout];
   }
 

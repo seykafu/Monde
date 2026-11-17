@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 // The End-of-Spring report and "To be continued" (MVP G-11; MVP_PLAN §11: "the Straw Poll and End-of-Spring report close
 // the run"). Opened over ZoneScene by finale/attach.ts on the morning after the Bloom Fair, once the Lantern (with the
 // poll) has been read. Page one is the Spring on one sheet of the Ledger's paper (finale/report.ts); page two is
@@ -111,7 +112,7 @@ export class SpringReportScene extends Phaser.Scene {
 
   private text(x: number, y: number, s: string, size: number, o: { color?: string; family?: string; italic?: boolean; bold?: boolean; align?: 'left' | 'center' | 'right'; wrap?: number; lines?: number } = {}): Phaser.GameObjects.Text {
     const t = this.add.text(x, y, s, {
-      fontFamily: o.family ?? FAMILY_BODY, fontSize: `${size}px`, color: o.color ?? INK_CSS, resolution: RENDER_SCALE,
+      fontFamily: o.family ?? FAMILY_BODY, fontSize: `${textSize(Math.max(14, size))}px`, color: o.color ?? INK_CSS, resolution: RENDER_SCALE,
       fontStyle: [o.italic ? 'italic' : '', o.bold ? 'bold' : ''].join(' ').trim() || 'normal',
       ...(o.wrap ? { wordWrap: { width: o.wrap } } : {})
     }).setOrigin(o.align === 'center' ? 0.5 : o.align === 'right' ? 1 : 0, 0);

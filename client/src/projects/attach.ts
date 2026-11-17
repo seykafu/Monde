@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 // The Projects on the board (GDD §6.3, MVP G-03): ZoneScene calls attachProjects() in create() and update() every frame.
 //
 // - At a Project's site, E does its next thing: hand over materials, work a shift (10 Stamina, an hour), open it when
@@ -589,12 +590,12 @@ export function attachProjects(scene: Phaser.Scene, opts: ProjectsAttachOptions)
         const [x0, y0] = h.site.work.area;
         const at = door ? feet(door[0] + 1.9, door[1] + 0.7) : feet(x0 + 0.1, y0 + 0.4);
         // Kasimir's plank (S04): chalk on a blackboard-green board, propped on two legs.
-        const W = 76, H = 66;
+        const W = textSize(120), H = textSize(102);
         const board = scene.add.graphics();
         board.fillStyle(0x6e4b2c, 1).fillRect(-2, -2, W + 4, H + 4).fillStyle(0x2b3a31, 1).fillRect(0, 0, W, H);
         board.lineStyle(1, 0x8a6a45, 1).strokeRect(-2, -2, W + 4, H + 4);
         board.fillStyle(0x6e4b2c, 1).fillRect(6, H + 2, 4, 10).fillRect(W - 10, H + 2, 4, 10);
-        const label = scene.add.text(W / 2, 4, text, { fontFamily: FAMILY_UI, fontSize: '9px', color: '#ecebdf', align: 'center', lineSpacing: 0, resolution: RENDER_SCALE * 2 }).setOrigin(0.5, 0);
+        const label = scene.add.text(W / 2, 4, text, { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: '#ecebdf', align: 'center', lineSpacing: 0, resolution: RENDER_SCALE * 2 }).setOrigin(0.5, 0);
         const plank = worldOnly(scene.add.container(at.x - W / 2, at.y - H - 12, [board, label]).setDepth(actorDepth(at.y)).setAngle(-3));
         art = { id: h.id, plank, text: label, key: text };
         planks.set(h.id, art);

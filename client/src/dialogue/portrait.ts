@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 // The dialogue portrait (GDD §16.2, §18 Dialogue): a resident's bust in the VN panel, one of six expressions.
 //
 // Art first: if client/public/assets/portraits/manifest.json lists the resident, their sheet (one WebP, a frame per
@@ -791,7 +792,7 @@ export class Portrait {
     this.images = [0, 1].map(() => scene.add.image(0, 0, '__MISSING').setOrigin(0.5, 1).setVisible(false)) as [Phaser.GameObjects.Image, Phaser.GameObjects.Image];
     this.body.add([this.bust, ...this.faces, ...this.images, this.overlay]);
     this.label = opts.label && import.meta.env.DEV
-      ? scene.add.text(W - 12, 12, '', { fontFamily: FAMILY_BODY, fontSize: '13px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE }).setOrigin(1, 0)
+      ? scene.add.text(W - 12, 12, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE }).setOrigin(1, 0)
       : null;
     this.veil = scene.add.graphics().setAlpha(0);
     this.veil.fillStyle(0x0c100d, 1).fillRoundedRect(0, 0, W, H, 16);

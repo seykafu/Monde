@@ -1,3 +1,4 @@
+import { textSize } from '../../accessibility/runtime';
 // The HUD's menu buttons (Kasey, 2026-10-24: Tasks and the map "from a key and a HUD button"): Bag, Tasks, Journal,
 // Ledger and Map in a column at the bottom right (clear of the E prompt and the toasts, which are centred), each
 // showing its key, for the mouse. They open what their keys open and hide whenever the objective line does (scenes,
@@ -21,7 +22,7 @@ export function hudButtonsBox(count: number, width: number): { x0: number; y0: n
   return { x0: GAME_WIDTH - MARGIN - width, y0: GAME_HEIGHT - MARGIN - count * (H + GAP) + GAP, x1: GAME_WIDTH, y1: GAME_HEIGHT };
 }
 /** Every button is as wide as this. */
-export const HUD_BUTTON_W = 104;
+export const HUD_BUTTON_W = 118;
 
 /** Draw the buttons (UI camera objects: the caller keeps them off the world camera) and keep their visibility in step. */
 export function attachHudButtons(scene: Phaser.Scene, buttons: readonly HudButton[], busy: () => boolean): Phaser.GameObjects.GameObject[] {
@@ -30,16 +31,19 @@ export function attachHudButtons(scene: Phaser.Scene, buttons: readonly HudButto
   buttons.forEach((b, i) => {
     const y = box.y0 + i * (H + GAP);
     const bg = scene.add.graphics();
-    const label = scene.add.text(x + 39, y + H / 2, b.label, { fontFamily: FAMILY_UI, fontSize: '14px', color: '#fff0ce', resolution: RENDER_SCALE }).setOrigin(0, 0.5);
+    const label = scene.add.text(x + 39, y + H / 2, b.label, { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, fontStyle: '600', color: '#fff0ce', resolution: RENDER_SCALE }).setOrigin(0, 0.5);
     const draw = (hot: boolean) => {
-      bg.clear().fillStyle(0x28372d, hot ? 1 : 0.88).fillRoundedRect(x, y, w, H, 8).lineStyle(1.5, 0xe4c77f, hot ? 0.95 : 0.5).strokeRoundedRect(x, y, w, H, 8);
+      bg.clear().fillStyle(hot ? 0x3a4d40 : 0x28372d, hot ? 1 : 0.88).fillRoundedRect(x, y, w, H, 8).lineStyle(1.5, 0xe4c77f, hot ? 0.95 : 0.5).strokeRoundedRect(x, y, w, H, 8);
+      bg.lineStyle(1, 0xffedbc, 0.28).lineBetween(x + 8, y + 2, x + w - 8, y + 2);
       bg.fillStyle(0xe4c77f, hot ? 1 : 0.85).fillRoundedRect(x + 9, y + 5, 20, 20, 5);
     };
     draw(false);
-    const key = scene.add.text(x + 19, y + H / 2, b.key, { fontFamily: FAMILY_UI, fontSize: '13px', fontStyle: 'bold', color: '#28372d', resolution: RENDER_SCALE }).setOrigin(0.5);
+    const key = scene.add.text(x + 19, y + H / 2, b.key, { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, fontStyle: '600', color: '#28372d', resolution: RENDER_SCALE }).setOrigin(0.5);
     const hit = scene.add.zone(x, y, w, H).setOrigin(0).setInteractive({ useHandCursor: true })
       .on('pointerover', () => draw(true)).on('pointerout', () => draw(false))
-      .on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, e: Phaser.Types.Input.EventData) => { e.stopPropagation(); playSfx('click'); b.run(); });
+      .on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, e: Phaser.Types.Input.EventData) => { e.stopPropagation(); key.setY(y + H / 2 + 1); label.setY(y + H / 2 + 1); playSfx('click'); b.run(); })
+      .on('pointerup', reset).on('pointerout', reset);
+    function reset() { key.setY(y + H / 2); label.setY(y + H / 2); }
     objects.push(bg, key, label, hit);
   });
   let at = 0, shown = true;

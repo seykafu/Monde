@@ -8,7 +8,9 @@ import { getFellow, setFellow } from '../fellow/state';
 import { getTown } from '../scenes/TownLedgerScene';
 import { appendEvent } from '../scenes/events';
 import { uuid } from '../mind/api';
-import { FAMILY_BODY, GAME_WIDTH } from '../util/constants';
+import { hudPlate } from '../scenes/zone/hudPlate';
+import { textSize } from '../accessibility/runtime';
+import { FAMILY_UI, FAMILY_BODY, GAME_WIDTH } from '../util/constants';
 import { economyOf, coinsOf, ECONOMY_KEY, COINS_KEY } from './runtime';
 import { awakeMinute, completeWork, sleep } from './rules';
 import { openBag } from './BagScene';
@@ -28,10 +30,22 @@ let devWork = import.meta.env.DEV && typeof window !== 'undefined' ? new URLSear
 export interface EconomyAttachment { objects: Phaser.GameObjects.GameObject[]; interaction(place: string): { label: string; run(): void } | null }
 export function attachEconomy(scene: Phaser.Scene, clock: Clock, toast: (text: string) => void, home: () => void): EconomyAttachment {
   const r = scene.registry;
-  const hud = scene.add.text(GAME_WIDTH - 510, 18, '', { fontFamily: FAMILY_BODY, fontSize: '18px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 10, y: 8 } });
+  const width = 218, y = 16, x = GAME_WIDTH - 20 - textSize(264) - 12 - width;
+  const plate = scene.add.graphics();
+  const hud = scene.add.text(x + 12, y + 8, '', { fontFamily: FAMILY_UI, fontSize: `${textSize(18)}px`, color: '#fff0ce', lineSpacing: 5 });
   const bar = scene.add.graphics();
-  const update = () => { const s = economyOf(r); hud.setText(`Stamina ${Math.ceil(s.stamina)}/${s.maxStamina}\n${coinsOf(r)} coins  ·  I: Bag`);
-    bar.clear().fillStyle(0x18291f).fillRect(GAME_WIDTH - 500, 78, 190, 6).fillStyle(0xa6ca89).fillRect(GAME_WIDTH - 500, 78, 190 * s.stamina / s.maxStamina, 6); };
+  let lastReadout = '';
+  const update = () => {
+    const s = economyOf(r);
+    const readout = `${s.stamina}/${s.maxStamina}/${coinsOf(r)}`;
+    if (readout === lastReadout) return;
+    lastReadout = readout;
+    hud.setText(`Stamina ${Math.ceil(s.stamina)}/${s.maxStamina}\n${coinsOf(r)} coins`);
+    const barY = hud.y + hud.height + 5, barW = width - 24;
+    hudPlate(plate, x, y, width, barY - y + 14);
+    bar.clear().fillStyle(0x18291f).fillRect(x + 12, barY, barW, 6)
+      .fillStyle(0xa6ca89).fillRect(x + 12, barY, barW * Math.min(1, Math.max(0, s.stamina / s.maxStamina)), 6);
+  };
   scene.events.on('update', update); update();
   const payStipend = () => {
     // Stipend is paid by the Town Fund; lack of funds may put it into debt (GDD-GAP: no insolvency rule).
@@ -95,7 +109,7 @@ export function attachEconomy(scene: Phaser.Scene, clock: Clock, toast: (text: s
     const once = () => { if (clock.paused || !devWork) return; devWork = null; scene.events.off('update', once); work(devTask); };
     scene.events.on('update', once); scene.events.once('shutdown', () => scene.events.off('update', once));
   }
-  return { objects: [hud, bar], interaction: place => {
+  return { objects: [plate, hud, bar], interaction: place => {
     if (place === 'old_quarter.lamplighter_cottage') return { label: 'Sleep until morning', run: () => {
       if (clock.paused) return;
       clock.pause('sleep-prompt');

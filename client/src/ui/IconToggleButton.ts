@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { COLORS } from "../util/constants";
+import { FAMILY_SYMBOL, COLORS } from "../util/constants";
 import { sfxClick, sfxHover } from "../audio/Sfx";
 
 // Generic circular glyph toggle for the battle top bar — same pattern and
@@ -31,7 +31,7 @@ export class IconToggleButton extends Phaser.GameObjects.Container {
     this.bg = scene.add.graphics();
     this.add(this.bg);
     this.glyph = scene.add.text(0, 1, glyphChar, {
-      fontFamily: "Segoe UI Symbol, Apple Symbols, Symbola, sans-serif",
+      fontFamily: FAMILY_SYMBOL,
       fontSize: "16px",
       color: "#f4e4b0"
     }).setOrigin(0.5);

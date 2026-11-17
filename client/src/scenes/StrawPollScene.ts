@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 // The Straw Poll's card (MVP G-11; S10c "The Straw Poll"): Sable's three jam jars filling bean by bean, the shares with
 // their honest margin, and three residents in their own words. Opened over StoryScene by its `strawPoll` presenter cue
 // (finale/attach.ts openStrawPoll); resolves when the player reads on. Newsprint, in the Ledger's paper and ink.
@@ -64,7 +65,7 @@ export class StrawPollScene extends Phaser.Scene {
     const pct = percentages(poll.shares), margin = Math.round(poll.margin * 100);
     const text = (x: number, y: number, s: string, size: number, o: { color?: string; family?: string; italic?: boolean; bold?: boolean; origin?: number; wrap?: number } = {}) =>
       this.add.text(x, y, s, {
-        fontFamily: o.family ?? FAMILY_BODY, fontSize: `${size}px`, color: o.color ?? INK_CSS,
+        fontFamily: o.family ?? FAMILY_BODY, fontSize: `${textSize(Math.max(14, size))}px`, color: o.color ?? INK_CSS,
         fontStyle: [o.italic ? 'italic' : '', o.bold ? 'bold' : ''].join(' ').trim() || 'normal', resolution: RENDER_SCALE,
         ...(o.wrap ? { wordWrap: { width: o.wrap } } : {})
       }).setOrigin(o.origin ?? 0.5, 0);
@@ -190,7 +191,7 @@ export class StrawPollScene extends Phaser.Scene {
       void this.open.ask?.(q.id, q.band).then(live => { if (live && line.active) line.setText(`“${live}”`); });
     });
     this.add.text(GAME_WIDTH / 2, Y0 + H - 28, 'Enter or click to read on', {
-      fontFamily: FAMILY_BODY, fontSize: '13px', color: MUTED, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: MUTED, resolution: RENDER_SCALE
     }).setOrigin(0.5, 0);
   }
 }

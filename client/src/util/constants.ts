@@ -102,19 +102,21 @@ export const COLORS = {
   hover: 0xfff7c4
 } as const;
 
-export const FONT_TITLE = '700 56px "Times New Roman", serif';
-export const FONT_HEADER = '600 22px serif';
-export const FONT_BODY = '400 16px "Georgia", "Times New Roman", serif';
-export const FONT_UI = '600 14px "Segoe UI", "Helvetica Neue", Arial, sans-serif';
-export const FONT_MONO = '12px "Consolas", "Menlo", monospace';
+// GDD §16.6 assigns typefaces by their role in town.
+export const FAMILY_DISPLAY = '"EB Garamond", Georgia, "Times New Roman", serif';
+export const FAMILY_HEADING = FAMILY_DISPLAY;
+export const FAMILY_BODY = FAMILY_DISPLAY;
+export const FAMILY_UI = '"Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif';
+export const FAMILY_HAND = '"Caveat", "Bradley Hand", "Segoe Print", cursive';
+export const FAMILY_PRESS = '"Old Standard TT", "Times New Roman", serif';
+export const FAMILY_SYMBOL = '"Segoe UI Symbol", "Apple Symbols", Symbola, sans-serif';
+export const FAMILY_MONO = '"Consolas", "Menlo", monospace';
 
-// Neutral system-font placeholders until Monde art direction lands.
-export const FAMILY_DISPLAY = '"Times New Roman", serif';
-export const FAMILY_HEADING = '"Times New Roman", serif';
-export const FAMILY_BODY    = '"Georgia", "Times New Roman", serif';
-export const FAMILY_UI      = '"Segoe UI", "Helvetica Neue", Arial, sans-serif';
-export const FAMILY_MONO    = '"Consolas", "Menlo", monospace';
-
+export const FONT_TITLE = `700 56px ${FAMILY_DISPLAY}`;
+export const FONT_HEADER = `600 24px ${FAMILY_HEADING}`;
+export const FONT_BODY = `400 18px ${FAMILY_BODY}`;
+export const FONT_UI = `600 14px ${FAMILY_UI}`;
+export const FONT_MONO = `14px ${FAMILY_MONO}`;
 // Typography scale — single source of truth for Phaser TextStyle objects.
 // All scenes should pull from this rather than hand-rolling fontFamily/fontSize.
 import type Phaser from "phaser";
@@ -150,7 +152,7 @@ export const TYPO = {
   } as TS,
   h2: {
     fontFamily: FAMILY_HEADING,
-    fontSize: "20px",
+    fontSize: "22px",
     color: "#e8c97c",
     stroke: "#1a0e04",
     strokeThickness: 3,
@@ -166,7 +168,7 @@ export const TYPO = {
   } as TS,
   body: {
     fontFamily: FAMILY_BODY,
-    fontSize: "20px",
+    fontSize: "22px",
     color: "#f3ecd9",
     stroke: "#000",
     strokeThickness: 2,
@@ -174,7 +176,7 @@ export const TYPO = {
   } as TS,
   bodyItalic: {
     fontFamily: FAMILY_BODY,
-    fontSize: "20px",
+    fontSize: "22px",
     color: "#dccfa8",
     fontStyle: "italic",
     stroke: "#000",
@@ -183,7 +185,7 @@ export const TYPO = {
   } as TS,
   caption: {
     fontFamily: FAMILY_BODY,
-    fontSize: "16px",
+    fontSize: "18px",
     color: "#c9b07a",
     stroke: "#000",
     strokeThickness: 2
@@ -205,14 +207,14 @@ export const TYPO = {
   } as TS,
   micro: {
     fontFamily: FAMILY_UI,
-    fontSize: "11px",
+    fontSize: "14px",
     color: "#a0a8b8",
     stroke: "#000",
     strokeThickness: 2
   } as TS,
   mono: {
     fontFamily: FAMILY_MONO,
-    fontSize: "12px",
+    fontSize: "14px",
     color: "#aab2c0"
   } as TS
 } as const;

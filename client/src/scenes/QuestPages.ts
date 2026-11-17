@@ -66,10 +66,11 @@ export class QuestPages {
 
   private text(x: number, y: number, s: string, size: number, opts: TextOpts = {}): Phaser.GameObjects.Text {
     const family = opts.family ?? FAMILY_BODY;
+    const font = textSize(Math.max(14, Math.round(size * (family === FAMILY_BODY ? 1.1 : 1))));
     const t = this.scene.add.text(x, y, s, {
-      fontFamily: family, fontSize: `${family === FAMILY_BODY ? textSize(size) : size}px`, color: opts.color ?? INK_CSS,
+      fontFamily: family, fontSize: `${font}px`, color: opts.color ?? INK_CSS,
       fontStyle: [opts.italic ? 'italic' : '', opts.bold ? 'bold' : ''].join(' ').trim() || 'normal',
-      resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap } } : {})
+      resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap }, lineSpacing: Math.ceil(font * 0.3) } : {})
     });
     this.content.add(t);
     return t;

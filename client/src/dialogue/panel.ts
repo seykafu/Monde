@@ -19,7 +19,7 @@ export const PANEL_Y = GAME_HEIGHT - 20 - PANEL_H;
 export const PAD = 30;
 export const BODY_Y = PANEL_Y + 40;
 export const BODY_W = PANEL_W - PAD * 2 - 60;
-export const BODY_FONT = 22;
+export const BODY_FONT = 26;
 export const BODY_SPACING = 8;
 export const BODY_MAX_LINES = () => maxLinesFor(textSize(BODY_FONT), BODY_SPACING, PANEL_H - 40 - 30);
 export const PORTRAIT_X = PANEL_X + 22;
@@ -105,16 +105,18 @@ export class PanelButton {
 
   constructor(scene: Phaser.Scene, readonly x: number, private y: number, readonly w: number, text: string,
     readonly onClick: () => void, private readonly opts: { center?: boolean; muted?: boolean; size?: number; minH?: number } = {}) {
-    const size = opts.size ?? 18;
+    const size = opts.size ?? 20;
     this.label = scene.add.text(0, 0, text, {
-      fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
-      wordWrap: { width: w - 28 }, lineSpacing: 2, align: opts.center ? 'center' : 'left'
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, fontStyle: '600', color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
+      wordWrap: { width: w - 28 }, lineSpacing: Math.ceil(textSize(size) * 0.3), align: opts.center ? 'center' : 'left'
     }).setDepth(41);
     this.h = Math.max(opts.minH ?? 40, Math.ceil(this.label.height) + 16);
     this.bg = scene.add.graphics().setDepth(40);
     this.hit = scene.add.rectangle(x, y, w, this.h, 0x000000, 0).setOrigin(0).setDepth(42).setInteractive({ useHandCursor: true });
+    this.hit.on('pointerdown', () => this.label.setY(this.y + this.h / 2 + 1));
+    this.hit.on('pointerup', () => this.label.setY(this.y + this.h / 2));
     this.hit.on('pointerover', () => { this.hovered = true; this.redraw(); });
-    this.hit.on('pointerout', () => { this.hovered = false; this.redraw(); });
+    this.hit.on('pointerout', () => { this.hovered = false; this.label.setY(this.y + this.h / 2); this.redraw(); });
     // Deferred a tick: the click may tear this button down, which mustn't happen inside its own input event.
     this.hit.on('pointerup', () => { playSfx('click'); scene.time.delayedCall(0, this.onClick); });
     this.moveTo(y);
@@ -134,7 +136,8 @@ export class PanelButton {
   private redraw(): void {
     const lit = this.hovered || this.focused;
     this.bg.clear();
-    this.bg.fillStyle(lit ? 0x3a4d40 : PLATE, 0.96).fillRoundedRect(this.x, this.y, this.w, this.h, 9);
-    this.bg.lineStyle(lit ? 2 : 1, lit ? 0xffe3a0 : GOLD, lit ? 1 : 0.55).strokeRoundedRect(this.x, this.y, this.w, this.h, 9);
+    this.bg.fillStyle(lit ? 0x3a4d40 : PLATE, 0.96).fillRoundedRect(this.x, this.y, this.w, this.h, 8);
+    this.bg.lineStyle(lit ? 2 : 1, lit ? 0xffe3a0 : GOLD, lit ? 1 : 0.55).strokeRoundedRect(this.x, this.y, this.w, this.h, 8);
+    this.bg.lineStyle(1, GOLD, 0.28).lineBetween(this.x + 8, this.y + 2, this.x + this.w - 8, this.y + 2);
   }
 }

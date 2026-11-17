@@ -42,7 +42,7 @@ import { DEPTH, actorDepth } from '../render/depth';
 import { FOLLOW, FOLLOW_REDUCED, placeFollow, stepFollow, toDevicePixel, type FollowState, type Vec } from '../render/cameraFollow';
 import { CharacterSprite, PLAYER_LOOK_KEY, playerLook, preloadCharacterSheets } from '../render/characterSprite';
 import { ensureFellow } from '../fellow/state';
-import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_BODY } from '../util/constants';
+import { GAME_WIDTH, GAME_HEIGHT, RENDER_SCALE, FAMILY_UI, FAMILY_BODY } from '../util/constants';
 import { boardFor, boardNeighbours, boards, doorLinks, interiors, zones } from '../world/zones';
 import { districtOf, type Point, type ZoneDef } from '../world/zoneFormat';
 import { doorAt, placeArrival, walkingIn } from '../world/interiors';
@@ -69,7 +69,8 @@ import { attachMigration } from './migration';
 import { attachArrivals } from './zone/arrivals';
 import { attachFinale } from '../finale/attach';
 import { closingToast } from '../story/hint';
-import { attachQuestHud } from '../quests/hud';
+import { hudPlate } from './zone/hudPlate';
+import { attachQuestHud, OBJECTIVE_HIDDEN_UNDER } from '../quests/hud';
 import { attachQuestMarker } from '../quests/marker';
 import { attachQuestsClock, queueQuestToast } from '../quests/runtime';
 import { storySession } from '../puzzles/runtime';
@@ -263,6 +264,9 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
   private contact!: Phaser.GameObjects.Ellipse;
   /** The player's sheet and walk/idle animation (render/characterSprite); shown on both figure and shadow. */
   private avatar!: CharacterSprite;
+  private promptGroup!: Phaser.GameObjects.Container;
+  private promptPlate!: Phaser.GameObjects.Graphics;
+  private promptKey!: Phaser.GameObjects.Text;
   private prompt!: Phaser.GameObjects.Text;
   private keys!: Record<string, Phaser.Input.Keyboard.Key>;
   private transitioning = false;
@@ -390,7 +394,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       // Place names fade in as you near the door, readable over the night (a room's own name is its title).
       this.placeLabels = this.zone.places.filter(place => place.id !== this.zone.interior?.building).map(place => {
         const p = this.projection.tileToWorld({ x: place.door[0], y: place.door[1] });
-        const text = this.add.text(p.x, p.y - 30, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#343d34cc', padding: { x: 4, y: 1 }, resolution: RENDER_SCALE })
+        const text = this.add.text(p.x, p.y - 30, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: '#fff0ce', backgroundColor: '#343d34cc', padding: { x: 4, y: 1 }, resolution: RENDER_SCALE })
           .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK).setAlpha(0);
         return { text, x: place.door[0] + 0.5, y: place.door[1] + 0.5 };
       });
@@ -408,7 +412,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       for (const place of this.zone.places) {
         const p = this.projection.tileToWorld({ x: place.door[0], y: place.door[1] });
         this.add.rectangle(p.x, p.y, 18, 7, 0xe4c77f).setDepth(DEPTH.GROUND_MARK);
-        this.add.text(p.x, p.y - 22, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: '11px', color: '#fff0ce', backgroundColor: '#343d34' })
+        this.add.text(p.x, p.y - 22, placeName(place.id), { fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: '#fff0ce', backgroundColor: '#343d34' })
           .setOrigin(0.5, 1).setDepth(DEPTH.OVER_DARK);
       }
     }
@@ -470,16 +474,33 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     ui.ignore(world);
     // Drawn closer indoors: the world's words (name tags, speech bubbles, place names) render sharp at the zoom.
     if (zoom !== 1) for (const o of world) if (o instanceof Phaser.GameObjects.Text) o.setResolution(RENDER_SCALE * zoom);
-    const title = this.add.text(24, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce', backgroundColor: '#28372d' });
-    const controls = this.add.text(24, 56, 'WASD / arrows: walk  ·  E: interact  ·  I: bag  ·  T: tasks  ·  M: map  ·  L: ledger  ·  J: journal', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce', backgroundColor: '#28372d' });
-    const devHelp = this.add.text(24, 82, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
+    const titlePlate = this.add.graphics();
+    const title = this.add.text(32, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce' });
+    hudPlate(titlePlate, 20, 14, title.width + 24, title.height + 8);
+    // Day 1 only: walking and E (the corner buttons carry every other key).
+    const controlsPlate = this.add.graphics();
+    const controls = this.add.text(32, 60, 'WASD or arrows to walk  ·  E to talk or use', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce' });
+    hudPlate(controlsPlate, 20, 56, controls.width + 24, controls.height + 8);
+    const showControls = (on: boolean) => { controls.setVisible(on); controlsPlate.setVisible(on); };
+    showControls(this.clock.day === 1);
+    this.events.once('shutdown', this.clock.onDawn(() => showControls(false)));
+    const devHelp = this.add.text(24, 92, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
     this.events.once('shutdown', watchAccessibility(() => this.toast?.setFontSize(textSize(17))));
-    this.prompt = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 50, '', { fontFamily: FAMILY_BODY, fontSize: '22px', color: '#fff0ce', backgroundColor: '#28372d', padding: { x: 12, y: 6 } }).setOrigin(0.5);
+    this.promptPlate = this.add.graphics();
+    this.prompt = this.add.text(38, 0, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(24)}px`, color: '#fff0ce' }).setOrigin(0, 0.5);
+    this.promptKey = this.add.text(20, 0, 'E', { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, fontStyle: '600', color: '#28372d' }).setOrigin(0.5);
+    this.promptGroup = this.add.container(0, GAME_HEIGHT - 50, [this.promptPlate, this.prompt, this.promptKey]).setVisible(false);
+    const hidePrompt = () => { this.promptGroup.setVisible(false); ui.setVisible(false); };
+    const restoreHud = () => ui.setVisible(true);
+    this.events.on('resume', restoreHud);
+    this.events.once('shutdown', () => this.events.off('resume', restoreHud));
+    this.events.on('pause', hidePrompt);
+    this.events.once('shutdown', () => this.events.off('pause', hidePrompt));
     // Above the E prompt: the gentle toasts (a scene's window about to close).
     this.toast = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 84, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(17)}px`, wordWrap: { width: GAME_WIDTH - 120 }, fontStyle: 'italic', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 14, y: 7 }, resolution: RENDER_SCALE })
       .setOrigin(0.5, 1).setAlpha(0);
-    camera.ignore([title, controls, devHelp, this.prompt, this.toast, ...this.buildHud(), ...this.residents.buildUi()]);
+    camera.ignore([titlePlate, title, controlsPlate, controls, devHelp, this.promptGroup, this.toast, ...this.buildHud(), ...this.residents.buildUi()]);
     // A map journey's arrival (or why it stopped at the doorstep), ahead of any news waiting for the toast (quests/hud.ts).
     const travelled = this.registry.get(TRAVEL_TOAST_KEY) as string | undefined;
     if (travelled) { this.registry.remove(TRAVEL_TOAST_KEY); queueQuestToast(travelled, true); }
@@ -494,7 +515,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       position: () => this.position, weather: () => this.now, toast: text => this.showToast(text),
       refreshBoard: () => this.town?.refresh(this.townLook()), busy: () => this.transitioning });
     // The objective line under the clock, the first-steps card and the dreams' toasts (quests/hud.ts).
-    attachQuestHud(this, { story: this.story, projects: this.projects, toast: text => this.showToast(text), busy: () => this.transitioning, x: GAME_WIDTH - 20 - 248, w: 248 });
+    attachQuestHud(this, { story: this.story, projects: this.projects, toast: text => this.showToast(text), busy: () => this.transitioning, x: GAME_WIDTH - 20 - textSize(264), w: textSize(264), clockBottom: 16 + textSize(102) });
     // Where the objective line points: a pin on this board, or an arrow at the screen's edge (quests/marker.ts).
     attachQuestMarker(this, { zone: this.zone, projection: this.projection, position: () => this.position, personAt: id => this.residents.positionOf(id),
       story: this.story, busy: () => this.transitioning, zoom });
@@ -836,21 +857,20 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
 
   /** Top-right: weekday, season and day, the time, the weather and a wind arrow (pointing downwind). */
   private buildHud(): Phaser.GameObjects.GameObject[] {
-    const W = 248, H = 102, x0 = GAME_WIDTH - 20 - W, y0 = 16;
+    const W = textSize(264), H = textSize(102), x0 = GAME_WIDTH - 20 - W, y0 = 16;
     const style = (size: number, color = '#fff0ce'): Phaser.Types.GameObjects.Text.TextStyle =>
-      ({ fontFamily: FAMILY_BODY, fontSize: `${size}px`, color, resolution: RENDER_SCALE });
+      ({ fontFamily: FAMILY_UI, fontSize: `${textSize(size)}px`, color, resolution: RENDER_SCALE });
     const bg = this.add.graphics();
-    bg.fillStyle(0x28372d, 0.92).fillRoundedRect(x0, y0, W, H, 10);
-    bg.lineStyle(2, 0xe4c77f, 0.55).strokeRoundedRect(x0, y0, W, H, 10);
-    const arrow = this.add.graphics({ x: x0 + W - 80, y: y0 + 84 });
+    hudPlate(bg, x0, y0, W, H);
+    const arrow = this.add.graphics({ x: x0 + W - 80, y: y0 + textSize(84) });
     arrow.lineStyle(2.5, 0xfff0ce, 1).lineBetween(0, 8, 0, -5);
     arrow.fillStyle(0xfff0ce, 1).fillTriangle(0, -10, -5, -3, 5, -3);
     this.hud = {
       date: this.add.text(x0 + 16, y0 + 10, '', style(17)),
-      time: this.add.text(x0 + 16, y0 + 31, '', style(32)),
-      weather: this.add.text(x0 + 16, y0 + 75, '', style(15, '#e9dfc4')),
-      wind: this.add.text(x0 + W - 16, y0 + 75, '', style(15, '#e9dfc4')).setOrigin(1, 0),
-      icon: this.add.graphics({ x: x0 + W - 42, y: y0 + 42 }),
+      time: this.add.text(x0 + 16, y0 + textSize(31), '', style(32)),
+      weather: this.add.text(x0 + 16, y0 + textSize(75), '', style(15, '#e9dfc4')),
+      wind: this.add.text(x0 + W - 16, y0 + textSize(75), '', style(15, '#e9dfc4')).setOrigin(1, 0),
+      icon: this.add.graphics({ x: x0 + W - 42, y: y0 + textSize(42) }),
       arrow
     };
     this.pillarStrip = new PillarStrip(this, x0, y0 + H + 6, W).onClick(() => openTownLedger(this, this.clock));
@@ -1055,7 +1075,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     }
     if (time - this.hintAt > 250) { this.hintAt = time; this.refreshHint(); }
     // Held (a menu, a talk, a fade): the camera still settles where the player stopped.
-    if (this.transitioning || !this.keys || this.clock.paused) { this.followPlayer(dt); return; }
+    if (this.transitioning || !this.keys || this.clock.paused) { this.promptGroup.setVisible(false); this.followPlayer(dt); return; }
     const down = (...names: string[]) => names.some(name => this.keys[name]!.isDown) ? 1 : 0;
     const input = { x: down('D', 'RIGHT') - down('A', 'LEFT'), y: down('S', 'DOWN') - down('W', 'UP') };
     const from = this.position;
@@ -1096,7 +1116,15 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     const puzzle = place && !closed ? puzzleInteraction(this, this.clock, `${here}.${place.id}`, project) : null;
     const scuffle = !talk && !mark ? scuffleInteraction(this, this.clock, this.zone, this.position) : null;
     const goIn = door ? (): void => this.goInside(door) : undefined;
-    this.prompt.setText(scuffle ? `E: ${scuffle.label}` : talk ? `E: Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'E: Read the plaque' : door ? `E: Go into ${placeName(door.building)}` : place ? `E: ${closed ? 'Closed: Port Vane survey site' : puzzle?.label ?? project?.label ?? placeName(place.id)}` : '').setVisible(!!scuffle || !!talk || !!mark || !!door || !!place);
+    const action = scuffle ? scuffle.label : talk ? `Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'Read the plaque' : door ? `Go into ${placeName(door.building)}` : place ? (closed ? 'Closed: Port Vane survey site' : puzzle?.label ?? project?.label ?? placeName(place.id)) : '';
+    if (action !== this.prompt.text) {
+      this.prompt.setText(action);
+      const width = this.prompt.width + 50, height = this.prompt.height + 12;
+      hudPlate(this.promptPlate, 0, -height / 2, width, height);
+      this.promptPlate.fillStyle(0xe4c77f).fillRoundedRect(8, -12, 24, 24, 5);
+      this.promptGroup.setX((GAME_WIDTH - width) / 2);
+    }
+    this.promptGroup.setVisible(!!action && !this.clock.paused && !OBJECTIVE_HIDDEN_UNDER.some(key => this.scene.isActive(key)));
     this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? goIn ?? (place ? (closed ? () => this.showToast('Closed: Port Vane survey site.') : puzzle?.run ?? project?.run) ?? (locked ? () => this.showToast(locked) : () => console.log(`${here}.${place.id}`)) : undefined));
     // A street encounter on the doorstep (the Old Quarter's bins sit at the cottage door every third day) is offered on E,
     // never forced: walking up into the door still goes in.

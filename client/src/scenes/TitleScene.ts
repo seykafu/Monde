@@ -51,6 +51,14 @@ class SaveMenuBase extends Phaser.Scene {
   private busy = false;
   /** On the way into the town (enter): the title's song no longer starts. */
   private leaving = false;
+  private footer!: Phaser.GameObjects.Graphics;
+  private setMessage(value: string): void {
+    const size = scaledText(15, accessibility().textSize);
+    this.message.setFontSize(size).setLineSpacing(Math.ceil(size * 0.35)).setText(value);
+    const height = Math.max(38, this.message.height + 16);
+    this.footer.clear().fillStyle(0x1f2a22, 0.95).fillRoundedRect(64, 708 - height, 1152, height, 8);
+    this.message.setY(708 - (height + this.message.height) / 2);
+  }
   private message!: Phaser.GameObjects.Text;
   private back: () => void = () => undefined;
   /** Settings' invite-code field (a DOM input over the canvas), while it's open. */
@@ -71,6 +79,7 @@ class SaveMenuBase extends Phaser.Scene {
     this.cameras.main.setZoom(RENDER_SCALE).setOrigin(0, 0);
     this.cameras.main.roundPixels = true;
     if (this.pausedGame) {
+      this.scene.bringToTop();
       this.add.rectangle(640, 360, 1280, 720, 0x101c18, 0.72);
     } else {
       this.add.rectangle(640, 360, 1280, 720, 0x1f2a22);
@@ -88,8 +97,7 @@ class SaveMenuBase extends Phaser.Scene {
     this.content = this.add.container(0, 0);
     this.message = this.text(84, 612, '', 15, '#fff0ce');
     this.message.setWordWrapWidth(1112);
-    const footer = this.add.graphics();
-    footer.fillStyle(0x1f2a22, 0.95).fillRoundedRect(64, 604, 1152, 104, 8);
+    this.footer = this.add.graphics();
     this.message.setDepth(2);
     // Whether residents are live (Haiku) or speaking written lines, always in view on the title (§9.14).
     if (!this.pausedGame) {
@@ -121,7 +129,7 @@ class SaveMenuBase extends Phaser.Scene {
     this.events.once('shutdown', () => { this.input.keyboard?.off('keydown', onKey); this.closeInvite(); });
     void this.home().catch(error => this.error(error));
   }
-  private error(error: unknown): void { this.message.setText(`Could not complete that: ${error instanceof Error ? error.message : String(error)}`); }
+  private error(error: unknown): void { this.setMessage(`Could not complete that: ${error instanceof Error ? error.message : String(error)}`); }
   private activate(index: number): void {
     const action = this.choices[index]?.run;
     if (action) this.perform(action);
@@ -137,19 +145,32 @@ class SaveMenuBase extends Phaser.Scene {
       const enabled = !!this.choices[i]?.run, selected = enabled && i === this.focus;
       label.setColor(!enabled ? '#9b9f90' : selected ? '#ffe3a0' : '#fff0ce');
       const { bg, box: b } = this.buttons[i]!;
-      bg.clear().fillStyle(selected ? 0x3a4d40 : 0x28372d, 1).fillRoundedRect(b.x, b.y, b.w, b.h, 7);
-      bg.lineStyle(selected ? 2 : 1, 0xe4c77f, selected ? 1 : enabled ? 0.4 : 0.15).strokeRoundedRect(b.x, b.y, b.w, b.h, 7);
+      bg.clear().fillStyle(selected ? 0x3a4d40 : 0x28372d, 1).fillRoundedRect(b.x, b.y, b.w, b.h, 8);
+      bg.lineStyle(selected ? 2 : 1, 0xe4c77f, selected ? 1 : enabled ? 0.4 : 0.15).strokeRoundedRect(b.x, b.y, b.w, b.h, 8);
+      bg.lineStyle(1, 0xffedbc, 0.28).lineBetween(b.x + 8, b.y + 2, b.x + b.w - 8, b.y + 2);
+      label.setAlpha(enabled ? 1 : 0.45);
+      bg.setAlpha(enabled ? 1 : 0.45);
       if (selected) bg.fillStyle(0xe4c77f).fillTriangle(b.x + 10, b.y + 14, b.x + 16, b.y + 20, b.x + 10, b.y + 26);
     });
   }
-  private show(choices: Choice[], back: () => void, mode: MenuMode = 'list', title = 'A quiet moment'): void {
+  private show(choices: Choice[], back: () => void, mode: MenuMode = 'list', title = 'A quiet moment', explanation?: string): void {
     this.content.removeAll(true);
     this.buttons = [];
     this.choices = choices; this.focus = Math.max(0, choices.findIndex(c => c.run)); this.back = back;
     this.heading.setText(title).setFontSize(scaledText(mode === 'home' ? 96 : 42, accessibility().textSize));
     this.status?.setFontSize(scaledText(14, accessibility().textSize));
     this.message.setFontSize(scaledText(15, accessibility().textSize));
-    const layout = menuLayout(choices, accessibility().textSize, mode);
+    let top: number | undefined;
+    if (explanation) {
+      const paragraph = this.text(84, this.heading.y + this.heading.height + 12, explanation, 20)
+        .setWordWrapWidth(1060).setLineSpacing(Math.ceil(scaledText(20, accessibility().textSize) * 0.35));
+      // A backing plate: the paragraph sits over the bright harbour sky.
+      const backing = this.add.graphics().fillStyle(0x1f2a22, 0.88)
+        .fillRoundedRect(64, paragraph.y - 10, 1152, paragraph.height + 20, 10);
+      this.content.add([backing, paragraph]);
+      top = Math.ceil(paragraph.y + paragraph.height + 22);
+    }
+    const layout = menuLayout(choices, accessibility().textSize, mode, top);
     const { x, y, width, height } = layout;
     this.frame.clear().fillStyle(0x1f2a22, 0.97).fillRoundedRect(x, y, width, height, 12);
     this.frame.lineStyle(2, 0xe4c77f, 0.8).strokeRoundedRect(x, y, width, height, 12);
@@ -165,7 +186,7 @@ class SaveMenuBase extends Phaser.Scene {
       const bg = this.add.graphics();
       this.content.add(bg);
       this.buttons.push({ bg, box: b });
-      const label = this.text(b.x + 26, b.y + 9, c.text, 18);
+      const label = this.text(b.x + 26, b.y + 9, c.text, 20).setFontStyle('600');
       this.content.add(label);
       this.fit(label, b.w - 52);
       if (c.value !== undefined) {
@@ -179,13 +200,14 @@ class SaveMenuBase extends Phaser.Scene {
         this.content.add(value);
       }
       if (c.detail) {
-        const detail = this.text(b.x + 26, b.y + layout.font + 13, c.detail, 14, '#cfc4a6');
+        const detail = this.text(b.x + 26, b.y + layout.font + 13, c.detail, 15, '#cfc4a6');
+        detail.setLineSpacing(Math.ceil(layout.small * 0.3));
         this.fit(detail, b.w - 52);
         this.content.add(detail);
       }
       const hit = this.add.rectangle(b.x, b.y, b.w, b.h, 0, 0).setOrigin(0);
       this.content.add(hit);
-      if (c.run) hit.setInteractive({ useHandCursor: true }).on('pointerover', () => { this.focus = i; this.highlight(); }).on('pointerdown', () => this.activate(i));
+      if (c.run) hit.setInteractive({ useHandCursor: true }).on('pointerover', () => { this.focus = i; this.highlight(); }).on('pointerdown', () => { label.setY(b.y + 10); this.activate(i); }).on('pointerup', () => label.setY(b.y + 9)).on('pointerout', () => label.setY(b.y + 9));
       return label;
     });
     this.highlight();
@@ -200,7 +222,7 @@ class SaveMenuBase extends Phaser.Scene {
     await finishSaving();
     const entries = sortForMenu(await saveStorage.list());
     if (!this.sys.isActive()) return;
-    this.message.setText(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Temporary saves only — storage is unavailable in this browser session.' : '↑ ↓ to choose · Enter to select · Esc to go back');
+    this.setMessage(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Temporary saves only — storage is unavailable in this browser session.' : '↑ ↓ to choose · Enter to select · Esc to go back');
     // While the title waits, the town's code comes in (game.ts), then its art (prefetchForTitle).
     if (!this.pausedGame) {
       void gameCode().then(code => { if (this.sys.isActive()) code.prefetchForTitle(this, entries[0]?.save.player.zone); }, () => undefined);
@@ -210,7 +232,7 @@ class SaveMenuBase extends Phaser.Scene {
         ...MANUAL_SLOTS.map((slot, i) => ({ text: `Save to slot ${i + 1}`, detail: entries.find(e => e.slot === slot) ? this.saveDescription(entries.find(e => e.slot === slot)!) : 'Empty slot', run: async () => {
           await (await awaitGameCode()).saveGame(slot, 'manual', `Slot ${i + 1}`);
           await this.home();
-          this.message.setText(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Saved (temporary — this browser session only)' : 'Saved');
+          this.setMessage(saveStorage instanceof IndexedDBSaveStorage && saveStorage.temporary ? 'Saved (temporary — this browser session only)' : 'Saved');
         } })),
         { text: 'Load', run: async () => this.loadList(sortForMenu(await saveStorage.list())) },
         { text: 'Settings', run: () => this.settings() },
@@ -219,7 +241,7 @@ class SaveMenuBase extends Phaser.Scene {
       ], () => this.resume(), 'pause', 'A quiet moment');
     } else {
       this.show([
-        { text: 'Continue', run: entries[0] ? () => this.enter(code => code.loadGame(this, entries[0]!.save, entries[0]!.slot)) : undefined },
+        ...(entries[0] ? [{ text: 'Continue', run: () => this.enter(code => code.loadGame(this, entries[0]!.save, entries[0]!.slot)) }] : []),
         // Q-06: the one-time sharing question comes before the first New Game (and on a first visit to Settings).
         { text: 'New Game', run: () => (telemetryChoice() === null ? this.askSharing(() => this.newGame()) : this.newGame()) },
         { text: 'Load', run: async () => this.loadList(sortForMenu(await saveStorage.list())) },
@@ -233,14 +255,15 @@ class SaveMenuBase extends Phaser.Scene {
    */
   /** Q-06: off unless the player says yes; Esc keeps it off. Asked once per install. */
   private askSharing(then: () => void | Promise<void>): void {
-    this.message.setText('Share play events and optional surveys? They carry a random ID for this install, never your name, invite code or dialogue. Only the optional survey note sends typed text. Nothing is sent in Offline mode. Change this in Settings anytime.');
+    this.setMessage('↑ ↓ to choose · Enter to select · Esc to go back');
+    const explanation = 'Share play events and optional surveys? They carry a random ID for this install, never your name, invite code or dialogue. Only the optional survey note sends typed text. Nothing is sent in Offline mode. Change this in Settings anytime.';
     this.show([{ text: 'Keep sharing off', run: () => { chooseTelemetry(false); return then(); } },
-      { text: 'Yes, help improve Monde', run: () => { chooseTelemetry(true); return then(); } }], () => this.perform(() => { chooseTelemetry(false); return then(); }), 'list', 'Make yourself at home');
+      { text: 'Yes, help improve Monde', run: () => { chooseTelemetry(true); return then(); } }], () => this.perform(() => { chooseTelemetry(false); return then(); }), 'list', 'Make yourself at home', explanation);
   }
   private settings(): void {
     if (telemetryChoice() === null) { this.askSharing(() => this.settings()); return; }
     const mind = getMind();
-    this.message.setText(statusDetail(mind.status));
+    this.setMessage(statusDetail(mind.status));
     const retry = mind.status === 'unreachable' || mind.status === 'connecting';
     const prefs = accessibility();
     const toggle = (patch: Parameters<typeof setAccessibility>[0]) => { const focus = this.focus; setAccessibility(patch); this.settings(); this.focus = focus; this.highlight(); };
@@ -255,7 +278,7 @@ class SaveMenuBase extends Phaser.Scene {
       { text: 'Play events & surveys', group: 'Connection & sharing', value: `${telemetryChoice() === 'yes' ? 'On' : 'Off'}`, run: () => { chooseTelemetry(telemetryChoice() !== 'yes'); this.settings(); } },
       { text: 'Invite code', group: 'Connection & sharing', value: `${maskInvite(mind.invite)}`, run: () => this.askInvite() },
       ...(mind.invite ? [{ text: 'Clear invite code', group: 'Connection & sharing', run: async () => { await mind.setInvite(null); this.settings(); } }] : []),
-      ...(retry ? [{ text: 'Try to reconnect', group: 'Connection & sharing', run: async () => { this.message.setText('Trying the town…'); await mind.reconnect(); this.settings(); } }] : []),
+      ...(retry ? [{ text: 'Try to reconnect', group: 'Connection & sharing', run: async () => { this.setMessage('Trying the town…'); await mind.reconnect(); this.settings(); } }] : []),
       { text: 'Back', run: () => this.home() }
     ], () => { void this.home().catch(error => this.error(error)); }, 'settings', 'Settings');
   }
@@ -271,7 +294,7 @@ class SaveMenuBase extends Phaser.Scene {
     input.spellcheck = false;
     Object.assign(input.style, {
       position: 'fixed', zIndex: '10', boxSizing: 'border-box', margin: '0', padding: '0 0.6em', outline: 'none',
-      background: '#1f2a22', color: '#fff0ce', border: '2px solid #e4c77f', borderRadius: '8px', fontFamily: 'Georgia, serif'
+      background: '#1f2a22', color: '#fff0ce', border: '2px solid #e4c77f', borderRadius: '8px', fontFamily: FAMILY_BODY
     } satisfies Partial<CSSStyleDeclaration>);
     const place = () => {
       const rect = this.game.canvas.getBoundingClientRect();
@@ -283,7 +306,7 @@ class SaveMenuBase extends Phaser.Scene {
     place();
     window.addEventListener('resize', place);
     this.inviteInput = { input, place };
-    this.message.setText('Type the invite code, then Enter · Esc to cancel');
+    this.setMessage('Type the invite code, then Enter · Esc to cancel');
     // Keys typed here are the input's: the menu's own keys (Enter, Esc, arrows) must not fire underneath.
     input.addEventListener('keydown', e => {
       e.stopPropagation();
@@ -291,13 +314,13 @@ class SaveMenuBase extends Phaser.Scene {
       if (e.key !== 'Enter') return;
       e.preventDefault();
       const code = input.value.trim();
-      if (!validInvite(code)) { this.message.setText('Invite codes are letters, numbers, - and _ (up to 64).'); return; }
+      if (!validInvite(code)) { this.setMessage('Invite codes are letters, numbers, - and _ (up to 64).'); return; }
       this.closeInvite();
-      this.message.setText('Joining the town…');
+      this.setMessage('Joining the town…');
       void getMind().setInvite(code).then(status => {
         if (!this.sys.isActive()) return;
         this.settings();
-        this.message.setText(status === 'online' ? 'Joined. Residents will speak for themselves.'
+        this.setMessage(status === 'online' ? 'Joined. Residents will speak for themselves.'
           : status === 'no_invite' ? "That invite code wasn't accepted. Residents will speak written lines." : statusDetail(status));
       });
     });
@@ -325,14 +348,14 @@ class SaveMenuBase extends Phaser.Scene {
     try { await go(await awaitGameCode()); } catch (error) { this.leaving = false; throw error; }
   }
   private confirm(text: string, yes: () => void | Promise<void>, no: () => void = () => { void this.home().catch(error => this.error(error)); }): void {
-    this.message.setText(text);
+    this.setMessage(text);
     this.show([{ text: 'Cancel', run: no }, { text: 'Confirm', run: yes }], no, 'list', 'One more thing');
   }
   private loadList(entries: SaveEntry[], page = 0): void {
     // Pagination keeps an unbounded set of named checkpoints keyboard- and mouse-accessible.
     const size = 3;
     const rows = entries.slice(page * size, (page + 1) * size);
-    this.message.setText(entries.length ? 'Choose a save to load or delete.' : 'No saves yet.');
+    this.setMessage(entries.length ? 'Choose a save to load or delete.' : 'No saves yet.');
     this.show([
       ...rows.map(entry => ({ text: entry.save.label, detail: this.saveDescription(entry), run: () => this.detail(entry, entries, page) })),
       ...(page > 0 ? [{ text: 'Previous page', run: () => this.loadList(entries, page - 1) }] : []),
@@ -342,7 +365,7 @@ class SaveMenuBase extends Phaser.Scene {
   }
   private detail(entry: SaveEntry, entries: SaveEntry[], page: number): void {
     const back = () => this.loadList(entries, page);
-    this.message.setText(formatSummary(entry.save));
+    this.setMessage(formatSummary(entry.save));
     this.show([
       { text: `Load ${entry.save.label}`, run: () => this.enter(code => code.loadGame(this, entry.save, entry.slot)) },
       { text: 'Delete', run: () => this.confirm(`Delete ${entry.save.label}? This cannot be undone.`, async () => {

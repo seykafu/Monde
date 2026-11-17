@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { COLORS } from "../util/constants";
+import { FAMILY_SYMBOL, COLORS } from "../util/constants";
 import { sfxClick, sfxHover } from "../audio/Sfx";
 
 // Circular glyph button for the battle top bar — the same look as
@@ -33,7 +33,7 @@ export class IconButton extends Phaser.GameObjects.Container {
     this.bg = scene.add.graphics();
     this.add(this.bg);
     this.glyph = scene.add.text(0, 0, glyphChar, {
-      fontFamily: "Segoe UI Symbol, Apple Symbols, Symbola, sans-serif",
+      fontFamily: FAMILY_SYMBOL,
       fontSize: "18px",
       color: "#f4e4b0"
     }).setOrigin(0.5);
@@ -71,9 +71,11 @@ export class IconButton extends Phaser.GameObjects.Container {
     const g = this.bg;
     g.clear();
     g.fillStyle(this.pressed ? COLORS.gold : this.hovered ? 0x1c2032 : 0x131724, this.pressed ? 0.9 : 0.92);
-    g.fillCircle(0, 0, r);
+    g.fillRoundedRect(-r, -r, r * 2, r * 2, 8);
     g.lineStyle(1, COLORS.gold, this.hovered ? 0.95 : 0.55);
-    g.strokeCircle(0, 0, r);
+    g.strokeRoundedRect(-r, -r, r * 2, r * 2, 8);
+    g.lineStyle(1, COLORS.gold, 0.26).lineBetween(-r + 8, -r + 2, r - 8, -r + 2);
+    this.glyph.setY(this.pressed ? 1 : 0);
     this.glyph.setColor(this.pressed ? "#1a1408" : "#f4e4b0");
   }
 }

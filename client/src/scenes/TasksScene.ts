@@ -150,16 +150,17 @@ export class TasksScene extends Phaser.Scene {
     this.add.text(LIST_X + 112, PY + 40, 'What to do next, and where', { fontFamily: FAMILY_BODY, fontSize: '16px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE });
     g.fillStyle(INK, 1).fillRect(LIST_X, PY + 80, LIST_W, 2).fillRect(LIST_X, PY + 84, LIST_W, 1);
     this.add.text(PX + PW - 30, PY + PH - 26, '↑↓ choose  ·  Enter: on the map  ·  J: the Journal’s Quests  ·  T or Esc to close', {
-      fontFamily: FAMILY_UI, fontSize: '13px', color: MUTED, resolution: RENDER_SCALE
+      fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: MUTED, resolution: RENDER_SCALE
     }).setOrigin(1, 0.5);
   }
 
   private text(x: number, y: number, s: string, size: number, opts: { color?: string; family?: string; italic?: boolean; bold?: boolean; wrap?: number } = {}): Phaser.GameObjects.Text {
     const family = opts.family ?? FAMILY_BODY;
+    const font = textSize(Math.max(14, Math.round(size * (family === FAMILY_BODY ? 1.1 : 1))));
     const t = this.add.text(x, y, s, {
-      fontFamily: family, fontSize: `${family === FAMILY_BODY || family === FAMILY_HEADING ? textSize(size) : size}px`, color: opts.color ?? INK_CSS,
+      fontFamily: family, fontSize: `${font}px`, color: opts.color ?? INK_CSS,
       fontStyle: [opts.italic ? 'italic' : '', opts.bold ? 'bold' : ''].join(' ').trim() || 'normal',
-      resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap } } : {})
+      resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap }, lineSpacing: Math.ceil(font * 0.3) } : {})
     });
     this.content.add(t);
     return t;
@@ -188,7 +189,7 @@ export class TasksScene extends Phaser.Scene {
       const badge = BADGE[task.kind];
       const b = this.add.graphics().fillStyle(badge.color, task.actionable ? 1 : 0.55).fillRoundedRect(LIST_X + 8, top + 2, 80, 22, 6);
       this.content.add(b);
-      this.content.add(this.add.text(LIST_X + 48, top + 13, badge.word, { fontFamily: FAMILY_UI, fontSize: '12px', fontStyle: 'bold', color: '#fbf3df', resolution: RENDER_SCALE }).setOrigin(0.5));
+      this.content.add(this.add.text(LIST_X + 48, top + 13, badge.word, { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, fontStyle: 'bold', color: '#fbf3df', resolution: RENDER_SCALE }).setOrigin(0.5));
       let ty = top;
       const title = this.text(TEXT_X, ty, task.title, 20, { family: FAMILY_HEADING, wrap: TEXT_W });
       ty += title.height + 2;

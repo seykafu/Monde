@@ -132,7 +132,7 @@ export class PeopleScene extends Phaser.Scene {
     this.questPages = new QuestPages(this, this.content, { lx: LX, lw: LW, rx: RX, rw: RW, top: LIST_Y - 6, bottom: BY + BH - 46 }, () => this.refresh(),
       // Only the people the player has met: a scene's reason keeps a stranger a stranger ("a man in a good coat").
       ids => ids.filter(id => !!getFriendship(this.registry).residents[id]).map(id => townNames()[id] ?? id).join(', '));
-    this.questSwitch = this.add.text(LX, BY + BH - 30, '', { fontFamily: FAMILY_UI, fontSize: '13px', color: BRASS_CSS, resolution: RENDER_SCALE })
+    this.questSwitch = this.add.text(LX, BY + BH - 30, '', { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: BRASS_CSS, resolution: RENDER_SCALE })
       .setOrigin(0, 0.5).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.questPages.toggleObjective());
     this.ids = peopleIds(metResidents(getFriendship(this.registry)), this.registry.get('monde.town') as TownState | undefined, this.open.clock.day);
     const keep = lastPicked ? this.ids.indexOf(lastPicked) : -1;
@@ -208,15 +208,16 @@ export class PeopleScene extends Phaser.Scene {
     this.add.text(LX + 2, BY + 74, 'Pages', { fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE });
     g.fillStyle(INK, 1).fillRect(LX, BY + 100, LW, 2).fillRect(LX, BY + 104, LW, 1);
     this.add.text(BX + BW - 30, BY + BH - 30, '←→ pages  ·  W/S or ↑↓ to choose  ·  J or Esc to close', {
-      fontFamily: FAMILY_UI, fontSize: '13px', color: MUTED, resolution: RENDER_SCALE
+      fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: MUTED, resolution: RENDER_SCALE
     }).setOrigin(1, 0.5);
   }
 
   private text(x: number, y: number, s: string, size: number, opts: { color?: string; family?: string; italic?: boolean; bold?: boolean; wrap?: number; origin?: [number, number] } = {}): Phaser.GameObjects.Text {
+    const font = textSize(Math.max(14, Math.round(size * ((opts.family ?? FAMILY_BODY) === FAMILY_BODY ? 1.1 : 1))));
     const t = this.add.text(x, y, s, {
-      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${!opts.family || opts.family === FAMILY_BODY ? textSize(size) : size}px`, color: opts.color ?? INK_CSS,
+      fontFamily: opts.family ?? FAMILY_BODY, fontSize: `${font}px`, color: opts.color ?? INK_CSS,
       fontStyle: [opts.italic ? 'italic' : '', opts.bold ? 'bold' : ''].join(' ').trim() || 'normal',
-      resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap } } : {})
+      resolution: RENDER_SCALE, ...(opts.wrap ? { wordWrap: { width: opts.wrap }, lineSpacing: Math.ceil(font * 0.3) } : {})
     }).setOrigin(...(opts.origin ?? [0, 0]));
     this.content.add(t);
     return t;

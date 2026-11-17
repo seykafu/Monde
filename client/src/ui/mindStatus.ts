@@ -1,8 +1,9 @@
+import { textSize } from '../accessibility/runtime';
 // The HUD's Online/Offline dot (GDD §9.14). A small dot in the HUD's top-right corner: green while residents speak
 // for themselves, amber while joining, and grey with the word "offline" in Quiet Mode. Hovering shows what's going
 // on; clicking retries at once, and while the server is unreachable it retries on its own (mind/connection.ts).
 import Phaser from 'phaser';
-import { FAMILY_BODY, RENDER_SCALE } from '../util/constants';
+import { FAMILY_UI, RENDER_SCALE } from '../util/constants';
 import { getMind } from '../mind/api';
 import { Reconnect, statusDetail, statusLabel, type MindStatus } from '../mind/connection';
 
@@ -22,10 +23,10 @@ export class MindStatusDot {
   /** `x, y` is the dot's centre; the label sits to its left and the detail below the HUD at `detailY`. */
   constructor(scene: Phaser.Scene, private readonly x: number, private readonly y: number, detailY: number) {
     this.dot = scene.add.graphics();
-    this.label = scene.add.text(x - 9, y, '', { fontFamily: FAMILY_BODY, fontSize: '12px', color: '#d9cfb4', resolution: RENDER_SCALE }).setOrigin(1, 0.5);
+    this.label = scene.add.text(x - 9, y, '', { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: '#d9cfb4', resolution: RENDER_SCALE }).setOrigin(1, 0.5);
     this.detail = scene.add.text(x + 6, detailY, '', {
-      fontFamily: FAMILY_BODY, fontSize: '13px', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 8, y: 4 },
-      wordWrap: { width: 260 }, resolution: RENDER_SCALE
+      fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 8, y: 4 },
+      lineSpacing: Math.ceil(textSize(14) * 0.3), wordWrap: { width: 260 }, resolution: RENDER_SCALE
     }).setOrigin(1, 0).setDepth(50).setVisible(false);
     const hit = scene.add.rectangle(x - 46, y, 64, 20, 0x000000, 0).setInteractive({ useHandCursor: true });
     hit.on('pointerover', () => this.detail.setText(statusDetail(getMind().status)).setVisible(true));

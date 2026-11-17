@@ -40,7 +40,7 @@ const CRACK_LINE = 0x262932;
 export function heartIcon(kind: HeartIcon, accessible = false): IconArt {
   const f = new Frame(HEART_CELL.w, HEART_CELL.h);
   const m = heartMask();
-  const edge = { line: kind === 'cracked' ? CRACK_LINE : HEART_LINE, inner: kind === 'cracked' ? CRACK_LINE : HEART_LINE };
+  const edge = { line: kind === 'empty' ? 0xffe3a0 : kind === 'cracked' ? CRACK_LINE : HEART_LINE, inner: kind === 'cracked' ? CRACK_LINE : HEART_LINE };
   const shading = { top: 1, left: 1, right: 1, bottom: 1 };
   if (kind === 'half') {
     const left = m.clone().clip(new Mask(m.w, m.h).rect(0, 0, 6, m.h));

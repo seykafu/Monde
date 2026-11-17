@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 import Phaser from "phaser";
 import { COLORS, FAMILY_HEADING } from "../util/constants";
 import { sfxClick, sfxHover } from "../audio/Sfx";
@@ -50,8 +51,8 @@ export class Button extends Phaser.GameObjects.Container {
     this.bg = scene.add.graphics();
 
     this.text = scene.add.text(opts.w / 2, opts.h / 2, opts.label, {
-      fontFamily: FAMILY_HEADING,
-      fontSize: `${opts.fontSize ?? 16}px`,
+      fontFamily: FAMILY_HEADING, fontStyle: "600",
+      fontSize: `${textSize(Math.max(14, opts.fontSize ?? 18))}px`,
       color: "#f4e4b0",
       stroke: "#000",
       strokeThickness: 2,
@@ -163,15 +164,17 @@ export class Button extends Phaser.GameObjects.Container {
     const { w, h, primary } = this.opts;
     const g = this.bg;
     g.clear();
-    const accent = primary ? COLORS.gold : COLORS.steel;
+    const accent = primary || this.hovered ? COLORS.gold : COLORS.steel;
     const fillTop = this.enabledFlag ? (this.pressed ? 0x0a0c14 : this.hovered ? 0x1c2032 : 0x131724) : 0x0a0c14;
     const fillBot = this.enabledFlag ? (this.pressed ? 0x05060a : 0x0a0c14) : 0x05060a;
     g.fillGradientStyle(fillTop, fillTop, fillBot, fillBot, 1);
-    g.fillRect(0, 0, w, h);
+    g.fillRoundedRect(0, 0, w, h, 8);
     g.lineStyle(1, accent, this.enabledFlag ? 0.85 : 0.3);
-    g.strokeRect(0.5, 0.5, w - 1, h - 1);
+    g.strokeRoundedRect(0.5, 0.5, w - 1, h - 1, 8);
     g.lineStyle(1, primary ? 0xffd97a : 0xb6c2d6, this.enabledFlag ? (this.hovered ? 0.6 : 0.25) : 0.1);
-    g.strokeRect(2.5, 2.5, w - 5, h - 5);
+    g.lineBetween(8, 2, w - 8, 2);
+    this.setAlpha(this.enabledFlag ? 1 : 0.45);
+    this.text.setY(h / 2 + (this.pressed ? 1 : 0));
     this.text.setColor(this.enabledFlag ? (primary ? "#fff2c0" : "#dde6ef") : "#5a5a60");
   }
 }

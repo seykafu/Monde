@@ -15,7 +15,7 @@
        * draws its own, in the menus' colours (scenes/TitleScene.ts).
        */
       #loading { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: #14110f;
-        font-family: Georgia, "Times New Roman", serif; transition: opacity 400ms ease; }
+        font-family: "EB Garamond", Georgia, "Times New Roman", serif; transition: opacity 400ms ease; }
       #loading.out { opacity: 0; pointer-events: none; }
       #loading[hidden] { display: none; }
       #loading .stage { position: relative; width: min(100vw, calc(100vh * 16 / 9)); height: min(100vh, calc(100vw * 9 / 16));
@@ -25,7 +25,7 @@
         linear-gradient(90deg, rgb(16 28 24 / 1) 0%, rgb(16 28 24 / .62) 25%, rgb(16 28 24 / .34) 50%, rgb(16 28 24 / .18) 75%, rgb(16 28 24 / .12) 100%),
         radial-gradient(42% 30% at 63% 29%, rgb(246 172 104 / .5), rgb(246 172 104 / 0) 72%),
         linear-gradient(180deg, #4b4f86 0%, #8a6f9a 17%, #d39a86 28.5%, #5b6aa6 30%, #3b4a82 46%, #4a4f6e 62%, #9c8068 64%, #b49372 100%); }
-      #loading .title { position: absolute; left: calc(84 * var(--u)); top: calc(36 * var(--u)); margin: 0; font: 400 calc(96 * var(--u)) / 1.15 "Times New Roman", serif;
+      #loading .title { position: absolute; left: calc(84 * var(--u)); top: calc(36 * var(--u)); margin: 0; font: 400 calc(96 * var(--u)) / 1.15 "EB Garamond", Georgia, "Times New Roman", serif;
         color: #ffe3a0; }
       #loading .panel { position: absolute; left: calc(64 * var(--u)); top: calc(246 * var(--u)); width: calc(480 * var(--u)); box-sizing: border-box;
         padding: calc(20 * var(--u)) calc(26 * var(--u)) calc(16 * var(--u)); background: rgb(31 42 34 / .97);

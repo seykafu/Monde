@@ -3,9 +3,9 @@ import { scaledText, type TextSize } from '../accessibility/preferences';
 export interface MenuRow { group?: string; detail?: string; value?: string }
 export type MenuMode = 'home' | 'pause' | 'settings' | 'list';
 /** Integer design pixels. Settings use two notebook columns; lists reserve room for pagination. */
-export function menuLayout(rows: readonly MenuRow[], size: TextSize, mode: MenuMode) {
-  const font = scaledText(18, size), small = scaledText(14, size);
-  const x = 64, y = mode === 'home' ? 246 : 142;
+export function menuLayout(rows: readonly MenuRow[], size: TextSize, mode: MenuMode, top?: number) {
+  const font = scaledText(20, size), small = scaledText(15, size);
+  const x = 64, y = top ?? (mode === 'home' ? 246 : 142);
   const width = mode === 'home' ? 480 : 1152;
   const cursors = [y + 22, y + 22];
   const details = rows.filter(row => row.detail).length;
@@ -15,7 +15,7 @@ export function menuLayout(rows: readonly MenuRow[], size: TextSize, mode: MenuM
     const column = mode === 'settings' && row.group === 'Connection & sharing' ? 1 : 0;
     const heading = mode === 'settings' && !!row.group && !rows.slice(0, index).some(r => r.group === row.group);
     if (heading) cursors[column]! += 32;
-    const h = row.detail ? font + small * 2 + 26 : font + 22;
+    const h = row.detail ? font + small * 2 + Math.ceil(small * 0.3) + 26 : font + 22;
     const box = { x: x + 20 + column * 566, y: cursors[column]!, w: mode === 'settings' ? 546 : width - 40, h, heading };
     if (navigation && !row.detail) {
       const count = rows.length - details;

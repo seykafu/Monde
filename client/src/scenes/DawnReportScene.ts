@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 import { openSurvey } from './SurveyScene';
 import { Portrait } from "../dialogue/portrait";
 import { portraitArtId, portraitLook } from "../dialogue/portraitModel";
@@ -6,7 +7,7 @@ import Phaser from 'phaser';
 import type { Press } from '@monde/shared';
 import type { Clock } from '../sim/clock';
 import { frontPage, printTime } from '../press/model';
-import { FAMILY_BODY, FAMILY_DISPLAY, GAME_WIDTH, GAME_HEIGHT } from '../util/constants';
+import { FAMILY_PRESS, GAME_WIDTH, GAME_HEIGHT } from '../util/constants';
 import { openPeople } from './PeopleScene';
 import { reportDue } from '../finale/state';
 import type { ReportBody } from '@monde/shared';
@@ -20,7 +21,7 @@ const POLL_NAME = { fellow: 'The Fellow', vane: 'Mr. Vane', moss: 'Old Moss' } a
 function drawPollBox(scene: Phaser.Scene, g: Phaser.GameObjects.Graphics, poll: NonNullable<Press['poll']>, x: number, y: number): void {
   const ink = '#30291f';
   const t = (tx: number, ty: number, s: string, size: number, o: { italic?: boolean; bold?: boolean; width?: number } = {}) => scene.add.text(tx, ty, s, {
-    fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: ink, fontStyle: [o.italic ? 'italic' : '', o.bold ? 'bold' : ''].join(' ').trim() || 'normal',
+    fontFamily: FAMILY_PRESS, fontSize: `${textSize(Math.max(14, size))}px`, color: ink, fontStyle: [o.italic ? 'italic' : '', o.bold ? 'bold' : ''].join(' ').trim() || 'normal',
     ...(o.width ? { wordWrap: { width: o.width } } : {})
   });
   g.lineBetween(x - 16, 280, x - 16, 480);
@@ -69,9 +70,9 @@ export class DawnReportScene extends Phaser.Scene {
     const printed = printPaper(this.opened.paper, getFriendship(this.registry).reported);
     const paper = printed.paper;
     this.add.rectangle(0,0,GAME_WIDTH,GAME_HEIGHT,0xece2c8).setOrigin(0).setInteractive();
-    const text = (x: number,y: number,t: string,size: number,width = 1100) => this.add.text(x,y,t,{ fontFamily: FAMILY_BODY, fontSize: `${size}px`, color: INK, wordWrap: { width } });
+    const text = (x: number,y: number,t: string,size: number,width = 1100) => this.add.text(x,y,t,{ fontFamily: FAMILY_PRESS, fontSize: `${textSize(Math.max(14, size))}px`, color: INK, lineSpacing: Math.ceil(textSize(size) * 0.3), wordWrap: { width } });
     const { masthead: m } = frontPage(paper,seed);
-    text(420,22,'The Lantern',58).setFontFamily(FAMILY_DISPLAY);
+    text(420,22,'The Lantern',58);
     text(58,92,`Day ${m.day} · ${m.season} · ${m.weather} · Wind from ${m.wind} · Sunrise ${printTime(m.sunrise)} · Sunset ${printTime(m.sunset)}`,17);
     text(58,119,`LOW WATER ${m.tides.lows.map(printTime).join(' / ')}     HIGH WATER ${m.tides.highs.map(printTime).join(' / ')}`,16);
     const g = this.add.graphics().lineStyle(2,0x30291f); g.lineBetween(55,150,1225,150);
@@ -101,7 +102,7 @@ export class DawnReportScene extends Phaser.Scene {
         const shown = printed.letters[i]!.withdrawn ? l.text : `${l.from}: ${l.text}`;
         const line = text(x,y,shown,15,width - 64).setMaxLines(lines);
         this.control(printed.letters[i]!, x + width, y, () => line.setText(WITHDRAWN.letter));
-        y += Math.min(line.getWrappedText(shown).length, lines) * 18 + 4;
+        y += line.height + 4;
       });
     };
     // §6.6: comings and goings, each with the newcomer's (or the leaver's) portrait and one line (G-02).
@@ -141,7 +142,7 @@ export class DawnReportScene extends Phaser.Scene {
   /** A small "Report" at (x, y), right-aligned, for a model-written item still in print. */
   private control(item: PrintedItem, x: number, y: number, withdraw: () => void): void {
     if (!item.report || !item.key) return;
-    const label = this.add.text(x, y, 'Report', { fontFamily: FAMILY_BODY, fontSize: '13px', color: FADED, fontStyle: 'italic', padding: { x: 3, y: 1 } })
+    const label = this.add.text(x, y, 'Report', { fontFamily: FAMILY_PRESS, fontSize: `${textSize(14)}px`, color: FADED, fontStyle: 'italic', padding: { x: 3, y: 1 } })
       .setOrigin(1, 0).setInteractive({ useHandCursor: true });
     const c: Control = { key: item.key, report: item.report, label, withdraw, armed: false };
     label.on('pointerover', () => { if (!c.armed) label.setColor(INK); });

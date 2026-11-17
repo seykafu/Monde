@@ -143,7 +143,7 @@ const PANEL_Y = GAME_HEIGHT - 20 - PANEL_H;
 const PAD = 30;
 const BODY_Y = PANEL_Y + 40;
 const BODY_W = PANEL_W - PAD * 2 - 60;
-const BODY_FONT = 22;
+const BODY_FONT = 26;
 const BODY_SPACING = 8;
 const BODY_MAX_LINES = () => maxLinesFor(textSize(BODY_FONT), BODY_SPACING, PANEL_H - 40 - 30);
 const PORTRAIT_X = PANEL_X + 22;
@@ -205,16 +205,18 @@ class PanelButton {
 
   constructor(scene: Phaser.Scene, readonly x: number, private y: number, readonly w: number, text: string,
     readonly onClick: () => void, private readonly opts: { center?: boolean; muted?: boolean; size?: number; minH?: number } = {}) {
-    const size = opts.size ?? 18;
+    const size = opts.size ?? 20;
     this.label = scene.add.text(0, 0, text, {
-      fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
-      wordWrap: { width: w - 28 }, lineSpacing: 2, align: opts.center ? 'center' : 'left'
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, fontStyle: '600', color: opts.muted ? MUTED : CREAM, resolution: RENDER_SCALE,
+      wordWrap: { width: w - 28 }, lineSpacing: Math.ceil(textSize(size) * 0.3), align: opts.center ? 'center' : 'left'
     }).setDepth(41);
     this.h = Math.max(opts.minH ?? 40, Math.ceil(this.label.height) + 16);
     this.bg = scene.add.graphics().setDepth(40);
     this.hit = scene.add.rectangle(x, y, w, this.h, 0x000000, 0).setOrigin(0).setDepth(42).setInteractive({ useHandCursor: true });
+    this.hit.on('pointerdown', () => this.label.setY(this.y + this.h / 2 + 1));
+    this.hit.on('pointerup', () => this.label.setY(this.y + this.h / 2));
     this.hit.on('pointerover', () => { this.hovered = true; this.redraw(); });
-    this.hit.on('pointerout', () => { this.hovered = false; this.redraw(); });
+    this.hit.on('pointerout', () => { this.hovered = false; this.label.setY(this.y + this.h / 2); this.redraw(); });
     // Deferred a tick: the click may tear this button down, which mustn't happen inside its own input event.
     this.hit.on('pointerup', () => { playSfx('click'); scene.time.delayedCall(0, this.onClick); });
     this.moveTo(y);
@@ -234,8 +236,9 @@ class PanelButton {
   private redraw(): void {
     const lit = this.hovered || this.focused;
     this.bg.clear();
-    this.bg.fillStyle(lit ? 0x3a4d40 : PLATE, 0.96).fillRoundedRect(this.x, this.y, this.w, this.h, 9);
-    this.bg.lineStyle(lit ? 2 : 1, lit ? 0xffe3a0 : GOLD, lit ? 1 : 0.55).strokeRoundedRect(this.x, this.y, this.w, this.h, 9);
+    this.bg.fillStyle(lit ? 0x3a4d40 : PLATE, 0.96).fillRoundedRect(this.x, this.y, this.w, this.h, 8);
+    this.bg.lineStyle(lit ? 2 : 1, lit ? 0xffe3a0 : GOLD, lit ? 1 : 0.55).strokeRoundedRect(this.x, this.y, this.w, this.h, 8);
+    this.bg.lineStyle(1, GOLD, 0.28).lineBetween(this.x + 8, this.y + 2, this.x + this.w - 8, this.y + 2);
   }
 }
 
@@ -429,18 +432,18 @@ export class DialogueScene extends Phaser.Scene {
     const measure = this.add.text(0, 0, '', bodyStyle).setVisible(false);
     this.reader = new DialogueReader(text => paginateBody(measure, text, BODY_MAX_LINES()));
     this.echo = this.add.text(PLATE_X + this.plateW + 18, PANEL_Y + 10, '', {
-      fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE,
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(16)}px`, fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE,
       wordWrap: { width: PANEL_X + PANEL_W - 120 - (PLATE_X + this.plateW + 18) }, maxLines: 1
     });
     this.more = this.add.text(PANEL_X + PANEL_W - 22, PANEL_Y + PANEL_H - 12, '', {
-      fontFamily: FAMILY_BODY, fontSize: '16px', color: '#e4c77f', resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(18)}px`, color: '#e4c77f', resolution: RENDER_SCALE
     }).setOrigin(1, 1);
     this.tweens.add({ targets: this.more, alpha: 0.45, duration: 650, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     this.devMark = this.add.text(PANEL_X + 14, PANEL_Y + PANEL_H - 8, '', {
-      fontFamily: FAMILY_BODY, fontSize: '11px', color: '#8f8a78', resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: '#8f8a78', resolution: RENDER_SCALE
     }).setOrigin(0, 1).setVisible(DEV_MARK);
     this.offlineNote = this.add.text(PANEL_X + PANEL_W - 22, PANEL_Y + PANEL_H + 3, '', {
-      fontFamily: FAMILY_BODY, fontSize: '12px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE
     }).setOrigin(1, 0);
     // Small notes ("Thanks. That line has been noted.") along the panel's foot, clear of the choices.
     this.toastText = this.add.text(PANEL_X + PANEL_W / 2, PANEL_Y + PANEL_H - 22, '', {
@@ -454,7 +457,7 @@ export class DialogueScene extends Phaser.Scene {
     dots.on('pointerup', () => (this.menu.length ? this.closeMenu() : this.openMenu()));
     // Log: this conversation so far (also the L key).
     const logButton = this.add.text(PANEL_X + PANEL_W - 64, PANEL_Y + 13, 'Log', {
-      fontFamily: FAMILY_BODY, fontSize: '16px', color: '#e4c77f', padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(18)}px`, color: '#e4c77f', padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
     logButton.on('pointerover', () => logButton.setColor('#fff0ce'));
     logButton.on('pointerout', () => logButton.setColor('#e4c77f'));
@@ -941,10 +944,10 @@ export class DialogueScene extends Phaser.Scene {
     Object.assign(input.style, {
       position: 'fixed', zIndex: '10', boxSizing: 'border-box', margin: '0', padding: '0 0.6em', outline: 'none',
       background: 'rgba(31, 42, 34, 0.97)', color: '#fff0ce', border: '2px solid #e4c77f', borderRadius: '8px',
-      fontFamily: 'Georgia, "Times New Roman", serif', caretColor: '#e4c77f'
+      fontFamily: FAMILY_BODY, caretColor: '#e4c77f'
     } satisfies Partial<CSSStyleDeclaration>);
     const hint = this.add.text(CHOICE_X + CHOICE_W, PANEL_Y - 18, '', {
-      fontFamily: FAMILY_BODY, fontSize: '14px', color: MUTED, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(15)}px`, color: MUTED, resolution: RENDER_SCALE
     }).setOrigin(1, 1).setDepth(41);
     const count = () => hint.setText(`Enter to say · Esc to cancel · ${input.value.length}/${SAY_MAX}`);
     count();
@@ -1005,7 +1008,7 @@ export class DialogueScene extends Phaser.Scene {
     this.menu.push(bg);
     items.forEach(([label, act], i) => {
       const t = this.add.text(x + 14, y0 + 4 + i * rowH + rowH / 2, label, {
-        fontFamily: FAMILY_BODY, fontSize: '16px', color: CREAM, resolution: RENDER_SCALE
+        fontFamily: FAMILY_BODY, fontSize: `${textSize(18)}px`, color: CREAM, resolution: RENDER_SCALE
       }).setOrigin(0, 0.5).setDepth(51);
       const hit = this.add.rectangle(x, y0 + 4 + i * rowH, w, rowH, 0xffffff, 0).setOrigin(0).setDepth(52).setInteractive({ useHandCursor: true });
       hit.on('pointerover', () => hit.setFillStyle(0xffffff, 0.08));

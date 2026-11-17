@@ -151,7 +151,7 @@ export class TownMapScene extends Phaser.Scene {
     this.drawPlayer();
     this.ring = this.add.graphics();
     this.hoverRing = this.add.graphics();
-    this.tip = this.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: '13px', color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 6, y: 3 }, resolution: RENDER_SCALE })
+    this.tip = this.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: '#fff0ce', backgroundColor: '#28372dee', padding: { x: 6, y: 3 }, resolution: RENDER_SCALE })
       .setOrigin(0.5, 1).setVisible(false).setDepth(10);
     this.side = this.add.container(0, 0);
 
@@ -217,7 +217,7 @@ export class TownMapScene extends Phaser.Scene {
     this.add.text(SIDE_X + 2, BY + 62, 'A map of the town', { fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE });
     g.fillStyle(INK, 1).fillRect(SIDE_X, BY + 88, SIDE_W, 2).fillRect(SIDE_X, BY + 92, SIDE_W, 1);
     this.add.text(SIDE_X + SIDE_W, BY + BH - 16, 'Arrows: move  ·  Tab: places with tasks  ·  Enter: go  ·  M or Esc: close', {
-      fontFamily: FAMILY_UI, fontSize: '12px', color: MUTED, resolution: RENDER_SCALE, wordWrap: { width: SIDE_W }, align: 'right'
+      fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: MUTED, resolution: RENDER_SCALE, wordWrap: { width: SIDE_W }, align: 'right'
     }).setOrigin(1, 1);
   }
 
@@ -274,7 +274,7 @@ export class TownMapScene extends Phaser.Scene {
     }
     const order = [...places].filter(p => !p.minor).sort((a, b) => Number(b.room) - Number(a.room) || a.name.length - b.name.length);
     for (const p of order) {
-      const t = this.add.text(0, 0, p.name, { fontFamily: FAMILY_UI, fontSize: '11px', color: INK_CSS, backgroundColor: '#f2e8d0cc', padding: { x: 2, y: 0 }, resolution: RENDER_SCALE });
+      const t = this.add.text(0, 0, p.name, { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: INK_CSS, backgroundColor: '#f2e8d0cc', padding: { x: 2, y: 0 }, resolution: RENDER_SCALE });
       const x = this.sx(p.x), y = this.sy(p.y);
       const spots: [number, number, number, number][] = [[x, y + 5, 0.5, 0], [x, y - 5, 0.5, 1], [x + 6, y, 0, 0.5], [x - 6, y, 1, 0.5]];
       const fit = spots.find(([sx, sy, ox, oy]) => {
@@ -302,7 +302,7 @@ export class TownMapScene extends Phaser.Scene {
       g.fillStyle(0x000000, 0.25 * a).fillEllipse(x, y + 6, 10, 4);
       g.fillStyle(INK, a).fillTriangle(x - 5, y - 9, x + 5, y - 9, x, y + 5).fillCircle(x, y - 12, 8.5);
       g.fillStyle(on ? RED : GOLD, a).fillTriangle(x - 3.5, y - 9, x + 3.5, y - 9, x, y + 2).fillCircle(x, y - 12, 6.8);
-      this.add.text(x, y - 12, String(tasks.length), { fontFamily: FAMILY_UI, fontSize: '10px', fontStyle: 'bold', color: on ? '#fff6e0' : INK_CSS, resolution: RENDER_SCALE })
+      this.add.text(x, y - 12, String(tasks.length), { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, fontStyle: 'bold', color: on ? '#fff6e0' : INK_CSS, resolution: RENDER_SCALE })
         .setOrigin(0.5).setAlpha(a);
     }
   }
@@ -315,7 +315,7 @@ export class TownMapScene extends Phaser.Scene {
     g.fillStyle(INK, 1).fillCircle(x + 18, y + 38, 9).fillStyle(RED, 1).fillCircle(x + 18, y + 38, 7);
     g.fillStyle(INK, 1).fillCircle(x + 18, y + 58, 9).fillStyle(GOLD, 1).fillCircle(x + 18, y + 58, 7);
     g.fillStyle(0xfff6e0, 1).fillCircle(x + 18, y + 78, 4.5).fillStyle(INK, 1).fillCircle(x + 18, y + 78, 3);
-    const line = (dy: number, s: string) => this.add.text(x + 34, y + dy, s, { fontFamily: FAMILY_UI, fontSize: '12px', color: INK_CSS, resolution: RENDER_SCALE }).setOrigin(0, 0.5);
+    const line = (dy: number, s: string) => this.add.text(x + 34, y + dy, s, { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, color: INK_CSS, resolution: RENDER_SCALE }).setOrigin(0, 0.5);
     line(18, 'You'); line(38, 'Your objective (on the HUD)'); line(58, 'Tasks here (how many)'); line(78, 'A place: pick it to go there');
   }
 
@@ -326,7 +326,7 @@ export class TownMapScene extends Phaser.Scene {
     const x = this.sx(at[0]), y = this.sy(at[1]);
     const halo = this.add.circle(x, y, 9, 0x2f6fb0, 0.3);
     this.add.circle(x, y, 5.5, 0x2f6fb0, 1).setStrokeStyle(2, 0xffffff, 1);
-    this.add.text(x, y - 10, 'You', { fontFamily: FAMILY_UI, fontSize: '12px', fontStyle: 'bold', color: '#ffffff', backgroundColor: '#2f6fb0', padding: { x: 4, y: 1 }, resolution: RENDER_SCALE }).setOrigin(0.5, 1);
+    this.add.text(x, y - 10, 'You', { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, fontStyle: 'bold', color: '#ffffff', backgroundColor: '#2f6fb0', padding: { x: 4, y: 1 }, resolution: RENDER_SCALE }).setOrigin(0.5, 1);
     if (!reducedMotion()) this.tweens.add({ targets: halo, scale: 1.8, alpha: 0, duration: 1100, repeat: -1 });
   }
 
@@ -395,8 +395,9 @@ export class TownMapScene extends Phaser.Scene {
 
   private text(x: number, y: number, s: string, size: number, opts: { color?: string; family?: string; italic?: boolean; bold?: boolean; wrap?: number } = {}): Phaser.GameObjects.Text {
     const family = opts.family ?? FAMILY_BODY;
+    const font = textSize(Math.max(14, Math.round(size * (family === FAMILY_BODY ? 1.1 : 1))));
     const t = this.add.text(x, y, s, {
-      fontFamily: family, fontSize: `${family === FAMILY_BODY || family === FAMILY_HEADING ? textSize(size) : size}px`, color: opts.color ?? INK_CSS,
+      fontFamily: family, fontSize: `${font}px`, color: opts.color ?? INK_CSS,
       fontStyle: [opts.italic ? 'italic' : '', opts.bold ? 'bold' : ''].join(' ').trim() || 'normal',
       resolution: RENDER_SCALE, wordWrap: { width: opts.wrap ?? SIDE_W }
     });

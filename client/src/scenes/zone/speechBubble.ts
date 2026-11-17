@@ -1,3 +1,4 @@
+import { textSize } from '../../accessibility/runtime';
 /**
  * A resident's speech bubble on the board (GDD §9.11.3 "plays as speech bubbles over their heads"; §16.6 UI art).
  *
@@ -31,9 +32,9 @@ export class SpeechBubble {
   constructor(scene: Phaser.Scene) {
     this.frame = scene.add.graphics().setDepth(DEPTH.FLOATER).setVisible(false);
     const style = (size: number, color: string, extra: Phaser.Types.GameObjects.Text.TextStyle = {}): Phaser.Types.GameObjects.Text.TextStyle =>
-      ({ fontFamily: FAMILY_BODY, fontSize: `${size}px`, color, resolution: RENDER_SCALE, ...extra });
-    this.name = scene.add.text(0, 0, '', style(10, '#9a5b2a', { fontStyle: 'bold' })).setDepth(DEPTH.FLOATER + 0.01).setVisible(false);
-    this.body = scene.add.text(0, 0, '', style(13, '#3b2a1e', { wordWrap: { width: WRAP, useAdvancedWrap: true }, lineSpacing: 1 }))
+      ({ fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color, resolution: RENDER_SCALE, ...extra });
+    this.name = scene.add.text(0, 0, '', style(14, '#9a5b2a', { fontStyle: 'bold' })).setDepth(DEPTH.FLOATER + 0.01).setVisible(false);
+    this.body = scene.add.text(0, 0, '', style(14, '#3b2a1e', { wordWrap: { width: WRAP, useAdvancedWrap: true }, lineSpacing: Math.ceil(textSize(14) * 0.3) }))
       .setDepth(DEPTH.FLOATER + 0.01).setVisible(false);
   }
 

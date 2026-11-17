@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 import { choiceViewport } from '../ui/choiceViewport';
 import type { Outcome as ScuffleOutcome } from '../combat/scuffle/engine';
 import { SCUFFLE_SCENE, openScuffle } from '../scuffles/ScuffleScene';
@@ -207,30 +208,30 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.body = this.add.text(PANEL_X + PAD, BODY_Y, '', bodyStyle());
     this.measure = this.add.text(0, 0, '', bodyStyle()).setVisible(false);
     this.echo = this.add.text(PANEL_X + PAD, PANEL_Y + 10, '', {
-      fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE, maxLines: 1
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(16)}px`, fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE, maxLines: 1
     });
     this.more = this.add.text(PANEL_X + PANEL_W - 22, PANEL_Y + PANEL_H - 12, '', {
-      fontFamily: FAMILY_BODY, fontSize: '16px', color: '#e4c77f', resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(18)}px`, color: '#e4c77f', resolution: RENDER_SCALE
     }).setOrigin(1, 1);
     this.tweens.add({ targets: this.more, alpha: 0.45, duration: 650, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     // Dev builds (or ?dev): which scene is playing, small along the panel's foot.
     this.caption = this.add.text(PANEL_X + 14, PANEL_Y + PANEL_H - 8, '', {
-      fontFamily: FAMILY_BODY, fontSize: '11px', color: '#8f8a78', resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: '#8f8a78', resolution: RENDER_SCALE
     }).setOrigin(0, 1).setVisible(false);
     const logButton = this.add.text(PANEL_X + PANEL_W - 22, PANEL_Y + 13, 'Log', {
-      fontFamily: FAMILY_BODY, fontSize: '16px', color: '#e4c77f', padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(18)}px`, color: '#e4c77f', padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true });
     logButton.on('pointerover', () => logButton.setColor('#fff0ce'));
     logButton.on('pointerout', () => logButton.setColor('#e4c77f'));
     logButton.on('pointerup', () => { playSfx('click'); this.time.delayedCall(0, () => (this.backlog ? this.closeLog() : this.openLog())); });
     this.reportButton = this.add.text(PANEL_X + PANEL_W - 76, PANEL_Y + 15, 'Report', {
-      fontFamily: FAMILY_BODY, fontSize: '14px', fontStyle: 'italic', color: MUTED, padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(15)}px`, fontStyle: 'italic', color: MUTED, padding: { x: 6, y: 2 }, resolution: RENDER_SCALE
     }).setOrigin(1, 0).setInteractive({ useHandCursor: true }).setVisible(false);
     this.reportButton.on('pointerover', () => { if (!this.reportArmed) this.reportButton.setColor('#fff0ce'); });
     this.reportButton.on('pointerout', () => { if (!this.reportArmed) this.reportButton.setColor(MUTED); });
     this.reportButton.on('pointerup', () => { playSfx('click'); this.time.delayedCall(0, () => this.pressReport()); });
     this.reportNote = this.add.text(PANEL_X + PANEL_W / 2, PANEL_Y + PANEL_H - 22, '', {
-      fontFamily: FAMILY_BODY, fontSize: '15px', fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(16)}px`, fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE
     }).setOrigin(0.5).setAlpha(0);
     this.plate.container.setAlpha(0);
     // The portrait sits under the panel's top edge (depth 5); the panel and its text above it.
@@ -781,7 +782,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
       fontFamily: FAMILY_HEADING, fontSize: '38px', color: '#fff0ce', resolution: RENDER_SCALE
     }).setOrigin(0.5, 0);
     const sub = this.add.text(GAME_WIDTH / 2, 130, [palette.label, sceneTitle].filter(Boolean).join('  ·  '), {
-      fontFamily: FAMILY_BODY, fontSize: '16px', fontStyle: 'italic', color: '#e9dfc4', resolution: RENDER_SCALE
+      fontFamily: FAMILY_BODY, fontSize: `${textSize(18)}px`, fontStyle: 'italic', color: '#e9dfc4', resolution: RENDER_SCALE
     }).setOrigin(0.5, 0);
     this.backdropLayer.add([wash, glow, vignette, rule, zoneText, placeText, sub]);
   }

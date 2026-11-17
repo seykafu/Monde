@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 import { ALLIES, askAlly, canInvite } from './allies';
 import type { ResidentSim } from '../sim/residentSim';
 import { deploymentTiles } from '../combat/scuffle/arena';
@@ -176,7 +177,7 @@ export class ScuffleScene extends Phaser.Scene {
       img.setPosition(p.x, p.y).setDepth(11000 + p.y * 1e-3).setVisible(!u.departed).setAlpha(isAlive(u) ? 1 : .65);
       if (!isAlive(u) && !u.departed) this.pose(u, 'winded', 3);
       else if (isAlive(u)) { const sprite = new CharacterSprite(this, u.id, this.look(u)); sprite.apply(img); }
-      let label = this.labels.get(u.id); if (!label) { label = this.world(this.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: '12px', color: '#fff3da', backgroundColor: '#253c37', resolution: RENDER_SCALE * this.zoom }).setOrigin(.5, 0).setDepth(12000)); this.labels.set(u.id, label); }
+      let label = this.labels.get(u.id); if (!label) { label = this.world(this.add.text(0, 0, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(14)}px`, color: '#fff3da', backgroundColor: '#253c37', resolution: RENDER_SCALE * this.zoom }).setOrigin(.5, 0).setDepth(12000)); this.labels.set(u.id, label); }
       label.setPosition(p.x, p.y + 3).setVisible(!u.departed).setText(`${u.name} ${u.state.hp}/${u.stats.hp}\n${u.tool}${u.state.stance !== 'none' ? ` · ${u.state.stance === 'defensive' ? 'brace' : u.state.stance}` : ''}`);
     }
     this.text(730, 24, this.feedback || b.log.slice(-2).join('\n'), 18);

@@ -54,7 +54,7 @@ export class HeartRowView {
     this.images.forEach((img, i) => {
       const icon = icons[i];
       if (!icon) { img.setVisible(false); return; }
-      img.setVisible(true).setTexture(heartTexture(this.scene, icon));
+      img.setVisible(true).setAlpha(icon === 'empty' ? 0.55 : 1).setTexture(heartTexture(this.scene, icon));
       if (pop && !reducedMotion() && this.icons[i] !== icon) {
         this.scene.tweens.killTweensOf(img);
         this.scene.tweens.add({ targets: img, scale: { from: this.scale * 1.45, to: this.scale }, duration: 220, ease: 'Back.easeOut' });

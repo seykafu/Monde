@@ -1,3 +1,4 @@
+import { textSize } from '../accessibility/runtime';
 // Character creation as the Fellowship application (GDD §11.1; MVP W-07): Pell's hand-lettered form on a
 // clipboard, two pages (Particulars, Likeness), the live sprite pinned beside it walking in place, and a
 // signature line with the player's badge. Keyboard and mouse both work throughout.
@@ -10,7 +11,7 @@
 
 import Phaser from 'phaser';
 import { BACKGROUNDS, BUILDS, HAIR_STYLES, HEIGHTS, LOVES, NAME_MAX, NAME_TYPABLE, WHY_MONDE, checkName, type PlayerProfile } from '@monde/shared';
-import { FAMILY_BODY, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
+import { FAMILY_HAND, FAMILY_BODY, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { CharacterSprite, badgeTexture } from '../render/characterSprite';
 import { CLOTH_COLOURS, EYE_COLOURS, HAIR_COLOURS, SKIN_TONES, type CharacterLook } from '../render/character/look';
 import type { Facing } from '../render/character/sheet';
@@ -60,7 +61,7 @@ export function openFellowshipForm(host: Phaser.Scene): Promise<FellowshipResult
 // ── Look of the page ────────────────────────────────────────────────────────
 
 /** Hand-lettering: Caveat if installed, else the system's handwriting faces. */
-const HAND = '"Caveat", "Bradley Hand", "Noteworthy", "Segoe Print", "Chalkboard SE", cursive';
+const HAND = FAMILY_HAND;
 const PRINT = FAMILY_BODY;
 const INK = '#26324a', PRINTED = '#5b4a36', FADED = '#a08f75', RED = '#b03a2e', PENCIL = '#7a6d60';
 const INK_N = 0x26324a, RED_N = 0xb03a2e;
@@ -179,12 +180,12 @@ export class FellowshipScene extends Phaser.Scene {
     g.fillStyle(0xe8a39a).fillCircle(CARD.x + CARD.w / 2 - 2, CARD.y + 8, 2);
     g.fillStyle(0x6b5a40, 0.18).fillEllipse(SPRITE.x, SPRITE.feet + 2, 150, 22);
 
-    this.add.text(PAPER.x + PAPER.w / 2, PAPER.y + 14, FORM_TEXT.office.toUpperCase(), { fontFamily: PRINT, fontSize: '13px', color: PRINTED, letterSpacing: 3 }).setOrigin(0.5, 0);
+    this.add.text(PAPER.x + PAPER.w / 2, PAPER.y + 14, FORM_TEXT.office.toUpperCase(), { fontFamily: PRINT, fontSize: `${textSize(14)}px`, color: PRINTED, letterSpacing: 3 }).setOrigin(0.5, 0);
     this.add.text(PAPER.x + PAPER.w / 2, PAPER.y + 32, FORM_TEXT.title, { fontFamily: HAND, fontSize: '34px', color: INK }).setOrigin(0.5, 0);
-    this.add.text(PAPER.x + PAPER.w / 2, PAPER.y + 76, FORM_TEXT.smallPrint, { fontFamily: PRINT, fontSize: '13px', fontStyle: 'italic', color: PENCIL }).setOrigin(0.5, 0);
+    this.add.text(PAPER.x + PAPER.w / 2, PAPER.y + 76, FORM_TEXT.smallPrint, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: PENCIL }).setOrigin(0.5, 0);
     this.add.text(CARD.x + CARD.w / 2, CARD.y + 26, 'Likeness', { fontFamily: HAND, fontSize: '30px', color: INK }).setOrigin(0.5, 0);
-    this.add.text(CARD.x + CARD.w / 2, CARD.y + 64, FORM_TEXT.likenessNote, { fontFamily: PRINT, fontSize: '12px', fontStyle: 'italic', color: PENCIL, align: 'center', wordWrap: { width: CARD.w - 50 } }).setOrigin(0.5, 0);
-    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 8, this.opts.next ? `${FORM_TEXT.keys} · ${FORM_TEXT.back}` : FORM_TEXT.keys, { fontFamily: PRINT, fontSize: '12px', color: '#c9bfa8' }).setOrigin(0.5, 1);
+    this.add.text(CARD.x + CARD.w / 2, CARD.y + 64, FORM_TEXT.likenessNote, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: PENCIL, align: 'center', lineSpacing: Math.ceil(textSize(14) * 0.3), wordWrap: { width: CARD.w - 50 } }).setOrigin(0.5, 0);
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 8, this.opts.next ? `${FORM_TEXT.keys} · ${FORM_TEXT.back}` : FORM_TEXT.keys, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, color: '#c9bfa8' }).setOrigin(0.5, 1);
   }
 
   /** Everything that changes: the page's rows, the footer, the focus band. Rebuilt on every change. */
@@ -220,7 +221,7 @@ export class FellowshipScene extends Phaser.Scene {
     const t = (FIELD_TEXT as Record<string, { label: string; hint: string }>)[which];
     this.text(LABEL_X, y + 2, t?.label ?? which, { fontFamily: HAND, fontSize: '22px', color: PRINTED });
     const h = hint || t?.hint;
-    if (h) this.text(LABEL_X, y + 28, h, { fontFamily: PRINT, fontSize: '11px', fontStyle: 'italic', color: FADED, wordWrap: { width: CONTROL_X - LABEL_X - 12 } });
+    if (h) this.text(LABEL_X, y + 28, h, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: FADED, lineSpacing: Math.ceil(textSize(14) * 0.3), wordWrap: { width: CONTROL_X - LABEL_X - 12 } });
   }
 
   private tabs(): void {
@@ -232,7 +233,7 @@ export class FellowshipScene extends Phaser.Scene {
       this.clickable(t, 'tabs', () => { this.page = i as 0 | 1; });
     });
     const problemsElsewhere = this.page === 1 && this.problems.length > 0;
-    if (problemsElsewhere) this.text(CONTROL_X + 170, y + 8, '← something to fix on page I', { fontFamily: PRINT, fontSize: '13px', color: RED });
+    if (problemsElsewhere) this.text(CONTROL_X + 170, y + 8, '← something to fix on page I', { fontFamily: PRINT, fontSize: `${textSize(14)}px`, color: RED });
     this.field({ id: 'tabs', area: this.rowArea(y - 2, 38), step: d => { this.page = d > 0 ? 1 : 0; }, press: () => { this.page = this.page ? 0 : 1; } });
   }
 
@@ -246,13 +247,13 @@ export class FellowshipScene extends Phaser.Scene {
     const nameText = this.text(CONTROL_X + 4, y - 4, f.name || ' ', { fontFamily: HAND, fontSize: '32px', color: INK });
     const line = this.add.rectangle(CONTROL_X, y + 36, 250, 1.5, 0x5b4a36).setOrigin(0, 0).setDepth(2);
     this.layer.push(line);
-    this.text(CONTROL_X + 252, y + 22, `${[...f.name].length}/${NAME_MAX}`, { fontFamily: PRINT, fontSize: '11px', color: FADED }).setOrigin(1, 0);
+    this.text(CONTROL_X + 252, y + 22, `${[...f.name].length}/${NAME_MAX}`, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, color: FADED }).setOrigin(1, 0);
     const hitName = this.add.rectangle(CONTROL_X, y - 6, 252, 46, 0, 0).setOrigin(0, 0).setDepth(4);
     this.layer.push(hitName);
     this.clickable(hitName, 'name', () => undefined);
     if (this.focusId === 'name') this.caret = this.text(CONTROL_X + 6 + (f.name ? nameText.width : 0), y - 4, '|', { fontFamily: HAND, fontSize: '32px', color: INK });
     const nameProblem = this.problems.find(p => p.field === 'name');
-    if (nameProblem) this.text(CONTROL_X + 270, y + 4, nameProblem.problem, { fontFamily: PRINT, fontSize: '14px', fontStyle: 'italic', color: RED, wordWrap: { width: CONTROL_END - CONTROL_X - 270 } });
+    if (nameProblem) this.text(CONTROL_X + 270, y + 4, nameProblem.problem, { fontFamily: PRINT, fontSize: '14px', fontStyle: 'italic', color: RED, lineSpacing: Math.ceil(textSize(14) * 0.3), wordWrap: { width: CONTROL_END - CONTROL_X - 270 } });
     this.field({ id: 'name', area: this.rowArea(y - 6, 50), text: 'name' });
 
     // Pronouns, and the custom set's three gaps.
@@ -278,7 +279,7 @@ export class FellowshipScene extends Phaser.Scene {
         if (i < 2) { this.text(x, y + 4, '·', { fontFamily: PRINT, fontSize: '15px', color: FADED }); x += 18; }
       });
       const customProblem = this.problems.find(p => p.field === 'custom');
-      if (customProblem) this.text(x + 4, y - 2, customProblem.problem, { fontFamily: PRINT, fontSize: '12px', fontStyle: 'italic', color: RED, wordWrap: { width: Math.max(90, CONTROL_END - x - 4) } });
+      if (customProblem) this.text(x + 4, y - 2, customProblem.problem, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: RED, lineSpacing: Math.ceil(textSize(14) * 0.3), wordWrap: { width: Math.max(90, CONTROL_END - x - 4) } });
       this.text(LABEL_X, y + 4, FIELD_TEXT.custom.label, { fontFamily: HAND, fontSize: '20px', color: FADED });
       this.field({ id: 'custom', area: this.rowArea(y - 6, 42), text: 'custom', step: d => { this.customBox = Math.max(0, Math.min(2, this.customBox + d)); } });
     }
@@ -289,8 +290,8 @@ export class FellowshipScene extends Phaser.Scene {
     this.ticks(y, 'background', BACKGROUNDS.map(b => BACKGROUND_TEXT[b].name), BACKGROUNDS.indexOf(f.background), i => { f.background = BACKGROUNDS[i]!; });
     const bg = BACKGROUND_TEXT[f.background], wrap = { width: CONTROL_END - CONTROL_X };
     this.text(CONTROL_X, y + 34, bg.who, { fontFamily: HAND, fontSize: '20px', color: INK });
-    const start = this.text(CONTROL_X, y + 62, `Start: ${bg.start}`, { fontFamily: PRINT, fontSize: '13px', color: PRINTED, wordWrap: wrap });
-    this.text(CONTROL_X, start.y + start.height + 3, `Perk: ${bg.perk}`, { fontFamily: PRINT, fontSize: '13px', color: PRINTED, wordWrap: wrap });
+    const start = this.text(CONTROL_X, y + 62, `Start: ${bg.start}`, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, color: PRINTED, lineSpacing: Math.ceil(textSize(14) * 0.3), wordWrap: wrap });
+    this.text(CONTROL_X, start.y + start.height + 3, `Perk: ${bg.perk}`, { fontFamily: PRINT, fontSize: `${textSize(14)}px`, color: PRINTED, lineSpacing: Math.ceil(textSize(14) * 0.3), wordWrap: wrap });
 
     // Why Monde?
     y = 460;
@@ -417,7 +418,7 @@ export class FellowshipScene extends Phaser.Scene {
     this.clickable(left, 'turn', () => turn(-1));
     this.clickable(right, 'turn', () => turn(1));
     this.clickable(label, 'turn', () => { this.walking = !this.walking; });
-    this.text(cx, y + 34, this.walking ? '(walking: click to stand)' : '(standing: click to walk)', { fontFamily: PRINT, fontSize: '11px', fontStyle: 'italic', color: FADED }).setOrigin(0.5, 0);
+    this.text(cx, y + 34, this.walking ? '(walking: click to stand)' : '(standing: click to walk)', { fontFamily: PRINT, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: FADED }).setOrigin(0.5, 0);
     this.field({ id: 'turn', area: { x: CARD.x + 20, y: y - 6, w: CARD.w - 40, h: 58 }, step: turn, press: () => { this.walking = !this.walking; } });
 
     const button = (id: string, by: number, words: string, run: () => void) => {
@@ -446,7 +447,7 @@ export class FellowshipScene extends Phaser.Scene {
     this.layer.push(seal);
     this.text(bx + bw / 2, y + 22, FORM_TEXT.sign, { fontFamily: HAND, fontSize: '30px', color: '#fbeee0' }).setOrigin(0.5, 0);
     this.clickable(seal, 'sign', () => this.sign());
-    if (this.tried && this.problems.length) this.text(bx + bw / 2, y + 68, 'Not yet: see the red ink.', { fontFamily: PRINT, fontSize: '12px', fontStyle: 'italic', color: RED }).setOrigin(0.5, 0);
+    if (this.tried && this.problems.length) this.text(bx + bw / 2, y + 68, 'Not yet: see the red ink.', { fontFamily: PRINT, fontSize: `${textSize(14)}px`, fontStyle: 'italic', color: RED }).setOrigin(0.5, 0);
     this.field({ id: 'sign', area: { x: bx - 8, y: y + 8, w: bw + 16, h: 62 }, press: () => this.sign() });
   }
 
@@ -556,7 +557,7 @@ export class FellowshipScene extends Phaser.Scene {
   /** Pell's RECEIVED stamp lands on the form. */
   private stamp(then: () => void): void {
     const stamp = this.add.text(PAPER.x + PAPER.w - 250, FOOTER_Y - 120, 'RECEIVED\nE. Pell, Mayor', {
-      fontFamily: PRINT, fontSize: '26px', fontStyle: 'bold', color: RED, align: 'center', lineSpacing: 2
+      fontFamily: PRINT, fontSize: '26px', fontStyle: 'bold', color: RED, align: 'center', lineSpacing: 8
     }).setOrigin(0.5).setAngle(-9).setAlpha(0).setScale(1.6).setDepth(8);
     const border = this.add.rectangle(stamp.x, stamp.y, stamp.width + 24, stamp.height + 16).setStrokeStyle(3, RED_N).setAngle(-9).setAlpha(0).setScale(1.6).setDepth(8);
     this.tweens.add({ targets: [stamp, border], alpha: 0.85, scale: 1, duration: 180, ease: 'Quad.easeIn' });

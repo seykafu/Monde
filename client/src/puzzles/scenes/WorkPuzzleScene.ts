@@ -97,7 +97,7 @@ export class WorkPuzzleScene extends Phaser.Scene {
 
   private persist(): void { storeWork(this.registry, this.board, this.state); this.saved = this.state.elapsed; }
   private text(x: number, y: number, text: string, size = 18, width = 1050): Phaser.GameObjects.Text {
-    const t = this.add.text(x, y, text, { fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color: INK, resolution: RENDER_SCALE, wordWrap: { width }, lineSpacing: 5 });
+    const t = this.add.text(x, y, text, { fontFamily: FAMILY_BODY, fontSize: `${textSize(size)}px`, color: INK, resolution: RENDER_SCALE, wordWrap: { width }, lineSpacing: Math.ceil(textSize(size) * 0.3) });
     this.page.add(t); return t;
   }
   private button(x: number, y: number, text: string, run: () => void, width = 150, size = 18, label?: string): Phaser.GameObjects.Text {
@@ -188,7 +188,7 @@ export class WorkPuzzleScene extends Phaser.Scene {
     for (const [a, b, w] of map.edges) {
       const p = at(a), q = at(b), trod = walked.has(`${a}-${b}`);
       g.lineStyle(trod ? 4 : 2, trod ? 0x7a5641 : 0xb79b68, trod ? 0.9 : 0.8).lineBetween(p.x, p.y, q.x, q.y);
-      this.text((p.x + q.x) / 2 - 7, (p.y + q.y) / 2 - 9, String(w), 12, 40).setColor(FAINT);
+      this.text((p.x + q.x) / 2 - 7, (p.y + q.y) / 2 - 9, String(w), 14, 40).setColor(FAINT);
     }
     const legal = new Set(this.state.solved ? [] : board.puzzle.legalMoves(this.state));
     const glyph = (i: number) => letters.has(i) ? (done.has(i) ? '✓' : '✉') : i === map.start ? '⌂' : '•';
@@ -199,7 +199,7 @@ export class WorkPuzzleScene extends Phaser.Scene {
         this.button(p.x - 13, p.y - 15, glyph(i), () => this.walk(i), 40, 18, `Next: ${node.label} · ${steps} steps${letters.has(i) && !done.has(i) ? ' · a letter' : ''}`);
       } else if (i !== here) this.text(p.x - 7, p.y - 12, glyph(i), letters.has(i) ? 18 : 14, 40).setColor(letters.has(i) ? INK : FAINT);
       // Doors stand a few steps apart, so a letter is tagged with its number in the satchel list, not its address.
-      if (letters.has(i)) this.text(p.x + 15, p.y - 2, String(round.letters.indexOf(i) + 1), 12, 30).setColor(done.has(i) ? FAINT : '#a2452f');
+      if (letters.has(i)) this.text(p.x + 15, p.y - 2, String(round.letters.indexOf(i) + 1), 14, 30).setColor(done.has(i) ? FAINT : '#a2452f');
     });
     // The Fellow, walking the last street (straight there with reduced motion).
     const me = at(here), walker = this.text(me.x - 11, me.y - 15, '◉', 22, 40).setColor('#a2452f');
@@ -242,7 +242,7 @@ export class WorkPuzzleScene extends Phaser.Scene {
         t.setX(x(other));
         this.tweens.add({ targets: t, x: x(slot), duration: 220, ease: 'Sine.easeInOut' });
       }
-      this.text(x(slot) + width / 2 - 12, base + 20, String(slot + 1), 12, 40).setColor(FAINT);
+      this.text(x(slot) + width / 2 - 12, base + 20, String(slot + 1), 14, 40).setColor(FAINT);
     });
     this.moved = null;
     this.text(104, 420, `Swaps ${swaps}  ·  par ${shelf.par}`, 22, 500).setColor(swaps > shelf.par ? '#a2452f' : INK);
