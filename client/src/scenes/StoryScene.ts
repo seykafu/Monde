@@ -32,6 +32,7 @@ import {
   PAD, PANEL_H, PANEL_W, PANEL_X, PANEL_Y, PLATE_X, PLAYER_COLOUR, PORTRAIT_X, PORTRAIT_Y, PanelButton,
   bodyStyle, drawPanel, rosterColour, youPlate
 } from '../dialogue/panel';
+import { StyledBody } from '../dialogue/styledBody';
 import { Portrait } from '../dialogue/portrait';
 import { PORTRAIT_W, portraitArtId, portraitLook, type PortraitLook } from '../dialogue/portraitModel';
 import { browserStorage, getMind } from '../mind/api';
@@ -164,7 +165,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
   private portrait: Portrait | null = null;
   private plate!: NamePlate;
   private you!: Phaser.GameObjects.Container;
-  private body!: Phaser.GameObjects.Text;
+  private body!: StyledBody;
   private measure!: Phaser.GameObjects.Text;
   private echo!: Phaser.GameObjects.Text;
   private more!: Phaser.GameObjects.Text;
@@ -205,7 +206,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.plate = new NamePlate(this, PORTRAIT_W + 8);
     this.you = youPlate(this).setAlpha(0);
     const panel = drawPanel(this.add.graphics());
-    this.body = this.add.text(PANEL_X + PAD, BODY_Y, '', bodyStyle());
+    this.body = new StyledBody(this, PANEL_X + PAD, BODY_Y, bodyStyle(), MUTED);
     this.measure = this.add.text(0, 0, '', bodyStyle()).setVisible(false);
     this.echo = this.add.text(PANEL_X + PAD, PANEL_Y + 10, '', {
       fontFamily: FAMILY_BODY, fontSize: `${textSize(16)}px`, fontStyle: 'italic', color: MUTED, resolution: RENDER_SCALE, maxLines: 1
@@ -235,7 +236,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     }).setOrigin(0.5).setAlpha(0);
     this.plate.container.setAlpha(0);
     // The portrait sits under the panel's top edge (depth 5); the panel and its text above it.
-    this.panelLayer = this.add.container(0, 0, [panel, this.plate.container, this.you, this.body, this.echo, this.more, this.caption, logButton, this.reportButton, this.reportNote]).setDepth(10);
+    this.panelLayer = this.add.container(0, 0, [panel, this.plate.container, this.you, this.body.container, this.echo, this.more, this.caption, logButton, this.reportButton, this.reportNote]).setDepth(10);
 
     const keyboard = this.input.keyboard!;
     keyboard.addCapture('SPACE,TAB,UP,DOWN');
@@ -255,7 +256,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.shown = ms <= 0 ? pageText.length : Math.min(pageText.length, this.shown + delta / ms);
     const n = Math.floor(this.shown);
     if (n !== before) {
-      this.body.setText(pageText.slice(0, n));
+      this.body.setText(pageText.slice(0, n), this.pages.slice(0, this.page).join(''));
       this.blip(pageText.slice(before, n), time);
     }
     if (n >= pageText.length) this.typing = false;
@@ -395,7 +396,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     if (!this.reading || this.answer) return;
     if (this.typing) {
       this.shown = (this.pages[this.page] ?? '').length;
-      this.body.setText(this.pages[this.page] ?? '');
+      this.body.setText(this.pages[this.page] ?? '', this.pages.slice(0, this.page).join(''));
       this.typing = false;
       this.updateMore();
       return;
@@ -606,7 +607,7 @@ export class StoryScene extends Phaser.Scene implements StoryPresenter {
     this.typing = false;
     this.body.setColor(BODY_COLOUR).setFontStyle('italic').setText('…');
     this.stopThinking();
-    this.thinkingTween = this.tweens.add({ targets: this.body, alpha: 0.4, duration: 520, yoyo: true, repeat: -1 });
+    this.thinkingTween = this.tweens.add({ targets: this.body.container, alpha: 0.4, duration: 520, yoyo: true, repeat: -1 });
   }
 
   private stopThinking(): void {

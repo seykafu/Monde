@@ -70,6 +70,7 @@ import { HeartRowView, heartTexture } from '../ui/hearts';
 import { HEART_ANIMATION, heartFeedback, type HeartFeedback } from '../friendship/hearts';
 import { meetResident, recordDialogueTurn, regardFor } from './friendship';
 import { callName, isBareLeave, normalizeChoices, type PersonaCard, type TalkQuest } from '@monde/shared';
+import { StyledBody } from '../dialogue/styledBody';
 
 export const DIALOGUE_SCENE = 'Dialogue';
 
@@ -273,7 +274,7 @@ export class DialogueScene extends Phaser.Scene {
   private scriptedNodes: Record<number, string> = {};
   private reader!: DialogueReader;
   // Presentation.
-  private body!: Phaser.GameObjects.Text;
+  private body!: StyledBody;
   private echo!: Phaser.GameObjects.Text;
   private more!: Phaser.GameObjects.Text;
   private devMark!: Phaser.GameObjects.Text;
@@ -428,7 +429,7 @@ export class DialogueScene extends Phaser.Scene {
       fontFamily: FAMILY_BODY, fontSize: `${textSize(BODY_FONT)}px`, color: '#f3ecd9', lineSpacing: BODY_SPACING,
       wordWrap: { width: BODY_W }, resolution: RENDER_SCALE
     };
-    this.body = this.add.text(PANEL_X + PAD, BODY_Y, '', bodyStyle);
+    this.body = new StyledBody(this, PANEL_X + PAD, BODY_Y, bodyStyle, MUTED);
     const measure = this.add.text(0, 0, '', bodyStyle).setVisible(false);
     this.reader = new DialogueReader(text => paginateBody(measure, text, BODY_MAX_LINES()));
     this.echo = this.add.text(PLATE_X + this.plateW + 18, PANEL_Y + 10, '', {
@@ -496,7 +497,8 @@ export class DialogueScene extends Phaser.Scene {
     const text = this.reader.hasText ? this.reader.visible : this.thinking ?? '';
     if (text !== this.shownBody) {
       this.shownBody = text;
-      this.body.setText(text).setColor(BODY_COLOUR).setFontStyle(this.reader.hasText ? 'normal' : 'italic').setAlpha(this.reader.hasText ? 1 : 0.8);
+      const before = this.reader.hasText ? this.reader.pages().slice(0, this.reader.page).join('') : '';
+      this.body.setText(text, before).setColor(BODY_COLOUR).setFontStyle(this.reader.hasText ? 'normal' : 'italic').setAlpha(this.reader.hasText ? 1 : 0.8);
     }
     // A streamed line has no expression until its turn arrives: keep the last one (or "thinking" during the beat).
     const lineExpr = this.reader.expr();
