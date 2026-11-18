@@ -56,6 +56,14 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   const app = Fastify({ logger: { level: config.LOG_LEVEL }, genReqId: () => randomUUID() });
   const database = createDatabase(config.DATABASE_URL);
   const redis = createRedis(config.REDIS_URL);
+  // A rejected key leaves every resident on written lines with nothing else failing, so it is logged loudly
+  // (throttled in the client) and shown on /v1/health as checks.mind.
+  const mind = options.mind ?? createMindClient(config, (info) => {
+    const level = info.status === 401 || info.status === 403 ? "error" : "warn";
+    app.log[level]({ anthropic: info }, level === "error"
+      ? "Anthropic rejected the API key: residents are on written lines until it is replaced"
+      : "Anthropic API call failed");
+  });
 
   app.register(cors, {
     origin: [
@@ -89,7 +97,7 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
       service: "monde-mind",
       env: config.MONDE_ENV,
       version: config.GIT_SHA,
-      checks: { db, redis: redisStatus },
+      checks: { db, redis: redisStatus, mind: mind.enabled ? mind.health?.() ?? "ok" : "off" },
     };
   });
   // Loading the prompt version at request time proves the prompt templates shipped with the build.
@@ -98,7 +106,6 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   if (db) configureBudget(db, config);
   registerAdminRoutes(app, config, db);
   registerUsageRoutes(app, config, db);
-  const mind = options.mind ?? createMindClient(config);
   registerModelRoutes(app, config, db, mind);
   registerCensusRoutes(app, config, db, mind);
   registerWorldRoutes(app, config, db);

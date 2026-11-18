@@ -26,7 +26,7 @@ describe("monde-mind", () => {
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({
       ok: true, service: "monde-mind", env: "dev", version: "dev",
-      checks: { db: "off", redis: "off" },
+      checks: { db: "off", redis: "off", mind: "off" },
     });
     expect(response.headers["x-request-id"]).toBeTruthy();
   });
