@@ -137,6 +137,12 @@ export class MindClient {
    */
   private restingUntil = 0;
   private get resting(): boolean { return this.now() < this.restingUntil; }
+  /** Start (or extend) a rest the server asked for. */
+  private rest(seconds: unknown): void {
+    // GDD-GAP: cap a server-directed retry at ten minutes and use the usual cooldown for invalid delays.
+    const delay = typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds, 600) * 1000 : OFFLINE_COOLDOWN_MS;
+    this.restingUntil = Math.max(this.restingUntil, this.now() + delay);
+  }
   private offlineUntil = 0;
   private chosenOffline = false;
   get offline(): boolean { return !!this.opts.offline || this.chosenOffline; }
@@ -354,8 +360,10 @@ export class MindClient {
       if (res && !res.ok) this.log('warn', `prewarm ${residentId}: HTTP ${res.status}`);
       // A prewarm refused for budget (§9.15: past 100% an Ambient resident isn't prewarmed) says nothing about talking to
       // them, which goes on to 200%: only a refused turn puts the town in Quiet Mode.
-      if (res?.ok) await res.json().catch(() => undefined);
-      else if (res) await res.body?.cancel().catch(() => undefined);
+      if (res?.ok) {
+        const body = await res.json().catch(() => undefined) as { reason?: unknown; retry_after_s?: unknown } | undefined;
+        if (body?.reason === 'resting') this.rest(body.retry_after_s);
+      } else if (res) await res.body?.cancel().catch(() => undefined);
     } catch (error) {
       this.log('info', `prewarm ${residentId} failed`, error);
     }
@@ -463,11 +471,7 @@ export class MindClient {
       if (res.status === 503) {
         const body = await res.clone().json().catch(() => null);
         if (body?.error === 'mind_resting') {
-          const seconds = body.retry_after_s;
-          // GDD-GAP: cap a server-directed retry at ten minutes and use the usual cooldown for invalid delays.
-          const delay = typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0
-            ? Math.min(seconds, 600) * 1000 : OFFLINE_COOLDOWN_MS;
-          this.restingUntil = this.now() + delay;
+          this.rest(body.retry_after_s);
           return quiet('mind resting');
         }
       }

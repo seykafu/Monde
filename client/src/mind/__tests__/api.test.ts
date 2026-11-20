@@ -324,3 +324,15 @@ it("keeps the rest of the server (events, the dawn paper) while only the model r
   await mind.getDawn(2);
   expect(net.calls.map(c => c.url.split('/').pop())).toEqual(['worlds', 'talk', 'events', '2']);
 });
+
+it("learns the rest from a prewarm too, so the HUD doesn't say online between conversations", async () => {
+  let now = 100;
+  const net = fakeFetch(url => url.endsWith('/worlds') ? json({ world_id: WORLD, token: TOKEN })
+    : url.endsWith('/prewarm') ? json({ warmed: false, reason: 'resting', retry_after_s: 30 }) : sse([event('turn', serverTurn)]));
+  const mind = client({ fetch: net.fetch, now: () => now });
+  await mind.prewarm('pell');
+  expect(mind.status).toBe('resting');
+  expect((await mind.talk(request, { fallback: () => quietTurn }))?.reason).toBe('mind resting');
+  now += 30_000;
+  expect((await mind.talk(request, { fallback: () => quietTurn }))?.source).toBe('server');
+});

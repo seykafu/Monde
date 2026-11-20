@@ -696,7 +696,7 @@ it("answers resting talk and prewarm before opening a session or recording usage
   expect(response.json()).toEqual({ error: "mind_resting", reason: "no_credit", retry_after_s: 2 });
   const warm = await env.app.inject({ method: "POST", url: `/v1/worlds/${env.worldId}/prewarm`, headers: env.headers, payload: { resident_id: "pell" } });
   expect(warm.statusCode).toBe(200);
-  expect(warm.json()).toEqual({ warmed: false, reason: "resting" });
+  expect(warm.json()).toEqual({ warmed: false, reason: "resting", retry_after_s: 2 });
   expect(await turnsOf(env.worldId)).toEqual([]);
   expect(await logs(env.worldId)).toEqual([]);
   expect(await database.db.select().from(conversationSessions).where(eq(conversationSessions.worldId, env.worldId))).toEqual([]);

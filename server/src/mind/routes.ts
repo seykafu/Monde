@@ -147,11 +147,13 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
   // ------------------------------------------------------------------------------------------------------------
   // Dialogue (GDD §9.10)
   // ------------------------------------------------------------------------------------------------------------
+  /** Whole seconds until the resting mind admits a trial call (at least 1). */
+  const restSeconds = () => Math.max(1, Math.ceil((mind.restRemainingMs?.() ?? MIND_REST_MS) / 1000));
   app.post<{ Params: { w: string } }>("/v1/worlds/:w/talk", async (request, reply) => {
     const parsed = TalkBody.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ error: "invalid talk request", issues: issues(parsed.error) });
     if (mind.enabled && mind.available?.() === false) {
-      const seconds = Math.max(1, Math.ceil((mind.restRemainingMs?.() ?? MIND_REST_MS) / 1000));
+      const seconds = restSeconds();
       return reply.code(503).header("Retry-After", seconds).send({
         error: "mind_resting", reason: mind.health?.(), retry_after_s: seconds,
       });
@@ -374,7 +376,8 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     const worldId = request.params.w;
     const residentId = parsed.data.resident_id;
     if (!mind.enabled) return { warmed: false, reason: "disabled" };
-    if (mind.available?.() === false) return { warmed: false, reason: "resting" };
+    // The client learns the rest from walking past residents too, so its HUD dot doesn't say online between turns.
+    if (mind.available?.() === false) return { warmed: false, reason: "resting", retry_after_s: restSeconds() };
 
     const key = `${worldId}:${residentId}:${routerFor(db).resolve("dialogue").model}`;
     const at = now();
