@@ -73,6 +73,9 @@ async function talk(worldId: string, who: Who, conv: string, day: number, minute
     resident_id: who.id, conversation_id: conv, input, context: { day, minute, place: who.place, weather: "bright spells" },
   });
   const text = await res.text();
+  if (res.status === 503 && /application\/json/.test(res.headers.get("content-type") ?? "") && JSON.parse(text).error === "mind_resting") {
+    return { turn: { fallback: true }, status: res.status, ms: Date.now() - t0 };
+  }
   const events = [...text.matchAll(/event: (\w+)\ndata: (.*)\n/g)].map((m) => [m[1], JSON.parse(m[2]!)] as const);
   return { turn: (events.find((e) => e[0] === "turn")?.[1] as Turn | undefined) ?? null, status: res.status, ms: Date.now() - t0 };
 }
@@ -95,8 +98,8 @@ for (let day = 1; day <= DAYS; day++) {
     for (let i = 0; i < 3 && turns < TURNS; i++) {
       const r = await talk(worldId, who, conv, day, minute, input).catch(() => ({ turn: null, status: 0, ms: 0 }));
       turns++; times.push(r.ms);
+      if (r.turn?.fallback) fallbacks++;
       if (r.status !== 200 || !r.turn) { errors++; break; }
-      if (r.turn.fallback) fallbacks++;
       if (r.turn.wrap_up) break;
       const choice = r.turn.choices?.find((c) => c.intent !== "leave") ?? r.turn.choices?.[0];
       input = i === 0 ? { kind: "say", text: pick(SAYS) } : choice ? { kind: "choice", choice_id: choice.id, text: choice.text, intent: choice.intent } : { kind: "say", text: "Go on." };
@@ -159,3 +162,11 @@ fs.mkdirSync(OUT, { recursive: true });
 const file = path.join(OUT, `soak_${worldId.slice(0, 8)}.md`);
 fs.writeFileSync(file, report);
 console.log(`wrote ${file}`);
+
+// GDD-GAP: §9.16 uses <2% on scripted conversations. The noisier live soak flags outages above 10%.
+const totalTurns = log.reduce((sum, day) => sum + day.turns, 0);
+const totalFallbacks = log.reduce((sum, day) => sum + day.fallbacks, 0);
+if (totalFallbacks > totalTurns * 0.1) {
+  console.error(`Live soak failed: ${totalFallbacks}/${totalTurns} dialogue turns used written fallbacks (above 10%).`);
+  process.exitCode = 1;
+}

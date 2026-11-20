@@ -21,7 +21,7 @@ describe('mind status', () => {
   it('labels only the offline states, and says what to do about each', () => {
     expect(statusLabel('online')).toBe('');
     expect(statusLabel('connecting')).toBe('connecting');
-    for (const s of ['unreachable', 'no_invite', 'offline'] as const) {
+    for (const s of ['resting', 'unreachable', 'no_invite', 'offline'] as const) {
       expect(statusLabel(s)).toBe('offline');
       expect(isQuiet(s)).toBe(true);
       expect(statusDetail(s)).toMatch(/written lines/);
@@ -34,6 +34,7 @@ describe('mind status', () => {
 
 describe('the dialogue panel marker', () => {
   it('shows on Quiet Mode turns and on a server with no model, never on live or server-fallback turns', () => {
+    expect(offlineMarker('quiet', 'mind resting')).toBe(OFFLINE_MARKER);
     expect(offlineMarker('quiet', 'no world')).toBe(OFFLINE_MARKER);
     expect(offlineMarker('quiet', 'offline')).toBe(OFFLINE_MARKER);
     expect(offlineMarker('quiet', 'cooling off after a network failure')).toBe(OFFLINE_MARKER);

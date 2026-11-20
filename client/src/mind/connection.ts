@@ -12,7 +12,7 @@
  *   no_invite    no invite code, or the server refused the one given
  *   offline      the player chose Offline (`?offline`, `--offline`)
  */
-export type MindStatus = 'budget' | 'online' | 'connecting' | 'unreachable' | 'no_invite' | 'offline';
+export type MindStatus = 'resting' | 'budget' | 'online' | 'connecting' | 'unreachable' | 'no_invite' | 'offline';
 
 export interface MindSnapshot {
   offline: boolean;
@@ -31,7 +31,7 @@ export function mindStatus(s: MindSnapshot): MindStatus {
 }
 
 /** Residents are speaking written lines (Quiet Mode) in this state. */
-export const isQuiet = (status: MindStatus): boolean => status === 'budget' || status === 'unreachable' || status === 'no_invite' || status === 'offline';
+export const isQuiet = (status: MindStatus): boolean => status === 'resting' || status === 'budget' || status === 'unreachable' || status === 'no_invite' || status === 'offline';
 
 /** The HUD's word beside the dot: nothing while online (the green dot says it). */
 export function statusLabel(status: MindStatus): string {
@@ -45,6 +45,7 @@ export function statusLabel(status: MindStatus): string {
 /** A sentence for Settings and the dot's hover: what's going on and what to do. */
 export function statusDetail(status: MindStatus): string {
   switch (status) {
+    case 'resting': return "The town's mind is resting, so residents speak written lines. Trying again shortly.";
     case 'budget': return 'Quiet Mode: residents are speaking written lines for today.';
     case 'online': return 'Online: residents are speaking for themselves.';
     case 'connecting': return 'Joining the town…';

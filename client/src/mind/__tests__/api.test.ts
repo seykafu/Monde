@@ -294,3 +294,33 @@ describe('Settings Offline switch', () => {
     expect(c.invite).toBe('SPRING');
   });
 });
+
+it.each([[3, 3000], [null, 60_000], [-1, 60_000], [900, 600_000]])("rests for retry_after_s=%s before trying live dialogue", async (seconds, delay) => {
+  let now = 100;
+  const net = fakeFetch(url => url.endsWith('/worlds') ? json({ world_id: WORLD, token: TOKEN })
+    : now === 100 ? json({ error: 'mind_resting', retry_after_s: seconds }, 503) : sse([event('turn', serverTurn)]));
+  const mind = client({ fetch: net.fetch, now: () => now });
+  const talk = () => mind.talk(request, { fallback: () => quietTurn });
+  expect(await talk()).toEqual({ turn: quietTurn, source: 'quiet', reason: 'mind resting' });
+  now += delay! - 1;
+  expect(mind.status).toBe('resting');
+  await mind.prewarm('pell');
+  expect((await talk())?.reason).toBe('mind resting');
+  expect(net.calls).toHaveLength(2);
+  now++;
+  expect((await talk())?.source).toBe('server');
+  expect(mind.status).toBe('online');
+  expect(net.calls).toHaveLength(3);
+});
+
+it("keeps the rest of the server (events, the dawn paper) while only the model rests", async () => {
+  const now = 100;
+  const net = fakeFetch(url => url.endsWith('/worlds') ? json({ world_id: WORLD, token: TOKEN })
+    : url.endsWith('/talk') ? json({ error: 'mind_resting', retry_after_s: 60 }, 503) : json({}));
+  const mind = client({ fetch: net.fetch, now: () => now });
+  await mind.talk(request, { fallback: () => quietTurn });
+  expect(mind.status).toBe('resting');
+  await mind.postEvents([]);
+  await mind.getDawn(2);
+  expect(net.calls.map(c => c.url.split('/').pop())).toEqual(['worlds', 'talk', 'events', '2']);
+});

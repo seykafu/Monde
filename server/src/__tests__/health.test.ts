@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { FakeMind } from "../mind/__tests__/fakeMind.js";
 import { buildApp } from "../app.js";
 import { parseConfig } from "../config.js";
 
@@ -52,4 +53,12 @@ describe("monde-mind", () => {
     const response = await app().inject({ url: "/v1/health", headers: { origin } });
     expect(response.headers["access-control-allow-origin"]).toBe(allowed ? origin : undefined);
   });
+});
+
+it.each([["unchecked", "primary"], ["error_rate", "backup"]] as const)("reports %s health on the %s key", async (health, key) => {
+  const mind = Object.assign(new FakeMind(), { health: () => health, keyInUse: () => key });
+  const instance = buildApp(parseConfig({ LOG_LEVEL: "silent" }), undefined, { mind });
+  apps.push(instance);
+  const response = await instance.inject({ url: "/v1/health" });
+  expect(response.json().checks).toMatchObject({ mind: health, mind_key: key });
 });

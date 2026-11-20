@@ -1,0 +1,32 @@
+name: Hourly mind health
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    env:
+      # Add production at L-01.
+      HEALTH_URL: https://monde-mind-staging.fly.dev/v1/health
+    steps:
+      - name: Check staging mind
+        run: |
+          for attempt in 1 2 3; do
+            if code=$(curl -sS --max-time 10 -o health.json -w '%{http_code}' "$HEALTH_URL") && [[ "$code" == 200 ]]; then
+              cat health.json
+              if ! jq -e '.ok == true' health.json >/dev/null; then echo "::error::Server unhealthy (database or redis down). See docs/RUNBOOK.md"; exit 1; fi
+              if jq -e '.checks.mind_key == "backup"' health.json >/dev/null; then echo "::error::Running on the backup API key: the primary was rejected. Replace it (docs/RUNBOOK.md)"; exit 1; fi
+              mind="$(jq -r '.checks.mind' health.json)"
+              case "$mind" in
+                ok) exit 0 ;;
+                unchecked) if [[ "$attempt" == 3 ]]; then echo "::warning::Mind still unchecked after three probes"; exit 0; fi ;;
+                *) echo "::error::Residents are on written lines: checks.mind is $mind. See docs/RUNBOOK.md"; exit 1 ;;
+              esac
+            else
+              cat health.json 2>/dev/null || true
+              echo "Health request failed (HTTP $code)"
+              if [[ "$attempt" == 3 ]]; then exit 1; fi
+            fi
+            sleep 20
+          done

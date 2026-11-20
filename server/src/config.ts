@@ -25,6 +25,8 @@ const schema = z.object({
   // Migrations need a session connection; Supabase's pooled DATABASE_URL (port 6543) is transaction mode.
   DATABASE_DIRECT_URL: z.url().optional(),
   REDIS_URL: z.url().optional(),
+  ALERT_WEBHOOK_URL: z.url({ protocol: /^https$/ }).optional(),
+  ANTHROPIC_API_KEY_BACKUP: z.string().min(1).optional(),
   ANTHROPIC_API_KEY: z.string().min(1).optional(),
   // Needed only when the API key is org-level rather than scoped to a workspace (sent as anthropic-workspace-id).
   ANTHROPIC_WORKSPACE_ID: z.string().min(1).optional(),

@@ -16,6 +16,7 @@ import { registerWorldRoutes } from "./worlds/routes.js";
 import { registerSnapshotRoutes } from "./worlds/snapshots.js";
 import type { WorldDatabase } from "./worlds/createWorld.js";
 import { promptVersion } from "./mind/promptBuilder.js";
+import { stateAlerts } from "./mind/alerts.js";
 import { createMindClient, type MindClient } from "./mind/mindClient.js";
 import { registerMindRoutes } from "./mind/routes.js";
 import type { DialogueTimings } from "./mind/dialogue.js";
@@ -61,9 +62,9 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
   const mind = options.mind ?? createMindClient(config, (info) => {
     const level = info.status === 401 || info.status === 403 ? "error" : "warn";
     app.log[level]({ anthropic: info }, level === "error"
-      ? "Anthropic rejected the API key: residents are on written lines until it is replaced"
+      ? "Anthropic rejected the API key"
       : "Anthropic API call failed");
-  });
+  }, stateAlerts(config, app.log));
 
   app.register(cors, {
     origin: [
@@ -97,7 +98,7 @@ export function buildApp(config: Config, testDb?: WorldDatabase, options: AppOpt
       service: "monde-mind",
       env: config.MONDE_ENV,
       version: config.GIT_SHA,
-      checks: { db, redis: redisStatus, mind: mind.enabled ? mind.health?.() ?? "ok" : "off" },
+      checks: { db, redis: redisStatus, mind: mind.enabled ? mind.health?.() ?? "ok" : "off", ...(mind.enabled ? { mind_key: mind.keyInUse?.() ?? "primary" } : {}) },
     };
   });
   // Loading the prompt version at request time proves the prompt templates shipped with the build.

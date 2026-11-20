@@ -6,7 +6,7 @@ import type { DialogueTurnOutput, ResidentState } from "@monde/shared";
 import { buildApp, type AppOptions } from "../../app.js";
 import { parseConfig } from "../../config.js";
 import { createTestDatabase } from "../../db/testDatabase.js";
-import { aiLog, dialogueTurns, favors, memories, residents } from "../../db/schema.js";
+import { conversationSessions, aiLog, dialogueTurns, favors, memories, residents } from "../../db/schema.js";
 import { createWorld } from "../../worlds/createWorld.js";
 import { worldToken } from "../../worlds/routes.js";
 import type { MindClient } from "../mindClient.js";
@@ -685,4 +685,19 @@ describe('G-09 gift reaction turn', () => {
     expect(row!.talkGain).toBe(6);
     expect(userBlocks(mind.streams[1]!).join(' ')).toContain('engine-decided reaction is love');
   });
+});
+
+it("answers resting talk and prewarm before opening a session or recording usage", async () => {
+  const mind = Object.assign(new FakeMind(), { available: () => false, health: () => "no_credit" as const, restRemainingMs: () => 1001 });
+  const env = await setup(mind);
+  const response = await talk(env, payload());
+  expect(response.statusCode).toBe(503);
+  expect(response.headers["retry-after"]).toBe("2");
+  expect(response.json()).toEqual({ error: "mind_resting", reason: "no_credit", retry_after_s: 2 });
+  const warm = await env.app.inject({ method: "POST", url: `/v1/worlds/${env.worldId}/prewarm`, headers: env.headers, payload: { resident_id: "pell" } });
+  expect(warm.statusCode).toBe(200);
+  expect(warm.json()).toEqual({ warmed: false, reason: "resting" });
+  expect(await turnsOf(env.worldId)).toEqual([]);
+  expect(await logs(env.worldId)).toEqual([]);
+  expect(await database.db.select().from(conversationSessions).where(eq(conversationSessions.worldId, env.worldId))).toEqual([]);
 });

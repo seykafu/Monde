@@ -130,6 +130,13 @@ export class MindClient {
   private inviteCode: string | null;
   private session: Session | null = null;
   private pending: Promise<Session | null> | null = null;
+  /**
+   * The server said its model is down (503 mind_resting): until then, conversations, ambient chat and prewarms use
+   * Quiet Mode without asking. The rest of the server (nights, events, the dawn paper, snapshots) still works, so
+   * those calls go on as usual.
+   */
+  private restingUntil = 0;
+  private get resting(): boolean { return this.now() < this.restingUntil; }
   private offlineUntil = 0;
   private chosenOffline = false;
   get offline(): boolean { return !!this.opts.offline || this.chosenOffline; }
@@ -170,7 +177,7 @@ export class MindClient {
 
   /** Bounded, fully validated ambient exchange. Caller owns the authored offline fallback. */
   async chat(body: ChatBody, signal?: AbortSignal): Promise<ChatReply | null> {
-    if (!this.enabled || this.now() < this.offlineUntil || signal?.aborted) return null;
+    if (!this.enabled || this.resting || this.now() < this.offlineUntil || signal?.aborted) return null;
     const controller = new AbortController();
     const abort = () => controller.abort();
     signal?.addEventListener('abort', abort, { once: true });
@@ -203,6 +210,7 @@ export class MindClient {
   get status(): MindStatus {
     if (this.offline) return 'offline';
     if (this.budgetQuiet) return 'budget';
+    if (this.resting) return 'resting';
     return mindStatus({
       offline: !!this.offline, hasSession: this.session !== null, hasInvite: this.inviteCode !== null,
       inviteRejected: this.inviteRejected, coolingOff: this.now() < this.offlineUntil
@@ -231,7 +239,7 @@ export class MindClient {
 
   /** Try the server now instead of waiting out the cooldown (the HUD's gentle retry). Never rejects. */
   async reconnect(): Promise<MindStatus> {
-    if (this.offline) return this.status;
+    if (this.offline || this.resting) return this.status;
     this.offlineUntil = 0;
     if (!this.session) {
       await this.ensureWorld();
@@ -340,6 +348,7 @@ export class MindClient {
 
   /** Warm the resident's prompt cache (§9.10 step 1). Fire and forget: never rejects. */
   async prewarm(residentId: string, day?: number): Promise<void> {
+    if (this.resting) return;
     try {
       const res = await this.authed('/prewarm', { method: 'POST', body: JSON.stringify(day ? { resident_id: residentId, day } : { resident_id: residentId }) }, REQUEST_TIMEOUT_MS);
       if (res && !res.ok) this.log('warn', `prewarm ${residentId}: HTTP ${res.status}`);
@@ -357,7 +366,7 @@ export class MindClient {
    * resident only while the day's Ambient prewarms last (prewarm.ts).
    */
   prewarmNear(residentId: string, day: number, minute: number, tier: PrewarmTier = 'core'): void {
-    if (!this.enabled || this.now() < this.offlineUntil) return;
+    if (!this.enabled || this.resting || this.now() < this.offlineUntil) return;
     if (!this.prewarmGate.allow(residentId, day, minute, tier)) return;
     void this.prewarm(residentId, day);
   }
@@ -431,6 +440,7 @@ export class MindClient {
   async talk(request: TalkRequest, h: TalkHandlers): Promise<TalkResult | null> {
     const quiet = (reason: string): TalkResult => ({ turn: h.fallback(), source: 'quiet', reason });
     if (h.signal?.aborted) return null;
+    if (this.resting && !this.offline) return quiet('mind resting');
     if (!this.online && !(await this.ensureWorld())) return quiet(this.offline ? 'offline' : 'no world');
     if (this.now() < this.offlineUntil) return quiet('cooling off after a network failure');
 
@@ -450,6 +460,17 @@ export class MindClient {
         method: 'POST', body: JSON.stringify(request), signal: controller.signal, headers: { accept: 'text/event-stream' }
       });
       if (!res) return quiet('no world');
+      if (res.status === 503) {
+        const body = await res.clone().json().catch(() => null);
+        if (body?.error === 'mind_resting') {
+          const seconds = body.retry_after_s;
+          // GDD-GAP: cap a server-directed retry at ten minutes and use the usual cooldown for invalid delays.
+          const delay = typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0
+            ? Math.min(seconds, 600) * 1000 : OFFLINE_COOLDOWN_MS;
+          this.restingUntil = this.now() + delay;
+          return quiet('mind resting');
+        }
+      }
       if (!res.ok || !res.body) {
         const detail = await res.text().catch(() => '');
         this.log('warn', `talk: HTTP ${res.status}`, detail);
@@ -470,7 +491,7 @@ export class MindClient {
       if (!turn) return quiet('stream ended without a turn');
       // Back in touch: send an application that couldn't go earlier.
       if (!this.profileSynced) void this.syncPlayer();
-      if (!turn.fallback) this.budgetQuiet = false;
+      if (!turn.fallback) { this.budgetQuiet = false; this.restingUntil = 0; }
       return { turn, source: 'server' };
     } catch (error) {
       if (h.signal?.aborted) return null;

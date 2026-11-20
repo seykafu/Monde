@@ -40,7 +40,7 @@ import {
 } from "./dialogue.js";
 import { aiLogRow, persistTurn } from "./effects.js";
 import { LEAVE_CHOICE, THINKING_BEAT, fallbackTurn, giftLine } from "./fallback.js";
-import { tokensOf, type MindClient } from "./mindClient.js";
+import { MIND_REST_MS, tokensOf, type MindClient } from "./mindClient.js";
 import { PlayerProfile, PlayerProfilePatch, savePlayerProfile, storedProfile } from "./player.js";
 import { costUsd } from "./pricing.js";
 
@@ -150,6 +150,12 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
   app.post<{ Params: { w: string } }>("/v1/worlds/:w/talk", async (request, reply) => {
     const parsed = TalkBody.safeParse(request.body);
     if (!parsed.success) return reply.code(400).send({ error: "invalid talk request", issues: issues(parsed.error) });
+    if (mind.enabled && mind.available?.() === false) {
+      const seconds = Math.max(1, Math.ceil((mind.restRemainingMs?.() ?? MIND_REST_MS) / 1000));
+      return reply.code(503).header("Retry-After", seconds).send({
+        error: "mind_resting", reason: mind.health?.(), retry_after_s: seconds,
+      });
+    }
     const body = parsed.data;
     const worldId = request.params.w;
     return sessions.run(`${worldId}:${body.resident_id}`, async () => {
@@ -368,6 +374,7 @@ export function registerMindRoutes(app: FastifyInstance, db: WorldDatabase | und
     const worldId = request.params.w;
     const residentId = parsed.data.resident_id;
     if (!mind.enabled) return { warmed: false, reason: "disabled" };
+    if (mind.available?.() === false) return { warmed: false, reason: "resting" };
 
     const key = `${worldId}:${residentId}:${routerFor(db).resolve("dialogue").model}`;
     const at = now();

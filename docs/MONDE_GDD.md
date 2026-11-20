@@ -1394,6 +1394,13 @@ stores' current rules before submitting (§21 open questions).
 Quiet Mode starts when there's no connection, when the server's error rate is over 20% for 60 s, when a
 world's AI budget is exhausted (§9.15), or when the player chooses **Offline** in settings.
 
+The server measures the model's error rate itself, over a rolling 60 s (at least five calls), and a rejected API key
+or an empty credit balance counts at once. While the model rests, `/talk` answers `503 mind_resting` with a
+`Retry-After`, and the client plays Quiet Mode until then. Only conversations, ambient chat and prewarms pause: nights,
+events and the Dawn Report go on. One trial call a minute decides when the town comes back. An optional backup key
+takes over if the primary is rejected or runs out of credit. `/v1/health` reports the state, and an hourly check and an
+optional webhook alert say so (docs/RUNBOOK.md).
+
 | System | Online | Quiet Mode |
 |---|---|---|
 | Plans | Generated daily or weekly | Persona routine templates, with a seeded whim from a table per archetype |

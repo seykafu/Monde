@@ -78,8 +78,9 @@ export function registerChatRoutes(app: FastifyInstance, db: WorldDatabase | und
         .some(block => block.place === body.place && block.with.includes(side.card.id === body.a ? body.b : body.a)
           && hhmmToMinutes(block.start) <= body.minute && body.minute < hhmmToMinutes(block.end)));
       const ambient = a.state.tier === 'ambient' && b.state.tier === 'ambient';
-      let answer = { ...fallback, reason: denied ?? (mind.enabled && ambient ? 'ambient' : 'offline') };
-      if (!denied && mind.enabled && !ambient) {
+      const live = mind.enabled && mind.available?.() !== false;
+      let answer = { ...fallback, reason: denied ?? (live && ambient ? 'ambient' : 'offline') };
+      if (!denied && live && !ambient) {
         const input = buildLiveGossipRequest({ a: { card: a.card, view: av, news: an }, b: { card: b.card, view: bv, news: bn },
           flags: a.flags, names: a.names, day: body.day, weekday: weekdayOf(body.day), minute: body.minute, place: body.place, mode: 'live',
           fellow: playerView(world?.player as PlayerProfile | null | undefined) }, body, a, b);
