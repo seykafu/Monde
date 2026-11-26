@@ -11090,7 +11090,10 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
   the map (M) keep track. A **marker** points where the objective line says: a pin
   at the place, at the door to go in by, or over the person to see; in another district, at the edge toward
   the next one ("→ Market Row"); indoors, at the room's way out; off screen, an arrow at the screen's edge. It
-  hides with the line. In the bottom right corner, buttons for the Bag, Tasks, Journal, Ledger and Map show
+  hides with the line. Someone to see (a Favor they want to ask, a dream's talk) is looked for where they are now,
+  not at their home or work: the line names the place and until when (`Fountain Square, until 12:30`), and while
+  they're indoors somewhere the player can't go, where they'll be next (`Indoors at Clocktower until 12:24, then at
+  Achterberg Horlogerie`). The Tasks row says the same. In the bottom right corner, buttons for the Bag, Tasks, Journal, Ledger and Map show
   their keys.
 - **Tasks (T):** the checklist beside the Journal's Quests page, built from the same data. One row per thing to
   do now: the main story's next beat (or a Project opening today), Favors taken on, someone with a Favor to

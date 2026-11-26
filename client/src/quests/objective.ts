@@ -11,6 +11,7 @@
 //              district the player is in;
 //   hud        what the objective line shows: `main`, or `meanwhile` with `next` as its reason.
 import type { StoryHint, UpcomingBeat } from '../story/hint';
+import type { PersonLocation } from './whereabouts';
 
 export type ObjectiveKind = 'story' | 'ceremony' | 'upcoming' | 'favor' | 'project' | 'offer' | 'dream' | 'mark' | 'explore' | 'rest';
 
@@ -24,6 +25,8 @@ export interface Objective {
   title: string;
   /** Where, as a name: "Fountain Square, Old Quarter" ('' when anywhere will do). */
   where: string;
+  /** Show the resident’s live whereabouts under the title. */
+  visitingPerson?: boolean;
   /** "before 11:30", "10:40–11:30", "Tomorrow, 10:00–12:00", "by Day 6" ('' when any time). */
   when: string;
   /** Why, one short line: "Pell is waiting." */
@@ -59,6 +62,8 @@ export interface FavorThread {
   task: string;
   place: string;
   placeName: string;
+  /** Where to meet the resident while this Favor is on offer. */
+  person?: PersonLocation;
   /** The last day it can be done. */
   by: number;
   /** The dream stage it serves, in the stage's words. */
@@ -90,6 +95,8 @@ export interface DreamThread {
   actionable: boolean;
   place: string | null;
   placeName: string | null;
+  /** Where to meet the resident for a talk step. */
+  person?: PersonLocation;
 }
 
 export interface ObjectiveInput {
@@ -141,7 +148,7 @@ function make(input: ObjectiveInput, o: Omit<Objective, 'zone' | 'direction' | '
   const w = o.summoned ? { zone: o.place?.split('.')[0] ?? null, direction: null, route: null } : way(input, o.place);
   const { summoned: _summoned, ...rest } = o;
   const out = { ...rest, ...w, line: '' };
-  out.line = lineOf(out);
+  out.line = out.visitingPerson ? [out.title, out.where, out.direction, out.when].filter(Boolean).join(' · ') : lineOf(out);
   return out;
 }
 
@@ -189,13 +196,13 @@ export function suggestion(input: ObjectiveInput): Objective {
   const offer = [...input.favors].filter(f => f.status === 'proposed' && f.by >= input.day).sort((a, b) => a.by - b.by)[0];
   if (offer) return make(input, {
     id: `favor:${offer.id}`, kind: 'offer', header: 'SOMEONE TO SEE', title: `Talk to ${offer.name}`,
-    where: placeWhere(input, offer.placeName, offer.place), when: `by Day ${offer.by}`, reason: `${offer.name} has a Favor to ask.`,
-    place: offer.place, people: [offer.resident]
+    visitingPerson: !!offer.person, where: offer.person?.where ?? placeWhere(input, offer.placeName, offer.place), when: `by Day ${offer.by}`, reason: `${offer.name} has a Favor to ask.`,
+    place: offer.person?.place ?? offer.place, people: [offer.resident]
   });
   const dream = input.dreams.find(d => d.actionable);
   if (dream) return make(input, {
-    id: `dream:${dream.resident}`, kind: 'dream', header: 'A DREAM', title: trimDot(dream.next),
-    where: placeWhere(input, dream.placeName, dream.place), when: '', reason: `For ${dream.name}: the Journal's Quests page.`, place: dream.place, people: [dream.resident]
+    id: `dream:${dream.resident}`, kind: 'dream', header: 'A DREAM', title: dream.person ? `Talk to ${dream.name}` : trimDot(dream.next),
+    visitingPerson: !!dream.person, where: dream.person?.where ?? placeWhere(input, dream.placeName, dream.place), when: '', reason: `For ${dream.name}: the Journal's Quests page.`, place: dream.person?.place ?? dream.place, people: [dream.resident]
   });
   const mark = input.marks[0];
   if (mark) return make(input, {

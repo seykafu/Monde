@@ -183,6 +183,13 @@ export class ResidentSim {
     return this.executor.stateAt(plan, minute);
   }
 
+  /** The indexed plan, optionally restricted to residents present at this minute. */
+  planFor(id: string, day: number, minute?: number): DayPlan | null {
+    this.plansFor(day);
+    if (minute !== undefined && !this.present(id, day, minute)) return null;
+    return this.planById.get(id) ?? null;
+  }
+
   /** Who is on `zone` at `minute` or will be within `lookahead` minutes (the on-screen roster). */
   boardRoster(zone: string, day: number, minute: number, lookahead: number): Set<string> {
     const ids = new Set<string>();

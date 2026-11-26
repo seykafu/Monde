@@ -19,7 +19,7 @@ import type { ProjectsAttachment } from '../projects/attach';
 import type { StoryAttachment } from '../scenes/story/attach';
 import { FAMILY_UI, FAMILY_BODY, RENDER_SCALE } from '../util/constants';
 import type { Objective, Objectives } from './objective';
-import { nextQuestToast, noteTasks, objectivesNow, tasksNow } from './runtime';
+import { hudThreadsNow, nextQuestToast, noteTasks } from './runtime';
 import { OBJECTIVE_KEY, TASKS_KEY, getQuests, objectiveShown, updateQuests, watchObjectiveShown } from './state';
 
 /** Overlays that hide the objective line and the card (they're for walking about). */
@@ -87,10 +87,10 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
     const k = `${clock?.day}:${clock?.minute}:${opts.story.place()}:${version}`;
     if (k !== key || !current) {
       key = k;
-      current = objectivesNow(registry, { ceremony: opts.projects.hint() });
+      const { objectives, tasks } = hudThreadsNow(registry, { ceremony: opts.projects.hint() });
+      current = objectives;
       registry.set(OBJECTIVE_KEY, current);
       // The Tasks menu's list, from the same objectives; a task given or done since the last list is news (a toast).
-      const tasks = tasksNow(registry, current);
       noteTasks(registry, tasks);
       registry.set(TASKS_KEY, tasks);
     }
@@ -102,13 +102,15 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
   const layout = (o: Objective | null, visible: boolean) => {
     const top = opts.clockBottom + 6 + (registry.get(STRIP_KEY) !== false ? opts.stripHeight + 6 : 0);
     const on = visible && !!o;
-    const k = on ? `${o!.header}|${o!.title}|${o!.direction}|${o!.reason}|${o!.when}|${top}` : '';
+    const k = on ? `${o!.header}|${o!.title}|${o!.where}|${o!.direction}|${o!.reason}|${o!.when}|${top}` : '';
     if (k !== shownKey) {
       shownKey = k;
       if (on) {
         const header = o!.when && !o!.header.includes(o!.when.toUpperCase()) && !o!.header.includes(o!.when) ? `${o!.header} · ${o!.when}` : o!.header;
         head.setText(header.toUpperCase()).setY(top + 9);
-        title.setText(o!.direction ? `${o!.title}  ${o!.direction}` : o!.title).setY(head.y + head.height + 2);
+        const heading = o!.direction ? `${o!.title}  ${o!.direction}` : o!.title;
+        title.setWordWrapWidth(opts.w - 28, !!o!.visitingPerson);
+        title.setText(o!.visitingPerson ? `${heading}\n${o!.where}` : heading).setY(head.y + head.height + 2);
         why.setText(o!.reason).setY(title.y + title.height + 2);
         const h = why.y + why.height + 9 - top;
         bg.clear().fillStyle(0x28372d, 0.86).fillRoundedRect(opts.x, top, opts.w, h, 8)

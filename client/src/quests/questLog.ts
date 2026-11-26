@@ -10,6 +10,7 @@
 import type { DreamProgress, Favor } from '@monde/shared';
 import { currentStageFavor, gateHolds, type DreamRules, type DreamWorld, type Gate } from './dreams';
 import type { FavorThread, Objectives, ProjectThread } from './objective';
+import type { PersonLocation } from './whereabouts';
 
 export interface BeatLine { id: string; title: string }
 
@@ -22,6 +23,8 @@ export interface DreamStep {
   actionable: boolean;
   /** Where to go for it (the Favor's place, else the resident's), if anywhere. */
   place: string | null;
+  /** Where to meet the resident when this step asks for a conversation. */
+  person?: PersonLocation;
 }
 
 export interface DreamView {
@@ -64,6 +67,8 @@ export interface DreamNames {
   placeName(place: string): string;
   /** Where a resident is usually found (their workplace, else home). */
   placeOf(id: string): string | null;
+  /** Live whereabouts for a conversation, when the sim has a plan for this resident. */
+  person?(id: string): PersonLocation | undefined;
   projectName(id: string): string;
 }
 
@@ -97,7 +102,12 @@ export function dreamNextStep(rules: DreamRules, p: DreamProgress, w: DreamWorld
     const where = names.placeName(f.task.place);
     return { words: rule.words, how: `You said you'd help: half an hour at ${where} (E there), by Day ${f.expires_day}.`, actionable: true, place: f.task.place };
   }
-  if (f) return { words: rule.words, how: `${who} has a Favor to ask: talk to them${home ? ` (${names.placeName(home)})` : ''}.`, actionable: true, place: home };
+  if (f) {
+    const person = names.person?.(rules.resident);
+    const location = person?.where ?? (home && names.placeName(home));
+    return { words: rule.words, how: `${who} has a Favor to ask: talk to them${location ? ` (${location})` : ''}.`,
+      actionable: true, place: person?.place ?? home, person };
+  }
   return { words: rule.words, how: `${who} will ask for your help with it soon.`, actionable: false, place: home };
 }
 

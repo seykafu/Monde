@@ -31,7 +31,11 @@ import { TOWN_FLAGS, type TownState } from '../town/pillars';
 import { isFerryDay } from '../town/migration';
 import { placeName } from '../world/player';
 import { allCards, findCard } from '../world/roster';
-import { zones } from '../world/zones';
+import type { ResidentSim } from '../sim/residentSim';
+import { doorLocked } from '../scenes/zone/indoors';
+import { describeWhereabouts, whereabouts, type PersonLocation } from './whereabouts';
+import { roomOf } from '../world/interiors';
+import { doorLinks, interiors, zones } from '../world/zones';
 import { checkDreams, dreamRules, dueDreamFavors, type DreamCheck, type DreamRules, type DreamWorld, type RuleContext } from './dreams';
 import { objectives, type DreamThread, type FavorThread, type Objective, type Objectives, type ProjectThread } from './objective';
 import { beatTitle, dreamNextStep, questLog, type DreamNames, type QuestLog } from './questLog';
@@ -228,15 +232,17 @@ export function attachQuestsClock(r: Registry, clock: Clock): void {
 const HINT_PLACES = { placeName, zoneName: (id: string) => zones[id]?.name ?? id, route: (from: string, to: string) => zoneRoute(zones, from, to) };
 const fullPlaceName = (place: string): string => sitePlaceName(place);
 
-function favorThreads(r: Registry, day: number): FavorThread[] {
+function favorThreads(r: Registry, day: number, names: DreamNames): FavorThread[] {
   return favorBook(r).filter(f => (f.status === 'accepted' || f.status === 'proposed') && f.expires_day >= day).map(f => {
     const task = f.task.kind === 'chore' ? `Help with a chore (${f.task.minutes} min)` : f.task.kind === 'find' ? `Find ${f.task.item ?? 'something lost'}`
       : f.task.kind === 'delivery' ? `Take a parcel to ${nameOf(f.task.recipient)}` : f.task.kind === 'introduce' ? `Introduce ${nameOf(f.task.recipient)}`
       : `Bring ${f.task.item ?? 'it'}`;
     const stage = f.reward.dream ? Number(f.reward.dream.split('#')[1]) : NaN;
     const dream = Number.isInteger(stage) ? rulesFor(f.resident_id)?.stages[stage]?.words ?? null : null;
-    return { id: f.id, resident: f.resident_id, name: nameOf(f.resident_id), status: f.status as 'accepted' | 'proposed', task, place: f.task.place,
-      placeName: fullPlaceName(f.task.place), by: f.expires_day, dream };
+    const person = f.status === 'proposed' ? names.person?.(f.resident_id) : undefined;
+    const place = person?.place ?? f.task.place;
+    return { person, id: f.id, resident: f.resident_id, name: nameOf(f.resident_id), status: f.status as 'accepted' | 'proposed', task, place,
+      placeName: fullPlaceName(place), by: f.expires_day, dream };
   });
 }
 
@@ -262,12 +268,47 @@ const DREAM_NAMES: DreamNames = {
   projectName: id => PROJECTS.find(p => p.id === id)?.name ?? id.replaceAll('_', ' ')
 };
 
-function dreamThreads(r: Registry, world: DreamWorld): DreamThread[] {
+const doorsByPlace = new Map(doorLinks.map(link => [`${link.district}.${link.building}`, link]));
+
+function nowOf(r: Registry): Now {
+  const clock = r.get('monde.clock') as Clock | undefined;
+  return { day: clock?.day ?? 1, minute: clock?.minute ?? 360 };
+}
+
+function namesNow(r: Registry): DreamNames {
+  const now = nowOf(r);
+  const sim = r.get('monde.residents') as ResidentSim | undefined;
+  const people = new Map<string, PersonLocation>();
+  return { ...DREAM_NAMES, person(id) {
+    if (!sim) return undefined;
+    const known = people.get(id);
+    if (known) return known;
+    const fallback = DREAM_NAMES.placeOf(id);
+    if (!fallback) return undefined;
+    const plan = sim.planFor(id, now.day, now.minute);
+    if (!plan) return undefined;
+    const at = whereabouts(sim.executor.timeline(plan).segments, now.minute, (place, index) => {
+      const area = plan.blocks[index]?.area;
+      const info = area ? sim.executor.resolveArea(place, area) : sim.executor.resolve(place);
+      if (info.kind === 'open') return true;
+      const door = doorsByPlace.get(`${info.zone}.${info.local}`);
+      return !!door && !doorLocked(r, door);
+    });
+    const location = describeWhereabouts(at, fallback, fullPlaceName);
+    // Residents upstairs meet visitors in the host room, including flats without a map entry.
+    const info = sim.executor.resolve(location.place);
+    if (at && info.kind === 'interior' && !roomOf(interiors, location.place)) location.place = `${info.zone}.${info.local}`;
+    people.set(id, location);
+    return location;
+  } };
+}
+
+function dreamThreads(r: Registry, world: DreamWorld, names: DreamNames): DreamThread[] {
   const book = favorBook(r);
   return Object.entries(getQuests(r).dreams).flatMap(([resident, p]) => {
     const rules = rulesFor(resident);
-    const step = rules && dreamNextStep(rules, p, world, DREAM_NAMES, book);
-    return step ? [{ resident, name: nameOf(resident), next: step.words, actionable: step.actionable, place: step.place, placeName: step.place ? fullPlaceName(step.place) : null }] : [];
+    const step = rules && dreamNextStep(rules, p, world, names, book);
+    return step ? [{ resident, name: nameOf(resident), person: step.person, next: step.words, actionable: step.actionable, place: step.place, placeName: step.place ? fullPlaceName(step.place) : null }] : [];
   });
 }
 
@@ -277,10 +318,9 @@ export interface ObjectiveOptions {
 }
 
 /** Every objective now (quests/objective.ts), from the story session, the town and the player's threads. */
-export function objectivesNow(r: Registry, opts: ObjectiveOptions = {}): Objectives {
+export function objectivesNow(r: Registry, opts: ObjectiveOptions = {}, names = namesNow(r)): Objectives {
   const session = storySession(r);
-  const clock = r.get('monde.clock') as Clock | undefined;
-  const now = { day: clock?.day ?? 1, minute: clock?.minute ?? 360 };
+  const now = nowOf(r);
   const context = session?.world ? session.context() : null;
   const done = new Set(session?.director.serialize().completed ?? []);
   const hint = session && context ? storyHint(session.scenes, context, session.flags, HINT_PLACES, done, session.active) ?? opts.ceremony ?? null : opts.ceremony ?? null;
@@ -291,7 +331,7 @@ export function objectivesNow(r: Registry, opts: ObjectiveOptions = {}): Objecti
   return objectives({
     day: now.day, minute: now.minute, zone: context?.zone ?? 'old_quarter', hint, upcoming,
     cast: id => session?.header(id)?.cast ?? [],
-    favors: favorThreads(r, now.day), projects: projectThreads(r, now), dreams: dreamThreads(r, world),
+    favors: favorThreads(r, now.day, names), projects: projectThreads(r, now), dreams: dreamThreads(r, world, names),
     marks: SPRING_RIDDLES.filter(m => entries[m.id]?.status === 'found').map(m => ({ id: m.id, title: m.title })),
     springOver: done.has('s10c_straw_poll') || (session?.flags.has('s10c_done') ?? false),
     places: HINT_PLACES
@@ -326,16 +366,15 @@ function beatLines(scenes: readonly CompiledScene[], completed: readonly string[
  * The Journal's Quests page now (a Project opening today kept from the HUD's last objectives: the Journal has no zone).
  * The HUD passes the objectives it has just worked out.
  */
-export function questLogNow(r: Registry, objectivesHere?: Objectives): QuestLog {
+export function questLogNow(r: Registry, objectivesHere?: Objectives, names = namesNow(r)): QuestLog {
   const session = storySession(r);
-  const clock = r.get('monde.clock') as Clock | undefined;
-  const day = clock?.day ?? 1, minute = clock?.minute ?? 360;
+  const { day, minute } = nowOf(r);
   const world = dreamWorld(r, day);
-  const fresh = objectivesHere ?? objectivesNow(r), shown = r.get(OBJECTIVE_KEY) as Objectives | undefined;
+  const fresh = objectivesHere ?? objectivesNow(r, {}, names), shown = r.get(OBJECTIVE_KEY) as Objectives | undefined;
   return questLog({
-    objectives: !fresh.main && shown?.main?.kind === 'ceremony' ? shown : fresh,
+    objectives: !objectivesHere && !fresh.main && shown?.main?.kind === 'ceremony' ? shown : fresh,
     beats: session ? beatLines(session.scenes, session.director.serialize().completed) : [],
-    projects: projectThreads(r, { day, minute }), favors: favorThreads(r, day), dreams: getQuests(r).dreams, rules: rulesFor, world, names: DREAM_NAMES,
+    projects: projectThreads(r, { day, minute }), favors: favorThreads(r, day, names), dreams: getQuests(r).dreams, rules: rulesFor, world, names,
     favorBook: favorBook(r)
   });
 }
@@ -345,13 +384,20 @@ export function questLogNow(r: Registry, objectivesHere?: Objectives): QuestLog 
 const TASK_NAMES = { zoneName: (id: string) => zones[id]?.name ?? id, placeName: fullPlaceName };
 
 /** The Tasks menu now (quests/tasks.ts), from the same Quest Log as the Journal's Quests page. */
-export function tasksNow(r: Registry, objectivesHere?: Objectives): Task[] {
+export function tasksNow(r: Registry, objectivesHere?: Objectives, names = namesNow(r)): Task[] {
   const entries = marks(r).entries;
   return tasksFrom({
-    log: questLogNow(r, objectivesHere),
+    log: questLogNow(r, objectivesHere, names),
     marks: SPRING_RIDDLES.filter(m => entries[m.id]?.status === 'found').map(m => ({ id: m.id, title: m.title })),
     names: TASK_NAMES
   });
+}
+
+/** One set of person lookups for both lists published by the HUD on this refresh. */
+export function hudThreadsNow(r: Registry, opts: ObjectiveOptions): { objectives: Objectives; tasks: Task[] } {
+  const names = namesNow(r);
+  const objectives = objectivesNow(r, opts, names);
+  return { objectives, tasks: tasksNow(r, objectives, names) };
 }
 
 /** What became of a task gone from the list: a Favor completed, a Project opened, a Mark answered. */

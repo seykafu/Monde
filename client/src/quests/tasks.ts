@@ -91,7 +91,7 @@ export function tasksFrom({ log, marks, names }: TaskInput): Task[] {
   });
   for (const f of log.offers) out.push({
     id: `offer:${f.id}`, kind: 'offer', title: `${f.name} has a Favor to ask`, next: `Talk to ${f.name} (E beside them).`, detail: '',
-    ...located(names, f.place), when: `by Day ${f.by}`, actionable: true, people: [f.resident]
+    ...located(names, f.person?.place ?? f.place), ...(f.person && { where: f.person.where }), when: `by Day ${f.by}`, actionable: true, people: [f.resident]
   });
   for (const p of log.projects) out.push({
     id: `project:${p.id}`, kind: 'project', title: `Town Project: ${capital(p.name)}`, next: p.next, detail: `Led by ${p.lead}.`,
@@ -102,7 +102,7 @@ export function tasksFrom({ log, marks, names }: TaskInput): Task[] {
     const at = located(names, d.next!.place);
     out.push({
       id: `dream:${d.resident}`, kind: 'dream', title: `${d.name}’s dream · ${d.stage} of ${d.total}`, next: d.next!.how, detail: `Next: ${trimDot(d.next!.words)}.`,
-      ...at, where: at.place ? at.where : 'No place yet', when: '', actionable: d.next!.actionable, people: [d.resident]
+      ...at, where: d.next!.person?.where ?? (at.place ? at.where : 'No place yet'), when: '', actionable: d.next!.actionable, people: [d.resident]
     });
   }
   for (const m of marks) out.push({
