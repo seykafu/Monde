@@ -1,3 +1,6 @@
+import { appealNow, appealSincePaper, appealValue } from '../town/appealFeedback';
+import { createTownState, PILLARS } from '../town/pillars';
+import { getTown } from './TownLedgerScene';
 import { textSize } from '../accessibility/runtime';
 import { openSurvey } from './SurveyScene';
 import { Portrait } from "../dialogue/portrait";
@@ -90,7 +93,25 @@ export class DawnReportScene extends Phaser.Scene {
     g.strokeRect(1150,28,35,48).lineBetween(1150,28,1167,15).lineBetween(1167,15,1185,28);
     for (let x=1155;x<1185;x+=6) g.lineBetween(x,35,x,70);
     const town = paper.ledger;
-    if (town) text(58,490,`TOWN LEDGER  ${Object.entries(town.pillars).map(([k,v]) => `${k} ${v.toFixed(1)} ${v > town.dayStart[k as keyof typeof town.pillars] ? '↑' : v < town.dayStart[k as keyof typeof town.pillars] ? '↓' : '→'}`).join(' · ')}\nCensus ${town.census} · Appeal ${town.appeal.toFixed(1)} · Fund ${town.fund} coins`,16);
+    if (town) {
+      const live = getTown(this.registry);
+      const morning = live?.day === paper.day ? live : undefined;
+      // A normal Spring starts without a printed Day 1 edition. Keep its opening
+      // numbers available when the player reopens Day 2 from the Journal.
+      const opening = paper.day === 2 && !morning ? createTownState() : undefined;
+      const prior = getFriendship(this.registry).papers.find(p => p.day === paper.day - 1)?.ledger
+        ?? (opening && { pillars: opening.pillars, appeal: appealNow(opening) });
+      const previous = prior?.pillars ?? morning?.history.find(s => s.day === paper.day - 1)?.pillars;
+      const change = (delta: number) => {
+        const amount = appealValue(Math.abs(delta));
+        return amount === '0.0' ? '→' : `${delta > 0 ? '↑' : '↓'}${amount}`;
+      };
+      const pillars = PILLARS.map(p => `${p} ${town.pillars[p].toFixed(1)}${previous ? ' ' + change(town.pillars[p] - previous[p]) : ''}`);
+      const delta = morning ? appealSincePaper(morning, prior?.appeal, town.appeal)
+        : prior ? town.appeal - prior.appeal : null;
+      const appeal = appealValue(town.appeal) + (delta === null ? '' : ` (${change(delta)})`);
+      text(58,490,`TOWN LEDGER  ${pillars.join(' · ')}\nCensus ${town.census} · Appeal ${appeal} · Fund ${town.fund} coins`,16);
+    }
     // Letters to the Lantern, one by one so each letter a resident wrote can be reported.
     const letters = (x: number, width: number) => {
       text(x,553,'LETTERS TO THE LANTERN',15,width);

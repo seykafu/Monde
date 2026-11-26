@@ -32,7 +32,7 @@ describe('the first-steps card', () => {
     expect(firstStepsLines(o)).toEqual([
       'The cottage is yours, and so is the rest of the day.',
       'Next: tomorrow, 10:00–12:00, Monde Free Library, Old Quarter. Margo is opening the Marks log.',
-      'Your Tasks (T) keep track of where to go, and the map (M) can take you there. Until then, say hello to the neighbours (E).'
+      "Every fix raises the town's Appeal (under the clock): at 35, new people start stepping off the ferry. Your Tasks (T) and the map (M) show where to go."
     ]);
     expect(o.hud).toMatchObject({ header: 'MEANWHILE', title: 'Talk to residents around the Old Quarter', reason: 'Next: tomorrow, 10:00–12:00, Monde Free Library, Old Quarter.' });
   });

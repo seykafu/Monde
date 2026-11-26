@@ -21,6 +21,7 @@ import { marks } from './riddles';
 import Phaser from 'phaser';
 import { FAMILY_BODY, FAMILY_PRESS, FAMILY_UI, GAME_HEIGHT, GAME_WIDTH, RENDER_SCALE } from '../util/constants';
 import { formatClock, formatDate, gameTime, weekdayOf, type Clock } from '../sim/clock';
+import { appealNow, appealAtDawn, appealValue } from '../town/appealFeedback';
 import { computeAppeal } from '../town/appeal';
 import { MARKET_DAY_STALL_FEES, UPKEEP_RULES, dailyRates } from '../town/fund';
 import { ARRIVAL_APPEAL, householdsForAppeal, isArrivalDay, isFerryDay } from '../town/migration';
@@ -146,12 +147,13 @@ const HUD_DOWN = '#ffb08a';
 /** §18: the small Pillar strip under the clock. Each Pillar's icon, its value and today's arrow. */
 export class PillarStrip {
   readonly objects: Phaser.GameObjects.GameObject[];
+  readonly height = 2 * textSize(32);
   private readonly values: Phaser.GameObjects.Text[] = [];
   private readonly arrows: Phaser.GameObjects.Text[] = [];
   private readonly hit: Phaser.GameObjects.Zone;
 
   constructor(private readonly scene: Phaser.Scene, x: number, y: number, w: number) {
-    const h = 32, cell = w / PILLARS.length;
+    const h = this.height, cell = w / PILLARS.length;
     const bg = scene.add.graphics();
     bg.fillStyle(0x28372d, 0.92).fillRoundedRect(x, y, w, h, 8);
     bg.lineStyle(2, 0xe4c77f, 0.55).strokeRoundedRect(x, y, w, h, 8);
@@ -159,11 +161,13 @@ export class PillarStrip {
     const style = (size: number, color: string): Phaser.Types.GameObjects.Text.TextStyle =>
       ({ fontFamily: FAMILY_UI, fontSize: `${textSize(Math.max(14, size))}px`, color, resolution: RENDER_SCALE });
     PILLARS.forEach((p, i) => {
-      const cx = x + cell * i + 16;
-      drawPillarIcon(icons, p, cx, y + h / 2, 7.5, PILLAR_COLOR[p], 0x28372d);
-      this.values.push(scene.add.text(cx + 12, y + h / 2, '', style(15, HUD_CREAM)).setOrigin(0, 0.5));
-      this.arrows.push(scene.add.text(cx + 34, y + h / 2, '', style(10, HUD_CREAM)).setOrigin(0, 0.5));
+      const cx = x + cell * i + 10;
+      drawPillarIcon(icons, p, cx, y + h / 4, 7.5, PILLAR_COLOR[p], 0x28372d);
+      this.values.push(scene.add.text(cx + 10, y + h / 4, '', style(15, HUD_CREAM)).setOrigin(0, 0.5));
+      this.arrows.push(scene.add.text(cx + 34, y + h / 4, '', style(10, HUD_CREAM)).setOrigin(0, 0.5));
     });
+    this.values.push(scene.add.text(x + 10, y + 3 * h / 4, '', style(15, HUD_CREAM)).setOrigin(0, 0.5));
+    this.arrows.push(scene.add.text(x, y + 3 * h / 4, '', style(14, HUD_CREAM)).setOrigin(0, 0.5));
     // The whole strip is a button for the Ledger too.
     this.hit = scene.add.zone(x, y, w, h).setOrigin(0).setInteractive({ useHandCursor: true });
     this.objects = [bg, icons, ...this.values, ...this.arrows, this.hit];
@@ -193,9 +197,15 @@ export class PillarStrip {
     const town = getTown(this.scene.registry);
     if (!town) return;
     const change = todayChange(town);
-    PILLARS.forEach((p, i) => {
-      this.values[i]!.setText(String(Math.round(town.pillars[p])));
-      const a = arrow(change[p]);
+    const appeal = appealNow(town);
+    const target = appeal < ARRIVAL_APPEAL ? `/${ARRIVAL_APPEAL}` : '';
+    const cells = [
+      ...PILLARS.map(p => ({ value: String(Math.round(town.pillars[p])), delta: change[p] })),
+      { value: `Appeal ${appealValue(appeal)}${target}`, delta: appeal - appealAtDawn(town) }
+    ];
+    cells.forEach(({ value, delta }, i) => {
+      this.values[i]!.setText(value);
+      const a = arrow(delta);
       this.arrows[i]!.setText(a.dir === 0 ? '' : a.dir > 0 ? '▲' : '▼').setColor(a.dir > 0 ? HUD_UP : HUD_DOWN)
         .setX(this.values[i]!.x + this.values[i]!.width + 3);
     });

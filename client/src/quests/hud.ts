@@ -12,6 +12,7 @@
 //   opening the Journal, the Tasks or the map.
 // - The Tasks menu's list (quests/tasks.ts) is worked out with the objectives and published for the map's pins.
 // - Toasts: a dream learned or moved on, and a task given or done (quests/runtime.ts), show in the zone's toast.
+import { ARRIVAL_APPEAL } from '../town/migration';
 import type Phaser from 'phaser';
 import { textSize, watchAccessibility } from '../accessibility/runtime';
 import type { ProjectsAttachment } from '../projects/attach';
@@ -43,6 +44,8 @@ export interface QuestHudOptions {
   x: number;
   w: number;
   clockBottom: number;
+  stripHeight: number;
+  toastReady(): boolean;
 }
 
 /** The first-steps card's lines (2–3 lines, in the game's voice), from the objectives once the cottage is the player's. */
@@ -51,7 +54,7 @@ export function firstStepsLines(o: Objectives): string[] {
   return [
     'The cottage is yours, and so is the rest of the day.',
     next ? `Next: ${next.when.replace(/^Tomorrow/, 'tomorrow')}, ${next.where}. ${next.reason}` : `For now: ${o.meanwhile.title}.`,
-    'Your Tasks (T) keep track of where to go, and the map (M) can take you there. Until then, say hello to the neighbours (E).'
+    `Every fix raises the town's Appeal (under the clock): at ${ARRIVAL_APPEAL}, new people start stepping off the ferry. Your Tasks (T) and the map (M) show where to go.`
   ];
 }
 
@@ -97,7 +100,7 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
   // ── The line ──
   let shownKey = '';
   const layout = (o: Objective | null, visible: boolean) => {
-    const top = opts.clockBottom + 6 + (registry.get(STRIP_KEY) !== false ? 38 : 0);
+    const top = opts.clockBottom + 6 + (registry.get(STRIP_KEY) !== false ? opts.stripHeight + 6 : 0);
     const on = visible && !!o;
     const k = on ? `${o!.header}|${o!.title}|${o!.direction}|${o!.reason}|${o!.when}|${top}` : '';
     if (k !== shownKey) {
@@ -143,7 +146,6 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
   };
 
   // Toasts wait for the zone to be uncovered (a dawn's dream news would otherwise fade under the paper).
-  let toastAt = -Infinity;
   let at = 0;
   const update = (time: number) => {
     if (time - at < REFRESH_MS) return;
@@ -151,7 +153,7 @@ export function attachQuestHud(scene: Phaser.Scene, opts: QuestHudOptions): void
     const covered = OBJECTIVE_HIDDEN_UNDER.some(k => scene.scene.isActive(k));
     if (covered && cardUp && ['People', 'Tasks', 'TownMap'].some(k => scene.scene.isActive(k))) dismiss();
     if (covered || opts.busy()) { layout(null, false); for (const o of card) o.setVisible(false); return; }
-    if (time - toastAt > TOAST_GAP_MS) { const t = nextQuestToast(); if (t) { toastAt = time; opts.toast(t); } }
+    if (opts.toastReady()) { const t = nextQuestToast(); if (t) opts.toast(t); }
     const o = objectivesFor();
     // Standing there with the window open: the scene is about to start, nothing to point at.
     const hint = opts.story.hint();

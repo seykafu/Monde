@@ -57,7 +57,9 @@ import { darkness, sunPosition, twilightGlow } from '../sim/sunAngle';
 import { ResidentLayer } from './zone/residents';
 import { stepAt } from './zone/footsteps';
 import { attachDialogue } from './DialogueScene';
-import { PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
+import { appealNow, appealToastText } from '../town/appealFeedback';
+import type { TownState, PillarSource } from '../town/pillars';
+import { TOWN_KEY, PillarStrip, attachTown, getTown, openTownLedger } from './TownLedgerScene';
 import { MindStatusDot } from '../ui/mindStatus';
 import { getMusic, musicHeld } from '../audio/Music';
 import { ambientMusic } from '../audio/musicDirector';
@@ -70,7 +72,7 @@ import { attachArrivals } from './zone/arrivals';
 import { attachFinale } from '../finale/attach';
 import { closingToast } from '../story/hint';
 import { hudPlate } from './zone/hudPlate';
-import { attachQuestHud, OBJECTIVE_HIDDEN_UNDER } from '../quests/hud';
+import { attachQuestHud, OBJECTIVE_HIDDEN_UNDER, TOAST_GAP_MS } from '../quests/hud';
 import { attachQuestMarker } from '../quests/marker';
 import { attachQuestsClock, queueQuestToast } from '../quests/runtime';
 import { storySession } from '../puzzles/runtime';
@@ -108,6 +110,7 @@ const SIGN_DEFAULT_FELLOW = query.get('skiptitle') === '1' || query.get('demo') 
 const PREFETCH_AFTER_MS = 1500;
 /** Scene windows already warned about (story/hint.ts closingToast), per game: `sceneId@day`. */
 const WARNED_KEY = 'monde.story.warned';
+const PLAYER_PILLAR_SOURCES = new Set<PillarSource>(['community_work', 'project', 'riddle', 'story', 'scuffle', 'tollmen']);
 /** Overlays that hold back the closing toast (it's for walking about). */
 const HINT_HIDDEN_UNDER = [STORY_SCENE, DIALOGUE_SCENE, FELLOWSHIP_SCENE, 'TownLedger', 'People', 'SaveMenu'];
 /** A line for the zone's toast once a map journey arrives (ZoneScene.travel). */
@@ -313,6 +316,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
   private askAction: { label: string; run(): void } | null = null;
   private projectCache = { at: 0, key: '', project: null as { label: string; run(): void } | null, ask: null as { label: string; run(): void } | null };
   private toast!: Phaser.GameObjects.Text;
+  private lastToastAt = -Infinity;
   private hintAt = 0;
   /** v2 zones: the town drawn from its sprites (render/town), and its small life. */
   private town?: TownBoard;
@@ -515,7 +519,12 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       position: () => this.position, weather: () => this.now, toast: text => this.showToast(text),
       refreshBoard: () => this.town?.refresh(this.townLook()), busy: () => this.transitioning });
     // The objective line under the clock, the first-steps card and the dreams' toasts (quests/hud.ts).
-    attachQuestHud(this, { story: this.story, projects: this.projects, toast: text => this.showToast(text), busy: () => this.transitioning, x: GAME_WIDTH - 20 - textSize(264), w: textSize(264), clockBottom: 16 + textSize(102) });
+    this.watchAppeal();
+    attachQuestHud(this, {
+      story: this.story, projects: this.projects, toast: text => this.showToast(text), busy: () => this.transitioning,
+      toastReady: () => !this.clock.paused && this.input.enabled && performance.now() - this.lastToastAt >= TOAST_GAP_MS,
+      stripHeight: this.pillarStrip.height, x: GAME_WIDTH - 20 - textSize(264), w: textSize(264), clockBottom: 16 + textSize(102)
+    });
     // Where the objective line points: a pin on this board, or an arrow at the screen's edge (quests/marker.ts).
     attachQuestMarker(this, { zone: this.zone, projection: this.projection, position: () => this.position, personAt: id => this.residents.positionOf(id),
       story: this.story, busy: () => this.transitioning, zoom });
@@ -891,7 +900,37 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     if (toast) this.showToast(toast);
   }
 
+  private watchAppeal(): void {
+    let batch: { before: number; after: number } | undefined;
+    let timer: Phaser.Time.TimerEvent | undefined;
+    const flush = () => {
+      if (batch && Math.abs(batch.after - batch.before) >= 0.1 - 1e-10) {
+        queueQuestToast(appealToastText(batch.before, batch.after));
+      }
+      timer?.remove();
+      timer = undefined;
+      batch = undefined;
+    };
+    const changed = (_registry: unknown, next: TownState, prev: TownState) => {
+      if (!next || !prev || next.day !== prev.day) { flush(); return; }
+      if (next.log === prev.log && next.pillars === prev.pillars && next.flags === prev.flags && next.openJobs === prev.openJobs) return;
+      const before = appealNow(prev), after = appealNow(next);
+      if (before === after) return;
+      const appended = next.log.slice(prev.log.length);
+      if (!appended.length || !appended.every(c => PLAYER_PILLAR_SOURCES.has(c.source))) { flush(); return; }
+      batch = { before: batch?.before ?? before, after };
+      timer?.remove();
+      timer = this.time.delayedCall(1000, flush);
+    };
+    this.registry.events.on(`changedata-${TOWN_KEY}`, changed);
+    this.events.once('shutdown', () => {
+      this.registry.events.off(`changedata-${TOWN_KEY}`, changed);
+      flush();
+    });
+  }
+
   private showToast(text: string): void {
+    this.lastToastAt = performance.now();
     this.tweens.killTweensOf(this.toast);
     this.toast.setText(text).setAlpha(0);
     this.tweens.add({ targets: this.toast, alpha: 1, duration: 300, yoyo: true, hold: 4200, ease: 'Sine.easeInOut' });

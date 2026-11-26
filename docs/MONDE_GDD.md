@@ -503,7 +503,9 @@ Journal. The contents:
   previous day (§9.12), with fallback templates in Appendix B.5.
 - **Comings and goings:** arrivals with portraits and one line each ("Ilse Maertens, 34, cartographer,
   has taken No. 4 Terrace Row. She says the light here is 'unreasonable.'"); departures with a kind line.
-- **Town Ledger strip:** the four Pillars with arrows, census, Appeal, Town Fund.
+- **Town Ledger strip:** the four Pillars, each with its change since the previous paper (`charm 25.5 ↑0.5`; a bare
+  `→` when it didn't move), census, Appeal with its change (`Appeal 23.9 (↑0.4)`), Town Fund. Day 1 has no previous
+  paper, so no arrows.
 - **Notices:** today's events, Project calls for volunteers, the market, the ferry, Lantern letters
   (residents' generated letters to the editor).
 - **Campaign season (D70+):** the weekly poll (§10.3).
@@ -11073,12 +11075,16 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
 
 ## 18. UI and UX
 
-- **HUD:** the clock with the day, weekday and weather; Stamina; coins; a small Pillar strip; the
-  Option Clause gauge when relevant (§6.5). It hides automatically when standing still. Under the clock, the
+- **HUD:** the clock with the day, weekday and weather; Stamina; coins; a small Pillar strip (the four Pillars with
+  today's arrows, and on a second row Appeal with its arrow and, until it gets there, the 35 arrivals need:
+  `Appeal 23.8/35`); the Option Clause gauge when relevant (§6.5). When something the player did (work, a Project, a
+  Mark, a scene, a Scuffle, the Tollmen) moves Appeal, a toast after the action's own says so: `Appeal 23.5 → 23.8 ·
+  at 35, new people start stepping off the ferry`. It hides automatically when standing still. Under the clock, the
   **objective line**: the scene to catch today (where, when, why, and "→ Market Row" when it's on another
   board), or between beats something to do meanwhile with the next beat's day; hidden during scenes and menus,
-  and switched off from the Journal's Quests page. After S01c a one-time first-steps card says where to go next
-  and that the Tasks (T) and the map (M) keep track. A **marker** points where the objective line says: a pin
+  and switched off from the Journal's Quests page. After S01c a one-time first-steps card says where to go next,
+  that every fix raises Appeal and that at 35 new people start stepping off the ferry, and that the Tasks (T) and
+  the map (M) keep track. A **marker** points where the objective line says: a pin
   at the place, at the door to go in by, or over the person to see; in another district, at the edge toward
   the next one ("→ Market Row"); indoors, at the room's way out; off screen, an arrow at the screen's edge. It
   hides with the line. In the bottom right corner, buttons for the Bag, Tasks, Journal, Ledger and Map show
