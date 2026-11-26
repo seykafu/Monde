@@ -13,7 +13,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "prepare": "git config core.hooksPath .githooks || true",
+    "prepare": "git config --get core.hooksPath | grep -qx .githooks && git config --unset core.hooksPath || true",
     "dashboard": "node tools/dashboard/server.mjs",
     "dev": "npm run dev -w @monde/client",
     "dev:server": "npm run dev -w @monde/server",

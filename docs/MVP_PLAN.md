@@ -132,7 +132,7 @@ tools/   verify_puzzles.py, card linter, script compiler
 |---|---|---|
 | Creative director | **Kasey** | Approves scope, the style bible, card spot-checks and copy; plays every gate build; decides open questions |
 | Orchestrator and reviewer | **Claude Opus 5.5** | Turns these tasks into written Codex specs, checks and reviews every change (typecheck, tests, capture screenshots), sends findings back, commits; designs the AI layer's prompts, validators and evals (Astra implements them) |
-| All code | **GPT-6.2 Astra via Codex** (the `/build` skill: `tools/codex/task.sh`) | Every engine, client, server, shared and tooling change below, one worktree per task. Each task has named files and acceptance criteria. |
+| All code | **GPT-6.2 Astra via Codex** (the `/astra-build:build` skill of Kasey's `astra-build` plugin) | Every engine, client, server, shared and tooling change below, one worktree per task. Each task has named files and acceptance criteria. |
 | Art | **GPT-6 image generation** through the Codex CLI | Everything in §7 Phase A, through the Ravage-style `scripts/art/` pipeline |
 | Writing | **Claude Sonnet 5.5** | Extracting cards and scenes into `content/`, Quiet Mode tuning, Dawn Report templates, store and survey copy |
 | Runtime | **Claude Haiku 5.5** | Residents, the press, arrival personas |

@@ -1,0 +1,27 @@
+{
+  "model": "gpt-6.2-astra",
+  "minCodexCli": "0.169.0",
+  "code": [
+    "{client,server,shared,tools,scripts,desktop}/**/*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,py,sh,css,html}",
+    "*.{ts,mts,cts,js,mjs,cjs}"
+  ],
+  "notCode": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/dist-itch/**",
+    ".claude/**"
+  ],
+  "checks": [
+    "npm run typecheck",
+    "npm test",
+    "npm run lint"
+  ],
+  "worktree": {
+    "base": "origin/main",
+    "setup": [
+      "git lfs checkout client/public",
+      "npm ci --prefer-offline --no-audit --no-fund --loglevel=error"
+    ]
+  },
+  "land": "push"
+}
