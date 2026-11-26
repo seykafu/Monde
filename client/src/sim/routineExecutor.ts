@@ -82,19 +82,86 @@ const gatherKey = (b: Pick<DayPlanBlock, 'place' | 'startMin' | 'endMin'>): stri
 /** At most this many residents stand round one social spot; a bigger gathering spreads over the place's spots. */
 const GROUP = 3;
 
+type Stand = NonNullable<DayPlanBlock['stand']>;
+type Visit = { plan: DayPlan; block: DayPlanBlock; preferred: number };
+type ActiveStand = { end: number; stand: Stand };
+
+function standIndex(info: PlaceInfo, cells: Point[], active: ActiveStand[], group: Visit[], block: DayPlanBlock, preferred: number): number {
+  const occupied = new Set(active.map(v => v.stand.index));
+  if (preferred >= 0 && !occupied.has(preferred)) return preferred;
+  let index = -1;
+  // Leave the legacy anchor free for any overlapping resident who can still claim it.
+  const reserved = new Set(group.filter(v => v.block.startMin < block.endMin && block.startMin < v.block.endMin).map(v => v.preferred));
+  let best = -Infinity;
+  info.spots.forEach(([x, y], i) => {
+    if (occupied.has(i)) return;
+    const distance = Math.min(...active.map(v => {
+      const [ax, ay] = cells[v.stand.index]!;
+      return (ax - x) ** 2 + (ay - y) ** 2;
+    }));
+    const score = reserved.has(i) ? -1 : distance;
+    if (score > best) { best = score; index = i; }
+  });
+  if (index < 0) index = cells.findIndex((_, i) => !occupied.has(i));
+  if (index < 0) {
+    // All cells are occupied. Balance subsequent arrivals across the outermost ring.
+    const first = info.outerStart ?? 0;
+    let least = Infinity;
+    for (let i = first; i < cells.length; i++) {
+      const count = active.filter(v => v.stand.index === i).length;
+      if (count < least) { index = i; least = count; }
+    }
+  }
+  return index;
+}
+
+function assignStands(plans: readonly DayPlan[], executor: RoutineExecutor) {
+  const stands = new Map<DayPlan, Map<DayPlanBlock, Stand>>();
+  const visits = new Map<PlaceInfo, Visit[]>();
+  for (const plan of plans) for (const block of plan.blocks) {
+    if (block.area || GATHER_VERBS.has(block.action) || block.endMin <= block.startMin) continue;
+    const info = executor.resolve(block.place);
+    if (info.kind !== 'open') continue;
+    const group = visits.get(info) ?? [];
+    group.push({ plan, block, preferred: info.spots.length ? hashString(`${plan.resident}@${info.id}`) % info.spots.length : -1 });
+    visits.set(info, group);
+  }
+  for (const [info, group] of visits) {
+    const cells = [...info.spots, ...(info.overflow ?? [])];
+    if (!cells.length) continue;
+    group.sort((a, b) => a.block.startMin - b.block.startMin);
+    let active: ActiveStand[] = [];
+    for (const { plan, block, preferred } of group) {
+      active = active.filter(v => v.end > block.startMin);
+      const index = standIndex(info, cells, active, group, block, preferred);
+      const stand = { index, overflow: 0 };
+      active.push({ end: block.endMin, stand });
+      const overflow = Math.max(0, ...active.map(v => v.stand.index + 1 - info.spots.length));
+      for (const v of active) v.stand.overflow = Math.max(v.stand.overflow, overflow);
+      const byBlock = stands.get(plan) ?? new Map<DayPlanBlock, Stand>();
+      byBlock.set(block, stand);
+      stands.set(plan, byBlock);
+    }
+  }
+  return stands;
+}
+
 /**
  * Seats for the day's gatherings: the socialize / eat blocks at the same place and in the same band are one gathering;
  * it splits into groups of two or three (one spot each, round the place's spots) and each member gets a cell of their
  * own at their group's spot. Plans with no such block are returned as they were (the executor caches timelines by plan).
  */
-export function withSeats(plans: readonly DayPlan[]): DayPlan[] {
+export function withSeats(plans: readonly DayPlan[], executor?: RoutineExecutor): DayPlan[] {
   const isGathering = (b: DayPlanBlock) => GATHER_VERBS.has(b.action) && !b.area;
   const size = new Map<string, number>();
   for (const p of plans) for (const b of p.blocks) if (isGathering(b)) size.set(gatherKey(b), (size.get(gatherKey(b)) ?? 0) + 1);
   const taken = new Map<string, number>();
+  const stands = executor ? assignStands(plans, executor) : undefined;
   return plans.map(plan => {
-    if (!plan.blocks.some(isGathering)) return plan;
+    if (!stands?.has(plan) && !plan.blocks.some(isGathering)) return plan;
     return { ...plan, blocks: plan.blocks.map(b => {
+      const stand = stands?.get(plan)?.get(b);
+      if (stand) return { ...b, stand };
       if (!isGathering(b)) return b;
       const key = gatherKey(b), n = taken.get(key) ?? 0, groups = Math.ceil(size.get(key)! / GROUP);
       taken.set(key, n + 1);
@@ -149,6 +216,8 @@ export interface PlaceInfo {
   door: Point | null;
   /** Open ground only: the cells a resident may stand on, row-major. */
   spots: readonly Point[];
+  overflow?: readonly Point[];
+  outerStart?: number;
   /** Off-board and lane only: the unbuilt zone (a lane home's own key), and the board cell where its road leaves. */
   offZone?: string;
   road?: Loc;
@@ -264,7 +333,7 @@ export class RoutineExecutor {
       const walled = zone.tiles.some(t => t.building === local);
       return walled
         ? { id, kind: 'building', zone: zoneId, local, door: place.door, spots: [] }
-        : { id, kind: 'open', zone: zoneId, local, door: place.door, spots: spotsIn(zone, place.rect, place.door) };
+        : { id, kind: 'open', zone: zoneId, local, door: place.door, ...standingCells(zone, place) };
     }
     const home = this.homeOf(zone, id, local);
     if (home) return home;
@@ -357,6 +426,11 @@ export class RoutineExecutor {
       const cell = seat ? seat.index * Math.ceil(seat.groups / n) + Math.floor(seat.group / n) : hashString(`${plan.resident}@${spot.id}`);
       const tile = spot.stand[(cell + (seat ? hashString(spot.id) : 0)) % spot.stand.length]!;
       return { info: { ...info, spots: spot.stand }, zone: info.zone, tile, visible: true, key: `${info.zone}:${tile[0]},${tile[1]}` };
+    }
+    if (block?.stand && info.kind === 'open' && !area) {
+      const spots = block.stand.overflow ? [...info.spots, ...(info.overflow?.slice(0, block.stand.overflow) ?? [])] : info.spots;
+      const tile = spots[block.stand.index]!;
+      return { info: { ...info, spots }, zone: info.zone, tile, visible: true, key: `${info.zone}:${tile[0]},${tile[1]}` };
     }
     const tile = info.kind === 'open' && info.spots.length > 0
       ? info.spots[hashString(`${plan.resident}@${placeId}`) % info.spots.length]!
@@ -529,6 +603,41 @@ function spotsIn(zone: ZoneDef, [x0, y0, w, h]: readonly [number, number, number
     out.push([x, y]);
   }
   return out;
+}
+
+// GDD-GAP: allow three tiles of spillover so residents remain recognizably at the place.
+const OVERFLOW_RADIUS = 3;
+
+function standingCells(zone: ZoneDef, place: ZoneDef['places'][number]) {
+  const spots = spotsIn(zone, place.rect, place.door);
+  const doors = new Set(zone.places.map(p => p.door.join(',')));
+  for (const building of zone.town?.buildings ?? []) if (building.door) doors.add(building.door.join(','));
+
+  const overflow: Point[] = [];
+  const seen = new Set(spots.map(p => p.join(',')));
+  let frontier = spots;
+  let outerStart = 0;
+  for (let step = 1; step <= OVERFLOW_RADIUS && frontier.length; step++) {
+    const ringStart = overflow.length;
+    const next: Point[] = [];
+    for (const [x, y] of frontier) {
+      const neighbours: Point[] = [[x, y - 1], [x - 1, y], [x + 1, y], [x, y + 1]];
+      for (const cell of neighbours) {
+        const [cx, cy] = cell;
+        const key = cell.join(',');
+        if (seen.has(key) || !isWalkable(zone.walkability, cx, cy)) continue;
+        seen.add(key);
+        next.push(cell);
+        // A walk may cross a doorstep or another place, but residents stand on unclaimed ground.
+        if (cx <= 0 || cy <= 0 || cx >= zone.width - 1 || cy >= zone.height - 1 || doors.has(key)) continue;
+        if (zone.places.some(({ rect: [px, py, w, h] }) => cx >= px && cx < px + w && cy >= py && cy < py + h)) continue;
+        overflow.push(cell);
+      }
+    }
+    if (overflow.length > ringStart) outerStart = spots.length + ringStart;
+    frontier = next;
+  }
+  return { spots, overflow, outerStart };
 }
 
 function firstBorderCell(zone: ZoneDef): Point | null {

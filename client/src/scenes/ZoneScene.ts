@@ -48,6 +48,7 @@ import { districtOf, type Point, type ZoneDef } from '../world/zoneFormat';
 import { doorAt, placeArrival, walkingIn } from '../world/interiors';
 import { InteriorRoom } from '../render/town/InteriorRoom';
 import { ROOM_VOID } from '../render/town/roomArt';
+import { chooseInteraction } from './zone/interactionOrder';
 import { doorLocked, indoorLight } from './zone/indoors';
 import { playSfx } from '../audio/Sfx';
 import { movePlayer, resolveEdge, nearbyPlace, placeName, standable, type Position } from '../world/player';
@@ -312,6 +313,8 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
   private story!: StoryAttachment;
   /** G-03: the Projects at their sites (E), the asks beside residents (H), volunteers at work, openings. */
   private projects!: ProjectsAttachment;
+  /** Q beside a resident: talk to them, whatever E does. */
+  private talkAction?: () => void;
   /** H beside a resident: ask about the Projects. */
   private askAction: { label: string; run(): void } | null = null;
   private projectCache = { at: 0, key: '', project: null as { label: string; run(): void } | null, ask: null as { label: string; run(): void } | null };
@@ -481,18 +484,22 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     const titlePlate = this.add.graphics();
     const title = this.add.text(32, 18, this.zone.name, { fontFamily: FAMILY_BODY, fontSize: '28px', color: '#fff0ce' });
     hudPlate(titlePlate, 20, 14, title.width + 24, title.height + 8);
-    // Day 1 only: walking and E (the corner buttons carry every other key).
+    // Day 1 only: walking, E and Q (the corner buttons carry every other key).
     const controlsPlate = this.add.graphics();
-    const controls = this.add.text(32, 60, 'WASD or arrows to walk  ·  E to talk or use', { fontFamily: FAMILY_BODY, fontSize: '17px', color: '#fff0ce' });
+    const controls = this.add.text(32, 60, 'WASD or arrows to walk  ·  E to talk or use  ·  Q to talk', { fontFamily: FAMILY_BODY, fontSize: `${textSize(17)}px`, color: '#fff0ce' });
     hudPlate(controlsPlate, 20, 56, controls.width + 24, controls.height + 8);
     const showControls = (on: boolean) => { controls.setVisible(on); controlsPlate.setVisible(on); };
     showControls(this.clock.day === 1);
     this.events.once('shutdown', this.clock.onDawn(() => showControls(false)));
     const devHelp = this.add.text(24, 92, DEV_KEYS ? 'Dev  ·  [ / ]: hour back / forward  ·  \\: cycle weather  ·  N: resident paths' : '', { fontFamily: FAMILY_BODY, fontSize: '14px', color: '#d9cfb4', backgroundColor: '#28372d' })
       .setVisible(DEV_KEYS);
-    this.events.once('shutdown', watchAccessibility(() => this.toast?.setFontSize(textSize(17))));
+    this.events.once('shutdown', watchAccessibility(() => {
+      this.toast?.setFontSize(textSize(17));
+      controls.setFontSize(textSize(17));
+      hudPlate(controlsPlate, 20, 56, controls.width + 24, controls.height + 8);
+    }));
     this.promptPlate = this.add.graphics();
-    this.prompt = this.add.text(38, 0, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(24)}px`, color: '#fff0ce' }).setOrigin(0, 0.5);
+    this.prompt = this.add.text(38, 0, '', { fontFamily: FAMILY_BODY, fontSize: `${textSize(24)}px`, wordWrap: { width: GAME_WIDTH - 90 }, color: '#fff0ce' }).setOrigin(0, 0.5);
     this.promptKey = this.add.text(20, 0, 'E', { fontFamily: FAMILY_UI, fontSize: `${textSize(14)}px`, fontStyle: '600', color: '#28372d' }).setOrigin(0.5);
     this.promptGroup = this.add.container(0, GAME_HEIGHT - 50, [this.promptPlate, this.prompt, this.promptKey]).setVisible(false);
     const hidePrompt = () => { this.promptGroup.setVisible(false); ui.setVisible(false); };
@@ -541,6 +548,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       refreshBoard: () => this.town?.refresh(this.townLook()), toast: text => this.showToast(text) });
     // G-11: the Bloom Fair on the Commons, the Straw Poll's card, the End-of-Spring report.
     attachFinale(this, { zone: this.zone, clock: this.clock, residents: this.residents, projection: this.projection, busy: () => this.transitioning });
+    this.talkAction = undefined;
     this.askAction = null;
     this.projectCache = { at: 0, key: '', project: null, ask: null };
     this.keys = this.input.keyboard!.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E') as Record<string, Phaser.Input.Keyboard.Key>;
@@ -610,6 +618,7 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       else if (event.code === 'KeyT' || event.key === 't' || event.key === 'T') openTasks(this, this.clock);
       else if (event.code === 'KeyM' || event.key === 'm' || event.key === 'M') openTownMap(this, this.clock);
       else if (event.code === 'KeyP' || event.key === 'p' || event.key === 'P') this.pillarStrip.toggle();
+      else if ((event.code === 'KeyQ' || event.key === 'q' || event.key === 'Q') && !this.clock.paused) this.talkAction?.();
       else if ((event.code === 'KeyH' || event.key === 'h' || event.key === 'H') && !this.clock.paused) this.askAction?.run();
     };
     this.input.keyboard?.on('keydown', onKey);
@@ -1129,15 +1138,14 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     if (this.avatar.anim.footfalls) stepAt(this.zone, this.position, this.avatar.anim.foot);
     this.syncFigure(); this.followPlayer(dt, moved);
     this.story.update(this.position);
-    // Residents take precedence over doors.
     const talk = this.residents.talkTarget(this.position);
-    const mark = talk ? undefined : markInteraction(this, this.clock, this.zone, this.position, { weather: this.now.kind, wind: this.daily.wind });
+    const mark = markInteraction(this, this.clock, this.zone, this.position, { weather: this.now.kind, wind: this.daily.wind });
     // A door with a room behind it (W-03): E (or walking up into it) goes in; the place's own business is inside. A locked
     // one is a doorstep as before (scenes/zone/indoors.ts), saying why when you try it.
-    const link = talk || mark ? undefined : doorAt(doorLinks, this.zone, this.position);
+    const link = mark ? undefined : doorAt(doorLinks, this.zone, this.position);
     const locked = link ? doorLocked(this.registry, link) : null;
     const door = locked ? undefined : link;
-    const place = talk || mark || door ? undefined : nearbyPlace(this.zone, this.position);
+    const place = mark || door ? undefined : nearbyPlace(this.zone, this.position);
     const here = districtOf(this.zone);
     const town = getTown(this.registry);
     const closed = !!place && !!town && optionClosesPlace(town, `${here}.${place.id}`);
@@ -1154,8 +1162,18 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
     this.askAction = talk ? this.projectCache.ask : null;
     const puzzle = place && !closed ? puzzleInteraction(this, this.clock, `${here}.${place.id}`, project) : null;
     const scuffle = !talk && !mark ? scuffleInteraction(this, this.clock, this.zone, this.position) : null;
-    const goIn = door ? (): void => this.goInside(door) : undefined;
-    const action = scuffle ? scuffle.label : talk ? `Talk to ${talk.name}${this.askAction ? '  ·  H: Ask about the Projects' : ''}` : mark ? 'Read the plaque' : door ? `Go into ${placeName(door.building)}` : place ? (closed ? 'Closed: Port Vane survey site' : puzzle?.label ?? project?.label ?? placeName(place.id)) : '';
+    const conversation = talk ? { label: `Talk to ${talk.name}`, run: () => this.residents.requestTalk(talk.id) } : null;
+    this.talkAction = conversation?.run;
+    const notice = closed ? 'Closed: Port Vane survey site' : locked;
+    const choice = chooseInteraction({
+      scuffle, mark: mark && { label: 'Read the plaque', run: mark },
+      door: door && { label: `Go into ${placeName(door.building)}`, run: () => this.goInside(door) },
+      placeAction: puzzle ?? project ?? economy, talk: conversation, ask: !!this.askAction,
+      message: notice ? { label: notice, run: () => this.showToast(closed ? notice + '.' : notice) }
+        : place && { label: placeName(place.id), run: () => console.log(`${here}.${place.id}`) }
+    });
+    this.interact = choice.run;
+    const action = choice.label;
     if (action !== this.prompt.text) {
       this.prompt.setText(action);
       const width = this.prompt.width + 50, height = this.prompt.height + 12;
@@ -1164,11 +1182,10 @@ export class ZoneScene extends Phaser.Scene implements TravelHost {
       this.promptGroup.setX((GAME_WIDTH - width) / 2);
     }
     this.promptGroup.setVisible(!!action && !this.clock.paused && !OBJECTIVE_HIDDEN_UNDER.some(key => this.scene.isActive(key)));
-    this.interact = scuffle?.run ?? (talk ? () => this.residents.requestTalk(talk.id) : mark ?? goIn ?? (place ? (closed ? () => this.showToast('Closed: Port Vane survey site.') : puzzle?.run ?? project?.run) ?? (locked ? () => this.showToast(locked) : () => console.log(`${here}.${place.id}`)) : undefined));
     // A street encounter on the doorstep (the Old Quarter's bins sit at the cottage door every third day) is offered on E,
     // never forced: walking up into the door still goes in.
-    const entering = !talk ? walkingIn(doorLinks, this.zone, this.position, input) : undefined;
-    if (entering && !result.edge) { this.goInside(entering); return; }
+    const entering = walkingIn(doorLinks, this.zone, this.position, input);
+    if (entering && !result.edge && (!talk || !doorLocked(this.registry, entering))) { this.goInside(entering); return; }
     if (result.edge) {
       const edge = result.edge;
       // Out of a room through its doorway: the door shuts behind you.

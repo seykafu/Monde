@@ -157,7 +157,7 @@ export class ResidentSim {
         this.plans = [...syntheticPlans(authored, authored.length + this.extra, true), ...base.filter(p => !authoredIds.has(p.resident))];
       } else this.plans = [...base];
       // Gatherings: everyone at a social spot on a cell of their own (routineExecutor.ts).
-      this.plans = withSeats(this.plans);
+      this.plans = withSeats(this.plans, this.executor);
       this.planById = new Map(this.plans.map(p => [p.resident, p]));
       this.lastKey = '';
     }

@@ -855,7 +855,10 @@ model picks an expression per line. If it picks one the card doesn't have, the e
 ### 9.5 Place registry
 
 Residents may only plan actions at registered places. Place ids are `zone.place`. The engine owns the
-coordinates, opening hours and capacity. Agents only ever see the ids and short descriptions. Generated
+coordinates, opening hours and capacity. Outdoors, residents standing at the same place at the same time each get
+a cell of their own, the earliest arrivals first; when the place runs out of cells, the rest stand on the open ground
+round it, up to three steps out on foot, nearest first (only past that do two share a cell). Agents only ever see the
+ids and short descriptions. Generated
 places (new shops, restored houses) are added to the registry when a Project completes.
 
 | Zone | Place ids |
@@ -11119,7 +11122,8 @@ The Journal is a cloth-bound notebook. Mark plaques are engraved brass. Pillar i
   instant), colorblind-safe Pillar colors and emotes, reduced motion (no camera bob or bloom
   pulsing), captioned blips ("[Odile, gruff]"), **Choices only** (no free text), **Offline / Quiet
   Mode**, hold-to-confirm off, and remappable controls.
-- **Controls:** WASD or arrows to move, E to interact, Tab for the Journal, Esc for the menu, mouse
+- **Controls:** WASD or arrows to move, E to interact (a Mark, a door, or a place's job, Favor, Project or puzzle
+  comes before a resident standing there; the prompt then offers Q), Q to talk to the resident beside you, Tab for the Journal, Esc for the menu, mouse
   click-to-move (optional), and full controller support at Beta.
 
 ---

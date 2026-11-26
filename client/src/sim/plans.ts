@@ -32,6 +32,8 @@ export interface DayPlanBlock {
    * the executor stands them on its open cells, outdoors, instead of at the place's door or anywhere in it.
    */
   area?: readonly [number, number, number, number];
+  /** Assigned cell and the number of overflow cells used during this stay. */
+  stand?: { index: number; overflow: number };
   /**
    * Where in a gathering this resident stands (routineExecutor.ts `withSeats`): residents meeting at the same place and
    * time split into groups of two or three, a social spot each, and take different cells round it. Client-only, like
