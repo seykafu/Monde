@@ -131,15 +131,16 @@ tools/   verify_puzzles.py, card linter, script compiler
 | Role | Who | Does |
 |---|---|---|
 | Creative director | **Kasey** | Approves scope, the style bible, card spot-checks and copy; plays every gate build; decides open questions |
-| Orchestrator and reviewer | **Claude Opus 5.5** | Turns these tasks into focused Codex tasks, reviews every change (typecheck, tests, capture screenshots), owns the AI layer's prompts, validators and evals |
-| Heavy implementation | **GPT-6.2 Astra via Codex** (`/codex:rescue`) | Most engine, client and server tasks below. Each task has named files and acceptance criteria. |
-| Integration-heavy implementation | **Claude Opus 5.5** subagents | The prompt builder, reflection/plan jobs, the voter model, cross-cutting fixes |
+| Orchestrator and reviewer | **Claude Opus 5.5** | Turns these tasks into written Codex specs, checks and reviews every change (typecheck, tests, capture screenshots), sends findings back, commits; designs the AI layer's prompts, validators and evals (Astra implements them) |
+| All code | **GPT-6.2 Astra via Codex** (the `/build` skill: `tools/codex/task.sh`) | Every engine, client, server, shared and tooling change below, one worktree per task. Each task has named files and acceptance criteria. |
 | Art | **GPT-6 image generation** through the Codex CLI | Everything in §7 Phase A, through the Ravage-style `scripts/art/` pipeline |
 | Writing | **Claude Sonnet 5.5** | Extracting cards and scenes into `content/`, Quiet Mode tuning, Dawn Report templates, store and survey copy |
 | Runtime | **Claude Haiku 5.5** | Residents, the press, arrival personas |
 
-**Loop per task:** Opus writes the Codex task → Codex implements → Opus reviews (diff, `tsc`, `vitest`,
-capture screenshots for anything visual) → fixes → commit and push to `main` (trunk-based, auto-push).
+**Loop per task:** Opus writes the Codex spec → Astra implements in its own worktree → Opus checks and reviews
+(diff, `tsc`, `vitest`, capture screenshots for anything visual) → findings go back to the same Codex thread →
+commit with a `Codex-Job:` trailer and push to `main` (trunk-based, auto-push). Opus doesn't edit code itself; a
+hook enforces it (2026-11-25).
 **CI on every push** (GitHub Actions): typecheck, lint, vitest, `verify_puzzles.py`, the script
 compiler, the card linter, and a production build. A red CI blocks the next task in that area.
 

@@ -58,4 +58,11 @@ npm run ci             # everything CI runs
 ## Working agreement for coding agents
 - Make the change, run `npm run typecheck` and `npm test`, and report what you changed and what you verified.
 - **Do not commit or push.** The orchestrator reviews and commits.
-- Stay inside the files and directories the task names.
+- Stay inside the files and directories the task names. If the change seems to need another file, stop and
+  say so in your report instead of editing it.
+- Codex tasks run in their own git worktree (`<repo>-codex/<slug>`, branch `codex/<slug>`) from a written spec.
+  Your sandbox can't bind ports or use tsx IPC: when a check fails for that reason, say so plainly rather than
+  working around it. Review findings come back in the same thread; fix exactly what they list.
+- Things review keeps catching (avoid them): edits outside the named files; numbers not in the GDD without a
+  `// GDD-GAP:` comment; extra work on a model call's hot path (global locks, unindexed full-table scans);
+  fail-closed defaults that block the player; tests that assert the implementation instead of the behaviour.

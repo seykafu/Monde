@@ -1,0 +1,28 @@
+#!/bin/sh
+# Monde: a commit that changes code names the Codex (GPT-6.2 Astra) thread that wrote it, as a trailer:
+#   Codex-Job: <threadId>          (tools/codex/task.sh prints this line)
+# Code that Codex didn't write says why instead, so the exception shows in history:
+#   Codex-Job: none (<reason>)
+# Merge commits pass. "Code" is defined once, in .claude/hooks/code-goes-to-codex.mjs (isCode).
+# Installed by `npm install` (the root package.json `prepare` sets core.hooksPath to .githooks).
+
+msg="$1"
+git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1 && exit 0
+
+root="$(git rev-parse --show-toplevel)"
+classifier="$root/.claude/hooks/code-goes-to-codex.mjs"
+if [ ! -f "$classifier" ] || ! command -v node >/dev/null 2>&1; then
+  echo "commit-msg: can't check for Codex-Job (no node or no $classifier); letting the commit through" >&2
+  exit 0
+fi
+
+code="$(git diff --cached --name-only | node "$classifier" --list-code)" || exit 0
+[ -z "$code" ] && exit 0
+
+grep -qE '^Codex-Job:[[:space:]]*[^[:space:]]' "$msg" && exit 0
+
+echo "commit-msg: this commit changes code:" >&2
+echo "$code" | head -12 | sed 's/^/  /' >&2
+echo "Add a trailer naming the Codex thread that wrote it:   Codex-Job: <threadId>" >&2
+echo "or, for code Codex didn't write, say why:              Codex-Job: none (<reason>)" >&2
+exit 1

@@ -11214,9 +11214,8 @@ browser build.
 | Role | Who | Responsibilities |
 |---|---|---|
 | Creative director | **Kasey** | Final say on story, tone, art, scope; style-bible approval; playtests |
-| Orchestrator, architect, reviewer | **Claude Opus 5.5** | Plans and breaks down work, owns this GDD and the architecture, reviews every diff, writes the AI layer's prompts and validators, runs evals |
-| Heavy implementation | **GPT-6 Astra via Codex** (`/codex:rescue`) | Engine systems, scenes, porting Ravage modules, server endpoints, tests. Each task is focused, with named files and acceptance criteria. The output is always inspected (typecheck, tests, capture) before it's accepted. |
-| Heavy implementation, tightly integrated | **Claude Opus 5.5** (subagents) | Sim/AI integration, cross-cutting refactors, the hardest bugs |
+| Orchestrator, architect, reviewer | **Claude Opus 5.5** | Plans and breaks down work into written specs, owns this GDD and the architecture, checks and reviews every diff and commits it, designs the AI layer's prompts and validators, runs evals. Doesn't write code (2026-11-25). |
+| All code | **GPT-6.2 Astra via Codex** (the `/build` skill) | Engine systems, sim/AI integration, porting Ravage modules, server endpoints, tooling, tests, refactors and the hardest bugs. Each task is focused, in its own worktree, with named files and acceptance criteria. The output is always inspected (typecheck, tests, capture) before it's accepted, and review findings go back to the same Codex thread. |
 | Art generation | **GPT-6 image generation** via the Codex CLI | Portraits, backdrops, sprites, tiles, UI, through `scripts/art/` |
 | Writing and docs | **Claude Sonnet 5.5** | Persona cards, scripts, line libraries, Lantern templates, store copy, docs |
 | Runtime minds | **Claude Haiku 5.5** on Fly.io | Dialogue, plans, reflections, gossip, press, arrivals |

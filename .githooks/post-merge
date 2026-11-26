@@ -1,0 +1,4 @@
+#!/bin/sh
+# Git LFS (core.hooksPath is .githooks, so git no longer runs .git/hooks; pre-push uploads the LFS art).
+command -v git-lfs >/dev/null 2>&1 || { echo >&2 "\nThis repository uses Git LFS but git-lfs was not found on your path (brew install git-lfs).\n"; exit 2; }
+git lfs post-merge "$@"
