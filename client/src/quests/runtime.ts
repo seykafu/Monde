@@ -30,6 +30,7 @@ import { ALL_SCENES } from '../story/session';
 import { TOWN_FLAGS, type TownState } from '../town/pillars';
 import { isFerryDay } from '../town/migration';
 import { placeName } from '../world/player';
+import { leavingNoticeTitle } from '../town/people';
 import { allCards, findCard } from '../world/roster';
 import type { ResidentSim } from '../sim/residentSim';
 import { doorLocked } from '../scenes/zone/indoors';
@@ -241,7 +242,10 @@ function favorThreads(r: Registry, day: number, names: DreamNames): FavorThread[
     const dream = Number.isInteger(stage) ? rulesFor(f.resident_id)?.stages[stage]?.words ?? null : null;
     const person = f.status === 'proposed' ? names.person?.(f.resident_id) : undefined;
     const place = person?.place ?? f.task.place;
-    return { person, id: f.id, resident: f.resident_id, name: nameOf(f.resident_id), status: f.status as 'accepted' | 'proposed', task, place,
+    const name = nameOf(f.resident_id);
+    const leaving = f.notice && { title: leavingNoticeTitle(findCard(f.resident_id)?.name ?? name, f.notice.deadline),
+      reason: leavingNoticeTitle(name, f.notice.deadline) + '.' };
+    return { person, leaving, id: f.id, resident: f.resident_id, name, status: f.status as 'accepted' | 'proposed', task, place,
       placeName: fullPlaceName(place), by: f.expires_day, dream };
   });
 }

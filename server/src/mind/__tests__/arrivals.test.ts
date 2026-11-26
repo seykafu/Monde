@@ -5,17 +5,19 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type Anthropic from "@anthropic-ai/sdk";
 import { and, eq } from "drizzle-orm";
 import {
-  ARRIVAL_SYSTEM_PROMPT, HOME_TOKEN, PersonaCard, WHIMS, portraitById, tagsOfEntry, templateHousehold, type ArrivalHouseholdOutput, type HouseholdDraw,
+  EVENT_IMPORTANCE, departureEventId, ARRIVAL_SYSTEM_PROMPT, HOME_TOKEN, PersonaCard, WHIMS, portraitById, tagsOfEntry, templateHousehold, type ArrivalHouseholdOutput, type HouseholdDraw,
   type MemberDraw,
 } from "@monde/shared";
 import { createTestDatabase } from "../../db/testDatabase.js";
-import { aiLog, arrivals, events, memories, relationships, residents } from "../../db/schema.js";
+import { aiLog, arrivals, events, favors, memories, plans, relationships, residents } from "../../db/schema.js";
 import { createWorld } from "../../worlds/createWorld.js";
 import { FULL, fullRosterContent } from "../../__tests__/fullRoster.js";
 import {
   ARRIVAL_ATTEMPTS, ARRIVAL_BUFFER_SIZE, adoptHouseholds, arrivalsFor, commitArrivals, departResidents, generatedIds,
   noticeMemories, refillBuffer, writeHousehold, type ArrivalDeps, type ArrivalRequest,
 } from "../arrivals.js";
+import { templatePlan } from "../templatePlan.js";
+import { ingestClientEvents } from "../eventIngestion.js";
 import { buildDawnPackage } from "../dawn.js";
 import { DisabledMindClient, type MindClient } from "../mindClient.js";
 import { SILENT_LOG } from "../nightJob.js";
@@ -168,6 +170,35 @@ describe("the ferry day (A.3.1 step 7)", () => {
 });
 
 describe("Quiet Mode households, departures and notices (§6.4)", () => {
+  it("accepts census notices, protects authored ids and prints each sailing once in either delivery order", async () => {
+    const world = await createWorld(database.db, "census-ferry", "invite", undefined, FULL);
+    const db = database.db;
+    const stamp = { day: 11, minute: 570, kind: "town_event", place: "wharf.ferry_slip" };
+    const notice = { ...stamp, day: 9, minute: 360, id: "notice_malachy", type: "leaving_notice", importance: EVENT_IMPORTANCE.leaving_notice,
+      participants: ["malachy_wakefield", "olwen_wakefield"], summary: "Malachy Wakefield is weighing Friday's ferry." };
+    expect((await ingestClientEvents(db, world.id, [notice], { nightDay: 9 })).accepted).toEqual([notice.id]);
+    const [stored] = await db.select().from(events).where(and(eq(events.worldId, world.id), eq(events.id, notice.id)));
+    expect(stored).toMatchObject({ day: 9, minute: 360, summary: notice.summary });
+    for (const [id, first] of [["malachy_wakefield", true], ["cass_lyall", false]] as const) {
+      const event = { ...stamp, id: departureEventId(id, 11), type: "departure", importance: EVENT_IMPORTANCE.departure,
+        participants: [id], summary: "A neighbour left on the Gannet." };
+      const [row] = await db.select().from(residents).where(and(eq(residents.worldId, world.id), eq(residents.id, id)));
+      await db.insert(plans).values({ worldId: world.id, residentId: id, day: 8, plan: templatePlan(row!.card, 8), source: "template" });
+      await db.insert(favors).values({ worldId: world.id, id, residentId: id, template: "help_chore", target: id,
+        text: "Help with a chore.", status: "accepted", createdDay: 6, expiresDay: 10, reward: {} });
+      if (first) expect((await ingestClientEvents(db, world.id, [event])).accepted).toEqual([event.id]);
+      expect(await departResidents(db, world.id, [id, "ada", "pell"], 11)).toBe(first ? 0 : 1);
+      expect((await ingestClientEvents(db, world.id, [event])).duplicates).toEqual([event.id]);
+      expect(await db.select().from(residents).where(and(eq(residents.worldId, world.id), eq(residents.id, id)))).toHaveLength(0);
+      expect(await db.select().from(plans).where(and(eq(plans.worldId, world.id), eq(plans.residentId, id)))).toHaveLength(0);
+      expect(await db.select().from(relationships).where(and(eq(relationships.worldId, world.id), eq(relationships.toId, id)))).toHaveLength(0);
+      expect(await db.select().from(relationships).where(and(eq(relationships.worldId, world.id), eq(relationships.fromId, id)))).toHaveLength(0);
+      const [favor] = await db.select().from(favors).where(and(eq(favors.worldId, world.id), eq(favors.id, id)));
+      expect(favor?.status).toBe("expired");
+    }
+    expect(await db.select().from(events).where(and(eq(events.worldId, world.id), eq(events.type, "departure")))).toMatchObject([{ day: 11, minute: 570 }, { day: 11, minute: 570 }]);
+  }, 30_000);
+
   it("adopts the client's offline households once, lets leavers go, and writes the notice into memories", async () => {
     const world = await createWorld(database.db, "arrivals-adopt", "invite");
     const offline = await commitArrivals(deps(new DisabledMindClient()), world.id, request({ day: 4 }));

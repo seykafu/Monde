@@ -2,6 +2,8 @@
 // morning boat and its doors, the Stay pass and Leaving Notices, the walk to the slip, departures, the Last Chance,
 // the server's households replacing the local templates, and the save round trip.
 import { describe, expect, it } from 'vitest';
+import { springVoters } from '../../finale/poll';
+import { day1Cards } from '../../world/residents';
 import { SavedTown, livingArrivals } from '@monde/shared';
 import { loadCards, loadWorld, loadZones } from '../../sim/__tests__/content';
 import { landingDayPlan, leavingDayPlan, FERRY_SLIP } from '../../sim/arrivalPlans';
@@ -22,7 +24,7 @@ const dir = directoryFromCards(cards);
 const HOMES = townHomeKeys(loadZones(), dir);
 const world = (over: Partial<MigrationWorld> = {}): MigrationWorld => ({
   seed: 11, homes: HOMES, dir, beds: homeBeds, homeName, storyFlags: new Set(), cast: new Map(cards.map(c => [c.id, { name: c.name }])),
-  friends: () => 0, regard: () => 0, ...over
+  friends: id => day1Cards.some(c => c.id === id) ? 4 : 0, regard: () => 0, ...over
 });
 const roll = (day: number, households: number, youthShare = 0.5): { decision: ArrivalDecision } =>
   ({ decision: { day, eligible: true, appeal: 41, wanted: households, households, youthShare, outcome: 'arrivals' } });
@@ -97,6 +99,7 @@ describe('Stay, Leaving Notices and departures (§6.4)', () => {
   /** A lone newcomer with nothing to do, in a town at its lowest: Stay well under 25. */
   function lonely(): { state: TownState; id: string } {
     let state = landOne(sundayTown(8), 8, 'widowed_elder');
+    state = resolveNotice({ ...state, migration: { ...state.migration, notices: { fenna_renard: 6 } } }, 'fenna_renard', 8);
     state = { ...state, pillars: { prosperity: 10, safety: 10, spirit: 10, charm: 10 } };
     const resident = livingArrivals(state.people).find(r => r.card.age >= 18)!;
     return { state, id: resident.card.id };
@@ -116,7 +119,7 @@ describe('Stay, Leaving Notices and departures (§6.4)', () => {
     expect(departureDay(13, state.flags)).toBe(15); // Day 15 is a Tuesday sailing
   });
 
-  it('walks them to the slip on their ferry, takes them at 10:00, and lets them go at the next dawn', () => {
+  it('walks them to the slip on their ferry, takes them at 09:30, and lets them go at the next dawn', () => {
     const start = lonely();
     const id = start.id;
     let state = start.state;
@@ -170,7 +173,7 @@ describe('Stay, Leaving Notices and departures (§6.4)', () => {
     let state = sundayTown(8);
     state = { ...state, pillars: { prosperity: 0, safety: 0, spirit: 0, charm: 0 } };
     for (let day = 9; day <= 20; day++) state = migrationDawn(state, day, world(), { decision: null }).state;
-    expect(Object.keys(state.migration.notices)).toEqual([]);
+    expect(cards.some(c => c.id in state.migration.notices || c.id in state.migration.lowStayNights)).toBe(false);
   });
 });
 
@@ -189,7 +192,7 @@ describe('a newcomer\'s first and last day in the simulation', () => {
     expect(landed.zone).toBe('wharf');
     const home = sim.sample(resident.card.id, 8, 10 * 60 + 30)!;
     expect(home.place).toBe(resident.card.home);
-    // A leaving day: at the slip from 09:30, off the board at 10:00.
+    // A leaving day: the slip is the final stop and they leave the board at sailing.
     state = { ...state, migration: { ...state.migration, notices: { [resident.card.id]: 10 } }, people: { ...peopleOf(state), leaving: [{ id: resident.card.id, day: 12 }] } };
     const leaving = leavingDayPlan(dayPlan(resident.card, 'Fri'));
     expect(leaving.blocks.at(-1)).toMatchObject({ place: FERRY_SLIP, startMin: 9 * 60 + 30 });
@@ -208,5 +211,73 @@ describe('saving (SavedTown.people)', () => {
     const old = restore(JSON.parse(JSON.stringify({ ...serialize(createTownState()), people: undefined })));
     expect(old.people).toBeUndefined();
     expect(peopleOf(old).households).toEqual([]);
+  });
+});
+
+describe('a Day-1 household on an old save', () => {
+  it('sails two noticed adults with two accompanying children and keeps a third notice standing', () => {
+    const state = createTownState();
+    state.migration.notices = { anatole_treharne: 5, fenna_renard: 5, vera_sheehan: 6 };
+    const w = world();
+    const ferry = migrationDawn(state, 8, w, { decision: null }).state;
+    expect([...sailingToday(ferry, 8)].sort()).toEqual(['anatole_treharne', 'fenna_renard', 'freja_treharne', 'laila_treharne']);
+    const next = migrationDawn(ferry, 9, w, { decision: null });
+    expect(next.departed.map(d => d.id).sort()).toEqual(['anatole_treharne', 'fenna_renard', 'freja_treharne', 'laila_treharne']);
+    expect(next.state.migration.notices.vera_sheehan).toBe(6);
+    expect(migrationDawn(next.state, 8, w, { decision: null }).leaving).toEqual([]);
+  });
+
+  it('counts five nights from loading, offers the ferry, and releases the door only if the resident sails', () => {
+    const id = 'fenna_renard';
+    const card = day1Cards.find(c => c.id === id)!;
+    const w = world({ friends: other => other === id ? 0 : 4 });
+    let state = restore(JSON.parse(JSON.stringify(serialize(createTownState()))));
+    state = { ...state, pillars: { prosperity: 22, safety: 22, spirit: 22, charm: 22 } };
+    for (let day = 2; day <= 6; day++) {
+      const dawn = migrationDawn(state, day, w, { decision: null });
+      expect(dawn.notices.map(n => n.resident)).toEqual(day === 6 ? [id] : []);
+      state = dawn.state;
+    }
+    const ferry = migrationDawn(state, 8, w, { decision: null }).state;
+    expect(presentAt(ferry, id, 8, SAILING_MINUTE)).toBe(false);
+    const saved = migrationDawn(resolveNotice(ferry, id, 8), 9, w, { decision: null });
+    expect(saved.departed).toEqual([]);
+    const sailed = migrationDawn(ferry, 9, w, { decision: null });
+    const sim = new ResidentSim([card], loadWorld());
+    sim.setPresence((id, day, minute) => presentAt(sailed.state, id, day, minute));
+    expect(sim.sample(id, 9, 720)).toBeNull();
+    expect(sailed.state.census).toBe(state.census - 1);
+    expect(sailed.state.migration.lowStayNights[id]).toBeUndefined();
+    const voters = springVoters({ worldSeed: 1, town: sailed.state, cards: [card], regard: () => 0, met: () => true,
+      flags: new Set(), deeds: { projects: [], scuffles: [], work: 0 } });
+    expect(voters.some(v => v.id === id)).toBe(false);
+    const arrivals = templateArrivals(sailed.state, { ...w, homes: [card.home] }, 11, 1, 0.5, { archetype: 'drifter' });
+    expect(arrivals[0]?.home).toBe(card.home);
+  });
+});
+
+describe("Spring's first Leaving Notice", () => {
+  const roll = { decision: null };
+  const w = world({ friends: id => ['elin_fleury', 'vera_sheehan'].includes(id) ? 0 : 4 });
+
+  it('breaks a lowest-Stay tie by id and a resolved notice survives a reload', () => {
+    const ninth = migrationDawn(createTownState({ day: 8 }), 9, w, roll);
+    expect(ninth.notices).toEqual([{ resident: 'elin_fleury', day: 9, deadline: 11 }]);
+    const saved = restore(serialize(resolveNotice(ninth.state, 'elin_fleury', 10)));
+    expect(migrationDawn(saved, 9, w, roll).notices).toEqual([]);
+    expect(migrationDawn(saved, 11, w, roll).leaving).toEqual([]);
+  });
+
+  it('honors earlier standing and completed notices on older saves', () => {
+    const state = createTownState({ day: 8 });
+    state.migration.notices.fenna_renard = 6;
+    for (const old of [state, resolveNotice(state, 'fenna_renard', 7)]) {
+      expect(migrationDawn(restore(serialize(old)), 9, w, roll).notices).toEqual([]);
+    }
+  });
+
+  it('does not backfill a missed Day 9 on loading an old Day-12 save', () => {
+    const old = restore(serialize(createTownState({ day: 12 })));
+    expect(migrationDawn(old, 13, w, roll).notices).toEqual([]);
   });
 });

@@ -71,9 +71,11 @@ describe('the census gauge (§6.5 UI)', () => {
   it('stays hidden until the clause is known (S08, Day 18)', () => {
     expect(optionGauge(town(170, false)).visible).toBe(false);
   });
-  it('shows once known, whenever the census is under 185', () => {
-    expect(optionGauge(town(190, true)).visible).toBe(false);
-    expect(optionGauge(town(185, true)).visible).toBe(false);
+  it('shows the cushion once known and clamps the fill at 205', () => {
+    expect(optionGauge(town(205, true))).toMatchObject({ visible: true, fill: 1, caption: 'Census 205 · 25 above the line' });
+    expect(optionGauge(town(189, true)).caption).toBe('Census 189 · 9 above the line');
+    expect(optionGauge(town(180, true)).caption).toBe('Census 180 · at the line');
+    expect(optionGauge(town(179, true)).caption).toContain('of 7 dawns below the line');
     expect(optionGauge(town(184, true))).toMatchObject({ visible: true, census: 184, line: 180, dawnsUnder: 0, dawnsNeeded: 7 });
   });
   it('becomes known when it triggers', () => {

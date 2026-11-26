@@ -471,12 +471,22 @@ Stay = 60 · Σ(values_p · Pillar_p / 100)        // the town, as this person w
      + 10 · (has_job_or_purpose)
      + 10 · min(1, years_in_monde / 10)          // roots
 ```
+Who has a Stay: every grown-up of the Day-1 census and every arrival. The hand-written cast's comings and goings
+belong to the story. A census grown-up has a job or purpose when employed, a carer, or by their archetype (A.2), and
+their roots are the census's years in Monde.
+
 A resident whose Stay is **under 25 for 5 nights in a row** gets a **Leaving Notice**. Their reflection
 writes it as a decision they've been circling, and they tell friends. Two days before the next ferry
 they'd leave on, the player gets a **"Last Chance" Favor** aimed at their lowest-scoring factor (find
 them a job, introduce them to someone, fix their roof). If it's done in time, they stay and get +10
-Regard. At most 2 departures per ferry day. Departing residents walk to the slip with a suitcase at
+Regard. At most 2 grown-ups leave on a ferry day; children go with the last adult of their household. Departing residents walk to the slip with a suitcase at
 09:30; their friends see them off.
+
+**The Spring's first notice.** The rule alone sends nobody in Spring: the lowest Day-1 Stay is 25.1 (Fenna Renard,
+widowed, with no friends in town). So at the Day 9 dawn, if nobody has had a Leaving Notice yet, the grown-up with
+the lowest Stay gets one (once a game, never the hand-written cast), and the Last Chance Favor and the first ferry
+two days on (Day 11) follow as above. A notice and a departure are town events (§9.12): the next morning's paper
+leads with one on a quiet day, and a Last Chance Favor comes before a Town Project on the objective line.
 
 A strong run ends with **380–450 residents**. A quiet run that leans on community work and ignores
 Projects tends to hover around 200–240.
@@ -490,8 +500,8 @@ Projects tends to hover around 200–240.
   Nell's and every fisher's Regard toward Pell drops to Wary. Wharf Projects pause.
 - **Undo:** the Charter's Article III voids the sale. When S21 completes, the Wharf reopens at once
   (Spirit +6 on top of the Charter's bonus).
-- **UI:** once the clause is known, the Town Ledger shows a census gauge with a 180 line and a 7-day
-  counter whenever the census is under 185.
+- **UI:** once the clause is known, the Town Ledger always shows the census against the 180 line (`Census 189 · 9
+  above the line`), and while the census is under 180, how many of the 7 dawns have passed.
 
 ### 6.6 The Dawn Report
 
@@ -1345,7 +1355,8 @@ Everything notable becomes a **TownEvent** `{id, day, minute, type, where, who[]
 nightly ranker scores events by importance, novelty, how many residents know about them, and player
 involvement. The top 5 feed the Press job, which writes the Dawn Report in Sable's voice (headline,
 deks and two short stories), the "Comings and goings" lines and up to 2 **letters to the editor** from
-residents with strong stances. Fallback templates are in Appendix B.5.
+residents with strong stances. Fallback templates are in Appendix B.5. Departures are news: a Leaving Notice is a
+`leaving_notice` event (importance 6) and a sailing a `departure` (5), beside a Scuffle's 7 and a Project opening's 6.
 
 ### 9.13 Guardrails and safety
 

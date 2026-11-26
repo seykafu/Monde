@@ -37,6 +37,16 @@ describe('the roster', () => {
     off();
   });
 
+  it('removes a departed census resident from dialogue and Favor lookups, and restores them in a new game', () => {
+    const card = findCard('fenna_renard')!;
+    syncRoster({ ...emptyPeople(), departed: [{ id: card.id, name: card.name, household: card.household!,
+      home: card.home, portrait: card.portrait, day: 8, line: 'Fenna left on the Gannet.' }] }, 9);
+    expect(findCard(card.id)).toBeUndefined();
+    expect(allCards().some(c => c.id === card.id)).toBe(false);
+    syncRoster(undefined, 1);
+    expect(findCard(card.id)).toEqual(card);
+  });
+
   it("resolves S05's `arrival` to the first real arrival, the morning's boat included", () => {
     expect(resolveAlias('arrival')).toBe('arrival');
     const h = household(8);

@@ -12,14 +12,14 @@
 // - S05's scripted `arrival` resolves to the first real arrival; its held memories and Regard go once the server
 //   knows who that is.
 import type Phaser from 'phaser';
-import type { ArrivalHousehold } from '@monde/shared';
-import { livingArrivals } from '@monde/shared';
+import type { ArrivalHousehold, DepartedResident } from '@monde/shared';
+import { EVENT_IMPORTANCE, departureEventId, livingArrivals, type TownPeople } from '@monde/shared';
 import type { DawnPackage, NightRequest } from '../mind/dawn';
 import { resolveHeld } from '../mind/events';
 import type { Clock } from '../sim/clock';
 import { landingDayPlan, leavingDayPlan } from '../sim/arrivalPlans';
 import type { ResidentSim } from '../sim/residentSim';
-import { DAY1_PUPILS, adoptServerArrivals, arrivalFacts, bookArrivals, markSynced, migrationDawn, movementLines, peopleOf, presentAt, sailingToday, type MigrationWorld } from '../town/people';
+import { DAY1_PUPILS, leavingNoticeTitle, SAILING_MINUTE, settleSailings, adoptServerArrivals, arrivalFacts, bookArrivals, markSynced, migrationDawn, movementLines, peopleOf, presentAt, sailingToday, stayFriends, type MigrationWorld } from '../town/people';
 import type { TownState } from '../town/pillars';
 import type { DawnReport } from '../town/townEngine';
 import { homeDirectory } from '../world/homes';
@@ -27,8 +27,8 @@ import { personaCards } from '../world/residents';
 import { arrivalId, findCard, generatedCards, onRosterChange, syncRoster } from '../world/roster';
 import { homeBeds, homeName, townHomeKeys } from '../world/townHomes';
 import { zones } from '../world/zones';
-import { EVENTS_KEY, getEventLog } from './events';
-import { regardFor, tieMap } from './friendship';
+import { EVENTS_KEY, appendEvent, getEventLog } from './events';
+import { regardFor, tieMap, updateFriendship } from './friendship';
 
 type Registry = Phaser.Data.DataManager;
 const TOWN_KEY = 'monde.town';
@@ -53,26 +53,24 @@ function storyFlags(registry: Pick<Registry, 'get'>): Set<string> {
 }
 
 /** Friends in town (§6.4: affinity ≥ 40): the G-13 ties labelled Friends or Close friends, and their own household. */
-export function friendsInTown(registry: Registry, id: string): number {
-  const friends = new Set<string>();
-  for (const t of tieMap(registry).values()) {
-    if ((t.a === id || t.b === id) && (t.label === 'friends' || t.label === 'close_friends')) friends.add(t.a === id ? t.b : t.a);
-  }
-  const town = getTown(registry);
-  const living = new Set([...personaCards.map(c => c.id), ...livingArrivals(town?.people).map(r => r.card.id)]);
-  for (const r of findCard(id)?.relationships ?? []) if (r.affinity >= 40 && living.has(r.id)) friends.add(r.id);
-  friends.delete(id);
-  return friends.size;
+function livingFriendIds(registry: Registry, id: string, people = getTown(registry)?.people): string[] {
+  return stayFriends([...personaCards, ...livingArrivals(people).map(r => r.card)], tieMap(registry).values())(id, people);
+}
+
+export function friendsInTown(registry: Registry, id: string, people?: TownPeople): number {
+  return livingFriendIds(registry, id, people).length;
 }
 
 /** The world the pure pass reads. */
 export function migrationWorld(registry: Registry): MigrationWorld {
   const seed = (registry.get('monde.save.weather') as { seed?: number } | undefined)?.seed ?? (Number(query.get('seed')) || 1);
+  const people = getTown(registry)?.people;
+  const friends = stayFriends([...personaCards, ...livingArrivals(people).map(r => r.card)], tieMap(registry).values());
   return {
     seed, homes: allHomes(), dir: homeDirectory, beds: homeBeds, homeName,
     storyFlags: storyFlags(registry),
     cast: new Map(personaCards.map(c => [c.id, { name: c.name, portrait: c.portrait }])),
-    friends: id => friendsInTown(registry, id),
+    friends: (id, current = people) => friends(id, current).length,
     regard: id => regardFor(registry, id)
   };
 }
@@ -110,17 +108,40 @@ export function attachMigration(registry: Registry, clock: Clock): void {
     const report = registry.get(DAWN_REPORT_KEY) as DawnReport | undefined;
     const world = migrationWorld(registry);
     const result = migrationDawn(town, t.day, world, { decision: report?.day === t.day ? report.arrivals : null });
-    registry.set(MIGRATION_NIGHT_KEY, {
-      day: t.day, departed: result.departed.map(d => d.id),
-      notices: result.notices.map(n => ({ ...n, friends: friendIds(registry, n.resident) }))
-    } satisfies MigrationNight);
     registry.set(TOWN_KEY, result.state);
+    const notices = result.notices.map(n => ({ ...n, friends: livingFriendIds(registry, n.resident).slice(0, 12) }));
+    registry.set(MIGRATION_NIGHT_KEY, { day: t.day, departed: peopleOf(result.state).departed.filter(d => d.day === t.day - 1).map(d => d.id), notices } satisfies MigrationNight);
+    for (const n of notices) {
+      const card = findCard(n.resident)!;
+      appendEvent(registry, { kind: 'town_event', type: 'leaving_notice', id: `leaving_notice_${n.resident}_${n.day}`,
+        day: t.day, minute: t.minute, place: card.home, participants: [n.resident, ...n.friends],
+        importance: EVENT_IMPORTANCE.leaving_notice, summary: `${leavingNoticeTitle(card.name, n.deadline)}.` });
+    }
+    recordDepartures(registry, result.departed);
     if (import.meta.env.DEV && (result.arriving.length || result.leaving.length || result.notices.length || result.departed.length)) {
       console.info(`[arrivals] Day ${t.day}: ${result.arriving.map(h => `${h.residents.map(r => r.card.name).join(' & ')} (${h.archetype}) → ${h.home}`).join('; ') || 'nobody on the boat'} · leaving ${result.leaving.join(', ') || 'nobody'} · notices ${result.notices.map(n => n.resident).join(', ') || 'none'} · left ${result.departed.map(d => d.name).join(', ') || 'nobody'}`);
     }
   });
-  clock.onMinute(t => landBoat(registry, t.day, t.minute));
-  landBoat(registry, clock.day, clock.minute);
+  const boats = (day: number, minute: number) => {
+    landBoat(registry, day, minute);
+    const town = getTown(registry);
+    if (minute < SAILING_MINUTE || !town?.people?.leaving.some(l => l.day <= day)) return;
+    const result = settleSailings(town, day, migrationWorld(registry));
+    registry.set(TOWN_KEY, result.state);
+    recordDepartures(registry, result.departed);
+  };
+  clock.onMinute(t => boats(t.day, t.minute));
+  boats(clock.day, clock.minute);
+}
+
+function recordDepartures(registry: Registry, departed: readonly DepartedResident[]): void {
+  if (!departed.length) return;
+  const gone = new Set(departed.map(d => d.id));
+  updateFriendship(registry, s => ({ ...s, favor_book: s.favor_book.map(f =>
+    gone.has(f.resident_id) && (f.status === 'proposed' || f.status === 'accepted') ? { ...f, status: 'expired' } : f) }));
+  for (const d of departed) appendEvent(registry, { kind: 'town_event', type: 'departure', id: departureEventId(d.id, d.day),
+      day: d.day, minute: SAILING_MINUTE, place: 'wharf.ferry_slip', participants: [d.id],
+      importance: EVENT_IMPORTANCE.departure, summary: `${d.name} left on the Gannet.` });
 }
 
 /** The 08:00 boat: book in anyone whose household has landed (a load after 08:00 lands them at once). */
@@ -132,15 +153,6 @@ export function landBoat(registry: Registry, day: number, minute: number): Arriv
   registry.set(TOWN_KEY, state);
   registry.events.emit(ARRIVALS_LANDED, booked);
   return booked;
-}
-
-/** Friends to tell about a Leaving Notice. */
-function friendIds(registry: Registry, id: string): string[] {
-  const out = new Set<string>();
-  for (const t of tieMap(registry).values()) if ((t.a === id || t.b === id) && (t.label === 'friends' || t.label === 'close_friends')) out.add(t.a === id ? t.b : t.a);
-  for (const r of findCard(id)?.relationships ?? []) if (r.affinity >= 40) out.add(r.id);
-  out.delete(id);
-  return [...out].slice(0, 12);
 }
 
 /** The night POST's G-02 part, for the night before `dawnDay` (scenes/friendship.ts nightRequest). */

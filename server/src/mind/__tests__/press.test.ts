@@ -1,12 +1,22 @@
 import { expect,it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { parse } from 'yaml';
-import { fallbackPress, fillHeadline, rankPressEvents, UNSUPPORTED_SCHEMA_KEYS, type HeadlineTemplate } from '@monde/shared';
+import { EVENT_IMPORTANCE, fallbackPress, fillHeadline, rankPressEvents, UNSUPPORTED_SCHEMA_KEYS, type HeadlineTemplate } from '@monde/shared';
 import { pressRequest, validatePress } from '../press.js';
 const event = (id: string,importance=2,day=3) => ({ id,importance,day,minute:600,type:'sweeping',summary:`A broom was used at ${id}.`,who:['player'] });
 it('ranks yesterday only, deduplicates, and uses novelty, reach and player involvement',() => {
   const ranked = rankPressEvents([event('small'),event('big',7),event('future',10,4),event('big',7),{ ...event('novel'),type:'arrival',known:20 }],3,['sweeping']);
   expect(ranked.map(e => e.id)).toEqual(['big','novel','small']);
+});
+it('leads a quiet morning with the previous night’s leaving notice', () => {
+  const notice = { ...event('notice', EVENT_IMPORTANCE.leaving_notice), type: 'leaving_notice',
+    summary: "Malachy Wakefield is weighing Tuesday's ferry.", who: ['malachy_wakefield', 'olwen_wakefield'] };
+  const paper = fallbackPress(4, [event('sweep'), notice], []);
+  expect(paper.headline).toBe(notice.summary);
+  expect(paper.stories[0]?.event_id).toBe(notice.id);
+  const ids = new Set(paper.event_ids);
+  expect(validatePress(JSON.stringify(paper), ids, notice.id)).toBeTruthy();
+  expect(validatePress(JSON.stringify({ ...paper, stories: [...paper.stories].reverse() }), ids, notice.id)).toBeNull();
 });
 it('uses B.5 with complete facts and never leaves placeholders or invents missing facts',() => {
   const { headlines } = parse(readFileSync(new URL('../../../../content/lines/headlines.yaml',import.meta.url),'utf8')) as { headlines: HeadlineTemplate[] };

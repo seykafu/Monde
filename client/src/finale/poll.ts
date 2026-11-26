@@ -47,13 +47,17 @@ export function bandOf(flags: ReadonlySet<string>, spirit: number): FairBand {
 
 // GDD-GAP: §10.3 records approximate five-style soak results, but gives no per-script share cap or Vane minimum. Keep the authored scoring; audit the actual bot distributions and H5 spread.
 /** The §10.3 count and the fair's jars for this world. */
-export function springPoll(w: SpringWorld): StrawPollRecord {
-  const people = springElectorate({
-    worldSeed: w.worldSeed, day: POLL_DAY, cards: w.cards.map(elector), regard: w.regard, met: w.met,
+export function springVoters(w: SpringWorld) {
+  const gone = new Set(w.town.people?.departed.map(d => d.id));
+  return springElectorate({
+    worldSeed: w.worldSeed, day: POLL_DAY, cards: w.cards.filter(c => !gone.has(c.id)).map(elector), regard: w.regard, met: w.met,
     arrivals: livingArrivals(w.town.people).map(r => ({ card: elector(r.card), arrivedDay: r.arrived_day, household: r.household })),
     ...(w.ties ? { ties: w.ties } : {}), deeds: w.deeds, flags: w.flags
   });
-  return strawPoll(people, { worldSeed: w.worldSeed, pillars: w.town.pillars, day1: DAY1_PILLARS }, bandOf(w.flags, w.town.pillars.spirit), POLL_DAY);
+}
+
+export function springPoll(w: SpringWorld): StrawPollRecord {
+  return strawPoll(springVoters(w), { worldSeed: w.worldSeed, pillars: w.town.pillars, day1: DAY1_PILLARS }, bandOf(w.flags, w.town.pillars.spirit), POLL_DAY);
 }
 
 /** Community-work tasks in the town's week-long change log (§6.1's log keeps seven days; §8: every task is seen). */

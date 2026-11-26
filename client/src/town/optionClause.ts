@@ -4,15 +4,14 @@
 // - Trigger: the census is under 180 for 7 consecutive dawns. Vane exercises the option. (The floor was 200 until the
 //   2026-11-05 census trim took Day 1 from 210 to 190; it moved with it, keeping the ten-resident cushion.)
 // - Undo: the Charter's Article III voids it (`charter_found`, S21).
-// - UI: once known, the Town Ledger shows a census gauge with a 180 line and a 7-day counter whenever the
-//   census is under 185.
+// - Once known, the Ledger shows the census cushion. Below the line it counts consecutive dawns.
 // Consequences use the saved exercised state; the Charter reopens the sites immediately.
 import type { TownFlags, TownState } from './pillars';
 
 export const OPTION_CENSUS_LINE = 180;
 export const OPTION_DAWNS = 7;
-/** The gauge shows while the census is under this. */
-export const OPTION_GAUGE_BELOW = 185;
+/** The Ledger track spans twenty residents either side of the clause line. */
+const GAUGE_RADIUS = 20;
 
 export interface OptionClauseState {
   /** Consecutive dawns with the census under 180. */
@@ -46,7 +45,9 @@ export const optionClauseDawn = (oc: OptionClauseState, census: number, day: num
 };
 
 export interface OptionGauge {
-  /** Show the census gauge (known, not void, census under 185; or already exercised). */
+  /** Fraction of the Ledger track filled, including at either endpoint. */
+  fill: number;
+  caption: string;
   visible: boolean;
   known: boolean;
   census: number;
@@ -62,8 +63,12 @@ export const optionGauge = (state: Pick<TownState, 'census' | 'flags' | 'optionC
   const oc = state.optionClause;
   const known = optionKnown(state.flags, oc);
   const isVoid = optionVoid(state.flags);
+  const delta = state.census - OPTION_CENSUS_LINE;
   return {
-    visible: known && !isVoid && (oc.exercised || state.census < OPTION_GAUGE_BELOW),
+    visible: known && !isVoid,
+    fill: Math.max(0, Math.min(1, (delta + GAUGE_RADIUS) / (2 * GAUGE_RADIUS))),
+    caption: `Census ${state.census} · ${delta < 0 ? `${oc.dawnsUnder} of ${OPTION_DAWNS} dawns below the line`
+      : delta ? `${delta} above the line` : 'at the line'}`,
     known,
     census: state.census,
     line: OPTION_CENSUS_LINE,

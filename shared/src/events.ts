@@ -2,9 +2,10 @@ import { FavorProof, LeavingFavorNotice } from "./favorEngine";
 import { z } from "zod";
 import { PlaceId } from "./ids";
 
-/** GDD-GAP: §9.6 refers to an event table but only supplies these three values.
- * Restrict ingestion to those authored types until the remaining table is specified. */
-export const EVENT_IMPORTANCE = { scuffle: 7, project_open: 6, sweeping: 2 } as const;
+// GDD-GAP: §9.6 gives no importance for a leaving notice or a departure.
+export const EVENT_IMPORTANCE = { scuffle: 7, project_open: 6, sweeping: 2, leaving_notice: 6, departure: 5 } as const;
+export const FERRY_SAILING_MINUTE = 9 * 60 + 30;
+export const departureEventId = (resident: string, day: number): string => `departure_${resident}_${day}`;
 const key = z.string().trim().min(1).max(200);
 const stamp = { id: key, day: z.number().int().min(1).max(100_000), minute: z.number().int().min(0).max(1560) };
 const cue = { ...stamp, resident: key, scene_id: key, cue_key: key };
@@ -17,7 +18,7 @@ export const ClientEvent = z.discriminatedUnion("kind", [
   z.object({ ...stamp, kind: z.literal("favor_done"), resident: key, favor: key, proof: FavorProof }),
   z.object({
     ...stamp, kind: z.literal("town_event"),
-    type: z.enum(["scuffle", "project_open", "sweeping"]), place: PlaceId,
+    type: z.enum(["scuffle", "project_open", "sweeping", "leaving_notice", "departure"]), place: PlaceId,
     participants: z.array(key).max(500), summary: z.string().trim().min(1).max(200), importance,
   }).refine(e => e.importance === EVENT_IMPORTANCE[e.type], { path: ["importance"], message: "importance must match the event type" }),
   z.object({

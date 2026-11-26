@@ -1,9 +1,10 @@
+import { canDepart, settleDeparturesIn } from './arrivals.js';
 import { feasibleFavor, restoreDreamFavor, restoreQuietFavor } from "./favorFeasibility.js";
 import { Favor, canCompleteFavor, clampDreamStage, stageWords } from "@monde/shared";
 import { loadItems } from '../content/loadContent.js';
 import { randomUUID } from "node:crypto";
 import { and, eq, inArray, gte, sql } from "drizzle-orm";
-import { ClientEvent, COMMUNITY_TASKS, matchGift, giftRegard, isBirthday, applyScriptedRegard, type EventIngestionResult, type PersonaCard, type RegardSnapshot } from "@monde/shared";
+import { ClientEvent, departureEventId, COMMUNITY_TASKS, matchGift, giftRegard, isBirthday, applyScriptedRegard, type EventIngestionResult, type PersonaCard, type RegardSnapshot } from "@monde/shared";
 import { events, memories, plans, processedClientEvents, residents, worlds, favors, relationships } from "../db/schema.js";
 import type { WorldDatabase } from "../worlds/createWorld.js";
 import { loadPlaceRegistry } from "./places.js";
@@ -79,6 +80,12 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
       await tx.insert(processedClientEvents).values({ worldId, key: keys[0]! }).onConflictDoNothing();
       result.duplicates.push(e.id); continue;
     }
+    // The night transaction can record the sailing and remove its participant before the outbox arrives.
+    if (e.kind === "town_event" && e.type === "departure" && !byId.has(e.participants[0] ?? "")) {
+      const [existing] = await tx.select({ id: events.id }).from(events)
+        .where(and(eq(events.worldId, worldId), eq(events.id, e.id), eq(events.type, "departure")));
+      if (existing) { result.duplicates.push(e.id); continue; }
+    }
     let reason: string | undefined;
     if (options.nightDay !== undefined && (e.day > options.nightDay || world.day > options.nightDay)) reason = "event is outside this unprocessed night";
     if (original.kind === 'community_work' && (!task || original.place !== task.place || original.day < task.opens || original.minute + task.minutes > 1560)) reason = 'invalid community task, place or time';
@@ -88,6 +95,11 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
     if ("place" in e && !registry.ids.has(e.place)) reason = "unknown place";
     if ("resident" in e && !byId.has(e.resident)) reason = "unknown resident";
     if ("participants" in e && e.participants.some(id => id !== "player" && !byId.has(id))) reason = "unknown participant";
+    if (!reason && e.kind === "town_event" && e.type === "departure") {
+      const resident = e.participants[0];
+      const card = resident && (await cards()).get(resident);
+      if (!card || e.participants.length !== 1 || !canDepart(card) || e.id !== departureEventId(card.id, e.day)) reason = "invalid sailing";
+    }
     if (e.kind === "flags" && e.revision <= world.flagsRevision) reason = "stale flags revision";
     if (e.kind === "dream_stage" && !reason && e.stage > ((await cards()).get(e.resident)?.dream.stages.length ?? 0)) reason = "the dream has fewer stages";
     if (reason) { result.rejected.push({ id: e.id, reason }); continue; }
@@ -137,7 +149,7 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
         }
         const everyone = await cards();
         const seen: (typeof memories.$inferInsert)[] = [];
-        for (const row of rows) {
+        for (const row of byId.values()) {
           const participant = e.participants.includes(row.id);
           if (!participant && !witnesses((byResident.get(row.id) ?? templatePlan(everyone.get(row.id)!, e.day)).blocks, e.place, e.minute, positions)) continue;
           seen.push({ worldId, id: randomUUID(), residentId: row.id, day: e.day, minute: e.minute,
@@ -149,6 +161,11 @@ export async function ingestInTransaction(tx: Transaction, worldId: string, batc
         // One statement per hundred witnesses (a busy square on a 212-resident Day 1 has dozens).
         for (let i = 0; i < seen.length; i += 100) await tx.insert(memories).values(seen.slice(i, i + 100));
         result.accepted.push(e.id);
+      }
+      if (e.type === "departure") {
+        const id = e.participants[0]!;
+        await settleDeparturesIn(tx, worldId, [id], e.day);
+        byId.delete(id);
       }
     } else if ((e.kind === 'gift' || e.kind === 'meal') && item) {
       const row = byId.get(e.resident)!, card = (await cards()).get(e.resident)!;

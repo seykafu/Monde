@@ -13,6 +13,7 @@ export interface RosterEntry {
   index: number;
 }
 
+let departed = new Set<string>();
 let generated: readonly PersonaCard[] = [];
 /** Generated ids in the order they first appeared: their index never shifts when someone leaves. */
 const order: string[] = [];
@@ -22,6 +23,7 @@ const listeners = new Set<() => void>();
 
 const rebuild = (): void => {
   byId = new Map<string, RosterEntry>(personaCards.map((card, index) => [card.id, { card, index }]));
+  for (const id of departed) byId.delete(id);
   for (const card of generated) byId.set(card.id, { card, index: personaCards.length + order.indexOf(card.id) });
 };
 
@@ -29,8 +31,8 @@ const rebuild = (): void => {
  * The generated residents now: those living in town and those on today's boat (their sprites exist before they step
  * off, hidden until 08:00). Notifies listeners when the set or a card changed.
  */
-export function setGeneratedCards(cards: readonly PersonaCard[]): void {
-  if (cards.length === generated.length && cards.every((c, i) => c === generated[i])) return;
+function setGeneratedCards(cards: readonly PersonaCard[], censusChanged: boolean): void {
+  if (!censusChanged && cards.length === generated.length && cards.every((c, i) => c === generated[i])) return;
   for (const c of cards) if (!order.includes(c.id)) order.push(c.id);
   generated = [...cards];
   rebuild();
@@ -40,12 +42,15 @@ export function setGeneratedCards(cards: readonly PersonaCard[]): void {
 /** Mirror the town's generated residents (and S05's `arrival` alias) into the roster. */
 export function syncRoster(people: TownPeople | undefined, day?: number): void {
   const cards = [...livingArrivals(people), ...(people?.pending ?? []).flatMap(h => h.residents)].map(r => r.card);
+  const gone = new Set(people?.departed.map(d => d.id));
+  const changed = gone.size !== departed.size || [...gone].some(id => !departed.has(id));
+  departed = gone;
   arrivalAlias = firstArrival(people, day)?.card.id ?? null;
-  setGeneratedCards(cards);
+  setGeneratedCards(cards, changed);
 }
 
 /** Every card: the authored ones, then the generated residents. */
-export const allCards = (): readonly PersonaCard[] => [...personaCards, ...generated];
+export const allCards = (): readonly PersonaCard[] => [...personaCards.filter(c => !departed.has(c.id)), ...generated];
 export const generatedCards = (): readonly PersonaCard[] => generated;
 export const rosterEntry = (id: string): RosterEntry | undefined => byId.get(resolveAlias(id));
 export const findCard = (id: string): PersonaCard | undefined => rosterEntry(id)?.card;
@@ -62,5 +67,5 @@ export function onRosterChange(fn: () => void): () => void {
 
 /** Tests: back to the authored cards only. */
 export function resetRoster(): void {
-  generated = []; order.length = 0; arrivalAlias = null; rebuild();
+  departed.clear(); generated = []; order.length = 0; arrivalAlias = null; rebuild();
 }

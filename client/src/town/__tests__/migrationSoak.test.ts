@@ -48,12 +48,13 @@ describe('G-02 25-day mock soak', () => {
     expect(ages.some(a => a >= 60)).toBe(true);
   });
 
-  it('a passive player: Appeal never reaches 35, so the boats come in empty and nobody leaves either', () => {
+  it('a passive player: the boats come in empty and Fenna takes the Day-11 ferry', () => {
     checkRules(passive);
     expect(passive.firstArrivalDay).toBeNull();
     expect(passive.households).toHaveLength(0);
-    expect(passive.departures).toBe(0);
-    expect(passive.final.census).toBe(DAY1_CENSUS);
+    expect(passive.departures).toBe(1);
+    expect(passive.final.people?.departed[0]).toMatchObject({ id: 'fenna_renard', day: 11 });
+    expect(passive.final.census).toBe(DAY1_CENSUS - 1);
   });
 
   it('across 8 worlds: strong runs keep everyone; lapsed runs lose some newcomers, and Last Chance Favors keep them', () => {

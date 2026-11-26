@@ -27,6 +27,7 @@ export interface Objective {
   where: string;
   /** Show the resident’s live whereabouts under the title. */
   visitingPerson?: boolean;
+  lastChance?: boolean;
   /** "before 11:30", "10:40–11:30", "Tomorrow, 10:00–12:00", "by Day 6" ('' when any time). */
   when: string;
   /** Why, one short line: "Pell is waiting." */
@@ -58,6 +59,7 @@ export interface FavorThread {
   resident: string;
   name: string;
   status: 'proposed' | 'accepted';
+  leaving?: { title: string; reason: string };
   /** "Help with a chore (30 min)", "Bring a loaf". */
   task: string;
   place: string;
@@ -173,7 +175,7 @@ export function objectives(input: ObjectiveInput): Objectives {
     place: u.place, people: [...input.cast(u.sceneId)], summoned: u.summoned
   }) : null;
   const meanwhile = suggestion(input);
-  const hud: Objective = main ?? (next
+  const hud: Objective = main ?? (next && !meanwhile.lastChance
     ? { ...meanwhile, header: 'MEANWHILE', reason: `Next: ${next.when.replace(/^Tomorrow/, 'tomorrow')}, ${next.where}.` }
     : meanwhile);
   return { main, next, meanwhile, hud };
@@ -187,16 +189,16 @@ export function suggestion(input: ObjectiveInput): Objective {
     where: placeWhere(input, due.placeName, due.place), when: due.by === input.day ? 'today' : `by Day ${due.by}`,
     reason: due.dream ? `${due.name}'s dream: ${trimDot(due.dream)}.` : `${due.name} asked you.`, place: due.place, people: [due.resident]
   });
+  const offer = [...input.favors].filter(f => f.status === 'proposed' && f.by >= input.day).sort((a, b) => Number(!!b.leaving) - Number(!!a.leaving) || a.by - b.by)[0];
   const project = input.projects.find(p => ['open', 'funded', 'gathering', 'building', 'puzzle', 'ready'].includes(p.stage));
-  if (project) return make(input, {
+  if (project && !offer?.leaving) return make(input, {
     id: `project:${project.id}`, kind: 'project', header: 'TOWN PROJECT', title: project.next,
     where: placeWhere(input, project.stepPlaceName ?? project.placeName, project.stepPlace ?? project.place), when: '', reason: `${project.name.charAt(0).toUpperCase()}${project.name.slice(1)}, led by ${project.lead}.`,
     place: project.stepPlace ?? project.place, people: []
   });
-  const offer = [...input.favors].filter(f => f.status === 'proposed' && f.by >= input.day).sort((a, b) => a.by - b.by)[0];
   if (offer) return make(input, {
     id: `favor:${offer.id}`, kind: 'offer', header: 'SOMEONE TO SEE', title: `Talk to ${offer.name}`,
-    visitingPerson: !!offer.person, where: offer.person?.where ?? placeWhere(input, offer.placeName, offer.place), when: `by Day ${offer.by}`, reason: `${offer.name} has a Favor to ask.`,
+    lastChance: !!offer.leaving, visitingPerson: !!offer.person, where: offer.person?.where ?? placeWhere(input, offer.placeName, offer.place), when: `by Day ${offer.by}`, reason: offer.leaving?.reason ?? `${offer.name} has a Favor to ask.`,
     place: offer.person?.place ?? offer.place, people: [offer.resident]
   });
   const dream = input.dreams.find(d => d.actionable);

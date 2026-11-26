@@ -90,7 +90,7 @@ export function tasksFrom({ log, marks, names }: TaskInput): Task[] {
     ...located(names, f.place), when: `by Day ${f.by}`, actionable: true, people: [f.resident]
   });
   for (const f of log.offers) out.push({
-    id: `offer:${f.id}`, kind: 'offer', title: `${f.name} has a Favor to ask`, next: `Talk to ${f.name} (E beside them).`, detail: '',
+    id: `offer:${f.id}`, kind: 'offer', title: f.leaving?.title ?? `${f.name} has a Favor to ask`, next: `Talk to ${f.name} (E beside them).`, detail: '',
     ...located(names, f.person?.place ?? f.place), ...(f.person && { where: f.person.where }), when: `by Day ${f.by}`, actionable: true, people: [f.resident]
   });
   for (const p of log.projects) out.push({

@@ -22,7 +22,7 @@ import { budgetMind } from "./budget.js";
 import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import {
-  ARCHETYPES, ARRIVAL_SYSTEM_PROMPT, ArrivalHousehold, HOME_TOKEN, PersonaCard, RESERVED_FIRST_NAMES, ResidentState,
+  FERRY_SAILING_MINUTE, EVENT_IMPORTANCE, departureEventId, ARCHETYPES, ARRIVAL_SYSTEM_PROMPT, ArrivalHousehold, HOME_TOKEN, PersonaCard, RESERVED_FIRST_NAMES, ResidentState,
   arrivalMaxTokens, arrivalUserMessage, bindHome, cardsFromHousehold, drawHousehold, hashParts, HOUSEHOLD_JSON_BLOCK, parseJsonObject,
   repairHousehold, templateHousehold, validateHousehold, whimFor, ArrivalHouseholdOutput, type ArrivalFacts, type HouseholdDraw, type PromptContext,
   type RecentHousehold,
@@ -123,7 +123,7 @@ async function validationContext(db: Database, worldId: string, day: number) {
   return {
     places: registry.ids,
     residents: new Map(rows.map(r => [r.id, { name: r.card.name }])),
-    reservedFull: gone.filter(e => e.day > day - RECENT_DEPARTURE_DAYS).map(e => e.summary.split(",")[0]!.trim()),
+    reservedFull: gone.filter(e => e.day > day - RECENT_DEPARTURE_DAYS).map(e => e.summary.replace(/,? left on the Gannet\.$/, "").split(",")[0]!.trim()),
     // V16 also covers money that isn't Monde's (the World Bible: "Money is coins").
     banned: (text: string) => [...lexicalHits(text).map(h => h.group), ...(currencyHit(text) ? ["money"] : [])],
   };
@@ -232,7 +232,7 @@ async function drawForBuffer(db: Database, worldId: string, seed: number, reques
     db.select().from(arrivals).where(eq(arrivals.worldId, worldId)),
     db.select({ card: residents.card }).from(residents).where(eq(residents.worldId, worldId)),
   ]);
-  const generated = living.filter(r => r.card.kind === "arrival");
+  const generated = living.filter(r => r.card.kind === "arrival" || (r.card.kind === "resident" && !!r.card.generated_by));
   const buffered = rows.filter(r => r.status === "buffered");
   // Every living resident's portrait counts as worn (MVP M-03: the Day-1 census wears 90 library busts, not only the
   // arrivals), and so do the buffered ones: the buffer shouldn't fill with one face.
@@ -419,23 +419,29 @@ export async function adoptHouseholds(db: Database, worldId: string, households:
 /** Leavers the client reports (§6.4): their rows, ties and plans go; a `departure` event stays for the paper. */
 export async function departResidents(db: Database, worldId: string, ids: readonly string[], day: number): Promise<number> {
   if (!ids.length) return 0;
-  return db.transaction(async tx => {
-    // Only generated residents ever leave in Spring (the cast is protected).
-    const rows = (await tx.select({ id: residents.id, card: residents.card }).from(residents)
-      .where(and(eq(residents.worldId, worldId), inArray(residents.id, [...ids])))).filter(r => r.card.kind === "arrival");
-    if (!rows.length) return 0;
-    const gone = rows.map(r => r.id);
-    await tx.delete(relationships).where(and(eq(relationships.worldId, worldId), or(inArray(relationships.fromId, gone), inArray(relationships.toId, gone))));
-    await tx.delete(plans).where(and(eq(plans.worldId, worldId), inArray(plans.residentId, gone)));
-    // Their open asks go with them (a Favor nobody is left to thank for).
-    await tx.update(favors).set({ status: "expired" }).where(and(eq(favors.worldId, worldId), inArray(favors.residentId, gone), inArray(favors.status, ["proposed", "accepted"])));
-    await tx.delete(residents).where(and(eq(residents.worldId, worldId), inArray(residents.id, gone)));
-    await tx.insert(events).values(rows.map(r => ({
-      worldId, id: `departure_${r.id}_${day}`, day, minute: 10 * 60, type: "departure", wherePlace: "wharf.ferry_slip",
-      who: [r.id], importance: ARRIVAL_EVENT_IMPORTANCE, tags: ["departure"], summary: `${r.card.name}, left on the Gannet.`,
-    }))).onConflictDoNothing();
-    return gone.length;
-  });
+  return db.transaction(tx => settleDeparturesIn(tx, worldId, ids, day));
+}
+
+export const canDepart = (card: PersonaCard): boolean =>
+  card.kind === "arrival" || (card.kind === "resident" && !!card.generated_by);
+
+/** Also used when an offline sailing first reaches the server in the saved event outbox. */
+export async function settleDeparturesIn(tx: Parameters<Parameters<Database["transaction"]>[0]>[0], worldId: string, ids: readonly string[], day: number): Promise<number> {
+  // Census cards carry generated_by. Hand-written cards, including kind resident, never do.
+  const rows = (await tx.select({ id: residents.id, card: residents.card }).from(residents)
+    .where(and(eq(residents.worldId, worldId), inArray(residents.id, [...ids])))).filter(r => canDepart(r.card));
+  if (!rows.length) return 0;
+  const gone = rows.map(r => r.id);
+  await tx.delete(relationships).where(and(eq(relationships.worldId, worldId), or(inArray(relationships.fromId, gone), inArray(relationships.toId, gone))));
+  await tx.delete(plans).where(and(eq(plans.worldId, worldId), inArray(plans.residentId, gone)));
+  // Their open asks go with them (a Favor nobody is left to thank for).
+  await tx.update(favors).set({ status: "expired" }).where(and(eq(favors.worldId, worldId), inArray(favors.residentId, gone), inArray(favors.status, ["proposed", "accepted"])));
+  await tx.delete(residents).where(and(eq(residents.worldId, worldId), inArray(residents.id, gone)));
+  await tx.insert(events).values(rows.map(r => ({
+    worldId, id: departureEventId(r.id, day), day, minute: FERRY_SAILING_MINUTE, type: "departure", wherePlace: "wharf.ferry_slip",
+    who: [r.id], importance: EVENT_IMPORTANCE.departure, tags: ["departure"], summary: `${r.card.name} left on the Gannet.`,
+  }))).onConflictDoNothing();
+  return gone.length;
 }
 
 /** A Leaving Notice as memories (§6.4): the resident's decision, and a word to each friend. */

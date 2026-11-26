@@ -17,13 +17,15 @@ import {
   ARCHETYPE_BY_ID, cardsFromHousehold, drawHousehold, livingArrivals, templateHousehold, validateHousehold,
   type ArrivalHousehold, type ArrivalHouseholdOutput, type HouseholdDraw
 } from '@monde/shared';
+import { cardTies } from '../../friendship/state';
+import { personaCards } from '../../world/residents';
 import { weekdayOf } from '../../sim/clock';
-import { loadCards, loadRegistry, loadZones } from '../../sim/__tests__/content';
+import { loadRegistry, loadZones } from '../../sim/__tests__/content';
 import { homeBeds, homeName, townHomeKeys } from '../../world/townHomes';
 import { computeAppeal } from '../appeal';
 import { directoryFromCards, restoreHome } from '../occupancy';
 import {
-  adoptServerArrivals, arrivalFacts, bookArrivals, departureDay, migrationDawn, peopleOf, resolveNotice, type MigrationWorld
+  adoptServerArrivals, arrivalFacts, bookArrivals, departureDay, migrationDawn, peopleOf, settleSailings, stayFriends, resolveNotice, type MigrationWorld
 } from '../people';
 import {
   applyPillarDelta, applyPillarDeltas, createTownState, setTollmenLevelMax, setTownFlag,
@@ -154,14 +156,16 @@ export function runMigrationSoak(name: MigrationScenario, lastDay = 25, opts: So
   const seed = opts.seed ?? 2026;
   const lastChance = opts.lastChance ?? name === 'strong';
   restored = 0;
-  const cards = loadCards();
+  const cards = personaCards;
+  const censusFriends = stayFriends(cards, cardTies(cards));
+  const byId = new Set(cards.map(c => c.id));
   const dir = directoryFromCards(cards);
   const places = new Set(Object.entries(loadRegistry()).flatMap(([zone, ids]) => ids.map(id => `${zone}.${id}`)));
   const script = MIGRATION_SCENARIOS[name];
-  let friendsOf = (_id: string) => 0;
+  let friendsOf: MigrationWorld['friends'] = () => 0;
   const world: MigrationWorld = {
     seed, homes: townHomeKeys(loadZones(), dir), dir, beds: homeBeds, homeName, storyFlags: new Set(),
-    cast: new Map(cards.map(c => [c.id, { name: c.name }])), friends: id => friendsOf(id), regard: () => 0
+    cast: new Map(cards.map(c => [c.id, { name: c.name }])), friends: (id, people) => friendsOf(id, people), regard: () => 0
   };
   let s = createTownState();
   const days: MigrationSoakDay[] = [];
@@ -172,10 +176,11 @@ export function runMigrationSoak(name: MigrationScenario, lastDay = 25, opts: So
     if (day > 1) {
       const { state, report } = runDawn(s, { day });
       // Friends in town: their household, and one more for every few days here (see the head of this file).
-      friendsOf = id => {
-        const r = livingArrivals(state.people).find(x => x.card.id === id);
+      friendsOf = (id, people = state.people) => {
+        if (byId.has(id)) return censusFriends(id, people).length;
+        const r = livingArrivals(people).find(x => x.card.id === id);
         if (!r) return 0;
-        const kin = livingArrivals(state.people).filter(x => x.household === r.household && x.card.id !== id).length;
+        const kin = livingArrivals(people).filter(x => x.household === r.household && x.card.id !== id).length;
         return kin + Math.floor((day - r.arrived_day) / (state.pillars.spirit >= 40 ? 5 : 9));
       };
       const dawn = migrationDawn(state, day, world, { decision: report.arrivals });
@@ -206,7 +211,10 @@ export function runMigrationSoak(name: MigrationScenario, lastDay = 25, opts: So
         s = adoptServerArrivals(s, day, server);
       }
       const landed = bookArrivals(s, day, 8 * 60);
-      s = landed.state;
+      const sailed = settleSailings(landed.state, day, world);
+      s = sailed.state;
+      departed.push(...sailed.departed.map(d => d.id));
+      departures += sailed.departed.length;
       households = landed.booked.length;
       people = landed.booked.reduce((sum, h) => sum + h.residents.length, 0);
       arrived = landed.booked.flatMap(h => h.residents.map(r => `${r.card.name} (${r.card.age}, ${h.archetype})`));

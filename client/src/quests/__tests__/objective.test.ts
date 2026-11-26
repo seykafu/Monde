@@ -96,3 +96,13 @@ describe('between beats', () => {
 it('says a district the way a sentence does', () => {
   expect(['Old Quarter', 'The Wharf', 'Market Row', 'The Commons'].map(districtPhrase)).toEqual(['the Old Quarter', 'the Wharf', 'Market Row', 'the Commons']);
 });
+
+it('puts a Last Chance ahead of a Project and ordinary offers, after a current story beat or accepted Favor', () => {
+  const leaving = favor({ id: 'ferry', status: 'proposed', name: 'Fenna', by: 11,
+    leaving: { title: "Fenna Renard is weighing Friday's ferry", reason: "Fenna is weighing Friday's ferry." } });
+  const world = input({ favors: [favor({ status: 'proposed', by: 10 }), leaving], upcoming: upcoming(),
+    projects: [{ id: 'fountain', name: 'Fountain', stage: 'open', next: 'Find pipe fittings', lead: 'Kasimir', place: null, placeName: null }] });
+  expect(objectives(world).hud).toMatchObject({ title: 'Talk to Fenna', reason: leaving.leaving!.reason });
+  expect(objectives({ ...world, hint: hint() }).hud.kind).toBe('story');
+  expect(objectives({ ...world, favors: [...world.favors, favor()] }).hud.kind).toBe('favor');
+});

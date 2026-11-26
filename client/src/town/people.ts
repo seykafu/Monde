@@ -5,7 +5,7 @@
 //   1. last ferry's leavers: anyone whose Leaving Notice still stood when the Gannet sailed has gone (census, their
 //      home if the household is now empty, the Spirit hit for the well-liked); a resolved notice keeps them;
 //   2. the Sunday house: S05's "Kasimir did it on Sunday for nothing" restores No. 47 Lamplighter Lane on Day 6;
-//   3. the nightly Stay pass over the generated residents (Leaving Notices after 5 nights under 25);
+//   3. the nightly Stay pass over the census and arrival adults (Leaving Notices after 5 nights under 25);
 //   4. today's leavers: notices whose ferry is today walk to the slip at 09:30 (at most 2 a ferry day);
 //   5. today's arrivals: one household per slot of the roll, drawn and written from templates (A.3.8), each with a
 //      free restored home (A.3.4 rule 1). They wait on the ferry (`pending`) until 08:00, when bookArrivals() books
@@ -14,20 +14,29 @@
 // Core and featured residents (the authored cards) never get a Stay pass in Spring: GDD-GAP, §6.4 applies Stay to
 // "every resident", but the Spring story has no departures for its cast (June's ticket is for after the Regatta).
 import {
-  ARCHETYPE_BY_ID, PURPOSEFUL, cardsFromHousehold, drawHousehold, emptyPeople, householdLine, livingArrivals,
+  FERRY_SAILING_MINUTE, ARCHETYPE_BY_ID, PURPOSEFUL, cardsFromHousehold, drawHousehold, emptyPeople, householdLine, livingArrivals,
   templateHousehold, type ArrivalFacts, type ArrivalHousehold, type ArrivalResident, type DepartedResident, type RecentHousehold,
-  type TownPeople
+  type TownPeople, type PersonaCard, type TieData
 } from '@monde/shared';
+import { weekdayOf } from '../sim/clock';
+import { day1Cards, handWrittenCards } from '../world/residents';
 import { isFerryDay, nightlyStay, type ArrivalDecision, type ResidentStay } from './migration';
 import { freeHomes, homeKind, restoreHome, settleArrivalsAt, settleDeparturesFrom, type HomeDirectory, type HomeKey, type OccupancyLook } from './occupancy';
 import { applyPillarDelta, type TownState } from './pillars';
 
 /** §6.4: they walk off the ferry at 08:00 … */
 export const ARRIVAL_MINUTE = 8 * 60;
-/** … and leavers walk to the slip with a suitcase at 09:30; the Gannet sails at 10:00. */
-export const LEAVE_WALK_MINUTE = 9 * 60 + 30;
-export const SAILING_MINUTE = 10 * 60;
-/** §6.4: at most 2 departures per ferry day. */
+/** The Gannet sails with the noticed residents at 09:30. */
+export const SAILING_MINUTE = FERRY_SAILING_MINUTE;
+
+export function leavingNoticeTitle(name: string, deadline: number): string {
+  const weekday = { Tue: 'Tuesday', Wed: 'Wednesday', Thu: 'Thursday', Fri: 'Friday', Sat: 'Saturday', Sun: 'Sunday', Mon: 'Monday' }[weekdayOf(deadline)];
+  return `${name} is weighing ${weekday}'s ferry`;
+}
+/** §6.4, the Spring's first notice. */
+export const SPRING_FIRST_NOTICE_DAY = 9;
+const NOTICE_GIVEN = 'leaving_notice_given';
+/** §6.4: at most two noticed grown-ups per sailing. */
 export const MAX_DEPARTURES_PER_FERRY = 2;
 /** S05: the first house Kasimir makes dry, on Sunday (Day 6). */
 export const SUNDAY_HOUSE = 'old_quarter.vacant_house_47';
@@ -53,16 +62,52 @@ export function departureDay(noticeDay: number, flags: TownState['flags']): numb
   return d;
 }
 
-/** Everyone whose Stay is computed: the generated adults (children follow their household). */
-export const stayResidents = (people: TownPeople): ArrivalResident[] => livingArrivals(people).filter(r => r.card.age >= 18);
+// The census is immutable content. Only departures and nightly counts need space in a save.
+type TownResident = Pick<ArrivalResident, 'card' | 'household' | 'archetype' | 'arrived_day'>;
+const census: TownResident[] = day1Cards.map(card => ({
+  card, household: card.household!, archetype: card.archetype!, arrived_day: 1
+}));
+const censusById = new Map(census.map(r => [r.card.id, r]));
+
+function householdOf(people: TownPeople, id: string) {
+  const member = censusById.get(id);
+  if (!member) return people.households.find(h => h.residents.some(r => r.card.id === id));
+  const gone = new Set(people.departed.map(d => d.id));
+  return { id: member.household, home: member.card.home,
+    residents: census.filter(r => r.household === member.household && !gone.has(r.card.id)) };
+}
+
+export function stayResidents(people: TownPeople): TownResident[] {
+  const gone = new Set(people.departed.map(d => d.id));
+  return [...census, ...livingArrivals(people)].filter(r => r.card.age >= 18 && !gone.has(r.card.id));
+}
+
+/** Index both the town's current ties and each card's own relationships once per pass. */
+export function stayFriends(cards: readonly PersonaCard[], ties: Iterable<TieData>) {
+  const known = new Set(cards.map(c => c.id));
+  const friends = new Map<string, Set<string>>();
+  const add = (id: string, friend: string) => {
+    if (id === friend || !known.has(friend)) return;
+    let ids = friends.get(id);
+    if (!ids) friends.set(id, ids = new Set());
+    ids.add(friend);
+  };
+  for (const c of cards) for (const r of c.relationships) if (r.affinity >= 40) add(c.id, r.id);
+  for (const t of ties) if (t.label === 'friends' || t.label === 'close_friends') {
+    add(t.a, t.b);
+    add(t.b, t.a);
+  }
+  return (id: string, people?: TownPeople): string[] =>
+    [...(friends.get(id) ?? [])].filter(friend => !people?.departed.some(d => d.id === friend));
+}
 
 export interface StayWorld {
   /** Friends in town (affinity ≥ 40, the G-13 ties' Friends and Close friends). */
-  friends(id: string): number;
+  friends(id: string, people?: TownPeople): number;
 }
 
 /** §6.4's inputs for one generated resident. */
-export function stayInputsOf(r: ArrivalResident, day: number, world: StayWorld): ResidentStay {
+export function stayInputsOf(r: TownResident, day: number, world: StayWorld, people?: TownPeople): ResidentStay {
   const archetype = ARCHETYPE_BY_ID.get(r.archetype as never);
   const works = !!r.card.workplace && r.card.workplace !== r.card.home && !/^millbrook\.school$/.test(r.card.workplace);
   const fromHome = r.card.workplace === r.card.home && !!archetype && archetype.workplaces.includes('home');
@@ -70,9 +115,9 @@ export function stayInputsOf(r: ArrivalResident, day: number, world: StayWorld):
   // GDD-GAP: dream progress isn't tracked yet, so a drifter has no job or purpose for Stay in Spring.
   const drifting = archetype?.id === 'drifter';
   return {
-    id: r.card.id, values: r.card.values, friendsInTown: world.friends(r.card.id),
-    hasJobOrPurpose: !drifting && (works || fromHome || (!!archetype && PURPOSEFUL.has(archetype.id))),
-    yearsInMonde: Math.max(0, day - r.arrived_day) / DAYS_PER_YEAR
+    id: r.card.id, values: r.card.values, friendsInTown: world.friends(r.card.id, people),
+    hasJobOrPurpose: r.card.employment === 'employed' || r.card.employment === 'carer' || !drifting && (works || fromHome || (!!archetype && PURPOSEFUL.has(archetype.id))),
+    yearsInMonde: (r.card.years_in_monde ?? 0) + Math.max(0, day - r.arrived_day) / DAYS_PER_YEAR
   };
 }
 
@@ -125,7 +170,11 @@ export function arrivalFacts(state: TownState, people: TownPeople, world: Pick<M
   // S05: the Sunday house is the first one offered ("End of Lamplighter Lane, two doors from the Fellow's").
   const free = freeHomes(world.homes, world.dir, look).filter(h => !reserved.has(h) && !people.pending.some(p => p.home === h))
     .sort((a, b) => Number(b === SUNDAY_HOUSE) - Number(a === SUNDAY_HOUSE));
-  const pupils = DAY1_PUPILS + livingArrivals(people).filter(r => r.card.age >= 5 && r.card.age <= 12).length;
+  const departedPupils = people.departed.filter(d => {
+    const age = censusById.get(d.id)?.card.age;
+    return age !== undefined && age >= 5 && age <= 12;
+  }).length;
+  const pupils = DAY1_PUPILS - departedPupils + livingArrivals(people).filter(r => r.card.age >= 5 && r.card.age <= 12).length;
   const flags = new Set([...world.storyFlags, ...Object.entries(state.flags).filter(([, v]) => v).map(([k]) => k)]);
   return {
     day, pillars: state.pillars, flags, freeHomes: free.map(home => ({ home, beds: world.beds(home) })),
@@ -201,13 +250,15 @@ export function bookArrivals(state: TownState, day: number, minute: number): { s
 }
 
 /** Departures for leavers whose ferry has sailed (their notice still standing). */
-function settleLeavers(state: TownState, day: number, world: MigrationWorld): { state: TownState; departed: DepartedResident[] } {
+export function settleSailings(state: TownState, throughDay: number, world: MigrationWorld): { state: TownState; departed: DepartedResident[] } {
   let s = state;
   let people = peopleOf(s);
   const departed: DepartedResident[] = [];
-  const due = people.leaving.filter(l => l.day < day);
+  const due = people.leaving.filter(l => l.day <= throughDay);
+  if (!due.length) return { state, departed };
+  const adultsByDay = new Map<number, number>();
   for (const l of due) {
-    const household = people.households.find(h => h.residents.some(r => r.card.id === l.id));
+    const household = householdOf(people, l.id);
     const resident = household?.residents.find(r => r.card.id === l.id);
     if (!household || !resident || !(l.id in s.migration.notices)) {
       if (resident) people = { ...people, stayed: [...people.stayed, { id: l.id, day: l.day }] };
@@ -216,27 +267,41 @@ function settleLeavers(state: TownState, day: number, world: MigrationWorld): { 
     // Children leave with the last adult of their household.
     const adultsLeft = household.residents.filter(r => r.card.age >= 18 && r.card.id !== l.id);
     const going = adultsLeft.length ? [resident] : household.residents;
-    const emptied = going.length === household.residents.length;
+    const booked = adultsByDay.get(l.day) ?? 0;
+    if (booked >= MAX_DEPARTURES_PER_FERRY) continue;
+    adultsByDay.set(l.day, booked + 1);
+    const emptied = going.length === household.residents.length && !handWrittenCards.some(c => c.home === household.home)
+      && !census.some(r => r.card.home === household.home && r.household !== household.id && !people.departed.some(d => d.id === r.card.id));
     s = settleDeparturesFrom(s, going.map(r => r.card.id), emptied ? [household.home] : []);
-    const friends = world.friends(l.id);
-    if (friends >= 2 || world.regard(l.id) >= 40) s = applyPillarDelta(s, 'spirit', DEPARTURE_SPIRIT, 'resident_sim', `${resident.card.name} left on the ferry`);
-    if (resident.card.age >= 18 && resident.card.age < 65 && resident.card.workplace !== resident.card.home) s = applyPillarDelta(s, 'prosperity', DEPARTURE_PROSPERITY, 'resident_sim', `${resident.card.name} left on the ferry`);
-    for (const r of going) {
-      const stayed = Math.max(1, l.day - r.arrived_day);
-      departed.push({
-        id: r.card.id, name: r.card.name, household: household.id, home: household.home, day: l.day, portrait: r.card.portrait,
-        line: `${r.card.name} left on the Gannet on Day ${l.day}, after ${stayed} day${stayed === 1 ? '' : 's'} at ${world.homeName(household.home)}.`
-      });
+    for (const { card } of going) {
+      const reason = `${card.name} left on the ferry`;
+      if (world.friends(card.id, people) >= 2 || world.regard(card.id) >= 40)
+        s = applyPillarDelta(s, 'spirit', DEPARTURE_SPIRIT, 'resident_sim', reason);
+      const working = censusById.has(card.id) ? card.employment === 'employed' : card.workplace !== card.home;
+      if (card.age >= 18 && card.age < 65 && working)
+        s = applyPillarDelta(s, 'prosperity', DEPARTURE_PROSPERITY, 'resident_sim', reason);
     }
-    const rest = household.residents.filter(r => !going.includes(r));
+    const crossing = going.map(r => {
+      const stayed = Math.max(1, l.day - r.arrived_day);
+      const home = world.homeName(household.home);
+      const time = censusById.has(r.card.id) ? `from ${home}` : `after ${stayed} day${stayed === 1 ? '' : 's'} at ${home}`;
+      return { id: r.card.id, name: r.card.name, household: household.id, home: household.home, day: l.day,
+        portrait: r.card.portrait, line: `${r.card.name} left on the Gannet on Day ${l.day}, ${time}.` };
+    });
+    departed.push(...crossing);
+    const gone = new Set(crossing.map(d => d.id));
     people = {
       ...people,
-      households: rest.length ? people.households.map(h => (h === household ? { ...h, residents: rest } : h)) : people.households.filter(h => h !== household),
-      departed: [...people.departed, ...departed.filter(d => going.some(r => r.card.id === d.id))],
-      unsynced: people.unsynced.filter(id => id !== household.id || rest.length > 0)
+      households: people.households.flatMap(h => {
+        if (h.id !== household.id) return [h];
+        const residents = h.residents.filter(r => !gone.has(r.card.id));
+        return residents.length ? [{ ...h, residents }] : [];
+      }),
+      departed: [...people.departed, ...crossing],
+      unsynced: people.unsynced.filter(id => id !== household.id || going.length < household.residents.length)
     };
   }
-  people = { ...people, leaving: people.leaving.filter(l => l.day >= day) };
+  people = { ...people, leaving: people.leaving.filter(l => l.day > throughDay) };
   return { state: { ...s, people }, departed };
 }
 
@@ -251,25 +316,37 @@ export function migrationDawn(prev: TownState, day: number, world: MigrationWorl
   // Yesterday's boat, if nobody saw it in (a dev jump, a load before 08:00).
   state = bookArrivals(state, day, 0).state;
   // 1. The last ferry's leavers.
-  const left = settleLeavers(state, day, world);
+  const left = settleSailings(state, day - 1, world);
   state = left.state;
   // 2. The Sunday house.
   if (day >= SUNDAY_HOUSE_DAY && world.homes.includes(SUNDAY_HOUSE) && homeKind(SUNDAY_HOUSE, world.dir) === 'vacant') state = restoreHome(state, SUNDAY_HOUSE);
-  // 3. The nightly Stay pass (generated adults only).
+  // 3. The nightly Stay pass over living census and arrival adults.
   let people = peopleOf(state);
-  const inputs = stayResidents(people).map(r => stayInputsOf(r, day, world));
+  const inputs = stayResidents(people).map(r => stayInputsOf(r, day, world, people));
   // nightlyStay keeps every standing notice and drops the night counts of anyone not passed (the cast never is).
   const night = nightlyStay(state.migration, inputs, state.pillars, day);
-  state = { ...state, migration: night.migration };
+  if (day === SPRING_FIRST_NOTICE_DAY && !(NOTICE_GIVEN in state.flags)
+      && !Object.keys(night.migration.notices).length && !people.stayed.length && !people.departed.length) {
+    // Old saves also retain resolved notices in stayed and departed. Use tonight's full-precision scores.
+    const lowest = Object.entries(night.stay).sort(([a, x], [b, y]) => x - y || a.localeCompare(b))[0];
+    if (lowest) {
+      const [id] = lowest;
+      night.migration.notices[id] = day;
+      delete night.migration.lowStayNights[id];
+      night.notices.push(id);
+    }
+  }
+  const flags = night.notices.length ? { ...state.flags, [NOTICE_GIVEN]: true } : state.flags;
+  state = { ...state, flags, migration: night.migration };
   const notices = night.notices.map(id => ({ resident: id, day, deadline: departureDay(day, state.flags) }));
   // 4. Today's leavers.
   const leaving: string[] = [];
-  if (isFerryDay(day, state.flags)) {
+  if (isFerryDay(day, state.flags) && !people.departed.some(d => d.day === day)) {
     const due = Object.entries(state.migration.notices)
       .filter(([id, given]) => inputs.some(i => i.id === id) && departureDay(given, state.flags) <= day && !people.leaving.some(l => l.id === id))
-      .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]))
-      .slice(0, MAX_DEPARTURES_PER_FERRY);
-    for (const [id] of due) leaving.push(id);
+      .sort((a, b) => a[1] - b[1] || a[0].localeCompare(b[0]));
+    const booked = people.leaving.filter(l => l.day === day).length;
+    leaving.push(...due.slice(0, Math.max(0, MAX_DEPARTURES_PER_FERRY - booked)).map(([id]) => id));
     people = { ...people, leaving: [...people.leaving, ...leaving.map(id => ({ id, day }))] };
     state = { ...state, people };
   }
@@ -331,23 +408,26 @@ export function sailingToday(state: Pick<TownState, 'people' | 'migration'>, day
   for (const l of people.leaving) {
     if (l.day !== day || !(l.id in state.migration.notices)) continue;
     out.add(l.id);
-    const household = people.households.find(h => h.residents.some(r => r.card.id === l.id));
-    if (household && !household.residents.some(r => r.card.age >= 18 && r.card.id !== l.id)) for (const r of household.residents) out.add(r.card.id);
+  }
+  for (const id of [...out]) {
+    const household = householdOf(people, id);
+    if (household && household.residents.every(r => r.card.age < 18 || out.has(r.card.id)))
+      for (const r of household.residents) out.add(r.card.id);
   }
   return out;
 }
 
 /**
  * Is a generated resident about town at this minute? Not before their boat (08:00 on the day they land, or at all
- * while still pending), and not after the Gannet sails with them (10:00 on their ferry day, notice standing).
+ * while still pending), and not after the Gannet sails with them (09:30 on their ferry day, notice standing).
  */
 export function presentAt(state: Pick<TownState, 'people' | 'migration'>, id: string, day: number, minute: number): boolean {
   const people = peopleOf(state);
+  if (people.departed.some(d => d.id === id)) return false;
   if (people.pending.some(h => h.residents.some(r => r.card.id === id))) return false;
   const household = people.households.find(h => h.residents.some(r => r.card.id === id));
-  if (!household) return true;
-  if (household.day === day && minute < ARRIVAL_MINUTE) return false;
-  return !(minute >= SAILING_MINUTE && sailingToday(state, day).has(id));
+  if (household?.day === day && minute < ARRIVAL_MINUTE) return false;
+  return !(minute >= SAILING_MINUTE && people.leaving.length && sailingToday(state, day).has(id));
 }
 
 /** The Dawn Report's comings and goings for `day` (§6.6): who lands this morning and who leaves on the boat. */
@@ -357,7 +437,7 @@ export function movementLines(state: Pick<TownState, 'people' | 'migration'>, da
   const lines = landing.map(h => householdLine(h, homeName(h.home)));
   const residents = landing.map(h => h.residents[0]!.card.id);
   for (const l of people.leaving.filter(x => x.day === day && x.id in state.migration.notices)) {
-    const r = livingArrivals(people).find(x => x.card.id === l.id);
+    const r = householdOf(people, l.id)?.residents.find(x => x.card.id === l.id);
     if (!r) continue;
     lines.push(`${r.card.name} leaves on this morning's Gannet. The Lantern wishes ${r.card.pronouns === 'she/her' ? 'her' : r.card.pronouns === 'he/him' ? 'him' : 'them'} fair weather and a dry crossing.`);
     residents.push(r.card.id);

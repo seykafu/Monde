@@ -1,7 +1,7 @@
 import { instantiateFavor, type LeavingFavorNotice } from "@monde/shared";
 import { allCards, findCard } from "../world/roster";
-import { livingArrivals } from "@monde/shared";
-import { departureDay, resolveNotice, stayFactors, stayInputsOf } from "../town/people";
+
+import { departureDay, peopleOf, stayResidents, resolveNotice, stayFactors, stayInputsOf } from "../town/people";
 import { friendsInTown } from "../scenes/migration";
 import { items } from "../economy/content";
 import { getTown } from "../scenes/TownLedgerScene";
@@ -81,12 +81,9 @@ export function leavingFavors(r: Registry, day: number): LeavingFavorNotice[] {
     // §6.4: two days before the ferry they'd leave on (the first sailing at least two days after the notice).
     const deadline = departureDay(given, town.flags);
     if (day !== deadline - 2) return [];
-    // G-02: a generated resident's own Stay factors (friends from the ties, roots from their tenure); an authored
-    // card's from its card (GDD-GAP: no years-in-Monde field, so the cast keep the full 10 for roots).
-    const arrival = livingArrivals(town.people).find(a => a.card.id === resident);
-    const factors = arrival ? stayFactors(stayInputsOf(arrival, day, { friends: id => friendsInTown(r, id) }), town.pillars) : {
-      town: 60 * Object.entries(card.values).reduce((n,[k,v]) => n + v * town.pillars[k as keyof typeof town.pillars] / 100,0),
-      friends: 20*Math.min(1,card.relationships.filter(t => t.affinity >= 40).length/4), purpose: card.occupation ? 10 : 0, roots: 10 };
+    const member = stayResidents(peopleOf(town)).find(r => r.card.id === resident);
+    if (!member) return [];
+    const factors = stayFactors(stayInputsOf(member, day, { friends: id => friendsInTown(r, id) }), town.pillars);
     return [{ resident,deadline,factors }];
   });
 }

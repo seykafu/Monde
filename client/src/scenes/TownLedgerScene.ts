@@ -25,7 +25,7 @@ import { appealNow, appealAtDawn, appealValue } from '../town/appealFeedback';
 import { computeAppeal } from '../town/appeal';
 import { MARKET_DAY_STALL_FEES, UPKEEP_RULES, dailyRates } from '../town/fund';
 import { ARRIVAL_APPEAL, householdsForAppeal, isArrivalDay, isFerryDay } from '../town/migration';
-import { OPTION_CENSUS_LINE, optionGauge } from '../town/optionClause';
+import { optionGauge } from '../town/optionClause';
 import { PILLARS, communityWorkRoom, createTownState, todayChange, COMMUNITY_WORK_WEEKLY_CAP, type Pillar, type TownState } from '../town/pillars';
 import { runDawnsThrough, type DawnReport } from '../town/townEngine';
 import { DIALOGUE_SCENE } from './DialogueScene';
@@ -244,8 +244,6 @@ const YOUTH = 0x56b4e9;
 const ELDER = 0xd55e00;
 /** The Appeal bar's scale. */
 const APPEAL_SCALE = 60;
-/** The Option Clause gauge's census range: twenty either side of the line. */
-const GAUGE_MIN = OPTION_CENSUS_LINE - 20, GAUGE_MAX = OPTION_CENSUS_LINE + 20;
 
 export class TownLedgerScene extends Phaser.Scene {
   private open!: LedgerOpen;
@@ -476,19 +474,18 @@ export class TownLedgerScene extends Phaser.Scene {
     const upkeep = UPKEEP_RULES.filter(r => town.flags[r.flag]).reduce((sum, r) => sum + r.coins, 0);
     this.text(RX, PY + 480, `Rates ${dailyRates(town)} a day · stalls ${MARKET_DAY_STALL_FEES} on Saturdays · upkeep ${upkeep} a day`, 13, { family: FAMILY_UI, color: MUTED, wrap: RW });
 
-    // The Option Clause, once known and the census is near the line (§6.5).
+    // The Option Clause, once known (§6.5).
     const gauge = optionGauge(town);
     if (!gauge.visible) return;
     this.header(RX, PY + 510, 'The Option Clause');
-    const gy = PY + 530, gx = (v: number) => RX + (RW * (Math.min(GAUGE_MAX, Math.max(GAUGE_MIN, v)) - GAUGE_MIN)) / (GAUGE_MAX - GAUGE_MIN);
+    const gy = PY + 530, lineX = RX + RW / 2;
     g.fillStyle(TRACK, 1).fillRect(RX, gy, RW, 12);
-    g.fillStyle(town.census < gauge.line ? ELDER : INK, 0.8).fillRect(RX, gy, gx(town.census) - RX, 12);
+    g.fillStyle(town.census < gauge.line ? ELDER : INK, 0.8).fillRect(RX, gy, RW * gauge.fill, 12);
     g.lineStyle(1, INK, 0.55).strokeRect(RX, gy, RW, 12);
-    g.fillStyle(0xb5461f, 1).fillRect(gx(gauge.line) - 1.5, gy - 5, 3, 22);
-    this.text(gx(gauge.line), gy - 20, `${gauge.line}`, 11, { family: FAMILY_UI, color: DOWN_CSS, align: 'center' });
-    this.text(RX, gy + 18, gauge.exercised
-      ? `Exercised on Day ${gauge.exercisedDay}. The Wharf is Vane's.`
-      : `Census ${town.census} · dawns under ${gauge.line}: ${gauge.dawnsUnder} of ${gauge.dawnsNeeded}`, 14, { family: FAMILY_UI, color: gauge.dawnsUnder > 0 || gauge.exercised ? DOWN_CSS : INK_CSS });
+    g.fillStyle(0xb5461f, 1).fillRect(lineX - 1.5, gy - 5, 3, 22);
+    this.text(lineX, gy - 20, `${gauge.line}`, 11, { family: FAMILY_UI, color: DOWN_CSS, align: 'center' });
+    if (gauge.exercised) this.text(RX, gy + 38, `Exercised on Day ${gauge.exercisedDay}. The Wharf is Vane's.`, 14, { family: FAMILY_UI, color: DOWN_CSS });
+    this.text(RX, gy + 18, gauge.caption, 14, { family: FAMILY_UI, color: gauge.dawnsUnder > 0 || gauge.exercised ? DOWN_CSS : INK_CSS });
   }
 
   // ── Opening and closing ──────────────────────────────────────────────────
