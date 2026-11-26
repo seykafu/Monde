@@ -20,7 +20,9 @@
     "base": "origin/main",
     "setup": [
       "git lfs checkout client/public",
-      "npm ci --prefer-offline --no-audit --no-fund --loglevel=error"
+      "npm ci --prefer-offline --no-audit --no-fund --loglevel=error",
+      "npm run scenes",
+      "npm run residents"
     ]
   },
   "land": "push"
