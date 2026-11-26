@@ -9,7 +9,8 @@
 #   --effort    reasoning effort; Codex's default when omitted
 #
 # Writes <spec>.result.json (status, threadId, touchedFiles, rawOutput), appends a line to the shared
-# log <git-common-dir>/codex-tasks.log, and prints a summary whose `Codex-Job:` line goes in the commit.
+# log <git-common-dir>/codex-tasks.log, and lists the worktree's changes from `git status` in the summary.
+# The summary's `Codex-Job:` line goes in the commit.
 # Exits with Codex's status. A task takes minutes: run it as a background command.
 set -euo pipefail
 
@@ -65,8 +66,9 @@ status=0
 node "$companion" "${args[@]}" > "$out" || status=$?
 
 log="$common/codex-tasks.log"
-node - "$out" "$status" "$cwd" "$spec" "$resume" "$MODEL" "$log" <<'NODE'
+node - "$out" "$status" "$cwd" "$spec" "$resume" "$MODEL" "$log" <<'NODE' || true
 const fs = require('node:fs');
+const { execFileSync } = require('node:child_process');
 const [out, status, cwd, spec, resume, model, log] = process.argv.slice(2);
 let r = {};
 try { r = JSON.parse(fs.readFileSync(out, 'utf8')); } catch { r = { rawOutput: fs.readFileSync(out, 'utf8') }; }
@@ -75,7 +77,27 @@ const line = [new Date().toISOString(), model, resume === '1' ? 'resume' : 'new'
 try { fs.appendFileSync(log, line + '\n'); } catch {}
 console.log(`Codex task ${status === '0' ? 'finished' : `failed (exit ${status})`} · ${model} · ${resume === '1' ? 'resumed thread' : 'new thread'}`);
 console.log(`Worktree: ${cwd}`);
-console.log(`Files Codex touched (${files.length}):${files.length ? '\n  ' + files.join('\n  ') : ' none reported'}`);
+let changedPaths;
+try {
+  const output = execFileSync('git', ['-C', cwd, 'status', '--porcelain=v1', '--untracked-files=all'], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const changes = output.split('\n').filter(Boolean).map(line => ({
+    status: line.slice(0, 2),
+    path: line.slice(3),
+  }));
+  changedPaths = new Set(changes.map(change => change.path));
+  console.log(`Changed in the worktree (${changes.length}):${changes.length ? '' : ' nothing'}`);
+  for (const change of changes) console.log(`  ${change.status} ${change.path}`);
+} catch (error) {
+  const message = error.stderr?.trim() || error.message;
+  console.log(`Changed in the worktree: unknown (git status failed: ${message})`);
+}
+const reportedPaths = new Set(files);
+if (files.length && (!changedPaths || changedPaths.size !== reportedPaths.size || files.some(path => !changedPaths.has(path)))) {
+  console.log(`Codex reported (${files.length}):\n  ${files.join('\n  ')}`);
+}
 console.log(`Full result: ${out}`);
 if (r.threadId) console.log(`Codex-Job: ${r.threadId}`);
 console.log('\n--- Astra\'s report ---\n' + String(r.rawOutput ?? '').trim());
