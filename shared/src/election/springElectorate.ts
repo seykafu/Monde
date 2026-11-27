@@ -12,7 +12,7 @@
 // trade and who pays whom, §2.2), moved by what the town has learned (`option_public`). A stance the server does send
 // (`stances`) replaces the prior.
 import { FRIEND_AFFINITY, seededUnit } from "../friendship";
-import type { Candidate, PillarValues, Voter } from "./voterModel";
+import { FEAR_LINE, type Candidate, type PillarValues, type Voter } from "./voterModel";
 
 /** The card fields the electorate reads. */
 export interface ElectorCard {
@@ -54,6 +54,7 @@ export interface ElectorateInput {
   worldSeed: number | string;
   /** The poll day. */
   day: number;
+  prosperity: number;
   /** The carded residents living in Monde (animals and anyone off the map are left out here). */
   cards: readonly ElectorCard[];
   /** Regard toward the player (the client's mirror), and whether they have met (talked, or shared a scene). */
@@ -93,7 +94,12 @@ export const PRIORS = {
   /** Opinion of Vane: a polite stranger with forty jobs on offer (§2.2), paymaster of the Tollmen. */
   vane: { base: 5, spread: 12, millHand: 15, unemployed: 10, fisher: -15, tollman: 45, organizer: -10 },
   /** port_vane: wanted for jobs (Prosperity), feared for the Commons and the Wharf (Charm, Spirit, fishing). */
-  port: { prosperity: 100, pivot: 0.25, commons: 60, commonsPivot: 0.45, unemployed: 15, fisher: -30, tollman: 30, employee: 40, spread: 10, optionPublic: -15 },
+  port: {
+    // GDD-GAP: Spring port stance points per missing point of Prosperity. The eight-world H5 sweep
+    // put a neglected town’s count with Vane and a builder’s with the Fellow at 1.2.
+    gap: 1.2,
+    prosperity: 100, pivot: 0.25, commons: 60, commonsPivot: 0.45, unemployed: 15, fisher: -30, tollman: 30, employee: 40, spread: 10, optionPublic: -15,
+  },
   /** Opinion of Old Moss: the fishers' own skipper. */
   moss: { base: 0, spread: 10, fisher: 25 },
   /** A tie label as an opinion of the other (for vreg and moss_reg from the dawn's ties). */
@@ -114,9 +120,9 @@ const zoneOf = (place: string): string => place.split(".")[0] ?? place;
 const between = (lo: number, hi: number, ...parts: (string | number)[]): number => lo + (hi - lo) * seededUnit(...parts);
 
 /** port_vane's prior from what someone weighs and what they do. */
-export function portPrior(values: PillarValues, traits: { fisher?: boolean; tollman?: boolean; unemployed?: boolean; employee?: boolean; optionPublic?: boolean }, noise = 0): number {
+export function portPrior(values: PillarValues, prosperity: number, traits: { fisher?: boolean; tollman?: boolean; unemployed?: boolean; employee?: boolean; optionPublic?: boolean }, noise = 0): number {
   const P = PRIORS.port;
-  return clamp(P.prosperity * (values.prosperity - P.pivot) - P.commons * (values.charm + values.spirit - P.commonsPivot)
+  return clamp(P.gap * Math.max(0, FEAR_LINE - prosperity) + P.prosperity * (values.prosperity - P.pivot) - P.commons * (values.charm + values.spirit - P.commonsPivot)
     + (traits.unemployed ? P.unemployed : 0) + (traits.fisher ? P.fisher : 0) + (traits.tollman ? P.tollman : 0)
     + (traits.employee ? P.employee : 0) + (traits.optionPublic ? P.optionPublic : 0) + noise, -100, 100);
 }
@@ -167,7 +173,7 @@ export function springElectorate(input: ElectorateInput): Voter[] {
       vaneRegard: opinionOf(c, "vane", ties) ?? clamp(P.vane.base + (t.millHand ? P.vane.millHand : 0) + (t.unemployed ? P.vane.unemployed : 0)
         + (t.fisher ? P.vane.fisher : 0) + (t.tollman ? P.vane.tollman : 0) + (t.organizer ? P.vane.organizer : 0) + noise(P.vane.spread, "vreg"), -100, 100),
       mossRegard: c.id === "moss" ? 100 : opinionOf(c, "moss", ties) ?? clamp(P.moss.base + (t.fisher ? P.moss.fisher : 0) + noise(P.moss.spread, "mreg"), -100, 100),
-      port: stance(c.id, "port_vane") ?? portPrior(c.values, { fisher: t.fisher, tollman: t.tollman, unemployed: t.unemployed, employee: t.employee, optionPublic }, noise(P.port.spread, "port")),
+      port: stance(c.id, "port_vane") ?? portPrior(c.values, input.prosperity, { fisher: t.fisher, tollman: t.tollman, unemployed: t.unemployed, employee: t.employee, optionPublic }, noise(P.port.spread, "port")),
       ferryFolk: t.fisher, friends: cardFriends(c, ties),
       ...(CANDIDATE_OF[c.id] ? { candidate: CANDIDATE_OF[c.id] } : {}),
     });
@@ -188,7 +194,7 @@ export function springElectorate(input: ElectorateInput): Voter[] {
       regard: input.met(c.id) ? input.regard(c.id) : null, deeds: deedsFor(district, input.deeds),
       vaneRegard: opinionOf(c, "vane", ties) ?? PRIORS.vane.base,
       mossRegard: opinionOf(c, "moss", ties) ?? PRIORS.moss.base + (fisher ? PRIORS.moss.fisher : 0),
-      port: stance(c.id, "port_vane") ?? portPrior(c.values, { fisher, optionPublic }),
+      port: stance(c.id, "port_vane") ?? portPrior(c.values, input.prosperity, { fisher, optionPublic }),
       // Everyone off the Gannet rode the ferry once; a fisher's trade is the sea either way.
       ferryFolk: fisher,
       friends: [...new Set([...household, ...cardFriends(c, ties), ...pick(near, 1, id => id, "hub", seed, c.id)])],

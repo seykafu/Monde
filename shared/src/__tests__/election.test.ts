@@ -27,17 +27,23 @@ describe("§10.3 scores", () => {
     // record = 0.25·(10 + 0 + 20 + 10)/50 = 0.2; Player = 0.40·0.5 + 0.35·0.2 = 0.27
     expect(s.parts.record).toBeCloseTo(0.2, 10);
     expect(s.fellow).toBeCloseTo(0.27, 10);
-    // fear = (40 − 28)/40 · 0.25 = 0.075; Vane = 0.35·0.2 + 0.30·(−0.3) + 0.20·0.075 = −0.005
-    expect(s.parts.fear).toBeCloseTo(0.075, 10);
-    expect(s.vane).toBeCloseTo(-0.005, 10);
+    // Fear = (12 + 10)/40 × 0.25. Vane = 0.07 − 0.09 + 0.20 × fear.
+    expect(s.parts.fear).toBeCloseTo(0.1375, 10);
+    expect(s.vane).toBeCloseTo(0.0075, 10);
     // Moss = 0.10 + 0.30·0 + 0.10·0.1 = 0.11
     expect(s.moss).toBeCloseTo(0.11, 10);
   });
 
-  it("record is clamped to −1..1 and fear is 0 once Prosperity reaches 40", () => {
+  it("record is clamped to −1..1", () => {
     expect(record(EVEN, { prosperity: 100, safety: 100, spirit: 100, charm: 100 }, { prosperity: 0, safety: 0, spirit: 0, charm: 0 })).toBe(1);
-    expect(fear(EVEN, 40)).toBe(0);
-    expect(fear(EVEN, 0)).toBeCloseTo(0.25, 10);
+  });
+
+  it("weighs Safety and Prosperity shortfalls independently", () => {
+    const values = { prosperity: 0.4, safety: 0.2, spirit: 0.2, charm: 0.2 };
+    expect(fear(values, 50, 20)).toBeCloseTo(0.1);
+    expect(fear(values, 20, 50)).toBeCloseTo(0.2);
+    expect(fear(values, 20, 20)).toBeCloseTo(0.3);
+    expect(fear(values, 50, 50)).toBe(0);
   });
 
   it("a fisher (or a regular on the ferry) starts Moss at 0.40", () => {
@@ -54,8 +60,8 @@ describe("§10.3 scores", () => {
   });
 
   it("social is 0.15 × the friends' mean lean, carried two rounds", () => {
-    // Prosperity 40 (no fear) and no change since Day 1 (no record).
-    const calm = { prosperity: 40, safety: 30, spirit: 22, charm: 25 };
+    // Prosperity and Safety 40 (no fear) and no change since Day 1 (no record).
+    const calm = { prosperity: 40, safety: 40, spirit: 22, charm: 25 };
     // Y: met, Regard 100, nothing else → Player 0.40, Vane 0: lean 0.4. X counts Y a friend; Z counts X.
     const y = voter("y", { regard: 100 }), x = voter("x", { friends: ["y"] }), z = voter("z", { friends: ["x"] });
     const s = scoreAll([y, x, z], { worldSeed: 1, pillars: calm, day1: calm });
@@ -143,7 +149,7 @@ const CAST: ElectorCard[] = [
   card("vane", 48, "offmap.city"),
 ];
 const electorate = (over: { regard?: number; met?: boolean; flags?: string[]; seed?: number; cards?: readonly ElectorCard[] } = {}) => springElectorate({
-  worldSeed: over.seed ?? 5, day: 25, cards: over.cards ?? TOWN, regard: () => over.regard ?? 0, met: () => over.met ?? false, arrivals: [],
+  worldSeed: over.seed ?? 5, day: 25, prosperity: DAY1.prosperity, cards: over.cards ?? TOWN, regard: () => over.regard ?? 0, met: () => over.met ?? false, arrivals: [],
   deeds: { scuffles: [], projects: [] }, flags: new Set(over.flags ?? []),
 });
 
@@ -200,10 +206,14 @@ describe("the Spring electorate", () => {
     expect(a.filter(v => !generated.has(v.id))).toEqual(b.filter(v => !generated.has(v.id)));
   });
 
+  it.each([[18, 22], [30, 10], [40, 0], [45, 0]])("adds demand for port jobs at Prosperity %i", (prosperity, shortfall) => {
+    expect(portPrior(EVEN, prosperity, {})).toBeCloseTo(-3 + PRIORS.port.gap * shortfall);
+  });
+
   it("the Option Clause in the paper turns the town against Port Vane", () => {
     const before = electorate().reduce((s, v) => s + v.port, 0), after = electorate({ flags: ["option_public"] }).reduce((s, v) => s + v.port, 0);
     expect(after).toBeLessThan(before);
-    expect(portPrior(EVEN, { tollman: true })).toBeGreaterThan(portPrior(EVEN, { fisher: true }));
+    expect(portPrior(EVEN, 40, { tollman: true })).toBeGreaterThan(portPrior(EVEN, 40, { fisher: true }));
   });
 
   it("a Fellow the whole town likes outpolls one nobody has met", () => {

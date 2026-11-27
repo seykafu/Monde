@@ -50,7 +50,7 @@ export function bandOf(flags: ReadonlySet<string>, spirit: number): FairBand {
 export function springVoters(w: SpringWorld) {
   const gone = new Set(w.town.people?.departed.map(d => d.id));
   return springElectorate({
-    worldSeed: w.worldSeed, day: POLL_DAY, cards: w.cards.filter(c => !gone.has(c.id)).map(elector), regard: w.regard, met: w.met,
+    worldSeed: w.worldSeed, day: POLL_DAY, prosperity: w.town.pillars.prosperity, cards: w.cards.filter(c => !gone.has(c.id)).map(elector), regard: w.regard, met: w.met,
     arrivals: livingArrivals(w.town.people).map(r => ({ card: elector(r.card), arrivedDay: r.arrived_day, household: r.household })),
     ...(w.ties ? { ties: w.ties } : {}), deeds: w.deeds, flags: w.flags
   });

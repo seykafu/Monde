@@ -26,7 +26,7 @@ export const WEIGHTS = {
 } as const;
 /** record(v): a Pillar change of this many points is the whole of ±1 (§10.3, "/ 50"). */
 export const RECORD_SCALE = 50;
-/** fear(v) = max(0, (40 − Prosperity) / 40) × v's Prosperity value (§10.3). */
+/** Prosperity and Safety each contribute to fear below this line (§10.3). */
 export const FEAR_LINE = 40;
 /** reg(v) for someone who never met the player: 0.5 × the mean Regard of their friends, plus witnessed deeds (§10.3). */
 export const REPUTATION_SHARE = 0.5;
@@ -116,8 +116,9 @@ export function record(values: PillarValues, now: PillarValues, day1: PillarValu
   return clamp(PILLARS.reduce((sum, p) => sum + values[p] * (now[p] - day1[p]) / RECORD_SCALE, 0), -1, 1);
 }
 
-/** fear(v) = max(0, (40 − Prosperity) / 40) × v's Prosperity value. */
-export const fear = (values: PillarValues, prosperity: number): number => Math.max(0, (FEAR_LINE - prosperity) / FEAR_LINE) * values.prosperity;
+export const fear = (values: PillarValues, prosperity: number, safety: number): number =>
+  Math.max(0, (FEAR_LINE - prosperity) / FEAR_LINE) * values.prosperity
+  + Math.max(0, (FEAR_LINE - safety) / FEAR_LINE) * values.safety;
 
 /**
  * reg(v): Regard/100 for someone who has met the player; otherwise reputation, 0.5 × the mean Regard of their friends
@@ -154,7 +155,7 @@ export function scoreAll(people: readonly Voter[], town: ModelTown): Map<string,
       social: 0,
       vreg: clamp(v.vaneRegard / 100, -1, 1),
       port: clamp(v.port / 100, -1, 1),
-      fear: fear(v.values, town.pillars.prosperity),
+      fear: fear(v.values, town.pillars.prosperity, town.pillars.safety),
       mossReg: clamp(v.mossRegard / 100, -1, 1),
     };
     const W = WEIGHTS;

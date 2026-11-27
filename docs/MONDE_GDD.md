@@ -1673,7 +1673,7 @@ Moss(v)   = 0.10 + 0.30·[v is a fisher, or rode the ferry 5+ times] + 0.10·mos
 | `social(v)` | 0.15 × the mean lean of v's friends (affinity ≥ 40), propagated 2 rounds; plus endorsements (§10.4). |
 | `vreg(v)` | v's opinion of Vane (Vane is an agent too; his canvassing changes it). |
 | `port(v)` | v's stance on `port_vane` / 100. |
-| `fear(v)` | `max(0, (40 − Prosperity)/40)` × v's Prosperity value. Vane wins when people are scared and broke. |
+| `fear(v)` | `max(0, (40 − Prosperity)/40)` × v's Prosperity value `+ max(0, (40 − Safety)/40)` × v's Safety value. Vane wins when people are scared and broke. |
 | `evidence_*` | §10.6. |
 
 **The vote** goes to the highest score, plus a **fixed per-voter jitter** ε ~ N(0, 0.08) seeded by
@@ -1706,7 +1706,8 @@ OLD MOSS) and every grown-up in the crowd drops one bean. The rulings that fill 
   friends, and can be met, so their reputation is their own Regard once they have talked to the Fellow. Old Moss votes
   for himself.
 - **Opinions the MVP doesn't simulate.** Without mirrored stances (§9.4), `port`, `vreg` and `moss_reg` start from priors:
-  Port Vane wanted for Prosperity and feared for the Commons and the Wharf, `100·(P − 0.25) − 60·(C + Sp − 0.45)`, +15
+  Port Vane wanted for Prosperity and feared for the Commons and the Wharf, `100·(P − 0.25) − 60·(C + Sp − 0.45)`, plus
+  1.2 for every point the town's Prosperity is under 40 on the poll day (a poorer town wants the port's jobs more), +15
   for the out-of-work, +30 for Tollmen, +40 for Vane's staff, −30 for fishers, −15 for everyone once `option_public`;
   Vane a polite stranger (+5; mill hands +15, the out-of-work +10, fishers −15, Tollmen +45, retired organizers −10);
   Moss the fishers' own (+25). A census card's priors carry a seeded spread (±10 on `port`, ±12 on `vreg`, ±10 on
@@ -1722,8 +1723,11 @@ OLD MOSS) and every grown-up in the crowd drops one bean. The rulings that fill 
   `content/lines/straw_poll.yaml` for Quiet Mode.
 
 The MVP's H5 soak (five play styles × eight worlds over the full Day-1 roster, `client/src/finale/__tests__/h5.test.ts`)
-puts the Fellow's share of the jars at about 12% for a passive player, 36% for a talker, 44% for one who lapses, 68% for
-a builder and 77% for the strong player: a spread (standard deviation across all forty) of about 24 points.
+puts the Fellow's share of the jars at about 7% for a passive player, 26% for a talker, 26% for one who lapses, 62% for
+a builder and 71% for the strong player: a spread (standard deviation across all forty) of about 25 points. Wherever
+the Fellow isn't carrying the town, Vane has the biggest share of it (51% of a passive town, 41–42% of a talker's or a
+lapser's), Old Moss keeps the fishers and ferry riders (18–43%), and the jar's leader varies from world to world; the
+Fellow wins every builder's and strong player's jar.
 
 ### 10.4 Campaigning (Days 70–99)
 

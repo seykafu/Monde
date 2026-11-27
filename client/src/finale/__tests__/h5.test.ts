@@ -1,7 +1,7 @@
 // MVP G-11's acceptance: "Soak runs give a spread of poll results (H5)". MVP_PLAN §3 H5: "Straw Poll results spread
 // across players (not all landslides)", bar "std dev of player share ≥ 8 pts". Five play styles × eight worlds.
 import { describe, expect, it } from 'vitest';
-import { percentages } from '@monde/shared';
+import { percentages, type Candidate } from '@monde/shared';
 import { PLAY_STYLES, playerRegard, soakPoll, type PlayStyle, type SoakPoll } from './springSoak';
 
 const SEEDS = Array.from({ length: 8 }, (_, i) => 2026 + i);
@@ -45,6 +45,30 @@ describe('H5: the Spring Straw Poll spreads across play styles', () => {
     expect(byStyle.builder).toBeGreaterThan(byStyle.passive + 15);
     expect(runs.filter(r => r.poll.leader !== 'fellow').length).toBeGreaterThan(0);
     expect(runs.filter(r => r.poll.leader === 'fellow').length).toBeGreaterThan(0);
+  });
+
+  const meanShare = (style: PlayStyle, candidate: Candidate) => mean(of(style).map(r => r.poll.town.shares[candidate]));
+
+  it('gives Vane at least 45% of the passive town vote, with Moss second', () => {
+    const vane = meanShare('passive', 'vane'), moss = meanShare('passive', 'moss');
+    expect(vane).toBeGreaterThanOrEqual(0.45);
+    expect(vane).toBeGreaterThan(moss);
+    expect(moss).toBeGreaterThan(meanShare('passive', 'fellow'));
+  });
+
+  it.each(['lapsed', 'social'] as const)('gives Vane the largest %s town share', style => {
+    expect(meanShare(style, 'vane')).toBeGreaterThan(Math.max(meanShare(style, 'fellow'), meanShare(style, 'moss')));
+  });
+
+  it.each(['builder', 'strong'] as const)('gives the Fellow every %s jar and keeps Vane below 20%% of the town vote', style => {
+    expect(of(style).every(r => r.poll.leader === 'fellow')).toBe(true);
+    expect(meanShare(style, 'vane')).toBeLessThan(0.20);
+  });
+
+  it.each(PLAY_STYLES)('keeps Moss between 15%% and 45%% of the %s town vote', style => {
+    const moss = meanShare(style, 'moss');
+    expect(moss).toBeGreaterThanOrEqual(0.15);
+    expect(moss).toBeLessThanOrEqual(0.45);
   });
 
   it('is deterministic: the same world and play give the same poll', () => {
